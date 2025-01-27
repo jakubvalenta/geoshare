@@ -248,5 +248,7 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/pla
 
 ## Contributing
 
+You can add translations by adding `res/values-<lang>/strings.xml` [here](https://github.com/jakubvalenta/geoshare/tree/main/app/src/main/res) and `metadata/<locale>/` files [here](https://github.com/jakubvalenta/geoshare/tree/main/metadata). Examples: [res/values-cs/strings.xml](https://github.com/jakubvalenta/geoshare/blob/main/app/src/main/res/values-cs/strings.xml) and [metadata/cs-CZ/full_description.txt](https://github.com/jakubvalenta/geoshare/blob/main/metadata/cs-CZ/full_description.txt).
+
 __Feel free to remix this project__ under the terms of the GNU General Public
 License version 3 or later. See [COPYING](./COPYING) and [NOTICE](./NOTICE).
