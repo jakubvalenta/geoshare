@@ -248,7 +248,15 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/pla
 
 ## Contributing
 
-You can add translations by adding `res/values-<lang>/strings.xml` [here](https://github.com/jakubvalenta/geoshare/tree/main/app/src/main/res) and `metadata/<locale>/` files [here](https://github.com/jakubvalenta/geoshare/tree/main/metadata). Examples: [res/values-cs/strings.xml](https://github.com/jakubvalenta/geoshare/blob/main/app/src/main/res/values-cs/strings.xml) and [metadata/cs-CZ/full_description.txt](https://github.com/jakubvalenta/geoshare/blob/main/metadata/cs-CZ/full_description.txt).
+Your contributions are welcome! To show that you'd like to work on a bug,
+feature request or translation, please comment on the relevant [GitHub
+issue](https://github.com/jakubvalenta/geoshare/issues) or create a new one.
+
+You can add translations by adding a `values-<lang>/strings.xml` file to
+[app/src/main/res](./app/src/main/res) and a `<locale>` directory to
+[metadata](./metadata). Examples:
+[app/src/main/res/values-cs/strings.xml](./app/src/main/res/values-cs/strings.xml)
+and [metadata/cs-CZ](./metadata/cs-CZ).
 
 __Feel free to remix this project__ under the terms of the GNU General Public
 License version 3 or later. See [COPYING](./COPYING) and [NOTICE](./NOTICE).
