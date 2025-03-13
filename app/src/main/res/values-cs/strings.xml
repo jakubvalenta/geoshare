@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="copy_activity">Kopírovat geo:</string>
     <string name="share_activity">Sdílet geo:</string>
     <string name="nav_menu_content_description">Menu</string>
-    <string name="nav_back_content_description">Back to main screen</string>
+    <string name="nav_back_content_description"></string>
     <string name="intro_title">Intro</string>
     <string name="intro_how_to_share_headline">Jak otevřít polohu z Google Map v jiných mapách</string>
     <string name="intro_how_to_share_google_maps_caption">Sdílejte polohu z Google Map nebo z webového prohlížeče.</string>
@@ -28,7 +29,7 @@
     <string name="intro_settings_activity_not_found">Nepodařilo se otevřít nastavení</string>
     <string name="main_input_uri_label">Sem vložte odkaz na Google Mapy</string>
     <string name="main_input_uri_clear_content_description">Vymazat</string>
-    <string name="main_input_uri_supporting_text">Např. https://google.com/maps/&#8230; nebo maps.app.goo.gl/&#8230;</string>
+    <string name="main_input_uri_supporting_text">Např. https://google.com/maps/… nebo maps.app.goo.gl/…</string>
     <string name="main_result_geo_uri_copy_content_description">Kopírovat</string>
     <string name="main_result_geo_uri_share_content_description">Sdílet</string>
     <string name="main_create_geo_uri">Vytvořit geo: odkaz</string>
