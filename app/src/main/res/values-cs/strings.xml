@@ -3,7 +3,6 @@
     <string name="copy_activity">Kopírovat geo:</string>
     <string name="share_activity">Sdílet geo:</string>
     <string name="nav_menu_content_description">Menu</string>
-    <string name="nav_back_content_description"></string>
     <string name="intro_title">Intro</string>
     <string name="intro_how_to_share_headline">Jak otevřít polohu z Google Map v jiných mapách</string>
     <string name="intro_how_to_share_google_maps_caption">Sdílejte polohu z Google Map nebo z webového prohlížeče.</string>
