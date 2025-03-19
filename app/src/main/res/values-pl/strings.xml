@@ -64,4 +64,10 @@
     <string name="conversion_failed_invalid_url">Nieprawidłowy adres URL</string>
     <string name="conversion_permission_parse_html_text"><![CDATA[Link <tt>%1$s</tt> nie zawiera współrzędnych. %2$s może połączyć się z Google, aby je uzyskać, lub może, zamiast tego utworzyć geo: link prowadzący do wyszukiwania według nazwy miejsca.]]></string>
     <string name="about_app_icon_content_description">Ikona aplikacji</string>
+    <string name="about_donate">Wspomóż finansowo ↗</string>
+    <string name="faq_item_collapse">Zwiń sekcję</string>
+    <string name="faq_item_expand">Rozwiń sekcję</string>
+    <string name="permission_do_not_ask">Nie pytaj ponownie</string>
+    <string name="conversion_failed_nothing_to_do">Nie ma tutaj nic do zrobienia</string>
+    <string name="sharing_succeeded">Otworzono link geo:</string>
 </resources>
