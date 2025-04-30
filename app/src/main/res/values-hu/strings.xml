@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intro_how_to_share_google_maps_content_description">Képernyőkép a Google Térkép megosztás képernyőjéről</string>
+    <string name="copy_activity">Masolás mint geo:</string>
+    <string name="share_activity">Megosztás mint geo:</string>
+    <string name="nav_menu_content_description">Menü</string>
+    <string name="nav_back_content_description">Vissza a kezdőképernyőre</string>
+    <string name="intro_title">Bemutatkozás</string>
+    <string name="intro_how_to_share_headline">Így tekintheted meg a Google Térkepből megosztott linkeket más térkép alkalmazásban</string>
+    <string name="intro_how_to_share_google_maps_caption">Oszd meg egy hely linkjét a Google Térképből vagy webböngészőből.</string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Válaszd ki: <i>%1$s</i> és a %2$s lehetővé teszi, hogy bármely telepített térkép alkalmazással megnyithasd a helyet.]]></string>
+    <string name="intro_how_to_share_app_content_description">Képernyőkép a %1$s megosztás képernyőjéről</string>
+    <string name="intro_open_by_default_headline">Állítsd át az Androidot, hogy a Google Térkép linkjeit más alkalmazással nyissa meg (nem kötelező)</string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>Megnyitás alapértelmezés szerint</i> és kapcsold ki a hivatkzások megnyitását az alkalmazással.]]></string>
+    <string name="intro_open_by_default_google_maps_content_description">A Google Maps alapértelmezett megnyitás képernyőképe</string>
+</resources>
