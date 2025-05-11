@@ -193,13 +193,11 @@ and instrumented tests.
 ### Generating a signed release APK
 
 ```shell
-make sign keystore_path=/path/to/your/keystore.jks
-```
-
-### Installing the release APK on your phone
-
-```shell
-make install
+export STORE_FILE=path/to/keystore.js
+export STORE_PASSWORD=mypassword
+export KEY_ALIAS=com.example.android
+export KEY_PASSWORD=mypassword
+make build
 ```
 
 ### Testing various Google Maps links
