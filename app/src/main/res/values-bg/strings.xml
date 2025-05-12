@@ -78,4 +78,6 @@
     <string name="conversion_permission_xiaomi_title">Липсва разрешение</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="user_preferences_connect_to_google_description">За да поддържа кратки връзки към Google Карти и да получава координати от уеб страницата на Google Карти, когато връзката не ги съдържа, %1$s може да се свърже с Google. Можете да намерите повече информация на екрана с ЧЗВ.</string>
+    <string name="conversion_failed_parse_html_connection_error">Грешка при свързване когато се извлича страницата на Google Карти</string>
+    <string name="conversion_failed_unshorten_connection_error">Грешка при свързване когато се разрешава кратката връзка</string>
 </resources>
