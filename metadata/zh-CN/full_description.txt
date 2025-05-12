@@ -1,0 +1,13 @@
+<b>何时使用 Geo Share</b>
+
+如果有人向您发送 Google 地图链接，但您更喜欢使用 OpenStreetMap，您可以使用 Geo Share 分享该链接。该应用将在您选择的已安装的地图应用中打开它，例如 OsmAnd 或 Organic Maps。
+
+如果您喜欢在 Google 地图上查找地点，但更喜欢使用其他导航应用，您可以使用 Geo Share 从 Google 地图分享位置。该应用将在您喜欢的导航应用中打开它。
+
+您还可以使用该应用将 Google 地图链接以 geo: 链接的形式复制到您的剪贴板。
+
+<b>工作原理和隐私考虑</b>
+
+Geo Share 将 Google 地图链接转换为其他地图应用可以打开的 geo: 链接。要创建 geo: 链接，需要地理坐标。Geo Share 从 Google 地图 URL 中解析它们。
+
+然而，并非所有 Google 地图 URL 都包含坐标。在这种情况下，Geo Share 将提示您获得连接到 Google 的权限并从 HTTP 标头或链接的 HTML 文档中检索坐标。有关更多详细信息，请查看应用的常见问题页面。
