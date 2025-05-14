@@ -78,6 +78,11 @@ class ConversionViewModel @Inject constructor(
     )
 
     fun start() {
+        withMutableSnapshot {
+            resultGeoUri = ""
+            resultUnchanged = false
+            resultErrorMessageResId = null
+        }
         transition(ReceivedUriString(stateContext, inputUriString))
     }
 
