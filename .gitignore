@@ -19,4 +19,6 @@
 /local.properties
 README.html
 fastlane/Appfile
+fastlane/README.md
+fastlane/report.xml
 local.properties
