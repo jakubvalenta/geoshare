@@ -200,6 +200,21 @@ export KEY_PASSWORD=mypassword
 make build
 ```
 
+### Setting up Google Play publishing
+
+Create file `fastlane/Appfile` with the following content:
+
+```ruby
+json_key_file("path/to/play-store-credentials.json")
+package_name("page.ooooo.geoshare")
+```
+
+### Updating Google Play metadata
+
+```shell
+fastlane metadata
+```
+
 ### Testing various Google Maps links
 
 Link with coordinates in URL:
