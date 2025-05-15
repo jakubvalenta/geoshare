@@ -10,4 +10,4 @@ Você também pode usar o app para colar links do Google Maps e copiar como link
 
 O GeoShare converte links do Google Maps em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, coordenadas geográficas são necessárias. O Geo Share os extrai do link do Google Maps.
 
-Porém, nem todos as URLs do Google Maps contém coordenadas. Nesses casos, o Geo Share te pedirá permissão para se conectar ao Google e obter as coordenadas de cabeçalhos HTTP ou do documento HTML do link. Para mais informações detalhadas, verifique a tela de perguntas frequentes do app.
+Porém, nem todos as URLs do Google Maps contém coordenadas. Nesses casos, o Geo Share te pedirá permissão para se conectar ao Google e obter as coordenadas de cabeçalhos HTTP ou do documento HTML do link. Para mais informações detalhadas, confira a tela de perguntas frequentes do app.
