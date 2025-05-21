@@ -11,7 +11,7 @@
     <string name="intro_open_by_default_app_content_description">Capture d’écran des paramètres d’ouverture par défaut de %1$s</string>
     <string name="intro_geo_links_form_caption">Ou ouvrez %1$s et collez-y votre lien Google Maps.</string>
     <string name="main_info_box"><![CDATA[%1s prend en charge de nombreux formats d’URL Google Maps. Si vous trouvez un lien qui ne fonctionne toujours pas, veuillez <a href="https://github.com/jakubvalenta/geoshare/issues">signaler un problème</a>.]]></string>
-    <string name="main_navigate_to_intro">Découvrez plus de fonctionnalités de l’application</string>
+    <string name="main_navigate_to_intro">Découvrez plus de fonctionnalités de l’appli</string>
     <string name="intro_how_to_share_app_content_description">Capture d’écran de l’écran de partage de %1$s</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Choisissez <i>%1$s</i> et %2$s vous permettra d’ouvrir l’emplacement dans n’importe quelle application de carte installée.]]></string>
     <string name="intro_open_by_default_headline">Configurer Android pour ouvrir les liens vers Google Maps dans des cartes alternatives (facultatif)</string>
@@ -28,7 +28,7 @@
     <string name="intro_nav_finish">Commencer</string>
     <string name="intro_settings_activity_not_found">Échec de l’ouverture des paramètres</string>
     <string name="main_input_uri_clear_content_description">Effacer</string>
-    <string name="main_input_uri_supporting_text">par exemple https://google.com/maps/… ou maps.app.goo.gl/…</string>
+    <string name="main_input_uri_supporting_text">par ex. https://google.com/maps/… ou maps.app.goo.gl/…</string>
     <string name="main_result_geo_uri_copy_content_description">Copier</string>
     <string name="main_result_geo_uri_share_content_description">Partager</string>
     <string name="main_create_geo_uri">Créer un lien géo :</string>
@@ -65,11 +65,11 @@
     <string name="conversion_failed_parse_url_error">Échec de la création du lien géo :</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Échec de l’ouverture des paramètres d’autorisation</string>
     <string name="sharing_failed_xiaomi_permission_denied">Impossible de partager le lien géo : sans autorisation</string>
-    <string name="sharing_succeeded_unchanged">Géo ouvert : lien inchangé</string>
-    <string name="sharing_succeeded">Géo ouvert : lien</string>
+    <string name="sharing_succeeded_unchanged">Ouvert lien géo : inchangé</string>
+    <string name="sharing_succeeded">Ouvert lien géo :</string>
     <string name="sharing_failed_activity_not_found">Aucune application pouvant ouvrir les liens géo : n’est installée</string>
-    <string name="copying_finished">Géo copié : lien vers le presse-papiers</string>
-    <string name="copying_finished_unchanged">Géo copié : lien vers le presse-papiers inchangé</string>
+    <string name="copying_finished">Copié lien géo : dans le presse-papiers</string>
+    <string name="copying_finished_unchanged">Copié lien géo : dans le presse-papiers inchangé</string>
     <string name="conversion_failed_unshorten_permission_denied">Ce lien n’est pas pris en charge sans connexion à Google</string>
     <string name="conversion_failed_parse_html_error">Échec de la récupération de la page Google Maps</string>
     <string name="conversion_failed_parse_html_connection_error">Erreur de connexion lors de la récupération de la page Google Maps</string>
