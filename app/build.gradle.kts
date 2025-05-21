@@ -32,6 +32,8 @@ android {
             "bg",
             "cs",
             "en",
+            "es",
+            "fr",
             "it",
             "pl",
             "pt-rBR",
