@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="copy_activity">Copier géo :</string>
-    <string name="share_activity">Partager géo :</string>
+    <string name="copy_activity">Copier géo :</string>
+    <string name="share_activity">Partager géo :</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Retour à l’écran principal</string>
     <string name="intro_title">Intro</string>
@@ -19,10 +19,10 @@
     <string name="intro_open_by_default_google_maps_button">Ouvrir les paramètres de Google Maps</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Allez ensuite dans Paramètres &#8594; Applications &#8594; %1$s &#8594; <i>Ouvrir par défaut</i>, activez l’ouverture des liens dans cette application et appuyez sur <i>Ajouter des liens</i>.]]></string>
     <string name="intro_open_by_default_app_button">Ouvrir les paramètres %1$s</string>
-    <string name="intro_geo_links_headline">Comment créer des liens géo :</string>
+    <string name="intro_geo_links_headline">Comment créer des liens géo :</string>
     <string name="intro_geo_links_copy_caption"><![CDATA[Sélectionnez <i>%1$s</i> lors du partage depuis Google Maps.]]></string>
     <string name="intro_geo_links_copy_content_description">Capture d’écran de l’écran de partage de Google Maps</string>
-    <string name="intro_geo_links_form_content_description">Capture d’écran du formulaire de conversion de lien géo : de %1$s</string>
+    <string name="intro_geo_links_form_content_description">Capture d’écran du formulaire de conversion de lien géo : de %1$s</string>
     <string name="intro_nav_close">Fermer</string>
     <string name="intro_nav_next">Suivant</string>
     <string name="intro_nav_finish">Commencer</string>
@@ -31,10 +31,10 @@
     <string name="main_input_uri_supporting_text">par ex. https://google.com/maps/… ou maps.app.goo.gl/…</string>
     <string name="main_result_geo_uri_copy_content_description">Copier</string>
     <string name="main_result_geo_uri_share_content_description">Partager</string>
-    <string name="main_create_geo_uri">Créer un lien géo :</string>
+    <string name="main_create_geo_uri">Créer un lien géo :</string>
     <string name="conversion_permission_common_title">Se connecter à Google ?</string>
     <string name="conversion_permission_common_grant">OK</string>
-    <string name="conversion_permission_parse_html_deny">Créer une recherche géo : lien</string>
+    <string name="conversion_permission_parse_html_deny">Créer une recherche géo : lien</string>
     <string name="conversion_permission_xiaomi_title">Permission manquante</string>
     <string name="conversion_permission_xiaomi_grant">Ouvrir les paramètres Android</string>
     <string name="conversion_permission_xiaomi_deny">Rejeter</string>
@@ -62,14 +62,14 @@
     <string name="conversion_failed_invalid_url">URL invalide</string>
     <string name="conversion_failed_unshorten_error">Impossible de résoudre le lien court</string>
     <string name="conversion_failed_unshorten_connection_error">Erreur de connexion lors de la résolution du lien court</string>
-    <string name="conversion_failed_parse_url_error">Échec de la création du lien géo :</string>
+    <string name="conversion_failed_parse_url_error">Échec de la création du lien géo :</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Échec de l’ouverture des paramètres d’autorisation</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Impossible de partager le lien géo : sans autorisation</string>
-    <string name="sharing_succeeded_unchanged">Ouvert lien géo : inchangé</string>
-    <string name="sharing_succeeded">Ouvert lien géo :</string>
-    <string name="sharing_failed_activity_not_found">Aucune application pouvant ouvrir les liens géo : n’est installée</string>
-    <string name="copying_finished">Copié lien géo : dans le presse-papiers</string>
-    <string name="copying_finished_unchanged">Copié lien géo : dans le presse-papiers inchangé</string>
+    <string name="sharing_failed_xiaomi_permission_denied">Impossible de partager le lien géo : sans autorisation</string>
+    <string name="sharing_succeeded_unchanged">Ouvert lien géo : inchangé</string>
+    <string name="sharing_succeeded">Ouvert lien géo :</string>
+    <string name="sharing_failed_activity_not_found">Aucune application pouvant ouvrir les liens géo : n’est installée</string>
+    <string name="copying_finished">Copié lien géo : dans le presse-papiers</string>
+    <string name="copying_finished_unchanged">Copié lien géo : dans le presse-papiers inchangé</string>
     <string name="conversion_failed_unshorten_permission_denied">Ce lien n’est pas pris en charge sans connexion à Google</string>
     <string name="conversion_failed_parse_html_error">Échec de la récupération de la page Google Maps</string>
     <string name="conversion_failed_parse_html_connection_error">Erreur de connexion lors de la récupération de la page Google Maps</string>
