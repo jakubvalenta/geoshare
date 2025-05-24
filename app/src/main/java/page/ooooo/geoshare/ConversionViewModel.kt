@@ -26,7 +26,7 @@ class ConversionViewModel @Inject constructor(
 ) : ViewModel() {
 
     val stateContext = ConversionStateContext(
-        googleMapsUrlConverter = GoogleMapsUrlConverter(),
+        urlConverters = listOf(GoogleMapsUrlConverter()),
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,

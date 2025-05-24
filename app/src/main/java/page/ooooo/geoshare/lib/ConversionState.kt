@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.Clipboard
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
+import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
@@ -85,17 +86,21 @@ data class ReceivedUrl(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val isShortUrl = stateContext.googleMapsUrlConverter.isShortUrl(url)
+        val urlConverter = stateContext.urlConverters.find { it.isSupportedUrl(url) }
+        if (urlConverter == null) {
+            return ConversionFailed(stateContext, R.string.conversion_failed_unsupported_service)
+        }
+        val isShortUrl = urlConverter.isShortUrl(url)
         if (!isShortUrl) {
-            return UnshortenedUrl(stateContext, url, permission)
+            return UnshortenedUrl(stateContext, urlConverter, url, permission)
         }
         return when (permission
             ?: stateContext.userPreferencesRepository.getValue(
                 connectToGooglePermission
             )) {
-            Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, url)
+            Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, urlConverter, url)
 
-            Permission.ASK -> RequestedUnshortenPermission(stateContext, url)
+            Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
 
             Permission.NEVER -> DeniedUnshortenPermission(stateContext)
         }
@@ -104,6 +109,7 @@ data class ReceivedUrl(
 
 data class RequestedUnshortenPermission(
     val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
     val url: URL,
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
@@ -113,7 +119,7 @@ data class RequestedUnshortenPermission(
                 Permission.ALWAYS,
             )
         }
-        return GrantedUnshortenPermission(stateContext, url)
+        return GrantedUnshortenPermission(stateContext, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -129,6 +135,7 @@ data class RequestedUnshortenPermission(
 
 data class GrantedUnshortenPermission(
     val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
     val url: URL,
 ) : ConversionState() {
     override suspend fun transition(): State {
@@ -152,7 +159,7 @@ data class GrantedUnshortenPermission(
                 R.string.conversion_failed_unshorten_error
             )
         }
-        return UnshortenedUrl(stateContext, header, Permission.ALWAYS)
+        return UnshortenedUrl(stateContext, urlConverter, header, Permission.ALWAYS)
     }
 }
 
@@ -167,12 +174,13 @@ class DeniedUnshortenPermission(
 
 data class UnshortenedUrl(
     val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
     val url: URL,
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
         val geoUriBuilderFromUrl =
-            stateContext.googleMapsUrlConverter.parseUrl(url)
+            urlConverter.parseUrl(url)
                 ?: return ConversionFailed(
                     stateContext,
                     R.string.conversion_failed_parse_url_error
@@ -185,12 +193,14 @@ data class UnshortenedUrl(
                 )) {
                 Permission.ALWAYS -> GrantedParseHtmlPermission(
                     stateContext,
+                    urlConverter,
                     url,
                     geoUriFromUrl,
                 )
 
                 Permission.ASK -> RequestedParseHtmlPermission(
                     stateContext,
+                    urlConverter,
                     url,
                     geoUriFromUrl,
                 )
@@ -204,6 +214,7 @@ data class UnshortenedUrl(
 
 data class RequestedParseHtmlPermission(
     val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
     val url: URL,
     val geoUriFromUrl: String,
 ) : ConversionState(), PermissionState {
@@ -214,7 +225,7 @@ data class RequestedParseHtmlPermission(
                 Permission.ALWAYS,
             )
         }
-        return GrantedParseHtmlPermission(stateContext, url, geoUriFromUrl)
+        return GrantedParseHtmlPermission(stateContext, urlConverter, url, geoUriFromUrl)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -230,6 +241,7 @@ data class RequestedParseHtmlPermission(
 
 data class GrantedParseHtmlPermission(
     val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
     val url: URL,
     val geoUriFromUrl: String,
 ) : ConversionState() {
@@ -249,17 +261,20 @@ data class GrantedParseHtmlPermission(
                 R.string.conversion_failed_parse_html_error,
             )
         }
-        val geoUriBuilderFromHtml =
-            stateContext.googleMapsUrlConverter.parseHtml(html)
-        if (geoUriBuilderFromHtml != null) {
-            return ConversionSucceeded(geoUriBuilderFromHtml.toString())
+        val parseHtmlResult = urlConverter.parseHtml(html)
+        return when (parseHtmlResult) {
+            is UrlConverter.ParseHtmlResult.Parsed -> ConversionSucceeded(
+                parseHtmlResult.geoUriBuilder.toString(),
+            )
+
+            is UrlConverter.ParseHtmlResult.Redirect -> ReceivedUrl(
+                stateContext,
+                parseHtmlResult.url,
+                Permission.ALWAYS,
+            )
+
+            null -> ConversionSucceeded(geoUriFromUrl)
         }
-        val googleMapsUrl =
-            stateContext.googleMapsUrlConverter.parseGoogleSearchHtml(html)
-        if (googleMapsUrl != null) {
-            return ReceivedUrl(stateContext, googleMapsUrl, Permission.ALWAYS)
-        }
-        return ConversionSucceeded(geoUriFromUrl)
     }
 }
 

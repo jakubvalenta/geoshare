@@ -80,4 +80,5 @@
     <string name="conversion_failed_unshorten_permission_denied">This link is not supported without connecting to Google</string>
     <string name="conversion_failed_parse_html_error">Failed to fetch Google Maps page</string>
     <string name="conversion_failed_parse_html_connection_error">Connection error when fetching Google Maps page</string>
+    <string name="conversion_failed_unsupported_service">Unsupported map service</string>
 </resources>

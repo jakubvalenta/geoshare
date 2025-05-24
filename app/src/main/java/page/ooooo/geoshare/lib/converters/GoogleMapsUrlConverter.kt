@@ -12,10 +12,15 @@ import java.net.URL
 class GoogleMapsUrlConverter(
     private val log: ILog = DefaultLog(),
     private val uriQuote: UriQuote = DefaultUriQuote(),
-) {
+) : UrlConverter() {
 
-    val hostPattern: Pattern =
-        Pattern.compile("""^((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}$""")
+    override val name = "Google Maps"
+
+    val fullUrlPattern: Pattern =
+        Pattern.compile("""^https?://((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}/.+$""")
+    val shortUrlPattern: Pattern =
+        Pattern.compile("""^https?://(maps\.app\.goo\.gl/|(app\.)?goo\.gl/maps/|g.co/kgs/).+$""")
+
     val coordRegex =
         """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
     val coordPattern: Pattern = Pattern.compile(coordRegex)
@@ -66,21 +71,16 @@ class GoogleMapsUrlConverter(
     )
     val googleSearchHtmlPattern: Pattern =
         Pattern.compile("""data-url="(?P<url>[^"]+)""")
-    val shortUrlPattern: Pattern =
-        Pattern.compile("""^https?://(maps\.app\.goo\.gl/|(app\.)?goo\.gl/maps/|g.co/kgs/).+$""")
 
-    fun isShortUrl(url: URL): Boolean =
+    override fun isSupportedUrl(url: URL): Boolean = isFullUrl(url) || isShortUrl(url)
+
+    private fun isFullUrl(url: URL): Boolean =
+        fullUrlPattern.matcher(url.toString()).matches()
+
+    override fun isShortUrl(url: URL): Boolean =
         shortUrlPattern.matcher(url.toString()).matches()
 
-    fun parseUrl(url: URL): GeoUriBuilder? {
-        if (url.protocol != "http" && url.protocol != "https") {
-            log.w(null, "Unknown protocol in Google Maps URL $url")
-            return null
-        }
-        if (!hostPattern.matcher(url.host).matches()) {
-            log.w(null, "Unknown host in Google Maps URL $url")
-            return null
-        }
+    override fun parseUrl(url: URL): GeoUriBuilder? {
         val rawPath = url.path
         if (rawPath == null) {
             log.w(null, "Missing both path and query in Google Maps URL $url")
@@ -115,7 +115,19 @@ class GoogleMapsUrlConverter(
         return geoUriBuilder
     }
 
-    fun parseHtml(html: String): GeoUriBuilder? {
+    override fun parseHtml(html: String): ParseHtmlResult? {
+        val geoUriBuilder = parseGoogleMapsHtml(html)
+        if (geoUriBuilder !== null) {
+            return ParseHtmlResult.Parsed(geoUriBuilder)
+        }
+        val url = parseGoogleSearchHtml(html)
+        if (url !== null) {
+            return ParseHtmlResult.Redirect(url)
+        }
+        return null
+    }
+
+    private fun parseGoogleMapsHtml(html: String): GeoUriBuilder? {
         val m = htmlPatterns.firstNotNullOfOrNull {
             val m = it.matcher(html)
             if (m.find()) m else null
@@ -130,7 +142,7 @@ class GoogleMapsUrlConverter(
         return geoUriBuilder
     }
 
-    fun parseGoogleSearchHtml(html: String): URL? {
+    private fun parseGoogleSearchHtml(html: String): URL? {
         val m = googleSearchHtmlPattern.matcher(html)
             .let { if (it.find()) it else null }
         if (m == null) {
