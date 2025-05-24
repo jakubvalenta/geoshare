@@ -130,7 +130,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedIntent_intentContainsGeoUri_returnsSucceededUnchanged() =
+    fun receivedIntent_intentContainsGeoUri_returnsSucceeded() =
         runTest {
             val intent = Intent()
             val mockIntentTools = Mockito.mock(IntentTools::class.java)
@@ -149,7 +149,7 @@ class ConversionStateTest {
             )
             val state = ReceivedIntent(stateContext, intent)
             assertEquals(
-                ConversionSucceeded("geo:1,2?q=fromIntent", unchanged = true),
+                ConversionSucceeded("geo:1,2?q=fromIntent"),
                 state.transition(),
             )
         }
@@ -211,7 +211,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun receivedUriString_isGeoUri_returnsSucceededUnchanged() = runTest {
+    fun receivedUriString_isGeoUri_returnsSucceeded() = runTest {
         val stateContext = ConversionStateContext(
             googleMapsUrlConverter,
             mockIntentTools,
@@ -226,7 +226,7 @@ class ConversionStateTest {
         Mockito.`when`(mockUri.scheme).thenReturn("geo")
         val state = ReceivedUriString(stateContext, uriString) { mockUri }
         assertEquals(
-            ConversionSucceeded(uriString, unchanged = true),
+            ConversionSucceeded(uriString),
             state.transition(),
         )
     }
@@ -1268,7 +1268,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, url, null)
             assertEquals(
-                ConversionSucceeded(geoUriBuilderFromUrl.toString(), false),
+                ConversionSucceeded(geoUriBuilderFromUrl.toString()),
                 state.transition(),
             )
         }
@@ -1309,7 +1309,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, url, null)
             assertEquals(
-                ConversionSucceeded(geoUriBuilderFromUrl.toString(), false),
+                ConversionSucceeded(geoUriBuilderFromUrl.toString()),
                 state.transition(),
             )
         }
@@ -1617,7 +1617,7 @@ class ConversionStateTest {
                 geoUriBuilderFromUrl.toString(),
             )
             assertEquals(
-                ConversionSucceeded(geoUriBuilderFromHtml.toString(), false),
+                ConversionSucceeded(geoUriBuilderFromHtml.toString()),
                 state.transition(),
             )
         }
@@ -1656,7 +1656,7 @@ class ConversionStateTest {
                 geoUriBuilderFromUrl.toString(),
             )
             assertEquals(
-                ConversionSucceeded(geoUriBuilderFromUrl.toString(), false),
+                ConversionSucceeded(geoUriBuilderFromUrl.toString()),
                 state.transition(),
             )
         }
@@ -1715,14 +1715,14 @@ class ConversionStateTest {
                 geoUriBuilderFromUrl.toString()
             )
             assertEquals(
-                ConversionSucceeded(geoUriBuilderFromUrl.toString(), false),
+                ConversionSucceeded(geoUriBuilderFromUrl.toString()),
                 state.transition(),
             )
         }
 
     @Test
     fun conversionSucceeded_returnsNull() = runTest {
-        val state = ConversionSucceeded("geo:1,2", false)
+        val state = ConversionSucceeded("geo:1,2")
         assertNull(state.transition())
     }
 
@@ -1748,7 +1748,6 @@ class ConversionStateTest {
     fun acceptedSharing_backgroundStartActivityPermissionIsGranted_returnsGrantedSharePermission() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val mockXiaomiTools = Mockito.mock(XiaomiTools::class.java)
             Mockito.`when`(
                 mockXiaomiTools.isBackgroundStartActivityPermissionGranted(
@@ -1769,14 +1768,12 @@ class ConversionStateTest {
                 mockContext,
                 mockSettingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 GrantedSharePermission(
                     stateContext,
                     mockContext,
                     geoUri,
-                    unchanged,
                 ),
                 state.transition(),
             )
@@ -1786,7 +1783,6 @@ class ConversionStateTest {
     fun acceptedSharing_backgroundStartActivityPermissionIsNotGranted_returnsRequestedSharePermission() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val mockXiaomiTools = Mockito.mock(XiaomiTools::class.java)
             Mockito.`when`(
                 mockXiaomiTools.isBackgroundStartActivityPermissionGranted(
@@ -1807,7 +1803,6 @@ class ConversionStateTest {
                 mockContext,
                 mockSettingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 RequestedSharePermission(
@@ -1815,7 +1810,6 @@ class ConversionStateTest {
                     mockContext,
                     mockSettingsLauncherWrapper,
                     geoUri,
-                    unchanged,
                 ),
                 state.transition(),
             )
@@ -1825,7 +1819,6 @@ class ConversionStateTest {
     fun requestedSharePermission_grant_showPermissionEditorReturnsTrue_returnsShowedSharePermissionEditor() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val mockXiaomiTools = Mockito.mock(XiaomiTools::class.java)
             Mockito.`when`(
                 mockXiaomiTools.showPermissionEditor(
@@ -1847,7 +1840,6 @@ class ConversionStateTest {
                 mockContext,
                 mockSettingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 ShowedSharePermissionEditor(
@@ -1855,7 +1847,6 @@ class ConversionStateTest {
                     mockContext,
                     mockSettingsLauncherWrapper,
                     geoUri,
-                    unchanged,
                 ),
                 state.grant(false),
             )
@@ -1865,7 +1856,6 @@ class ConversionStateTest {
     fun requestedSharePermission_grant_showPermissionEditorReturnsFalse_returnsSharingFailed() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val mockXiaomiTools = Mockito.mock(XiaomiTools::class.java)
             Mockito.`when`(
                 mockXiaomiTools.showPermissionEditor(
@@ -1887,7 +1877,6 @@ class ConversionStateTest {
                 mockContext,
                 mockSettingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 SharingFailed(
@@ -1902,7 +1891,6 @@ class ConversionStateTest {
     fun requestedSharePermission_deny_returnsDismissedSharePermissionEditor() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val stateContext = ConversionStateContext(
                 googleMapsUrlConverter,
                 mockIntentTools,
@@ -1917,7 +1905,6 @@ class ConversionStateTest {
                 mockContext,
                 mockSettingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 SharingFailed(
@@ -1931,7 +1918,6 @@ class ConversionStateTest {
     @Test
     fun showedSharePermissionEditor_grant_returnsAcceptedSharing() = runTest {
         val geoUri = "geo:1,1"
-        val unchanged = false
         val stateContext = ConversionStateContext(
             googleMapsUrlConverter,
             mockIntentTools,
@@ -1946,7 +1932,6 @@ class ConversionStateTest {
             mockContext,
             mockSettingsLauncherWrapper,
             geoUri,
-            unchanged,
         )
         assertEquals(
             AcceptedSharing(
@@ -1954,7 +1939,6 @@ class ConversionStateTest {
                 mockContext,
                 mockSettingsLauncherWrapper,
                 geoUri,
-                unchanged,
             ),
             state.grant(false),
         )
@@ -1963,7 +1947,6 @@ class ConversionStateTest {
     @Test(expected = NotImplementedError::class)
     fun showedSharePermissionEditor_deny_throwsNotImplementedError() = runTest {
         val geoUri = "geo:1,1"
-        val unchanged = false
         val stateContext = ConversionStateContext(
             googleMapsUrlConverter,
             mockIntentTools,
@@ -1978,7 +1961,6 @@ class ConversionStateTest {
             mockContext,
             mockSettingsLauncherWrapper,
             geoUri,
-            unchanged,
         )
         state.deny(false)
     }
@@ -1987,7 +1969,6 @@ class ConversionStateTest {
     fun grantedSharePermission_intentToolsShareDoesNotThrow_returnsSharingSucceeded() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val mockIntentTools = Mockito.mock(IntentTools::class.java)
             Mockito.doNothing().`when`(mockIntentTools)
                 .share(any<Context>(), any<String>(), any<String>())
@@ -2004,7 +1985,6 @@ class ConversionStateTest {
                 stateContext,
                 mockContext,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 SharingSucceeded(stateContext, R.string.sharing_succeeded),
@@ -2018,47 +1998,9 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedSharePermission_intentToolsShareDoesNotThrowAndUnchangedIsTrue_returnsSharingSucceededUnchanged() =
-        runTest {
-            val geoUri = "geo:1,1"
-            val unchanged = true
-            val mockIntentTools = Mockito.mock(IntentTools::class.java)
-            Mockito.doNothing().`when`(mockIntentTools)
-                .share(any<Context>(), any<String>(), any<String>())
-            val stateContext = ConversionStateContext(
-                googleMapsUrlConverter,
-                mockIntentTools,
-                mockNetworkTools,
-                fakeUserPreferencesRepository,
-                mockXiaomiTools,
-                log = fakeLog,
-                onMessage = fakeOnMessage,
-            )
-            val state = GrantedSharePermission(
-                stateContext,
-                mockContext,
-                geoUri,
-                unchanged,
-            )
-            assertEquals(
-                SharingSucceeded(
-                    stateContext,
-                    R.string.sharing_succeeded_unchanged
-                ),
-                state.transition(),
-            )
-            verify(mockIntentTools).share(
-                mockContext,
-                Intent.ACTION_VIEW,
-                geoUri,
-            )
-        }
-
-    @Test
     fun grantedSharePermission_intentToolsShareThrows_returnsSharingFailed() =
         runTest {
             val geoUri = "geo:1,1"
-            val unchanged = false
             val mockIntentTools = Mockito.mock(IntentTools::class.java)
             Mockito.`when`(
                 mockIntentTools.share(
@@ -2080,7 +2022,6 @@ class ConversionStateTest {
                 stateContext,
                 mockContext,
                 geoUri,
-                unchanged,
             )
             assertEquals(
                 SharingFailed(
@@ -2130,7 +2071,6 @@ class ConversionStateTest {
     fun acceptedCopying_setsClipboardTextAndReturnsCopyingSucceeded() =
         runTest {
             val geoUri = "geo:1,1,"
-            val unchanged = false
 
             val mockClipboardTools = Mockito.mock(ClipboardTools::class.java)
             Mockito.`when`(
@@ -2155,52 +2095,9 @@ class ConversionStateTest {
                 stateContext,
                 mockClipboard,
                 geoUri,
-                unchanged,
             )
             assertEquals(
-                CopyingFinished(stateContext, unchanged),
-                state.transition(),
-            )
-            verify(mockClipboardTools).setPlainText(
-                mockClipboard,
-                "geo: URI",
-                geoUri,
-            )
-        }
-
-    @Test
-    fun acceptedCopying_unchangedIsTrue_setsClipboardTextAndReturnsCopyingSucceededUnchanged() =
-        runTest {
-            val geoUri = "geo:1,1,"
-            val unchanged = true
-
-            val mockClipboardTools = Mockito.mock(ClipboardTools::class.java)
-            Mockito.`when`(
-                mockClipboardTools.setPlainText(
-                    any<Clipboard>(),
-                    any<String>(),
-                    any<String>(),
-                )
-            ).thenReturn(Unit)
-
-            val stateContext = ConversionStateContext(
-                googleMapsUrlConverter,
-                mockIntentTools,
-                mockNetworkTools,
-                fakeUserPreferencesRepository,
-                mockXiaomiTools,
-                clipboardTools = mockClipboardTools,
-                log = fakeLog,
-                onMessage = fakeOnMessage,
-            )
-            val state = AcceptedCopying(
-                stateContext,
-                mockClipboard,
-                geoUri,
-                unchanged,
-            )
-            assertEquals(
-                CopyingFinished(stateContext, unchanged),
+                CopyingFinished(stateContext),
                 state.transition(),
             )
             verify(mockClipboardTools).setPlainText(
@@ -2224,13 +2121,13 @@ class ConversionStateTest {
                 onMessage = { message = it },
                 getBuildVersionSdkInt = { Build.VERSION_CODES.UPSIDE_DOWN_CAKE },
             )
-            val state = CopyingFinished(stateContext, true)
+            val state = CopyingFinished(stateContext)
             assertNull(state.transition())
             assertNull(message)
         }
 
     @Test
-    fun copyingSucceeded_buildVersionIsLessThanTiramisuAndUnchangedIsTrue_callsOnMessageAndReturnsNull() =
+    fun copyingSucceeded_buildVersionIsLessThanTiramisu_callsOnMessageAndReturnsNull() =
         runTest {
             var message: Message? = null
             val stateContext = ConversionStateContext(
@@ -2243,39 +2140,11 @@ class ConversionStateTest {
                 onMessage = { message = it },
                 getBuildVersionSdkInt = { Build.VERSION_CODES.R },
             )
-            val state = CopyingFinished(stateContext, true)
+            val state = CopyingFinished(stateContext)
             assertNull(state.transition())
             assertEquals(
                 message,
-                Message(
-                    R.string.copying_finished_unchanged,
-                    Message.Type.SUCCESS,
-                ),
-            )
-        }
-
-    @Test
-    fun copyingSucceeded_buildVersionIsLessThanTiramisuAndUnchangedIsFalse_callsOnMessageAndReturnsNull() =
-        runTest {
-            var message: Message? = null
-            val stateContext = ConversionStateContext(
-                googleMapsUrlConverter,
-                mockIntentTools,
-                mockNetworkTools,
-                fakeUserPreferencesRepository,
-                mockXiaomiTools,
-                log = fakeLog,
-                onMessage = { message = it },
-                getBuildVersionSdkInt = { Build.VERSION_CODES.R },
-            )
-            val state = CopyingFinished(stateContext, false)
-            assertNull(state.transition())
-            assertEquals(
-                message,
-                Message(
-                    R.string.copying_finished,
-                    Message.Type.SUCCESS,
-                ),
+                Message(R.string.copying_finished, Message.Type.SUCCESS),
             )
         }
 }

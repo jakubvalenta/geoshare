@@ -47,11 +47,6 @@ class ConversionViewModel @Inject constructor(
         "resultGeoUri",
         "",
     )
-    var resultUnchanged by SavableDelegate(
-        savedStateHandle,
-        "resultUnchanged",
-        false,
-    )
     var resultErrorMessageResId by SavableDelegate<Int?>(
         savedStateHandle,
         "resultErrorMessage",
@@ -81,7 +76,6 @@ class ConversionViewModel @Inject constructor(
     fun start() {
         withMutableSnapshot {
             resultGeoUri = ""
-            resultUnchanged = false
             resultErrorMessageResId = null
         }
         transition(ReceivedUriString(stateContext, inputUriString))
@@ -119,7 +113,6 @@ class ConversionViewModel @Inject constructor(
                 context,
                 settingsLauncherWrapper,
                 resultGeoUri,
-                resultUnchanged,
             )
         )
     }
@@ -130,7 +123,6 @@ class ConversionViewModel @Inject constructor(
                 stateContext,
                 clipboard,
                 resultGeoUri,
-                resultUnchanged,
             )
         )
     }
@@ -145,7 +137,6 @@ class ConversionViewModel @Inject constructor(
                     (stateContext.currentState as ConversionSucceeded).let {
                         withMutableSnapshot {
                             resultGeoUri = it.geoUri
-                            resultUnchanged = it.unchanged
                         }
                     }
 
@@ -163,7 +154,6 @@ class ConversionViewModel @Inject constructor(
         withMutableSnapshot {
             inputUriString = newUriString
             resultGeoUri = ""
-            resultUnchanged = false
             resultErrorMessageResId = null
         }
         if (stateContext.currentState !is Initial) {

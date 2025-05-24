@@ -32,7 +32,7 @@ data class ReceivedIntent(
         }
         val geoUri = stateContext.intentTools.getIntentGeoUri(intent)
         if (geoUri != null) {
-            return ConversionSucceeded(geoUri, true)
+            return ConversionSucceeded(geoUri)
         }
         val urlString = stateContext.intentTools.getIntentUrlString(intent)
             ?: return ConversionFailed(
@@ -51,7 +51,7 @@ data class ReceivedUriString(
     override suspend fun transition(): State {
         val uri = parseUri(uriString)
         if (uri.scheme == "geo") {
-            return ConversionSucceeded(uriString, true)
+            return ConversionSucceeded(uriString)
         }
         return ReceivedUrlString(stateContext, uriString, null)
     }
@@ -198,7 +198,7 @@ data class UnshortenedUrl(
                 Permission.NEVER -> DeniedParseHtmlPermission(geoUriFromUrl)
             }
         }
-        return ConversionSucceeded(geoUriFromUrl, false)
+        return ConversionSucceeded(geoUriFromUrl)
     }
 }
 
@@ -252,28 +252,24 @@ data class GrantedParseHtmlPermission(
         val geoUriBuilderFromHtml =
             stateContext.googleMapsUrlConverter.parseHtml(html)
         if (geoUriBuilderFromHtml != null) {
-            return ConversionSucceeded(geoUriBuilderFromHtml.toString(), false)
+            return ConversionSucceeded(geoUriBuilderFromHtml.toString())
         }
         val googleMapsUrl =
             stateContext.googleMapsUrlConverter.parseGoogleSearchHtml(html)
         if (googleMapsUrl != null) {
             return ReceivedUrl(stateContext, googleMapsUrl, Permission.ALWAYS)
         }
-        return ConversionSucceeded(geoUriFromUrl, false)
+        return ConversionSucceeded(geoUriFromUrl)
     }
 }
 
 data class DeniedParseHtmlPermission(
     val geoUriFromUrl: String,
 ) : ConversionState() {
-    override suspend fun transition(): State =
-        ConversionSucceeded(geoUriFromUrl, false)
+    override suspend fun transition(): State = ConversionSucceeded(geoUriFromUrl)
 }
 
-data class ConversionSucceeded(
-    val geoUri: String,
-    val unchanged: Boolean,
-) : ConversionState()
+data class ConversionSucceeded(val geoUri: String) : ConversionState()
 
 data class ConversionFailed(
     val stateContext: ConversionStateContext,
@@ -290,7 +286,6 @@ data class AcceptedSharing(
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
-    val unchanged: Boolean,
 ) : ConversionState() {
     override suspend fun transition(): State =
         if (stateContext.xiaomiTools.isBackgroundStartActivityPermissionGranted(
@@ -301,7 +296,6 @@ data class AcceptedSharing(
                 stateContext,
                 context,
                 geoUri,
-                unchanged,
             )
         } else {
             RequestedSharePermission(
@@ -309,7 +303,6 @@ data class AcceptedSharing(
                 context,
                 settingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
         }
 }
@@ -319,7 +312,6 @@ data class RequestedSharePermission(
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
-    val unchanged: Boolean,
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State =
         if (stateContext.xiaomiTools.showPermissionEditor(
@@ -332,7 +324,6 @@ data class RequestedSharePermission(
                 context,
                 settingsLauncherWrapper,
                 geoUri,
-                unchanged,
             )
         } else {
             SharingFailed(
@@ -353,7 +344,6 @@ data class ShowedSharePermissionEditor(
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
-    val unchanged: Boolean,
 ) : ConversionState(), PermissionState {
     /**
      * Share again after the permission editor has been closed.
@@ -364,7 +354,6 @@ data class ShowedSharePermissionEditor(
             context,
             settingsLauncherWrapper,
             geoUri,
-            unchanged,
         )
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -376,14 +365,10 @@ data class GrantedSharePermission(
     val stateContext: ConversionStateContext,
     val context: Context,
     val geoUri: String,
-    val unchanged: Boolean,
 ) : ConversionState() {
     override suspend fun transition(): State? = try {
         stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri)
-        SharingSucceeded(
-            stateContext,
-            if (unchanged) R.string.sharing_succeeded_unchanged else R.string.sharing_succeeded
-        )
+        SharingSucceeded(stateContext, R.string.sharing_succeeded)
     } catch (_: ActivityNotFoundException) {
         SharingFailed(
             stateContext,
@@ -416,28 +401,19 @@ data class AcceptedCopying(
     val stateContext: ConversionStateContext,
     val clipboard: Clipboard,
     val geoUri: String,
-    val unchanged: Boolean,
 ) : ConversionState() {
     override suspend fun transition(): State {
         stateContext.clipboardTools.setPlainText(clipboard, "geo: URI", geoUri)
-        return CopyingFinished(stateContext, unchanged)
+        return CopyingFinished(stateContext)
     }
 }
 
-data class CopyingFinished(
-    val stateContext: ConversionStateContext,
-    val unchanged: Boolean,
-) : ConversionState() {
+data class CopyingFinished(val stateContext: ConversionStateContext) : ConversionState() {
     override suspend fun transition(): State? {
         val systemHasClipboardEditor =
             stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
         if (!systemHasClipboardEditor) {
-            stateContext.onMessage(
-                Message(
-                    if (unchanged) R.string.copying_finished_unchanged else R.string.copying_finished,
-                    Message.Type.SUCCESS
-                )
-            )
+            stateContext.onMessage(Message(R.string.copying_finished, Message.Type.SUCCESS))
         }
         return null
     }
