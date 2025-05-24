@@ -1,11 +1,11 @@
-name: Bug - Google Maps URL
-description: File a bug report that a Google Maps URL doesn't work.
+name: Bug - Map Link
+description: File a bug report that a map URL doesn't work.
 labels: ["bug"]
 body:
   - type: input
     id: url
     attributes:
-      label: Google Maps URL
+      label: Map URL (Google Maps, Apple Maps etc.)
       placeholder: |
           https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=abcdefg
     validations:
@@ -15,7 +15,7 @@ body:
     attributes:
       label: Current behaviour
       value: |
-          The app shows 'Failed to create geo URL'.
+          The app shows 'Failed to process map link.
     validations:
       required: true
   - type: input
@@ -24,7 +24,7 @@ body:
       label: Version
       description: What version of the app are you running?
       placeholder: |
-          Example: 1.2.0
+          Example: 3.6.0
     validations:
       required: true
   - type: input

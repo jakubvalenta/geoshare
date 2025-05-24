@@ -1,1 +1,1 @@
-Open Google Maps in other map apps and create geo: links
+Open map links in other map apps and copy coordinates
