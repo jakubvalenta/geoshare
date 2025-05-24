@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import java.net.URL
 
 @Suppress("SpellCheckingInspection")

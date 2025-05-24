@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib
 
 import android.os.Build
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 
 data class ConversionStateContext(
     val googleMapsUrlConverter: GoogleMapsUrlConverter,

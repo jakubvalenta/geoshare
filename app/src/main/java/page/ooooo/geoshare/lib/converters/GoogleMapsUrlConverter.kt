@@ -1,6 +1,11 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.GeoUriBuilder
+import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.UriQuote
 import java.net.MalformedURLException
 import java.net.URL
 

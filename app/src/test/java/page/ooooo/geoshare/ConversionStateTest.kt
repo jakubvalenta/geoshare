@@ -21,6 +21,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import java.net.MalformedURLException
 import java.net.SocketTimeoutException
 import java.net.URL

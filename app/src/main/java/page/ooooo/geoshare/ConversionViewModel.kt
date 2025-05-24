@@ -16,6 +16,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import javax.inject.Inject
 
 @HiltViewModel
