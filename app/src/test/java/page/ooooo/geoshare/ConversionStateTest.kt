@@ -973,11 +973,12 @@ class ConversionStateTest {
             log = fakeLog,
             onMessage = fakeOnMessage,
         )
-        val state = DeniedUnshortenPermission(stateContext)
+        val state = DeniedUnshortenPermission(stateContext, googleMapsUrlConverter)
         assertEquals(
             ConversionFailed(
                 stateContext,
                 R.string.conversion_failed_unshorten_permission_denied,
+                listOf(googleMapsUrlConverter.name),
             ),
             state.transition(),
         )
@@ -1591,6 +1592,7 @@ class ConversionStateTest {
                 ConversionFailed(
                     stateContext,
                     R.string.conversion_failed_parse_html_connection_error,
+                    listOf(googleMapsUrlConverter.name),
                 ),
                 state.transition(),
             )
@@ -1629,6 +1631,7 @@ class ConversionStateTest {
                 ConversionFailed(
                     stateContext,
                     R.string.conversion_failed_parse_html_error,
+                    listOf(googleMapsUrlConverter.name),
                 ),
                 state.transition(),
             )

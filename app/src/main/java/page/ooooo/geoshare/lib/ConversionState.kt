@@ -102,7 +102,7 @@ data class ReceivedUrl(
 
             Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
 
-            Permission.NEVER -> DeniedUnshortenPermission(stateContext)
+            Permission.NEVER -> DeniedUnshortenPermission(stateContext, urlConverter)
         }
     }
 }
@@ -129,7 +129,7 @@ data class RequestedUnshortenPermission(
                 Permission.NEVER,
             )
         }
-        return DeniedUnshortenPermission(stateContext)
+        return DeniedUnshortenPermission(stateContext, urlConverter)
     }
 }
 
@@ -165,10 +165,12 @@ data class GrantedUnshortenPermission(
 
 class DeniedUnshortenPermission(
     val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
 ) : ConversionState() {
     override suspend fun transition(): State = ConversionFailed(
         stateContext,
         R.string.conversion_failed_unshorten_permission_denied,
+        listOf(urlConverter.name),
     )
 }
 
@@ -253,12 +255,14 @@ data class GrantedParseHtmlPermission(
             return ConversionFailed(
                 stateContext,
                 R.string.conversion_failed_parse_html_connection_error,
+                listOf(urlConverter.name),
             )
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(
                 stateContext,
                 R.string.conversion_failed_parse_html_error,
+                listOf(urlConverter.name),
             )
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
@@ -289,9 +293,10 @@ data class ConversionSucceeded(val geoUri: String) : ConversionState()
 data class ConversionFailed(
     val stateContext: ConversionStateContext,
     val messageResId: Int,
+    val formatArgs: List<String> = emptyList(),
 ) : ConversionState() {
     override suspend fun transition(): State? {
-        stateContext.onMessage(Message(messageResId, Message.Type.ERROR))
+        stateContext.onMessage(Message(messageResId, Message.Type.ERROR, formatArgs))
         return null
     }
 }

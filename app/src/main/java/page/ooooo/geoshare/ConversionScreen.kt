@@ -31,7 +31,10 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
             val requestedUnshortenPermission =
                 currentState as RequestedUnshortenPermission
             PermissionDialog(
-                title = stringResource(R.string.conversion_permission_common_title),
+                title = stringResource(
+                    R.string.conversion_permission_common_title,
+                    requestedUnshortenPermission.urlConverter.name,
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_unshorten_deny),
                 onConfirmation = { viewModel.grant(it) },
@@ -45,7 +48,8 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
                         stringResource(
                             R.string.conversion_permission_unshorten_text,
                             requestedUnshortenPermission.url.toString(),
-                            appName
+                            appName,
+                            requestedUnshortenPermission.urlConverter.name,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -57,7 +61,10 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
             val requestedParseHtmlPermission =
                 currentState as RequestedParseHtmlPermission
             PermissionDialog(
-                title = stringResource(R.string.conversion_permission_common_title),
+                title = stringResource(
+                    R.string.conversion_permission_common_title,
+                    requestedParseHtmlPermission.urlConverter.name,
+                ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_parse_html_deny),
                 onConfirmation = { viewModel.grant(it) },
@@ -71,7 +78,8 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
                         stringResource(
                             R.string.conversion_permission_parse_html_text,
                             truncateMiddle(requestedParseHtmlPermission.url.toString()),
-                            appName
+                            appName,
+                            requestedParseHtmlPermission.urlConverter.name,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
