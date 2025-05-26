@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.Clipboard
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
+import page.ooooo.geoshare.lib.converters.ParseHtmlResult
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
@@ -267,11 +268,11 @@ data class GrantedParseHtmlPermission(
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
-            is UrlConverter.ParseHtmlResult.Parsed -> ConversionSucceeded(
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(
                 parseHtmlResult.geoUriBuilder.toString(),
             )
 
-            is UrlConverter.ParseHtmlResult.Redirect -> ReceivedUrl(
+            is ParseHtmlResult.Redirect -> ReceivedUrl(
                 stateContext,
                 parseHtmlResult.url,
                 Permission.ALWAYS,

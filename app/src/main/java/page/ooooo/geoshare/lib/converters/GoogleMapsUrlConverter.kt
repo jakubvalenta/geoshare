@@ -12,8 +12,7 @@ import java.net.URL
 class GoogleMapsUrlConverter(
     private val log: ILog = DefaultLog(),
     private val uriQuote: UriQuote = DefaultUriQuote(),
-) : UrlConverter() {
-
+) : UrlConverter {
     override val name = "Google Maps"
 
     val fullUrlPattern: Pattern =

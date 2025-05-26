@@ -10,7 +10,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.UrlConverter.ParseHtmlResult
+import page.ooooo.geoshare.lib.converters.ParseHtmlResult
 import java.net.URL
 
 @Suppress("SpellCheckingInspection")
