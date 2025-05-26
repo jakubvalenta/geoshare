@@ -6,8 +6,13 @@ If you like finding places on Google Maps but prefer a different app for navigat
 
 You can also use the app to copy Google Maps links as geo: links to your clipboard.
 
+<b>Supported maps</b>
+
+- Google Maps
+- Apple Maps
+
 <b>How it works and privacy considerations</b>
 
-Geo Share converts Google Maps links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. Geo Share parses them from the Google Maps URL.
+Geo Share converts map links (e.g. https://maps.google.com/...) into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. Geo Share parses them from the map URL.
 
-However, not all Google Maps URLs include coordinates. In such cases, Geo Share will prompt you for permission to connect to Google and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app's FAQ screen.
+However, not all map URLs include coordinates. In such cases, Geo Share will prompt you for permission to connect to the map service (e.g. Google Maps) and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app's FAQ screen.
