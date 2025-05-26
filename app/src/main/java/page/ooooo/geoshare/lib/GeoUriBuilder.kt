@@ -34,11 +34,17 @@ data class GeoUriParams(
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) {
     fun fromMatcher(m: Matcher) {
-        val newQ = matchGroupOrNull(m, "q")
+        setQFromString(matchGroupOrNull(m, "q"))
+        setZFromString(matchGroupOrNull(m, "z"))
+    }
+
+    fun setQFromString(newQ: String?) {
         if (newQ != null) {
             q = newQ
         }
-        val newZ = matchGroupOrNull(m, "z")
+    }
+
+    fun setZFromString(newZ: String?) {
         if (newZ != null) {
             z = max(1, min(21, newZ.toDouble().roundToInt())).toString()
         }

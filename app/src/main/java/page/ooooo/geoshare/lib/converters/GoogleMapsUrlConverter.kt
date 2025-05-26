@@ -32,7 +32,7 @@ class GoogleMapsUrlConverter(
     val placeRegex = """(?P<q>[^/]+)"""
 
     @Suppress("SpellCheckingInspection")
-    val pathPatterns = listOf(
+    val urlPathPatterns = listOf(
         Pattern.compile("""^/maps/.*/@[\d.,+-]+,${zoomRegex}z/data=.*$dataCoordRegex.*$"""),
         Pattern.compile("""^/maps/.*/data=.*$dataCoordRegex.*$"""),
         Pattern.compile("""^/maps/@$coordRegex,${zoomRegex}z.*$"""),
@@ -57,14 +57,15 @@ class GoogleMapsUrlConverter(
         Pattern.compile("""^/search/?$"""),
         Pattern.compile("""^/?$"""),
     )
-    val queryPatterns = mapOf<String, List<Pattern>>(
-        // Later query patterns overwrite earlier ones.
-        "viewpoint" to listOf(coordPattern),
-        "center" to listOf(coordPattern),
-        "q" to listOf(coordPattern, queryPattern),
-        "query" to listOf(coordPattern, queryPattern),
-        "destination" to listOf(coordPattern, queryPattern),
-        "zoom" to listOf(zoomPattern)
+    val urlQueryPatterns = listOf<Map<String, Pattern>>(
+        mapOf("destination" to coordPattern),
+        mapOf("destination" to queryPattern),
+        mapOf("q" to coordPattern),
+        mapOf("q" to queryPattern),
+        mapOf("query" to coordPattern),
+        mapOf("query" to queryPattern),
+        mapOf("viewpoint" to coordPattern),
+        mapOf("center" to coordPattern),
     )
     val htmlPatterns = listOf(
         Pattern.compile("""/@$coordRegex"""),
@@ -82,33 +83,35 @@ class GoogleMapsUrlConverter(
         shortUrlPattern.matcher(url.toString()).matches()
 
     override fun parseUrl(url: URL): GeoUriBuilder? {
-        val rawPath = url.path
-        if (rawPath == null) {
+        val rawUrlPath = url.path
+        if (rawUrlPath == null) {
             log.w(null, "Missing both path and query in Google Maps URL $url")
             return null
         }
-        val path = uriQuote.decode(rawPath)
-        val m = pathPatterns.firstNotNullOfOrNull {
-            val m = it.matcher(path)
-            if (m.matches()) m else null
+        val urlPath = uriQuote.decode(rawUrlPath)
+        val urlPathMatcher = urlPathPatterns.firstNotNullOfOrNull {
+            it.matcher(urlPath)?.takeIf { it.matches() }
         }
-        if (m == null) {
+        if (urlPathMatcher == null) {
             log.w(null, "Failed to parse Google Maps URL $url")
             return null
         }
-        val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
-        geoUriBuilder.fromMatcher(m)
+
+        val geoUriBuilder = GeoUriBuilder(uriQuote)
+        geoUriBuilder.fromMatcher(urlPathMatcher)
+
         val urlQueryParams = getUrlQueryParams(url, uriQuote)
-        for (queryPattern in queryPatterns) {
-            val paramName = queryPattern.key
-            val paramValue = urlQueryParams[paramName] ?: continue
-            val patterns = queryPattern.value
-            val m = patterns.firstNotNullOfOrNull {
-                val m = it.matcher(paramValue)
-                if (m.matches()) m else null
-            } ?: continue
-            geoUriBuilder.fromMatcher(m)
+        val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
+            it.map { (paramName, paramPattern) ->
+                val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
+                paramPattern.matcher(paramValue).takeIf { it.matches() } ?: return@firstNotNullOfOrNull null
+            }
         }
+        urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
+
+        val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it) }?.takeIf { it.matches() }
+        zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
+
         log.i(null, "Converted $url to $geoUriBuilder")
         return geoUriBuilder
     }
