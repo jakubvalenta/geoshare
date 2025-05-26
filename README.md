@@ -137,18 +137,18 @@ GitHub](https://github.com/jakubvalenta/geoshare/issues).
 
 ## Screenshots
 
-[<img src="./metadata/en-US/images/phoneScreenshots/1.png"
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"
 alt="Screenshot of Geo Share's main screen"
-width="270">](./metadata/en-US/images/phoneScreenshots/1.png)
-[<img src="./metadata/en-US/images/phoneScreenshots/2.png"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"
 alt="Screenshot of Geo Share's share screen"
-width="270">](./metadata/en-US/images/phoneScreenshots/2.png)
-[<img src="./metadata/en-US/images/phoneScreenshots/3.png"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"
 alt="Screenshot of Geo Share asking for permission to connect to Google"
-width="270">](./metadata/en-US/images/phoneScreenshots/3.png)
-[<img src="./metadata/en-US/images/phoneScreenshots/4.png"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
 alt="Screenshot of Geo Share's intro screen"
-width="270">](./metadata/en-US/images/phoneScreenshots/4.png)
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
 
 ## Installation
 
