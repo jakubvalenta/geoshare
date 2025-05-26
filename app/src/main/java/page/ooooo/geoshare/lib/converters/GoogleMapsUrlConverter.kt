@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.GeoUriBuilder
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.getUrlQueryParams
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -96,19 +97,16 @@ class GoogleMapsUrlConverter(
         }
         val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
         geoUriBuilder.fromMatcher(m)
-        if (url.query != null) {
-            for (rawParam in url.query.split('&')) {
-                val paramParts = rawParam.split('=')
-                val paramName = paramParts.firstOrNull() ?: continue
-                val rawParamValue = paramParts.drop(1).firstOrNull() ?: continue
-                val patterns = queryPatterns[paramName] ?: continue
-                val paramValue = uriQuote.decode(rawParamValue)
-                val m = patterns.firstNotNullOfOrNull {
-                    val m = it.matcher(paramValue)
-                    if (m.matches()) m else null
-                } ?: continue
-                geoUriBuilder.fromMatcher(m)
-            }
+        val urlQueryParams = getUrlQueryParams(url, uriQuote)
+        for (queryPattern in queryPatterns) {
+            val paramName = queryPattern.key
+            val paramValue = urlQueryParams[paramName] ?: continue
+            val patterns = queryPattern.value
+            val m = patterns.firstNotNullOfOrNull {
+                val m = it.matcher(paramValue)
+                if (m.matches()) m else null
+            } ?: continue
+            geoUriBuilder.fromMatcher(m)
         }
         log.i(null, "Converted $url to $geoUriBuilder")
         return geoUriBuilder
