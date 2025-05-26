@@ -57,12 +57,13 @@ class GoogleMapsUrlConverter(
         Pattern.compile("""^/search/?$"""),
         Pattern.compile("""^/?$"""),
     )
-    val queryPatterns = hashMapOf<String, List<Pattern>>(
+    val queryPatterns = mapOf<String, List<Pattern>>(
+        // Later query patterns overwrite earlier ones.
+        "viewpoint" to listOf(coordPattern),
         "center" to listOf(coordPattern),
-        "destination" to listOf(coordPattern, queryPattern),
         "q" to listOf(coordPattern, queryPattern),
         "query" to listOf(coordPattern, queryPattern),
-        "viewpoint" to listOf(coordPattern),
+        "destination" to listOf(coordPattern, queryPattern),
         "zoom" to listOf(zoomPattern)
     )
     val htmlPatterns = listOf(

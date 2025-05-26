@@ -20,8 +20,7 @@ class GoogleMapsUrlConverterTest {
 
     @Before
     fun before() {
-        googleMapsUrlConverter =
-            GoogleMapsUrlConverter(FakeLog(), FakeUriQuote())
+        googleMapsUrlConverter = GoogleMapsUrlConverter(FakeLog(), FakeUriQuote())
     }
 
     @Test
@@ -35,12 +34,12 @@ class GoogleMapsUrlConverterTest {
     }
 
     @Test
-    fun isSupportedUrl_fullUrl() {
+    fun isSupportedUrl_supportedFullUrl() {
         assertTrue(googleMapsUrlConverter.isSupportedUrl(URL("https://www.google.com/maps/@52.5067296,13.2599309,6z")))
     }
 
     @Test
-    fun isSupportedUrl_shortUrl() {
+    fun isSupportedUrl_supportedShortUrl() {
         assertTrue(googleMapsUrlConverter.isSupportedUrl(URL("https://maps.app.goo.gl/foo")))
     }
 
@@ -229,6 +228,34 @@ class GoogleMapsUrlConverterTest {
         assertEquals(
             "geo:0,0?q=centurylink%20field",
             googleMapsUrlConverter.parseUrl(URL("https://www.google.com/maps/search/?api=1&query=centurylink%2Bfield"))
+                .toString()
+        )
+    }
+
+    @Test
+    fun parseUrl_parameterQTakesPrecendence() {
+        assertEquals(
+            "geo:40.7128,-74.0060",
+            googleMapsUrlConverter.parseUrl(URL("https://www.google.com/?q=40.7128,-74.0060&viewpoint=34.0522,-118.2437"))
+                .toString()
+        )
+        assertEquals(
+            "geo:40.7128,-74.0060",
+            googleMapsUrlConverter.parseUrl(URL("https://www.google.com/?q=40.7128,-74.0060&center=34.0522,-118.2437"))
+                .toString()
+        )
+    }
+
+    @Test
+    fun parseUrl_parameterDestinationTakesPrecendence() {
+        assertEquals(
+            "geo:0,0?q=Cherbourg%2CFrance",
+            googleMapsUrlConverter.parseUrl(URL("https://www.google.com/?destination=Cherbourg%2CFrance&q=Paris%2CFrance"))
+                .toString()
+        )
+        assertEquals(
+            "geo:0,0?q=Cherbourg%2CFrance",
+            googleMapsUrlConverter.parseUrl(URL("https://www.google.com/?destination=Cherbourg%2CFrance&query=Paris%2CFrance"))
                 .toString()
         )
     }
@@ -453,51 +480,51 @@ class GoogleMapsUrlConverterTest {
     }
 
     @Test
-    fun isGoogleMapsShortUri_mapsAppGooGlCorrect() {
+    fun isShortUri_mapsAppGooGlCorrect() {
         assertTrue(googleMapsUrlConverter.isShortUrl(URL("https://maps.app.goo.gl/foo")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_mapsAppGooGlWithQueryStringCorrect() {
+    fun isShortUri_mapsAppGooGlWithQueryStringCorrect() {
         assertTrue(googleMapsUrlConverter.isShortUrl(URL("https://maps.app.goo.gl/foo?g_st=isi")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_mapsAppGooGlMissingPath() {
+    fun isShortUri_mapsAppGooGlMissingPath() {
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://maps.app.goo.gl/")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_appGooGlCorrect() {
+    fun isShortUri_appGooGlCorrect() {
         assertTrue(googleMapsUrlConverter.isShortUrl(URL("https://app.goo.gl/maps/foo")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_appGooGlWrongPath() {
+    fun isShortUri_appGooGlWrongPath() {
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://app.goo.gl/maps")))
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://app.goo.gl/maps/")))
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://app.goo.gl/foo/bar")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_gooGlCorrect() {
+    fun isShortUri_gooGlCorrect() {
         assertTrue(googleMapsUrlConverter.isShortUrl(URL("https://goo.gl/maps/foo")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_gooGlWrongPath() {
+    fun isShortUri_gooGlWrongPath() {
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://goo.gl/maps")))
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://goo.gl/maps/")))
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://goo.gl/foo/bar")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_gCoCorrect() {
+    fun isShortUri_gCoCorrect() {
         assertTrue(googleMapsUrlConverter.isShortUrl(URL("https://g.co/kgs/foo")))
     }
 
     @Test
-    fun isGoogleMapsShortUri_unknownDomain() {
+    fun isShortUri_unknownDomain() {
         assertFalse(googleMapsUrlConverter.isShortUrl(URL("https://www.example.com/foo")))
     }
 }
