@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib
 
 import android.os.Build
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.UrlConverter
 
 data class ConversionStateContext(
