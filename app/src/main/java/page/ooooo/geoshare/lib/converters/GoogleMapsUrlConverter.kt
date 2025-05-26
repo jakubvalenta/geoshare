@@ -77,14 +77,9 @@ class GoogleMapsUrlConverter(
     override fun isShortUrl(url: URL): Boolean = shortUrlPattern.matcher(url.toString()).matches()
 
     override fun parseUrl(url: URL): ParseUrlResult? {
-        val rawUrlPath = url.path
-        if (rawUrlPath == null) {
-            log.w(null, "Google Maps URL is missing both path and query $url")
-            return null
-        }
-        val urlPath = uriQuote.decode(rawUrlPath)
+        val urlPath = uriQuote.decode(url.path)
         val urlPathMatcher = urlPathPatterns.firstNotNullOfOrNull {
-            it.matcher(urlPath)?.takeIf { it.matches() }
+            it.matcher(urlPath).takeIf { it.matches() }
         }
         if (urlPathMatcher == null) {
             log.w(null, "Google Maps URL does not match any known path pattern $url")
@@ -103,7 +98,7 @@ class GoogleMapsUrlConverter(
         }
         urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
 
-        val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it) }?.takeIf { it.matches() }
+        val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it).takeIf { it.matches() } }
         zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
 
         return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
@@ -121,7 +116,7 @@ class GoogleMapsUrlConverter(
 
     private fun parseGoogleMapsHtml(html: String): GeoUriBuilder? {
         val m = htmlPatterns.firstNotNullOfOrNull {
-            it.matcher(html)?.takeIf { it.find() }
+            it.matcher(html).takeIf { it.find() }
         }
         if (m == null) {
             log.w(null, "Google Maps HTML does not match any known pattern")

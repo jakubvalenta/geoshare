@@ -45,6 +45,30 @@ class GoogleMapsUrlConverterTest {
     }
 
     @Test
+    fun parseUrl_noPathOrKnownUrlQueryParams() {
+        assertEquals(
+            "geo:0,0",
+            (googleMapsUrlConverter.parseUrl(URL("https://maps.google.com")) as ParseUrlResult.RequiresHtmlParsingToGetCoords).geoUriBuilder
+                .toString()
+        )
+        assertEquals(
+            "geo:0,0",
+            (googleMapsUrlConverter.parseUrl(URL("https://maps.google.com/")) as ParseUrlResult.RequiresHtmlParsingToGetCoords).geoUriBuilder
+                .toString()
+        )
+        assertEquals(
+            "geo:0,0",
+            (googleMapsUrlConverter.parseUrl(URL("https://maps.google.com/?spam=1")) as ParseUrlResult.RequiresHtmlParsingToGetCoords).geoUriBuilder
+                .toString()
+        )
+    }
+
+    @Test
+    fun parseUrl_unknownPath() {
+        assertNull(googleMapsUrlConverter.parseUrl(URL("https://maps.google.com/spam")))
+    }
+
+    @Test
     fun parseUrl_coordinatesOnly() {
         assertEquals(
             "geo:52.5067296,13.2599309?z=6",
@@ -320,6 +344,15 @@ class GoogleMapsUrlConverterTest {
         assertEquals(
             "geo:-33.712206,150.311941?z=12",
             (googleMapsUrlConverter.parseUrl(URL("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206%2C150.311941&zoom=12&basemap=terrain")) as ParseUrlResult.Parsed).geoUriBuilder
+                .toString()
+        )
+    }
+
+    @Test
+    fun parseUrl_apiCenterWithInvalidZoom() {
+        assertEquals(
+            "geo:-33.712206,150.311941",
+            (googleMapsUrlConverter.parseUrl(URL("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206%2C150.311941&zoom=spam&basemap=terrain")) as ParseUrlResult.Parsed).geoUriBuilder
                 .toString()
         )
     }
