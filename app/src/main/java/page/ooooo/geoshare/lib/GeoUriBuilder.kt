@@ -31,7 +31,7 @@ data class GeoUriCoords(var lat: String = "0", var lon: String = "0") {
 data class GeoUriParams(
     var q: String? = null,
     var z: String? = null,
-    private val uriQuote: UriQuote = DefaultUriQuote()
+    private val uriQuote: UriQuote = DefaultUriQuote(),
 ) {
     fun fromMatcher(m: Matcher) {
         val newQ = matchGroupOrNull(m, "q")
@@ -44,7 +44,7 @@ data class GeoUriParams(
         }
     }
 
-    override fun toString(): String = hashMapOf("q" to q, "z" to z)
+    override fun toString(): String = mapOf("q" to q, "z" to z)
         .filter { it.value != null }
         .map { "${it.key}=${uriQuote.encode(it.value!!.replace('+', ' '))}" }
         .fastJoinToString("&")
