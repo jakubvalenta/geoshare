@@ -130,8 +130,7 @@ class GoogleMapsUrlConverter(
 
     private fun parseGoogleMapsHtml(html: String): GeoUriBuilder? {
         val m = htmlPatterns.firstNotNullOfOrNull {
-            val m = it.matcher(html)
-            if (m.find()) m else null
+            it.matcher(html)?.takeIf { it.find() }
         }
         if (m == null) {
             log.w(null, "Failed to parse Google Maps HTML document")
@@ -144,8 +143,7 @@ class GoogleMapsUrlConverter(
     }
 
     private fun parseGoogleSearchHtml(html: String): URL? {
-        val m = googleSearchHtmlPattern.matcher(html)
-            .let { if (it.find()) it else null }
+        val m = googleSearchHtmlPattern.matcher(html).takeIf { it.find() }
         if (m == null) {
             log.w(null, "Failed to parse Google Search HTML document")
             return null
