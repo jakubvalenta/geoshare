@@ -75,7 +75,7 @@
     <string name="sharing_failed_activity_not_found">Není nainstalovaná žádná aplikace, která umí otevřít geo: odkazy</string>
     <string name="copying_finished">geo: odkaz zkopírován do schránky</string>
     <string name="copying_finished_unchanged">geo: odkaz zkopírován do schránky beze změny</string>
-    <string name="conversion_failed_unshorten_permission_denied">Tento odkaz není podporován bez spojení s Googlem</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">Tento odkaz není podporován bez spojení s Googlem</string>
     <string name="conversion_failed_parse_html_error">Nepodařilo se stáhnout webovou stránku Google Map</string>
     <string name="nav_back_content_description">Zpět na hlavní obrazovku</string>
     <string name="conversion_failed_unshorten_connection_error">Chyba připojení při zpracovávání krátkého odkazu</string>

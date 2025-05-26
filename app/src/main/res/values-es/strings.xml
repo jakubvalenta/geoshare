@@ -63,7 +63,7 @@
     <string name="sharing_succeeded_unchanged">Se abrió el enlace geo: sin cambios</string>
     <string name="sharing_failed_activity_not_found">No hay ninguna aplicación instalada que pueda abrir enlaces geo:</string>
     <string name="copying_finished">Se copió el enlace geo: al portapapeles</string>
-    <string name="conversion_failed_unshorten_permission_denied">Este enlace no es compatible sin conectarse a Google</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">Este enlace no es compatible sin conectarse a Google</string>
     <string name="conversion_failed_parse_html_connection_error">Error de conexión al obtener la página de Google Maps</string>
     <string name="copy_activity">Copiar geo:</string>
     <string name="nav_back_content_description">Volver a la pantalla principal</string>

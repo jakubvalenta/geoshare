@@ -68,7 +68,7 @@
     <string name="sharing_succeeded">Link geo: aberto</string>
     <string name="sharing_failed_activity_not_found">Nenhum app que consiga abrir links geo: está instalado</string>
     <string name="copying_finished">Link geo: copiado para a área de transferência</string>
-    <string name="conversion_failed_unshorten_permission_denied">O link não é suportado sem se conectar ao Google</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">O link não é suportado sem se conectar ao Google</string>
     <string name="conversion_failed_parse_html_error">Falha ao solicitar a página do Google Maps</string>
     <string name="copying_finished_unchanged">Link geo: copiado para a área de transferência sem alterações</string>
     <string name="nav_back_content_description">Voltar para a tela inicial</string>

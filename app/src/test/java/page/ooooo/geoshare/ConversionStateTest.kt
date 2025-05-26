@@ -21,6 +21,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.ParseHtmlResult
 import page.ooooo.geoshare.lib.converters.ParseUrlResult
@@ -575,7 +576,7 @@ class ConversionStateTest {
                 URL("https://maps.app.goo.gl/foo"),
                 Permission.NEVER,
             )
-            assertTrue(state.transition() is DeniedUnshortenPermission)
+            assertTrue(state.transition() is DeniedConnectionPermission)
         }
 
     @Test
@@ -673,7 +674,7 @@ class ConversionStateTest {
                 URL("https://maps.app.goo.gl/foo"),
                 null,
             )
-            assertTrue(state.transition() is DeniedUnshortenPermission)
+            assertTrue(state.transition() is DeniedConnectionPermission)
         }
 
     @Test
@@ -796,7 +797,7 @@ class ConversionStateTest {
                 googleMapsUrlConverter,
                 url,
             )
-            assertTrue(state.deny(false) is DeniedUnshortenPermission)
+            assertTrue(state.deny(false) is DeniedConnectionPermission)
             verify(mockUserPreferencesRepository, never()).setValue(
                 eq(connectToGooglePermission),
                 any<Permission>(),
@@ -830,7 +831,7 @@ class ConversionStateTest {
                 googleMapsUrlConverter,
                 url,
             )
-            assertTrue(state.deny(true) is DeniedUnshortenPermission)
+            assertTrue(state.deny(true) is DeniedConnectionPermission)
             verify(mockUserPreferencesRepository).setValue(
                 connectToGooglePermission,
                 Permission.NEVER,
@@ -964,7 +965,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun deniedUnshortenPermission_returnsFailed() = runTest {
+    fun deniedConnectionPermission_returnsFailed() = runTest {
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -974,11 +975,11 @@ class ConversionStateTest {
             log = fakeLog,
             onMessage = fakeOnMessage,
         )
-        val state = DeniedUnshortenPermission(stateContext, googleMapsUrlConverter)
+        val state = DeniedConnectionPermission(stateContext, googleMapsUrlConverter)
         assertEquals(
             ConversionFailed(
                 stateContext,
-                R.string.conversion_failed_unshorten_permission_denied,
+                R.string.conversion_failed_connect_to_google_permission_denied,
                 listOf(googleMapsUrlConverter.name),
             ),
             state.transition(),
@@ -1022,7 +1023,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsAlways_returnsGrantedParseHtmlPermission() =
+    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsAlways_returnsGrantedParseHtmlToGetCoordsPermission() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val mockGoogleMapsUrlConverter =
@@ -1053,7 +1054,7 @@ class ConversionStateTest {
                 Permission.ALWAYS,
             )
             assertEquals(
-                GrantedParseHtmlPermission(
+                GrantedParseHtmlToGetCoordsPermission(
                     stateContext,
                     mockGoogleMapsUrlConverter,
                     url,
@@ -1064,7 +1065,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsAsk_returnsRequestedParseHtmlPermission() =
+    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsAsk_returnsRequestedParseHtmlToGetCoordsPermission() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val mockGoogleMapsUrlConverter =
@@ -1095,7 +1096,7 @@ class ConversionStateTest {
                 Permission.ASK,
             )
             assertEquals(
-                RequestedParseHtmlPermission(
+                RequestedParseHtmlToGetCoordsPermission(
                     stateContext,
                     mockGoogleMapsUrlConverter,
                     url,
@@ -1106,7 +1107,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNever_returnsDeniedParseHtmlPermission() =
+    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNever_returnsDeniedParseHtmlToGetCoordsPermission() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val mockGoogleMapsUrlConverter =
@@ -1137,13 +1138,13 @@ class ConversionStateTest {
                 Permission.NEVER,
             )
             assertEquals(
-                DeniedParseHtmlPermission(geoUriBuilderFromUrl.toString()),
+                DeniedParseHtmlToGetCoordsPermission(geoUriBuilderFromUrl.toString()),
                 state.transition(),
             )
         }
 
     @Test
-    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedParseHtmlPermission() =
+    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedParseHtmlToGetCoordsPermission() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val mockGoogleMapsUrlConverter =
@@ -1175,7 +1176,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
-                GrantedParseHtmlPermission(
+                GrantedParseHtmlToGetCoordsPermission(
                     stateContext,
                     mockGoogleMapsUrlConverter,
                     url,
@@ -1186,7 +1187,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedParseHtmlPermission() =
+    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedParseHtmlToGetCoordsPermission() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val mockGoogleMapsUrlConverter =
@@ -1218,7 +1219,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
-                RequestedParseHtmlPermission(
+                RequestedParseHtmlToGetCoordsPermission(
                     stateContext,
                     mockGoogleMapsUrlConverter,
                     url,
@@ -1229,7 +1230,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedParseHtmlPermission() =
+    fun unshortenedUrl_parsingUrlReturnsRequiresHtmlParsingToGetCoordsAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedParseHtmlToGetCoordsPermission() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val mockGoogleMapsUrlConverter =
@@ -1261,7 +1262,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
-                DeniedParseHtmlPermission(geoUriBuilderFromUrl.toString()),
+                DeniedParseHtmlToGetCoordsPermission(geoUriBuilderFromUrl.toString()),
                 state.transition(),
             )
         }
@@ -1346,6 +1347,7 @@ class ConversionStateTest {
 
     @Test
     fun requestedParseHtmlPermission_transition_returnsNull() = runTest {
+        val url = URL("https://maps.apple.com/foo")
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -1358,8 +1360,7 @@ class ConversionStateTest {
         val state = RequestedParseHtmlPermission(
             stateContext,
             googleMapsUrlConverter,
-            URL("https://maps.app.goo.gl/foo"),
-            "geo:1,2?q=fromUrl",
+            url,
         )
         assertNull(state.transition())
     }
@@ -1367,6 +1368,7 @@ class ConversionStateTest {
     @Test
     fun requestedParseHtmlPermission_grantWithDoNotAskFalse_doesNotSavePreferenceAndReturnsGrantedUnshortenPermission() =
         runTest {
+            val url = URL("https://maps.apple.com/foo")
             val mockUserPreferencesRepository = Mockito.mock(
                 FakeUserPreferencesRepository::class.java
             )
@@ -1376,12 +1378,6 @@ class ConversionStateTest {
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
-            val url = URL("https://maps.app.goo.gl/foo")
-            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
-            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
-            geoUriBuilderFromUrl.params =
-                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
-            val geoUriFromUrl = geoUriBuilderFromUrl.toString()
             val stateContext = ConversionStateContext(
                 urlConverters,
                 mockIntentTools,
@@ -1395,14 +1391,12 @@ class ConversionStateTest {
                 stateContext,
                 googleMapsUrlConverter,
                 url,
-                geoUriFromUrl,
             )
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
                     googleMapsUrlConverter,
                     url,
-                    geoUriFromUrl,
                 ),
                 state.grant(false),
             )
@@ -1415,12 +1409,7 @@ class ConversionStateTest {
     @Test
     fun requestedParseHtmlPermission_grantWithDoNotAskTrue_savesPreferenceAndReturnsGrantedUnshortenPermission() =
         runTest {
-            val url = URL("https://maps.app.goo.gl/foo")
-            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
-            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
-            geoUriBuilderFromUrl.params =
-                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
-            val geoUriFromUrl = geoUriBuilderFromUrl.toString()
+            val url = URL("https://maps.apple.com/foo")
             val mockUserPreferencesRepository = Mockito.mock(
                 FakeUserPreferencesRepository::class.java
             )
@@ -1443,14 +1432,12 @@ class ConversionStateTest {
                 stateContext,
                 googleMapsUrlConverter,
                 url,
-                geoUriFromUrl,
             )
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
                     googleMapsUrlConverter,
                     url,
-                    geoUriFromUrl,
                 ),
                 state.grant(true),
             )
@@ -1463,12 +1450,7 @@ class ConversionStateTest {
     @Test
     fun requestedParseHtmlPermission_denyWithDoNotAskFalse_doesNotSavePreferenceAndReturnsGrantedUnshortenPermission() =
         runTest {
-            val url = URL("https://maps.app.goo.gl/foo")
-            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
-            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
-            geoUriBuilderFromUrl.params =
-                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
-            val geoUriFromUrl = geoUriBuilderFromUrl.toString()
+            val url = URL("https://maps.apple.com/foo")
             val mockUserPreferencesRepository = Mockito.mock(
                 FakeUserPreferencesRepository::class.java
             )
@@ -1491,10 +1473,9 @@ class ConversionStateTest {
                 stateContext,
                 googleMapsUrlConverter,
                 url,
-                geoUriFromUrl,
             )
             assertEquals(
-                DeniedParseHtmlPermission(geoUriFromUrl), state.deny(false)
+                DeniedConnectionPermission(stateContext, googleMapsUrlConverter), state.deny(false)
             )
             verify(mockUserPreferencesRepository, never()).setValue(
                 eq(connectToGooglePermission),
@@ -1505,12 +1486,7 @@ class ConversionStateTest {
     @Test
     fun requestedParseHtmlPermission_denyWithDoNotAskTrue_savesPreferenceAndReturnsGrantedUnshortenPermission() =
         runTest {
-            val url = URL("https://maps.app.goo.gl/foo")
-            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
-            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
-            geoUriBuilderFromUrl.params =
-                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
-            val geoUriFromUrl = geoUriBuilderFromUrl.toString()
+            val url = URL("https://maps.apple.com/foo")
             val mockUserPreferencesRepository = Mockito.mock(
                 FakeUserPreferencesRepository::class.java
             )
@@ -1533,10 +1509,9 @@ class ConversionStateTest {
                 stateContext,
                 googleMapsUrlConverter,
                 url,
-                geoUriFromUrl,
             )
             assertEquals(
-                DeniedParseHtmlPermission(geoUriFromUrl), state.deny(true)
+                DeniedConnectionPermission(stateContext, googleMapsUrlConverter), state.deny(true)
             )
             verify(mockUserPreferencesRepository).setValue(
                 connectToGooglePermission,
@@ -1546,6 +1521,345 @@ class ConversionStateTest {
 
     @Test
     fun grantedParseHtmlPermission_downloadingHtmlThrowsSocketTimeoutException_returnsConversionFailedWithConnectionErrorMessage() =
+        runTest {
+            val url = URL("https://maps.apple.com/foo")
+            val mockNetworkTools = Mockito.mock(NetworkTools::class.java)
+            Mockito.`when`(mockNetworkTools.requestLocationHeader(any<URL>()))
+                .thenThrow(NotImplementedError::class.java)
+            Mockito.`when`(mockNetworkTools.getText(url)).thenThrow(
+                SocketTimeoutException::class.java
+            )
+            val stateContext = ConversionStateContext(
+                urlConverters,
+                mockIntentTools,
+                mockNetworkTools,
+                fakeUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                googleMapsUrlConverter,
+                url,
+            )
+            assertEquals(
+                ConversionFailed(
+                    stateContext,
+                    R.string.conversion_failed_parse_html_connection_error,
+                    listOf(googleMapsUrlConverter.name),
+                ),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlPermission_downloadingHtmlThrowsUnexpectedResponseCodeException_returnsConversionFailedWithGeneralErrorMessage() =
+        runTest {
+            val url = URL("https://maps.apple.com/foo")
+            val mockNetworkTools = Mockito.mock(NetworkTools::class.java)
+            Mockito.`when`(mockNetworkTools.requestLocationHeader(any<URL>()))
+                .thenThrow(NotImplementedError::class.java)
+            Mockito.`when`(mockNetworkTools.getText(url)).thenThrow(
+                UnexpectedResponseCodeException::class.java
+            )
+            val stateContext = ConversionStateContext(
+                urlConverters,
+                mockIntentTools,
+                mockNetworkTools,
+                fakeUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                googleMapsUrlConverter,
+                url,
+            )
+            assertEquals(
+                ConversionFailed(
+                    stateContext,
+                    R.string.conversion_failed_parse_html_error,
+                    listOf(googleMapsUrlConverter.name),
+                ),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlPermission_parsingHtmlSucceeds_returnsSucceededWithGeoUriFromHtml() =
+        runTest {
+            val url = URL("https://maps.apple.com/foo")
+            val html = "<html></html>"
+            val mockAppleMapsUrlConverter =
+                Mockito.mock(AppleMapsUrlConverter::class.java)
+            val geoUriBuilderFromHtml = GeoUriBuilder(fakeUriQuote)
+            geoUriBuilderFromHtml.coords = GeoUriCoords("1", "2")
+            geoUriBuilderFromHtml.params =
+                GeoUriParams(q = "fromHtml", uriQuote = fakeUriQuote)
+            Mockito.`when`(mockAppleMapsUrlConverter.parseHtml(html))
+                .thenReturn(ParseHtmlResult.Parsed(geoUriBuilderFromHtml))
+            val mockNetworkTools = Mockito.mock(NetworkTools::class.java)
+            Mockito.`when`(mockNetworkTools.requestLocationHeader(any<URL>()))
+                .thenThrow(NotImplementedError::class.java)
+            Mockito.`when`(mockNetworkTools.getText(url)).thenReturn(html)
+            val stateContext = ConversionStateContext(
+                listOf(mockAppleMapsUrlConverter),
+                mockIntentTools,
+                mockNetworkTools,
+                fakeUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                mockAppleMapsUrlConverter,
+                url,
+            )
+            assertEquals(
+                ConversionSucceeded(geoUriBuilderFromHtml.toString()),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlPermission_parsingHtmlFails_returnsDeniedConnectionPermission() =
+        runTest {
+            val url = URL("https://maps.apple.com/foo")
+            val html = "<html></html>"
+            val mockAppleMapsUrlConverter =
+                Mockito.mock(AppleMapsUrlConverter::class.java)
+            Mockito.`when`(mockAppleMapsUrlConverter.parseHtml(html))
+                .thenReturn(null)
+            val mockNetworkTools = Mockito.mock(NetworkTools::class.java)
+            Mockito.`when`(mockNetworkTools.requestLocationHeader(any<URL>()))
+                .thenThrow(NotImplementedError::class.java)
+            Mockito.`when`(mockNetworkTools.getText(url)).thenReturn(html)
+            val stateContext = ConversionStateContext(
+                listOf(mockAppleMapsUrlConverter),
+                mockIntentTools,
+                mockNetworkTools,
+                fakeUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                mockAppleMapsUrlConverter,
+                url,
+            )
+            assertEquals(
+                ConversionFailed(
+                    stateContext,
+                    R.string.conversion_failed_parse_html_error,
+                    listOf(mockAppleMapsUrlConverter.name),
+                ),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun requestedParseHtmlToGetCoordsPermission_transition_returnsNull() = runTest {
+        val url = URL("https://maps.app.goo.gl/foo")
+        val stateContext = ConversionStateContext(
+            urlConverters,
+            mockIntentTools,
+            mockNetworkTools,
+            fakeUserPreferencesRepository,
+            mockXiaomiTools,
+            log = fakeLog,
+            onMessage = fakeOnMessage,
+        )
+        val state = RequestedParseHtmlToGetCoordsPermission(
+            stateContext,
+            googleMapsUrlConverter,
+            url,
+            "geo:1,2?q=fromUrl",
+        )
+        assertNull(state.transition())
+    }
+
+    @Test
+    fun requestedParseHtmlToGetCoordsPermission_grantWithDoNotAskFalse_doesNotSavePreferenceAndReturnsGrantedUnshortenPermission() =
+        runTest {
+            val url = URL("https://maps.app.goo.gl/foo")
+            val mockUserPreferencesRepository = Mockito.mock(
+                FakeUserPreferencesRepository::class.java
+            )
+            Mockito.`when`(
+                mockUserPreferencesRepository.setValue(
+                    eq(connectToGooglePermission),
+                    any<Permission>(),
+                )
+            ).thenReturn(Unit)
+            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
+            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
+            geoUriBuilderFromUrl.params =
+                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
+            val stateContext = ConversionStateContext(
+                urlConverters,
+                mockIntentTools,
+                mockNetworkTools,
+                mockUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = RequestedParseHtmlToGetCoordsPermission(
+                stateContext,
+                googleMapsUrlConverter,
+                url,
+                geoUriBuilderFromUrl.toString(),
+            )
+            assertEquals(
+                GrantedParseHtmlToGetCoordsPermission(
+                    stateContext,
+                    googleMapsUrlConverter,
+                    url,
+                    geoUriBuilderFromUrl.toString(),
+                ),
+                state.grant(false),
+            )
+            verify(mockUserPreferencesRepository, never()).setValue(
+                eq(connectToGooglePermission),
+                any<Permission>(),
+            )
+        }
+
+    @Test
+    fun requestedParseHtmlToGetCoordsPermission_grantWithDoNotAskTrue_savesPreferenceAndReturnsGrantedUnshortenPermission() =
+        runTest {
+            val url = URL("https://maps.app.goo.gl/foo")
+            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
+            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
+            geoUriBuilderFromUrl.params =
+                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
+            val mockUserPreferencesRepository = Mockito.mock(
+                FakeUserPreferencesRepository::class.java
+            )
+            Mockito.`when`(
+                mockUserPreferencesRepository.setValue(
+                    eq(connectToGooglePermission),
+                    any<Permission>(),
+                )
+            ).thenReturn(Unit)
+            val stateContext = ConversionStateContext(
+                urlConverters,
+                mockIntentTools,
+                mockNetworkTools,
+                mockUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = RequestedParseHtmlToGetCoordsPermission(
+                stateContext,
+                googleMapsUrlConverter,
+                url,
+                geoUriBuilderFromUrl.toString(),
+            )
+            assertEquals(
+                GrantedParseHtmlToGetCoordsPermission(
+                    stateContext,
+                    googleMapsUrlConverter,
+                    url,
+                    geoUriBuilderFromUrl.toString(),
+                ),
+                state.grant(true),
+            )
+            verify(mockUserPreferencesRepository).setValue(
+                connectToGooglePermission,
+                Permission.ALWAYS,
+            )
+        }
+
+    @Test
+    fun requestedParseHtmlToGetCoordsPermission_denyWithDoNotAskFalse_doesNotSavePreferenceAndReturnsGrantedUnshortenPermission() =
+        runTest {
+            val url = URL("https://maps.app.goo.gl/foo")
+            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
+            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
+            geoUriBuilderFromUrl.params =
+                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
+            val mockUserPreferencesRepository = Mockito.mock(
+                FakeUserPreferencesRepository::class.java
+            )
+            Mockito.`when`(
+                mockUserPreferencesRepository.setValue(
+                    eq(connectToGooglePermission),
+                    any<Permission>(),
+                )
+            ).thenReturn(Unit)
+            val stateContext = ConversionStateContext(
+                urlConverters,
+                mockIntentTools,
+                mockNetworkTools,
+                mockUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = RequestedParseHtmlToGetCoordsPermission(
+                stateContext,
+                googleMapsUrlConverter,
+                url,
+                geoUriBuilderFromUrl.toString(),
+            )
+            assertEquals(
+                DeniedParseHtmlToGetCoordsPermission(geoUriBuilderFromUrl.toString()), state.deny(false)
+            )
+            verify(mockUserPreferencesRepository, never()).setValue(
+                eq(connectToGooglePermission),
+                any<Permission>(),
+            )
+        }
+
+    @Test
+    fun requestedParseHtmlToGetCoordsPermission_denyWithDoNotAskTrue_savesPreferenceAndReturnsGrantedUnshortenPermission() =
+        runTest {
+            val url = URL("https://maps.app.goo.gl/foo")
+            val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
+            geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
+            geoUriBuilderFromUrl.params =
+                GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
+            val mockUserPreferencesRepository = Mockito.mock(
+                FakeUserPreferencesRepository::class.java
+            )
+            Mockito.`when`(
+                mockUserPreferencesRepository.setValue(
+                    eq(connectToGooglePermission),
+                    any<Permission>(),
+                )
+            ).thenReturn(Unit)
+            val stateContext = ConversionStateContext(
+                urlConverters,
+                mockIntentTools,
+                mockNetworkTools,
+                mockUserPreferencesRepository,
+                mockXiaomiTools,
+                log = fakeLog,
+                onMessage = fakeOnMessage,
+            )
+            val state = RequestedParseHtmlToGetCoordsPermission(
+                stateContext,
+                googleMapsUrlConverter,
+                url,
+                geoUriBuilderFromUrl.toString(),
+            )
+            assertEquals(
+                DeniedParseHtmlToGetCoordsPermission(geoUriBuilderFromUrl.toString()), state.deny(true)
+            )
+            verify(mockUserPreferencesRepository).setValue(
+                connectToGooglePermission,
+                Permission.NEVER,
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlToGetCoordsPermission_downloadingHtmlThrowsSocketTimeoutException_returnsConversionFailedWithConnectionErrorMessage() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
@@ -1567,7 +1881,7 @@ class ConversionStateTest {
                 log = fakeLog,
                 onMessage = fakeOnMessage,
             )
-            val state = GrantedParseHtmlPermission(
+            val state = GrantedParseHtmlToGetCoordsPermission(
                 stateContext,
                 googleMapsUrlConverter,
                 url,
@@ -1584,7 +1898,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_downloadingHtmlThrowsUnexpectedResponseCodeException_returnsConversionFailedWithGeneralErrorMessage() =
+    fun grantedParseHtmlToGetCoordsPermission_downloadingHtmlThrowsUnexpectedResponseCodeException_returnsConversionFailedWithGeneralErrorMessage() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
@@ -1606,7 +1920,7 @@ class ConversionStateTest {
                 log = fakeLog,
                 onMessage = fakeOnMessage,
             )
-            val state = GrantedParseHtmlPermission(
+            val state = GrantedParseHtmlToGetCoordsPermission(
                 stateContext,
                 googleMapsUrlConverter,
                 url,
@@ -1623,7 +1937,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_parsingHtmlSucceeds_returnsSucceededWithGeoUriFromHtml() =
+    fun grantedParseHtmlToGetCoordsPermission_parsingHtmlSucceeds_returnsSucceededWithGeoUriFromHtml() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val html = "<html></html>"
@@ -1652,7 +1966,7 @@ class ConversionStateTest {
                 log = fakeLog,
                 onMessage = fakeOnMessage,
             )
-            val state = GrantedParseHtmlPermission(
+            val state = GrantedParseHtmlToGetCoordsPermission(
                 stateContext,
                 mockGoogleMapsUrlConverter,
                 url,
@@ -1665,7 +1979,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_parsingHtmlFailsAndParsingGoogleSearchHtmlFails_returnsSucceededWithGeoUriFromHtml() =
+    fun grantedParseHtmlToGetCoordsPermission_parsingHtmlFailsAndParsingGoogleSearchHtmlFails_returnsSucceededWithGeoUriFromHtml() =
         runTest {
             val url = URL("https://maps.google.com/foo")
             val html = "<html></html>"
@@ -1690,7 +2004,7 @@ class ConversionStateTest {
                 log = fakeLog,
                 onMessage = fakeOnMessage,
             )
-            val state = GrantedParseHtmlPermission(
+            val state = GrantedParseHtmlToGetCoordsPermission(
                 stateContext,
                 mockGoogleMapsUrlConverter,
                 url,
@@ -1703,7 +2017,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_parsingHtmlFailsAndParsingGoogleSearchHtmlSucceeds_returnsReceivedUrlWithGoogleMapsUrlAndPermissionAlways() =
+    fun grantedParseHtmlToGetCoordsPermission_parsingHtmlFailsAndParsingGoogleSearchHtmlSucceeds_returnsReceivedUrlWithGoogleMapsUrlAndPermissionAlways() =
         runTest {
             val url = URL("https://g.co/kgs/foo")
             val html = "<html></html>"
@@ -1728,7 +2042,7 @@ class ConversionStateTest {
                 log = fakeLog,
                 onMessage = fakeOnMessage,
             )
-            val state = GrantedParseHtmlPermission(
+            val state = GrantedParseHtmlToGetCoordsPermission(
                 stateContext,
                 mockGoogleMapsUrlConverter,
                 url,
@@ -1745,13 +2059,13 @@ class ConversionStateTest {
         }
 
     @Test
-    fun deniedParseHtmlPermission_returnsSucceededWithGeoUriFromUrl() =
+    fun deniedParseHtmlToGetCoordsPermission_returnsSucceededWithGeoUriFromUrl() =
         runTest {
             val geoUriBuilderFromUrl = GeoUriBuilder(fakeUriQuote)
             geoUriBuilderFromUrl.coords = GeoUriCoords("0", "0")
             geoUriBuilderFromUrl.params =
                 GeoUriParams(q = "fromUrl", uriQuote = fakeUriQuote)
-            val state = DeniedParseHtmlPermission(
+            val state = DeniedParseHtmlToGetCoordsPermission(
                 geoUriBuilderFromUrl.toString()
             )
             assertEquals(

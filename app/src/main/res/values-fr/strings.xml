@@ -70,7 +70,7 @@
     <string name="sharing_failed_activity_not_found">Aucune application pouvant ouvrir les liens géo : n’est installée</string>
     <string name="copying_finished">Copié lien géo : dans le presse-papiers</string>
     <string name="copying_finished_unchanged">Copié lien géo : dans le presse-papiers inchangé</string>
-    <string name="conversion_failed_unshorten_permission_denied">Ce lien n’est pas pris en charge sans connexion à Google</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">Ce lien n’est pas pris en charge sans connexion à Google</string>
     <string name="conversion_failed_parse_html_error">Échec de la récupération de la page Google Maps</string>
     <string name="conversion_failed_parse_html_connection_error">Erreur de connexion lors de la récupération de la page Google Maps</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Tout d’abord, allez dans Paramètres &#8594; Applications &#8594; Cartes &#8594; <i>Ouvrir par défaut</i> et désactivez l’ouverture des liens dans cette application.]]></string>

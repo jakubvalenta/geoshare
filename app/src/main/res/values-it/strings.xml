@@ -43,7 +43,7 @@
     <string name="copying_finished_unchanged">Link geo: copiato invariato</string>
     <string name="sharing_failed_activity_not_found">Nessuna app in grado di aprire link geo: installata</string>
     <string name="conversion_failed_parse_html_error">Impossibile recuperare la pagina di Google Maps</string>
-    <string name="conversion_failed_unshorten_permission_denied">Questo link non è supportato senza collegarsi a Google</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">Questo link non è supportato senza collegarsi a Google</string>
     <string name="copy_activity">Copia geo:</string>
     <string name="share_activity">Condividi geo:</string>
     <string name="main_result_geo_uri_share_content_description">Condividi</string>

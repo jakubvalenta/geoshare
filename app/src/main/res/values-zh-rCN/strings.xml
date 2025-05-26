@@ -62,7 +62,7 @@
     <string name="sharing_failed_activity_not_found">未安装可以打开 geo: 链接的应用</string>
     <string name="copying_finished">geo: 链接已复制到剪贴板</string>
     <string name="copying_finished_unchanged">已复制到剪贴板的 geo: 链接未更改</string>
-    <string name="conversion_failed_unshorten_permission_denied">如果不连接到 Google，就不支持此链接</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">如果不连接到 Google，就不支持此链接</string>
     <string name="conversion_failed_parse_html_error">无法获取 Google 地图页面</string>
     <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
     <string name="intro_open_by_default_app_content_description">%1$s 默认打开设置的屏幕截图</string>

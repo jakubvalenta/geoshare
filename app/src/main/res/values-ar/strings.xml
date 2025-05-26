@@ -9,7 +9,7 @@
     <string name="faq_item_expand">توسيع القسم</string>
     <string name="copying_finished">تم نسخ رابط جيو: إلى الحافظة</string>
     <string name="copying_finished_unchanged">تم نسخ رابط جيو: إلى الحافظة دون تغيير</string>
-    <string name="conversion_failed_unshorten_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بجوجل</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بجوجل</string>
     <string name="copy_activity">نسخ جيو:</string>
     <string name="share_activity">مشاركة جيو:</string>
     <string name="nav_menu_content_description">القائمة</string>

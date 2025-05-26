@@ -119,7 +119,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Grant parse HTML permission
         val parseHtmlPermissionDialogSelector =
-            By.res("geoShareParseHtmlPermissionDialog")
+            By.res("geoShareParseHtmlToGetCoordsPermissionDialog")
         waitAndConfirmDialogAndAssertNewWindowIsOpen(
             parseHtmlPermissionDialogSelector
         )
@@ -144,7 +144,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Grant parse HTML permission and check "Don't ask me again"
         waitAndConfirmDialogAndAssertNewWindowIsOpen(
-            By.res("geoShareParseHtmlPermissionDialog"),
+            By.res("geoShareParseHtmlToGetCoordsPermissionDialog"),
             doNotAsk = true
         )
 
@@ -168,7 +168,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Deny parse HTML permission
         val parseHtmlPermissionDialogSelector =
-            By.res("geoShareParseHtmlPermissionDialog")
+            By.res("geoShareParseHtmlToGetCoordsPermissionDialog")
         waitAndDismissDialogAndAssertItIsClosed(
             parseHtmlPermissionDialogSelector
         )
@@ -190,7 +190,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Deny parse HTML permission
         waitAndDismissDialogAndAssertItIsClosed(
-            By.res("geoShareParseHtmlPermissionDialog"),
+            By.res("geoShareParseHtmlToGetCoordsPermissionDialog"),
             doNotAsk = true
         )
 
@@ -225,7 +225,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Deny parse HTML permission
         waitAndDismissDialogAndAssertItIsClosed(
-            By.res("geoShareParseHtmlPermissionDialog")
+            By.res("geoShareParseHtmlToGetCoordsPermissionDialog")
         )
 
         // Google Maps shows precise location
@@ -236,7 +236,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Use shell command instead of startActivity() to support Xiaomi
         executeShellCommand(
             "am start -a android.intent.action.VIEW -d $unsafeUriString " +
-                "-n $packageName/page.ooooo.geoshare.ShareActivity $packageName"
+                    "-n $packageName/page.ooooo.geoshare.ShareActivity $packageName"
         )
     }
 }

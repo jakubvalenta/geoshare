@@ -99,7 +99,7 @@ data class ReceivedUrl(
 
             Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
 
-            Permission.NEVER -> DeniedUnshortenPermission(stateContext, urlConverter)
+            Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
         }
     }
 }
@@ -126,7 +126,7 @@ data class RequestedUnshortenPermission(
                 Permission.NEVER,
             )
         }
-        return DeniedUnshortenPermission(stateContext, urlConverter)
+        return DeniedConnectionPermission(stateContext, urlConverter)
     }
 }
 
@@ -157,13 +157,13 @@ data class GrantedUnshortenPermission(
     }
 }
 
-class DeniedUnshortenPermission(
+data class DeniedConnectionPermission(
     val stateContext: ConversionStateContext,
     val urlConverter: UrlConverter,
 ) : ConversionState() {
     override suspend fun transition(): State = ConversionFailed(
         stateContext,
-        R.string.conversion_failed_unshorten_permission_denied,
+        R.string.conversion_failed_connect_to_google_permission_denied,
         listOf(urlConverter.name),
     )
 }
@@ -178,24 +178,30 @@ data class UnshortenedUrl(
         val parseUrlResult = urlConverter.parseUrl(url)
         return when (parseUrlResult) {
             is ParseUrlResult.Parsed -> ConversionSucceeded(parseUrlResult.geoUriBuilder.toString())
-            is ParseUrlResult.RequiresHtmlParsing -> TODO()
+            is ParseUrlResult.RequiresHtmlParsing ->
+                when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+                    Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, urlConverter, url)
+                    Permission.ASK -> RequestedParseHtmlPermission(stateContext, urlConverter, url)
+                    Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
+                }
+
             is ParseUrlResult.RequiresHtmlParsingToGetCoords ->
                 when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
-                    Permission.ALWAYS -> GrantedParseHtmlPermission(
+                    Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
                         stateContext,
                         urlConverter,
                         url,
                         parseUrlResult.geoUriBuilder.toString(),
                     )
 
-                    Permission.ASK -> RequestedParseHtmlPermission(
+                    Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
                         stateContext,
                         urlConverter,
                         url,
                         parseUrlResult.geoUriBuilder.toString(),
                     )
 
-                    Permission.NEVER -> DeniedParseHtmlPermission(parseUrlResult.geoUriBuilder.toString())
+                    Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(parseUrlResult.geoUriBuilder.toString())
                 }
 
             null -> ConversionFailed(stateContext, R.string.conversion_failed_parse_url_error)
@@ -204,6 +210,68 @@ data class UnshortenedUrl(
 }
 
 data class RequestedParseHtmlPermission(
+    val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
+    val url: URL,
+) : ConversionState(), PermissionState {
+    override suspend fun grant(doNotAsk: Boolean): State {
+        if (doNotAsk) {
+            stateContext.userPreferencesRepository.setValue(
+                connectToGooglePermission,
+                Permission.ALWAYS,
+            )
+        }
+        return GrantedParseHtmlPermission(stateContext, urlConverter, url)
+    }
+
+    override suspend fun deny(doNotAsk: Boolean): State {
+        if (doNotAsk) {
+            stateContext.userPreferencesRepository.setValue(
+                connectToGooglePermission,
+                Permission.NEVER,
+            )
+        }
+        return DeniedConnectionPermission(stateContext, urlConverter)
+    }
+}
+
+data class GrantedParseHtmlPermission(
+    val stateContext: ConversionStateContext,
+    val urlConverter: UrlConverter,
+    val url: URL,
+) : ConversionState() {
+    override suspend fun transition(): State {
+        val html = try {
+            stateContext.networkTools.getText(url)
+        } catch (_: IOException) {
+            // Catches SocketTimeoutException too.
+            return ConversionFailed(
+                stateContext,
+                R.string.conversion_failed_parse_html_connection_error,
+                listOf(urlConverter.name),
+            )
+        } catch (_: Exception) {
+            // Catches UnexpectedResponseCodeException too.
+            return ConversionFailed(
+                stateContext,
+                R.string.conversion_failed_parse_html_error,
+                listOf(urlConverter.name),
+            )
+        }
+        val parseHtmlResult = urlConverter.parseHtml(html)
+        return when (parseHtmlResult) {
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(parseHtmlResult.geoUriBuilder.toString())
+            is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, parseHtmlResult.url, Permission.ALWAYS)
+            null -> return ConversionFailed(
+                stateContext,
+                R.string.conversion_failed_parse_html_error,
+                listOf(urlConverter.name),
+            )
+        }
+    }
+}
+
+data class RequestedParseHtmlToGetCoordsPermission(
     val stateContext: ConversionStateContext,
     val urlConverter: UrlConverter,
     val url: URL,
@@ -216,7 +284,7 @@ data class RequestedParseHtmlPermission(
                 Permission.ALWAYS,
             )
         }
-        return GrantedParseHtmlPermission(stateContext, urlConverter, url, geoUriFromUrl)
+        return GrantedParseHtmlToGetCoordsPermission(stateContext, urlConverter, url, geoUriFromUrl)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -226,11 +294,11 @@ data class RequestedParseHtmlPermission(
                 Permission.NEVER,
             )
         }
-        return DeniedParseHtmlPermission(geoUriFromUrl)
+        return DeniedParseHtmlToGetCoordsPermission(geoUriFromUrl)
     }
 }
 
-data class GrantedParseHtmlPermission(
+data class GrantedParseHtmlToGetCoordsPermission(
     val stateContext: ConversionStateContext,
     val urlConverter: UrlConverter,
     val url: URL,
@@ -263,7 +331,7 @@ data class GrantedParseHtmlPermission(
     }
 }
 
-data class DeniedParseHtmlPermission(
+data class DeniedParseHtmlToGetCoordsPermission(
     val geoUriFromUrl: String,
 ) : ConversionState() {
     override suspend fun transition(): State = ConversionSucceeded(geoUriFromUrl)
