@@ -16,6 +16,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import javax.inject.Inject
 
@@ -26,7 +27,11 @@ class ConversionViewModel @Inject constructor(
 ) : ViewModel() {
 
     val stateContext = ConversionStateContext(
-        urlConverters = listOf(GoogleMapsUrlConverter()),
+        urlConverters = listOf(
+            // Ordering converters from the most common to the least one speeds the conversion up negligibly.
+            GoogleMapsUrlConverter(),
+            AppleMapsUrlConverter(),
+        ),
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
