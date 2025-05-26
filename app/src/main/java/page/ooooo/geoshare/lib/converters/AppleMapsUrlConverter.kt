@@ -17,8 +17,9 @@ class AppleMapsUrlConverter(
 
     val urlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
 
-    val coordRegex =
-        """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
+    val latRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?)"""
+    val lonRegex = """\+?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
+    val coordRegex = "$latRegex,$lonRegex"
     val coordPattern: Pattern = Pattern.compile(coordRegex)
     val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,15})?)"""
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
@@ -35,12 +36,16 @@ class AppleMapsUrlConverter(
         mapOf("sll" to coordPattern),
         mapOf("center" to coordPattern),
     )
+    val htmlPatterns = listOf(
+        Pattern.compile("""<meta property="place:location:latitude" content="$latRegex""""),
+        Pattern.compile("""<meta property="place:location:longitude" content="$lonRegex""""),
+    )
 
     override fun isSupportedUrl(url: URL): Boolean = urlPattern.matcher(url.toString()).matches()
 
     override fun isShortUrl(url: URL): Boolean = false
 
-    override fun parseUrl(url: URL): GeoUriBuilder? {
+    override fun parseUrl(url: URL): ParseUrlResult? {
         val geoUriBuilder = GeoUriBuilder(uriQuote)
 
         val urlQueryParams = getUrlQueryParams(url, uriQuote)
@@ -50,18 +55,42 @@ class AppleMapsUrlConverter(
                 paramPattern.matcher(paramValue).takeIf { it.matches() } ?: return@firstNotNullOfOrNull null
             }
         }
-        if (urlQueryMatchers == null) {
-            log.w(null, "Failed to parse Google Maps URL $url")
-            return null
-        }
-        urlQueryMatchers.forEach { geoUriBuilder.fromMatcher(it) }
+        urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
 
-        val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it) }?.takeIf { it.matches() }
+        val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { it.matches() } }
         zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
 
-        log.i(null, "Converted $url to $geoUriBuilder")
-        return geoUriBuilder
+        return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
+            log.i(null, "Apple Maps URL converted $url > $geoUriBuilder")
+            ParseUrlResult.Parsed(geoUriBuilder)
+        } else if (urlQueryParams["auid"] != null || urlQueryParams["place-id"] != null) {
+            if (geoUriBuilder.params.q != null) {
+                log.i(null, "Apple Maps URL converted but it requires HTML parsing to get coords $url > $geoUriBuilder")
+                ParseUrlResult.RequiresHtmlParsingToGetCoords(geoUriBuilder)
+            } else {
+                log.i(null, "Apple Maps URL requires HTML parsing to get coordinates for place id $url")
+                ParseUrlResult.RequiresHtmlParsing()
+            }
+        } else if (geoUriBuilder.params.q != null) {
+            log.i(null, "Apple Maps URL converted but it contains only query $url > $geoUriBuilder")
+            ParseUrlResult.Parsed(geoUriBuilder)
+        } else {
+            log.i(null, "Apple Maps URL does not contain coordinates or query or place id $url")
+            null
+        }
     }
 
-    override fun parseHtml(html: String): ParseHtmlResult? = null
+    override fun parseHtml(html: String): ParseHtmlResult? {
+        val htmlMatchers = htmlPatterns.mapNotNull {
+            it.matcher(html).takeIf { it.find() }
+        }
+        if (htmlMatchers.isEmpty()) {
+            log.w(null, "Apple Maps HTML does not match any known pattern")
+            return null
+        }
+        val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
+        htmlMatchers.forEach { geoUriBuilder.fromMatcher(it) }
+        log.i(null, "Apple Maps HTML parsed $geoUriBuilder")
+        return ParseHtmlResult.Parsed(geoUriBuilder)
+    }
 }
