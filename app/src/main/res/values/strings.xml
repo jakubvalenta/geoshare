@@ -35,12 +35,13 @@
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_info_box"><![CDATA[%1s supports many Google Maps, Apple Maps&#8230; URL formats. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues">report an issue</a>.]]></string>
-    <string name="conversion_permission_common_title">Connect to %1$s?</string>
+    <string name="converter_google_maps_permission_title">Connect to Google?</string>
+    <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
-    <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates or place name. %2$s needs to connect to %3$s to get the information.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates or place name. %2$s needs to connect to the map service to get the information.]]></string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Use place name only</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates, but it contains a place name. %2$s can connect to %3$s to get the coordinates, or it can use the place name, which is less precise.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates, but it contains a place name. %2$s can connect to the map service to get the coordinates, or it can use the place name, which is less precise.]]></string>
     <string name="conversion_permission_xiaomi_title">Missing permission</string>
     <string name="conversion_permission_xiaomi_grant">Open Android settings</string>
     <string name="conversion_permission_xiaomi_deny">Dismiss</string>
@@ -58,7 +59,7 @@
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
-    <string name="user_preferences_connect_to_google_title">Allow connecting to the map service (Google Maps, Apple Maps etc.)?</string>
+    <string name="user_preferences_connect_to_google_title">Allow connecting to map service (Google, Apple etc.)?</string>
     <string name="user_preferences_connect_to_google_description">To support short map links, and to get coordinates from the map app web page when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
     <string name="user_preferences_connect_to_google_option_always">Yes</string>
     <string name="user_preferences_connect_to_google_option_ask">Ask before connecting</string>
@@ -75,8 +76,8 @@
     <string name="sharing_succeeded">Opened map link</string>
     <string name="sharing_failed_activity_not_found">No app that can open map links is installed</string>
     <string name="copying_finished">Copied coordinates to clipboard</string>
-    <string name="conversion_failed_connect_to_google_permission_denied">This link is not supported without connecting to %1$s</string>
-    <string name="conversion_failed_parse_html_error">Failed to fetch %1$s page</string>
-    <string name="conversion_failed_parse_html_connection_error">Connection error when fetching %1$s page</string>
+    <string name="conversion_failed_connect_to_google_permission_denied">This link is not supported without connecting to the map service</string>
+    <string name="conversion_failed_parse_html_error">Failed to fetch page from the map service</string>
+    <string name="conversion_failed_parse_html_connection_error">Connection error when fetching page from the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
 </resources>

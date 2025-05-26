@@ -164,7 +164,6 @@ data class DeniedConnectionPermission(
     override suspend fun transition(): State = ConversionFailed(
         stateContext,
         R.string.conversion_failed_connect_to_google_permission_denied,
-        listOf(urlConverter.name),
     )
 }
 
@@ -248,25 +247,19 @@ data class GrantedParseHtmlPermission(
             return ConversionFailed(
                 stateContext,
                 R.string.conversion_failed_parse_html_connection_error,
-                listOf(urlConverter.name),
             )
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(
                 stateContext,
                 R.string.conversion_failed_parse_html_error,
-                listOf(urlConverter.name),
             )
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
             is ParseHtmlResult.Parsed -> ConversionSucceeded(parseHtmlResult.geoUriBuilder.toString())
             is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, parseHtmlResult.url, Permission.ALWAYS)
-            null -> return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_parse_html_error,
-                listOf(urlConverter.name),
-            )
+            null -> return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
         }
     }
 }
@@ -309,18 +302,10 @@ data class GrantedParseHtmlToGetCoordsPermission(
             stateContext.networkTools.getText(url)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
-            return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_parse_html_connection_error,
-                listOf(urlConverter.name),
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_connection_error)
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_parse_html_error,
-                listOf(urlConverter.name),
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
@@ -339,13 +324,9 @@ data class DeniedParseHtmlToGetCoordsPermission(
 
 data class ConversionSucceeded(val geoUri: String) : ConversionState()
 
-data class ConversionFailed(
-    val stateContext: ConversionStateContext,
-    val messageResId: Int,
-    val formatArgs: List<String> = emptyList(),
-) : ConversionState() {
+data class ConversionFailed(val stateContext: ConversionStateContext, val messageResId: Int) : ConversionState() {
     override suspend fun transition(): State? {
-        stateContext.onMessage(Message(messageResId, Message.Type.ERROR, formatArgs))
+        stateContext.onMessage(Message(messageResId, Message.Type.ERROR))
         return null
     }
 }

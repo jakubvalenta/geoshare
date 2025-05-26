@@ -977,11 +977,7 @@ class ConversionStateTest {
         )
         val state = DeniedConnectionPermission(stateContext, googleMapsUrlConverter)
         assertEquals(
-            ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_connect_to_google_permission_denied,
-                listOf(googleMapsUrlConverter.name),
-            ),
+            ConversionFailed(stateContext, R.string.conversion_failed_connect_to_google_permission_denied),
             state.transition(),
         )
     }
@@ -1544,11 +1540,7 @@ class ConversionStateTest {
                 url,
             )
             assertEquals(
-                ConversionFailed(
-                    stateContext,
-                    R.string.conversion_failed_parse_html_connection_error,
-                    listOf(googleMapsUrlConverter.name),
-                ),
+                ConversionFailed(stateContext, R.string.conversion_failed_parse_html_connection_error),
                 state.transition(),
             )
         }
@@ -1578,11 +1570,7 @@ class ConversionStateTest {
                 url,
             )
             assertEquals(
-                ConversionFailed(
-                    stateContext,
-                    R.string.conversion_failed_parse_html_error,
-                    listOf(googleMapsUrlConverter.name),
-                ),
+                ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error),
                 state.transition(),
             )
         }
@@ -1652,11 +1640,7 @@ class ConversionStateTest {
                 url,
             )
             assertEquals(
-                ConversionFailed(
-                    stateContext,
-                    R.string.conversion_failed_parse_html_error,
-                    listOf(mockAppleMapsUrlConverter.name),
-                ),
+                ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error),
                 state.transition(),
             )
         }
@@ -1888,11 +1872,7 @@ class ConversionStateTest {
                 geoUriBuilderFromUrl.toString(),
             )
             assertEquals(
-                ConversionFailed(
-                    stateContext,
-                    R.string.conversion_failed_parse_html_connection_error,
-                    listOf(googleMapsUrlConverter.name),
-                ),
+                ConversionFailed(stateContext, R.string.conversion_failed_parse_html_connection_error),
                 state.transition(),
             )
         }
@@ -1927,11 +1907,7 @@ class ConversionStateTest {
                 geoUriBuilderFromUrl.toString(),
             )
             assertEquals(
-                ConversionFailed(
-                    stateContext,
-                    R.string.conversion_failed_parse_html_error,
-                    listOf(googleMapsUrlConverter.name),
-                ),
+                ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error),
                 state.transition(),
             )
         }

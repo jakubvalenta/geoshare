@@ -53,7 +53,7 @@ class ShareActivity : ComponentActivity() {
                         (message as Message).let {
                             Toast.makeText(
                                 context,
-                                context.resources.getString(it.resId, *it.formatArgs.toTypedArray()),
+                                it.resId,
                                 if (it.type == Message.Type.SUCCESS) {
                                     Toast.LENGTH_SHORT
                                 } else {

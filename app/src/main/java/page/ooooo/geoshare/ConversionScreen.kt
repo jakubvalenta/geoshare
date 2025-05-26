@@ -30,9 +30,7 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
     when (currentState) {
         is RequestedUnshortenPermission -> (currentState as RequestedUnshortenPermission).let { currentState ->
             PermissionDialog(
-                title = stringResource(
-                    R.string.conversion_permission_common_title, currentState.urlConverter.name
-                ),
+                title = stringResource(currentState.urlConverter.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = { viewModel.grant(it) },
@@ -47,7 +45,6 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
                             R.string.conversion_permission_common_text,
                             currentState.url.toString(),
                             appName,
-                            currentState.urlConverter.name,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -57,9 +54,7 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
 
         is RequestedParseHtmlPermission -> (currentState as RequestedParseHtmlPermission).let { currentState ->
             PermissionDialog(
-                title = stringResource(
-                    R.string.conversion_permission_common_title, currentState.urlConverter.name
-                ),
+                title = stringResource(currentState.urlConverter.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = { viewModel.grant(it) },
@@ -74,7 +69,6 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
                             R.string.conversion_permission_common_text,
                             currentState.url.toString(),
                             appName,
-                            currentState.urlConverter.name,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -84,9 +78,7 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
 
         is RequestedParseHtmlToGetCoordsPermission -> (currentState as RequestedParseHtmlToGetCoordsPermission).let { currentState ->
             PermissionDialog(
-                title = stringResource(
-                    R.string.conversion_permission_common_title, currentState.urlConverter.name
-                ),
+                title = stringResource(currentState.urlConverter.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
                 onConfirmation = { viewModel.grant(it) },
