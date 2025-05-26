@@ -23,16 +23,17 @@ class AppleMapsUrlConverter(
     val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,15})?)"""
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
-    val queryPatterns = mapOf<String, List<Pattern>>(
-        // Later query patterns overwrite earlier ones.
-        "center" to listOf(coordPattern),
-        "sll" to listOf(coordPattern),
-        "coordinate" to listOf(coordPattern),
-        "ll" to listOf(coordPattern),
-        "q" to listOf(coordPattern, queryPattern),
-        "name" to listOf(queryPattern),
-        "address" to listOf(queryPattern),
-        "z" to listOf(zoomPattern),
+
+    val urlQueryPatterns = listOf<Map<String, Pattern>>(
+        mapOf("ll" to coordPattern),
+        mapOf("coordinate" to coordPattern),
+        mapOf("q" to coordPattern),
+        mapOf("address" to queryPattern),
+        mapOf("name" to queryPattern),
+        mapOf("q" to queryPattern, "sll" to coordPattern),
+        mapOf("q" to queryPattern),
+        mapOf("sll" to coordPattern),
+        mapOf("center" to coordPattern),
     )
 
     override fun isSupportedUrl(url: URL): Boolean = urlPattern.matcher(url.toString()).matches()
@@ -40,18 +41,24 @@ class AppleMapsUrlConverter(
     override fun isShortUrl(url: URL): Boolean = false
 
     override fun parseUrl(url: URL): GeoUriBuilder? {
-        val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
+        val geoUriBuilder = GeoUriBuilder(uriQuote)
+
         val urlQueryParams = getUrlQueryParams(url, uriQuote)
-        for (queryPattern in queryPatterns) {
-            val paramName = queryPattern.key
-            val paramValue = urlQueryParams[paramName] ?: continue
-            val patterns = queryPattern.value
-            val m = patterns.firstNotNullOfOrNull {
-                val m = it.matcher(paramValue)
-                if (m.matches()) m else null
-            } ?: continue
-            geoUriBuilder.fromMatcher(m)
+        val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
+            it.map { (paramName, paramPattern) ->
+                val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
+                paramPattern.matcher(paramValue).takeIf { it.matches() } ?: return@firstNotNullOfOrNull null
+            }
         }
+        if (urlQueryMatchers == null) {
+            log.w(null, "Failed to parse Google Maps URL $url")
+            return null
+        }
+        urlQueryMatchers.forEach { geoUriBuilder.fromMatcher(it) }
+
+        val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it) }?.takeIf { it.matches() }
+        zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
+
         log.i(null, "Converted $url to $geoUriBuilder")
         return geoUriBuilder
     }

@@ -48,7 +48,7 @@ class AppleMapsUrlConverterTest {
     @Test
     fun parseUrl_place() {
         assertEquals(
-            "geo:52.4890246,13.4295963?q=Reuterplatz%203%2C%2012047%20Berlin%2C%20Germany",
+            "geo:52.4890246,13.4295963",
             appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902"))
                 .toString()
         )
