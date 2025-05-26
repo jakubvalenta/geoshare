@@ -10,6 +10,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
 import page.ooooo.geoshare.lib.converters.ParseHtmlResult
+import page.ooooo.geoshare.lib.converters.ParseUrlResult
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
@@ -28,19 +29,16 @@ data class ReceivedIntent(
     override suspend fun transition(): State {
         if (stateContext.intentTools.isProcessed(intent)) {
             return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_nothing_to_do
+                stateContext, R.string.conversion_failed_nothing_to_do
             )
         }
         val geoUri = stateContext.intentTools.getIntentGeoUri(intent)
         if (geoUri != null) {
             return ConversionSucceeded(geoUri)
         }
-        val urlString = stateContext.intentTools.getIntentUrlString(intent)
-            ?: return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_missing_url
-            )
+        val urlString = stateContext.intentTools.getIntentUrlString(intent) ?: return ConversionFailed(
+            stateContext, R.string.conversion_failed_missing_url
+        )
         return ReceivedUrlString(stateContext, urlString, null)
     }
 }
@@ -73,8 +71,7 @@ data class ReceivedUrlString(
             URL(urlStringWithHttpsScheme)
         } catch (_: MalformedURLException) {
             return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_invalid_url
+                stateContext, R.string.conversion_failed_invalid_url
             )
         }
         return ReceivedUrl(stateContext, url, permission)
@@ -95,10 +92,9 @@ data class ReceivedUrl(
         if (!isShortUrl) {
             return UnshortenedUrl(stateContext, urlConverter, url, permission)
         }
-        return when (permission
-            ?: stateContext.userPreferencesRepository.getValue(
-                connectToGooglePermission
-            )) {
+        return when (permission ?: stateContext.userPreferencesRepository.getValue(
+            connectToGooglePermission
+        )) {
             Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, urlConverter, url)
 
             Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
@@ -144,20 +140,17 @@ data class GrantedUnshortenPermission(
             stateContext.networkTools.requestLocationHeader(url)
         } catch (_: MalformedURLException) {
             return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_unshorten_error
+                stateContext, R.string.conversion_failed_unshorten_error
             )
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
             return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_unshorten_connection_error
+                stateContext, R.string.conversion_failed_unshorten_connection_error
             )
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_unshorten_error
+                stateContext, R.string.conversion_failed_unshorten_error
             )
         }
         return UnshortenedUrl(stateContext, urlConverter, header, Permission.ALWAYS)
@@ -182,36 +175,31 @@ data class UnshortenedUrl(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val geoUriBuilderFromUrl =
-            urlConverter.parseUrl(url)
-                ?: return ConversionFailed(
-                    stateContext,
-                    R.string.conversion_failed_parse_url_error
-                )
-        val geoUriFromUrl = geoUriBuilderFromUrl.toString()
-        if (geoUriBuilderFromUrl.coords.lat == "0" && geoUriBuilderFromUrl.coords.lon == "0") {
-            return when (permission
-                ?: stateContext.userPreferencesRepository.getValue(
-                    connectToGooglePermission
-                )) {
-                Permission.ALWAYS -> GrantedParseHtmlPermission(
-                    stateContext,
-                    urlConverter,
-                    url,
-                    geoUriFromUrl,
-                )
+        val parseUrlResult = urlConverter.parseUrl(url)
+        return when (parseUrlResult) {
+            is ParseUrlResult.Parsed -> ConversionSucceeded(parseUrlResult.geoUriBuilder.toString())
+            is ParseUrlResult.RequiresHtmlParsing -> TODO()
+            is ParseUrlResult.RequiresHtmlParsingToGetCoords ->
+                when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+                    Permission.ALWAYS -> GrantedParseHtmlPermission(
+                        stateContext,
+                        urlConverter,
+                        url,
+                        parseUrlResult.geoUriBuilder.toString(),
+                    )
 
-                Permission.ASK -> RequestedParseHtmlPermission(
-                    stateContext,
-                    urlConverter,
-                    url,
-                    geoUriFromUrl,
-                )
+                    Permission.ASK -> RequestedParseHtmlPermission(
+                        stateContext,
+                        urlConverter,
+                        url,
+                        parseUrlResult.geoUriBuilder.toString(),
+                    )
 
-                Permission.NEVER -> DeniedParseHtmlPermission(geoUriFromUrl)
-            }
+                    Permission.NEVER -> DeniedParseHtmlPermission(parseUrlResult.geoUriBuilder.toString())
+                }
+
+            null -> ConversionFailed(stateContext, R.string.conversion_failed_parse_url_error)
         }
-        return ConversionSucceeded(geoUriFromUrl)
     }
 }
 
@@ -268,16 +256,8 @@ data class GrantedParseHtmlPermission(
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
-            is ParseHtmlResult.Parsed -> ConversionSucceeded(
-                parseHtmlResult.geoUriBuilder.toString(),
-            )
-
-            is ParseHtmlResult.Redirect -> ReceivedUrl(
-                stateContext,
-                parseHtmlResult.url,
-                Permission.ALWAYS,
-            )
-
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(parseHtmlResult.geoUriBuilder.toString())
+            is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, parseHtmlResult.url, Permission.ALWAYS)
             null -> ConversionSucceeded(geoUriFromUrl)
         }
     }
@@ -308,24 +288,23 @@ data class AcceptedSharing(
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
 ) : ConversionState() {
-    override suspend fun transition(): State =
-        if (stateContext.xiaomiTools.isBackgroundStartActivityPermissionGranted(
-                context
-            )
-        ) {
-            GrantedSharePermission(
-                stateContext,
-                context,
-                geoUri,
-            )
-        } else {
-            RequestedSharePermission(
-                stateContext,
-                context,
-                settingsLauncherWrapper,
-                geoUri,
-            )
-        }
+    override suspend fun transition(): State = if (stateContext.xiaomiTools.isBackgroundStartActivityPermissionGranted(
+            context
+        )
+    ) {
+        GrantedSharePermission(
+            stateContext,
+            context,
+            geoUri,
+        )
+    } else {
+        RequestedSharePermission(
+            stateContext,
+            context,
+            settingsLauncherWrapper,
+            geoUri,
+        )
+    }
 }
 
 data class RequestedSharePermission(
@@ -334,30 +313,26 @@ data class RequestedSharePermission(
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
 ) : ConversionState(), PermissionState {
-    override suspend fun grant(doNotAsk: Boolean): State =
-        if (stateContext.xiaomiTools.showPermissionEditor(
-                context,
-                settingsLauncherWrapper,
-            )
-        ) {
-            ShowedSharePermissionEditor(
-                stateContext,
-                context,
-                settingsLauncherWrapper,
-                geoUri,
-            )
-        } else {
-            SharingFailed(
-                stateContext,
-                R.string.sharing_failed_xiaomi_permission_show_editor_error
-            )
-        }
-
-    override suspend fun deny(doNotAsk: Boolean): State =
-        SharingFailed(
-            stateContext,
-            R.string.sharing_failed_xiaomi_permission_denied
+    override suspend fun grant(doNotAsk: Boolean): State = if (stateContext.xiaomiTools.showPermissionEditor(
+            context,
+            settingsLauncherWrapper,
         )
+    ) {
+        ShowedSharePermissionEditor(
+            stateContext,
+            context,
+            settingsLauncherWrapper,
+            geoUri,
+        )
+    } else {
+        SharingFailed(
+            stateContext, R.string.sharing_failed_xiaomi_permission_show_editor_error
+        )
+    }
+
+    override suspend fun deny(doNotAsk: Boolean): State = SharingFailed(
+        stateContext, R.string.sharing_failed_xiaomi_permission_denied
+    )
 }
 
 data class ShowedSharePermissionEditor(
@@ -369,13 +344,12 @@ data class ShowedSharePermissionEditor(
     /**
      * Share again after the permission editor has been closed.
      */
-    override suspend fun grant(doNotAsk: Boolean): State =
-        AcceptedSharing(
-            stateContext,
-            context,
-            settingsLauncherWrapper,
-            geoUri,
-        )
+    override suspend fun grant(doNotAsk: Boolean): State = AcceptedSharing(
+        stateContext,
+        context,
+        settingsLauncherWrapper,
+        geoUri,
+    )
 
     override suspend fun deny(doNotAsk: Boolean): State {
         throw NotImplementedError("It is not possible to deny sharing again after the permission editor has been closed")
@@ -431,8 +405,7 @@ data class AcceptedCopying(
 
 data class CopyingFinished(val stateContext: ConversionStateContext) : ConversionState() {
     override suspend fun transition(): State? {
-        val systemHasClipboardEditor =
-            stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
+        val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
         if (!systemHasClipboardEditor) {
             stateContext.onMessage(Message(R.string.copying_finished, Message.Type.SUCCESS))
         }

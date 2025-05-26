@@ -10,9 +10,15 @@ interface UrlConverter {
 
     fun isShortUrl(url: URL): Boolean
 
-    fun parseUrl(url: URL): GeoUriBuilder?
+    fun parseUrl(url: URL): ParseUrlResult?
 
     fun parseHtml(html: String): ParseHtmlResult?
+}
+
+sealed class ParseUrlResult {
+    data class Parsed(val geoUriBuilder: GeoUriBuilder) : ParseUrlResult()
+    class RequiresHtmlParsing() : ParseUrlResult()
+    data class RequiresHtmlParsingToGetCoords(val geoUriBuilder: GeoUriBuilder) : ParseUrlResult()
 }
 
 sealed class ParseHtmlResult {

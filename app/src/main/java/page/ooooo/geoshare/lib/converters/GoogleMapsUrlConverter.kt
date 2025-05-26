@@ -16,16 +16,13 @@ class GoogleMapsUrlConverter(
 ) : UrlConverter {
     override val name = "Google Maps"
 
-    val fullUrlPattern: Pattern =
-        Pattern.compile("""^https?://((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}/.+$""")
+    val fullUrlPattern: Pattern = Pattern.compile("""^https?://((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}/.+$""")
     val shortUrlPattern: Pattern =
         Pattern.compile("""^https?://(maps\.app\.goo\.gl/|(app\.)?goo\.gl/maps/|g.co/kgs/).+$""")
 
-    val coordRegex =
-        """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
+    val coordRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
     val coordPattern: Pattern = Pattern.compile(coordRegex)
-    val dataCoordRegex =
-        """!3d(?P<lat>-?\d{1,2}(\.\d{1,15})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
+    val dataCoordRegex = """!3d(?P<lat>-?\d{1,2}(\.\d{1,15})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
     val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,15})?)"""
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
@@ -71,21 +68,18 @@ class GoogleMapsUrlConverter(
         Pattern.compile("""/@$coordRegex"""),
         Pattern.compile("""\[null,null,$coordRegex\]"""),
     )
-    val googleSearchHtmlPattern: Pattern =
-        Pattern.compile("""data-url="(?P<url>[^"]+)""")
+    val googleSearchHtmlPattern: Pattern = Pattern.compile("""data-url="(?P<url>[^"]+)""")
 
     override fun isSupportedUrl(url: URL): Boolean = isFullUrl(url) || isShortUrl(url)
 
-    private fun isFullUrl(url: URL): Boolean =
-        fullUrlPattern.matcher(url.toString()).matches()
+    private fun isFullUrl(url: URL): Boolean = fullUrlPattern.matcher(url.toString()).matches()
 
-    override fun isShortUrl(url: URL): Boolean =
-        shortUrlPattern.matcher(url.toString()).matches()
+    override fun isShortUrl(url: URL): Boolean = shortUrlPattern.matcher(url.toString()).matches()
 
-    override fun parseUrl(url: URL): GeoUriBuilder? {
+    override fun parseUrl(url: URL): ParseUrlResult? {
         val rawUrlPath = url.path
         if (rawUrlPath == null) {
-            log.w(null, "Missing both path and query in Google Maps URL $url")
+            log.w(null, "Google Maps URL is missing both path and query $url")
             return null
         }
         val urlPath = uriQuote.decode(rawUrlPath)
@@ -93,7 +87,7 @@ class GoogleMapsUrlConverter(
             it.matcher(urlPath)?.takeIf { it.matches() }
         }
         if (urlPathMatcher == null) {
-            log.w(null, "Failed to parse Google Maps URL $url")
+            log.w(null, "Google Maps URL does not match any known path pattern $url")
             return null
         }
 
@@ -112,54 +106,50 @@ class GoogleMapsUrlConverter(
         val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it) }?.takeIf { it.matches() }
         zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
 
-        log.i(null, "Converted $url to $geoUriBuilder")
-        return geoUriBuilder
+        return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
+            log.i(null, "Google Maps URL converted $url > $geoUriBuilder")
+            ParseUrlResult.Parsed(geoUriBuilder)
+        } else {
+            log.i(null, "Google Maps URL converted but it requires HTML parsing to get coords $url > $geoUriBuilder")
+            ParseUrlResult.RequiresHtmlParsingToGetCoords(geoUriBuilder)
+        }
     }
 
-    override fun parseHtml(html: String): ParseHtmlResult? {
-        val geoUriBuilder = parseGoogleMapsHtml(html)
-        if (geoUriBuilder !== null) {
-            return ParseHtmlResult.Parsed(geoUriBuilder)
-        }
-        val url = parseGoogleSearchHtml(html)
-        if (url !== null) {
-            return ParseHtmlResult.Redirect(url)
-        }
-        return null
-    }
+    override fun parseHtml(html: String): ParseHtmlResult? =
+        parseGoogleMapsHtml(html)?.let { ParseHtmlResult.Parsed(it) }
+            ?: parseGoogleSearchHtml(html)?.let { ParseHtmlResult.Redirect(it) }
 
     private fun parseGoogleMapsHtml(html: String): GeoUriBuilder? {
         val m = htmlPatterns.firstNotNullOfOrNull {
             it.matcher(html)?.takeIf { it.find() }
         }
         if (m == null) {
-            log.w(null, "Failed to parse Google Maps HTML document")
+            log.w(null, "Google Maps HTML does not match any known pattern")
             return null
         }
         val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
         geoUriBuilder.fromMatcher(m)
-        log.i(null, "Parsed HTML document to $geoUriBuilder")
+        log.i(null, "Google Maps HTML parsed $geoUriBuilder")
         return geoUriBuilder
     }
 
     private fun parseGoogleSearchHtml(html: String): URL? {
         val m = googleSearchHtmlPattern.matcher(html).takeIf { it.find() }
         if (m == null) {
-            log.w(null, "Failed to parse Google Search HTML document")
+            log.w(null, "Google Search HTML does not contain a Google Maps URL")
             return null
         }
         val relativeOrAbsoluteUrlString = m.group("url")
         val absoluteUrlString = relativeOrAbsoluteUrlString.replace(
-            "^/".toRegex(),
-            "https://www.google.com/"
+            "^/".toRegex(), "https://www.google.com/"
         )
         val absoluteUrl = try {
             URL(absoluteUrlString)
         } catch (_: MalformedURLException) {
-            log.w(null, "Invalid URL $absoluteUrlString")
+            log.i(null, "Google Search HTML contains an invalid Google Maps URL $absoluteUrlString")
             return null
         }
-        log.i(null, "Parsed Google Search HTML document to $absoluteUrl")
+        log.i(null, "Google Search HTML parsed $absoluteUrl")
         return absoluteUrl
     }
 }
