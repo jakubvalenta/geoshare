@@ -32,12 +32,12 @@
     <string name="main_result_geo_uri_share_content_description">Compartilhar</string>
     <string name="main_create_geo_uri">Criar link geo:</string>
     <string name="main_navigate_to_intro">Conheça mais recursos do app</string>
-    <string name="conversion_permission_common_title">Conectar ao Google?</string>
+    <string name="converter_google_maps_permission_title">Conectar ao Google?</string>
     <string name="conversion_permission_common_grant">OK</string>
-    <string name="conversion_permission_unshorten_deny">Cancelar</string>
-    <string name="conversion_permission_unshorten_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas ou o nome do lugar. O %2$s precisa se conectar ao Google para conseguir essas informações.]]></string>
-    <string name="conversion_permission_parse_html_deny">Criar um link geo: de pesquisa</string>
-    <string name="conversion_permission_parse_html_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas. O %2$s pode se conectar ao Google para obter elas, ou também pode criar um link geo: que direciona a uma pesquisa pelo nome do lugar.]]></string>
+    <string name="conversion_permission_common_deny">Cancelar</string>
+    <string name="conversion_permission_common_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas ou o nome do lugar. O %2$s precisa se conectar ao Google para conseguir essas informações.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_deny">Criar um link geo: de pesquisa</string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas. O %2$s pode se conectar ao Google para obter elas, ou também pode criar um link geo: que direciona a uma pesquisa pelo nome do lugar.]]></string>
     <string name="conversion_permission_xiaomi_title">Permissão faltando</string>
     <string name="conversion_permission_xiaomi_grant">Abrir configurações do Android</string>
     <string name="about_title">Sobre</string>
@@ -64,13 +64,11 @@
     <string name="conversion_failed_parse_url_error">Falha ao criar link geo:</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Falha ao abrir as configurações de permissão</string>
     <string name="sharing_failed_xiaomi_permission_denied">Não é possível compartilhar o link geo: sem permissão</string>
-    <string name="sharing_succeeded_unchanged">Link geo: aberto sem alterações</string>
     <string name="sharing_succeeded">Link geo: aberto</string>
     <string name="sharing_failed_activity_not_found">Nenhum app que consiga abrir links geo: está instalado</string>
     <string name="copying_finished">Link geo: copiado para a área de transferência</string>
     <string name="conversion_failed_connect_to_google_permission_denied">O link não é suportado sem se conectar ao Google</string>
     <string name="conversion_failed_parse_html_error">Falha ao solicitar a página do Google Maps</string>
-    <string name="copying_finished_unchanged">Link geo: copiado para a área de transferência sem alterações</string>
     <string name="nav_back_content_description">Voltar para a tela inicial</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primeiro, vá em Configurações &#8594; Apps &#8594; Maps &#8594; <i>Abrir por padrão</i> e desative a abertura de links neste app.]]></string>
     <string name="main_info_box"><![CDATA[O %1s suporta vários formatos de URL do Google Maps. Se você encontrar um link que não funciona, por favor <a href="https://github.com/jakubvalenta/geoshare/issues">relate esse problema</a>.]]></string>

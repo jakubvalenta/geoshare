@@ -8,7 +8,6 @@
     <string name="permission_do_not_ask">لا تسألني مرة أخرى</string>
     <string name="faq_item_expand">توسيع القسم</string>
     <string name="copying_finished">تم نسخ رابط جيو: إلى الحافظة</string>
-    <string name="copying_finished_unchanged">تم نسخ رابط جيو: إلى الحافظة دون تغيير</string>
     <string name="conversion_failed_connect_to_google_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بجوجل</string>
     <string name="copy_activity">نسخ جيو:</string>
     <string name="share_activity">مشاركة جيو:</string>
@@ -42,12 +41,12 @@
     <string name="main_result_geo_uri_share_content_description">مشاركة</string>
     <string name="main_create_geo_uri">إنشاء رابط جيو:</string>
     <string name="main_navigate_to_intro">اكتشف المزيد من ميزات التطبيق</string>
-    <string name="conversion_permission_common_title">الاتصال بجوجل؟</string>
+    <string name="converter_google_maps_permission_title">الاتصال بجوجل؟</string>
     <string name="conversion_permission_common_grant">موافق</string>
-    <string name="conversion_permission_unshorten_deny">إلغاء</string>
-    <string name="conversion_permission_unshorten_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات أو اسم مكان. يحتاج %2$s إلى الاتصال بجوجل للحصول على المعلومات.]]></string>
-    <string name="conversion_permission_parse_html_deny">إنشاء رابط جيو: للبحث</string>
-    <string name="conversion_permission_parse_html_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات. يمكن لـ %2$s الاتصال بجوجل للحصول عليها، أو يمكنه إنشاء رابط جيو: يؤدي إلى البحث باسم المكان.]]></string>
+    <string name="conversion_permission_common_deny">إلغاء</string>
+    <string name="conversion_permission_common_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات أو اسم مكان. يحتاج %2$s إلى الاتصال بجوجل للحصول على المعلومات.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_deny">إنشاء رابط جيو: للبحث</string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات. يمكن لـ %2$s الاتصال بجوجل للحصول عليها، أو يمكنه إنشاء رابط جيو: يؤدي إلى البحث باسم المكان.]]></string>
     <string name="conversion_permission_xiaomi_title">إذن مفقود</string>
     <string name="conversion_permission_xiaomi_grant">فتح إعدادات أندرويد</string>
     <string name="conversion_permission_xiaomi_deny">تجاهل</string>
@@ -73,7 +72,6 @@
     <string name="conversion_failed_parse_url_error">فشل في إنشاء رابط جيو:</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">فشل في فتح إعدادات الأذونات</string>
     <string name="sharing_failed_xiaomi_permission_denied">لا يمكن مشاركة رابط جيو: بدون إذن</string>
-    <string name="sharing_succeeded_unchanged">تم فتح رابط جيو: دون تغيير</string>
     <string name="sharing_succeeded">تم فتح رابط جيو:</string>
     <string name="sharing_failed_activity_not_found">لا يوجد تطبيق مثبت يمكنه فتح روابط جيو:</string>
     <string name="conversion_failed_parse_html_error">فشل في جلب صفحة خرائط جوجل</string>

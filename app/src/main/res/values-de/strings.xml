@@ -20,10 +20,11 @@
     <string name="main_result_geo_uri_share_content_description">Teilen</string>
     <string name="main_create_geo_uri">Erstelle geo: link</string>
     <string name="main_navigate_to_intro">Entdecke die Funktionen der App</string>
-    <string name="conversion_permission_common_title">Mit Google Verbinden?</string>
-    <string name="conversion_permission_unshorten_deny">Abbrechen</string>
-    <string name="conversion_permission_unshorten_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten-Informationen oder Ortnamen. %2$s muss eine Verbindung zu Google aufbauen, um die Informationen zu bekommen.]]></string>
-    <string name="conversion_permission_parse_html_deny">Erstelle einen search geo: Link</string>
+    <string name="converter_google_maps_permission_title">Mit Google Verbinden?</string>
+    <string name="converter_apple_maps_permission_title">Mit Apple Verbinden?</string>
+    <string name="conversion_permission_common_deny">Abbrechen</string>
+    <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten-Informationen oder Ortnamen. %2$s muss eine Verbindung zu Google aufbauen, um die Informationen zu bekommen.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_deny">Erstelle einen search geo: Link</string>
     <string name="conversion_permission_xiaomi_title">Fehlende Berechtigung</string>
     <string name="conversion_permission_xiaomi_grant">Öffne die Android Einstellungen</string>
     <string name="conversion_permission_xiaomi_deny">Ignorieren</string>
@@ -36,7 +37,7 @@
     <string name="main_input_uri_label">Füge einen Google Maps Link hier ein</string>
     <string name="intro_nav_close">Schließen</string>
     <string name="intro_settings_activity_not_found">Einstellung öffnen fehlgeschlagen</string>
-    <string name="conversion_permission_parse_html_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten Informationen. %2$s kann sich mit Google verbinden, um die Koordinaten zu bekommen, oder %2$s kann sonst einen geo: Link erstellen, der zur Suche nach dem Ortname führt.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten Informationen. %2$s kann sich mit Google verbinden, um die Koordinaten zu bekommen, oder %2$s kann sonst einen geo: Link erstellen, der zur Suche nach dem Ortname führt.]]></string>
     <string name="intro_how_to_share_google_maps_caption">Teile den Google Maps Ort aus der App oder dem Browser.</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot von Google Maps’ Standardmäßig öffnen Einstellung</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Wähle <i>%1$s</i> und %2$s lässt Sie den Standort in jeder installierten Karten-App öffnen.]]></string>

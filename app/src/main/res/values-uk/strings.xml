@@ -7,7 +7,7 @@
     <string name="intro_settings_activity_not_found">Не вдалося відкрити налаштування</string>
     <string name="main_input_uri_supporting_text">наприклад, https://google.com/maps/… або maps.app.goo.gl/…</string>
     <string name="main_info_box"><![CDATA[%1s підтримує багато URL-форматів Google Maps. Якщо ви все ще знаходите посилання, яке не працює <a href="https://github.com/jakubvalenta/geoshare/issues">повідомте про проблему</a>.]]></string>
-    <string name="conversion_permission_unshorten_deny">Скасувати</string>
+    <string name="conversion_permission_common_deny">Скасувати</string>
     <string name="faq_how_it_works_headline">Як це працює та міркування щодо приватності</string>
     <string name="copy_activity">Копіювати гео:</string>
     <string name="nav_menu_content_description">Меню</string>
@@ -27,15 +27,15 @@
     <string name="main_result_geo_uri_share_content_description">Поділитися</string>
     <string name="main_create_geo_uri">Створити гео: посилання</string>
     <string name="main_navigate_to_intro">Дізнатися більше про функції застосунку</string>
-    <string name="conversion_permission_common_title">Під\'єднатися до Google?</string>
-    <string name="conversion_permission_parse_html_deny">Створити пошукове гео: посилання</string>
+    <string name="converter_google_maps_permission_title">Під\'єднатися до Google?</string>
+    <string name="conversion_permission_parse_html_to_get_coords_deny">Створити пошукове гео: посилання</string>
     <string name="conversion_permission_xiaomi_deny">Відхилити</string>
     <string name="about_title">Про застосунок</string>
     <string name="about_app_icon_content_description">Значок застосунку</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="faq_title">ЧаПи</string>
     <string name="nav_back_content_description">Назад на головний екран</string>
-    <string name="conversion_permission_parse_html_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат. %2$s може під’єднатися до Google, щоб отримати їх, або ж створити гео: посилання, яке веде до пошуку за назвою населеного пункту.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат. %2$s може під’єднатися до Google, щоб отримати їх, або ж створити гео: посилання, яке веде до пошуку за назвою населеного пункту.]]></string>
     <string name="intro_how_to_share_google_maps_content_description">Знімок екрана спільного доступу до Google Maps</string>
     <string name="intro_nav_close">Закрити</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Оберіть <i>%1$s</i> і %2$s дозволить вам відкрити розташування в будь-якому встановленому картографічному застосунку.]]></string>
@@ -44,14 +44,13 @@
     <string name="main_result_geo_uri_copy_content_description">Копіювати</string>
     <string name="conversion_permission_common_grant">Гаразд</string>
     <string name="conversion_permission_xiaomi_title">Бракує дозволу</string>
-    <string name="conversion_permission_unshorten_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат або назви населеного пункту. %2$s потрібно під’єднатися до Google, щоб отримати інформацію.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат або назви населеного пункту. %2$s потрібно під’єднатися до Google, щоб отримати інформацію.]]></string>
     <string name="conversion_permission_xiaomi_text"><![CDATA[Щоби поділитися гео: посиланнями вам потрібно дозволити <b>Інші дозволи</b> &#8594; <b>Показ спливних вікон під час роботи у фоновому режимі</b> в %1$s.]]></string>
     <string name="intro_nav_next">Далі</string>
     <string name="intro_geo_links_copy_content_description">Змінок екрана спільного доступу з Google Maps</string>
     <string name="main_input_uri_label">Вставте посилання на Google Maps тут</string>
     <string name="about_text"><![CDATA[<p>%1$s це безплатний застосунок з відкритим вихідним кодом, що розповсюджується під ліцензією <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> або пізнішої.</p><br><p>Ви можете знайти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, де також можете <a href="https://github.com/jakubvalenta/geoshare/issues">повідомити про помилку</a>.</p><br><p> Буду радий вашим відгукам. Ви можете зв’язатися зі мною за адресою <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="permission_do_not_ask">Не запитувати знову</string>
-    <string name="sharing_succeeded_unchanged">Відкрите гео: посилання не змінилося</string>
     <string name="conversion_failed_connect_to_google_permission_denied">Це посилання не підтримується без з\'єднання з Google</string>
     <string name="intro_how_to_share_google_maps_caption">Поділіться розташуванням із застосунку Google Maps або з веббраузера.</string>
     <string name="faq_gmaps_wv_headline">Сумісність із застосунком GMaps WV</string>
@@ -75,7 +74,6 @@
     <string name="sharing_succeeded">Відкрите гео: посилання</string>
     <string name="sharing_failed_activity_not_found">Немає жодного застосунку, який може відкрити гео: посилання</string>
     <string name="copying_finished">Гео: посилання скопійовано до буфера обміну</string>
-    <string name="copying_finished_unchanged">Скопійоване гео: посилання до буфера обміну не змінюється</string>
     <string name="conversion_failed_parse_html_error">Не вдалося отримати сторінку Google Maps</string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s перетворює посилання Google Maps на гео: посилання, які можна відкрити в інших картографічних застосунках. Для створення гео: посилань потрібні географічні координати. %1$s витягує їх із URL-адреси Google Maps.</p><br><p>Однак не всі URL-адреси Google Maps містять координати. У таких випадках %1$s <b>запитає у вас дозвіл на з’єднання з Google</b> та отримає координати з HTTP-заголовків або HTML-документа посилання.</p><br><p>Точніше, існує три сценарії, як %1$s перетворює URL-адресу Google Maps на географічну: URI:</p><br><p><b>1.</b></p><br><p>Якщо URL-адреса Google Maps вже містить географічні координати (наприклад, <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), то вона аналізується, і запит до серверів Google не надсилається.</p><br><p><b>2.</b></p><br><p>Якщо URL-адреса Google Maps не містить географічних координат (наприклад, <tt>https://www.google.com/maps/place/Central+Park/</tt>), то %1$s запитує вас, чи може воно з’єднатися з Google.</p><br><p>Якщо ви дозволите з’єднання з ним, то %1$s надсилатиме <b>HTTP GET-запит</b> до Google Maps та аналізує координати з HTML-відповіді. Ви можете уявити це як <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Якщо ви не дозволяєте з’єднання, то %1$s створює гео: посилання з пошуковим терміном місця (наприклад, <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Якщо URL-адреса Google Maps є коротким посиланням (наприклад, <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), то %1$s запитує вас, чи може він з’єднатися з Google.</p><br><p>Якщо ви дозволяєте з’єднатися з Google, то %1$s надсилає <b>HTTP HEAD-запит</b> до короткого посилання та зчитує повне посилання із заголовків відповіді. Ви можете уявити це як <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. Потім %1$s продовжує зі сценарієм 1 або 2, залежно від того, чи містить повне посилання координати чи ні. У випадку сценарію 2 буде встановлено ще одне з під’єднання до Google, але цього разу без запиту.</p><br><p>Якщо ви не дозволяєте змєднатися, то %1$s скасовує створення гео: посилання.</p><br><br><p>Щоби назавжди дозволити або заборонити під’єднання до Google замість того, щоб завжди запитувати (типово), перейдіть до налаштувань застосунку.</p>]]></string>
     <string name="conversion_failed_parse_html_connection_error">Помилка з’єднання під час отримання сторінки Карт Google</string>

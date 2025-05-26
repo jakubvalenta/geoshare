@@ -26,10 +26,10 @@
     <string name="main_result_geo_uri_copy_content_description">复制</string>
     <string name="main_result_geo_uri_share_content_description">分享</string>
     <string name="main_navigate_to_intro">发现更多应用功能</string>
-    <string name="conversion_permission_common_title">连接到 Google？</string>
-    <string name="conversion_permission_unshorten_deny">取消</string>
-    <string name="conversion_permission_parse_html_deny">创建搜索 geo: 链接</string>
-    <string name="conversion_permission_parse_html_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标。%2$s 可以连接到 Google 获取它们，也可以创建 geo: 链接，通过地名进行搜索。]]></string>
+    <string name="converter_google_maps_permission_title">连接到 Google？</string>
+    <string name="conversion_permission_common_deny">取消</string>
+    <string name="conversion_permission_parse_html_to_get_coords_deny">创建搜索 geo: 链接</string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标。%2$s 可以连接到 Google 获取它们，也可以创建 geo: 链接，通过地名进行搜索。]]></string>
     <string name="conversion_permission_xiaomi_title">缺少权限</string>
     <string name="conversion_permission_xiaomi_grant">打开 Android 设置</string>
     <string name="conversion_permission_xiaomi_deny">关闭</string>
@@ -57,11 +57,9 @@
     <string name="conversion_failed_parse_url_error">无法创建 geo: 链接</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">无法打开权限设置</string>
     <string name="sharing_failed_xiaomi_permission_denied">没有权限就无法分享 geo: 链接</string>
-    <string name="sharing_succeeded_unchanged">打开的 geo: 链接未更改</string>
     <string name="sharing_succeeded">已打开 geo: 链接</string>
     <string name="sharing_failed_activity_not_found">未安装可以打开 geo: 链接的应用</string>
     <string name="copying_finished">geo: 链接已复制到剪贴板</string>
-    <string name="copying_finished_unchanged">已复制到剪贴板的 geo: 链接未更改</string>
     <string name="conversion_failed_connect_to_google_permission_denied">如果不连接到 Google，就不支持此链接</string>
     <string name="conversion_failed_parse_html_error">无法获取 Google 地图页面</string>
     <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
@@ -74,7 +72,7 @@
     <string name="main_create_geo_uri">创建 geo: 链接</string>
     <string name="main_info_box"><![CDATA[%1s 支持多种 Google 地图 URL 格式。如果您仍然发现无法正常工作的链接，请<a href="https://github.com/jakubvalenta/geoshare/issues">报告问题</a>。]]></string>
     <string name="conversion_permission_common_grant">确定</string>
-    <string name="conversion_permission_unshorten_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标或地名。%2$s 需要连接到 Google 才能获取信息。]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标或地名。%2$s 需要连接到 Google 才能获取信息。]]></string>
     <string name="conversion_permission_xiaomi_text"><![CDATA[要分享 geo: 链接，您需要允许<b>其他权限</b> &#8594; <b>在后台运行 %1$s 时显示弹出窗口</b>。]]></string>
     <string name="about_text"><![CDATA[<p>%1$s 是根据 <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> 或更高版本许可协议分发的自由及开源应用。</p><br><p>您可以在 <a href="https://github.com/jakubvalenta/geoshare">GitHub</a> 找到代码，也可以在那里<a href="https://github.com/jakubvalenta/geoshare/issues">报告问题</a>。</p><br><p>欢迎您的反馈。您可以通过 <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>与我联系。</p>]]></string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s 将 Google 地图链接转换为其他地图应用可以打开的 geo: 链接。要创建 geo: 链接，需要地理坐标。%1$s 从 Google 地图 URL 中提取它们。</p><br><p>然而，并非所有 Google 地图 URL 都包含坐标。在这种情况下，%1$s 将<b>提示您获得连接到 Google 的权限</b>并从 HTTP 标头或链接的 HTML 文档中检索坐标。</p><br><p>更准确地说，%1$s 将 Google 地图 URL 转换为 geo: URI 有三种场景：</p><br><p><b>1.</b></p><br><p>如果 Google 地图 URL 已经包含地理坐标（例如 <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>），然后对其进行解析，不会向 Google 服务器发出任何请求。</p><br><p><b>2.</b></p><br><p>如果 Google 地图 URL 不包含地理坐标（例如 <tt>https://www.google.com/maps/place/Central+Park/</tt>），则 %1$s 会询问您是否可以连接到 Google。</p><br><p>如果您允许连接到 Google，则 %1$s 会向 Google 地图发出 <b>HTTP GET 请求</b>并从 HTML 响应中解析坐标。您可以将其想象为 <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>。</p><br><p>如果您不允许连接到 Google，则 %1$s 会创建带有地点搜索词的 geo: 链接（例如 <tt>geo:0,0?q=Central%%20Park</tt>）。</p><br><p><b>3.</b></p><br><p>如果 Google 地图 URL 是短链接（例如 <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>），则 %1$s 会询问您是否可以连接到 Google。</p><br><p>如果您允许连接到 Google，则 %1$s 会向短链接发出 <b>HTTP HEAD 请求</b>并从响应标头中读取完整链接。您可以将其想象为 <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>。然后 %1$s 继续场景 1 或 2，具体取决于完整链接是否包含坐标。在场景 2 的情况下，将与 Google 建立另一个连接，但这次没有询问。</p><br><p>如果您不允许连接到 Google，则 %1$s 会取消 geo: 链接的创建。</p><br><br><p>要永久允许或拒绝连接到 Google，而不是始终询问（默认设置），请转到应用的偏好设置。</p>]]></string>
