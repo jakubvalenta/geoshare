@@ -221,7 +221,7 @@ Coordinates links:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/?ll=50.894967,4.341626' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?address=Boddinstra%C3%9Fe%2C+Hermannstra%C3%9Fe+36%E2%80%9337%2C+12049+Berlin%2C+Germany\&coordinate=52.4804611%2C13.4250923\&name=Marked+Location' page.ooooo.geoshare.debug
 ```
 
 Place links:
@@ -247,7 +247,7 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https:/
 Short links:
 
 ```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.app.goo.gl/eukZjpeYrrvX3tDw6' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6' page.ooooo.geoshare.debug
 ```
 
 Links with coordinates only in HTML:
