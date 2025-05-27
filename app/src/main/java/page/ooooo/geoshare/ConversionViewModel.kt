@@ -28,7 +28,6 @@ class ConversionViewModel @Inject constructor(
 
     val stateContext = ConversionStateContext(
         urlConverters = listOf(
-            // Ordering converters from the most common to the least one speeds the conversion up negligibly.
             GoogleMapsUrlConverter(),
             AppleMapsUrlConverter(),
         ),

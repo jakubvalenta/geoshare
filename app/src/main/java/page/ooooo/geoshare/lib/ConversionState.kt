@@ -28,9 +28,7 @@ data class ReceivedIntent(
 ) : ConversionState() {
     override suspend fun transition(): State {
         if (stateContext.intentTools.isProcessed(intent)) {
-            return ConversionFailed(
-                stateContext, R.string.conversion_failed_nothing_to_do
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_nothing_to_do)
         }
         val geoUri = stateContext.intentTools.getIntentGeoUri(intent)
         if (geoUri != null) {
@@ -63,16 +61,11 @@ data class ReceivedUrlString(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val urlStringWithHttpsScheme = urlString.replace(
-            "^([a-z]+:)?(//)?(.)".toRegex(),
-            "https://$3",
-        )
+        val urlStringWithHttpsScheme = urlString.replace("^([a-z]+:)?(//)?(.)".toRegex(), "https://$3")
         val url = try {
             URL(urlStringWithHttpsScheme)
         } catch (_: MalformedURLException) {
-            return ConversionFailed(
-                stateContext, R.string.conversion_failed_invalid_url
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_invalid_url)
         }
         return ReceivedUrl(stateContext, url, permission)
     }
@@ -84,21 +77,15 @@ data class ReceivedUrl(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val urlConverter = stateContext.urlConverters.find { it.isSupportedUrl(url) }
-        if (urlConverter == null) {
-            return ConversionFailed(stateContext, R.string.conversion_failed_unsupported_service)
-        }
-        val isShortUrl = urlConverter.isShortUrl(url)
-        if (!isShortUrl) {
+        val urlConverter = stateContext.urlConverters.find { it.isSupportedUrl(url) } ?: return ConversionFailed(
+            stateContext, R.string.conversion_failed_unsupported_service
+        )
+        if (!urlConverter.isShortUrl(url)) {
             return UnshortenedUrl(stateContext, urlConverter, url, permission)
         }
-        return when (permission ?: stateContext.userPreferencesRepository.getValue(
-            connectToGooglePermission
-        )) {
+        return when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
             Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, urlConverter, url)
-
             Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
-
             Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
         }
     }
@@ -111,20 +98,14 @@ data class RequestedUnshortenPermission(
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(
-                connectToGooglePermission,
-                Permission.ALWAYS,
-            )
+            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.ALWAYS)
         }
         return GrantedUnshortenPermission(stateContext, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(
-                connectToGooglePermission,
-                Permission.NEVER,
-            )
+            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, urlConverter)
     }
@@ -139,19 +120,13 @@ data class GrantedUnshortenPermission(
         val header = try {
             stateContext.networkTools.requestLocationHeader(url)
         } catch (_: MalformedURLException) {
-            return ConversionFailed(
-                stateContext, R.string.conversion_failed_unshorten_error
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_unshorten_error)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
-            return ConversionFailed(
-                stateContext, R.string.conversion_failed_unshorten_connection_error
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_unshorten_connection_error)
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(
-                stateContext, R.string.conversion_failed_unshorten_error
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_unshorten_error)
         }
         return UnshortenedUrl(stateContext, urlConverter, header, Permission.ALWAYS)
     }
@@ -161,10 +136,8 @@ data class DeniedConnectionPermission(
     val stateContext: ConversionStateContext,
     val urlConverter: UrlConverter,
 ) : ConversionState() {
-    override suspend fun transition(): State = ConversionFailed(
-        stateContext,
-        R.string.conversion_failed_connect_to_google_permission_denied,
-    )
+    override suspend fun transition(): State =
+        ConversionFailed(stateContext, R.string.conversion_failed_connection_permission_denied)
 }
 
 data class UnshortenedUrl(
@@ -177,31 +150,32 @@ data class UnshortenedUrl(
         val parseUrlResult = urlConverter.parseUrl(url)
         return when (parseUrlResult) {
             is ParseUrlResult.Parsed -> ConversionSucceeded(parseUrlResult.geoUriBuilder.toString())
-            is ParseUrlResult.RequiresHtmlParsing ->
-                when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
-                    Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, urlConverter, url)
-                    Permission.ASK -> RequestedParseHtmlPermission(stateContext, urlConverter, url)
-                    Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
-                }
 
-            is ParseUrlResult.RequiresHtmlParsingToGetCoords ->
-                when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
-                    Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
-                        stateContext,
-                        urlConverter,
-                        url,
-                        parseUrlResult.geoUriBuilder.toString(),
-                    )
+            is ParseUrlResult.RequiresHtmlParsing -> when (permission
+                ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+                Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, urlConverter, url)
+                Permission.ASK -> RequestedParseHtmlPermission(stateContext, urlConverter, url)
+                Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
+            }
 
-                    Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
-                        stateContext,
-                        urlConverter,
-                        url,
-                        parseUrlResult.geoUriBuilder.toString(),
-                    )
+            is ParseUrlResult.RequiresHtmlParsingToGetCoords -> when (permission
+                ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+                Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
+                    stateContext,
+                    urlConverter,
+                    url,
+                    parseUrlResult.geoUriBuilder.toString(),
+                )
 
-                    Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(parseUrlResult.geoUriBuilder.toString())
-                }
+                Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
+                    stateContext,
+                    urlConverter,
+                    url,
+                    parseUrlResult.geoUriBuilder.toString(),
+                )
+
+                Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(parseUrlResult.geoUriBuilder.toString())
+            }
 
             null -> ConversionFailed(stateContext, R.string.conversion_failed_parse_url_error)
         }
@@ -215,20 +189,14 @@ data class RequestedParseHtmlPermission(
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(
-                connectToGooglePermission,
-                Permission.ALWAYS,
-            )
+            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.ALWAYS)
         }
         return GrantedParseHtmlPermission(stateContext, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(
-                connectToGooglePermission,
-                Permission.NEVER,
-            )
+            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, urlConverter)
     }
@@ -244,16 +212,10 @@ data class GrantedParseHtmlPermission(
             stateContext.networkTools.getText(url)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
-            return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_parse_html_connection_error,
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_connection_error)
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_parse_html_error,
-            )
+            return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
@@ -272,20 +234,14 @@ data class RequestedParseHtmlToGetCoordsPermission(
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(
-                connectToGooglePermission,
-                Permission.ALWAYS,
-            )
+            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.ALWAYS)
         }
         return GrantedParseHtmlToGetCoordsPermission(stateContext, urlConverter, url, geoUriFromUrl)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(
-                connectToGooglePermission,
-                Permission.NEVER,
-            )
+            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.NEVER)
         }
         return DeniedParseHtmlToGetCoordsPermission(geoUriFromUrl)
     }
@@ -341,18 +297,9 @@ data class AcceptedSharing(
             context
         )
     ) {
-        GrantedSharePermission(
-            stateContext,
-            context,
-            geoUri,
-        )
+        GrantedSharePermission(stateContext, context, geoUri)
     } else {
-        RequestedSharePermission(
-            stateContext,
-            context,
-            settingsLauncherWrapper,
-            geoUri,
-        )
+        RequestedSharePermission(stateContext, context, settingsLauncherWrapper, geoUri)
     }
 }
 
@@ -362,26 +309,15 @@ data class RequestedSharePermission(
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
 ) : ConversionState(), PermissionState {
-    override suspend fun grant(doNotAsk: Boolean): State = if (stateContext.xiaomiTools.showPermissionEditor(
-            context,
-            settingsLauncherWrapper,
-        )
-    ) {
-        ShowedSharePermissionEditor(
-            stateContext,
-            context,
-            settingsLauncherWrapper,
-            geoUri,
-        )
-    } else {
-        SharingFailed(
-            stateContext, R.string.sharing_failed_xiaomi_permission_show_editor_error
-        )
-    }
+    override suspend fun grant(doNotAsk: Boolean): State =
+        if (stateContext.xiaomiTools.showPermissionEditor(context, settingsLauncherWrapper)) {
+            ShowedSharePermissionEditor(stateContext, context, settingsLauncherWrapper, geoUri)
+        } else {
+            SharingFailed(stateContext, R.string.sharing_failed_xiaomi_permission_show_editor_error)
+        }
 
-    override suspend fun deny(doNotAsk: Boolean): State = SharingFailed(
-        stateContext, R.string.sharing_failed_xiaomi_permission_denied
-    )
+    override suspend fun deny(doNotAsk: Boolean): State =
+        SharingFailed(stateContext, R.string.sharing_failed_xiaomi_permission_denied)
 }
 
 data class ShowedSharePermissionEditor(
@@ -393,12 +329,8 @@ data class ShowedSharePermissionEditor(
     /**
      * Share again after the permission editor has been closed.
      */
-    override suspend fun grant(doNotAsk: Boolean): State = AcceptedSharing(
-        stateContext,
-        context,
-        settingsLauncherWrapper,
-        geoUri,
-    )
+    override suspend fun grant(doNotAsk: Boolean): State =
+        AcceptedSharing(stateContext, context, settingsLauncherWrapper, geoUri)
 
     override suspend fun deny(doNotAsk: Boolean): State {
         throw NotImplementedError("It is not possible to deny sharing again after the permission editor has been closed")
@@ -414,10 +346,7 @@ data class GrantedSharePermission(
         stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri)
         SharingSucceeded(stateContext, R.string.sharing_succeeded)
     } catch (_: ActivityNotFoundException) {
-        SharingFailed(
-            stateContext,
-            R.string.sharing_failed_activity_not_found,
-        )
+        SharingFailed(stateContext, R.string.sharing_failed_activity_not_found)
     }
 }
 
