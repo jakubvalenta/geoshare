@@ -8,7 +8,7 @@
     <string name="permission_do_not_ask">لا تسألني مرة أخرى</string>
     <string name="faq_item_expand">توسيع القسم</string>
     <string name="copying_finished">تم نسخ رابط جيو: إلى الحافظة</string>
-    <string name="conversion_failed_connect_to_google_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بجوجل</string>
+    <string name="conversion_failed_connection_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بجوجل</string>
     <string name="copy_activity">نسخ جيو:</string>
     <string name="share_activity">مشاركة جيو:</string>
     <string name="nav_menu_content_description">القائمة</string>
@@ -59,11 +59,11 @@
     <string name="faq_gmaps_wv_text"><![CDATA[<p>لا تحتاج إلى %1$s عند استخدام تطبيق GMaps WV، لأن هذا التطبيق ينتج بالفعل روابط جيو:. لذا يمكنك مشاركة موقع مباشرة من GMaps WV مع تطبيق خرائط آخر.</p>]]></string>
     <string name="faq_item_collapse">طي القسم</string>
     <string name="user_preferences_title">التفضيلات</string>
-    <string name="user_preferences_connect_to_google_title">السماح بالاتصال بجوجل؟</string>
-    <string name="user_preferences_connect_to_google_description">لدعم روابط خرائط جوجل القصيرة، وللحصول على الإحداثيات من صفحة ويب خرائط جوجل عندما لا يحتوي الرابط عليها، يمكن لـ %1$s الاتصال بجوجل. يمكنك العثور على مزيد من المعلومات في شاشة الأسئلة الشائعة.</string>
-    <string name="user_preferences_connect_to_google_option_always">نعم</string>
-    <string name="user_preferences_connect_to_google_option_ask">اسأل قبل الاتصال</string>
-    <string name="user_preferences_connect_to_google_option_never">لا</string>
+    <string name="user_preferences_connection_title">السماح بالاتصال بجوجل؟</string>
+    <string name="user_preferences_connection_description">لدعم روابط خرائط جوجل القصيرة، وللحصول على الإحداثيات من صفحة ويب خرائط جوجل عندما لا يحتوي الرابط عليها، يمكن لـ %1$s الاتصال بجوجل. يمكنك العثور على مزيد من المعلومات في شاشة الأسئلة الشائعة.</string>
+    <string name="user_preferences_connection_option_always">نعم</string>
+    <string name="user_preferences_connection_option_ask">اسأل قبل الاتصال</string>
+    <string name="user_preferences_connection_option_never">لا</string>
     <string name="user_preferences_last_run_version_code_title">ما هو إصدار التطبيق الذي تم تشغيله آخر مرة؟</string>
     <string name="conversion_failed_nothing_to_do">لا يوجد شيء للقيام به</string>
     <string name="conversion_failed_missing_url">رابط مفقود</string>

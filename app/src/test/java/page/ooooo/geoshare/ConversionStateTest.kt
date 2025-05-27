@@ -19,7 +19,7 @@ import org.mockito.kotlin.verify
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
+import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
@@ -489,7 +489,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.getValue(
-                    connectToGooglePermission
+                    connectionPermission
                 )
             ).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
@@ -524,7 +524,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.getValue(
-                    connectToGooglePermission
+                    connectionPermission
                 )
             ).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
@@ -559,7 +559,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.getValue(
-                    connectToGooglePermission
+                    connectionPermission
                 )
             ).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
@@ -587,7 +587,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.getValue(
-                    connectToGooglePermission
+                    connectionPermission
                 )
             ).thenReturn(Permission.ALWAYS)
             val stateContext = ConversionStateContext(
@@ -622,7 +622,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.getValue(
-                    connectToGooglePermission
+                    connectionPermission
                 )
             ).thenReturn(Permission.ASK)
             val stateContext = ConversionStateContext(
@@ -657,7 +657,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.getValue(
-                    connectToGooglePermission
+                    connectionPermission
                 )
             ).thenReturn(Permission.NEVER)
             val stateContext = ConversionStateContext(
@@ -705,7 +705,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -728,7 +728,7 @@ class ConversionStateTest {
                 state.grant(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectToGooglePermission),
+                eq(connectionPermission),
                 any<Permission>(),
             )
         }
@@ -742,7 +742,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -765,7 +765,7 @@ class ConversionStateTest {
                 state.grant(true),
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectToGooglePermission,
+                connectionPermission,
                 Permission.ALWAYS,
             )
         }
@@ -779,7 +779,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -799,7 +799,7 @@ class ConversionStateTest {
             )
             assertTrue(state.deny(false) is DeniedConnectionPermission)
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectToGooglePermission),
+                eq(connectionPermission),
                 any<Permission>(),
             )
         }
@@ -813,7 +813,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -833,7 +833,7 @@ class ConversionStateTest {
             )
             assertTrue(state.deny(true) is DeniedConnectionPermission)
             verify(mockUserPreferencesRepository).setValue(
-                connectToGooglePermission,
+                connectionPermission,
                 Permission.NEVER,
             )
         }
@@ -977,7 +977,7 @@ class ConversionStateTest {
         )
         val state = DeniedConnectionPermission(stateContext, googleMapsUrlConverter)
         assertEquals(
-            ConversionFailed(stateContext, R.string.conversion_failed_connect_to_google_permission_denied),
+            ConversionFailed(stateContext, R.string.conversion_failed_connection_permission_denied),
             state.transition(),
         )
     }
@@ -1159,7 +1159,7 @@ class ConversionStateTest {
                 FakeUserPreferencesRepository::class.java
             )
             Mockito.`when`(
-                mockUserPreferencesRepository.getValue(connectToGooglePermission)
+                mockUserPreferencesRepository.getValue(connectionPermission)
             ).thenReturn(Permission.ALWAYS)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1202,7 +1202,7 @@ class ConversionStateTest {
                 FakeUserPreferencesRepository::class.java
             )
             Mockito.`when`(
-                mockUserPreferencesRepository.getValue(connectToGooglePermission)
+                mockUserPreferencesRepository.getValue(connectionPermission)
             ).thenReturn(Permission.ASK)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1245,7 +1245,7 @@ class ConversionStateTest {
                 FakeUserPreferencesRepository::class.java
             )
             Mockito.`when`(
-                mockUserPreferencesRepository.getValue(connectToGooglePermission)
+                mockUserPreferencesRepository.getValue(connectionPermission)
             ).thenReturn(Permission.NEVER)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1284,7 +1284,7 @@ class ConversionStateTest {
                 FakeUserPreferencesRepository::class.java
             )
             Mockito.`when`(
-                mockUserPreferencesRepository.getValue(connectToGooglePermission)
+                mockUserPreferencesRepository.getValue(connectionPermission)
             ).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1323,7 +1323,7 @@ class ConversionStateTest {
                 FakeUserPreferencesRepository::class.java
             )
             Mockito.`when`(
-                mockUserPreferencesRepository.getValue(connectToGooglePermission)
+                mockUserPreferencesRepository.getValue(connectionPermission)
             ).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1370,7 +1370,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1397,7 +1397,7 @@ class ConversionStateTest {
                 state.grant(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectToGooglePermission),
+                eq(connectionPermission),
                 any<Permission>(),
             )
         }
@@ -1411,7 +1411,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1438,7 +1438,7 @@ class ConversionStateTest {
                 state.grant(true),
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectToGooglePermission,
+                connectionPermission,
                 Permission.ALWAYS,
             )
         }
@@ -1452,7 +1452,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1474,7 +1474,7 @@ class ConversionStateTest {
                 DeniedConnectionPermission(stateContext, googleMapsUrlConverter), state.deny(false)
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectToGooglePermission),
+                eq(connectionPermission),
                 any<Permission>(),
             )
         }
@@ -1488,7 +1488,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1510,7 +1510,7 @@ class ConversionStateTest {
                 DeniedConnectionPermission(stateContext, googleMapsUrlConverter), state.deny(true)
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectToGooglePermission,
+                connectionPermission,
                 Permission.NEVER,
             )
         }
@@ -1675,7 +1675,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1708,7 +1708,7 @@ class ConversionStateTest {
                 state.grant(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectToGooglePermission),
+                eq(connectionPermission),
                 any<Permission>(),
             )
         }
@@ -1726,7 +1726,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1755,7 +1755,7 @@ class ConversionStateTest {
                 state.grant(true),
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectToGooglePermission,
+                connectionPermission,
                 Permission.ALWAYS,
             )
         }
@@ -1773,7 +1773,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1796,7 +1796,7 @@ class ConversionStateTest {
                 DeniedParseHtmlToGetCoordsPermission(geoUriBuilderFromUrl.toString()), state.deny(false)
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectToGooglePermission),
+                eq(connectionPermission),
                 any<Permission>(),
             )
         }
@@ -1814,7 +1814,7 @@ class ConversionStateTest {
             )
             Mockito.`when`(
                 mockUserPreferencesRepository.setValue(
-                    eq(connectToGooglePermission),
+                    eq(connectionPermission),
                     any<Permission>(),
                 )
             ).thenReturn(Unit)
@@ -1837,7 +1837,7 @@ class ConversionStateTest {
                 DeniedParseHtmlToGetCoordsPermission(geoUriBuilderFromUrl.toString()), state.deny(true)
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectToGooglePermission,
+                connectionPermission,
                 Permission.NEVER,
             )
         }

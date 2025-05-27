@@ -8,7 +8,7 @@ import android.os.Build
 import androidx.compose.ui.platform.Clipboard
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
+import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ParseHtmlResult
 import page.ooooo.geoshare.lib.converters.ParseUrlResult
 import page.ooooo.geoshare.lib.converters.UrlConverter
@@ -83,7 +83,7 @@ data class ReceivedUrl(
         if (!urlConverter.isShortUrl(url)) {
             return UnshortenedUrl(stateContext, urlConverter, url, permission)
         }
-        return when (permission ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+        return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
             Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, urlConverter, url)
             Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
             Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
@@ -98,14 +98,14 @@ data class RequestedUnshortenPermission(
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
         return GrantedUnshortenPermission(stateContext, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, urlConverter)
     }
@@ -152,14 +152,14 @@ data class UnshortenedUrl(
             is ParseUrlResult.Parsed -> ConversionSucceeded(parseUrlResult.geoUriBuilder.toString())
 
             is ParseUrlResult.RequiresHtmlParsing -> when (permission
-                ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+                ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, urlConverter, url)
                 Permission.ASK -> RequestedParseHtmlPermission(stateContext, urlConverter, url)
                 Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
             }
 
             is ParseUrlResult.RequiresHtmlParsingToGetCoords -> when (permission
-                ?: stateContext.userPreferencesRepository.getValue(connectToGooglePermission)) {
+                ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
                     stateContext,
                     urlConverter,
@@ -189,14 +189,14 @@ data class RequestedParseHtmlPermission(
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
         return GrantedParseHtmlPermission(stateContext, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, urlConverter)
     }
@@ -234,14 +234,14 @@ data class RequestedParseHtmlToGetCoordsPermission(
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
         return GrantedParseHtmlToGetCoordsPermission(stateContext, urlConverter, url, geoUriFromUrl)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectToGooglePermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
         }
         return DeniedParseHtmlToGetCoordsPermission(geoUriFromUrl)
     }

@@ -44,11 +44,11 @@
     <string name="faq_item_collapse">折叠部分</string>
     <string name="faq_item_expand">展开部分</string>
     <string name="user_preferences_title">偏好设置</string>
-    <string name="user_preferences_connect_to_google_title">允许连接到 Google？</string>
-    <string name="user_preferences_connect_to_google_description">为了支持 Google 地图短链接，并在链接不包含坐标时从 Google 地图网页中获取坐标，%1$s 可以连接到 Google。您可以在常见问题屏幕上找到更多信息。</string>
-    <string name="user_preferences_connect_to_google_option_always">是</string>
-    <string name="user_preferences_connect_to_google_option_ask">连接前询问</string>
-    <string name="user_preferences_connect_to_google_option_never">否</string>
+    <string name="user_preferences_connection_title">允许连接到 Google？</string>
+    <string name="user_preferences_connection_description">为了支持 Google 地图短链接，并在链接不包含坐标时从 Google 地图网页中获取坐标，%1$s 可以连接到 Google。您可以在常见问题屏幕上找到更多信息。</string>
+    <string name="user_preferences_connection_option_always">是</string>
+    <string name="user_preferences_connection_option_ask">连接前询问</string>
+    <string name="user_preferences_connection_option_never">否</string>
     <string name="user_preferences_last_run_version_code_title">该应用上次运行的版本是什么？</string>
     <string name="conversion_failed_nothing_to_do">没有任何操作</string>
     <string name="conversion_failed_missing_url">缺少 URL</string>
@@ -60,7 +60,7 @@
     <string name="sharing_succeeded">已打开 geo: 链接</string>
     <string name="sharing_failed_activity_not_found">未安装可以打开 geo: 链接的应用</string>
     <string name="copying_finished">geo: 链接已复制到剪贴板</string>
-    <string name="conversion_failed_connect_to_google_permission_denied">如果不连接到 Google，就不支持此链接</string>
+    <string name="conversion_failed_connection_permission_denied">如果不连接到 Google，就不支持此链接</string>
     <string name="conversion_failed_parse_html_error">无法获取 Google 地图页面</string>
     <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
     <string name="intro_open_by_default_app_content_description">%1$s 默认打开设置的屏幕截图</string>

@@ -19,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
-import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
+import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
@@ -54,8 +54,8 @@ fun UserPreferencesScreen(
         ) {
             UserPreferencesItem(
                 viewModel,
-                connectToGooglePermission,
-                userPreferencesValues.connectToGooglePermissionValue,
+                connectionPermission,
+                userPreferencesValues.connectionPermissionValue,
                 Modifier.padding(top = Spacing.tiny),
             )
             if (BuildConfig.DEBUG) {

@@ -42,10 +42,10 @@
     <string name="faq_gmaps_wv_headline">Съвместимост с приложението GMaps WV</string>
     <string name="faq_gmaps_wv_text"><![CDATA[<p>Не се нуждаете от %1$s, когато използвате приложението GMaps WV, защото това приложение вече създава гео: връзки. Така че можете директно да споделяте местоположение от GMaps WV с друго приложение за карти.</p>]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
-    <string name="user_preferences_connect_to_google_title">Разрешаване на свързване с Google?</string>
-    <string name="user_preferences_connect_to_google_option_always">Да</string>
-    <string name="user_preferences_connect_to_google_option_ask">Попитай, преди да се свържеш</string>
-    <string name="user_preferences_connect_to_google_option_never">Не</string>
+    <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>
+    <string name="user_preferences_connection_option_always">Да</string>
+    <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>
+    <string name="user_preferences_connection_option_never">Не</string>
     <string name="user_preferences_last_run_version_code_title">Коя версия на приложението е стартирана последно?</string>
     <string name="conversion_failed_missing_url">Липсващ URL адрес</string>
     <string name="conversion_failed_invalid_url">Невалиден URL адрес</string>
@@ -65,7 +65,7 @@
     <string name="faq_how_it_works_headline">Как работи и съображения за поверителност</string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Създайте гео: връзка за търсене</string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s преобразува връзките на Google Карти в гео: връзки, които могат да се отварят от други приложения за карти. За да създадете гео: връзка, са необходими географски координати. %1$s ги извлича от URL адреса на Google Карти.</p><br><p>Не всички URL адреси на Google Карти обаче включват координати. В такива случаи %1$s ще <b>ви подкани за разрешение да се свържете с Google</b> и ще извлече координатите или от HTTP заглавки, или от HTML документа на връзката.</p><br><p>По-точно, има три сценария как %1$s преобразува URL адрес на Google Карти в гео: URI:</p><br><p><b>1.</b></p><br><p>Ако URL адресът на Google Карти вече съдържа географски координати (например <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), тогава се анализира и не се прави заявка към сървърите на Google.</p><br><p><b>2.</b></p><br><p>Ако URL адресът на Google Карти не съдържа географски координати (за пример <tt>https://www.google.com/maps/place/Central+Park/</tt>), тогава %1$s ви пита дали може да се свърже с Google.</p><br><p>Ако разрешите свързване с Google, тогава %1$s прави <b>HTTP GET заявка</b> към Google Карти и анализира координатите от HTML отговора. Можете да си го представите като <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Ако не разрешите свързване с Google, тогава %1$s създава гео: връзка с дума за търсене на място (например <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Ако URL адресът на Google Maps е кратък връзка (например <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), тогава %1$s ви пита дали може да се свърже с Google.</p><br><p>Ако разрешите свързване с Google, тогава %1$s прави <b>HTTP HEAD заявка</b> към кратката връзка и чете пълната връзка от заглавките на отговора. Можете да си го представите като <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep местоположение:</tt>. След това %1$s продължава със сценарий 1 или 2, в зависимост от това дали пълната връзка съдържа координати или не. В случай на сценарий 2 ще бъде осъществена друга връзка с Google, но този път без запитване.</p><br><p>Ако не разрешите свързване с Google, тогава %1$s отменя създаването на връзката гео:.</p><br><br><p>За да разрешите или откажете за постоянно свързване с Google, вместо винаги да питате (по подразбиране), отидете в Предпочитанията на приложението.</p>]]></string>
-    <string name="conversion_failed_connect_to_google_permission_denied">Тази връзка не се поддържа без свързване с Google</string>
+    <string name="conversion_failed_connection_permission_denied">Тази връзка не се поддържа без свързване с Google</string>
     <string name="conversion_failed_parse_url_error">Неуспешно създаване на гео: връзка</string>
     <string name="conversion_failed_parse_html_error">Неуспешно извличане на страницата на Google Карти</string>
     <string name="conversion_permission_xiaomi_text"><![CDATA[За да споделите гео: връзки, трябва да разрешите <b>Други разрешения</b> &#8594; <b>Показване на изскачащи прозорци, докато работи във фонов режим</b> на %1$s.]]></string>
@@ -75,7 +75,7 @@
     <string name="conversion_permission_xiaomi_grant">Отворете настройките на Android</string>
     <string name="conversion_permission_xiaomi_title">Липсва разрешение</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="user_preferences_connect_to_google_description">За да поддържа кратки връзки към Google Карти и да получава координати от уеб страницата на Google Карти, когато връзката не ги съдържа, %1$s може да се свърже с Google. Можете да намерите повече информация на екрана с ЧЗВ.</string>
+    <string name="user_preferences_connection_description">За да поддържа кратки връзки към Google Карти и да получава координати от уеб страницата на Google Карти, когато връзката не ги съдържа, %1$s може да се свърже с Google. Можете да намерите повече информация на екрана с ЧЗВ.</string>
     <string name="conversion_failed_parse_html_connection_error">Грешка при свързване когато се извлича страницата на Google Карти</string>
     <string name="conversion_failed_unshorten_connection_error">Грешка при свързване когато се разрешава кратката връзка</string>
 </resources>

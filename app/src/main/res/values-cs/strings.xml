@@ -58,11 +58,11 @@
     <string name="faq_item_collapse">Sbalit sekci</string>
     <string name="faq_item_expand">Rozbalit sekci</string>
     <string name="user_preferences_title">Nastavení</string>
-    <string name="user_preferences_connect_to_google_title">Povolit spojení s Googlem?</string>
-    <string name="user_preferences_connect_to_google_description">Pro podporu krátkých odkazů na Google Mapy a pro získání souřadnic z webové stránky Google Map, když odkaz souřadnice neobsahuje, se %1$s může spojit s Googlem. Více informací najdete na obrazovce Nejčastější dotazy.</string>
-    <string name="user_preferences_connect_to_google_option_always">Ano</string>
-    <string name="user_preferences_connect_to_google_option_ask">Zeptat se před spojením</string>
-    <string name="user_preferences_connect_to_google_option_never">Ne</string>
+    <string name="user_preferences_connection_title">Povolit spojení s Googlem?</string>
+    <string name="user_preferences_connection_description">Pro podporu krátkých odkazů na Google Mapy a pro získání souřadnic z webové stránky Google Map, když odkaz souřadnice neobsahuje, se %1$s může spojit s Googlem. Více informací najdete na obrazovce Nejčastější dotazy.</string>
+    <string name="user_preferences_connection_option_always">Ano</string>
+    <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
+    <string name="user_preferences_connection_option_never">Ne</string>
     <string name="user_preferences_last_run_version_code_title">Jaká verze aplikace byla naposledy spuštěná?</string>
     <string name="conversion_failed_nothing_to_do">Není, co by se dalo dělat</string>
     <string name="conversion_failed_missing_url">Chybí URL</string>
@@ -74,7 +74,7 @@
     <string name="sharing_succeeded">geo: odkaz otevřen</string>
     <string name="sharing_failed_activity_not_found">Není nainstalovaná žádná aplikace, která umí otevřít geo: odkazy</string>
     <string name="copying_finished">geo: odkaz zkopírován do schránky</string>
-    <string name="conversion_failed_connect_to_google_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
+    <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
     <string name="conversion_failed_parse_html_error">Nepodařilo se stáhnout webovou stránku mapové služky</string>
     <string name="nav_back_content_description">Zpět na hlavní obrazovku</string>
     <string name="conversion_failed_unshorten_connection_error">Chyba připojení při zpracovávání krátkého odkazu</string>
