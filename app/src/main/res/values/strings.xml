@@ -5,8 +5,8 @@
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>
-    <string name="intro_how_to_share_headline">How to show a location in other map app</string>
-    <string name="intro_how_to_share_google_maps_caption">Share the location from your map app or web browser.</string>
+    <string name="intro_how_to_share_headline">How to show a location in another map app</string>
+    <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>
     <string name="intro_how_to_share_google_maps_content_description">Screenshot of Google Maps’ share screen</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and %2$s will let you open the location in any installed map app.]]></string>
     <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
