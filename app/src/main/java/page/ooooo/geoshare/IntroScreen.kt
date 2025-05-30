@@ -3,7 +3,6 @@ package page.ooooo.geoshare
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
@@ -20,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -28,11 +28,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.screenshotTextColor
+import page.ooooo.geoshare.ui.theme.screenshotTextMedium
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -43,7 +50,7 @@ fun IntroScreen(
 ) {
     val appName = stringResource(R.string.app_name)
     val pageCount = 3
-    var page by remember { mutableStateOf(initialPage) }
+    var page by remember { mutableIntStateOf(initialPage) }
     val animatedProgress by animateFloatAsState(
         targetValue = (page + 1f) / pageCount,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
@@ -69,7 +76,7 @@ fun IntroScreen(
             } else {
                 Settings.ACTION_APPLICATION_DETAILS_SETTINGS
             }
-            val intent = Intent(action, Uri.parse("package:$packageName"))
+            val intent = Intent(action, "package:$packageName".toUri())
             settingsLauncher.launch(intent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(
@@ -116,10 +123,7 @@ fun IntroScreen(
                                 appName
                             ),
                         ) {
-                            IntroFigureImageMapApp(
-                                stringResource(R.string.intro_how_to_share_google_maps_content_description),
-                                highlightedIconIndex = 2
-                            )
+                            ScreenshotMapAppOpen()
                         }
                         IntroFigure(
                             stringResource(
@@ -128,10 +132,7 @@ fun IntroScreen(
                                 appName
                             ),
                         ) {
-                            IntroFigureImage(
-                                R.drawable.geo_share_open,
-                                stringResource(R.string.intro_how_to_share_app_content_description, appName),
-                            )
+                            ScreenshotOpen()
                         }
                     }
 
@@ -142,10 +143,7 @@ fun IntroScreen(
                         IntroFigure(
                             stringResource(R.string.intro_open_by_default_google_maps_caption),
                         ) {
-                            IntroFigureImage(
-                                R.drawable.open_by_default_google_maps,
-                                stringResource(R.string.intro_open_by_default_google_maps_content_description)
-                            )
+                            ScreenshotOpenByDefaultMapApp()
                             OutlinedButton({
                                 showOpenByDefaultSettings("com.google.android.apps.maps")
                             }) {
@@ -155,10 +153,7 @@ fun IntroScreen(
                         IntroFigure(
                             stringResource(R.string.intro_open_by_default_app_caption, appName),
                         ) {
-                            IntroFigureImage(
-                                R.drawable.open_by_default_geo_share,
-                                stringResource(R.string.intro_open_by_default_app_content_description, appName)
-                            )
+                            ScreenshotOpenByDefault()
                             OutlinedButton({
                                 showOpenByDefaultSettings(context.packageName)
                             }) {
@@ -180,18 +175,12 @@ fun IntroScreen(
                                 R.string.intro_geo_links_copy_caption, stringResource(R.string.copy_activity)
                             )
                         ) {
-                            IntroFigureImageMapApp(
-                                stringResource(R.string.intro_geo_links_copy_content_description),
-                                highlightedIconIndex = 2
-                            )
+                            ScreenshotMapAppCopy()
                         }
                         IntroFigure(
                             stringResource(R.string.intro_geo_links_form_caption, appName),
                         ) {
-                            IntroFigureImage(
-                                R.drawable.geo_share_main,
-                                stringResource(R.string.intro_geo_links_form_content_description, appName)
-                            )
+                            ScreenshotMain()
                         }
                     }
                 }
@@ -274,7 +263,7 @@ fun IntroFigure(
 }
 
 @Composable
-fun IntroFigureImage(
+fun Screenshot(
     drawableId: Int,
     contentDescription: String,
     originalWidthPx: Int = 1080,
@@ -290,8 +279,38 @@ fun IntroFigureImage(
             contentDescription = contentDescription,
             contentScale = ContentScale.Inside,
         )
-        content(with(LocalDensity.current) { maxWidth.toPx() / originalWidthPx }, originalWidthPx)
+        content(
+            with(LocalDensity.current) { this@BoxWithConstraints.maxWidth.toPx() / originalWidthPx }, originalWidthPx
+        )
     }
+}
+
+@Composable
+fun ScreenshotText(
+    text: String,
+    x: Int,
+    y: Int,
+    scale: Float,
+    color: Color = MaterialTheme.colorScheme.screenshotTextColor,
+    fontWeight: FontWeight = FontWeight.Normal,
+    style: TextStyle = MaterialTheme.typography.screenshotTextMedium,
+    width: Int? = null,
+) {
+    Text(
+        text,
+        if (width != null) {
+            Modifier.width(with(LocalDensity.current) { width.toDp() * scale })
+        } else {
+            Modifier
+        }.offset { IntOffset(x, y) * scale },
+        color = color,
+        fontWeight = fontWeight,
+        textAlign = if (width != null) TextAlign.Center else null,
+        style = style.copy(
+            fontSize = style.fontSize * scale,
+            lineHeight = style.lineHeight * scale,
+        ),
+    )
 }
 
 // Previews
