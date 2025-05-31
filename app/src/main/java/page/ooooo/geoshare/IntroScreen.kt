@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -30,8 +31,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
@@ -119,7 +122,7 @@ fun IntroScreen(
                             stringResource(
                                 R.string.intro_how_to_share_google_maps_caption,
                                 stringResource(R.string.share_activity),
-                                appName
+                                appName,
                             ),
                         ) {
                             ScreenshotMapAppOpen()
@@ -128,7 +131,7 @@ fun IntroScreen(
                             stringResource(
                                 R.string.intro_how_to_share_app_caption,
                                 stringResource(R.string.share_activity),
-                                appName
+                                appName,
                             ),
                         ) {
                             ScreenshotOpen()
@@ -171,8 +174,9 @@ fun IntroScreen(
                     ) {
                         IntroFigure(
                             stringResource(
-                                R.string.intro_geo_links_copy_caption, stringResource(R.string.copy_activity)
-                            )
+                                R.string.intro_geo_links_copy_caption,
+                                stringResource(R.string.copy_activity),
+                            ),
                         ) {
                             ScreenshotMapAppCopy()
                         }
@@ -265,22 +269,23 @@ fun IntroFigure(
 fun Screenshot(
     drawableId: Int,
     contentDescription: String,
-    originalWidthPx: Int = 1080,
-    content: @Composable (scale: Float, width: Int) -> Unit = { scale, width -> },
+    origSizePx: IntSize,
+    content: @Composable (scale: Float) -> Unit,
 ) {
-    BoxWithConstraints(
-        modifier = Modifier
+    var currentSizePx by remember { mutableStateOf(IntSize.Zero) }
+    Box(
+        Modifier
             .padding(horizontal = Spacing.large)
-            .clip(MaterialTheme.shapes.medium),
+            .clip(MaterialTheme.shapes.large),
     ) {
         Image(
             painter = painterResource(drawableId),
             contentDescription = contentDescription,
+            modifier = Modifier.onGloballyPositioned { currentSizePx = it.size },
             contentScale = ContentScale.Inside,
         )
-        content(
-            with(LocalDensity.current) { this@BoxWithConstraints.maxWidth.toPx() / originalWidthPx }, originalWidthPx
-        )
+        val scale = currentSizePx.width.toFloat() / origSizePx.width
+        content(scale)
     }
 }
 
@@ -307,17 +312,18 @@ fun ScreenshotColumn(
 @Composable
 fun ScreenshotRow(
     scale: Float,
-    width: Int?,
+    width: Int,
     x: Int = 0,
     y: Int = 0,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     content: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
-        Modifier.offset { IntOffset(x, y) * scale }
-            .let { if (width != null) it.width(with(LocalDensity.current) { (width - 2 * x).toDp() * scale }) else it },
+        Modifier
+            .offset { IntOffset(x, y) * scale }
+            .width(with(LocalDensity.current) { (width - 2 * x).toDp() * scale }),
         horizontalArrangement = horizontalArrangement,
-        content = content
+        content = content,
     )
 }
 
@@ -330,16 +336,18 @@ fun ScreenshotText(
     fontWeight: FontWeight = FontWeight.Normal,
     style: TextStyle = MaterialTheme.typography.screenshotTextMedium,
 ) {
-    Text(
-        text,
-        modifier,
-        color = color,
-        fontWeight = fontWeight,
-        style = style.copy(
-            fontSize = style.fontSize * scale,
-            lineHeight = style.lineHeight * scale,
-        ),
-    )
+    with(LocalDensity.current) {
+        Text(
+            text,
+            modifier,
+            color = color,
+            fontWeight = fontWeight,
+            style = style.copy(
+                fontSize = style.fontSize * 2.75 / this.density * scale,
+                lineHeight = style.lineHeight * 2.75 / this.density * scale,
+            ),
+        )
+    }
 }
 
 // Previews
@@ -389,5 +397,13 @@ private fun PageThreePreview() {
 private fun DarkPageThreePreview() {
     AppTheme {
         IntroScreen(initialPage = 2)
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPageOnePreview() {
+    AppTheme {
+        IntroScreen()
     }
 }

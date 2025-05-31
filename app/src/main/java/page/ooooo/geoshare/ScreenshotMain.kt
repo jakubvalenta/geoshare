@@ -3,13 +3,16 @@ package page.ooooo.geoshare
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -17,11 +20,12 @@ fun ScreenshotMain() {
     val appName = stringResource(R.string.app_name)
     Screenshot(
         R.drawable.geo_share_main,
-        stringResource(R.string.intro_geo_links_form_content_description, appName)
-    ) { scale, width ->
+        stringResource(R.string.intro_geo_links_form_content_description, appName),
+        IntSize(1080, 900),
+    ) { scale ->
         ScreenshotColumn(
             scale,
-            width,
+            1080,
             x = 88,
             y = 349,
             verticalSpacing = 53,
@@ -41,7 +45,7 @@ fun ScreenshotMain() {
         }
         ScreenshotColumn(
             scale,
-            width,
+            1080,
             y = 593,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalSpacing = 75,
@@ -81,6 +85,21 @@ private fun ScreenshotMainPreview() {
 private fun DarkScreenshotMainPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+            ScreenshotMain()
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletScreenshotMainPreview() {
+    AppTheme {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             ScreenshotMain()
         }
     }

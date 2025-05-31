@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -13,7 +14,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.screenshotTextExtraExtraExtraLarge
 import page.ooooo.geoshare.ui.theme.screenshotTextExtraExtraLarge
@@ -35,11 +38,12 @@ fun ScreenshotOpenByDefault() {
     )
     Screenshot(
         R.drawable.open_by_default_geo_share,
-        stringResource(R.string.intro_open_by_default_app_content_description, appName)
-    ) { scale, width ->
+        stringResource(R.string.intro_open_by_default_app_content_description, appName),
+        IntSize(1080, 1575),
+    ) { scale ->
         ScreenshotRow(
             scale,
-            width,
+            1080,
             x = 62,
             y = 28,
         ) {
@@ -52,7 +56,7 @@ fun ScreenshotOpenByDefault() {
         }
         ScreenshotColumn(
             scale,
-            width,
+            1080,
             y = 232,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -65,7 +69,7 @@ fun ScreenshotOpenByDefault() {
         }
         ScreenshotColumn(
             scale,
-            width,
+            1080,
             x = 218,
             y = 356,
             verticalSpacing = 76,
@@ -80,9 +84,9 @@ fun ScreenshotOpenByDefault() {
         }
         ScreenshotRow(
             scale,
+            1080,
             x = 153,
             y = 1385,
-            width = width,
             horizontalArrangement = Arrangement.End,
         ) {
             ScreenshotText(
@@ -117,6 +121,21 @@ private fun ScreenshotOpenByDefaultPreview() {
 private fun DarkScreenshotOpenByDefaultPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+            ScreenshotOpenByDefault()
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletScreenshotOpenByDefaultPreview() {
+    AppTheme {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             ScreenshotOpenByDefault()
         }
     }

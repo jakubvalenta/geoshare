@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.screenshotMutedTextColor
 import page.ooooo.geoshare.ui.theme.screenshotTextExtraLarge
@@ -25,10 +27,14 @@ private data class Icon(val name: String, val label: String? = null)
 private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: Int) {
     val appName = stringResource(R.string.app_name)
     val density = LocalDensity.current
-    Screenshot(R.drawable.map_app, contentDescription) { scale, width ->
+    Screenshot(
+        R.drawable.map_app,
+        contentDescription,
+        IntSize(1080, 952),
+    ) { scale ->
         ScreenshotRow(
             scale,
-            width,
+            1080,
             x = 42,
             y = 306,
         ) {
@@ -40,7 +46,7 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
         }
         ScreenshotColumn(
             scale,
-            width,
+            1080,
             x = 65,
             y = 443,
             verticalSpacing = 6,
@@ -58,7 +64,7 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
         }
         ScreenshotRow(
             scale,
-            width,
+            1080,
             y = 836,
         ) {
             for (icon in listOf(
@@ -136,6 +142,21 @@ private fun DarkScreenshotMapAppPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
             ScreenshotMapAppCopy()
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletScreenshotMapAppPreview() {
+    AppTheme {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ScreenshotMapAppOpen()
         }
     }
 }
