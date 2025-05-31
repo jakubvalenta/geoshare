@@ -2,76 +2,101 @@ package page.ooooo.geoshare
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.screenshotTextExtraExtraExtraLarge
+import page.ooooo.geoshare.ui.theme.screenshotTextExtraExtraLarge
 import page.ooooo.geoshare.ui.theme.screenshotTextLarge
-import page.ooooo.geoshare.ui.theme.screenshotTextMedium
 
 @Composable
 fun ScreenshotOpenByDefault() {
     val appName = stringResource(R.string.app_name)
+    val density = LocalDensity.current
+    val links = listOf(
+        "google.com",
+        "goo.gl",
+        "www.google.com",
+        "g.co",
+        "maps.google.com",
+        "app.goog.gl",
+        "maps.apple.com",
+        "maps.app.goog.gl",
+    )
     Screenshot(
-        R.drawable.open_by_default_geo_share_template,
+        R.drawable.open_by_default_geo_share,
         stringResource(R.string.intro_open_by_default_app_content_description, appName)
     ) { scale, width ->
-        ScreenshotText(
-            "Open by default",
-            x = 55,
-            y = 30,
-            scale = scale,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextLarge,
-        )
-        ScreenshotText(
-            "8 supported links",
-            x = 0,
-            y = 240,
-            scale = scale,
-            width = 1080,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextLarge,
-        )
-        val links = listOf(
-            "google.com",
-            "goo.gl",
-            "www.google.com",
-            "g.co",
-            "maps.google.com",
-            "app.goog.gl",
-            "maps.apple.com",
-            "maps.app.goog.gl",
-        )
-        for ((i, link) in links.withIndex()) {
+        ScreenshotRow(
+            scale,
+            width,
+            x = 62,
+            y = 28,
+        ) {
             ScreenshotText(
-                link,
-                x = 220,
-                y = 360 + i * 125,
-                scale = scale,
-                style = MaterialTheme.typography.screenshotTextMedium,
+                stringResource(R.string.intro_open_by_default_app_screenshot_title),
+                scale,
+                Modifier.alpha(0.5f),
+                style = MaterialTheme.typography.screenshotTextExtraExtraExtraLarge,
             )
         }
-        ScreenshotText(
-            "Cancel",
-            x = 660,
-            y = 1390,
-            scale = scale,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextMedium,
-        )
-        ScreenshotText(
-            "Add",
-            x = 860,
-            y = 1390,
-            scale = scale,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextMedium,
-        )
+        ScreenshotColumn(
+            scale,
+            width,
+            y = 232,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ScreenshotText(
+                stringResource(R.string.intro_open_by_default_app_screenshot_links, links.size),
+                scale,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.screenshotTextExtraExtraLarge,
+            )
+        }
+        ScreenshotColumn(
+            scale,
+            width,
+            x = 218,
+            y = 356,
+            verticalSpacing = 76,
+        ) {
+            for (text in links) {
+                ScreenshotText(
+                    text,
+                    scale,
+                    style = MaterialTheme.typography.screenshotTextLarge,
+                )
+            }
+        }
+        ScreenshotRow(
+            scale,
+            x = 153,
+            y = 1385,
+            width = width,
+            horizontalArrangement = Arrangement.End,
+        ) {
+            ScreenshotText(
+                stringResource(R.string.intro_open_by_default_app_screenshot_cancel),
+                scale,
+                Modifier.padding(end = with(density) { 63.toDp() }),
+                fontWeight = FontWeight.Medium,
+            )
+            ScreenshotText(
+                stringResource(R.string.intro_open_by_default_app_screenshot_add),
+                scale,
+                fontWeight = FontWeight.Medium,
+            )
+        }
     }
 }
 

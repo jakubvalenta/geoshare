@@ -5,62 +5,70 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.screenshotTextLarge
-import page.ooooo.geoshare.ui.theme.screenshotTextMedium
+import page.ooooo.geoshare.ui.theme.*
 
 @Composable
 fun ScreenshotOpenByDefaultMapApp() {
     Screenshot(
-        R.drawable.open_by_default_google_maps_template,
+        R.drawable.open_by_default_google_maps,
         stringResource(R.string.intro_open_by_default_google_maps_content_description)
     ) { scale, width ->
-        ScreenshotText(
-            "Open by default",
-            x = 55,
-            y = 30,
-            scale = scale,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextLarge,
-        )
-        ScreenshotText(
-            "Maps",
-            x = 0,
-            y = 500,
-            scale = scale,
-            width = 1080,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextLarge,
-        )
-        ScreenshotText(
-            "Choose how to open web links for this app",
-            x = 0,
-            y = 570,
-            scale = scale,
-            width = 1080,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextMedium,
-        )
-        ScreenshotText(
-            "In the app",
-            x = 190,
-            y = 780,
-            scale = scale,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextLarge,
-        )
-        ScreenshotText(
-            "In your browser",
-            x = 190,
-            y = 930,
-            scale = scale,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.screenshotTextLarge,
-        )
+        ScreenshotRow(
+            scale,
+            width,
+            x = 62,
+            y = 28,
+        ) {
+            ScreenshotText(
+                stringResource(R.string.intro_open_by_default_app_screenshot_title),
+                scale,
+                style = MaterialTheme.typography.screenshotTextExtraExtraExtraLarge,
+            )
+        }
+        ScreenshotColumn(
+            scale,
+            width,
+            x = 62,
+            y = 498,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalSpacing = 10,
+        ) {
+            ScreenshotText(
+                stringResource(R.string.intro_open_by_default_google_maps_screenshot_app),
+                scale,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.screenshotTextExtraExtraLarge,
+            )
+            ScreenshotText(
+                stringResource(R.string.intro_open_by_default_google_maps_screenshot_choose),
+                scale,
+                color = MaterialTheme.colorScheme.screenshotMutedTextColor,
+                style = MaterialTheme.typography.screenshotTextMedium,
+            )
+        }
+        ScreenshotColumn(
+            scale,
+            width,
+            x = 189,
+            y = 772,
+            verticalSpacing = 94,
+        ) {
+            for (text in listOf(
+                stringResource(R.string.intro_open_by_default_google_maps_screenshot_in_the_app),
+                stringResource(R.string.intro_open_by_default_google_maps_screenshot_in_your_browser),
+            )) {
+                ScreenshotText(
+                    text,
+                    scale = scale,
+                    style = MaterialTheme.typography.screenshotTextExtraExtraLarge,
+                )
+            }
+        }
     }
 }
 

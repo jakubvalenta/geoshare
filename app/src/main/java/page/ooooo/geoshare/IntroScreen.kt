@@ -30,7 +30,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.net.toUri
@@ -286,26 +285,56 @@ fun Screenshot(
 }
 
 @Composable
+fun ScreenshotColumn(
+    scale: Float,
+    width: Int?,
+    x: Int = 0,
+    y: Int = 0,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    verticalSpacing: Int = 0,
+    content: @Composable ColumnScope.() -> Unit = {},
+) {
+    val density = LocalDensity.current
+    Column(
+        Modifier.offset { IntOffset(x, y) * scale }
+            .let { if (width != null) it.width(with(density) { (width - 2 * x).toDp() * scale }) else it },
+        verticalArrangement = Arrangement.spacedBy(with(density) { verticalSpacing.toDp() * scale }),
+        horizontalAlignment = horizontalAlignment,
+        content = content
+    )
+}
+
+@Composable
+fun ScreenshotRow(
+    scale: Float,
+    width: Int?,
+    x: Int = 0,
+    y: Int = 0,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    content: @Composable RowScope.() -> Unit = {},
+) {
+    Row(
+        Modifier.offset { IntOffset(x, y) * scale }
+            .let { if (width != null) it.width(with(LocalDensity.current) { (width - 2 * x).toDp() * scale }) else it },
+        horizontalArrangement = horizontalArrangement,
+        content = content
+    )
+}
+
+@Composable
 fun ScreenshotText(
     text: String,
-    x: Int,
-    y: Int,
     scale: Float,
+    modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.screenshotTextColor,
     fontWeight: FontWeight = FontWeight.Normal,
     style: TextStyle = MaterialTheme.typography.screenshotTextMedium,
-    width: Int? = null,
 ) {
     Text(
         text,
-        if (width != null) {
-            Modifier.width(with(LocalDensity.current) { width.toDp() * scale })
-        } else {
-            Modifier
-        }.offset { IntOffset(x, y) * scale },
+        modifier,
         color = color,
         fontWeight = fontWeight,
-        textAlign = if (width != null) TextAlign.Center else null,
         style = style.copy(
             fontSize = style.fontSize * scale,
             lineHeight = style.lineHeight * scale,

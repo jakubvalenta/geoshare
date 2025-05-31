@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -15,45 +16,51 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun ScreenshotMain() {
     val appName = stringResource(R.string.app_name)
     Screenshot(
-        R.drawable.geo_share_main_template,
+        R.drawable.geo_share_main,
         stringResource(R.string.intro_geo_links_form_content_description, appName)
     ) { scale, width ->
-        ScreenshotText(
-            stringResource(R.string.main_input_uri_label),
-            x = 90,
-            y = 350,
-            scale = scale,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        ScreenshotText(
-            stringResource(R.string.main_input_uri_supporting_text),
-            x = 90,
-            y = 470,
-            scale = scale,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
-        ScreenshotText(
-            stringResource(R.string.main_create_geo_uri),
-            x = 0,
-            y = 600,
-            scale = scale,
-            width = 1080,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        ScreenshotText(
-            stringResource(R.string.main_navigate_to_intro),
-            x = 0,
-            y = 730,
-            scale = scale,
-            width = 1080,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+        ScreenshotColumn(
+            scale,
+            width,
+            x = 88,
+            y = 349,
+            verticalSpacing = 53,
+        ) {
+            ScreenshotText(
+                stringResource(R.string.main_input_uri_label),
+                scale,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            ScreenshotText(
+                stringResource(R.string.main_input_uri_supporting_text),
+                scale,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        ScreenshotColumn(
+            scale,
+            width,
+            y = 593,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalSpacing = 75,
+        ) {
+            ScreenshotText(
+                stringResource(R.string.main_create_geo_uri),
+                scale,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            ScreenshotText(
+                stringResource(R.string.main_navigate_to_intro),
+                scale,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
 }
 
