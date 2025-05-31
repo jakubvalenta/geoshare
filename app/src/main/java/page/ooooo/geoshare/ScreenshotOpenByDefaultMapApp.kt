@@ -98,6 +98,16 @@ private fun DarkScreenshotOpenByDefaultMapAppPreview() {
     }
 }
 
+@Preview(showBackground = true, locale = "ar-rEG")
+@Composable
+private fun RTLScreenshotOpenByDefaultMapAppPreview() {
+    AppTheme {
+        Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+            ScreenshotOpenByDefaultMapApp()
+        }
+    }
+}
+
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletScreenshotOpenByDefaultMapAppPreview() {

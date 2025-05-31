@@ -90,6 +90,16 @@ private fun DarkScreenshotMainPreview() {
     }
 }
 
+@Preview(showBackground = true, locale = "ar-rEG")
+@Composable
+private fun RTLScreenshotMainPreview() {
+    AppTheme {
+        Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+            ScreenshotMain()
+        }
+    }
+}
+
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletScreenshotMainPreview() {

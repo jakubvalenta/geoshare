@@ -97,7 +97,8 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
         }
         Box(
             modifier = Modifier
-                .offset { IntOffset((1080 / 5) * highlightedIconIndex + 11, 646) * scale }
+                .offset { IntOffset(0, 646) * scale }
+                .padding(start = with(density) { ((1080 / 5) * highlightedIconIndex + 11).toDp() * scale })
                 .size(with(density) { 192.toDp() * scale })
                 .border(
                     with(density) { 8.toDp() * scale },
@@ -142,6 +143,16 @@ private fun DarkScreenshotMapAppPreview() {
     AppTheme {
         Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
             ScreenshotMapAppCopy()
+        }
+    }
+}
+
+@Preview(showBackground = true, locale = "ar-rEG")
+@Composable
+private fun RTLScreenshotMapAppPreview() {
+    AppTheme {
+        Column(Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+            ScreenshotMapAppOpen()
         }
     }
 }
