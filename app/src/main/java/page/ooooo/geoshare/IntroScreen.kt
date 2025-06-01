@@ -3,14 +3,12 @@ package page.ooooo.geoshare
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,15 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -42,7 +39,7 @@ fun IntroScreen(
 ) {
     val appName = stringResource(R.string.app_name)
     val pageCount = 3
-    var page by remember { mutableStateOf(initialPage) }
+    var page by remember { mutableIntStateOf(initialPage) }
     val animatedProgress by animateFloatAsState(
         targetValue = (page + 1f) / pageCount,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
@@ -59,26 +56,23 @@ fun IntroScreen(
 
     fun showOpenByDefaultSettings(packageName: String) {
         try {
-            val action =
-                if (
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                    // Samsung supposedly doesn't allow going to the "Open by
-                    // default" settings page.
-                    Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
-                ) {
-                    Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
-                } else {
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                }
-            val intent = Intent(action, Uri.parse("package:$packageName"))
+            val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                // Samsung supposedly doesn't allow going to the "Open by
+                // default" settings page.
+                Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
+            ) {
+                Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+            } else {
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            }
+            val intent = Intent(action, "package:$packageName".toUri())
             settingsLauncher.launch(intent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(
                 context,
                 R.string.intro_settings_activity_not_found,
                 Toast.LENGTH_LONG,
-            )
-                .show()
+            ).show()
         }
     }
 
@@ -112,22 +106,23 @@ fun IntroScreen(
                         page,
                     ) {
                         IntroFigure(
-                            R.drawable.google_maps_share,
-                            stringResource(R.string.intro_how_to_share_google_maps_content_description),
-                            stringResource(R.string.intro_how_to_share_google_maps_caption),
-                        )
-                        IntroFigure(
-                            R.drawable.geo_share_open,
                             stringResource(
-                                R.string.intro_how_to_share_app_content_description,
-                                appName
+                                R.string.intro_how_to_share_google_maps_caption,
+                                stringResource(R.string.share_activity),
+                                appName,
                             ),
+                        ) {
+                            ScreenshotMapAppOpen()
+                        }
+                        IntroFigure(
                             stringResource(
                                 R.string.intro_how_to_share_app_caption,
                                 stringResource(R.string.share_activity),
-                                appName
+                                appName,
                             ),
-                        )
+                        ) {
+                            ScreenshotOpen()
+                        }
                     }
 
                     1 -> IntroPage(
@@ -135,10 +130,9 @@ fun IntroScreen(
                         page,
                     ) {
                         IntroFigure(
-                            R.drawable.open_by_default_google_maps,
-                            stringResource(R.string.intro_open_by_default_google_maps_content_description),
                             stringResource(R.string.intro_open_by_default_google_maps_caption),
                         ) {
+                            ScreenshotOpenByDefaultMapApp()
                             OutlinedButton({
                                 showOpenByDefaultSettings("com.google.android.apps.maps")
                             }) {
@@ -146,25 +140,13 @@ fun IntroScreen(
                             }
                         }
                         IntroFigure(
-                            R.drawable.open_by_default_geo_share,
-                            stringResource(
-                                R.string.intro_open_by_default_app_content_description,
-                                appName
-                            ),
-                            stringResource(
-                                R.string.intro_open_by_default_app_caption,
-                                appName
-                            ),
+                            stringResource(R.string.intro_open_by_default_app_caption, appName),
                         ) {
+                            ScreenshotOpenByDefault()
                             OutlinedButton({
                                 showOpenByDefaultSettings(context.packageName)
                             }) {
-                                Text(
-                                    stringResource(
-                                        R.string.intro_open_by_default_app_button,
-                                        appName
-                                    )
-                                )
+                                Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
                             ParagraphHtml(
                                 stringResource(R.string.intro_open_by_default_app_note),
@@ -178,24 +160,18 @@ fun IntroScreen(
                         page,
                     ) {
                         IntroFigure(
-                            R.drawable.google_maps_copy,
-                            stringResource(R.string.intro_geo_links_copy_content_description),
                             stringResource(
                                 R.string.intro_geo_links_copy_caption,
-                                stringResource(R.string.copy_activity)
+                                stringResource(R.string.copy_activity),
                             ),
-                        )
+                        ) {
+                            ScreenshotMapAppCopy()
+                        }
                         IntroFigure(
-                            R.drawable.geo_share_main,
-                            stringResource(
-                                R.string.intro_geo_links_form_content_description,
-                                appName
-                            ),
-                            stringResource(
-                                R.string.intro_geo_links_form_caption,
-                                appName
-                            ),
-                        )
+                            stringResource(R.string.intro_geo_links_form_caption, appName),
+                        ) {
+                            ScreenshotMain()
+                        }
                     }
                 }
             }
@@ -263,8 +239,6 @@ fun IntroPage(
 
 @Composable
 fun IntroFigure(
-    drawableId: Int,
-    contentDescription: String,
     captionHtml: String,
     content: @Composable () -> Unit = {},
 ) {
@@ -274,14 +248,6 @@ fun IntroFigure(
         verticalArrangement = Arrangement.spacedBy(Spacing.tiny),
     ) {
         ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
-        Image(
-            painter = painterResource(drawableId),
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Inside,
-            modifier = Modifier
-                .padding(horizontal = Spacing.large)
-                .clip(MaterialTheme.shapes.medium),
-        )
         content()
     }
 }
@@ -333,5 +299,13 @@ private fun PageThreePreview() {
 private fun DarkPageThreePreview() {
     AppTheme {
         IntroScreen(initialPage = 2)
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPageOnePreview() {
+    AppTheme {
+        IntroScreen()
     }
 }

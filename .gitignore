@@ -22,3 +22,4 @@ fastlane/Appfile
 fastlane/README.md
 fastlane/report.xml
 local.properties
+app/src/main/res/drawable-*/*_template.webp

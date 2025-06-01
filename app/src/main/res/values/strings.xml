@@ -8,16 +8,37 @@
     <string name="intro_how_to_share_headline">How to show a map location in another map app</string>
     <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>
     <string name="intro_how_to_share_google_maps_content_description">Screenshot of Google Maps’ share screen</string>
+    <string name="intro_how_to_share_google_maps_screenshot_title">Sharing with</string>
+    <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
+    <string name="intro_how_to_share_google_maps_screenshot_url" translatable="false">https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Messaging</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and %2$s will let you open the same location in any installed map app.]]></string>
     <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
+    <string name="intro_how_to_share_app_screenshot_title">Open with %1$s</string>
+    <string name="intro_how_to_share_app_screenshot_once">Just once</string>
+    <string name="intro_how_to_share_app_screenshot_always">Always</string>
+    <string name="intro_how_to_share_app_screenshot_different">Use a different app</string>
     <string name="intro_open_by_default_headline">Configure Android to open links to Google Maps in alternative maps (optional)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>Open by default</i> and turn off the opening of links in this app.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
     <string name="intro_open_by_default_google_maps_button">Open Google Maps settings</string>
+    <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
+    <string name="intro_open_by_default_google_maps_screenshot_choose">Choose how to open web links for this app</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_the_app">In the app</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">In your browser</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Then go to Settings &#8594; Apps &#8594; %1$s &#8594; <i>Open by default</i>, turn on the opening of links in this app, and tap <i>Add links</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">Screenshot of %1$s’s Open by default settings</string>
     <string name="intro_open_by_default_app_button">Open %1$s settings</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Select at least <tt>maps.google.com</tt> and <tt>maps.app.goo.gl</tt>. If some links are grayed out, other Google apps are set to open them by default. You can find these apps and turn off the opening of links for them, like we did for Google Maps.]]></string>
+    <string name="intro_open_by_default_app_screenshot_title">Open by default</string>
+    <plurals name="intro_open_by_default_app_screenshot_links">
+        <item quantity="one">%1$d supported link</item>
+        <item quantity="other">%1$d supported links</item>
+    </plurals>
+    <string name="intro_open_by_default_app_screenshot_cancel">Cancel</string>
+    <string name="intro_open_by_default_app_screenshot_add">Add</string>
     <string name="intro_geo_links_headline">How to copy geographic coordinates</string>
     <string name="intro_geo_links_copy_caption"><![CDATA[Choose <i>%1$s</i> when sharing a location from your map app.]]></string>
     <string name="intro_geo_links_copy_content_description">Screenshot of Google Maps’ share screen</string>

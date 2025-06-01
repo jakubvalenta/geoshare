@@ -1,5 +1,8 @@
 package page.ooooo.geoshare.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF006B59)
@@ -73,3 +76,11 @@ val surfaceContainerLowDark = Color(0xFF151D1B)
 val surfaceContainerDark = Color(0xFF19211F)
 val surfaceContainerHighDark = Color(0xFF232C29)
 val surfaceContainerHighestDark = Color(0xFF2E3734)
+
+val ColorScheme.screenshotTextColor: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) Color(0xFFE2E2E2) else Color(0XFF1B1B1B)
+
+val ColorScheme.screenshotMutedTextColor: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) Color(0xFFC6C6C6) else Color(0XFF474747)
