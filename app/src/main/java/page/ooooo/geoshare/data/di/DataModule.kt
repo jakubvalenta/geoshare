@@ -22,7 +22,7 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindUserPreferencesRepository(
-        userPreferencesRepository: DefaultUserPreferencesRepository
+        userPreferencesRepository: DefaultUserPreferencesRepository,
     ): UserPreferencesRepository
 }
 
@@ -44,6 +44,6 @@ class FakeUserPreferencesRepository @Inject constructor() :
 }
 
 val defaultFakeUserPreferences = UserPreferencesValues(
-    connectToGooglePermissionValue = Permission.ALWAYS,
+    connectionPermissionValue = Permission.ALWAYS,
     introShownForVersionCodeValue = 0,
 )

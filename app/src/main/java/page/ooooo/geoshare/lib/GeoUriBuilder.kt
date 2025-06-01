@@ -13,7 +13,7 @@ private fun matchGroupOrNull(m: Matcher, name: String): String? =
         null
     }
 
-data class GeoUriCoords(var lat: String = "0", var lon: String = "0") {
+data class GeoUriCoords(var lat: String? = null, var lon: String? = null) {
     fun fromMatcher(m: Matcher) {
         val newLat = matchGroupOrNull(m, "lat")
         if (newLat != null) {
@@ -25,13 +25,13 @@ data class GeoUriCoords(var lat: String = "0", var lon: String = "0") {
         }
     }
 
-    override fun toString(): String = "$lat,$lon"
+    override fun toString(): String = "${lat ?: 0},${lon ?: 0}"
 }
 
 data class GeoUriParams(
     var q: String? = null,
     var z: String? = null,
-    private val uriQuote: UriQuote = DefaultUriQuote()
+    private val uriQuote: UriQuote = DefaultUriQuote(),
 ) {
     fun fromMatcher(m: Matcher) {
         val newQ = matchGroupOrNull(m, "q")
@@ -44,7 +44,7 @@ data class GeoUriParams(
         }
     }
 
-    override fun toString(): String = hashMapOf("q" to q, "z" to z)
+    override fun toString(): String = mapOf("q" to q, "z" to z)
         .filter { it.value != null }
         .map { "${it.key}=${uriQuote.encode(it.value!!.replace('+', ' '))}" }
         .fastJoinToString("&")

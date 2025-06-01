@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.local.preferences.connectToGooglePermission
+import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import java.io.IOException
 import javax.inject.Inject
@@ -35,22 +35,15 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
-                connectToGooglePermissionValue = connectToGooglePermission.getValue(
-                    it
-                ),
-                introShownForVersionCodeValue = lastRunVersionCode.getValue(
-                    it
-                ),
+                connectionPermissionValue = connectionPermission.getValue(it),
+                introShownForVersionCodeValue = lastRunVersionCode.getValue(it),
             )
         }
 
     override suspend fun <T> getValue(userPreference: UserPreference<T>): T =
         userPreference.getValue(dataStore.data.first())
 
-    override suspend fun <T> setValue(
-        userPreference: UserPreference<T>,
-        value: T,
-    ) {
+    override suspend fun <T> setValue(userPreference: UserPreference<T>, value: T) {
         dataStore.edit { userPreference.setValue(it, value) }
     }
 }

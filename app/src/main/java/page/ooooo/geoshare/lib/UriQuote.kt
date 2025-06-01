@@ -19,5 +19,5 @@ class FakeUriQuote : UriQuote {
         URLEncoder.encode(s, "utf-8").replace("+", "%20")
 
     override fun decode(s: String): String =
-        URLDecoder.decode(s, "utf-8")
+        URLDecoder.decode(s, "utf-8").replace("%20", " ")
 }

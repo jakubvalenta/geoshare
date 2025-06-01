@@ -1,6 +1,6 @@
 # ![](./docs/icon-54.png) Geo Share
 
-An Android app to open Google Maps in other map apps and to create geo: links.
+An Android app to open map links in other map apps and copy coordinates.
 
 [<img src="https://f-droid.org/badge/get-it-on.png"
 alt="Get it on F-Droid"
@@ -11,31 +11,41 @@ height="80">](https://apt.izzysoft.de/packages/page.ooooo.geoshare)
 
 [![Translation status](https://hosted.weblate.org/widget/geoshare/svg-badge.svg)](https://hosted.weblate.org/engage/geoshare/)
 
-## When to use Geo Share
+Share a map link with Geo Share and the app will open it in another installed
+map app.
 
-If someone sends you a Google Maps link, but you prefer using OpenStreetMap, you
-can share the link with Geo Share. The app will open it in an installed map app
-of your choice, such as OsmAnd or Organic Maps.
+**Supported map links**
 
-If you like finding places on Google Maps but prefer a different app for
-navigation, you can share the location from Google Maps with Geo Share. The app
-will open it in your favorite navigation app.
+- Google Maps
+- Apple Maps (beta)
 
-You can also use the app to copy Google Maps links as geo: links to your
-clipboard.
+**Example use cases**
+
+When someone sends you a Google Maps link, but you prefer using OpenStreetMap,
+you can quickly open the same location in OsmAnd or Organic Maps.
+
+When you like Google Maps for finding places, but you prefer a different app for
+navigation, you can easily switch from Google Maps to your favorite navigation
+app.
+
+**Other features**
+
+- Show the geographic coordinates of a map link and copy them to clipboard as a
+  geo: link.
+- Paste map links directly into the app, instead of sharing them with it.
 
 ## Intro
 
-### How to view Google Maps locations in other map apps
+### How to show a map location in another map app
 
-Share a location from Google Maps app or from your web browser.
+Share a location from your map app or web browser.
 
 <img src="./app/src/main/res/drawable-mdpi/google_maps_share.webp"
-alt="Screenshot of Google Maps' share screen"
+alt="Screenshot of Google Maps’ share screen"
 width="540">
 
-Choose _Share geo\:_ and Geo Share will let you open the location in any
-installed map app.
+Choose _Open_ and Geo Share will let you open the same location in any installed
+map app.
 
 <img src="./app/src/main/res/drawable-mdpi/geo_share_open.webp"
 alt="Screenshot of Geo Share's share screen"
@@ -62,66 +72,67 @@ grayed out, other Google apps are set to open them by default. You can find
 these apps and turn off the opening of links for them, like we did for Google
 Maps.
 
-### How to create geo: links
+### How to copy geographic coordinates
 
-Select _Copy geo\:_ when sharing from Google Maps.
+Choose _Copy geo\:_ when sharing a location from your map app.
 
 <img src="./app/src/main/res/drawable-mdpi/google_maps_copy.webp"
 alt="Screenshot of Google Maps' share screen"
 width="540">
 
-Or open Geo Share and paste your Google Maps link there.
+Or open Geo Share and paste your map link there.
 
 <img src="./app/src/main/res/drawable-mdpi/geo_share_main.webp"
-alt="Screenshot of Geo Share's geo: link conversion form"
+alt="Screenshot of Geo Share's geographic coordinates form"
 width="540">
 
 ## How it works and privacy considerations
 
-Geo Share converts Google Maps links into geo: links that can be opened by other
-map apps. To create a geo: link, geographic coordinates are required. Geo Share
-extracts them from the Google Maps URL.
+Geo Share converts map links (e.g. https://maps.app.goo.gl/...) into geo: links
+that can be opened by other map apps. To create a geo: link, geographic
+coordinates are required. Geo Share extracts them from the map URL.
 
-However, not all Google Maps URLs include coordinates. In such cases, Geo Share
-will **prompt you for permission to connect to Google** and retrieve the
-coordinates from either HTTP headers or the HTML document of the link.
+However, not all map URLs include coordinates. In such cases, Geo Share will
+**prompt you for permission to connect to the map service** (Google Maps, Apple
+Maps etc.) and retrieve the coordinates from either HTTP headers or the HTML
+document of the link.
 
-More precisely, there are three scenarios how Geo Share converts a Google Maps
-URL into a geo: URI:
+More precisely, there are three scenarios how Geo Share converts a map URL into
+a geo: URI:
 
-1. If the Google Maps URL already contains geographic coordinates (for example
+1. If the map URL already contains geographic coordinates (for example
    `https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398`),
-   then it's parsed and no request to Google's servers is made.
+   then it’s parsed and no request to the map service’s servers is made.
 
-2. If the Google Maps URL doesn't contain geographic coordinates (for example
+2. If the map URL doesn’t contain geographic coordinates (for example
    `https://www.google.com/maps/place/Central+Park/`), then Geo Share asks you
-   if it can connect to Google.
+   if it can connect to the map service.
 
-   If you allow connecting to Google, then Geo Share makes an **HTTP GET
-   request** to Google Maps and parses the coordinates from the HTML response.
-   You can imagine it as `curl https://www.google.com/maps/place/Central+Park/ |
-   grep -E '/@[0-9.,-]+'`.
+   If you allow connecting to the map service, then Geo Share makes an **HTTP
+   GET request** to Google Maps (or Apple Maps etc.) and parses the coordinates
+   from the HTML response. You can imagine it as `curl
+   https://www.google.com/maps/place/Central+Park/ | grep -E '/@[0-9.,-]+'`.
 
-   If you don't allow connecting to Google, then Geo Share creates a geo: link
-   with a place search term (for example `geo:0,0?q=Central%20Park`).
+   If you don’t allow connecting to the map service, then Geo Share creates a
+   geo: link with a place search term (for example `geo:0,0?q=Central%%20Park`).
 
-3. If the Google Maps URL is a short link (for example
+3. If the map URL is a short link (for example
    `https://maps.app.goo.gl/TmbeHMiLEfTBws9EA`), then Geo Share asks you if it
-   can connect to Google.
+   can connect to the map service.
 
-   If you allow connecting to Google, then Geo Share makes an **HTTP HEAD
-   request** to the short link and reads the full link from the response
+   If you allow connecting to the map service, then Geo Share makes an **HTTP
+   HEAD request** to the short link and reads the full link from the response
    headers. You can imagine it as `curl -I
    https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:`. Then Geo Share
    continues with scenario 1 or 2, depending on whether the full link contains
-   coordinates or not. In case of scenario 2, another connection to Google will
-   be made, but this time without asking.
+   coordinates or not. In case of scenario 2, another connection to the map
+   service will be made, but this time without asking.
 
-   If you don't allow connecting to Google, then Geo Share cancels the creation
-   of the geo: link.
+   If you don’t allow connecting to the map service, then Geo Share cancels the
+   creation of the geo: link.
 
-To permanently allow or deny connecting to Google instead of always asking (the
-default), go to the app's Preferences.
+To permanently allow or deny connecting to the map service instead of always
+asking (the default), go to the app’s Preferences.
 
 ## Compatibility with the GMaps WV app
 
@@ -131,9 +142,9 @@ another map app.
 
 ## Reporting issues
 
-Geo Share supports many Google Maps URL formats. Still, if you find a link that
-doesn't work, please report an [issue on
-GitHub](https://github.com/jakubvalenta/geoshare/issues).
+Geo Share supports many types of Google Maps and Apple Maps links. If you still
+find a link that doesn’t work, please [report an
+issue](https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml).
 
 ## Screenshots
 
@@ -215,33 +226,50 @@ package_name("page.ooooo.geoshare")
 fastlane metadata
 ```
 
-### Testing various Google Maps links
+### Testing various map links
 
-Link with coordinates in URL:
+Coordinates links:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?address=Boddinstra%C3%9Fe%2C+Hermannstra%C3%9Fe+36%E2%80%9337%2C+12049+Berlin%2C+Germany\&coordinate=52.4804611%2C13.4250923\&name=Marked+Location' page.ooooo.geoshare.debug
 ```
 
-Link with view centerpoint coordinates in URL:
+Place links:
+
+```shell
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?place-id=I1E40915DF4BA1C96\&address=Reuterplatz+3,+12047+Berlin,+Germany\&coordinate=52.4890246,13.4295963\&name=Reuterplatz\&_provider=9902' page.ooooo.geoshare.debug
+```
+
+Map view links:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188\&center=52.49115540927951,13.42595574770533' page.ooooo.geoshare.debug
 ```
 
-Short link:
+Search links:
 
 ```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.app.goo.gl/eukZjpeYrrvX3tDw6' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/?q=Central+Park\&sll=50.894967,4.341626\&z=10\&t=s' page.ooooo.geoshare.debug
 ```
 
-Link with coordinates only in HTML:
+Short links:
+
+```shell
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6' page.ooooo.geoshare.debug
+```
+
+Links with coordinates only in HTML:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Berlin,+Germany/' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?place-id=I3B04EDEB21D5F86\&_provider=9902' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?auid=17017496253231963769\&lsp=7618' page.ooooo.geoshare.debug
 ```
 
-Place list link:
+Google Maps place list link:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg' page.ooooo.geoshare.debug
@@ -257,6 +285,7 @@ Link shared as a SEND Intent:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/" page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188\&center=52.49115540927951,13.42595574770533" page.ooooo.geoshare.debug
 ```
 
 ## Contributing
@@ -267,10 +296,9 @@ issue](https://github.com/jakubvalenta/geoshare/issues) or create a new one.
 
 ### Translating
 
-Geo Share
-is [available under Weblate](https://hosted.weblate.org/engage/geoshare/) thanks
-to their libre tier!
-More instructions can be found under *Info* in it.
+Geo Share is [available under
+Weblate](https://hosted.weblate.org/engage/geoshare/) thanks to their libre
+tier! More instructions can be found under *Info* in it.
 
 [![Translation status](https://hosted.weblate.org/widget/geoshare/multi-auto.svg)](https://hosted.weblate.org/engage/geoshare/)
 

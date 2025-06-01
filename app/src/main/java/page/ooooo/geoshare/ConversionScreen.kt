@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.lib.RequestedParseHtmlPermission
+import page.ooooo.geoshare.lib.RequestedParseHtmlToGetCoordsPermission
 import page.ooooo.geoshare.lib.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.truncateMiddle
 
@@ -27,13 +28,11 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
 
     when (currentState) {
-        is RequestedUnshortenPermission -> {
-            val requestedUnshortenPermission =
-                currentState as RequestedUnshortenPermission
+        is RequestedUnshortenPermission -> (currentState as RequestedUnshortenPermission).let { currentState ->
             PermissionDialog(
-                title = stringResource(R.string.conversion_permission_common_title),
+                title = stringResource(currentState.urlConverter.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
-                dismissText = stringResource(R.string.conversion_permission_unshorten_deny),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = { viewModel.grant(it) },
                 onDismissRequest = { viewModel.deny(it) },
                 modifier = Modifier
@@ -43,9 +42,9 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
-                            R.string.conversion_permission_unshorten_text,
-                            requestedUnshortenPermission.url.toString(),
-                            appName
+                            R.string.conversion_permission_common_text,
+                            currentState.url.toString(),
+                            appName,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -53,25 +52,47 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
             }
         }
 
-        is RequestedParseHtmlPermission -> {
-            val requestedParseHtmlPermission =
-                currentState as RequestedParseHtmlPermission
+        is RequestedParseHtmlPermission -> (currentState as RequestedParseHtmlPermission).let { currentState ->
             PermissionDialog(
-                title = stringResource(R.string.conversion_permission_common_title),
+                title = stringResource(currentState.urlConverter.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
-                dismissText = stringResource(R.string.conversion_permission_parse_html_deny),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = { viewModel.grant(it) },
                 onDismissRequest = { viewModel.deny(it) },
                 modifier = Modifier
                     .semantics { testTagsAsResourceId = true }
-                    .testTag("geoShareParseHtmlPermissionDialog")
+                    .testTag("geoShareParseHtmlPermissionDialog"),
             ) {
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
-                            R.string.conversion_permission_parse_html_text,
-                            truncateMiddle(requestedParseHtmlPermission.url.toString()),
-                            appName
+                            R.string.conversion_permission_common_text,
+                            currentState.url.toString(),
+                            appName,
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
+        }
+
+        is RequestedParseHtmlToGetCoordsPermission -> (currentState as RequestedParseHtmlToGetCoordsPermission).let { currentState ->
+            PermissionDialog(
+                title = stringResource(currentState.urlConverter.permissionTitleResId),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
+                onConfirmation = { viewModel.grant(it) },
+                onDismissRequest = { viewModel.deny(it) },
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        stringResource(
+                            R.string.conversion_permission_parse_html_to_get_coords_text,
+                            truncateMiddle(currentState.url.toString()),
+                            appName,
+                            currentState.urlConverter.name,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),

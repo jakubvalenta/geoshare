@@ -16,6 +16,8 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +27,10 @@ class ConversionViewModel @Inject constructor(
 ) : ViewModel() {
 
     val stateContext = ConversionStateContext(
-        googleMapsUrlConverter = GoogleMapsUrlConverter(),
+        urlConverters = listOf(
+            GoogleMapsUrlConverter(),
+            AppleMapsUrlConverter(),
+        ),
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
@@ -45,11 +50,6 @@ class ConversionViewModel @Inject constructor(
         savedStateHandle,
         "resultGeoUri",
         "",
-    )
-    var resultUnchanged by SavableDelegate(
-        savedStateHandle,
-        "resultUnchanged",
-        false,
     )
     var resultErrorMessageResId by SavableDelegate<Int?>(
         savedStateHandle,
@@ -80,7 +80,6 @@ class ConversionViewModel @Inject constructor(
     fun start() {
         withMutableSnapshot {
             resultGeoUri = ""
-            resultUnchanged = false
             resultErrorMessageResId = null
         }
         transition(ReceivedUriString(stateContext, inputUriString))
@@ -118,7 +117,6 @@ class ConversionViewModel @Inject constructor(
                 context,
                 settingsLauncherWrapper,
                 resultGeoUri,
-                resultUnchanged,
             )
         )
     }
@@ -129,7 +127,6 @@ class ConversionViewModel @Inject constructor(
                 stateContext,
                 clipboard,
                 resultGeoUri,
-                resultUnchanged,
             )
         )
     }
@@ -144,7 +141,6 @@ class ConversionViewModel @Inject constructor(
                     (stateContext.currentState as ConversionSucceeded).let {
                         withMutableSnapshot {
                             resultGeoUri = it.geoUri
-                            resultUnchanged = it.unchanged
                         }
                     }
 
@@ -162,7 +158,6 @@ class ConversionViewModel @Inject constructor(
         withMutableSnapshot {
             inputUriString = newUriString
             resultGeoUri = ""
-            resultUnchanged = false
             resultErrorMessageResId = null
         }
         if (stateContext.currentState !is Initial) {

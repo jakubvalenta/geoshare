@@ -90,13 +90,13 @@ class PermissionUserPreference(
     }
 }
 
-val connectToGooglePermission = PermissionUserPreference(
+val connectionPermission = PermissionUserPreference(
     title = @Composable {
-        stringResource(R.string.user_preferences_connect_to_google_title)
+        stringResource(R.string.user_preferences_connection_title)
     },
     description = @Composable {
         stringResource(
-            R.string.user_preferences_connect_to_google_description,
+            R.string.user_preferences_connection_description,
             stringResource(R.string.app_name)
         )
     },
@@ -106,19 +106,19 @@ val connectToGooglePermission = PermissionUserPreference(
         RadioButtonOption(
             Permission.ALWAYS,
             @Composable {
-                stringResource(R.string.user_preferences_connect_to_google_option_always)
+                stringResource(R.string.user_preferences_connection_option_always)
             }
         ),
         RadioButtonOption(
             Permission.ASK,
             @Composable {
-                stringResource(R.string.user_preferences_connect_to_google_option_ask)
+                stringResource(R.string.user_preferences_connection_option_ask)
             }
         ),
         RadioButtonOption(
             Permission.NEVER,
             @Composable {
-                stringResource(R.string.user_preferences_connect_to_google_option_never)
+                stringResource(R.string.user_preferences_connection_option_never)
             }
         ),
     ),
@@ -135,6 +135,6 @@ val lastRunVersionCode = NullableIntUserPreference(
 )
 
 data class UserPreferencesValues(
-    var connectToGooglePermissionValue: Permission = connectToGooglePermission.loading,
+    var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = lastRunVersionCode.loading,
 )
