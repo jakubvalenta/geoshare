@@ -17,7 +17,7 @@ map app.
 **Supported map links**
 
 - Google Maps
-- Apple Maps
+- Apple Maps (beta)
 
 **Example use cases**
 
@@ -30,10 +30,9 @@ app.
 
 **Other features**
 
-- Get the geographic coordinates of a map link and copy them to clipboard as a
+- Show the geographic coordinates of a map link and copy them to clipboard as a
   geo: link.
-- In addition to sharing a map link with Geo Share, you can also open the app
-  and paste your link there.
+- Paste map links directly into the app, instead of sharing them with it.
 
 ## Intro
 
@@ -45,8 +44,8 @@ Share a location from your map app or web browser.
 alt="Screenshot of Google Maps’ share screen"
 width="540">
 
-Choose _Open_ and Geo Share will let you open the location in any installed map
-app.
+Choose _Open_ and Geo Share will let you open the same location in any installed
+map app.
 
 <img src="./app/src/main/res/drawable-mdpi/geo_share_open.webp"
 alt="Screenshot of Geo Share's share screen"

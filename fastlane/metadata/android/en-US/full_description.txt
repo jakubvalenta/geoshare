@@ -3,7 +3,7 @@ Share a map link with Geo Share and the app will open it in another installed ma
 <b>Supported map links</b>
 
 - Google Maps
-- Apple Maps
+- Apple Maps (beta)
 
 <b>Example use cases</b>
 
@@ -14,7 +14,7 @@ When you like Google Maps for finding places, but you prefer a different app for
 <b>Other features</b>
 
 - Show the geographic coordinates of a map link and copy them to clipboard as a geo: link.
-- In addition to sharing a map link with Geo Share, you can also open the app and paste your link there.
+- Paste map links directly into the app, instead of sharing them with it.
 
 <b>How it works and privacy considerations</b>
 

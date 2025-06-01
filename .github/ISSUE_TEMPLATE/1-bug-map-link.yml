@@ -15,7 +15,7 @@ body:
     attributes:
       label: Current behaviour
       value: |
-          The app shows 'Failed to process map link.
+          The app shows 'Failed to process map link.'
     validations:
       required: true
   - type: input
@@ -24,7 +24,7 @@ body:
       label: Version
       description: What version of the app are you running?
       placeholder: |
-          Example: 3.6.0
+          Example: 4.0.0
     validations:
       required: true
   - type: input

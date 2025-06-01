@@ -8,7 +8,7 @@
     <string name="intro_how_to_share_headline">How to show a location in another map app</string>
     <string name="intro_how_to_share_google_maps_caption">Share a location from your map app or web browser.</string>
     <string name="intro_how_to_share_google_maps_content_description">Screenshot of Google Maps’ share screen</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and %2$s will let you open the location in any installed map app.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and %2$s will let you open the same location in any installed map app.]]></string>
     <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
     <string name="intro_open_by_default_headline">Configure Android to open links to Google Maps in alternative maps (optional)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>Open by default</i> and turn off the opening of links in this app.]]></string>
@@ -34,7 +34,7 @@
     <string name="main_result_geo_uri_share_content_description">Share</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
-    <string name="main_info_box"><![CDATA[%1s supports many types of Google Maps and Apple Maps links. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues">report an issue</a>.]]></string>
+    <string name="main_info_box"><![CDATA[%1s supports many types of Google Maps and Apple Maps links. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">report an issue</a>.]]></string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="conversion_permission_common_grant">OK</string>
@@ -49,7 +49,7 @@
     <string name="about_title">About</string>
     <string name="about_app_icon_content_description">Application icon</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
-    <string name="about_text"><![CDATA[<p>%1$s is a free and open-source app distributed under the <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> or later license.</p><br><p>You can find the code at <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, where you can also <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">report issues</a>.</p><br><p>Your feedback is welcome. You can reach me at <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
+    <string name="about_text"><![CDATA[<p>%1$s is a free and open-source app distributed under the <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> or later license.</p><br><p>You can find the code at <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, where you can also <a href="https://github.com/jakubvalenta/geoshare/issues">report issues</a>.</p><br><p>Your feedback is welcome. You can reach me at <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="permission_do_not_ask">Don’t ask me again</string>
     <string name="faq_title">FAQ</string>
     <string name="faq_how_it_works_headline">How it works and privacy considerations</string>
