@@ -36,7 +36,7 @@ app.
 
 ## Intro
 
-### How to show a location in another map app
+### How to show a map location in another map app
 
 Share a location from your map app or web browser.
 
