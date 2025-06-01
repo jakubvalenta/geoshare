@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
@@ -61,7 +62,7 @@ fun ScreenshotOpenByDefault() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             ScreenshotText(
-                stringResource(R.string.intro_open_by_default_app_screenshot_links, links.size),
+                pluralStringResource(R.plurals.intro_open_by_default_app_screenshot_links, links.size, links.size),
                 scale,
                 fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.screenshotTextExtraExtraLarge,
