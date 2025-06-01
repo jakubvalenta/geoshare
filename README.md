@@ -40,32 +40,26 @@ app.
 
 Share a location from your map app or web browser.
 
-<img src="./app/src/main/res/drawable-mdpi/google_maps_share.webp"
-alt="Screenshot of Google Maps’ share screen"
-width="540">
+![Screenshot of Google Maps’ share screen](./docs/map_app.webp)
 
 Choose _Open_ and Geo Share will let you open the same location in any installed
 map app.
 
-<img src="./app/src/main/res/drawable-mdpi/geo_share_open.webp"
-alt="Screenshot of Geo Share's share screen"
-width="540">
+![Screenshot of Geo Share's share screen](./docs/geo_share_open.webp)
 
 ### Configure Android to open links to Google Maps in alternative maps (optional)
 
 First, go to Settings > Apps > Maps > _Open by default_ and turn off the opening
 of links in this app.
 
-<img src="./app/src/main/res/drawable-mdpi/open_by_default_google_maps.webp"
-alt="Screenshot of Google Maps' Open by default settings"
-width="540">
+![Screenshot of Google Maps' Open by default
+settings](./docs/open_by_default_google_maps.webp)
 
 Then go to Settings > Apps > Geo Share > _Open by default_, turn on the opening
 of links in this app, and tap <i>Add links</i>.
 
-<img src="./app/src/main/res/drawable-mdpi/open_by_default_geo_share.webp"
-alt="Screenshot of Geo Share's Open by default settings"
-width="540">
+![Screenshot of Geo Share's Open by default
+settings](./docs/open_by_default_geo_share.webp)
 
 Select at least `maps.google.com` and `maps.app.goo.gl`. If some links are
 grayed out, other Google apps are set to open them by default. You can find
@@ -76,15 +70,12 @@ Maps.
 
 Choose _Copy geo\:_ when sharing a location from your map app.
 
-<img src="./app/src/main/res/drawable-mdpi/google_maps_copy.webp"
-alt="Screenshot of Google Maps' share screen"
-width="540">
+![Screenshot of Google Maps' share screen](./docs/google_maps_copy.webp)
 
 Or open Geo Share and paste your map link there.
 
-<img src="./app/src/main/res/drawable-mdpi/geo_share_main.webp"
-alt="Screenshot of Geo Share's geographic coordinates form"
-width="540">
+![Screenshot of Geo Share's geographic coordinates
+form](./docs/geo_share_main.webp)
 
 ## How it works and privacy considerations
 
