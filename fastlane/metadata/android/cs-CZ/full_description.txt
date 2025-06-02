@@ -1,13 +1,23 @@
-<b>Kdy používat Geo Share</b>
+Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové aplikaci, kterou máte nainstalovanou.
 
-Když vám někdo pošle odkaz na Google Mapy, ale vy preferujete OpenStreetMap, můžete sdílet tento odkaz s Geo Share. Aplikace jej otevře ve vámi zvolené nainstalované aplikaci, třeba v OsmAnd nebo Organic Maps.
+<b>Podporované odkazy na mapy</b>
 
-Když rádi hledáte místa v Google Mapách, ale pro navigování preferujete jinou aplikaci, můžete sdílet polohu z Google Map s Geo Share. Aplikace ji otevře ve vaši oblíbené navigaci.
+- Google Mapy
+- Apple Mapy (beta)
 
-Aplikaci můžete také použít pro kopírování odkazů na Google Mapy do schránky ve formátu geo: odkazů.
+<b>Příklady použití</b>
+
+Když vám někdo pošle odkaz na Google Mapy, ale vy preferujete OpenStreetMap, můžete rychle otevřít tutéž polohu v aplikaci OsmAnd nebo Organic Maps.
+
+Když rádi hledáte místa v Google Mapách, ale pro navigování preferujete jinou aplikaci, můžete snadno přepnout z Google Map do vaší oblíbené navigace.
+
+<b>Další funkce</b>
+
+- Zobrazte zeměpisné souřadnice odkazu na mapy a zkopírujte je do schránky jako geo: odkaz.
+- Vložte odkaz na mapy přímo do aplikace, místo abyste jej s aplikací sdíleli.
 
 <b>Jak to funguje a ochrana soukromí</b>
 
-Geo Share převádí odkazy z formátu Google Map na geo: odkazy, které lze otevřít v jiných mapových aplikacích. Pro vytvoření geo: odkazu jsou potřeba zeměpisné souřadnice, které Geo Share přečte z URL Google Map.
+Geo Share převádí odkazy na mapy (např. https://maps.app.goo.gl/...) na geo: odkazy, které dokážou jiné mapové aplikace otevřít. Pro vytvoření geo: odkazu jsou potřeba zeměpisné souřadnice, které Geo Share přečte z URL.
 
-Avšak ne všechny URL Google Map obsahují souřadnice. V takových případech se vás Geo Share zeptá, jestli se může spojit s Googlem a získat souřadnice z HTTP hlaviček nebo HTML dokumentu daného odkazu. Více informací najdete v aplikaci na obrazovce Nejčastější dotazy.
+Avšak ne všechna URL obsahují souřadnice. V takových případech se vás Geo Share zeptá, jestli se může spojit s danou mapovou službou (Google Mapy, Apple Mapy atd.) a získat souřadnice z HTTP hlaviček nebo HTML dokumentu daného odkazu. Podrobnější informace najdete v aplikaci na obrazovce Nejčastější dotazy.
