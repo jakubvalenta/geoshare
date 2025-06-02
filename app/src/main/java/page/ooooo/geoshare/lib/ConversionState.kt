@@ -15,6 +15,7 @@ import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
+import androidx.core.net.toUri
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -44,7 +45,7 @@ data class ReceivedIntent(
 data class ReceivedUriString(
     val stateContext: ConversionStateContext,
     val uriString: String,
-    private val parseUri: (String) -> Uri = { s -> Uri.parse(s) },
+    private val parseUri: (String) -> Uri = { s -> s.toUri() },
 ) : ConversionState() {
     override suspend fun transition(): State {
         val uri = parseUri(uriString)

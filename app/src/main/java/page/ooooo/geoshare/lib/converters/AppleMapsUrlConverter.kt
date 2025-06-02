@@ -27,7 +27,7 @@ class AppleMapsUrlConverter(
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
 
-    val urlQueryPatterns = listOf<Map<String, Pattern>>(
+    val urlQueryPatterns = listOf(
         mapOf("ll" to coordPattern),
         mapOf("coordinate" to coordPattern),
         mapOf("q" to coordPattern),
@@ -54,12 +54,12 @@ class AppleMapsUrlConverter(
         val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
             it.map { (paramName, paramPattern) ->
                 val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
-                paramPattern.matcher(paramValue).takeIf { it.matches() } ?: return@firstNotNullOfOrNull null
+                paramPattern.matcher(paramValue).takeIf { m -> m.matches() } ?: return@firstNotNullOfOrNull null
             }
         }
         urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
 
-        val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { it.matches() } }
+        val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
         zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
 
         return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
@@ -84,7 +84,7 @@ class AppleMapsUrlConverter(
 
     override fun parseHtml(html: String): ParseHtmlResult? {
         val htmlMatchers = htmlPatterns.mapNotNull {
-            it.matcher(html).takeIf { it.find() }
+            it.matcher(html).takeIf { m -> m.find() }
         }
         if (htmlMatchers.isEmpty()) {
             log.w(null, "Apple Maps HTML does not match any known pattern")

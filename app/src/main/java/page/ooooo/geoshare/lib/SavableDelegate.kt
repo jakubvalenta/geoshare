@@ -9,7 +9,7 @@ class SavableDelegate<T>(
     private val key: String,
     default: T,
 ) {
-    private var state = mutableStateOf<T>(savedStateHandle[key] ?: default)
+    private var state = mutableStateOf(savedStateHandle[key] ?: default)
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return state.value

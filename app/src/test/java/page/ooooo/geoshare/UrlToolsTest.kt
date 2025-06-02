@@ -25,7 +25,7 @@ class UrlToolsTest {
     @Test
     fun getUrlQueryParams_severalParameters_returnsMap() {
         assertEquals(
-            mapOf<String, String>("foo" to "bar", "baz" to "1"),
+            mapOf("foo" to "bar", "baz" to "1"),
             getUrlQueryParams(URL("https://www.example.com/?foo=bar&baz=1"), uriQuote),
         )
     }
@@ -33,7 +33,7 @@ class UrlToolsTest {
     @Test
     fun getUrlQueryParams_urlEncodeParameter_returnsMapWithUrlDecodedValue() {
         assertEquals(
-            mapOf<String, String>("foo" to "bar baz"),
+            mapOf("foo" to "bar baz"),
             getUrlQueryParams(URL("https://www.example.com/?foo=bar%20baz"), uriQuote),
         )
     }
@@ -41,11 +41,11 @@ class UrlToolsTest {
     @Test
     fun getUrlQueryParams_parameterWithoutValue_returnsMapWithEmptyStringsAsTheParameterValue() {
         assertEquals(
-            mapOf<String, String>("foo" to "bar", "spam" to "", "baz" to "1"),
+            mapOf("foo" to "bar", "spam" to "", "baz" to "1"),
             getUrlQueryParams(URL("https://www.example.com/?foo=bar&spam&baz=1"), uriQuote),
         )
         assertEquals(
-            mapOf<String, String>("foo" to "bar", "spam" to "", "baz" to "1"),
+            mapOf("foo" to "bar", "spam" to "", "baz" to "1"),
             getUrlQueryParams(URL("https://www.example.com/?foo=bar&spam=&baz=1"), uriQuote),
         )
     }
@@ -53,11 +53,11 @@ class UrlToolsTest {
     @Test
     fun getUrlQueryParams_parameterWithoutNameOrValue_returnsMapWithEmptyStringsAsTheParameterNameAndValue() {
         assertEquals(
-            mapOf<String, String>("foo" to "bar", "" to "", "baz" to "1"),
+            mapOf("foo" to "bar", "" to "", "baz" to "1"),
             getUrlQueryParams(URL("https://www.example.com/?foo=bar&=&baz=1"), uriQuote),
         )
         assertEquals(
-            mapOf<String, String>("foo" to "bar", "" to "", "baz" to "1"),
+            mapOf("foo" to "bar", "" to "", "baz" to "1"),
             getUrlQueryParams(URL("https://www.example.com/?foo=bar&&baz=1"), uriQuote),
         )
     }

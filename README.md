@@ -1,4 +1,4 @@
-# ![](./docs/icon-54.png) Geo Share
+# ![Application icon](./docs/icon-54.png) Geo Share
 
 An Android app to open map links in other map apps and copy coordinates.
 
@@ -70,7 +70,7 @@ Maps.
 
 Choose _Copy geo\:_ when sharing a location from your map app.
 
-![Screenshot of Google Maps' share screen](./docs/google_maps_copy.webp)
+![Screenshot of Google Maps' share screen](./docs/map_app.webp)
 
 Or open Geo Share and paste your map link there.
 

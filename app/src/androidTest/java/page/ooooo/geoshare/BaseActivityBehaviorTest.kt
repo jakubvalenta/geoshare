@@ -167,7 +167,7 @@ open class BaseActivityBehaviorTest {
         }
 
         // If there is a Google Maps sign in screen, skip it
-        var googleMapsSignInHeadline =
+        val googleMapsSignInHeadline =
             By.pkg(googleMapsPackageName).text("Make it your map")
         if (waitForObject(googleMapsSignInHeadline, 5000L)) {
             clickObject(

@@ -2,8 +2,8 @@ package page.ooooo.geoshare.lib
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 
 class IntentTools {
 
@@ -16,7 +16,7 @@ class IntentTools {
 
     fun share(context: Context, action: String, uriString: String) {
         context.startActivity(Intent(action).apply {
-            data = Uri.parse(uriString)
+            data = uriString.toUri()
             putExtra(extraProcessed, "true")
         })
     }
@@ -37,7 +37,7 @@ class IntentTools {
                     Log.w(null, "Missing intent data")
                     return null
                 }
-                return intentData.toString()
+                return intentData
             }
 
             Intent.ACTION_SEND -> {

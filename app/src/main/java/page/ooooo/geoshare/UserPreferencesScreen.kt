@@ -83,7 +83,7 @@ fun <T> UserPreferencesItem(
             style = MaterialTheme.typography.bodyLarge,
         )
         userPreference.description?.let { ParagraphHtml(it()) }
-        userPreference.component(value) {
+        userPreference.Component(value) {
             viewModel.setUserPreferenceValue(userPreference, it)
         }
     }

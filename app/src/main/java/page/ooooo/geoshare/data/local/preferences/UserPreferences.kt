@@ -24,7 +24,7 @@ interface UserPreference<T> {
     fun setValue(preferences: MutablePreferences, value: T)
 
     @Composable
-    fun component(value: T, onValueChange: (T) -> Unit)
+    fun Component(value: T, onValueChange: (T) -> Unit)
 }
 
 class NullableIntUserPreference(
@@ -42,7 +42,7 @@ class NullableIntUserPreference(
     }
 
     @Composable
-    override fun component(value: Int?, onValueChange: (Int?) -> Unit) {
+    override fun Component(value: Int?, onValueChange: (Int?) -> Unit) {
         var inputValue by remember { mutableStateOf(value.toString()) }
         OutlinedTextField(
             value = inputValue,
@@ -77,11 +77,11 @@ class PermissionUserPreference(
     }
 
     @Composable
-    override fun component(
+    override fun Component(
         value: Permission,
         onValueChange: (Permission) -> Unit,
     ) {
-        RadioButtonGroup<Permission>(
+        RadioButtonGroup(
             options = options,
             selectedValue = value,
             onSelect = { onValueChange(it) },

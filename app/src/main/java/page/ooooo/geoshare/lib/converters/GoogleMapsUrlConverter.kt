@@ -56,7 +56,7 @@ class GoogleMapsUrlConverter(
         Pattern.compile("""^/search/?$"""),
         Pattern.compile("""^/?$"""),
     )
-    val urlQueryPatterns = listOf<Map<String, Pattern>>(
+    val urlQueryPatterns = listOf(
         mapOf("destination" to coordPattern),
         mapOf("destination" to queryPattern),
         mapOf("q" to coordPattern),
@@ -81,7 +81,7 @@ class GoogleMapsUrlConverter(
     override fun parseUrl(url: URL): ParseUrlResult? {
         val urlPath = uriQuote.decode(url.path)
         val urlPathMatcher = urlPathPatterns.firstNotNullOfOrNull {
-            it.matcher(urlPath).takeIf { it.matches() }
+            it.matcher(urlPath).takeIf { m -> m.matches() }
         }
         if (urlPathMatcher == null) {
             log.w(null, "Google Maps URL does not match any known path pattern $url")
@@ -95,12 +95,12 @@ class GoogleMapsUrlConverter(
         val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
             it.map { (paramName, paramPattern) ->
                 val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
-                paramPattern.matcher(paramValue).takeIf { it.matches() } ?: return@firstNotNullOfOrNull null
+                paramPattern.matcher(paramValue).takeIf { m -> m.matches() } ?: return@firstNotNullOfOrNull null
             }
         }
         urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
 
-        val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it).takeIf { it.matches() } }
+        val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
         zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
 
         return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
@@ -118,7 +118,7 @@ class GoogleMapsUrlConverter(
 
     private fun parseGoogleMapsHtml(html: String): GeoUriBuilder? {
         val m = htmlPatterns.firstNotNullOfOrNull {
-            it.matcher(html).takeIf { it.find() }
+            it.matcher(html).takeIf { m -> m.find() }
         }
         if (m == null) {
             log.w(null, "Google Maps HTML does not match any known pattern")
