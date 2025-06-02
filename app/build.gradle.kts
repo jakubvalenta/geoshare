@@ -27,19 +27,22 @@ android {
             "clearPackageData" to "true",
         )
 
-        resourceConfigurations += listOf(
-            "ar",
-            "bg",
-            "cs",
-            "en",
-            "es",
-            "fr",
-            "it",
-            "pl",
-            "pt-rBR",
-            "uk",
-            "zh-rCN",
-        )
+        androidResources {
+            @Suppress("UnstableApiUsage")
+            localeFilters += listOf(
+                "ar",
+                "bg",
+                "cs",
+                "en",
+                "es",
+                "fr",
+                "it",
+                "pl",
+                "pt-rBR",
+                "uk",
+                "zh-rCN",
+            )
+        }
     }
 
     testOptions {
@@ -71,7 +74,7 @@ android {
         compose = true
     }
     lint {
-        disable += "MissingTranslation" // Translation is crowd-sourced, so this isn't viable
+        disable += "MissingTranslation" // Translation is crowdsourced, so this isn't viable
     }
 }
 
