@@ -86,7 +86,7 @@
     <string name="intro_how_to_share_app_screenshot_once">Pouze jednou</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Určete, jak se v této aplikaci mají otevírat webové odkazy</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">V prohlížeči</string>
-    <plurals name="intro_open_by_default_app_screenshot_links">
+    <plurals name="intro_open_by_default_app_screenshot_links" tools:ignore="MissingQuantity">
         <item quantity="one">%1$d podporovaný odkaz</item>
         <item quantity="few">%1$d podporované odkazy</item>
         <item quantity="other">%1$d podporovaných odkazů</item>
