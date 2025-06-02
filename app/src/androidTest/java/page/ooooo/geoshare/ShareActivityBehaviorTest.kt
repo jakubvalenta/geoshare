@@ -167,7 +167,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Deny parse HTML permission
         val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlPermissionDialog")
-        waitAndConfirmDialogAndAssertNewWindowIsOpen(parseHtmlPermissionDialogSelector, doNotAsk = true)
+        waitAndDismissDialogAndAssertItIsClosed(parseHtmlPermissionDialogSelector, doNotAsk = true)
 
         // Share another Apple Maps place link with the app
         shareUri("https://maps.apple.com/place?place-id=I263680A7B546CF16&_provider=9902")
