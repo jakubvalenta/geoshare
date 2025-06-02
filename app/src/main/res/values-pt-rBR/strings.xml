@@ -2,12 +2,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="intro_open_by_default_app_note"><![CDATA[Selecione pelo menos <tt>maps.google.com</tt> e <tt>maps.app.goo.gl</tt>. Se alguns links não podem ser selecionados, significa que outros apps do Google estão configurados para abri-los por padrão. Você pode desativar a abertura de links neles, como fizemos para o Google Maps.]]></string>
     <string name="nav_menu_content_description">Menu</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Selecione <i>%1$s</i> e o %2$s permitirá que você abra a localização em qualquer app de mapa instalado.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Selecione <i>%1$s</i> e o %2$s permitirá que você abra a mesma localização em qualquer app de mapa instalado.]]></string>
     <string name="copy_activity">Copiar geo:</string>
-    <string name="share_activity">Compartilhar geo:</string>
+    <string name="share_activity">Abrir</string>
     <string name="intro_title">Introdução</string>
-    <string name="intro_how_to_share_headline">Como ver localizações do Google Maps em outros apps de mapa</string>
-    <string name="intro_how_to_share_google_maps_caption">Compartilhe uma localização do app do Google Maps ou do seu navegador da web.</string>
+    <string name="intro_how_to_share_headline">Como mostrar uma localização no mapa em outro app</string>
+    <string name="intro_how_to_share_google_maps_caption">Compartilhe uma localização do seu app de mapa ou navegador web.</string>
     <string name="intro_how_to_share_google_maps_content_description">Captura da tela de compartilhamento do Google Maps</string>
     <string name="intro_how_to_share_app_content_description">Captura da tela de compartilhamento do %1$s</string>
     <string name="intro_open_by_default_headline">Configure o Android para abrir links do Google Maps em mapas alternativos (opcional)</string>
@@ -16,21 +16,21 @@
     <string name="intro_open_by_default_app_caption"><![CDATA[Depois, vá em Configurações &#8594; Apps &#8594; %1$s &#8594; <i>Abrir por padrão</i>, ative a abertura de links neste app, e toque em <i>Adicionar links</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">Captura de tela das configurações de Abrir por padrão do %1$s</string>
     <string name="intro_open_by_default_app_button">Abrir configurações do %1$s</string>
-    <string name="intro_geo_links_headline">Como criar links geo:</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Selecione <i>%1$s</i> ao compartilhar do Google Maps.]]></string>
+    <string name="intro_geo_links_headline">Como copiar coordenadas geográficas</string>
+    <string name="intro_geo_links_copy_caption"><![CDATA[Selecione <i>%1$s</i> ao compartilhar uma localização do seu app de mapa.]]></string>
     <string name="intro_geo_links_copy_content_description">Captura de tela de compartilhamento do Google Maps</string>
-    <string name="intro_geo_links_form_caption">Ou abra o %1$s e cole seu link do Google Maps lá.</string>
-    <string name="intro_geo_links_form_content_description">Captura de tela do formulário de conversão de links geo: do %1$s</string>
+    <string name="intro_geo_links_form_caption">Ou abra o %1$s e cole seu link de mapa ali.</string>
+    <string name="intro_geo_links_form_content_description">Captura de tela do formulário de coordenadas geográficas do %1$s</string>
     <string name="intro_nav_close">Fechar</string>
     <string name="intro_nav_next">Avançar</string>
     <string name="intro_nav_finish">Vamos lá</string>
     <string name="intro_settings_activity_not_found">Falha ao abrir as configurações</string>
-    <string name="main_input_uri_label">Cole um link do Google Maps aqui</string>
+    <string name="main_input_uri_label">Cole um link de mapa aqui</string>
     <string name="main_input_uri_clear_content_description">Limpar</string>
-    <string name="main_input_uri_supporting_text">ex: https://google.com/maps/… ou maps.app.goo.gl/…</string>
+    <string name="main_input_uri_supporting_text">ex: https://maps.app.goo.gl/… ou maps.apple.com/…</string>
     <string name="main_result_geo_uri_copy_content_description">Copiar</string>
     <string name="main_result_geo_uri_share_content_description">Compartilhar</string>
-    <string name="main_create_geo_uri">Criar link geo:</string>
+    <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="main_navigate_to_intro">Conheça mais recursos do app</string>
     <string name="converter_google_maps_permission_title">Conectar ao Google?</string>
     <string name="conversion_permission_common_grant">OK</string>
@@ -61,21 +61,44 @@
     <string name="conversion_failed_missing_url">URL faltando</string>
     <string name="conversion_failed_invalid_url">URL inválida</string>
     <string name="conversion_failed_unshorten_error">Falha ao traduzir link curto</string>
-    <string name="conversion_failed_parse_url_error">Falha ao criar link geo:</string>
+    <string name="conversion_failed_parse_url_error">Falha ao processar o link de mapa</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Falha ao abrir as configurações de permissão</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Não é possível compartilhar o link geo: sem permissão</string>
-    <string name="sharing_succeeded">Link geo: aberto</string>
-    <string name="sharing_failed_activity_not_found">Nenhum app que consiga abrir links geo: está instalado</string>
-    <string name="copying_finished">Link geo: copiado para a área de transferência</string>
+    <string name="sharing_failed_xiaomi_permission_denied">Não é possível abrir outro app de mapa sem permissão</string>
+    <string name="sharing_succeeded">App de mapa alternativo foi aberto</string>
+    <string name="sharing_failed_activity_not_found">Nenhum app de mapa está instalado</string>
+    <string name="copying_finished">Coordenadas copiadas para a área de transferência</string>
     <string name="conversion_failed_connection_permission_denied">O link não é suportado sem se conectar ao Google</string>
-    <string name="conversion_failed_parse_html_error">Falha ao solicitar a página do Google Maps</string>
+    <string name="conversion_failed_parse_html_error">Falha ao solicitar a página web do serviço de mapas</string>
     <string name="nav_back_content_description">Voltar para a tela inicial</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primeiro, vá em Configurações &#8594; Apps &#8594; Maps &#8594; <i>Abrir por padrão</i> e desative a abertura de links neste app.]]></string>
-    <string name="main_info_box"><![CDATA[O %1s suporta vários formatos de URL do Google Maps. Se você encontrar um link que não funciona, por favor <a href="https://github.com/jakubvalenta/geoshare/issues">relate esse problema</a>.]]></string>
+    <string name="main_info_box"><![CDATA[O %1s suporta vários tipos de links do Google Maps e do Apple Maps. Se você encontrar um link que não funciona, por favor <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">denuncie esse erro</a>.]]></string>
     <string name="conversion_permission_xiaomi_deny">Ignorar</string>
-    <string name="conversion_permission_xiaomi_text"><![CDATA[Para compartilhar links geo:, você precisa dar permissão em <b>Outras permissões</b> &#8594; <b>Exibir janelas pop-up enquanto executa em segundo plano</b> ao %1$s.]]></string>
+    <string name="conversion_permission_xiaomi_text"><![CDATA[Para permitir que o %1$s abra outros apps de mapa, você precisa dar permissão em <b>Outras permissões</b> &#8594; <b>Exibir janelas pop-up enquanto executa em segundo plano</b> ao %1$s.]]></string>
     <string name="about_text"><![CDATA[<p>O %1$s é um app livre e de código aberto distribuído sob a licença <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou mais nova.</p><br><p>Você pode encontrar o código-fonte no <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, aonde você também pode <a href="https://github.com/jakubvalenta/geoshare/issues">relatar problemas</a>.</p><br><p>Seu retorno é bem vindo. Você pode me contatar em <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>O %1$s converte links do Google Maps em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, coordenadas geográficas são necessárias. O %1$s as extrai da URL do Google Maps.</p><br><p>Porém, nem todas as URLs do Google Maps contêm coordenadas. Nestes casos, O %1$s te <b>pedirá permissão para se conectar ao Google</b> e obter as coordenadas dos cabeçalhos HTTP ou do documento HTML do link.</p><br><p>Mais precisamente, há três cenários como o %1$s converte a URL do Google Maps em uma URI geo: :</p><br><p><b>1.</b></p><br><p>Se a URL já contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), então elas são extraídas e nenhuma conexão é feita com os servidores do Google.</p><br><p><b>2.</b></p><br><p>Se a URL não contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/</tt>), então o %1$s te perguntará se pode se conectar ao Google.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de GET</b> ao Google Maps e extrai as coordenadas da resposta HTML. Você pode imaginá-lo como um <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Se você não permitir, então o %1$s criará um link geo: com o termo de pesquisa do lugar (por exemplo <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Se a URL do Google Maps é um link curto (por exemplo <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), então o %1$s te perguntará se pode se conectar ao Google.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de HEAD</b> ao link curto e lê o link completo dos cabeçalhos da resposta. Você pode imaginá-lo como um <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. E então o %1$s continua com o cenário 1 ou 2, dependendo se o link completo tem coordenadas geográficas ou não. No caso do cenário 2, outra conexão ao Google será feita, mas dessa vez sem perguntar.</p><br><p>Se você não permitir a conexão com o Google, então o %1$s cancela a criação do link geo:.</p><br><br><p>Para sempre permitir ou negar a conexão com o Google, em vez de sempre perguntar (padrão), visite as Preferências do app.</p>]]></string>
-    <string name="conversion_failed_parse_html_connection_error">Erro de conexão ao buscar a página do Google Maps</string>
+    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>O %1$s converte links de mapa em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</p><br><p>Porém, nem todas as URLs de mapa contêm coordenadas. Nestes casos, O %1$s te <b>pedirá permissão para se conectar ao serviço de mapas (Google Maps, Apple Maps, etc.)</b> e obter as coordenadas dos cabeçalhos HTTP ou do documento HTML do link.</p><br><p>Mais precisamente, há três cenários de como o %1$s pode converter uma URL de mapa em uma URI geo: :</p><br><p><b>1.</b></p><br><p>Se a URL já contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), então elas são extraídas e nenhuma conexão é feita com os servidores do serviço de mapas.</p><br><p><b>2.</b></p><br><p>Se a URL não contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/</tt>), então o %1$s te perguntará se pode se conectar ao serviço de mapas.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de GET</b> ao serviço de mapas e extrairá as coordenadas da resposta HTML. Você pode imaginá-lo como um <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Se você não permitir, então o %1$s criará um link geo: com o termo de pesquisa do lugar (por exemplo <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Se a URL do serviço de mapas é um link curto (por exemplo <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), então o %1$s te perguntará se pode se conectar ao serviço de mapas.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de HEAD</b> ao link curto e lê o link completo dos cabeçalhos da resposta. Você pode imaginá-lo como um <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. E então o %1$s continua com o cenário 1 ou 2, dependendo se o link completo tem coordenadas geográficas ou não. No caso do cenário 2, outra conexão ao serviço de mapas será feita, mas dessa vez sem perguntar.</p><br><p>Se você não permitir a conexão com o serviço de mapas, então o %1$s cancela a criação do link geo:.</p><br><br><p>Para sempre permitir ou negar a conexão ao serviço de mapas, em vez de sempre perguntar (padrão), visite as Preferências do app.</p>]]></string>
+    <string name="conversion_failed_parse_html_connection_error">Erro de conexão ao buscar a página web do serviço de mapas</string>
     <string name="conversion_failed_unshorten_connection_error">Erro de conexão ao traduzir link curto</string>
+    <string name="intro_open_by_default_google_maps_screenshot_choose">Escolha como abrir links da Web para este app</string>
+    <string name="conversion_failed_unsupported_service">Serviço de mapa sem suporte</string>
+    <string name="intro_how_to_share_google_maps_screenshot_title">Compartilhando com</string>
+    <string name="intro_how_to_share_google_maps_screenshot_place">Alfinete inserido</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mensagens</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
+    <string name="intro_how_to_share_app_screenshot_title">Abrir com %1$s</string>
+    <string name="intro_how_to_share_app_screenshot_once">Só uma vez</string>
+    <string name="intro_how_to_share_app_screenshot_different">Usar um app diferente</string>
+    <string name="intro_open_by_default_app_screenshot_title">Abrir por padrão</string>
+    <plurals name="intro_open_by_default_app_screenshot_links">
+        <item quantity="one">%1$d link suportado</item>
+        <item quantity="many">%1$d de links suportados</item>
+        <item quantity="other">%1$d links suportados</item>
+    </plurals>
+    <string name="converter_apple_maps_permission_title">Conectar à Apple?</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">No navegador</string>
+    <string name="intro_open_by_default_app_screenshot_add">Adicionar</string>
+    <string name="intro_how_to_share_app_screenshot_always">Sempre</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_the_app">No app</string>
+    <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
+    <string name="intro_open_by_default_app_screenshot_cancel">Cancelar</string>
 </resources>
