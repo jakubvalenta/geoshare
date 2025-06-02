@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.screenshotTextLarge
+import page.ooooo.geoshare.ui.theme.ScreenshotTheme
 
 @Composable
 fun ScreenshotOpen() {
@@ -39,7 +39,7 @@ fun ScreenshotOpen() {
                 stringResource(R.string.intro_how_to_share_app_screenshot_title, mapApps[0]),
                 scale,
                 fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.screenshotTextLarge,
+                style = ScreenshotTheme.typography.textLarge,
             )
         }
         ScreenshotRow(
@@ -71,7 +71,7 @@ fun ScreenshotOpen() {
                 stringResource(R.string.intro_how_to_share_app_screenshot_different),
                 scale,
                 fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.screenshotTextLarge,
+                style = ScreenshotTheme.typography.textLarge,
             )
         }
         ScreenshotColumn(
@@ -85,7 +85,7 @@ fun ScreenshotOpen() {
                 ScreenshotText(
                     text,
                     scale,
-                    style = MaterialTheme.typography.screenshotTextLarge,
+                    style = ScreenshotTheme.typography.textLarge,
                 )
             }
         }

@@ -4,7 +4,12 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -82,6 +87,50 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+@Immutable
+data class ScreenshotColors(
+    val textColor: Color,
+    val mutedTextColor: Color,
+)
+
+val LocalScreenshotColors = staticCompositionLocalOf {
+    ScreenshotColors(
+        textColor = Color.Unspecified,
+        mutedTextColor = Color.Unspecified,
+    )
+}
+
+private val lightScreenshotColors = ScreenshotColors(
+    textColor = screenshotTextColorLight,
+    mutedTextColor = screenshotMutedTextColorLight,
+)
+
+private val darkScreenshotColors = ScreenshotColors(
+    textColor = screenshotTextColorDark,
+    mutedTextColor = screenshotMutedTextColorDark,
+)
+
+val LocalScreenshotTypography = staticCompositionLocalOf {
+    ScreenshotTypography(
+        textExtraExtraExtraLarge = TextStyle.Default,
+        textExtraExtraLarge = TextStyle.Default,
+        textExtraLarge = TextStyle.Default,
+        textLarge = TextStyle.Default,
+        textMedium = TextStyle.Default,
+        textSmall = TextStyle.Default
+    )
+}
+
+object ScreenshotTheme {
+    val colors: ScreenshotColors
+        @Composable
+        get() = LocalScreenshotColors.current
+
+    val typography: ScreenshotTypography
+        @Composable
+        get() = LocalScreenshotTypography.current
+}
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -100,10 +149,16 @@ fun AppTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
+    val screenshotColors = if (darkTheme) darkScreenshotColors else lightScreenshotColors
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalScreenshotColors provides screenshotColors,
+        LocalScreenshotTypography provides screenshotTypography,
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content,
+        )
+    }
 }

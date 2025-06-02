@@ -31,7 +31,7 @@ fun ScreenshotOpenByDefaultMapApp() {
             ScreenshotText(
                 stringResource(R.string.intro_open_by_default_app_screenshot_title),
                 scale,
-                style = MaterialTheme.typography.screenshotTextExtraExtraExtraLarge,
+                style = ScreenshotTheme.typography.textExtraExtraExtraLarge,
             )
         }
         ScreenshotColumn(
@@ -46,13 +46,13 @@ fun ScreenshotOpenByDefaultMapApp() {
                 stringResource(R.string.intro_open_by_default_google_maps_screenshot_app),
                 scale,
                 fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.screenshotTextExtraExtraLarge,
+                style = ScreenshotTheme.typography.textExtraExtraLarge,
             )
             ScreenshotText(
                 stringResource(R.string.intro_open_by_default_google_maps_screenshot_choose),
                 scale,
-                color = MaterialTheme.colorScheme.screenshotMutedTextColor,
-                style = MaterialTheme.typography.screenshotTextMedium,
+                color = ScreenshotTheme.colors.mutedTextColor,
+                style = ScreenshotTheme.typography.textMedium,
             )
         }
         ScreenshotColumn(
@@ -69,7 +69,7 @@ fun ScreenshotOpenByDefaultMapApp() {
                 ScreenshotText(
                     text,
                     scale = scale,
-                    style = MaterialTheme.typography.screenshotTextExtraExtraLarge,
+                    style = ScreenshotTheme.typography.textExtraExtraLarge,
                 )
             }
         }

@@ -17,9 +17,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import page.ooooo.geoshare.ui.theme.ScreenshotTheme
 import page.ooooo.geoshare.ui.theme.Spacing
-import page.ooooo.geoshare.ui.theme.screenshotTextColor
-import page.ooooo.geoshare.ui.theme.screenshotTextMedium
 
 @Composable
 fun Screenshot(
@@ -88,9 +87,9 @@ fun ScreenshotText(
     text: String,
     scale: Float,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.screenshotTextColor,
+    color: Color = ScreenshotTheme.colors.textColor,
     fontWeight: FontWeight = FontWeight.Normal,
-    style: TextStyle = MaterialTheme.typography.screenshotTextMedium,
+    style: TextStyle = ScreenshotTheme.typography.textMedium,
 ) {
     with(LocalDensity.current) {
         Text(

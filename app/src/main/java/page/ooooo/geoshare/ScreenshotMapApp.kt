@@ -17,9 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.screenshotMutedTextColor
-import page.ooooo.geoshare.ui.theme.screenshotTextExtraLarge
-import page.ooooo.geoshare.ui.theme.screenshotTextSmall
+import page.ooooo.geoshare.ui.theme.ScreenshotTheme
 
 private data class Icon(val name: String, val label: String? = null)
 
@@ -41,7 +39,7 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
             ScreenshotText(
                 stringResource(R.string.intro_how_to_share_google_maps_screenshot_title),
                 scale,
-                style = MaterialTheme.typography.screenshotTextExtraLarge,
+                style = ScreenshotTheme.typography.textExtraLarge,
             )
         }
         ScreenshotColumn(
@@ -59,7 +57,7 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
             ScreenshotText(
                 stringResource(R.string.intro_how_to_share_google_maps_screenshot_url),
                 scale,
-                color = MaterialTheme.colorScheme.screenshotMutedTextColor,
+                color = ScreenshotTheme.colors.mutedTextColor,
             )
         }
         ScreenshotRow(
@@ -82,14 +80,14 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
                     ScreenshotText(
                         icon.name,
                         scale,
-                        style = MaterialTheme.typography.screenshotTextSmall,
+                        style = ScreenshotTheme.typography.textSmall,
                     )
                     if (icon.label != null) {
                         ScreenshotText(
                             icon.label,
                             scale,
-                            color = MaterialTheme.colorScheme.screenshotMutedTextColor,
-                            style = MaterialTheme.typography.screenshotTextSmall,
+                            color = ScreenshotTheme.colors.mutedTextColor,
+                            style = ScreenshotTheme.typography.textSmall,
                         )
                     }
                 }
