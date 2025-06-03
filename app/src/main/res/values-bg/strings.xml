@@ -20,8 +20,8 @@
     <string name="conversion_permission_common_grant">Добре</string>
     <string name="intro_geo_links_copy_caption"><![CDATA[Изберете <i>%1$s</i>, когато споделяте от Google Карти.]]></string>
     <string name="copy_activity">Копиране на гео:</string>
-    <string name="intro_how_to_share_headline">Как да видите местоположенията на Google Карти в други приложения за карти</string>
-    <string name="share_activity">Споделяне на гео:</string>
+    <string name="intro_how_to_share_headline">Как да покажа местоположение на картата в друго приложение за карти</string>
+    <string name="share_activity">Отвори</string>
     <string name="nav_back_content_description">Връщане към основния екран</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Първо отидете на Настройки &#8594; Приложения &#8594; Карти &#8594; <i>Отваряне по подразбиране</i> и изключете отварянето на връзки в това приложение.]]></string>
     <string name="intro_open_by_default_headline">Конфигурирайте Android да отваря връзки към Google Карти в алтернативни карти (по избор)</string>
