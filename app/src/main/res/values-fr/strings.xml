@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="copy_activity">Copier géo :</string>
+    <string name="copy_activity">Copier geo:</string>
     <string name="share_activity">Partager géo :</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Retour à l’écran principal</string>
