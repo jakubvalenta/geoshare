@@ -83,4 +83,20 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">蓝牙</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">分享方式</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
+    <string name="converter_apple_maps_permission_title">连接到 Apple？</string>
+    <string name="intro_how_to_share_app_screenshot_once">仅此一次</string>
+    <string name="intro_how_to_share_app_screenshot_always">始终</string>
+    <string name="intro_how_to_share_app_screenshot_different">使用其他应用</string>
+    <string name="intro_open_by_default_google_maps_screenshot_app">地图</string>
+    <string name="intro_open_by_default_google_maps_screenshot_choose">选择如何打开此应用的网络链接</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_the_app">在应用中</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">在浏览器中</string>
+    <string name="intro_open_by_default_app_screenshot_title">默认打开</string>
+    <plurals name="intro_open_by_default_app_screenshot_links">
+        <item quantity="other">%1$d 个支持的链接</item>
+    </plurals>
+    <string name="intro_open_by_default_app_screenshot_cancel">取消</string>
+    <string name="intro_open_by_default_app_screenshot_add">添加</string>
+    <string name="conversion_failed_unsupported_service">不支持的地图服务</string>
+    <string name="intro_how_to_share_app_screenshot_title">使用 %1$s 打开</string>
 </resources>
