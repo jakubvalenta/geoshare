@@ -1,9 +1,14 @@
 package page.ooooo.geoshare.lib
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Icon
+import android.os.Build
+import android.service.chooser.ChooserAction
 import android.util.Log
 import androidx.core.net.toUri
+import page.ooooo.geoshare.R
 
 class IntentTools {
 
@@ -15,10 +20,41 @@ class IntentTools {
         intent.getStringExtra(extraProcessed) != null
 
     fun share(context: Context, action: String, uriString: String) {
-        context.startActivity(Intent(action).apply {
-            data = uriString.toUri()
-            putExtra(extraProcessed, "true")
-        })
+        context.startActivity(
+            Intent.createChooser(
+                Intent(action).apply {
+                    data = uriString.toUri()
+                    putExtra(extraProcessed, "true")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        putExtra(
+                            Intent.EXTRA_CHOOSER_CUSTOM_ACTIONS, arrayOf(
+                                ChooserAction.Builder(
+                                    Icon.createWithResource(context, R.drawable.content_copy_24px),
+                                    "Copy to clipboard",
+                                    PendingIntent.getBroadcast(
+                                        context,
+                                        1,
+                                        Intent(Intent.ACTION_VIEW),
+                                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+                                    )
+                                ).build(),
+                                ChooserAction.Builder(
+                                    Icon.createWithResource(context, R.drawable.close_24px),
+                                    "Do nothing",
+                                    PendingIntent.getBroadcast(
+                                        context,
+                                        1,
+                                        Intent(Intent.ACTION_VIEW),
+                                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+                                    )
+                                ).build(),
+                            )
+                        )
+                    }
+                },
+                "Choose an app",
+            )
+        )
     }
 
     fun getIntentGeoUri(intent: Intent): String? {
