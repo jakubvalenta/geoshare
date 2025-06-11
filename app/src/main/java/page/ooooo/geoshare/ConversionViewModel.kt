@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.Clipboard
 import androidx.lifecycle.SavedStateHandle
@@ -89,6 +90,8 @@ class ConversionViewModel @Inject constructor(
         "loadingIndicatorTitleResId",
         null,
     )
+    private var originalUri: Uri? = null  // FIXME
+
     var resultGeoUri by SavableDelegate(
         savedStateHandle,
         "resultGeoUri",
@@ -154,8 +157,16 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun share(context: Context, settingsLauncherWrapper: ManagedActivityResultLauncherWrapper) {
-        stateContext.currentState = AcceptedSharing(stateContext, context, settingsLauncherWrapper, resultGeoUri)
-        transition()
+        originalUri?.let { originalUri ->
+            stateContext.currentState = AcceptedSharing(
+                stateContext,
+                context,
+                settingsLauncherWrapper,
+                resultGeoUri,
+                originalUri,
+            )
+            transition()
+        }
     }
 
     fun copy(clipboard: Clipboard) {

@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="copy_activity">Copy geo:</string>
     <string name="share_activity">Open</string>
+    <string name="skip_activity">Skip</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>

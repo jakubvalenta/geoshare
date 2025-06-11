@@ -304,14 +304,15 @@ data class AcceptedSharing(
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
+    val originalUri: Uri,
 ) : ConversionState() {
     override suspend fun transition(): State = if (stateContext.xiaomiTools.isBackgroundStartActivityPermissionGranted(
             context
         )
     ) {
-        GrantedSharePermission(stateContext, context, geoUri)
+        GrantedSharePermission(stateContext, context, geoUri, originalUri)
     } else {
-        RequestedSharePermission(stateContext, context, settingsLauncherWrapper, geoUri)
+        RequestedSharePermission(stateContext, context, settingsLauncherWrapper, geoUri, originalUri)
     }
 }
 
@@ -320,10 +321,11 @@ data class RequestedSharePermission(
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
+    val originalUri: Uri,
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State =
         if (stateContext.xiaomiTools.showPermissionEditor(context, settingsLauncherWrapper)) {
-            ShowedSharePermissionEditor(stateContext, context, settingsLauncherWrapper, geoUri)
+            ShowedSharePermissionEditor(stateContext, context, settingsLauncherWrapper, geoUri, originalUri)
         } else {
             SharingFailed(stateContext, R.string.sharing_failed_xiaomi_permission_show_editor_error)
         }
@@ -337,12 +339,13 @@ data class ShowedSharePermissionEditor(
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
+    val originalUri: Uri,
 ) : ConversionState(), PermissionState {
     /**
      * Share again after the permission editor has been closed.
      */
     override suspend fun grant(doNotAsk: Boolean): State =
-        AcceptedSharing(stateContext, context, settingsLauncherWrapper, geoUri)
+        AcceptedSharing(stateContext, context, settingsLauncherWrapper, geoUri, originalUri)
 
     override suspend fun deny(doNotAsk: Boolean): State {
         throw NotImplementedError("It is not possible to deny sharing again after the permission editor has been closed")
@@ -353,9 +356,10 @@ data class GrantedSharePermission(
     val stateContext: ConversionStateContext,
     val context: Context,
     val geoUri: String,
+    val originalUri: Uri,
 ) : ConversionState() {
     override suspend fun transition(): State? = try {
-        stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri)
+        stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri, originalUri)
         SharingSucceeded(stateContext, R.string.sharing_succeeded)
     } catch (_: ActivityNotFoundException) {
         SharingFailed(stateContext, R.string.sharing_failed_activity_not_found)

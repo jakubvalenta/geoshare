@@ -20,97 +20,27 @@
                 android:label="@string/copy_activity"
                 android:theme="@style/TranslucentTheme">
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data android:mimeType="text/plain"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data
-                        android:host="maps.app.goo.gl"
-                        android:scheme="https"/>
+                <data android:scheme="geo"/>
             </intent-filter>
-            <intent-filter android:autoVerify="false">
+        </activity>
+        <activity
+                android:name="page.ooooo.geoshare.SkipActivity"
+                android:excludeFromRecents="true"
+                android:exported="true"
+                android:label="@string/skip_activity"
+                android:theme="@style/TranslucentTheme">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data
-                        android:host="maps.google.com"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="app.goo.gl"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="goo.gl"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="google.com"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.google.com"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="g.co"
-                        android:pathPrefix="/kgs"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="maps.apple.com"
-                        android:scheme="https"/>
+                <data android:scheme="geo"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
