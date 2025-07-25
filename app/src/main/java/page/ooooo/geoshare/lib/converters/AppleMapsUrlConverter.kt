@@ -17,7 +17,8 @@ class AppleMapsUrlConverter(
     override val name = "Apple Maps"
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 
-    val urlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
+    val fullUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
+    val shortUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple/p/.+$""")
 
     val latRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?)"""
     val lonRegex = """\+?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
@@ -43,9 +44,11 @@ class AppleMapsUrlConverter(
         Pattern.compile("""<meta property="place:location:longitude" content="$lonRegex""""),
     )
 
-    override fun isSupportedUrl(url: URL): Boolean = urlPattern.matcher(url.toString()).matches()
+    override fun isSupportedUrl(url: URL): Boolean = isFullUrl(url) || isShortUrl(url)
 
-    override fun isShortUrl(url: URL): Boolean = false
+    private fun isFullUrl(url: URL): Boolean = fullUrlPattern.matcher(url.toString()).matches()
+
+    override fun isShortUrl(url: URL): Boolean = shortUrlPattern.matcher(url.toString()).matches()
 
     override fun parseUrl(url: URL): ParseUrlResult? {
         val geoUriBuilder = GeoUriBuilder(uriQuote)

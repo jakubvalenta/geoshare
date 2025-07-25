@@ -180,7 +180,12 @@ class AppleMapsUrlConverterTest {
     }
 
     @Test
-    fun isShortUrl_returnsFalse() {
+    fun isShortUrl_mapsApple_returnsTrue() {
+        assertTrue(appleMapsUrlConverter.isShortUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")))
+    }
+
+    @Test
+    fun isShortUrl_mapsAppleCom_returnsFalse() {
         assertFalse(appleMapsUrlConverter.isShortUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")))
     }
 }

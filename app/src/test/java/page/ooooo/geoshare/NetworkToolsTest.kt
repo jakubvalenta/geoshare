@@ -25,6 +25,21 @@ class NetworkToolsTest {
     }
 
     @Test
+    fun requestLocationHeader_301Response() = runTest {
+        val mockUrl = Mockito.mock(URL::class.java)
+        val mockConnection = Mockito.mock(HttpURLConnection::class.java)
+        Mockito.`when`(mockUrl.openConnection()).thenReturn(mockConnection)
+        Mockito.`when`(mockConnection.getResponseCode())
+            .thenReturn(HttpURLConnection.HTTP_MOVED_PERM)
+        Mockito.`when`(mockConnection.getHeaderField("Location"))
+            .thenReturn("https://maps.apple.com/place?address=Thomash%C3%B6he%2C+12053+Berlin%2C+Germany&coordinate=52.4737758%2C13.4373898")
+        assertEquals(
+            URL("https://maps.apple.com/place?address=Thomash%C3%B6he%2C+12053+Berlin%2C+Germany&coordinate=52.4737758%2C13.4373898"),
+            networkTools.requestLocationHeader(mockUrl)
+        )
+    }
+
+    @Test
     fun requestLocationHeader_302Response() = runTest {
         val mockUrl = Mockito.mock(URL::class.java)
         val mockConnection = Mockito.mock(HttpURLConnection::class.java)

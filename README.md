@@ -250,6 +250,7 @@ Short links:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple/p/7E-Brjrk_THN14' page.ooooo.geoshare.debug
 ```
 
 Links with coordinates only in HTML:

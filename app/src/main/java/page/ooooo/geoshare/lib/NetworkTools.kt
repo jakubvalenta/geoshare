@@ -25,10 +25,9 @@ class NetworkTools(private val log: ILog = DefaultLog()) {
                 url,
                 method = "HEAD",
                 followRedirects = false,
-                expectedResponseCode = HttpURLConnection.HTTP_MOVED_TEMP,
+                expectedResponseCodes = listOf(HttpURLConnection.HTTP_MOVED_PERM, HttpURLConnection.HTTP_MOVED_TEMP),
             ) { connection ->
-                val locationUrlString: String? =
-                    connection.getHeaderField("Location")
+                val locationUrlString: String? = connection.getHeaderField("Location")
                 val locationUrl = try {
                     URL(locationUrlString)
                 } catch (e: MalformedURLException) {
@@ -55,7 +54,7 @@ class NetworkTools(private val log: ILog = DefaultLog()) {
     private fun <T> connect(
         url: URL,
         method: String = "GET",
-        expectedResponseCode: Int = HttpURLConnection.HTTP_OK,
+        expectedResponseCodes: List<Int> = listOf(HttpURLConnection.HTTP_OK),
         followRedirects: Boolean = true,
         connectTimeout: Int = 15_000,
         readTimeout: Int = 30_000,
@@ -75,7 +74,7 @@ class NetworkTools(private val log: ILog = DefaultLog()) {
         try {
             connection.connect()
             val responseCode = connection.responseCode
-            if (responseCode == expectedResponseCode) {
+            if (expectedResponseCodes.contains(responseCode)) {
                 return block(connection)
             }
             log.w(null, "Received HTTP code $responseCode for $url")
