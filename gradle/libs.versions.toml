@@ -3,6 +3,7 @@ agp = "8.10.0"
 androidXNavigationCompose = "2.9.2"
 androidxActivityCompose = "1.10.1"
 androidxComposeBom = "2025.07.00"
+androidxComposeMaterial3 = "1.4.0-alpha18"
 androidxCore = "1.16.0"
 androidxDatastorePreferences = "1.1.7"
 androidxHiltNavigationCompose = "1.2.0"
@@ -21,7 +22,8 @@ re2j = "1.7"
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3-android" }
+androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core-android" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "androidxComposeMaterial3" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview-android" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }

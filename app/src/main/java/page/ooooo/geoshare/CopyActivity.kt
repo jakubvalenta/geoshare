@@ -33,7 +33,7 @@ class CopyActivity : ComponentActivity() {
             val message by viewModel.message.collectAsStateWithLifecycle()
 
             AppTheme {
-                ConversionScreen(viewModel)
+                ConversionScreen(viewModel = viewModel)
             }
 
             LaunchedEffect(intent) {

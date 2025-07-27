@@ -16,10 +16,15 @@ import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
 import androidx.core.net.toUri
+import kotlinx.coroutines.CancellationException
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
 }
+
+open class ConversionStateWithLoadingIndicator(
+    open val urlConverter: UrlConverter,
+) : ConversionState()
 
 class Initial : ConversionState()
 
@@ -114,12 +119,14 @@ data class RequestedUnshortenPermission(
 
 data class GrantedUnshortenPermission(
     val stateContext: ConversionStateContext,
-    val urlConverter: UrlConverter,
+    override val urlConverter: UrlConverter,
     val url: URL,
-) : ConversionState() {
+) : ConversionStateWithLoadingIndicator(urlConverter) {
     override suspend fun transition(): State {
         val header = try {
             stateContext.networkTools.requestLocationHeader(url)
+        } catch (_: CancellationException) {
+            return ConversionFailed(stateContext, R.string.conversion_failed_cancelled)
         } catch (_: MalformedURLException) {
             return ConversionFailed(stateContext, R.string.conversion_failed_unshorten_error)
         } catch (_: IOException) {
@@ -205,12 +212,14 @@ data class RequestedParseHtmlPermission(
 
 data class GrantedParseHtmlPermission(
     val stateContext: ConversionStateContext,
-    val urlConverter: UrlConverter,
+    override val urlConverter: UrlConverter,
     val url: URL,
-) : ConversionState() {
+) : ConversionStateWithLoadingIndicator(urlConverter) {
     override suspend fun transition(): State {
         val html = try {
             stateContext.networkTools.getText(url)
+        } catch (_: CancellationException) {
+            return ConversionFailed(stateContext, R.string.conversion_failed_cancelled)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
             return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_connection_error)
@@ -250,13 +259,15 @@ data class RequestedParseHtmlToGetCoordsPermission(
 
 data class GrantedParseHtmlToGetCoordsPermission(
     val stateContext: ConversionStateContext,
-    val urlConverter: UrlConverter,
+    override val urlConverter: UrlConverter,
     val url: URL,
     val geoUriFromUrl: String,
-) : ConversionState() {
+) : ConversionStateWithLoadingIndicator(urlConverter) {
     override suspend fun transition(): State {
         val html = try {
             stateContext.networkTools.getText(url)
+        } catch (_: CancellationException) {
+            return ConversionFailed(stateContext, R.string.conversion_failed_cancelled)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
             return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_connection_error)

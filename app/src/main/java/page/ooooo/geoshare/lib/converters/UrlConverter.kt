@@ -6,6 +6,7 @@ import java.net.URL
 interface UrlConverter {
     val name: String
     val permissionTitleResId: Int
+    val loadingIndicatorTitleResId: Int
 
     fun isSupportedUrl(url: URL): Boolean
 

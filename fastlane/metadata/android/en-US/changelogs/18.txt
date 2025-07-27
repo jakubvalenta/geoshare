@@ -1,1 +1,2 @@
 - Added Apple Maps support.
+- Added loading indicator while processing map links.

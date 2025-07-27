@@ -13,12 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import page.ooooo.geoshare.lib.ConversionFailed
-import page.ooooo.geoshare.lib.ConversionSucceeded
-import page.ooooo.geoshare.lib.ManagedActivityResultLauncherWrapper
-import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.SharingFailed
-import page.ooooo.geoshare.lib.SharingSucceeded
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
@@ -40,7 +35,7 @@ class ShareActivity : ComponentActivity() {
             }
 
             AppTheme {
-                ShareScreen(viewModel)
+                ShareScreen(viewModel = viewModel)
             }
 
             LaunchedEffect(intent) {

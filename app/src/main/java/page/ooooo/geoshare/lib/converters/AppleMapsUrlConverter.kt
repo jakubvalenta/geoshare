@@ -16,6 +16,7 @@ class AppleMapsUrlConverter(
 ) : UrlConverter {
     override val name = "Apple Maps"
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
+    override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
 
     val fullUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
     val shortUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple/p/.+$""")

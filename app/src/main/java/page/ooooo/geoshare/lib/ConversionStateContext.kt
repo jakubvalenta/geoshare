@@ -13,7 +13,12 @@ data class ConversionStateContext(
     val clipboardTools: ClipboardTools = ClipboardTools(),
     val log: ILog = DefaultLog(),
     val onMessage: (message: Message) -> Unit,
+    val onStateChange: (State) -> Unit = {},
     val getBuildVersionSdkInt: () -> Int = { Build.VERSION.SDK_INT },
 ) : StateContext() {
     override var currentState: State = Initial()
+        set(value) {
+            field = value
+            onStateChange(value)
+        }
 }

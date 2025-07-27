@@ -8,9 +8,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -36,6 +35,45 @@ class ConversionViewModel @Inject constructor(
         userPreferencesRepository = userPreferencesRepository,
         xiaomiTools = XiaomiTools(),
         onMessage = { _message.value = it },
+        onStateChange = { newState ->
+            _currentState.value = newState
+            when (newState) {
+                is ConversionStateWithLoadingIndicator -> {
+                    loadingIndicatorJob?.cancel()
+                    loadingIndicatorJob = viewModelScope.launch {
+                        // Show loading indicator only if the state lasts longer than 200ms.
+                        delay(200L)
+                        withMutableSnapshot {
+                            loadingIndicatorTitleResId = newState.urlConverter.loadingIndicatorTitleResId
+                        }
+                    }
+                }
+
+                else -> {
+                    loadingIndicatorJob?.cancel()
+                    loadingIndicatorJob = viewModelScope.launch {
+                        // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
+                        delay(200L)
+                        withMutableSnapshot {
+                            loadingIndicatorTitleResId = null
+                        }
+                    }
+                }
+            }
+            when (newState) {
+                is ConversionSucceeded -> {
+                    withMutableSnapshot {
+                        resultGeoUri = newState.geoUri
+                    }
+                }
+
+                is ConversionFailed -> {
+                    withMutableSnapshot {
+                        resultErrorMessageResId = newState.messageResId
+                    }
+                }
+            }
+        }
     )
 
     private val _currentState = MutableStateFlow<State>(Initial())
@@ -46,6 +84,11 @@ class ConversionViewModel @Inject constructor(
         "inputUriString",
         "",
     )
+    var loadingIndicatorTitleResId by SavableDelegate<Int?>(
+        savedStateHandle,
+        "loadingIndicatorTitleResId",
+        null,
+    )
     var resultGeoUri by SavableDelegate(
         savedStateHandle,
         "resultGeoUri",
@@ -53,12 +96,15 @@ class ConversionViewModel @Inject constructor(
     )
     var resultErrorMessageResId by SavableDelegate<Int?>(
         savedStateHandle,
-        "resultErrorMessage",
+        "resultErrorMessageResId",
         null,
     )
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message
+
+    private var loadingIndicatorJob: Job? = null
+    private var transitionJob: Job? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userPreferencesValues: StateFlow<UserPreferencesValues> =
@@ -82,76 +128,50 @@ class ConversionViewModel @Inject constructor(
             resultGeoUri = ""
             resultErrorMessageResId = null
         }
-        transition(ReceivedUriString(stateContext, inputUriString))
+        stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
+        transition()
     }
 
     fun start(intent: Intent) {
-        transition(ReceivedIntent(stateContext, intent))
+        stateContext.currentState = ReceivedIntent(stateContext, intent)
+        transition()
     }
 
     fun grant(doNotAsk: Boolean) {
+        assert(stateContext.currentState is PermissionState)
         viewModelScope.launch {
-            assert(stateContext.currentState is PermissionState)
-            transition(
-                (stateContext.currentState as PermissionState).grant(doNotAsk)
-            )
+            stateContext.currentState = (stateContext.currentState as PermissionState).grant(doNotAsk)
+            transition()
         }
     }
 
     fun deny(doNotAsk: Boolean) {
+        assert(stateContext.currentState is PermissionState)
         viewModelScope.launch {
-            assert(stateContext.currentState is PermissionState)
-            transition(
-                (stateContext.currentState as PermissionState).deny(doNotAsk)
-            )
+            stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
+            transition()
         }
     }
 
-    fun share(
-        context: Context,
-        settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
-    ) {
-        transition(
-            AcceptedSharing(
-                stateContext,
-                context,
-                settingsLauncherWrapper,
-                resultGeoUri,
-            )
-        )
+    fun share(context: Context, settingsLauncherWrapper: ManagedActivityResultLauncherWrapper) {
+        stateContext.currentState = AcceptedSharing(stateContext, context, settingsLauncherWrapper, resultGeoUri)
+        transition()
     }
 
     fun copy(clipboard: Clipboard) {
-        transition(
-            AcceptedCopying(
-                stateContext,
-                clipboard,
-                resultGeoUri,
-            )
-        )
+        stateContext.currentState = AcceptedCopying(stateContext, clipboard, resultGeoUri)
+        transition()
     }
 
-    private fun transition(newState: State) {
-        viewModelScope.launch {
-            stateContext.currentState = newState
+    private fun transition() {
+        transitionJob?.cancel()
+        transitionJob = viewModelScope.launch {
             stateContext.transition()
-            _currentState.value = stateContext.currentState
-            when (stateContext.currentState) {
-                is ConversionSucceeded ->
-                    (stateContext.currentState as ConversionSucceeded).let {
-                        withMutableSnapshot {
-                            resultGeoUri = it.geoUri
-                        }
-                    }
-
-                is ConversionFailed ->
-                    (stateContext.currentState as ConversionFailed).let {
-                        withMutableSnapshot {
-                            resultErrorMessageResId = it.messageResId
-                        }
-                    }
-            }
         }
+    }
+
+    fun cancel() {
+        transitionJob?.cancel()
     }
 
     fun updateInput(newUriString: String) {
@@ -161,7 +181,8 @@ class ConversionViewModel @Inject constructor(
             resultErrorMessageResId = null
         }
         if (stateContext.currentState !is Initial) {
-            transition(Initial())
+            stateContext.currentState = Initial()
+            transition()
         }
     }
 

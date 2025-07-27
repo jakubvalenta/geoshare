@@ -17,6 +17,7 @@ class GoogleMapsUrlConverter(
 ) : UrlConverter {
     override val name = "Google Maps"
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
+    override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     val fullUrlPattern: Pattern = Pattern.compile("""^https?://((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}/.+$""")
     val shortUrlPattern: Pattern =

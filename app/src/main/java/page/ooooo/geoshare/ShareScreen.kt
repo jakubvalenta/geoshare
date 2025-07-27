@@ -20,11 +20,11 @@ import page.ooooo.geoshare.lib.RequestedSharePermission
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ShareScreen(viewModel: ConversionViewModel = hiltViewModel()) {
+fun ShareScreen(loadingIndicatorEnabled: Boolean = true, viewModel: ConversionViewModel = hiltViewModel()) {
     val appName = stringResource(R.string.app_name)
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
 
-    ConversionScreen(viewModel)
+    ConversionScreen(loadingIndicatorEnabled, viewModel)
 
     when (currentState) {
         is RequestedSharePermission -> {

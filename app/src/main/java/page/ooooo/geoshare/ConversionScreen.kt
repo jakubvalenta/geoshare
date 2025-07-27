@@ -15,6 +15,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import page.ooooo.geoshare.components.LoadingIndicatorDialog
 import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.lib.RequestedParseHtmlPermission
 import page.ooooo.geoshare.lib.RequestedParseHtmlToGetCoordsPermission
@@ -23,7 +24,7 @@ import page.ooooo.geoshare.lib.truncateMiddle
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
+fun ConversionScreen(loadingIndicatorEnabled: Boolean = true, viewModel: ConversionViewModel = hiltViewModel()) {
     val appName = stringResource(R.string.app_name)
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
 
@@ -98,6 +99,15 @@ fun ConversionScreen(viewModel: ConversionViewModel = hiltViewModel()) {
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )
             }
+        }
+    }
+
+    if (loadingIndicatorEnabled) {
+        viewModel.loadingIndicatorTitleResId?.let { loadingIndicatorTitleResId ->
+            LoadingIndicatorDialog(
+                titleResId = loadingIndicatorTitleResId,
+                onDismissRequest = { viewModel.cancel() },
+            )
         }
     }
 }

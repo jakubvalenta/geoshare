@@ -57,7 +57,10 @@
     <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_info_box"><![CDATA[%1s supports many types of Google Maps and Apple Maps links. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">report an issue</a>.]]></string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
+    <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
+    <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
+    <string name="conversion_loading_indicator_cancel">Cancel</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates or place name. %2$s needs to connect to the map service to get the information.]]></string>
@@ -101,4 +104,5 @@
     <string name="conversion_failed_parse_html_error">Failed to fetch web page from the map service</string>
     <string name="conversion_failed_parse_html_connection_error">Connection error when fetching web page from the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
+    <string name="conversion_failed_cancelled">Cancelled</string>
 </resources>

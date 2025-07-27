@@ -7,14 +7,12 @@ abstract class StateContext {
 
     suspend fun transition() {
         var i = 0
-        var newState = currentState
         while (i < maxIterations) {
-            newState = newState.transition() ?: break
+            currentState = currentState.transition() ?: break
             i++
         }
         if (i >= maxIterations) {
             throw Exception("Exceeded max state iterations")
         }
-        currentState = newState
     }
 }

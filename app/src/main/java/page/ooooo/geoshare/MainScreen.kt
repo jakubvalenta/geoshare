@@ -38,7 +38,7 @@ import page.ooooo.geoshare.lib.ManagedActivityResultLauncherWrapper
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainScreen(
     onNavigateToAboutScreen: () -> Unit = {},
@@ -58,7 +58,7 @@ fun MainScreen(
         viewModel.grant(doNotAsk = false)
     }
 
-    ShareScreen(viewModel)
+    ShareScreen(loadingIndicatorEnabled = false, viewModel = viewModel)
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -77,8 +77,7 @@ fun MainScreen(
                             )
                         }
                         DropdownMenu(
-                            expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }) {
+                            expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.user_preferences_title)) },
                                 onClick = {
@@ -149,14 +148,20 @@ fun MainScreen(
                 supportingText = {
                     Text(
                         stringResource(
-                            viewModel.resultErrorMessageResId
-                                ?: R.string.main_input_uri_supporting_text
+                            viewModel.resultErrorMessageResId ?: R.string.main_input_uri_supporting_text
                         )
                     )
                 },
                 isError = viewModel.resultErrorMessageResId != null,
             )
-            if (viewModel.resultGeoUri.isNotEmpty()) {
+            if (viewModel.loadingIndicatorTitleResId != null) {
+                LoadingIndicator(
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = Spacing.small),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                )
+            } else if (viewModel.resultGeoUri.isNotEmpty()) {
                 Card(
                     Modifier
                         .fillMaxWidth()
@@ -279,6 +284,40 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
+private fun LoadingIndicatorPreview() {
+    AppTheme {
+        MainScreen(
+            viewModel = ConversionViewModel(
+                FakeUserPreferencesRepository(),
+                SavedStateHandle(
+                    mapOf(
+                        "loadingIndicatorVisible" to true
+                    )
+                ),
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkLoadingIndicatorPreview() {
+    AppTheme {
+        MainScreen(
+            viewModel = ConversionViewModel(
+                FakeUserPreferencesRepository(),
+                SavedStateHandle(
+                    mapOf(
+                        "loadingIndicatorVisible" to true
+                    )
+                ),
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun DonePreview() {
     AppTheme {
         MainScreen(
@@ -323,7 +362,7 @@ private fun ErrorPreview() {
                 SavedStateHandle(
                     mapOf(
                         "inputUriString" to "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        "resultErrorMessage" to "Failed to create geo: link",
+                        "resultErrorMessage" to R.string.conversion_failed_parse_url_error
                     )
                 ),
             )
@@ -341,7 +380,7 @@ private fun DarkErrorPreview() {
                 SavedStateHandle(
                     mapOf(
                         "inputUriString" to "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        "resultErrorMessage" to "Failed to create geo: link",
+                        "resultErrorMessage" to R.string.conversion_failed_parse_url_error
                     )
                 ),
             )
