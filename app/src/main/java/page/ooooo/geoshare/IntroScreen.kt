@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +25,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp.Companion.Hairline
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
@@ -133,7 +135,7 @@ fun IntroScreen(
                             stringResource(R.string.intro_open_by_default_google_maps_caption),
                         ) {
                             ScreenshotOpenByDefaultMapApp()
-                            OutlinedButton({
+                            IntroOutlinedButton({
                                 showOpenByDefaultSettings("com.google.android.apps.maps")
                             }) {
                                 Text(stringResource(R.string.intro_open_by_default_google_maps_button))
@@ -143,7 +145,7 @@ fun IntroScreen(
                             stringResource(R.string.intro_open_by_default_app_caption, appName),
                         ) {
                             ScreenshotOpenByDefault()
-                            OutlinedButton({
+                            IntroOutlinedButton({
                                 showOpenByDefaultSettings(context.packageName)
                             }) {
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
@@ -248,6 +250,16 @@ fun IntroFigure(
         verticalArrangement = Arrangement.spacedBy(Spacing.tiny),
     ) {
         ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
+        content()
+    }
+}
+
+@Composable
+fun IntroOutlinedButton(
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    OutlinedButton(onClick, border = BorderStroke(width = Hairline, color = MaterialTheme.colorScheme.outline)) {
         content()
     }
 }
