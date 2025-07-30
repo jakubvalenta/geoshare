@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
+import io.ktor.client.engine.mock.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -22,15 +23,10 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.ParseHtmlResult
-import page.ooooo.geoshare.lib.converters.ParseUrlResult
-import page.ooooo.geoshare.lib.converters.UrlConverter
+import page.ooooo.geoshare.lib.converters.*
 import java.net.MalformedURLException
 import java.net.SocketTimeoutException
 import java.net.URL
-import kotlin.jvm.java
 
 class ConversionStateTest {
 
@@ -843,11 +839,10 @@ class ConversionStateTest {
     @Test
     fun grantedUnshortenPermission_gettingLocationHeaderThrowsCancellationException_returnsConversionFailedWithCancelledErrorMessage() =
         runTest {
-            val mockNetworkTools = Mockito.mock(NetworkTools::class.java)
-            Mockito.`when`(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(CancellationException::class.java)
-            Mockito.`when`(mockNetworkTools.getText(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            val mockEngine = MockEngine {
+                throw CancellationException()
+            }
+            val mockNetworkTools = NetworkTools(mockEngine, fakeLog)
             val stateContext = ConversionStateContext(
                 urlConverters,
                 mockIntentTools,

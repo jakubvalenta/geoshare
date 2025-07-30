@@ -93,6 +93,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.re2j)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.mock)
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -14,8 +14,9 @@ androidxTestUiAutomator = "2.3.0"
 hilt = "2.56.2"
 junit = "4.13.2"
 kotlin = "2.1.0"
-kotlinxCoroutinesTest = "1.9.0"
+kotlinxCoroutinesTest = "1.10.2"
 ksp = "2.1.0-1.0.29"
+ktor = "3.2.2"
 mockitoKotlin = "5.4.0"
 re2j = "1.7"
 
@@ -37,6 +38,8 @@ androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 re2j = { group = "com.google.re2j", name = "re2j", version.ref = "re2j" }
