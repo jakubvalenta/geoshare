@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -256,6 +257,7 @@ fun MainScreen(
 
 // Previews
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
@@ -269,6 +271,7 @@ private fun DefaultPreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
@@ -282,6 +285,7 @@ private fun DarkPreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun LoadingIndicatorPreview() {
@@ -299,6 +303,7 @@ private fun LoadingIndicatorPreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkLoadingIndicatorPreview() {
@@ -316,6 +321,7 @@ private fun DarkLoadingIndicatorPreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun DonePreview() {
@@ -334,6 +340,7 @@ private fun DonePreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkDonePreview() {
@@ -352,6 +359,7 @@ private fun DarkDonePreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun ErrorPreview() {
@@ -370,6 +378,7 @@ private fun ErrorPreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkErrorPreview() {

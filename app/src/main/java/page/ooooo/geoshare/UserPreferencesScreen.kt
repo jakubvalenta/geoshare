@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -91,6 +92,7 @@ fun <T> UserPreferencesItem(
 
 // Previews
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
@@ -104,6 +106,7 @@ private fun DefaultPreview() {
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
