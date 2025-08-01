@@ -104,4 +104,8 @@
     <string name="conversion_failed_unshorten_error">فشل حل الرابط المختصر</string>
     <string name="conversion_failed_parse_html_connection_error">خطأ في الاتصال عند جلب صفحة الويب من خدمة الخرائط</string>
     <string name="conversion_failed_unsupported_service">خدمة الخرائط غير مدعومة</string>
+    <string name="converter_google_maps_loading_indicator_title">يتصل بجوجل…</string>
+    <string name="converter_apple_maps_loading_indicator_title">يتصل ب Apple…</string>
+    <string name="conversion_loading_indicator_cancel">ألغِ</string>
+    <string name="conversion_failed_cancelled">أُلغِيَ</string>
 </resources>
