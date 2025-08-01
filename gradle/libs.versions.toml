@@ -1,12 +1,12 @@
 [versions]
 agp = "8.10.1"
-androidXNavigationCompose = "2.9.3"
 androidxActivityCompose = "1.10.1"
 androidxComposeBom = "2025.07.00"
 androidxComposeMaterial3 = "1.5.0-alpha01"
 androidxCore = "1.16.0"
 androidxDatastorePreferences = "1.1.7"
 androidxHiltNavigationCompose = "1.2.0"
+androidxNavigationCompose = "2.9.3"
 androidxTestExt = "1.2.1"
 androidxTestOrchestrator = "1.5.1"
 androidxTestRunner = "1.6.2"
@@ -30,7 +30,7 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidxDatastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidXNavigationCompose" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigationCompose" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExt" }
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidxTestOrchestrator" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
