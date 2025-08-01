@@ -100,4 +100,8 @@
     <string name="intro_open_by_default_google_maps_screenshot_app">Карти</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставен маркер</string>
+    <string name="converter_google_maps_loading_indicator_title">Свързване с Google…</string>
+    <string name="converter_apple_maps_loading_indicator_title">Свързване с Apple…</string>
+    <string name="conversion_loading_indicator_cancel">Отказ</string>
+    <string name="conversion_failed_cancelled">Отменено</string>
 </resources>
