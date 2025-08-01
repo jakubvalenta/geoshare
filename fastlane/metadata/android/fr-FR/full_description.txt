@@ -1,4 +1,4 @@
-Partagez un lien de carte avec Geo Share et l’application l’ouvrira dans une autre application cartographique installée.
+Partagez un lien cartographique avec Geo Share et l’application l’ouvrira dans une autre application cartographique installée.
 
 <b>Liens cartographiques pris en charge</b>
 
@@ -13,11 +13,11 @@ Lorsque vous aimez Google Maps pour trouver des lieux, mais que vous préférez 
 
 <b>Autres fonctionnalités</b>
 
-- Affichez les coordonnées géographiques d’un lien de carte et copiez-les dans le presse-papiers sous la forme d’un lien geo:.
+- Affichez les coordonnées géographiques d’un lien cartographique et copiez-les dans le presse-papiers sous la forme d’un lien geo:.
 - Collez les liens cartographiques directement dans l’application, plutôt que de les partager avec elle.
 
 <b>Comment ça marche et respect de la confidentialité</b>
 
-Geo Share convertit les liens de carte (par ex. https://maps.app.goo.gl/…) en liens geo:, qui peuvent être ouverts par d’autres applications cartographiques. Pour créer un lien geo:, des coordonnées géographiques sont nécessaires. Geo Share les extrait de l’URL de la carte.
+Geo Share convertit les liens cartographiques (par ex. https://maps.app.goo.gl/…) en liens geo:, qui peuvent être ouverts par d’autres applications cartographiques. Pour créer un lien geo:, des coordonnées géographiques sont nécessaires. Geo Share les extrait de l’URL de la carte.
 
-Cependant, toutes les URL de carte ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous demandera l’autorisation de vous connecter au service de carte (Google Maps, Apple Plans, etc.) et de récupérer les coordonnées soit dans les en-têtes HTTP, soit dans le document HTML du lien. Pour plus d’informations, consultez l’écran FAQ de l’application.
+Cependant, toutes les URL de carte ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous demandera l’autorisation de vous connecter au service de cartographie (Google Maps, Apple Plans, etc.) et de récupérer les coordonnées soit dans les en-têtes HTTP, soit dans le document HTML du lien. Pour plus d’informations, consultez l’écran FAQ de l’application.

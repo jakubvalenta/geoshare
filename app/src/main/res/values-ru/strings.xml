@@ -88,7 +88,7 @@
     <string name="conversion_failed_parse_html_error">Не удалось получить веб-страницу из картографического сервиса</string>
     <string name="conversion_failed_connection_permission_denied">Эта ссылка не поддерживается без подключения к картографическому сервису</string>
     <string name="intro_geo_links_headline">Как скопировать географические координаты</string>
-    <string name="main_input_uri_supporting_text">Например, https://maps.app.goo.gl/... или maps.apple.com/…</string>
+    <string name="main_input_uri_supporting_text">Например, https://maps.app.goo.gl/… или maps.apple.com/…</string>
     <string name="conversion_permission_xiaomi_grant">Открыть настройки Android</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Выберете хотя бы <tt>maps.google.com</tt> и <tt>maps.app.goo.gl</tt>. Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Maps.]]></string>
     <string name="sharing_failed_xiaomi_permission_denied">Невозможно открыть другое приложение для карт без разрешения</string>
