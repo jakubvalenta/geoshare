@@ -101,4 +101,8 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">No app</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Cancelar</string>
+    <string name="converter_google_maps_loading_indicator_title">Conectando-se ao Google…</string>
+    <string name="converter_apple_maps_loading_indicator_title">Conectando-se à Apple…</string>
+    <string name="conversion_loading_indicator_cancel">Cancelar</string>
+    <string name="conversion_failed_cancelled">Cancelado</string>
 </resources>
