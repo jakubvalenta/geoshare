@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="copy_activity">Copy geo:</string>
-    <string name="share_activity">Open</string>
     <string name="skip_activity">Skip</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
@@ -15,7 +14,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Messaging</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and %2$s will let you open the same location in any installed map app.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and the app will let you open the same location in any installed map app.]]></string>
     <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
     <string name="intro_how_to_share_app_screenshot_title">Open with %1$s</string>
     <string name="intro_how_to_share_app_screenshot_once">Just once</string>

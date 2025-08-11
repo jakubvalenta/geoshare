@@ -34,8 +34,7 @@ class IntentTools {
                         ComponentName("page.ooooo.geoshare", "ShareActivity"),
                     )
                 )
-            }
-        )
+            })
     }
 
     fun view(context: Context, data: Uri?) {
@@ -49,8 +48,7 @@ class IntentTools {
                         ComponentName("page.ooooo.geoshare", "ShareActivity"),
                     )
                 )
-            }
-        )
+            })
     }
 
     fun getIntentGeoUri(intent: Intent): String? {
@@ -73,8 +71,7 @@ class IntentTools {
             }
 
             Intent.ACTION_SEND -> {
-                val intentText =
-                    intent.getStringExtra("android.intent.extra.TEXT")
+                val intentText = intent.getStringExtra("android.intent.extra.TEXT")
                 if (intentText == null) {
                     Log.w(null, "Missing intent extra text")
                     return null

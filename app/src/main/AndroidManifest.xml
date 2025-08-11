@@ -41,7 +41,6 @@
                 android:name="page.ooooo.geoshare.ShareActivity"
                 android:excludeFromRecents="true"
                 android:exported="true"
-                android:label="@string/share_activity"
                 android:theme="@style/TranslucentTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
@@ -155,6 +154,14 @@
                 <data
                         android:host="maps.apple"
                         android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="geo"/>
             </intent-filter>
         </activity>
         <activity

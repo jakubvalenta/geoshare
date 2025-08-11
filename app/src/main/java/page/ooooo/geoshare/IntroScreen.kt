@@ -108,18 +108,13 @@ fun IntroScreen(
                         page,
                     ) {
                         IntroFigure(
-                            stringResource(
-                                R.string.intro_how_to_share_google_maps_caption,
-                                stringResource(R.string.share_activity),
-                                appName,
-                            ),
+                            stringResource(R.string.intro_how_to_share_google_maps_caption),
                         ) {
                             ScreenshotMapAppOpen()
                         }
                         IntroFigure(
                             stringResource(
                                 R.string.intro_how_to_share_app_caption,
-                                stringResource(R.string.share_activity),
                                 appName,
                             ),
                         ) {
