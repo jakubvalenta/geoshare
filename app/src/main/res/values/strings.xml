@@ -90,7 +90,6 @@
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="user_preferences_connection_option_never">No</string>
     <string name="user_preferences_last_run_version_code_title">Which version of the app was last run?</string>
-    <string name="conversion_failed_nothing_to_do">Nothing to do</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
     <string name="conversion_failed_invalid_url">Invalid URL</string>
     <string name="conversion_failed_unshorten_error">Failed to resolve short link</string>

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.compose.ui.platform.Clipboard
+import androidx.core.net.toUri
+import kotlinx.coroutines.CancellationException
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
@@ -15,8 +17,6 @@ import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
-import androidx.core.net.toUri
-import kotlinx.coroutines.CancellationException
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -33,36 +33,36 @@ data class ReceivedIntent(
     val intent: Intent,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        if (stateContext.intentTools.isProcessed(intent)) {
-            return ConversionFailed(stateContext, R.string.conversion_failed_nothing_to_do)
-        }
         val geoUri = stateContext.intentTools.getIntentGeoUri(intent)
+        val intentData = intent.data
         if (geoUri != null) {
-            return ConversionSucceeded(geoUri)
+            return ConversionSucceeded(intentData, geoUri)
         }
         val urlString = stateContext.intentTools.getIntentUrlString(intent) ?: return ConversionFailed(
             stateContext, R.string.conversion_failed_missing_url
         )
-        return ReceivedUrlString(stateContext, urlString, null)
+        return ReceivedUrlString(stateContext, intentData, urlString, null)
     }
 }
 
 data class ReceivedUriString(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val uriString: String,
     private val parseUri: (String) -> Uri = { s -> s.toUri() },
 ) : ConversionState() {
     override suspend fun transition(): State {
         val uri = parseUri(uriString)
         if (uri.scheme == "geo") {
-            return ConversionSucceeded(uriString)
+            return ConversionSucceeded(intentData, uriString)
         }
-        return ReceivedUrlString(stateContext, uriString, null)
+        return ReceivedUrlString(stateContext, intentData, uriString, null)
     }
 }
 
 data class ReceivedUrlString(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val urlString: String,
     val permission: Permission?,
 ) : ConversionState() {
@@ -73,12 +73,13 @@ data class ReceivedUrlString(
         } catch (_: MalformedURLException) {
             return ConversionFailed(stateContext, R.string.conversion_failed_invalid_url)
         }
-        return ReceivedUrl(stateContext, url, permission)
+        return ReceivedUrl(stateContext, intentData, url, permission)
     }
 }
 
 data class ReceivedUrl(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val url: URL,
     val permission: Permission?,
 ) : ConversionState() {
@@ -87,11 +88,11 @@ data class ReceivedUrl(
             stateContext, R.string.conversion_failed_unsupported_service
         )
         if (!urlConverter.isShortUrl(url)) {
-            return UnshortenedUrl(stateContext, urlConverter, url, permission)
+            return UnshortenedUrl(stateContext, intentData, urlConverter, url, permission)
         }
         return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
-            Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, urlConverter, url)
-            Permission.ASK -> RequestedUnshortenPermission(stateContext, urlConverter, url)
+            Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, intentData, urlConverter, url)
+            Permission.ASK -> RequestedUnshortenPermission(stateContext, intentData, urlConverter, url)
             Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
         }
     }
@@ -99,6 +100,7 @@ data class ReceivedUrl(
 
 data class RequestedUnshortenPermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val urlConverter: UrlConverter,
     val url: URL,
 ) : ConversionState(), PermissionState {
@@ -106,7 +108,7 @@ data class RequestedUnshortenPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
-        return GrantedUnshortenPermission(stateContext, urlConverter, url)
+        return GrantedUnshortenPermission(stateContext, intentData, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -119,6 +121,7 @@ data class RequestedUnshortenPermission(
 
 data class GrantedUnshortenPermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     override val urlConverter: UrlConverter,
     val url: URL,
 ) : ConversionStateWithLoadingIndicator(urlConverter) {
@@ -136,7 +139,7 @@ data class GrantedUnshortenPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(stateContext, R.string.conversion_failed_unshorten_error)
         }
-        return UnshortenedUrl(stateContext, urlConverter, header, Permission.ALWAYS)
+        return UnshortenedUrl(stateContext, intentData, urlConverter, header, Permission.ALWAYS)
     }
 }
 
@@ -150,6 +153,7 @@ data class DeniedConnectionPermission(
 
 data class UnshortenedUrl(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val urlConverter: UrlConverter,
     val url: URL,
     val permission: Permission?,
@@ -157,12 +161,15 @@ data class UnshortenedUrl(
     override suspend fun transition(): State {
         val parseUrlResult = urlConverter.parseUrl(url)
         return when (parseUrlResult) {
-            is ParseUrlResult.Parsed -> ConversionSucceeded(parseUrlResult.geoUriBuilder.toString())
+            is ParseUrlResult.Parsed -> ConversionSucceeded(
+                intentData,
+                parseUrlResult.geoUriBuilder.toString(),
+            )
 
             is ParseUrlResult.RequiresHtmlParsing -> when (permission
                 ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
-                Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, urlConverter, url)
-                Permission.ASK -> RequestedParseHtmlPermission(stateContext, urlConverter, url)
+                Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, intentData, urlConverter, url)
+                Permission.ASK -> RequestedParseHtmlPermission(stateContext, intentData, urlConverter, url)
                 Permission.NEVER -> DeniedConnectionPermission(stateContext, urlConverter)
             }
 
@@ -170,6 +177,7 @@ data class UnshortenedUrl(
                 ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
                     stateContext,
+                    intentData,
                     urlConverter,
                     url,
                     parseUrlResult.geoUriBuilder.toString(),
@@ -177,12 +185,16 @@ data class UnshortenedUrl(
 
                 Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
                     stateContext,
+                    intentData,
                     urlConverter,
                     url,
                     parseUrlResult.geoUriBuilder.toString(),
                 )
 
-                Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(parseUrlResult.geoUriBuilder.toString())
+                Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(
+                    intentData,
+                    parseUrlResult.geoUriBuilder.toString(),
+                )
             }
 
             null -> ConversionFailed(stateContext, R.string.conversion_failed_parse_url_error)
@@ -192,6 +204,7 @@ data class UnshortenedUrl(
 
 data class RequestedParseHtmlPermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val urlConverter: UrlConverter,
     val url: URL,
 ) : ConversionState(), PermissionState {
@@ -199,7 +212,7 @@ data class RequestedParseHtmlPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
-        return GrantedParseHtmlPermission(stateContext, urlConverter, url)
+        return GrantedParseHtmlPermission(stateContext, intentData, urlConverter, url)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
@@ -212,6 +225,7 @@ data class RequestedParseHtmlPermission(
 
 data class GrantedParseHtmlPermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     override val urlConverter: UrlConverter,
     val url: URL,
 ) : ConversionStateWithLoadingIndicator(urlConverter) {
@@ -229,8 +243,8 @@ data class GrantedParseHtmlPermission(
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
-            is ParseHtmlResult.Parsed -> ConversionSucceeded(parseHtmlResult.geoUriBuilder.toString())
-            is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, parseHtmlResult.url, Permission.ALWAYS)
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(intentData, parseHtmlResult.geoUriBuilder.toString())
+            is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, intentData, parseHtmlResult.url, Permission.ALWAYS)
             null -> return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
         }
     }
@@ -238,6 +252,7 @@ data class GrantedParseHtmlPermission(
 
 data class RequestedParseHtmlToGetCoordsPermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val urlConverter: UrlConverter,
     val url: URL,
     val geoUriFromUrl: String,
@@ -246,19 +261,20 @@ data class RequestedParseHtmlToGetCoordsPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
-        return GrantedParseHtmlToGetCoordsPermission(stateContext, urlConverter, url, geoUriFromUrl)
+        return GrantedParseHtmlToGetCoordsPermission(stateContext, intentData, urlConverter, url, geoUriFromUrl)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
         }
-        return DeniedParseHtmlToGetCoordsPermission(geoUriFromUrl)
+        return DeniedParseHtmlToGetCoordsPermission(intentData, geoUriFromUrl)
     }
 }
 
 data class GrantedParseHtmlToGetCoordsPermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     override val urlConverter: UrlConverter,
     val url: URL,
     val geoUriFromUrl: String,
@@ -277,20 +293,21 @@ data class GrantedParseHtmlToGetCoordsPermission(
         }
         val parseHtmlResult = urlConverter.parseHtml(html)
         return when (parseHtmlResult) {
-            is ParseHtmlResult.Parsed -> ConversionSucceeded(parseHtmlResult.geoUriBuilder.toString())
-            is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, parseHtmlResult.url, Permission.ALWAYS)
-            null -> ConversionSucceeded(geoUriFromUrl)
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(intentData, parseHtmlResult.geoUriBuilder.toString())
+            is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, intentData, parseHtmlResult.url, Permission.ALWAYS)
+            null -> ConversionSucceeded(intentData, geoUriFromUrl)
         }
     }
 }
 
 data class DeniedParseHtmlToGetCoordsPermission(
+    val intentData: Uri?,
     val geoUriFromUrl: String,
 ) : ConversionState() {
-    override suspend fun transition(): State = ConversionSucceeded(geoUriFromUrl)
+    override suspend fun transition(): State = ConversionSucceeded(intentData, geoUriFromUrl)
 }
 
-data class ConversionSucceeded(val geoUri: String) : ConversionState()
+data class ConversionSucceeded(val intentData: Uri?, val geoUri: String) : ConversionState()
 
 data class ConversionFailed(val stateContext: ConversionStateContext, val messageResId: Int) : ConversionState() {
     override suspend fun transition(): State? {
@@ -301,31 +318,31 @@ data class ConversionFailed(val stateContext: ConversionStateContext, val messag
 
 data class AcceptedSharing(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
-    val originalUri: Uri,
 ) : ConversionState() {
     override suspend fun transition(): State = if (stateContext.xiaomiTools.isBackgroundStartActivityPermissionGranted(
             context
         )
     ) {
-        GrantedSharePermission(stateContext, context, geoUri, originalUri)
+        GrantedSharePermission(stateContext, intentData, context, geoUri)
     } else {
-        RequestedSharePermission(stateContext, context, settingsLauncherWrapper, geoUri, originalUri)
+        RequestedSharePermission(stateContext, intentData, context, settingsLauncherWrapper, geoUri)
     }
 }
 
 data class RequestedSharePermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
-    val originalUri: Uri,
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State =
         if (stateContext.xiaomiTools.showPermissionEditor(context, settingsLauncherWrapper)) {
-            ShowedSharePermissionEditor(stateContext, context, settingsLauncherWrapper, geoUri, originalUri)
+            ShowedSharePermissionEditor(stateContext, intentData, context, settingsLauncherWrapper, geoUri)
         } else {
             SharingFailed(stateContext, R.string.sharing_failed_xiaomi_permission_show_editor_error)
         }
@@ -336,16 +353,16 @@ data class RequestedSharePermission(
 
 data class ShowedSharePermissionEditor(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val context: Context,
     val settingsLauncherWrapper: ManagedActivityResultLauncherWrapper,
     val geoUri: String,
-    val originalUri: Uri,
 ) : ConversionState(), PermissionState {
     /**
      * Share again after the permission editor has been closed.
      */
     override suspend fun grant(doNotAsk: Boolean): State =
-        AcceptedSharing(stateContext, context, settingsLauncherWrapper, geoUri, originalUri)
+        AcceptedSharing(stateContext, intentData, context, settingsLauncherWrapper, geoUri)
 
     override suspend fun deny(doNotAsk: Boolean): State {
         throw NotImplementedError("It is not possible to deny sharing again after the permission editor has been closed")
@@ -354,12 +371,12 @@ data class ShowedSharePermissionEditor(
 
 data class GrantedSharePermission(
     val stateContext: ConversionStateContext,
+    val intentData: Uri?,
     val context: Context,
     val geoUri: String,
-    val originalUri: Uri,
 ) : ConversionState() {
     override suspend fun transition(): State? = try {
-        stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri, originalUri)
+        stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri, intentData)
         SharingSucceeded(stateContext, R.string.sharing_succeeded)
     } catch (_: ActivityNotFoundException) {
         SharingFailed(stateContext, R.string.sharing_failed_activity_not_found)
@@ -387,6 +404,7 @@ data class SharingFailed(
 }
 
 data class AcceptedCopying(
+    // TODO Remove
     val stateContext: ConversionStateContext,
     val clipboard: Clipboard,
     val geoUri: String,
@@ -397,7 +415,7 @@ data class AcceptedCopying(
     }
 }
 
-data class CopyingFinished(val stateContext: ConversionStateContext) : ConversionState() {
+data class CopyingFinished(val stateContext: ConversionStateContext) : ConversionState() { // TODO Remove
     override suspend fun transition(): State? {
         val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
         if (!systemHasClipboardEditor) {

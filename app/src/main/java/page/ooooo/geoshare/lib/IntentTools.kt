@@ -1,31 +1,55 @@
 package page.ooooo.geoshare.lib
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
+import page.ooooo.geoshare.CopyActivity
+import page.ooooo.geoshare.SkipActivity
 
 class IntentTools {
 
-    private val extraProcessed = "page.ooooo.geoshare.EXTRA_PROCESSED"
-    private val extraOriginalUri = "page.ooooo.geoshare.EXTRA_ORIGINAL_URI"
-
     private val intentUrlRegex = Regex("https?://\\S+")
 
-    fun isProcessed(intent: Intent): Boolean =
-        intent.getStringExtra(extraProcessed) != null
-
-    fun share(context: Context, action: String, uriString: String, originalUri: Uri) {
+    fun share(context: Context, action: String, uriString: String, originalData: Uri?) {
         context.startActivity(
             Intent.createChooser(
-                Intent(action).apply {
-                    data = uriString.toUri()
-                    putExtra(extraProcessed, "true")
-                    putExtra(extraOriginalUri, originalUri)
-                },
+                Intent(action, uriString.toUri()),
                 "Choose an app",
-            )
+            ).apply {
+                putExtra(
+                    Intent.EXTRA_INITIAL_INTENTS, arrayOf(
+                        Intent(context, CopyActivity::class.java).apply {
+                            data = uriString.toUri()
+                        },
+                        Intent(context, SkipActivity::class.java).apply {
+                            data = originalData
+                        },
+                    )
+                )
+                putExtra(
+                    Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
+                        ComponentName("page.ooooo.geoshare", "ShareActivity"),
+                    )
+                )
+            }
+        )
+    }
+
+    fun view(context: Context, data: Uri?) {
+        context.startActivity(
+            Intent.createChooser(
+                Intent(Intent.ACTION_VIEW, data),
+                "Choose an app",
+            ).apply {
+                putExtra(
+                    Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
+                        ComponentName("page.ooooo.geoshare", "ShareActivity"),
+                    )
+                )
+            }
         )
     }
 
@@ -69,6 +93,4 @@ class IntentTools {
             }
         }
     }
-
-    fun getIntentOriginalUri(intent: Intent): Uri? = intent.getStringExtra(extraOriginalUri)?.toUri()
 }

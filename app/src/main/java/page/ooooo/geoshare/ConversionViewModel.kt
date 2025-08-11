@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.Clipboard
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,6 +66,7 @@ class ConversionViewModel @Inject constructor(
                 is ConversionSucceeded -> {
                     withMutableSnapshot {
                         resultGeoUri = newState.geoUri
+                        resultIntentData = newState.intentData
                     }
                 }
 
@@ -90,7 +92,6 @@ class ConversionViewModel @Inject constructor(
         "loadingIndicatorTitleResId",
         null,
     )
-    private var originalUri: Uri? = null  // FIXME
 
     var resultGeoUri by SavableDelegate(
         savedStateHandle,
@@ -100,6 +101,11 @@ class ConversionViewModel @Inject constructor(
     var resultErrorMessageResId by SavableDelegate<Int?>(
         savedStateHandle,
         "resultErrorMessageResId",
+        null,
+    )
+    var resultIntentData by SavableDelegate<Uri?>(
+        savedStateHandle,
+        "resultIntentData",
         null,
     )
 
@@ -130,8 +136,9 @@ class ConversionViewModel @Inject constructor(
         withMutableSnapshot {
             resultGeoUri = ""
             resultErrorMessageResId = null
+            resultIntentData = null
         }
-        stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
+        stateContext.currentState = ReceivedUriString(stateContext, inputUriString.toUri(), inputUriString)
         transition()
     }
 
@@ -157,19 +164,17 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun share(context: Context, settingsLauncherWrapper: ManagedActivityResultLauncherWrapper) {
-        originalUri?.let { originalUri ->
-            stateContext.currentState = AcceptedSharing(
-                stateContext,
-                context,
-                settingsLauncherWrapper,
-                resultGeoUri,
-                originalUri,
-            )
-            transition()
-        }
+        stateContext.currentState = AcceptedSharing(
+            stateContext,
+            resultIntentData,
+            context,
+            settingsLauncherWrapper,
+            resultGeoUri,
+        )
+        transition()
     }
 
-    fun copy(clipboard: Clipboard) {
+    fun copy(clipboard: Clipboard) { // TODO Remove
         stateContext.currentState = AcceptedCopying(stateContext, clipboard, resultGeoUri)
         transition()
     }
@@ -190,6 +195,7 @@ class ConversionViewModel @Inject constructor(
             inputUriString = newUriString
             resultGeoUri = ""
             resultErrorMessageResId = null
+            resultIntentData = null
         }
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
