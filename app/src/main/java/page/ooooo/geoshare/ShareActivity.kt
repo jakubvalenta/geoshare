@@ -1,19 +1,13 @@
 package page.ooooo.geoshare
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.components.ConversionDialog
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
@@ -25,61 +19,11 @@ class ShareActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val context = LocalContext.current
-            val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-            val message by viewModel.message.collectAsStateWithLifecycle()
-            val settingsLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.StartActivityForResult(),
-            ) {
-                viewModel.grant(doNotAsk = false)
-            }
-
-            AppTheme {
-                ShareScreen(viewModel = viewModel)
-            }
-
             LaunchedEffect(intent) {
                 viewModel.start(intent)
             }
-
-            LaunchedEffect(message) {
-                if (message != null) {
-                    if (currentState !is SharingSucceeded) {
-                        (message as Message).let {
-                            Toast.makeText(
-                                context,
-                                it.resId,
-                                if (it.type == Message.Type.SUCCESS) {
-                                    Toast.LENGTH_SHORT
-                                } else {
-                                    Toast.LENGTH_LONG
-                                },
-                            ).show()
-                        }
-                    }
-                    viewModel.dismissMessage()
-                }
-            }
-
-            when (currentState) {
-                is ConversionSucceeded -> {
-                    viewModel.share(
-                        context,
-                        ManagedActivityResultLauncherWrapper(settingsLauncher),
-                    )
-                }
-
-                is ConversionFailed -> {
-                    finish()
-                }
-
-                is SharingSucceeded -> {
-                    finish()
-                }
-
-                is SharingFailed -> {
-                    finish()
-                }
+            AppTheme {
+                ConversionDialog(onFinish = { finish() }, viewModel = viewModel)
             }
         }
     }

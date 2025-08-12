@@ -1,31 +1,20 @@
 package page.ooooo.geoshare
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
-import io.ktor.client.engine.mock.*
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
-import java.net.MalformedURLException
-import java.net.SocketTimeoutException
 import java.net.URL
 
 class ConversionStateTest {
@@ -68,10 +57,7 @@ class ConversionStateTest {
         Mockito.`when`(mockIntentTools.getIntentUrlString(any<Intent>()))
             .thenThrow(NotImplementedError::class.java)
         Mockito.`when`(
-            mockIntentTools.share(
-                any<Context>(),
-                any<String>(),
-                any<String>(),
+            mockIntentTools.createChooser(
                 any<Uri>(),
             )
         ).thenThrow(NotImplementedError::class.java)

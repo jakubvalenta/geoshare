@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.Clipboard
@@ -10,8 +11,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -76,8 +80,7 @@ class ConversionViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    )
+        })
 
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
@@ -163,6 +166,14 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun queryGeoUriApps(context: Context): List<Pair<String, Int>> =
+        context.packageManager.queryIntentActivities(
+            stateContext.intentTools.createChooser("geo:0,0".toUri()),
+            PackageManager.MATCH_ALL,
+        ).map {
+            Pair(it.activityInfo.loadLabel(context.packageManager).toString(), it.iconResource)
+        }
+
     fun share(context: Context, settingsLauncherWrapper: ManagedActivityResultLauncherWrapper) {
         stateContext.currentState = AcceptedSharing(
             stateContext,
@@ -174,7 +185,20 @@ class ConversionViewModel @Inject constructor(
         transition()
     }
 
-    fun copy(clipboard: Clipboard) { // TODO Remove
+    fun skip(context: Context, settingsLauncherWrapper: ManagedActivityResultLauncherWrapper) {
+        resultIntentData?.let {
+            stateContext.currentState = AcceptedSharing(
+                stateContext,
+                resultIntentData,
+                context,
+                settingsLauncherWrapper,
+                it.toString(),
+            )
+            transition()
+        }
+    }
+
+    fun copy(clipboard: Clipboard) {
         stateContext.currentState = AcceptedCopying(stateContext, clipboard, resultGeoUri)
         transition()
     }

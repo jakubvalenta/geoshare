@@ -376,7 +376,7 @@ data class GrantedSharePermission(
     val geoUri: String,
 ) : ConversionState() {
     override suspend fun transition(): State? = try {
-        stateContext.intentTools.share(context, Intent.ACTION_VIEW, geoUri, intentData)
+        context.startActivity(stateContext.intentTools.createChooser(geoUri.toUri()))
         SharingSucceeded(stateContext, R.string.sharing_succeeded)
     } catch (_: ActivityNotFoundException) {
         SharingFailed(stateContext, R.string.sharing_failed_activity_not_found)
@@ -404,7 +404,6 @@ data class SharingFailed(
 }
 
 data class AcceptedCopying(
-    // TODO Remove
     val stateContext: ConversionStateContext,
     val clipboard: Clipboard,
     val geoUri: String,
@@ -415,7 +414,7 @@ data class AcceptedCopying(
     }
 }
 
-data class CopyingFinished(val stateContext: ConversionStateContext) : ConversionState() { // TODO Remove
+data class CopyingFinished(val stateContext: ConversionStateContext) : ConversionState() {
     override suspend fun transition(): State? {
         val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
         if (!systemHasClipboardEditor) {

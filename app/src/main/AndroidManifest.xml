@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="geo"/>
+        </intent>
+    </queries>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
             android:name=".Application"
@@ -13,30 +19,6 @@
             android:supportsRtl="true"
             android:theme="@style/MainTheme"
             tools:targetApi="35">
-        <activity
-                android:name="page.ooooo.geoshare.CopyActivity"
-                android:excludeFromRecents="true"
-                android:exported="true"
-                android:label="@string/copy_activity"
-                android:theme="@style/TranslucentTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <data android:scheme="geo"/>
-            </intent-filter>
-        </activity>
-        <activity
-                android:name="page.ooooo.geoshare.SkipActivity"
-                android:excludeFromRecents="true"
-                android:exported="true"
-                android:label="@string/skip_activity"
-                android:theme="@style/TranslucentTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <data android:scheme="geo"/>
-            </intent-filter>
-        </activity>
         <activity
                 android:name="page.ooooo.geoshare.ShareActivity"
                 android:excludeFromRecents="true"

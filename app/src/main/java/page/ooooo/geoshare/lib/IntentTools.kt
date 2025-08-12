@@ -1,63 +1,31 @@
 package page.ooooo.geoshare.lib
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import androidx.core.net.toUri
-import page.ooooo.geoshare.CopyActivity
-import page.ooooo.geoshare.SkipActivity
 
 class IntentTools {
 
     private val intentUrlRegex = Regex("https?://\\S+")
 
-    fun share(context: Context, action: String, uriString: String, originalData: Uri?) {
-        context.startActivity(
-            Intent.createChooser(
-                Intent(action, uriString.toUri()),
-                "Choose an app",
-            ).apply {
-                putExtra(
-                    Intent.EXTRA_INITIAL_INTENTS, arrayOf(
-                        Intent(context, CopyActivity::class.java).apply {
-                            data = uriString.toUri()
-                        },
-                        Intent(context, SkipActivity::class.java).apply {
-                            data = originalData
-                        },
-                    )
-                )
-                putExtra(
-                    Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
-                        ComponentName("page.ooooo.geoshare", "ShareActivity"),
-                    )
-                )
-            })
+    fun createChooser(data: Uri): Intent = Intent.createChooser(
+        Intent(Intent.ACTION_VIEW, data),
+        "Choose an app",
+    ).apply {
+        putExtra(
+            Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
+                ComponentName("page.ooooo.geoshare", "ShareActivity"),
+            )
+        )
     }
 
-    fun view(context: Context, data: Uri?) {
-        context.startActivity(
-            Intent.createChooser(
-                Intent(Intent.ACTION_VIEW, data),
-                "Choose an app",
-            ).apply {
-                putExtra(
-                    Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
-                        ComponentName("page.ooooo.geoshare", "ShareActivity"),
-                    )
-                )
-            })
-    }
-
-    fun getIntentGeoUri(intent: Intent): String? {
-        return if (intent.action == Intent.ACTION_VIEW && intent.data != null && intent.scheme == "geo") {
+    fun getIntentGeoUri(intent: Intent): String? =
+        if (intent.action == Intent.ACTION_VIEW && intent.data != null && intent.scheme == "geo") {
             intent.data?.toString()
         } else {
             null
         }
-    }
 
     fun getIntentUrlString(intent: Intent): String? {
         when (val intentAction = intent.action) {
