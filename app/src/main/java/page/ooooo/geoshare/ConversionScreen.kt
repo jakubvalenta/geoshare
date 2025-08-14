@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.Intent
@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -26,7 +29,10 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import page.ooooo.geoshare.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import page.ooooo.geoshare.components.ConfirmationDialog
+import page.ooooo.geoshare.components.PermissionDialog
+import page.ooooo.geoshare.components.ResultCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
@@ -34,9 +40,37 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 import java.net.URL
 
+@Composable
+fun ConversionScreen(intent: Intent, viewModel: ConversionViewModel, onFinish: () -> Unit = {}) {
+    val clipboard = LocalClipboard.current
+    val context = LocalContext.current
+    val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(intent) {
+        viewModel.start(intent)
+    }
+
+    ConversionScreen(
+        currentState,
+        viewModel.loadingIndicatorTitleResId,
+        queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context) },
+        onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
+        onDeny = { doNotAsk -> viewModel.grant(doNotAsk) },
+        onCopy = { viewModel.copy(context, clipboard) },
+        onShare = { settingsLauncher ->
+            viewModel.share(context, ManagedActivityResultLauncherWrapper(settingsLauncher))
+        },
+        onSkip = { settingsLauncher ->
+            viewModel.skip(context, ManagedActivityResultLauncherWrapper(settingsLauncher))
+        },
+        onCancel = { viewModel.cancel() },
+        onFinish = onFinish,
+    )
+}
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ConversionDialog(
+fun ConversionScreen(
     currentState: State,
     loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: (Context) -> List<Pair<String, Int>>,
@@ -229,7 +263,7 @@ fun ConversionDialog(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = ConversionSucceeded(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
                 "geo:50.123456,11.123456",
@@ -250,7 +284,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = ConversionSucceeded(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
                 "geo:50.123456,11.123456",
@@ -271,7 +305,7 @@ private fun DarkPreview() {
 @Composable
 private fun PermissionPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = RequestedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
@@ -300,7 +334,7 @@ private fun PermissionPreview() {
 @Composable
 private fun DarkPermissionPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = RequestedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
@@ -329,7 +363,7 @@ private fun DarkPermissionPreview() {
 @Composable
 private fun ErrorPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = ConversionFailed(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
                 R.string.conversion_failed_parse_url_error,
@@ -350,7 +384,7 @@ private fun ErrorPreview() {
 @Composable
 private fun DarkErrorPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = ConversionFailed(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
                 R.string.conversion_failed_parse_url_error,
@@ -371,7 +405,7 @@ private fun DarkErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = Initial(),
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
@@ -389,7 +423,7 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        ConversionDialog(
+        ConversionScreen(
             currentState = Initial(),
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },

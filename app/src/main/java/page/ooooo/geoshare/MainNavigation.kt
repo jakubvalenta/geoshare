@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -7,9 +8,10 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import page.ooooo.geoshare.components.MainScreen
 
 @Composable
-fun MainNavigation(viewModel: ConversionViewModel) {
+fun MainNavigation(intent: Intent, viewModel: ConversionViewModel) {
     val navController = rememberNavController()
     val introShown by viewModel.introShown.collectAsState()
 
@@ -46,6 +48,12 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("conversion") {
+            ConversionScreen(
+                intent = intent,
                 viewModel = viewModel,
             )
         }

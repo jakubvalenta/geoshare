@@ -22,16 +22,38 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
+@Composable
+fun MainScreen(
+    onNavigateToAboutScreen: () -> Unit = {},
+    onNavigateToConversionScreen: () -> Unit = {},
+    onNavigateToFaqScreen: () -> Unit = {},
+    onNavigateToIntroScreen: () -> Unit = {},
+    onNavigateToUserPreferencesScreen: () -> Unit = {},
+    viewModel: ConversionViewModel = hiltViewModel(),
+) {
+    MainScreen(
+        inputUriString = viewModel.inputUriString,
+        onUpdateInput = { viewModel.updateInput(it) },
+        onNavigateToConversionScreen = onNavigateToConversionScreen,
+        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+        onNavigateToFaqScreen = onNavigateToFaqScreen,
+        onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onNavigateToAboutScreen = onNavigateToAboutScreen,
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainForm(
+fun MainScreen(
     inputUriString: String,
-    onStart: () -> Unit,
     onUpdateInput: (String) -> Unit,
+    onNavigateToConversionScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -128,7 +150,7 @@ fun MainForm(
                 },
             )
             Button(
-                { onStart() },
+                onNavigateToConversionScreen,
                 Modifier
                     .fillMaxWidth()
                     .padding(top = Spacing.small),
@@ -176,10 +198,10 @@ fun MainForm(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        MainForm(
+        MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            onStart = {},
             onUpdateInput = {},
+            onNavigateToConversionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
@@ -192,10 +214,10 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        MainForm(
+        MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            onStart = {},
             onUpdateInput = {},
+            onNavigateToConversionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
