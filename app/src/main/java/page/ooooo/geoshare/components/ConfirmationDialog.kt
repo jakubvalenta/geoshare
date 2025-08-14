@@ -1,9 +1,8 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -11,6 +10,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun ConfirmationDialog(
@@ -22,42 +22,44 @@ fun ConfirmationDialog(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    AlertDialog(
-        title = { Text(text = title) },
-        text = { content() },
-        onDismissRequest = { onDismissRequest() },
-        confirmButton = {
-            TextButton(
-                { onConfirmation() },
-                Modifier.testTag("geoShareConfirmationDialogConfirmButton"),
-            ) {
-                Text(confirmText)
-            }
-        },
-        dismissButton = {
-            TextButton(
+    ConfirmationLayout(
+        modifier,
+        startButton = {
+            OutlinedButton(
                 { onDismissRequest() },
                 Modifier.testTag("geoShareConfirmationDialogDismissButton"),
             ) {
                 Text(dismissText)
             }
         },
-        modifier = modifier,
-    )
+        endButton = {
+            Button(
+                { onConfirmation() },
+                Modifier.testTag("geoShareConfirmationDialogConfirmButton"),
+            ) {
+                Text(confirmText)
+            }
+        },
+    ) {
+        Text(title, Modifier.padding(bottom = Spacing.small), style = MaterialTheme.typography.headlineSmall)
+        content()
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        ConfirmationDialog(
-            title = "My title",
-            confirmText = "Confirm",
-            dismissText = "Dismiss",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+        Surface {
+            ConfirmationDialog(
+                title = "My title",
+                confirmText = "Confirm",
+                dismissText = "Dismiss",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+            }
         }
     }
 }
@@ -66,14 +68,16 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        ConfirmationDialog(
-            title = "My title",
-            confirmText = "Confirm",
-            dismissText = "Dismiss",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+        Surface {
+            ConfirmationDialog(
+                title = "My title",
+                confirmText = "Confirm",
+                dismissText = "Dismiss",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+            }
         }
     }
 }

@@ -31,7 +31,6 @@ fun ResultCard(
     position: Position,
     onCopy: () -> Unit,
     onShare: (String) -> Unit,
-    onSkip: () -> Unit,
 ) {
     Column {
         Card(
@@ -127,7 +126,6 @@ private fun DefaultPreview() {
                 position = Position(Position.Coords("50.123456", "11.123456")),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }
@@ -143,7 +141,6 @@ private fun DarkPreview() {
                 position = Position(Position.Coords("50.123456", "11.123456")),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }

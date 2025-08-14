@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import page.ooooo.geoshare.components.ConfirmationLayout
 import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.components.ResultCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
@@ -54,11 +55,22 @@ fun ConversionScreen(
         onBack = onBack,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
-        onCopy = { viewModel.copy(context, clipboard) },
-        onShare = { packageName -> viewModel.share(context, packageName) },
-        onSkip = { viewModel.skip(context) },
-        onCancel = { viewModel.cancel() },
-        onFinish = onFinish,
+        onCopy = {
+            viewModel.copy(context, clipboard)
+            onFinish()
+        },
+        onShare = { packageName ->
+            viewModel.share(context, packageName)
+            onFinish()
+        },
+        onSkip = {
+            viewModel.skip(context)
+            onFinish()
+        },
+        onCancel = {
+            viewModel.cancel()
+            onFinish()
+        },
     )
 }
 
@@ -75,7 +87,6 @@ fun ConversionScreen(
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
     onCancel: () -> Unit,
-    onFinish: () -> Unit = {},
 ) {
     val appName = stringResource(R.string.app_name)
     val context = LocalContext.current
@@ -100,33 +111,40 @@ fun ConversionScreen(
                 .padding(top = Spacing.small)
                 .consumeWindowInsets(innerPadding)
                 .imePadding()
-                .padding(horizontal = Spacing.windowPadding)
         ) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                when (currentState) {
-                    is HasResult -> {
+            when (currentState) {
+                is HasResult -> {
+                    ConfirmationLayout(
+                        startButton = {
+                            OutlinedButton(onSkip) {
+                                Text(stringResource(R.string.main_result_skip))
+                            }
+                        },
+                        endButton = {
+                            Button(onBack) {
+                                Text(stringResource(R.string.conversion_done))
+                            }
+                        },
+                    ) {
                         ResultCard(
                             queryGeoUriApps(context),
                             currentState.position,
                             onCopy,
-                            onShare = { packageName ->
-                                onShare(packageName)
-                                onFinish()
-                            },
-                            onSkip = {
-                                onSkip()
-                                onFinish()
-                            },
+                            onShare,
                         )
                     }
                 }
+            }
 
-                when (currentState) {
-                    is HasError -> {
+            when (currentState) {
+                is HasError -> {
+                    ConfirmationLayout(
+                        endButton = {
+                            Button(onBack) {
+                                Text(stringResource(R.string.conversion_done))
+                            }
+                        },
+                    ) {
                         Card(
                             Modifier.fillMaxWidth(),
                             shape = OutlinedTextFieldDefaults.shape,
@@ -146,82 +164,90 @@ fun ConversionScreen(
                         }
                     }
                 }
+            }
 
-                when (currentState) {
-                    is RequestedUnshortenPermission -> {
-                        PermissionDialog(
-                            title = stringResource(currentState.urlConverter.permissionTitleResId),
-                            confirmText = stringResource(R.string.conversion_permission_common_grant),
-                            dismissText = stringResource(R.string.conversion_permission_common_deny),
-                            onConfirmation = onGrant,
-                            onDismissRequest = onDeny,
-                            modifier = Modifier
-                                .semantics { testTagsAsResourceId = true }
-                                .testTag("geoShareUnshortenPermissionDialog"),
-                        ) {
-                            Text(
-                                AnnotatedString.fromHtml(
-                                    stringResource(
-                                        R.string.conversion_permission_common_text,
-                                        currentState.url.toString(),
-                                        appName,
-                                    )
-                                ),
-                                style = TextStyle(lineBreak = LineBreak.Paragraph),
-                            )
-                        }
-                    }
-
-                    is RequestedParseHtmlPermission -> {
-                        PermissionDialog(
-                            title = stringResource(currentState.urlConverter.permissionTitleResId),
-                            confirmText = stringResource(R.string.conversion_permission_common_grant),
-                            dismissText = stringResource(R.string.conversion_permission_common_deny),
-                            onConfirmation = onGrant,
-                            onDismissRequest = onDeny,
-                            modifier = Modifier
-                                .semantics { testTagsAsResourceId = true }
-                                .testTag("geoShareParseHtmlPermissionDialog"),
-                        ) {
-                            Text(
-                                AnnotatedString.fromHtml(
-                                    stringResource(
-                                        R.string.conversion_permission_common_text,
-                                        currentState.url.toString(),
-                                        appName,
-                                    )
-                                ),
-                                style = TextStyle(lineBreak = LineBreak.Paragraph),
-                            )
-                        }
-                    }
-
-                    is RequestedParseHtmlToGetCoordsPermission -> {
-                        PermissionDialog(
-                            title = stringResource(currentState.urlConverter.permissionTitleResId),
-                            confirmText = stringResource(R.string.conversion_permission_common_grant),
-                            dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
-                            onConfirmation = onGrant,
-                            onDismissRequest = onDeny,
-                            modifier = Modifier
-                                .semantics { testTagsAsResourceId = true }
-                                .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")) {
-                            Text(
-                                AnnotatedString.fromHtml(
-                                    stringResource(
-                                        R.string.conversion_permission_parse_html_to_get_coords_text,
-                                        truncateMiddle(currentState.url.toString()),
-                                        appName,
-                                        currentState.urlConverter.name,
-                                    )
-                                ),
-                                style = TextStyle(lineBreak = LineBreak.Paragraph),
-                            )
-                        }
+            when (currentState) {
+                is RequestedUnshortenPermission -> {
+                    PermissionDialog(
+                        title = stringResource(currentState.urlConverter.permissionTitleResId),
+                        confirmText = stringResource(R.string.conversion_permission_common_grant),
+                        dismissText = stringResource(R.string.conversion_permission_common_deny),
+                        onConfirmation = onGrant,
+                        onDismissRequest = onDeny,
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("geoShareUnshortenPermissionDialog"),
+                    ) {
+                        Text(
+                            AnnotatedString.fromHtml(
+                                stringResource(
+                                    R.string.conversion_permission_common_text,
+                                    currentState.url.toString(),
+                                    appName,
+                                )
+                            ),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
+                        )
                     }
                 }
 
-                if (loadingIndicatorTitleResId != null) {
+                is RequestedParseHtmlPermission -> {
+                    PermissionDialog(
+                        title = stringResource(currentState.urlConverter.permissionTitleResId),
+                        confirmText = stringResource(R.string.conversion_permission_common_grant),
+                        dismissText = stringResource(R.string.conversion_permission_common_deny),
+                        onConfirmation = onGrant,
+                        onDismissRequest = onDeny,
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("geoShareParseHtmlPermissionDialog"),
+                    ) {
+                        Text(
+                            AnnotatedString.fromHtml(
+                                stringResource(
+                                    R.string.conversion_permission_common_text,
+                                    currentState.url.toString(),
+                                    appName,
+                                )
+                            ),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
+                        )
+                    }
+                }
+
+                is RequestedParseHtmlToGetCoordsPermission -> {
+                    PermissionDialog(
+                        title = stringResource(currentState.urlConverter.permissionTitleResId),
+                        confirmText = stringResource(R.string.conversion_permission_common_grant),
+                        dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
+                        onConfirmation = onGrant,
+                        onDismissRequest = onDeny,
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")) {
+                        Text(
+                            AnnotatedString.fromHtml(
+                                stringResource(
+                                    R.string.conversion_permission_parse_html_to_get_coords_text,
+                                    truncateMiddle(currentState.url.toString()),
+                                    appName,
+                                    currentState.urlConverter.name,
+                                )
+                            ),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
+                        )
+                    }
+                }
+            }
+
+            if (loadingIndicatorTitleResId != null) {
+                ConfirmationLayout(
+                    startButton = {
+                        OutlinedButton(onCancel) {
+                            Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                        }
+                    },
+                ) {
                     LoadingIndicator(
                         Modifier
                             .align(Alignment.CenterHorizontally)
@@ -233,28 +259,6 @@ fun ConversionScreen(
                         Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                     )
-                }
-            }
-
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = Spacing.tiny),
-            ) {
-                if (loadingIndicatorTitleResId != null) {
-                    OutlinedButton(onCancel) {
-                        Text(stringResource(R.string.conversion_loading_indicator_cancel))
-                    }
-                } else {
-                    if (currentState is HasResult) {
-                        OutlinedButton(onSkip) {
-                            Text(stringResource(R.string.main_result_skip))
-                        }
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Button(onBack) {
-                        Text(stringResource(R.string.conversion_done))
-                    }
                 }
             }
         }

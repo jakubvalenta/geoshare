@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -71,22 +72,24 @@ private fun DefaultPreview() {
         val appName = stringResource(R.string.app_name)
         val url =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        PermissionDialog(
-            title = "Connect to Google?",
-            confirmText = "Allow",
-            dismissText = "Create a search geo: link",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(
-                AnnotatedString.fromHtml(
-                    "The link <tt>%s</tt>  doesn't contain coordinates. %s can connect to Google to get them, or it can create a geo: link with a search term instead.".format(
-                        truncateMiddle(url),
-                        appName
-                    )
-                ),
-                style = TextStyle(lineBreak = LineBreak.Paragraph),
-            )
+        Surface {
+            PermissionDialog(
+                title = "Connect to Google?",
+                confirmText = "Allow",
+                dismissText = "Create a search geo: link",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        "The link <tt>%s</tt>  doesn't contain coordinates. %s can connect to Google to get them, or it can create a geo: link with a search term instead.".format(
+                            truncateMiddle(url),
+                            appName
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
         }
     }
 }
@@ -98,22 +101,24 @@ private fun DarkPreview() {
         val appName = stringResource(R.string.app_name)
         val url =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        PermissionDialog(
-            title = "Connect to Google?",
-            confirmText = "Allow",
-            dismissText = "Create a search geo: link",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(
-                AnnotatedString.fromHtml(
-                    "The link <tt>%s</tt> doesn't contain coordinates. %s can connect to Google to get them, or it can create a geo: link with a search term instead.".format(
-                        truncateMiddle(url),
-                        appName
-                    )
-                ),
-                style = TextStyle(lineBreak = LineBreak.Paragraph),
-            )
+        Surface {
+            PermissionDialog(
+                title = "Connect to Google?",
+                confirmText = "Allow",
+                dismissText = "Create a search geo: link",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        "The link <tt>%s</tt> doesn't contain coordinates. %s can connect to Google to get them, or it can create a geo: link with a search term instead.".format(
+                            truncateMiddle(url),
+                            appName
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
         }
     }
 }
@@ -124,22 +129,24 @@ private fun ParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
         val url = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        PermissionDialog(
-            title = "Connect to Google?",
-            confirmText = "Allow",
-            dismissText = "Quit",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(
-                AnnotatedString.fromHtml(
-                    "The link <tt>%s</tt> doesn't contain coordinates or place name. %s must connect to Google to get the information.".format(
-                        truncateMiddle(url),
-                        appName
-                    )
-                ),
-                style = TextStyle(lineBreak = LineBreak.Paragraph),
-            )
+        Surface {
+            PermissionDialog(
+                title = "Connect to Google?",
+                confirmText = "Allow",
+                dismissText = "Quit",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        "The link <tt>%s</tt> doesn't contain coordinates or place name. %s must connect to Google to get the information.".format(
+                            truncateMiddle(url),
+                            appName
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
         }
     }
 }
@@ -150,22 +157,24 @@ private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
         val url = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        PermissionDialog(
-            title = "Connect to Google?",
-            confirmText = "Allow",
-            dismissText = "Quit",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(
-                AnnotatedString.fromHtml(
-                    "The link <tt>%s</tt> doesn't contain coordinates or place name. %s must connect to Google to get the information.".format(
-                        truncateMiddle(url),
-                        appName
-                    )
-                ),
-                style = TextStyle(lineBreak = LineBreak.Paragraph),
-            )
+        Surface {
+            PermissionDialog(
+                title = "Connect to Google?",
+                confirmText = "Allow",
+                dismissText = "Quit",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        "The link <tt>%s</tt> doesn't contain coordinates or place name. %s must connect to Google to get the information.".format(
+                            truncateMiddle(url),
+                            appName
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
         }
     }
 }
