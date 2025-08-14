@@ -36,7 +36,7 @@ fun MainScreen(
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     MainScreen(
-        inputUriString = viewModel.inputUri,
+        inputUriString = viewModel.inputUriString,
         onUpdateInput = { viewModel.updateInput(it) },
         onStart = { viewModel.start() },
         onNavigateToConversionScreen = onNavigateToConversionScreen,

@@ -26,7 +26,7 @@ class IntentTools {
 
     fun getIntentPosition(intent: Intent): Position? =
         intent.data.takeIf { it != null && intent.action == Intent.ACTION_VIEW && intent.scheme == "geo" }?.let {
-            Position.fromGeoUri(it)
+            Position.fromGeoUriString(it.toString())
         }
 
     fun getIntentUriString(intent: Intent): String? {

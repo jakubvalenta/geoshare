@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib
 
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
 import page.ooooo.geoshare.R
@@ -13,7 +12,6 @@ import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
-import kotlin.toString
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -41,7 +39,7 @@ data class ReceivedIntent(
     override suspend fun transition(): State {
         val position = stateContext.intentTools.getIntentPosition(intent)
         if (position != null) {
-            return ConversionSucceeded(intent.data.toString(), position) // FIXME
+            return ConversionSucceeded(intent.data.toString(), position)
         }
         val inputUriString = stateContext.intentTools.getIntentUriString(intent) ?: return ConversionFailed(
             R.string.conversion_failed_missing_url
@@ -50,17 +48,17 @@ data class ReceivedIntent(
     }
 }
 
-data class ReceivedUri(
+data class ReceivedUriString(
     val stateContext: ConversionStateContext,
-    val uri: Uri,
+    val inputUriString: String,
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val position = Position.fromGeoUri(uri, uriQuote)
+        val position = Position.fromGeoUriString(inputUriString, uriQuote)
         if (position != null) {
-            return ConversionSucceeded(uri.toString(), position)
+            return ConversionSucceeded(inputUriString, position)
         }
-        return ReceivedUrlString(stateContext, uri.toString(), null)
+        return ReceivedUrlString(stateContext, inputUriString, null)
     }
 }
 

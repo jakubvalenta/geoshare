@@ -70,9 +70,9 @@ class ConversionViewModel @Inject constructor(
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
 
-    var inputUri by SavableDelegate(
+    var inputUriString by SavableDelegate(
         savedStateHandle,
-        "inputUri",
+        "inputUriString",
         "",
     )
 
@@ -100,7 +100,7 @@ class ConversionViewModel @Inject constructor(
     )
 
     fun start() {
-        stateContext.currentState = ReceivedUri(stateContext, inputUri.toUri())
+        stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
         transition()
     }
 
@@ -146,7 +146,7 @@ class ConversionViewModel @Inject constructor(
             context.startActivity(
                 stateContext.intentTools.createViewIntent(
                     packageName,
-                    currentState.position.toGeoUri()
+                    currentState.position.toGeoUriString().toUri()
                 )
             )
         }
@@ -165,7 +165,11 @@ class ConversionViewModel @Inject constructor(
         assert(stateContext.currentState is HasResult)
         viewModelScope.launch {
             (stateContext.currentState as HasResult).let { currentState ->
-                stateContext.clipboardTools.setPlainText(clipboard, "geo: URI", currentState.position.toGeoUriString())
+                stateContext.clipboardTools.setPlainText(
+                    clipboard,
+                    "geo: URI",
+                    currentState.position.toGeoUriString(),
+                )
                 val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
                 if (!systemHasClipboardEditor) {
                     Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
@@ -187,7 +191,7 @@ class ConversionViewModel @Inject constructor(
 
     fun updateInput(newUriString: String) {
         withMutableSnapshot {
-            inputUri = newUriString
+            inputUriString = newUriString
         }
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()

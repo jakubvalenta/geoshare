@@ -36,20 +36,6 @@ class ConversionStateTest {
     private lateinit var mockXiaomiTools: XiaomiTools
     private lateinit var fakeUserPreferencesRepository: UserPreferencesRepository
 
-    private fun createMockUri(uriString: String): Uri {
-        val mockUri = Mockito.mock(Uri::class.java)
-        val schemeAndRest = uriString.split(":", limit = 2)
-        val scheme = schemeAndRest[0]
-        val authorityAndQuery = schemeAndRest.getOrNull(1)?.split("?", limit = 2)
-        val authority = authorityAndQuery?.get(0)
-        val query = authorityAndQuery?.getOrNull(1)
-        Mockito.`when`(mockUri.scheme).thenReturn(scheme)
-        Mockito.`when`(mockUri.authority).thenReturn(authority)
-        Mockito.`when`(mockUri.query).thenReturn(query)
-        Mockito.`when`(mockUri.toString()).thenReturn(uriString)
-        return mockUri
-    }
-
     @Before
     fun before() = runTest {
         fakeLog = FakeLog()
@@ -97,7 +83,8 @@ class ConversionStateTest {
     @Test
     fun receivedIntent_intentContainsGeoUri_returnsSucceeded() = runTest {
         val inputUriString = "geo:1,2?q=fromIntent"
-        val mockUri = createMockUri(inputUriString)
+        val mockUri = Mockito.mock(Uri::class.java)
+        Mockito.`when`(mockUri.toString()).thenReturn(inputUriString)
         val mockIntent = Mockito.mock(Intent::class.java)
         Mockito.`when`(mockIntent.data).thenReturn(mockUri)
         val position = Position("1", "2", q = "fromIntent")
@@ -164,7 +151,6 @@ class ConversionStateTest {
     @Test
     fun receivedUri_isGeoUri_returnsSucceeded() = runTest {
         val inputUriString = "geo:1,2?q="
-        val mockUri = createMockUri(inputUriString)
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -173,7 +159,7 @@ class ConversionStateTest {
             mockXiaomiTools,
             log = fakeLog,
         )
-        val state = ReceivedUri(stateContext, mockUri, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ConversionSucceeded(inputUriString, Position("1", "2", q = "")),
             state.transition(),
@@ -183,7 +169,6 @@ class ConversionStateTest {
     @Test
     fun receivedUri_isNotGeoUri_returnsReceivedUrlStringWithPermissionNull() = runTest {
         val inputUriString = "https://www.example.com/"
-        val mockUri = createMockUri(inputUriString)
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -192,7 +177,7 @@ class ConversionStateTest {
             mockXiaomiTools,
             log = fakeLog,
         )
-        val state = ReceivedUri(stateContext, mockUri, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ReceivedUrlString(stateContext, inputUriString, null),
             state.transition(),
@@ -202,8 +187,6 @@ class ConversionStateTest {
     @Test
     fun receivedUri_isMissingScheme_returnsReceivedUrlStringWithPermissionNull() = runTest {
         val inputUriString = "www.example.com"
-        val mockUri = createMockUri(inputUriString)
-        Mockito.`when`(mockUri.scheme).thenReturn(null)
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -212,7 +195,7 @@ class ConversionStateTest {
             mockXiaomiTools,
             log = fakeLog,
         )
-        val state = ReceivedUri(stateContext, mockUri, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ReceivedUrlString(stateContext, inputUriString, null),
             state.transition(),
