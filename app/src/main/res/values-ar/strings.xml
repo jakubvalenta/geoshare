@@ -9,7 +9,7 @@
     <string name="faq_item_expand">توسيع القسم</string>
     <string name="copying_finished">نُسخ الإحداثيات إلى الحافظة</string>
     <string name="conversion_failed_connection_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بخدمة الخرائط</string>
-    <string name="main_result_geo_uri_copy">انسخ geo:</string>
+    <string name="conversion_succeeded_copy_geo">انسخ geo:</string>
     <string name="share_activity">افتح</string>
     <string name="nav_menu_content_description">القائمة</string>
     <string name="nav_back_content_description">العودة إلى الشاشة الرئيسية</string>
@@ -37,7 +37,7 @@
     <string name="main_input_uri_label">ألصق رابط خرائط هنا</string>
     <string name="main_input_uri_clear_content_description">مسح</string>
     <string name="main_input_uri_supporting_text">مثال: https://maps.app.goo.gl/… أو maps.apple.com/…</string>
-    <string name="main_result_geo_uri_copy_content_description">نسخ</string>
+    <string name="conversion_succeeded_copy_content_description">نسخ</string>
     <string name="main_result_geo_uri_share_content_description">مشاركة</string>
     <string name="main_create_geo_uri">أظهر الإحداثيات</string>
     <string name="main_navigate_to_intro">اكتشف المزيد من ميزات التطبيق</string>
@@ -73,7 +73,7 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">فشل في فتح إعدادات الأذونات</string>
     <string name="sharing_failed_xiaomi_permission_denied">لا يمكن فتح تطبيق خرائط آخر بدون إذن</string>
     <string name="sharing_succeeded">فُتح تطبيق خرائط آخر</string>
-    <string name="sharing_failed_activity_not_found">لم يتم تثبيت تطبيق الخرائط</string>
+    <string name="conversion_succeeded_apps_not_found">لم يتم تثبيت تطبيق الخرائط</string>
     <string name="conversion_failed_parse_html_error">فشل جلب صفحة الويب من خدمة الخرائط</string>
     <string name="main_info_box"><![CDATA[%1s يدعم العديد من أنواع روابط خرائط جوجل وخرائط Apple. إذا وجدت رابطًا لا يزال لا يعمل، فيُرجى <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">الإبلاغ عن مشكلة</a>.]]></string>
     <string name="intro_how_to_share_google_maps_screenshot_title">مشاركة مع</string>

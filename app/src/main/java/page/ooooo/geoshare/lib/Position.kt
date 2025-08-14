@@ -63,5 +63,4 @@ data class Position(
     fun toDegString(): String = "${lat ?: 0}, ${lon ?: 0}"
 
     fun toGeoUri(uriQuote: UriQuote = DefaultUriQuote()): Uri = toGeoUriString(uriQuote).toUri()
-
 }

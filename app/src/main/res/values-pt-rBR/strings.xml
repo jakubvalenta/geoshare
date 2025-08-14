@@ -3,7 +3,7 @@
     <string name="intro_open_by_default_app_note"><![CDATA[Selecione pelo menos <tt>maps.google.com</tt> e <tt>maps.app.goo.gl</tt>. Se alguns links não podem ser selecionados, significa que outros apps do Google estão configurados para abri-los por padrão. Você pode desativar a abertura de links neles, como fizemos para o Google Maps.]]></string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Selecione <i>%1$s</i> e o %2$s permitirá que você abra a mesma localização em qualquer app de mapa instalado.]]></string>
-    <string name="main_result_geo_uri_copy">Copiar geo:</string>
+    <string name="conversion_succeeded_copy_geo">Copiar geo:</string>
     <string name="share_activity">Abrir</string>
     <string name="intro_title">Introdução</string>
     <string name="intro_how_to_share_headline">Como mostrar uma localização no mapa em outro app</string>
@@ -28,7 +28,7 @@
     <string name="main_input_uri_label">Cole um link de mapa aqui</string>
     <string name="main_input_uri_clear_content_description">Limpar</string>
     <string name="main_input_uri_supporting_text">ex: https://maps.app.goo.gl/… ou maps.apple.com/…</string>
-    <string name="main_result_geo_uri_copy_content_description">Copiar</string>
+    <string name="conversion_succeeded_copy_content_description">Copiar</string>
     <string name="main_result_geo_uri_share_content_description">Compartilhar</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="main_navigate_to_intro">Conheça mais recursos do app</string>
@@ -65,7 +65,7 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Falha ao abrir as configurações de permissão</string>
     <string name="sharing_failed_xiaomi_permission_denied">Não é possível abrir outro app de mapa sem permissão</string>
     <string name="sharing_succeeded">App de mapa alternativo foi aberto</string>
-    <string name="sharing_failed_activity_not_found">Nenhum app de mapa está instalado</string>
+    <string name="conversion_succeeded_apps_not_found">Nenhum app de mapa está instalado</string>
     <string name="copying_finished">Coordenadas copiadas para a área de transferência</string>
     <string name="conversion_failed_connection_permission_denied">O link não é suportado sem se conectar ao Google</string>
     <string name="conversion_failed_parse_html_error">Falha ao solicitar a página web do serviço de mapas</string>

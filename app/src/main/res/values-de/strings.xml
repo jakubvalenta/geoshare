@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="main_result_geo_uri_copy">geo: kopieren</string>
+    <string name="conversion_succeeded_copy_geo">geo: kopieren</string>
     <string name="share_activity">geo: teilen</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="intro_how_to_share_google_maps_content_description">Bildschirmfoto von Google Maps share Sheet</string>
@@ -16,7 +16,7 @@
     <string name="intro_nav_next">Weiter</string>
     <string name="main_input_uri_clear_content_description">Löschen</string>
     <string name="main_input_uri_supporting_text">z.B. https://google.com/maps/… oder maps.app.goo.gl/…</string>
-    <string name="main_result_geo_uri_copy_content_description">Kopieren</string>
+    <string name="conversion_succeeded_copy_content_description">Kopieren</string>
     <string name="main_result_geo_uri_share_content_description">Teilen</string>
     <string name="main_create_geo_uri">Erstelle geo: link</string>
     <string name="main_navigate_to_intro">Entdecke die Funktionen der App</string>

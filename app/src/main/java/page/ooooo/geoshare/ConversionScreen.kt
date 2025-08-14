@@ -96,7 +96,7 @@ fun ConversionScreen(
     when (currentState) {
         is HasResult -> {
             ConfirmationScaffold(
-                title = "Your coordinates", // TODO
+                title = stringResource(R.string.conversion_succeeded_title),
                 navigationIcon = {
                     IconButton(onClick = { onBack() }) {
                         Icon(
@@ -125,7 +125,7 @@ fun ConversionScreen(
     when (currentState) {
         is HasError -> {
             ConfirmationScaffold(
-                title = "Error", // TODO
+                title = stringResource(R.string.conversion_error_title),
                 navigationIcon = {
                     IconButton(onClick = { onBack() }) {
                         Icon(

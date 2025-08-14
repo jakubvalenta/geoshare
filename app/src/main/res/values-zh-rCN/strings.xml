@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="main_result_geo_uri_copy">复制 geo:</string>
+    <string name="conversion_succeeded_copy_geo">复制 geo:</string>
     <string name="share_activity">打开</string>
     <string name="nav_menu_content_description">菜单</string>
     <string name="nav_back_content_description">返回主屏幕</string>
@@ -23,7 +23,7 @@
     <string name="intro_nav_finish">开始</string>
     <string name="main_input_uri_label">在此处粘贴地图链接</string>
     <string name="main_input_uri_clear_content_description">清除</string>
-    <string name="main_result_geo_uri_copy_content_description">复制</string>
+    <string name="conversion_succeeded_copy_content_description">复制</string>
     <string name="main_result_geo_uri_share_content_description">分享</string>
     <string name="main_navigate_to_intro">发现更多应用功能</string>
     <string name="converter_google_maps_permission_title">连接到 Google？</string>
@@ -58,7 +58,7 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">无法打开权限设置</string>
     <string name="sharing_failed_xiaomi_permission_denied">没有权限就无法打开其他地图应用</string>
     <string name="sharing_succeeded">已打开其他地图应用</string>
-    <string name="sharing_failed_activity_not_found">未安装地图应用</string>
+    <string name="conversion_succeeded_apps_not_found">未安装地图应用</string>
     <string name="copying_finished">已将坐标复制到剪贴板</string>
     <string name="conversion_failed_connection_permission_denied">如果不连接到 Google，就不支持此链接</string>
     <string name="conversion_failed_parse_html_error">无法从地图服务获取网页</string>

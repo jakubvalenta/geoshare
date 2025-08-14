@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="main_result_geo_uri_copy">Copier geo:</string>
+    <string name="conversion_succeeded_copy_geo">Copier geo:</string>
     <string name="share_activity">Ouvrir</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Retour à l’écran principal</string>
@@ -29,7 +29,7 @@
     <string name="intro_settings_activity_not_found">Échec de l’ouverture des paramètres</string>
     <string name="main_input_uri_clear_content_description">Effacer</string>
     <string name="main_input_uri_supporting_text">par ex. https://maps.app.goo.gl/… ou maps.apple.com/…</string>
-    <string name="main_result_geo_uri_copy_content_description">Copier</string>
+    <string name="conversion_succeeded_copy_content_description">Copier</string>
     <string name="main_result_geo_uri_share_content_description">Partager</string>
     <string name="main_create_geo_uri">Afficher les coordonnées</string>
     <string name="converter_google_maps_permission_title">Se connecter à Google ?</string>
@@ -67,7 +67,7 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Échec de l’ouverture des paramètres d’autorisation</string>
     <string name="sharing_failed_xiaomi_permission_denied">Impossible d’ouvrir une autre application cartographique sans autorisation</string>
     <string name="sharing_succeeded">Ouvert une autre application cartographique</string>
-    <string name="sharing_failed_activity_not_found">Aucune application cartographique n’est installée</string>
+    <string name="conversion_succeeded_apps_not_found">Aucune application cartographique n’est installée</string>
     <string name="copying_finished">Copié coordonnées dans le presse-papiers</string>
     <string name="conversion_failed_connection_permission_denied">Ce lien n’est pas pris en charge sans connexion au service de cartographie</string>
     <string name="conversion_failed_parse_html_error">Échec de la récupération de la page web du service de cartographie</string>

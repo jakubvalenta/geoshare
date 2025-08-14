@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="main_result_geo_uri_copy">Kopírovat geo:</string>
+    <string name="conversion_succeeded_copy_geo">Kopírovat geo:</string>
     <string name="share_activity">Otevřít</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_title">Intro</string>
@@ -29,7 +29,7 @@
     <string name="main_input_uri_label">Sem vložte odkaz na mapu</string>
     <string name="main_input_uri_clear_content_description">Vymazat</string>
     <string name="main_input_uri_supporting_text">Např. https://maps.app.goo.gl/… nebo maps.apple.com/…</string>
-    <string name="main_result_geo_uri_copy_content_description">Kopírovat</string>
+    <string name="conversion_succeeded_copy_content_description">Kopírovat</string>
     <string name="main_result_geo_uri_share_content_description">Sdílet</string>
     <string name="main_create_geo_uri">Zobrazit souřadnice</string>
     <string name="main_navigate_to_intro">Objevte další funkce aplikace</string>
@@ -72,7 +72,7 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Nepodařilo se otevřít nastavení oprávnění</string>
     <string name="sharing_failed_xiaomi_permission_denied">Bez oprávnění nelze otevřít jinou mapovou aplikaci</string>
     <string name="sharing_succeeded">Jiná mapová aplikace byla otevřena</string>
-    <string name="sharing_failed_activity_not_found">Není nainstalovaná žádná mapová aplikace</string>
+    <string name="conversion_succeeded_apps_not_found">Není nainstalovaná žádná mapová aplikace</string>
     <string name="copying_finished">Souřadnice byly zkopírovány do schránky</string>
     <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
     <string name="conversion_failed_parse_html_error">Nepodařilo se stáhnout webovou stránku mapové služky</string>

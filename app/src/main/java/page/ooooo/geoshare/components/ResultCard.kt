@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,7 +64,7 @@ fun ResultCard(
                 IconButton({ onCopy() }) {
                     Icon(
                         painterResource(R.drawable.content_copy_24px),
-                        contentDescription = stringResource(R.string.main_result_geo_uri_copy_content_description)
+                        contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
                     )
                 }
             }
@@ -77,45 +78,52 @@ fun ResultCard(
             SuggestionChip(
                 onClick = { onCopy() },
                 label = {
-                    Text(stringResource(R.string.main_result_geo_uri_copy))
+                    Text(stringResource(R.string.conversion_succeeded_copy_geo))
                 },
             )
         }
 
         Text(
-            "Open with", // TODO
+            stringResource(R.string.conversion_succeeded_apps_headline),
             Modifier.padding(top = Spacing.medium, bottom = Spacing.small),
             style = MaterialTheme.typography.bodyLarge,
         )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
-        ) {
-            geoUriApps.map {
-                item(it.packageName) {
-                    Column(
-                        Modifier
-                            .clickable { onShare(it.packageName) }
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
-                        Image(
-                            rememberDrawablePainter(it.icon),
-                            it.label,
+        if (geoUriApps.isNotEmpty()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+            ) {
+                geoUriApps.map {
+                    item(it.packageName) {
+                        Column(
                             Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .widthIn(max = 64.dp),
-                        )
-                        Text(
-                            it.label,
-                            Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
+                                .clickable { onShare(it.packageName) }
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                            Image(
+                                rememberDrawablePainter(it.icon),
+                                it.label,
+                                Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .widthIn(max = 48.dp),
+                            )
+                            Text(
+                                it.label,
+                                Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                 }
             }
-            // TODO Add no apps installed message.
+        } else {
+            Text(
+                stringResource(R.string.conversion_succeeded_apps_not_found),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontStyle = FontStyle.Italic,
+            )
         }
         Row(
             Modifier
@@ -126,7 +134,7 @@ fun ResultCard(
             SuggestionChip(
                 onClick = { onSkip() },
                 label = {
-                    Text(stringResource(R.string.main_result_skip))
+                    Text(stringResource(R.string.conversion_succeeded_skip))
                 },
             )
         }
@@ -144,7 +152,7 @@ private fun DefaultPreview() {
                     ConversionViewModel.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
-                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
                 position = Position("50.123456", "11.123456"),
@@ -170,6 +178,38 @@ private fun DarkPreview() {
                         icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
                     ),
                 ),
+                position = Position("50.123456", "11.123456"),
+                onCopy = {},
+                onShare = {},
+                onSkip = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NoAppsPreview() {
+    AppTheme {
+        Surface {
+            ResultCard(
+                geoUriApps = listOf(),
+                position = Position("50.123456", "11.123456"),
+                onCopy = {},
+                onShare = {},
+                onSkip = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNoAppsPreview() {
+    AppTheme {
+        Surface {
+            ResultCard(
+                geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onShare = {},

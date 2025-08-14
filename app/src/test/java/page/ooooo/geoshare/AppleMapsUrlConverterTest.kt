@@ -18,7 +18,6 @@ import java.net.URL
 class AppleMapsUrlConverterTest {
 
     private lateinit var appleMapsUrlConverter: AppleMapsUrlConverter
-    private val uriQuote = FakeUriQuote()
 
     @Before
     fun before() {

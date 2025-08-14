@@ -27,7 +27,7 @@
     <string name="about_title">Info su</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="faq_how_it_works_headline">Come funziona e considerazioni sulla privacy</string>
-    <string name="main_result_geo_uri_copy_content_description">Copia</string>
+    <string name="conversion_succeeded_copy_content_description">Copia</string>
     <string name="user_preferences_connection_title">Consenti la connessione a Google?</string>
     <string name="faq_gmaps_wv_headline">Compatibilità con l’app GMaps WV</string>
     <string name="user_preferences_connection_option_always">Si</string>
@@ -39,10 +39,10 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Impossibile aprire le impostazioni dei permessi</string>
     <string name="conversion_failed_unshorten_error">Impossibile risolvere il collegamento abbreviato</string>
     <string name="copying_finished">Link geo: copiato</string>
-    <string name="sharing_failed_activity_not_found">Nessuna app in grado di aprire link geo: installata</string>
+    <string name="conversion_succeeded_apps_not_found">Nessuna app in grado di aprire link geo: installata</string>
     <string name="conversion_failed_parse_html_error">Impossibile recuperare la pagina di Google Maps</string>
     <string name="conversion_failed_connection_permission_denied">Questo link non è supportato senza collegarsi a Google</string>
-    <string name="main_result_geo_uri_copy">Copia geo:</string>
+    <string name="conversion_succeeded_copy_geo">Copia geo:</string>
     <string name="share_activity">Condividi geo:</string>
     <string name="main_result_geo_uri_share_content_description">Condividi</string>
     <string name="intro_how_to_share_google_maps_caption">Condividi una posizione dall’applicazione Google Maps o dal browser web.</string>

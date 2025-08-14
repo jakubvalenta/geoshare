@@ -14,12 +14,12 @@
     <string name="main_input_uri_label">Поставете връзка към картата тук</string>
     <string name="main_input_uri_clear_content_description">Изчисти</string>
     <string name="main_result_geo_uri_share_content_description">Споделяне</string>
-    <string name="main_result_geo_uri_copy_content_description">Копиране</string>
+    <string name="conversion_succeeded_copy_content_description">Копиране</string>
     <string name="main_create_geo_uri">Показване на координати</string>
     <string name="converter_google_maps_permission_title">Свързване с Google?</string>
     <string name="conversion_permission_common_grant">Добре</string>
     <string name="intro_geo_links_copy_caption"><![CDATA[Изберете <i>%1$s</i>, когато споделяте местоположение от приложението си за карти.]]></string>
-    <string name="main_result_geo_uri_copy">Копиране на гео:</string>
+    <string name="conversion_succeeded_copy_geo">Копиране на гео:</string>
     <string name="intro_how_to_share_headline">Как да покажа местоположение на картата в друго приложение за карти</string>
     <string name="share_activity">Отвори</string>
     <string name="nav_back_content_description">Връщане към основния екран</string>
@@ -53,7 +53,7 @@
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Неуспешно отваряне на настройките за разрешение</string>
     <string name="sharing_failed_xiaomi_permission_denied">Не може да се отвори друго приложение за карти без разрешение</string>
     <string name="sharing_succeeded">Отваряне на друго приложение за карти</string>
-    <string name="sharing_failed_activity_not_found">Не е инсталирано приложение за карти</string>
+    <string name="conversion_succeeded_apps_not_found">Не е инсталирано приложение за карти</string>
     <string name="copying_finished">Координатите са копирани в клипборда</string>
     <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s може да се свърже с Google, за да ги получи, или вместо това може да създаде гео: връзка, водеща до търсене по име на място.]]></string>
     <string name="conversion_permission_xiaomi_deny">Отхвърляне</string>

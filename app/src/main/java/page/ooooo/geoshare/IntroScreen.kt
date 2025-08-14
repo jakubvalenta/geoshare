@@ -159,7 +159,7 @@ fun IntroScreen(
                         IntroFigure(
                             stringResource(
                                 R.string.intro_geo_links_copy_caption,
-                                stringResource(R.string.main_result_geo_uri_copy),
+                                stringResource(R.string.conversion_succeeded_copy_geo),
                             ),
                         ) {
                             ScreenshotMapAppCopy()
