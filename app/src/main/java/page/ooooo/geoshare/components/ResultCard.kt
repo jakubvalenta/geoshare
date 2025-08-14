@@ -90,7 +90,7 @@ fun ResultCard(
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
             geoUriApps.map {
                 item(it.packageName) {
