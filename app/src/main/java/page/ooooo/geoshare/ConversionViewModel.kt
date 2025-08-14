@@ -155,7 +155,9 @@ class ConversionViewModel @Inject constructor(
     fun skip(context: Context) {
         assert(stateContext.currentState is HasResult)
         (stateContext.currentState as HasResult).let { currentState ->
-            context.startActivity(stateContext.intentTools.createChooserIntent(currentState.inputUri.toUri()))
+            context.startActivity(
+                stateContext.intentTools.createChooserIntent(currentState.inputUriString.toUri())
+            )
         }
     }
 

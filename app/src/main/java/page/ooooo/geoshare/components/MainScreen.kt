@@ -60,6 +60,7 @@ fun MainScreen(
     onNavigateToAboutScreen: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
+    var errorMessageResId by remember { mutableStateOf<Int?>(null) }
     var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -125,7 +126,10 @@ fun MainScreen(
         ) {
             OutlinedTextField(
                 value = inputUriString,
-                onValueChange = { onUpdateInput(it) },
+                onValueChange = {
+                    onUpdateInput(it)
+                    errorMessageResId = null
+                },
                 modifier = Modifier
                     .testTag("geoShareMainInputUriStringTextField")
                     .fillMaxWidth()
@@ -135,7 +139,10 @@ fun MainScreen(
                 },
                 trailingIcon = if (inputUriString.isNotEmpty()) {
                     {
-                        IconButton({ onUpdateInput("") }) {
+                        IconButton({
+                            onUpdateInput("")
+                            errorMessageResId = null
+                        }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = stringResource(R.string.main_input_uri_clear_content_description),
@@ -146,14 +153,21 @@ fun MainScreen(
                     null
                 },
                 supportingText = {
-                    // TODO Simple validation and trimming.
-                    Text(stringResource(R.string.main_input_uri_supporting_text))
+                    Text(stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text))
                 },
+                isError = errorMessageResId != null,
             )
             Button(
                 {
-                    onStart()
-                    onNavigateToConversionScreen()
+                    if (inputUriString.isEmpty()) {
+                        // To show the user immediate feedback on this screen, do a simple validation before
+                        // starting the conversion. Else the user would see an error message only on the conversion
+                        // screen.
+                        errorMessageResId = R.string.conversion_failed_missing_url
+                    } else {
+                        onStart()
+                        onNavigateToConversionScreen()
+                    }
                 },
                 Modifier
                     .fillMaxWidth()
