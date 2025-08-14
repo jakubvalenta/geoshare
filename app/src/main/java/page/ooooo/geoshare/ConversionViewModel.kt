@@ -100,7 +100,7 @@ class ConversionViewModel @Inject constructor(
     )
 
     fun start() {
-        stateContext.currentState = ReceivedUriString(stateContext, inputUri)
+        stateContext.currentState = ReceivedUri(stateContext, inputUri.toUri())
         transition()
     }
 
