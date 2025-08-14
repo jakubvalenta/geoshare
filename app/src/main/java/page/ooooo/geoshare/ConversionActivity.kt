@@ -9,7 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
-class ShareActivity : ComponentActivity() {
+class ConversionActivity : ComponentActivity() {
 
     private val viewModel: ConversionViewModel by viewModels()
 

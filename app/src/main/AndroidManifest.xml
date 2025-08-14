@@ -20,7 +20,7 @@
             android:theme="@style/MainTheme"
             tools:targetApi="35">
         <activity
-                android:name="page.ooooo.geoshare.ShareActivity"
+                android:name="page.ooooo.geoshare.ConversionActivity"
                 android:excludeFromRecents="true"
                 android:exported="true"
                 android:theme="@style/TranslucentTheme">
