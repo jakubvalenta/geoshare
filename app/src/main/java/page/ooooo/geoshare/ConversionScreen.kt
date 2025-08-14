@@ -96,7 +96,7 @@ fun ConversionScreen(
     when (currentState) {
         is HasResult -> {
             ConfirmationScaffold(
-                title = appName,
+                title = "Your coordinates", // TODO
                 navigationIcon = {
                     IconButton(onClick = { onBack() }) {
                         Icon(
@@ -125,7 +125,7 @@ fun ConversionScreen(
     when (currentState) {
         is HasError -> {
             ConfirmationScaffold(
-                title = appName,
+                title = "Error", // TODO
                 navigationIcon = {
                     IconButton(onClick = { onBack() }) {
                         Icon(
@@ -247,7 +247,7 @@ fun ConversionScreen(
             LoadingIndicator(
                 Modifier
                     .align(Alignment.CenterHorizontally)
-                    .size(120.dp),
+                    .size(64.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

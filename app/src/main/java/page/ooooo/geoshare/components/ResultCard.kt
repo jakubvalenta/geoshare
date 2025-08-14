@@ -83,9 +83,9 @@ fun ResultCard(
         }
 
         Text(
-            "Open with",
+            "Open with", // TODO
             Modifier.padding(top = Spacing.medium, bottom = Spacing.small),
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.bodyLarge,
         )
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
@@ -115,6 +115,7 @@ fun ResultCard(
                     }
                 }
             }
+            // TODO Add no apps installed message.
         }
         Row(
             Modifier

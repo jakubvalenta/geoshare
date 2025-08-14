@@ -1,10 +1,10 @@
 package page.ooooo.geoshare.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import page.ooooo.geoshare.ui.theme.Spacing
@@ -14,7 +14,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun ConfirmationScaffold(
     title: String,
     modifier: Modifier = Modifier,
-    navigationIcon: (@Composable () -> Unit) = {},
+    navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
     content: @Composable (ColumnScope.() -> Unit),
@@ -22,7 +22,7 @@ fun ConfirmationScaffold(
     Scaffold(
         modifier,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(title)
                 },
