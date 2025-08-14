@@ -84,6 +84,7 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
+    implementation(libs.accompanist.drawableplainter)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.material3)

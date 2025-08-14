@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
+import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
@@ -16,7 +17,11 @@ class GoogleMapsUrlConverter(
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : UrlConverter {
     override val name = "Google Maps"
+
+    @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
+
+    @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
     val fullUrlPattern: Pattern = Pattern.compile("""^https?://((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}/.+$""")

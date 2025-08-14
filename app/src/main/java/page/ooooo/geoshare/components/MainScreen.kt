@@ -38,8 +38,9 @@ fun MainScreen(
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     MainScreen(
-        inputUriString = viewModel.inputUriString,
+        inputUriString = viewModel.inputUri,
         onUpdateInput = { viewModel.updateInput(it) },
+        onStart = { viewModel.start() },
         onNavigateToConversionScreen = onNavigateToConversionScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
@@ -53,6 +54,7 @@ fun MainScreen(
 fun MainScreen(
     inputUriString: String,
     onUpdateInput: (String) -> Unit,
+    onStart: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -132,9 +134,7 @@ fun MainScreen(
                     .fillMaxWidth()
                     .padding(top = Spacing.small),
                 label = {
-                    Text(
-                        stringResource(R.string.main_input_uri_label),
-                    )
+                    Text(stringResource(R.string.main_input_uri_label))
                 },
                 trailingIcon = if (inputUriString.isNotEmpty()) {
                     {
@@ -148,9 +148,15 @@ fun MainScreen(
                 } else {
                     null
                 },
+                supportingText = {
+                    Text(stringResource(R.string.main_input_uri_supporting_text))
+                },
             )
             Button(
-                onNavigateToConversionScreen,
+                {
+                    onStart()
+                    onNavigateToConversionScreen()
+                },
                 Modifier
                     .fillMaxWidth()
                     .padding(top = Spacing.small),
@@ -201,6 +207,7 @@ private fun DefaultPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             onUpdateInput = {},
+            onStart = {},
             onNavigateToConversionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
@@ -217,6 +224,7 @@ private fun DarkPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             onUpdateInput = {},
+            onStart = {},
             onNavigateToConversionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},

@@ -52,7 +52,6 @@
     <string name="main_input_uri_clear_content_description">Clear</string>
     <string name="main_input_uri_supporting_text">e.g. https://maps.app.goo.gl/&#8230; or maps.apple.com/&#8230;</string>
     <string name="main_result_geo_uri_copy_content_description">Copy</string>
-    <string name="main_result_geo_uri_share_content_description">Share</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_info_box"><![CDATA[%1s supports many types of Google Maps and Apple Maps links. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">report an issue</a>.]]></string>
@@ -94,9 +93,6 @@
     <string name="conversion_failed_unshorten_error">Failed to resolve short link</string>
     <string name="conversion_failed_unshorten_connection_error">Connection error when resolving short link</string>
     <string name="conversion_failed_parse_url_error">Failed to process map link</string>
-    <string name="sharing_failed_xiaomi_permission_show_editor_error">Failed to open permission settings</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Can’t open another map app without permission</string>
-    <string name="sharing_failed_activity_not_found">No map app is installed</string>
     <string name="copying_finished">Copied coordinates to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
     <string name="conversion_failed_parse_html_error">Failed to fetch web page from the map service</string>

@@ -9,7 +9,11 @@ class IntentTools {
 
     private val intentUrlRegex = Regex("https?://\\S+")
 
-    fun createChooser(data: Uri): Intent = Intent.createChooser(
+    fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
+        setPackage(packageName)
+    }
+
+    fun createChooserIntent(data: Uri): Intent = Intent.createChooser(
         Intent(Intent.ACTION_VIEW, data),
         "Choose an app",
     ).apply {
@@ -27,7 +31,7 @@ class IntentTools {
             null
         }
 
-    fun getIntentUrlString(intent: Intent): String? {
+    fun getIntentUriString(intent: Intent): String? {
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
                 val intentData: String? = intent.data?.toString()

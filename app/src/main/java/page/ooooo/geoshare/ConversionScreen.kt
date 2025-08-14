@@ -1,17 +1,12 @@
 package page.ooooo.geoshare
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,9 +23,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import page.ooooo.geoshare.components.ConfirmationDialog
 import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.components.ResultCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
@@ -41,28 +34,21 @@ import page.ooooo.geoshare.ui.theme.Spacing
 import java.net.URL
 
 @Composable
-fun ConversionScreen(intent: Intent, viewModel: ConversionViewModel, onFinish: () -> Unit = {}) {
+fun ConversionScreen(viewModel: ConversionViewModel, onFinish: () -> Unit = {}) {
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(intent) {
-        viewModel.start(intent)
-    }
+    val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
 
     ConversionScreen(
         currentState,
-        viewModel.loadingIndicatorTitleResId,
-        queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context) },
+        loadingIndicatorTitleResId,
+        queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context.packageManager) },
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
-        onDeny = { doNotAsk -> viewModel.grant(doNotAsk) },
+        onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onCopy = { viewModel.copy(context, clipboard) },
-        onShare = { settingsLauncher ->
-            viewModel.share(context, ManagedActivityResultLauncherWrapper(settingsLauncher))
-        },
-        onSkip = { settingsLauncher ->
-            viewModel.skip(context, ManagedActivityResultLauncherWrapper(settingsLauncher))
-        },
+        onShare = { packageName -> viewModel.share(context, packageName) },
+        onSkip = { viewModel.skip(context) },
         onCancel = { viewModel.cancel() },
         onFinish = onFinish,
     )
@@ -72,23 +58,18 @@ fun ConversionScreen(intent: Intent, viewModel: ConversionViewModel, onFinish: (
 @Composable
 fun ConversionScreen(
     currentState: State,
-    loadingIndicatorTitleResId: Int?,
-    queryGeoUriApps: (Context) -> List<Pair<String, Int>>,
+    @StringRes loadingIndicatorTitleResId: Int?,
+    queryGeoUriApps: (Context) -> List<ConversionViewModel.App>,
     onGrant: (Boolean) -> Unit,
     onDeny: (Boolean) -> Unit,
     onCopy: () -> Unit,
-    onShare: (ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit,
-    onSkip: (ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit,
+    onShare: (String) -> Unit,
+    onSkip: () -> Unit,
     onCancel: () -> Unit,
     onFinish: () -> Unit = {},
 ) {
     val appName = stringResource(R.string.app_name)
     val context = LocalContext.current
-    val settingsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-    ) {
-        onGrant(false)
-    }
 
     Scaffold(
         topBar = {
@@ -114,8 +95,14 @@ fun ConversionScreen(
                         queryGeoUriApps(context),
                         currentState.geoUri,
                         onCopy,
-                        onShare = { onShare(settingsLauncher) },
-                        onSkip = { onSkip(settingsLauncher) },
+                        onShare = { packageName ->
+                            onShare(packageName)
+                            onFinish()
+                        },
+                        onSkip = {
+                            onSkip()
+                            onFinish()
+                        },
                     )
                 }
             }
@@ -215,35 +202,10 @@ fun ConversionScreen(
                     }
                 }
 
-                is RequestedSharePermission -> {
-                    ConfirmationDialog(
-                        title = stringResource(R.string.conversion_permission_xiaomi_title),
-                        confirmText = stringResource(R.string.conversion_permission_xiaomi_grant),
-                        dismissText = stringResource(R.string.conversion_permission_xiaomi_deny),
-                        onConfirmation = { onGrant(false) },
-                        onDismissRequest = { onGrant(false) },
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareXiaomiPermissionDialog"),
-                    ) {
-                        Text(
-                            AnnotatedString.fromHtml(
-                                stringResource(
-                                    R.string.conversion_permission_xiaomi_text, appName
-                                )
-                            ),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
-                        )
+                is ConversionFailed -> {
+                    Button(onClick = onFinish) {
+                        Text("Finish") // TODO
                     }
-                }
-            }
-
-            when (currentState) {
-                is ConversionFailed,
-                is SharingSucceeded,
-                is SharingFailed,
-                    -> {
-                    onFinish()
                 }
             }
 
@@ -265,7 +227,7 @@ private fun DefaultPreview() {
     AppTheme {
         ConversionScreen(
             currentState = ConversionSucceeded(
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 "geo:50.123456,11.123456",
             ),
             loadingIndicatorTitleResId = null,
@@ -286,7 +248,7 @@ private fun DarkPreview() {
     AppTheme {
         ConversionScreen(
             currentState = ConversionSucceeded(
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 "geo:50.123456,11.123456",
             ),
             loadingIndicatorTitleResId = null,
@@ -314,7 +276,7 @@ private fun PermissionPreview() {
                     FakeUserPreferencesRepository(),
                     XiaomiTools(),
                 ),
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
                 URL("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
             ),
@@ -343,7 +305,7 @@ private fun DarkPermissionPreview() {
                     FakeUserPreferencesRepository(),
                     XiaomiTools(),
                 ),
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
                 URL("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
             ),
@@ -365,7 +327,6 @@ private fun ErrorPreview() {
     AppTheme {
         ConversionScreen(
             currentState = ConversionFailed(
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
                 R.string.conversion_failed_parse_url_error,
             ),
             loadingIndicatorTitleResId = null,
@@ -386,7 +347,6 @@ private fun DarkErrorPreview() {
     AppTheme {
         ConversionScreen(
             currentState = ConversionFailed(
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
                 R.string.conversion_failed_parse_url_error,
             ),
             loadingIndicatorTitleResId = null,

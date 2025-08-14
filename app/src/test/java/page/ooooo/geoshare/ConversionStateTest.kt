@@ -54,10 +54,10 @@ class ConversionStateTest {
         mockIntentTools = Mockito.mock(IntentTools::class.java)
         Mockito.`when`(mockIntentTools.getIntentGeoUri(any<Intent>()))
             .thenThrow(NotImplementedError::class.java)
-        Mockito.`when`(mockIntentTools.getIntentUrlString(any<Intent>()))
+        Mockito.`when`(mockIntentTools.getIntentUriString(any<Intent>()))
             .thenThrow(NotImplementedError::class.java)
         Mockito.`when`(
-            mockIntentTools.createChooser(
+            mockIntentTools.createChooserIntent(
                 any<Uri>(),
             )
         ).thenThrow(NotImplementedError::class.java)
@@ -112,7 +112,7 @@ class ConversionStateTest {
             )
             val state = ReceivedIntent(stateContext, intent)
             assertEquals(
-                ConversionSucceeded(null, "geo:1,2?q=fromIntent"),
+                ConversionSucceeded("geo:1,2?q=fromIntent", "geo:1,2?q=fromIntent"),
                 state.transition(),
             )
         }
@@ -122,7 +122,7 @@ class ConversionStateTest {
         val intent = Intent()
         val mockIntentTools = Mockito.mock(IntentTools::class.java)
         Mockito.`when`(mockIntentTools.getIntentGeoUri(intent)).thenReturn(null)
-        Mockito.`when`(mockIntentTools.getIntentUrlString(intent))
+        Mockito.`when`(mockIntentTools.getIntentUriString(intent))
             .thenReturn(null)
         val stateContext = ConversionStateContext(
             urlConverters,
@@ -134,7 +134,7 @@ class ConversionStateTest {
         )
         val state = ReceivedIntent(stateContext, intent)
         assertEquals(
-            ConversionFailed(null, R.string.conversion_failed_missing_url),
+            ConversionFailed(R.string.conversion_failed_missing_url),
             state.transition(),
         )
     }

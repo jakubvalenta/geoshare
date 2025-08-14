@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
+import androidx.annotation.StringRes
 import page.ooooo.geoshare.lib.GeoUriBuilder
 import java.net.URL
 import com.google.re2j.Pattern
@@ -15,7 +16,11 @@ class AppleMapsUrlConverter(
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : UrlConverter {
     override val name = "Apple Maps"
+
+    @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
+
+    @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
 
     val fullUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
