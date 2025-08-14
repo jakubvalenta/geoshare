@@ -109,7 +109,6 @@ class ConversionStateTest {
                 fakeUserPreferencesRepository,
                 mockXiaomiTools,
                 log = fakeLog,
-                onMessage = fakeOnMessage,
             )
             val state = ReceivedIntent(stateContext, intent)
             assertEquals(
@@ -132,14 +131,10 @@ class ConversionStateTest {
             fakeUserPreferencesRepository,
             mockXiaomiTools,
             log = fakeLog,
-            onMessage = fakeOnMessage,
         )
         val state = ReceivedIntent(stateContext, intent)
         assertEquals(
-            ConversionFailed(
-                stateContext,
-                R.string.conversion_failed_missing_url
-            ),
+            ConversionFailed(null, R.string.conversion_failed_missing_url),
             state.transition(),
         )
     }

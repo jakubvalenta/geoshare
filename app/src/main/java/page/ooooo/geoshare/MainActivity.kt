@@ -25,31 +25,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val context = LocalContext.current
-            val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-            val message by viewModel.message.collectAsStateWithLifecycle()
-
             AppTheme {
                 MainNavigation(viewModel)
-            }
-
-            LaunchedEffect(message) {
-                if (message != null) {
-                    if (currentState !is SharingSucceeded && currentState !is ConversionFailed) {
-                        (message as Message).let {
-                            Toast.makeText(
-                                context,
-                                it.resId,
-                                if (it.type == Message.Type.SUCCESS) {
-                                    Toast.LENGTH_SHORT
-                                } else {
-                                    Toast.LENGTH_LONG
-                                },
-                            ).show()
-                        }
-                    }
-                    viewModel.dismissMessage()
-                }
             }
         }
     }

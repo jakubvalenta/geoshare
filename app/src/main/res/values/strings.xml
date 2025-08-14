@@ -96,7 +96,6 @@
     <string name="conversion_failed_parse_url_error">Failed to process map link</string>
     <string name="sharing_failed_xiaomi_permission_show_editor_error">Failed to open permission settings</string>
     <string name="sharing_failed_xiaomi_permission_denied">Can’t open another map app without permission</string>
-    <string name="sharing_succeeded">Opened another map app</string>
     <string name="sharing_failed_activity_not_found">No map app is installed</string>
     <string name="copying_finished">Copied coordinates to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>

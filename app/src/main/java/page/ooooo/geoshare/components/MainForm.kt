@@ -152,14 +152,14 @@ fun MainForm(
                 Row(
                     Modifier.padding(Spacing.small),
                     horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-                    verticalAlignment = Alignment.Companion.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(painterResource(R.drawable.lightbulb_24px), null)
                     Text(
-                        AnnotatedString.Companion.fromHtml(
+                        AnnotatedString.fromHtml(
                             stringResource(R.string.main_info_box, appName),
                             linkStyles = TextLinkStyles(
-                                SpanStyle(textDecoration = TextDecoration.Companion.Underline)
+                                SpanStyle(textDecoration = TextDecoration.Underline)
                             ),
                         ),
                         style = MaterialTheme.typography.bodySmall,
