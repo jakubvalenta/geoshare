@@ -8,12 +8,13 @@ plugins {
 
 android {
     namespace = "page.ooooo.geoshare"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "page.ooooo.geoshare"
         minSdk = 25
-        targetSdk = 35
+        // noinspection EditedTargetSdkVersion
+        targetSdk = 36
         versionCode = 18
         versionName = "4.0.0"
 
