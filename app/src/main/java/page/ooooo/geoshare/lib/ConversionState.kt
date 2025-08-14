@@ -19,12 +19,17 @@ import java.net.MalformedURLException
 import java.net.URL
 
 open class ConversionState : State {
+    interface LoadingIndicator {
+        val urlConverter: UrlConverter
+    }
+
+    interface Result {
+        val geoUri: String
+        val errorMessageResId: Int?
+    }
+
     override suspend fun transition(): State? = null
 }
-
-open class ConversionStateWithLoadingIndicator(
-    open val urlConverter: UrlConverter,
-) : ConversionState()
 
 class Initial : ConversionState()
 
@@ -124,7 +129,7 @@ data class GrantedUnshortenPermission(
     val intentData: Uri?,
     override val urlConverter: UrlConverter,
     val url: URL,
-) : ConversionStateWithLoadingIndicator(urlConverter) {
+) : ConversionState(), ConversionState.LoadingIndicator {
     override suspend fun transition(): State {
         val header = try {
             stateContext.networkTools.requestLocationHeader(url)
@@ -159,8 +164,7 @@ data class UnshortenedUrl(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val parseUrlResult = urlConverter.parseUrl(url)
-        return when (parseUrlResult) {
+        return when (val parseUrlResult = urlConverter.parseUrl(url)) {
             is ParseUrlResult.Parsed -> ConversionSucceeded(
                 intentData,
                 parseUrlResult.geoUriBuilder.toString(),
@@ -228,7 +232,7 @@ data class GrantedParseHtmlPermission(
     val intentData: Uri?,
     override val urlConverter: UrlConverter,
     val url: URL,
-) : ConversionStateWithLoadingIndicator(urlConverter) {
+) : ConversionState(), ConversionState.LoadingIndicator {
     override suspend fun transition(): State {
         val html = try {
             stateContext.networkTools.getText(url)
@@ -241,8 +245,7 @@ data class GrantedParseHtmlPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
         }
-        val parseHtmlResult = urlConverter.parseHtml(html)
-        return when (parseHtmlResult) {
+        return when (val parseHtmlResult = urlConverter.parseHtml(html)) {
             is ParseHtmlResult.Parsed -> ConversionSucceeded(intentData, parseHtmlResult.geoUriBuilder.toString())
             is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, intentData, parseHtmlResult.url, Permission.ALWAYS)
             null -> return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
@@ -278,7 +281,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
     override val urlConverter: UrlConverter,
     val url: URL,
     val geoUriFromUrl: String,
-) : ConversionStateWithLoadingIndicator(urlConverter) {
+) : ConversionState(), ConversionState.LoadingIndicator {
     override suspend fun transition(): State {
         val html = try {
             stateContext.networkTools.getText(url)
@@ -291,8 +294,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(stateContext, R.string.conversion_failed_parse_html_error)
         }
-        val parseHtmlResult = urlConverter.parseHtml(html)
-        return when (parseHtmlResult) {
+        return when (val parseHtmlResult = urlConverter.parseHtml(html)) {
             is ParseHtmlResult.Parsed -> ConversionSucceeded(intentData, parseHtmlResult.geoUriBuilder.toString())
             is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, intentData, parseHtmlResult.url, Permission.ALWAYS)
             null -> ConversionSucceeded(intentData, geoUriFromUrl)

@@ -22,8 +22,8 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @Composable
 fun ResultCard(
     geoUriApps: List<Pair<String, Int>>,
-    resultGeoUri: String,
-    resultErrorMessageResId: Int?,
+    geoUri: String,
+    errorMessageResId: Int?,
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onSkip: () -> Unit,
@@ -36,12 +36,12 @@ fun ResultCard(
             Modifier.fillMaxWidth(),
             shape = OutlinedTextFieldDefaults.shape,
             colors = CardDefaults.cardColors(
-                containerColor = if (resultErrorMessageResId == null) {
+                containerColor = if (errorMessageResId == null) {
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
                     MaterialTheme.colorScheme.errorContainer
                 },
-                contentColor = if (resultErrorMessageResId == null) {
+                contentColor = if (errorMessageResId == null) {
                     MaterialTheme.colorScheme.onPrimaryContainer
                 } else {
                     MaterialTheme.colorScheme.onErrorContainer
@@ -51,10 +51,10 @@ fun ResultCard(
             Row(Modifier.padding(Spacing.small)) {
                 SelectionContainer {
                     Text(
-                        if (resultErrorMessageResId == null) {
-                            resultGeoUri
+                        if (errorMessageResId == null) {
+                            geoUri
                         } else {
-                            stringResource(resultErrorMessageResId)
+                            stringResource(errorMessageResId)
                         },
                         style = MaterialTheme.typography.bodyLarge,
                     )
@@ -108,8 +108,8 @@ private fun DefaultPreview() {
         Surface {
             ResultCard(
                 geoUriApps = listOf(),
-                resultGeoUri = "geo:50.123456,11.123456",
-                resultErrorMessageResId = null,
+                geoUri = "geo:50.123456,11.123456",
+                errorMessageResId = null,
                 onCopy = {},
                 onShare = {},
                 onSkip = {},
@@ -125,8 +125,8 @@ private fun DarkPreview() {
         Surface {
             ResultCard(
                 geoUriApps = listOf(),
-                resultGeoUri = "geo:50.123456,11.123456",
-                resultErrorMessageResId = null,
+                geoUri = "geo:50.123456,11.123456",
+                errorMessageResId = null,
                 onCopy = {},
                 onShare = {},
                 onSkip = {},
@@ -142,8 +142,8 @@ private fun DefaultErrorPreview() {
         Surface {
             ResultCard(
                 geoUriApps = listOf(),
-                resultGeoUri = "geo:50.123456,11.123456",
-                resultErrorMessageResId = R.string.conversion_failed_unshorten_error,
+                geoUri = "geo:50.123456,11.123456",
+                errorMessageResId = R.string.conversion_failed_unshorten_error,
                 onCopy = {},
                 onShare = {},
                 onSkip = {},
@@ -159,8 +159,8 @@ private fun DarkErrorPreview() {
         Surface {
             ResultCard(
                 geoUriApps = listOf(),
-                resultGeoUri = "geo:50.123456,11.123456",
-                resultErrorMessageResId = R.string.conversion_failed_unshorten_error,
+                geoUri = "geo:50.123456,11.123456",
+                errorMessageResId = R.string.conversion_failed_unshorten_error,
                 onCopy = {},
                 onShare = {},
                 onSkip = {},

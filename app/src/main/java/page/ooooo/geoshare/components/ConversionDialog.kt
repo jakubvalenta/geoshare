@@ -75,35 +75,42 @@ fun ConversionDialog(onFinish: () -> Unit = {}, viewModel: ConversionViewModel =
                 })
         }) { innerPadding ->
         Column(
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .imePadding()
                 .padding(horizontal = Spacing.windowPadding)
         ) {
-            viewModel.resultGeoUri.takeIf { it.isNotEmpty() }?.let { resultGeoUri ->
-                val geoUriApps = viewModel.queryGeoUriApps(context)
-                ResultCard(
-                    geoUriApps,
-                    resultGeoUri,
-                    viewModel.resultErrorMessageResId,
-                    onCopy = {
-                        viewModel.copy(clipboard)
-                    },
-                    onShare = {
-                        viewModel.share(
-                            context, ManagedActivityResultLauncherWrapper(settingsLauncher)
-                        )
-                    },
-                    onSkip = {
-                        viewModel.skip(
-                            context, ManagedActivityResultLauncherWrapper(settingsLauncher),
-                        )
-                    },
-                )
-            }
-
             when (currentState) {
+                is ConversionFailed,
+                is SharingSucceeded,
+                is SharingFailed,
+                    -> {
+                    onFinish()
+                }
+
+                is ConversionState.Result -> (currentState as ConversionState.Result).let { currentState ->
+                    val geoUriApps = viewModel.queryGeoUriApps(context)
+                    ResultCard(
+                        geoUriApps,
+                        currentState.geoUri,
+                        currentState.errorMessageResId,
+                        onCopy = {
+                            viewModel.copy(clipboard)
+                        },
+                        onShare = {
+                            viewModel.share(
+                                context, ManagedActivityResultLauncherWrapper(settingsLauncher)
+                            )
+                        },
+                        onSkip = {
+                            viewModel.skip(
+                                context, ManagedActivityResultLauncherWrapper(settingsLauncher),
+                            )
+                        },
+                    )
+                }
+
                 is RequestedUnshortenPermission -> (currentState as RequestedUnshortenPermission).let { currentState ->
                     PermissionDialog(
                         title = stringResource(currentState.urlConverter.permissionTitleResId),
@@ -111,19 +118,19 @@ fun ConversionDialog(onFinish: () -> Unit = {}, viewModel: ConversionViewModel =
                         dismissText = stringResource(R.string.conversion_permission_common_deny),
                         onConfirmation = { viewModel.grant(it) },
                         onDismissRequest = { viewModel.deny(it) },
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .semantics { testTagsAsResourceId = true }
                             .testTag("geoShareUnshortenPermissionDialog"),
                     ) {
                         Text(
-                            AnnotatedString.Companion.fromHtml(
+                            AnnotatedString.fromHtml(
                                 stringResource(
                                     R.string.conversion_permission_common_text,
                                     currentState.url.toString(),
                                     appName,
                                 )
                             ),
-                            style = TextStyle(lineBreak = LineBreak.Companion.Paragraph),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
                         )
                     }
                 }
@@ -135,19 +142,19 @@ fun ConversionDialog(onFinish: () -> Unit = {}, viewModel: ConversionViewModel =
                         dismissText = stringResource(R.string.conversion_permission_common_deny),
                         onConfirmation = { viewModel.grant(it) },
                         onDismissRequest = { viewModel.deny(it) },
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .semantics { testTagsAsResourceId = true }
                             .testTag("geoShareParseHtmlPermissionDialog"),
                     ) {
                         Text(
-                            AnnotatedString.Companion.fromHtml(
+                            AnnotatedString.fromHtml(
                                 stringResource(
                                     R.string.conversion_permission_common_text,
                                     currentState.url.toString(),
                                     appName,
                                 )
                             ),
-                            style = TextStyle(lineBreak = LineBreak.Companion.Paragraph),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
                         )
                     }
                 }
@@ -159,11 +166,11 @@ fun ConversionDialog(onFinish: () -> Unit = {}, viewModel: ConversionViewModel =
                         dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
                         onConfirmation = { viewModel.grant(it) },
                         onDismissRequest = { viewModel.deny(it) },
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .semantics { testTagsAsResourceId = true }
                             .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")) {
                         Text(
-                            AnnotatedString.Companion.fromHtml(
+                            AnnotatedString.fromHtml(
                                 stringResource(
                                     R.string.conversion_permission_parse_html_to_get_coords_text,
                                     truncateMiddle(currentState.url.toString()),
@@ -171,7 +178,7 @@ fun ConversionDialog(onFinish: () -> Unit = {}, viewModel: ConversionViewModel =
                                     currentState.urlConverter.name,
                                 )
                             ),
-                            style = TextStyle(lineBreak = LineBreak.Companion.Paragraph),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
                         )
                     }
                 }
@@ -183,31 +190,19 @@ fun ConversionDialog(onFinish: () -> Unit = {}, viewModel: ConversionViewModel =
                         dismissText = stringResource(R.string.conversion_permission_xiaomi_deny),
                         onConfirmation = { viewModel.grant(doNotAsk = false) },
                         onDismissRequest = { viewModel.deny(doNotAsk = false) },
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .semantics { testTagsAsResourceId = true }
                             .testTag("geoShareXiaomiPermissionDialog"),
                     ) {
                         Text(
-                            AnnotatedString.Companion.fromHtml(
+                            AnnotatedString.fromHtml(
                                 stringResource(
                                     R.string.conversion_permission_xiaomi_text, appName
                                 )
                             ),
-                            style = TextStyle(lineBreak = LineBreak.Companion.Paragraph),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
                         )
                     }
-                }
-
-                is ConversionFailed -> {
-                    onFinish()
-                }
-
-                is SharingSucceeded -> {
-                    onFinish()
-                }
-
-                is SharingFailed -> {
-                    onFinish()
                 }
             }
 
@@ -234,7 +229,6 @@ private fun DefaultPreview() {
                 SavedStateHandle(
                     mapOf(
                         "inputUriString" to "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        "resultGeoUri" to "geo:50.123456,11.123456",
                     )
                 ),
             )
@@ -253,7 +247,6 @@ private fun DarkPreview() {
                 SavedStateHandle(
                     mapOf(
                         "inputUriString" to "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        "resultGeoUri" to "geo:50.123456,11.123456",
                     )
                 ),
             )
@@ -310,7 +303,7 @@ private fun ErrorPreview() {
                 SavedStateHandle(
                     mapOf(
                         "inputUriString" to "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        "resultErrorMessage" to R.string.conversion_failed_parse_url_error
+                        "resultErrorMessageResId" to R.string.conversion_failed_parse_url_error
                     )
                 ),
             )
@@ -329,7 +322,7 @@ private fun DarkErrorPreview() {
                 SavedStateHandle(
                     mapOf(
                         "inputUriString" to "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        "resultErrorMessage" to R.string.conversion_failed_parse_url_error
+                        "resultErrorMessageResId" to R.string.conversion_failed_parse_url_error
                     )
                 ),
             )
