@@ -19,7 +19,7 @@
     <string name="converter_google_maps_permission_title">Свързване с Google?</string>
     <string name="conversion_permission_common_grant">Добре</string>
     <string name="intro_geo_links_copy_caption"><![CDATA[Изберете <i>%1$s</i>, когато споделяте местоположение от приложението си за карти.]]></string>
-    <string name="copy_activity">Копиране на гео:</string>
+    <string name="main_result_geo_uri_copy">Копиране на гео:</string>
     <string name="intro_how_to_share_headline">Как да покажа местоположение на картата в друго приложение за карти</string>
     <string name="share_activity">Отвори</string>
     <string name="nav_back_content_description">Връщане към основния екран</string>

@@ -64,7 +64,7 @@
     <string name="copying_finished">Se copió el enlace geo: al portapapeles</string>
     <string name="conversion_failed_connection_permission_denied">Este enlace no es compatible sin conectarse a Google</string>
     <string name="conversion_failed_parse_html_connection_error">Error de conexión al obtener la página de Google Maps</string>
-    <string name="copy_activity">Copiar geo:</string>
+    <string name="main_result_geo_uri_copy">Copiar geo:</string>
     <string name="nav_back_content_description">Volver a la pantalla principal</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Seleccione al menos <tt>maps.google.com</tt> y <tt>maps.app.goo.gl</tt>. Si algunos enlaces aparecen en gris, otras aplicaciones de Google están configuradas para abrirlos de forma predeterminada. Puede buscar estas aplicaciones y desactivar la apertura de enlaces para ellas, como pasó con Google Maps.]]></string>
     <string name="intro_settings_activity_not_found">Error al abrir ajustes</string>

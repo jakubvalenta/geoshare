@@ -5,7 +5,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.GeoUriBuilder
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.getUrlQueryParams
@@ -94,27 +94,27 @@ class GoogleMapsUrlConverter(
             return null
         }
 
-        val geoUriBuilder = GeoUriBuilder(uriQuote)
-        geoUriBuilder.fromMatcher(urlPathMatcher)
+        val position = Position()
+        position.addMatcher(urlPathMatcher)
 
-        val urlQueryParams = getUrlQueryParams(url, uriQuote)
+        val urlQueryParams = getUrlQueryParams(url.query, uriQuote)
         val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
             it.map { (paramName, paramPattern) ->
                 val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
                 paramPattern.matcher(paramValue).takeIf { m -> m.matches() } ?: return@firstNotNullOfOrNull null
             }
         }
-        urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
+        urlQueryMatchers?.forEach { position.addMatcher(it) }
 
         val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
-        zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
+        zoomMatcher?.let { position.addMatcher(it) }
 
-        return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
-            log.i(null, "Google Maps URL converted $url > $geoUriBuilder")
-            ParseUrlResult.Parsed(geoUriBuilder)
+        return if (position.coords.lat != null && position.coords.lon != null) {
+            log.i(null, "Google Maps URL converted $url > $position")
+            ParseUrlResult.Parsed(position)
         } else {
-            log.i(null, "Google Maps URL converted but it requires HTML parsing to get coords $url > $geoUriBuilder")
-            ParseUrlResult.RequiresHtmlParsingToGetCoords(geoUriBuilder)
+            log.i(null, "Google Maps URL converted but it requires HTML parsing to get coords $url > $position")
+            ParseUrlResult.RequiresHtmlParsingToGetCoords(position)
         }
     }
 
@@ -122,7 +122,7 @@ class GoogleMapsUrlConverter(
         parseGoogleMapsHtml(html)?.let { ParseHtmlResult.Parsed(it) }
             ?: parseGoogleSearchHtml(html)?.let { ParseHtmlResult.Redirect(it) }
 
-    private fun parseGoogleMapsHtml(html: String): GeoUriBuilder? {
+    private fun parseGoogleMapsHtml(html: String): Position? {
         val m = htmlPatterns.firstNotNullOfOrNull {
             it.matcher(html).takeIf { m -> m.find() }
         }
@@ -130,10 +130,10 @@ class GoogleMapsUrlConverter(
             log.w(null, "Google Maps HTML does not match any known pattern")
             return null
         }
-        val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
-        geoUriBuilder.fromMatcher(m)
-        log.i(null, "Google Maps HTML parsed $geoUriBuilder")
-        return geoUriBuilder
+        val position = Position()
+        position.addMatcher(m)
+        log.i(null, "Google Maps HTML parsed $position")
+        return position
     }
 
     private fun parseGoogleSearchHtml(html: String): URL? {

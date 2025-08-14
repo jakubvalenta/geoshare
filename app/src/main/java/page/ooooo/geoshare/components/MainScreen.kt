@@ -149,6 +149,7 @@ fun MainScreen(
                     null
                 },
                 supportingText = {
+                    // TODO Simple validation and trimming.
                     Text(stringResource(R.string.main_input_uri_supporting_text))
                 },
             )

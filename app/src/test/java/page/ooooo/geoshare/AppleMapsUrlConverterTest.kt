@@ -17,6 +17,7 @@ import java.net.URL
 class AppleMapsUrlConverterTest {
 
     private lateinit var appleMapsUrlConverter: AppleMapsUrlConverter
+    private val uriQuote = FakeUriQuote()
 
     @Before
     fun before() {
@@ -49,8 +50,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_coordinates() {
         assertEquals(
             "geo:50.894967,4.341626",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -58,8 +59,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_place() {
         assertEquals(
             "geo:52.4890246,13.4295963",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -67,8 +68,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_view() {
         assertEquals(
             "geo:52.49115540927951,13.42595574770533",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -77,8 +78,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_search() {
         assertEquals(
             "geo:0,0?q=Central%20Park",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?q=Central+Park")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?q=Central+Park")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -86,8 +87,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_searchLocation() {
         assertEquals(
             "geo:50.894967,4.341626?q=Central%20Park&z=10",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -95,8 +96,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_searchLocationWithInvalidZoom() {
         assertEquals(
             "geo:50.894967,4.341626?q=Central%20Park",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -104,18 +105,18 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_parameterLlTakesPrecedence() {
         assertEquals(
             "geo:-17.2165721,-149.9470294",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
         assertEquals(
             "geo:-17.2165721,-149.9470294",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
         assertEquals(
             "geo:-17.2165721,-149.9470294",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -123,13 +124,13 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_parameterAddressTakesPrecedence() {
         assertEquals(
             "geo:0,0?q=Reuterplatz%203%2C%2012047%20Berlin%2C%20Germany",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
         assertEquals(
             "geo:0,0?q=Reuterplatz%203%2C%2012047%20Berlin%2C%20Germany",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -137,8 +138,8 @@ class AppleMapsUrlConverterTest {
     fun parseUrl_parameterNamesTakesPrecedenceOverQ() {
         assertEquals(
             "geo:0,0?q=Reuterplatz",
-            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")) as ParseUrlResult.Parsed).geoUriBuilder
-                .toString()
+            (appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")) as ParseUrlResult.Parsed).position
+                .toGeoUriString(uriQuote)
         )
     }
 
@@ -169,8 +170,8 @@ class AppleMapsUrlConverterTest {
             this.javaClass.classLoader!!.getResource("I3B04EDEB21D5F86.html")!!
                 .readText()
         assertEquals(
-            "geo:52.4735927,13.4050798",
-            (appleMapsUrlConverter.parseHtml(html) as ParseHtmlResult.Parsed).geoUriBuilder.toString()
+            "52.4735927, 13.4050798",
+            (appleMapsUrlConverter.parseHtml(html) as ParseHtmlResult.Parsed).position.toDegString()
         )
     }
 

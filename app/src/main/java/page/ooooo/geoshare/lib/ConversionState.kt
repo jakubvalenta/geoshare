@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib
 
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import kotlinx.coroutines.CancellationException
@@ -25,7 +24,7 @@ interface HasLoadingIndicator {
 
 interface HasResult {
     val inputUri: String
-    val geoUri: String
+    val position: Position
 }
 
 interface HasError {
@@ -39,9 +38,9 @@ data class ReceivedIntent(
     val intent: Intent,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val geoUri = stateContext.intentTools.getIntentGeoUri(intent)
-        if (geoUri != null) {
-            return ConversionSucceeded(intent.data.toString(), geoUri)
+        val position = stateContext.intentTools.getIntentPosition(intent)
+        if (position != null) {
+            return ConversionSucceeded(intent.data.toString(), position)
         }
         val inputUri = stateContext.intentTools.getIntentUriString(intent) ?: return ConversionFailed(
             R.string.conversion_failed_missing_url
@@ -53,12 +52,12 @@ data class ReceivedIntent(
 data class ReceivedUriString(
     val stateContext: ConversionStateContext,
     val inputUri: String,
-    private val parseUri: (String) -> Uri = { s -> s.toUri() },
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val uri = parseUri(inputUri)
-        if (uri.scheme == "geo") {
-            return ConversionSucceeded(inputUri, inputUri)
+        val uri = inputUri.toUri()
+        val position = Position.fromGeoUri(uri)
+        if (position != null) {
+            return ConversionSucceeded(inputUri, position)
         }
         return ReceivedUrlString(stateContext, inputUri, null)
     }
@@ -166,7 +165,7 @@ data class UnshortenedUrl(
         return when (val parseUrlResult = urlConverter.parseUrl(url)) {
             is ParseUrlResult.Parsed -> ConversionSucceeded(
                 inputUri,
-                parseUrlResult.geoUriBuilder.toString(),
+                parseUrlResult.position,
             )
 
             is ParseUrlResult.RequiresHtmlParsing -> when (permission
@@ -183,7 +182,7 @@ data class UnshortenedUrl(
                     inputUri,
                     urlConverter,
                     url,
-                    parseUrlResult.geoUriBuilder.toString(),
+                    parseUrlResult.position,
                 )
 
                 Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
@@ -191,12 +190,12 @@ data class UnshortenedUrl(
                     inputUri,
                     urlConverter,
                     url,
-                    parseUrlResult.geoUriBuilder.toString(),
+                    parseUrlResult.position,
                 )
 
                 Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(
                     inputUri,
-                    parseUrlResult.geoUriBuilder.toString(),
+                    parseUrlResult.position,
                 )
             }
 
@@ -245,7 +244,7 @@ data class GrantedParseHtmlPermission(
             return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
         return when (val parseHtmlResult = urlConverter.parseHtml(html)) {
-            is ParseHtmlResult.Parsed -> ConversionSucceeded(inputUri, parseHtmlResult.geoUriBuilder.toString())
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(inputUri, parseHtmlResult.position)
             is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, inputUri, parseHtmlResult.url, Permission.ALWAYS)
             null -> return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
@@ -257,20 +256,20 @@ data class RequestedParseHtmlToGetCoordsPermission(
     val inputUri: String,
     val urlConverter: UrlConverter,
     val url: URL,
-    val geoUriFromUrl: String,
+    val positionFromUrl: Position,
 ) : ConversionState(), PermissionState {
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
         }
-        return GrantedParseHtmlToGetCoordsPermission(stateContext, inputUri, urlConverter, url, geoUriFromUrl)
+        return GrantedParseHtmlToGetCoordsPermission(stateContext, inputUri, urlConverter, url, positionFromUrl)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
         }
-        return DeniedParseHtmlToGetCoordsPermission(inputUri, geoUriFromUrl)
+        return DeniedParseHtmlToGetCoordsPermission(inputUri, positionFromUrl)
     }
 }
 
@@ -279,7 +278,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
     val inputUri: String,
     override val urlConverter: UrlConverter,
     val url: URL,
-    val geoUriFromUrl: String,
+    val positionFromUrl: Position,
 ) : ConversionState(), HasLoadingIndicator {
     override suspend fun transition(): State {
         val html = try {
@@ -294,23 +293,23 @@ data class GrantedParseHtmlToGetCoordsPermission(
             return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
         return when (val parseHtmlResult = urlConverter.parseHtml(html)) {
-            is ParseHtmlResult.Parsed -> ConversionSucceeded(inputUri, parseHtmlResult.geoUriBuilder.toString())
+            is ParseHtmlResult.Parsed -> ConversionSucceeded(inputUri, parseHtmlResult.position)
             is ParseHtmlResult.Redirect -> ReceivedUrl(stateContext, inputUri, parseHtmlResult.url, Permission.ALWAYS)
-            null -> ConversionSucceeded(inputUri, geoUriFromUrl)
+            null -> ConversionSucceeded(inputUri, positionFromUrl)
         }
     }
 }
 
 data class DeniedParseHtmlToGetCoordsPermission(
     val inputUri: String,
-    val geoUriFromUrl: String,
+    val positionFromUrl: Position,
 ) : ConversionState() {
-    override suspend fun transition(): State = ConversionSucceeded(inputUri, geoUriFromUrl)
+    override suspend fun transition(): State = ConversionSucceeded(inputUri, positionFromUrl)
 }
 
 data class ConversionSucceeded(
     override val inputUri: String,
-    override val geoUri: String,
+    override val position: Position,
 ) : ConversionState(), HasResult
 
 data class ConversionFailed(

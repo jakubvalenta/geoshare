@@ -52,7 +52,7 @@ fun IntroScreen(
     val scrollState = rememberScrollState()
     val settingsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
-    ) { result ->
+    ) { _ ->
         // Do nothing.
     }
 
@@ -159,7 +159,7 @@ fun IntroScreen(
                         IntroFigure(
                             stringResource(
                                 R.string.intro_geo_links_copy_caption,
-                                stringResource(R.string.copy_activity),
+                                stringResource(R.string.main_result_geo_uri_copy),
                             ),
                         ) {
                             ScreenshotMapAppCopy()

@@ -6,7 +6,8 @@ import android.net.Uri
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -14,7 +15,8 @@ import org.mockito.kotlin.any
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.*
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.net.URL
 
 class ConversionStateTest {
@@ -31,6 +33,7 @@ class ConversionStateTest {
     private lateinit var mockSettingsLauncherWrapper: ManagedActivityResultLauncherWrapper
     private lateinit var mockXiaomiTools: XiaomiTools
     private lateinit var fakeUserPreferencesRepository: UserPreferencesRepository
+    private val uriQuote = FakeUriQuote()
 
     @Before
     fun before() = runTest {
@@ -52,7 +55,7 @@ class ConversionStateTest {
             .thenThrow(NotImplementedError::class.java)
 
         mockIntentTools = Mockito.mock(IntentTools::class.java)
-        Mockito.`when`(mockIntentTools.getIntentGeoUri(any<Intent>()))
+        Mockito.`when`(mockIntentTools.getIntentPosition(any<Intent>()))
             .thenThrow(NotImplementedError::class.java)
         Mockito.`when`(mockIntentTools.getIntentUriString(any<Intent>()))
             .thenThrow(NotImplementedError::class.java)
@@ -98,10 +101,14 @@ class ConversionStateTest {
     @Test
     fun receivedIntent_intentContainsGeoUri_returnsSucceeded() =
         runTest {
-            val intent = Intent()
+            val position = Position(Position.Coords("1", "2"), Position.Params(q = "fromIntent"))
+            val mockUri = Mockito.mock(Uri::class.java)
+            val mockIntent = Mockito.mock(Intent::class.java)
+            Mockito.`when`(mockIntent.data)
+                .thenReturn(mockUri)
             val mockIntentTools = Mockito.mock(IntentTools::class.java)
-            Mockito.`when`(mockIntentTools.getIntentGeoUri(intent))
-                .thenReturn("geo:1,2?q=fromIntent")
+            Mockito.`when`(mockIntentTools.getIntentPosition(mockIntent))
+                .thenReturn(position)
             val stateContext = ConversionStateContext(
                 urlConverters,
                 mockIntentTools,
@@ -110,9 +117,9 @@ class ConversionStateTest {
                 mockXiaomiTools,
                 log = fakeLog,
             )
-            val state = ReceivedIntent(stateContext, intent)
+            val state = ReceivedIntent(stateContext, mockIntent)
             assertEquals(
-                ConversionSucceeded("geo:1,2?q=fromIntent", "geo:1,2?q=fromIntent"),
+                ConversionSucceeded(mockUri.toString(), position),
                 state.transition(),
             )
         }
@@ -121,7 +128,7 @@ class ConversionStateTest {
     fun receivedIntent_intentDoesNotContainUrl_returnsFailed() = runTest {
         val intent = Intent()
         val mockIntentTools = Mockito.mock(IntentTools::class.java)
-        Mockito.`when`(mockIntentTools.getIntentGeoUri(intent)).thenReturn(null)
+        Mockito.`when`(mockIntentTools.getIntentPosition(intent)).thenReturn(null)
         Mockito.`when`(mockIntentTools.getIntentUriString(intent))
             .thenReturn(null)
         val stateContext = ConversionStateContext(

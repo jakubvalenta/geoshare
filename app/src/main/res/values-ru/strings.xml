@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="copy_activity">Копировать как geo:</string>
+    <string name="main_result_geo_uri_copy">Копировать как geo:</string>
     <string name="nav_menu_content_description">Меню</string>
     <string name="main_result_geo_uri_share_content_description">Поделиться</string>
     <string name="intro_geo_links_form_caption">Или откройте %1$s и вставьте туда ссылку на вашу карту.</string>

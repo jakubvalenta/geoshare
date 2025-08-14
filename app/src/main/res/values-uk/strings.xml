@@ -9,7 +9,7 @@
     <string name="main_info_box"><![CDATA[%1s підтримує багато типів посилань Google Карт і Apple Maps. Якщо ви все ще знаходите посилання, яке не працює <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">повідомте про проблему</a>.]]></string>
     <string name="conversion_permission_common_deny">Скасувати</string>
     <string name="faq_how_it_works_headline">Як це працює та міркування щодо приватності</string>
-    <string name="copy_activity">Копіювати гео:</string>
+    <string name="main_result_geo_uri_copy">Копіювати гео:</string>
     <string name="nav_menu_content_description">Меню</string>
     <string name="conversion_permission_xiaomi_grant">Відкрити налаштування Android</string>
     <string name="share_activity">Відкрити</string>

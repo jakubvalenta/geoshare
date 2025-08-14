@@ -53,6 +53,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         }
         composable("conversion") {
             ConversionScreen(
+                onBack = { navController.navigate("main") },
                 viewModel = viewModel,
             )
         }

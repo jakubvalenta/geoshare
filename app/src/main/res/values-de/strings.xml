@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="copy_activity">geo: kopieren</string>
+    <string name="main_result_geo_uri_copy">geo: kopieren</string>
     <string name="share_activity">geo: teilen</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="intro_how_to_share_google_maps_content_description">Bildschirmfoto von Google Maps share Sheet</string>

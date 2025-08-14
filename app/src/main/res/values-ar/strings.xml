@@ -9,7 +9,7 @@
     <string name="faq_item_expand">توسيع القسم</string>
     <string name="copying_finished">نُسخ الإحداثيات إلى الحافظة</string>
     <string name="conversion_failed_connection_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بخدمة الخرائط</string>
-    <string name="copy_activity">انسخ geo:</string>
+    <string name="main_result_geo_uri_copy">انسخ geo:</string>
     <string name="share_activity">افتح</string>
     <string name="nav_menu_content_description">القائمة</string>
     <string name="nav_back_content_description">العودة إلى الشاشة الرئيسية</string>

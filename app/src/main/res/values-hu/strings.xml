@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="intro_how_to_share_google_maps_content_description">Képernyőkép a Google Térkép megosztás képernyőjéről</string>
-    <string name="copy_activity">Masolás mint geo:</string>
+    <string name="main_result_geo_uri_copy">Masolás mint geo:</string>
     <string name="share_activity">Megosztás mint geo:</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="nav_back_content_description">Vissza a kezdőképernyőre</string>

@@ -5,6 +5,8 @@ import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,7 +37,11 @@ import page.ooooo.geoshare.ui.theme.Spacing
 import java.net.URL
 
 @Composable
-fun ConversionScreen(viewModel: ConversionViewModel, onFinish: () -> Unit = {}) {
+fun ConversionScreen(
+    onBack: () -> Unit,
+    onFinish: () -> Unit = {},
+    viewModel: ConversionViewModel,
+) {
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
@@ -44,6 +51,7 @@ fun ConversionScreen(viewModel: ConversionViewModel, onFinish: () -> Unit = {}) 
         currentState,
         loadingIndicatorTitleResId,
         queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context.packageManager) },
+        onBack = onBack,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onCopy = { viewModel.copy(context, clipboard) },
@@ -60,6 +68,7 @@ fun ConversionScreen(
     currentState: State,
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: (Context) -> List<ConversionViewModel.App>,
+    onBack: () -> Unit,
     onGrant: (Boolean) -> Unit,
     onDeny: (Boolean) -> Unit,
     onCopy: () -> Unit,
@@ -74,10 +83,13 @@ fun ConversionScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    if (loadingIndicatorTitleResId != null) {
-                        Text(stringResource(loadingIndicatorTitleResId))
+                navigationIcon = {
+                    IconButton(onClick = { onBack() }) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, "Back") // TODO
                     }
+                },
+                title = {
+                    Text(appName)
                 },
             )
         },
@@ -85,135 +97,163 @@ fun ConversionScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .padding(top = Spacing.small)
                 .consumeWindowInsets(innerPadding)
                 .imePadding()
                 .padding(horizontal = Spacing.windowPadding)
         ) {
-            when (currentState) {
-                is HasResult -> {
-                    ResultCard(
-                        queryGeoUriApps(context),
-                        currentState.geoUri,
-                        onCopy,
-                        onShare = { packageName ->
-                            onShare(packageName)
-                            onFinish()
-                        },
-                        onSkip = {
-                            onSkip()
-                            onFinish()
-                        },
-                    )
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                when (currentState) {
+                    is HasResult -> {
+                        ResultCard(
+                            queryGeoUriApps(context),
+                            currentState.position,
+                            onCopy,
+                            onShare = { packageName ->
+                                onShare(packageName)
+                                onFinish()
+                            },
+                            onSkip = {
+                                onSkip()
+                                onFinish()
+                            },
+                        )
+                    }
                 }
-            }
 
-            when (currentState) {
-                is HasError -> {
-                    Card(
-                        Modifier.fillMaxWidth(),
-                        shape = OutlinedTextFieldDefaults.shape,
-                        colors = CardDefaults.cardColors(
-                            MaterialTheme.colorScheme.errorContainer,
-                            MaterialTheme.colorScheme.onErrorContainer,
-                        ),
-                    ) {
-                        Row(Modifier.padding(Spacing.small)) {
-                            SelectionContainer {
-                                Text(
-                                    stringResource(currentState.errorMessageResId),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                )
+                when (currentState) {
+                    is HasError -> {
+                        Card(
+                            Modifier.fillMaxWidth(),
+                            shape = OutlinedTextFieldDefaults.shape,
+                            colors = CardDefaults.cardColors(
+                                MaterialTheme.colorScheme.errorContainer,
+                                MaterialTheme.colorScheme.onErrorContainer,
+                            ),
+                        ) {
+                            Row(Modifier.padding(Spacing.small)) {
+                                SelectionContainer {
+                                    Text(
+                                        stringResource(currentState.errorMessageResId),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
+                when (currentState) {
+                    is RequestedUnshortenPermission -> {
+                        PermissionDialog(
+                            title = stringResource(currentState.urlConverter.permissionTitleResId),
+                            confirmText = stringResource(R.string.conversion_permission_common_grant),
+                            dismissText = stringResource(R.string.conversion_permission_common_deny),
+                            onConfirmation = onGrant,
+                            onDismissRequest = onDeny,
+                            modifier = Modifier
+                                .semantics { testTagsAsResourceId = true }
+                                .testTag("geoShareUnshortenPermissionDialog"),
+                        ) {
+                            Text(
+                                AnnotatedString.fromHtml(
+                                    stringResource(
+                                        R.string.conversion_permission_common_text,
+                                        currentState.url.toString(),
+                                        appName,
+                                    )
+                                ),
+                                style = TextStyle(lineBreak = LineBreak.Paragraph),
+                            )
+                        }
+                    }
+
+                    is RequestedParseHtmlPermission -> {
+                        PermissionDialog(
+                            title = stringResource(currentState.urlConverter.permissionTitleResId),
+                            confirmText = stringResource(R.string.conversion_permission_common_grant),
+                            dismissText = stringResource(R.string.conversion_permission_common_deny),
+                            onConfirmation = onGrant,
+                            onDismissRequest = onDeny,
+                            modifier = Modifier
+                                .semantics { testTagsAsResourceId = true }
+                                .testTag("geoShareParseHtmlPermissionDialog"),
+                        ) {
+                            Text(
+                                AnnotatedString.fromHtml(
+                                    stringResource(
+                                        R.string.conversion_permission_common_text,
+                                        currentState.url.toString(),
+                                        appName,
+                                    )
+                                ),
+                                style = TextStyle(lineBreak = LineBreak.Paragraph),
+                            )
+                        }
+                    }
+
+                    is RequestedParseHtmlToGetCoordsPermission -> {
+                        PermissionDialog(
+                            title = stringResource(currentState.urlConverter.permissionTitleResId),
+                            confirmText = stringResource(R.string.conversion_permission_common_grant),
+                            dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
+                            onConfirmation = onGrant,
+                            onDismissRequest = onDeny,
+                            modifier = Modifier
+                                .semantics { testTagsAsResourceId = true }
+                                .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")) {
+                            Text(
+                                AnnotatedString.fromHtml(
+                                    stringResource(
+                                        R.string.conversion_permission_parse_html_to_get_coords_text,
+                                        truncateMiddle(currentState.url.toString()),
+                                        appName,
+                                        currentState.urlConverter.name,
+                                    )
+                                ),
+                                style = TextStyle(lineBreak = LineBreak.Paragraph),
+                            )
+                        }
+                    }
+                }
+
+                if (loadingIndicatorTitleResId != null) {
+                    LoadingIndicator(
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .size(120.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        stringResource(loadingIndicatorTitleResId),
+                        Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
 
-            when (currentState) {
-                is RequestedUnshortenPermission -> {
-                    PermissionDialog(
-                        title = stringResource(currentState.urlConverter.permissionTitleResId),
-                        confirmText = stringResource(R.string.conversion_permission_common_grant),
-                        dismissText = stringResource(R.string.conversion_permission_common_deny),
-                        onConfirmation = onGrant,
-                        onDismissRequest = onDeny,
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareUnshortenPermissionDialog"),
-                    ) {
-                        Text(
-                            AnnotatedString.fromHtml(
-                                stringResource(
-                                    R.string.conversion_permission_common_text,
-                                    currentState.url.toString(),
-                                    appName,
-                                )
-                            ),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
-                        )
-                    }
-                }
-
-                is RequestedParseHtmlPermission -> {
-                    PermissionDialog(
-                        title = stringResource(currentState.urlConverter.permissionTitleResId),
-                        confirmText = stringResource(R.string.conversion_permission_common_grant),
-                        dismissText = stringResource(R.string.conversion_permission_common_deny),
-                        onConfirmation = onGrant,
-                        onDismissRequest = onDeny,
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareParseHtmlPermissionDialog"),
-                    ) {
-                        Text(
-                            AnnotatedString.fromHtml(
-                                stringResource(
-                                    R.string.conversion_permission_common_text,
-                                    currentState.url.toString(),
-                                    appName,
-                                )
-                            ),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
-                        )
-                    }
-                }
-
-                is RequestedParseHtmlToGetCoordsPermission -> {
-                    PermissionDialog(
-                        title = stringResource(currentState.urlConverter.permissionTitleResId),
-                        confirmText = stringResource(R.string.conversion_permission_common_grant),
-                        dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
-                        onConfirmation = onGrant,
-                        onDismissRequest = onDeny,
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")) {
-                        Text(
-                            AnnotatedString.fromHtml(
-                                stringResource(
-                                    R.string.conversion_permission_parse_html_to_get_coords_text,
-                                    truncateMiddle(currentState.url.toString()),
-                                    appName,
-                                    currentState.urlConverter.name,
-                                )
-                            ),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
-                        )
-                    }
-                }
-
-                is ConversionFailed -> {
-                    Button(onClick = onFinish) {
-                        Text("Finish") // TODO
-                    }
-                }
-            }
-
-            if (loadingIndicatorTitleResId != null) {
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    LoadingIndicator(Modifier.size(120.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Button(onCancel) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = Spacing.tiny),
+            ) {
+                if (loadingIndicatorTitleResId != null) {
+                    OutlinedButton(onCancel) {
                         Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                    }
+                } else {
+                    if (currentState is HasResult) {
+                        OutlinedButton(onSkip) {
+                            Text(stringResource(R.string.main_result_skip))
+                        }
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Button(onBack) {
+                        Text(stringResource(R.string.conversion_done))
                     }
                 }
             }
@@ -228,10 +268,11 @@ private fun DefaultPreview() {
         ConversionScreen(
             currentState = ConversionSucceeded(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                "geo:50.123456,11.123456",
+                Position(Position.Coords("50.123456", "11.123456")),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -249,10 +290,11 @@ private fun DarkPreview() {
         ConversionScreen(
             currentState = ConversionSucceeded(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                "geo:50.123456,11.123456",
+                Position(Position.Coords("50.123456", "11.123456")),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -282,6 +324,7 @@ private fun PermissionPreview() {
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -311,6 +354,7 @@ private fun DarkPermissionPreview() {
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -331,6 +375,7 @@ private fun ErrorPreview() {
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -351,6 +396,7 @@ private fun DarkErrorPreview() {
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -369,6 +415,7 @@ private fun LoadingIndicatorPreview() {
             currentState = Initial(),
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
@@ -387,6 +434,7 @@ private fun DarkLoadingIndicatorPreview() {
             currentState = Initial(),
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
+            onBack = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},

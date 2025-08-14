@@ -3,7 +3,7 @@
     <string name="intro_open_by_default_app_note"><![CDATA[Selecione pelo menos <tt>maps.google.com</tt> e <tt>maps.app.goo.gl</tt>. Se alguns links não podem ser selecionados, significa que outros apps do Google estão configurados para abri-los por padrão. Você pode desativar a abertura de links neles, como fizemos para o Google Maps.]]></string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Selecione <i>%1$s</i> e o %2$s permitirá que você abra a mesma localização em qualquer app de mapa instalado.]]></string>
-    <string name="copy_activity">Copiar geo:</string>
+    <string name="main_result_geo_uri_copy">Copiar geo:</string>
     <string name="share_activity">Abrir</string>
     <string name="intro_title">Introdução</string>
     <string name="intro_how_to_share_headline">Como mostrar uma localização no mapa em outro app</string>

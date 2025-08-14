@@ -22,7 +22,7 @@ class ConversionActivity : ComponentActivity() {
                 LaunchedEffect(intent) {
                     viewModel.start(intent)
                 }
-                ConversionScreen(viewModel) { finish() }
+                ConversionScreen(onBack = { finish() }, onFinish = { finish() }, viewModel = viewModel)
             }
         }
     }

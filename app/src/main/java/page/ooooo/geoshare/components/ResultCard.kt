@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,52 +21,70 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun ResultCard(
     geoUriApps: List<ConversionViewModel.App>,
-    geoUri: String,
+    position: Position,
     onCopy: () -> Unit,
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Column {
         Card(
-            Modifier.fillMaxWidth(),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = Spacing.small),
             shape = OutlinedTextFieldDefaults.shape,
             colors = CardDefaults.cardColors(
-                MaterialTheme.colorScheme.primaryContainer,
-                MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
         ) {
-            Row(Modifier.padding(Spacing.small)) {
-                SelectionContainer {
-                    Text(geoUri, style = MaterialTheme.typography.bodyLarge)
+            Row(
+                Modifier.padding(
+                    start = Spacing.small,
+                    top = Spacing.tiny,
+                    end = 4.dp,
+                    bottom = Spacing.tiny,
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(Modifier.weight(1f)) {
+                    SelectionContainer {
+                        Text(position.toDegString(), style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+                IconButton({ onCopy() }) {
+                    Icon(
+                        painterResource(R.drawable.content_copy_24px),
+                        contentDescription = stringResource(R.string.main_result_geo_uri_copy_content_description)
+                    )
                 }
             }
         }
         Row(
-            Modifier.horizontalScroll(rememberScrollState()),
+            Modifier
+                .padding(top = Spacing.tiny)
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
-            AssistChip(
+            SuggestionChip(
                 onClick = { onCopy() },
-                label = { Text(stringResource(R.string.main_result_geo_uri_copy_content_description)) },
-                leadingIcon = {
-                    Icon(
-                        painterResource(R.drawable.content_copy_24px),
-                        contentDescription = null,
-                    )
-                })
-            AssistChip(onClick = { onSkip() }, label = { Text(stringResource(R.string.skip_activity)) }, leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                )
-            })
+                label = {
+                    Text(stringResource(R.string.main_result_geo_uri_copy))
+                },
+            )
         }
+
+        Text(
+            "Open with",
+            Modifier.padding(top = Spacing.medium, bottom = Spacing.small),
+            style = MaterialTheme.typography.headlineSmall,
+        )
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             horizontalArrangement = Arrangement.spacedBy(Spacing.small),
@@ -80,12 +96,13 @@ fun ResultCard(
                         Modifier
                             .clickable { onShare(it.packageName) }
                             .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
                         Image(
                             rememberDrawablePainter(it.icon),
                             it.label,
-                            Modifier.widthIn(max = 64.dp),
+                            Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .widthIn(max = 64.dp),
                         )
                         Text(
                             it.label,
@@ -107,7 +124,7 @@ private fun DefaultPreview() {
         Surface {
             ResultCard(
                 geoUriApps = listOf(),
-                geoUri = "geo:50.123456,11.123456",
+                position = Position(Position.Coords("50.123456", "11.123456")),
                 onCopy = {},
                 onShare = {},
                 onSkip = {},
@@ -123,7 +140,7 @@ private fun DarkPreview() {
         Surface {
             ResultCard(
                 geoUriApps = listOf(),
-                geoUri = "geo:50.123456,11.123456",
+                position = Position(Position.Coords("50.123456", "11.123456")),
                 onCopy = {},
                 onShare = {},
                 onSkip = {},

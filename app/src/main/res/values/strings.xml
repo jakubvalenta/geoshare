@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
-    <string name="copy_activity">Copy geo:</string>
-    <string name="skip_activity">Skip</string>
+    <string name="main_result_geo_uri_copy">Copy geo:</string>
+    <string name="main_result_skip">Skip</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>
@@ -59,6 +59,7 @@
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
+    <string name="conversion_done">Done</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>

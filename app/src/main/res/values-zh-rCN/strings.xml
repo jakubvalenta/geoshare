@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="copy_activity">复制 geo:</string>
+    <string name="main_result_geo_uri_copy">复制 geo:</string>
     <string name="share_activity">打开</string>
     <string name="nav_menu_content_description">菜单</string>
     <string name="nav_back_content_description">返回主屏幕</string>

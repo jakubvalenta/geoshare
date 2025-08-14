@@ -24,11 +24,9 @@ class IntentTools {
         )
     }
 
-    fun getIntentGeoUri(intent: Intent): String? =
-        if (intent.action == Intent.ACTION_VIEW && intent.data != null && intent.scheme == "geo") {
-            intent.data?.toString()
-        } else {
-            null
+    fun getIntentPosition(intent: Intent): Position? =
+        intent.data.takeIf { it != null && intent.action == Intent.ACTION_VIEW && intent.scheme == "geo" }?.let {
+            Position.fromGeoUri(it)
         }
 
     fun getIntentUriString(intent: Intent): String? {

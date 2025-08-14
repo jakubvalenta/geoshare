@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
-import page.ooooo.geoshare.lib.GeoUriBuilder
+import page.ooooo.geoshare.lib.Position
 import java.net.URL
 
 interface UrlConverter {
@@ -18,12 +18,12 @@ interface UrlConverter {
 }
 
 sealed class ParseUrlResult {
-    data class Parsed(val geoUriBuilder: GeoUriBuilder) : ParseUrlResult()
+    data class Parsed(val position: Position) : ParseUrlResult()
     class RequiresHtmlParsing() : ParseUrlResult()
-    data class RequiresHtmlParsingToGetCoords(val geoUriBuilder: GeoUriBuilder) : ParseUrlResult()
+    data class RequiresHtmlParsingToGetCoords(val position: Position) : ParseUrlResult()
 }
 
 sealed class ParseHtmlResult {
-    data class Parsed(val geoUriBuilder: GeoUriBuilder) : ParseHtmlResult()
+    data class Parsed(val position: Position) : ParseHtmlResult()
     data class Redirect(val url: URL) : ParseHtmlResult()
 }

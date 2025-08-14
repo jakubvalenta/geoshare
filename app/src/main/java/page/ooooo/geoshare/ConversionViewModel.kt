@@ -143,7 +143,12 @@ class ConversionViewModel @Inject constructor(
     fun share(context: Context, packageName: String) {
         assert(stateContext.currentState is HasResult)
         (stateContext.currentState as HasResult).let { currentState ->
-            context.startActivity(stateContext.intentTools.createViewIntent(packageName, currentState.geoUri.toUri()))
+            context.startActivity(
+                stateContext.intentTools.createViewIntent(
+                    packageName,
+                    currentState.position.toGeoUri()
+                )
+            )
         }
     }
 
@@ -158,7 +163,7 @@ class ConversionViewModel @Inject constructor(
         assert(stateContext.currentState is HasResult)
         viewModelScope.launch {
             (stateContext.currentState as HasResult).let { currentState ->
-                stateContext.clipboardTools.setPlainText(clipboard, "geo: URI", currentState.geoUri)
+                stateContext.clipboardTools.setPlainText(clipboard, "geo: URI", currentState.position.toGeoUriString())
                 val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
                 if (!systemHasClipboardEditor) {
                     Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
