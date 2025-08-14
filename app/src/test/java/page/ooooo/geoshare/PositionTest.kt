@@ -18,10 +18,7 @@ class PositionTest {
         Mockito.`when`(mockUri.authority).thenReturn("50.123456,11.123456")
         Mockito.`when`(mockUri.query).thenReturn("q=foo%20bar&z=3")
         assertEquals(
-            Position(
-                Position.Coords("50.123456", "11.123456"),
-                Position.Params(q = "foo bar", z = "3"),
-            ),
+            Position("50.123456", "11.123456", q = "foo bar", z = "3"),
             Position.fromGeoUri(mockUri, uriQuote),
         )
     }

@@ -261,7 +261,7 @@ private fun DefaultPreview() {
         ConversionScreen(
             currentState = ConversionSucceeded(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position(Position.Coords("50.123456", "11.123456")),
+                Position("50.123456", "11.123456"),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -283,7 +283,7 @@ private fun DarkPreview() {
         ConversionScreen(
             currentState = ConversionSucceeded(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position(Position.Coords("50.123456", "11.123456")),
+                Position("50.123456", "11.123456"),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },

@@ -33,7 +33,6 @@ class ConversionStateTest {
     private lateinit var mockSettingsLauncherWrapper: ManagedActivityResultLauncherWrapper
     private lateinit var mockXiaomiTools: XiaomiTools
     private lateinit var fakeUserPreferencesRepository: UserPreferencesRepository
-    private val uriQuote = FakeUriQuote()
 
     @Before
     fun before() = runTest {
@@ -101,7 +100,7 @@ class ConversionStateTest {
     @Test
     fun receivedIntent_intentContainsGeoUri_returnsSucceeded() =
         runTest {
-            val position = Position(Position.Coords("1", "2"), Position.Params(q = "fromIntent"))
+            val position = Position("1", "2", q = "fromIntent")
             val mockUri = Mockito.mock(Uri::class.java)
             val mockIntent = Mockito.mock(Intent::class.java)
             Mockito.`when`(mockIntent.data)

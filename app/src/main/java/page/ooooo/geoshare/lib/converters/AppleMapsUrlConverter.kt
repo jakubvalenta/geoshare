@@ -71,18 +71,18 @@ class AppleMapsUrlConverter(
         val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
         zoomMatcher?.let { position.addMatcher(it) }
 
-        return if (position.coords.lat != null && position.coords.lon != null) {
+        return if (position.lat != null && position.lon != null) {
             log.i(null, "Apple Maps URL converted $url > $position")
             ParseUrlResult.Parsed(position)
         } else if (urlQueryParams["auid"] != null || urlQueryParams["place-id"] != null) {
-            if (position.params.q != null) {
+            if (position.q != null) {
                 log.i(null, "Apple Maps URL converted but it requires HTML parsing to get coords $url > $position")
                 ParseUrlResult.RequiresHtmlParsingToGetCoords(position)
             } else {
                 log.i(null, "Apple Maps URL requires HTML parsing to get coordinates for place id $url")
                 ParseUrlResult.RequiresHtmlParsing()
             }
-        } else if (position.params.q != null) {
+        } else if (position.q != null) {
             log.i(null, "Apple Maps URL converted but it contains only query $url > $position")
             ParseUrlResult.Parsed(position)
         } else {

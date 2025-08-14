@@ -15,71 +15,53 @@ private fun matchGroupOrNull(m: Matcher, name: String): String? = try {
 }
 
 data class Position(
-    var coords: Coords = Coords(),
-    var params: Params = Params(),
+    var lat: String? = null,
+    var lon: String? = null,
+    var q: String? = null,
+    var z: String? = null,
 ) {
-    data class Coords(var lat: String? = null, var lon: String? = null) {
-        companion object {
-            fun fromGeoUri(geoUri: Uri): Coords = geoUri.authority.takeIf { it != null }?.let { authority ->
-                authority.split(",").takeIf { it.size >= 2 }?.let { parts ->
-                    Coords(parts[0], parts[1])
-                }
-            } ?: Coords()
-        }
-
-        fun addMatcher(m: Matcher) {
-            val newLat = matchGroupOrNull(m, "lat")
-            if (newLat != null) {
-                lat = newLat
-            }
-            val newLon = matchGroupOrNull(m, "lon")
-            if (newLon != null) {
-                lon = newLon
-            }
-        }
-
-        fun toGeoUriAuthority(): String = "geo:${lat ?: 0},${lon ?: 0}"
-
-        fun toDegString(): String = "${lat ?: 0}, ${lon ?: 0}"
-    }
-
-    data class Params(var q: String? = null, var z: String? = null) {
-        companion object {
-            fun fromGeoUri(geoUri: Uri, uriQuote: UriQuote = DefaultUriQuote()): Params =
-                getUrlQueryParams(geoUri.query, uriQuote).let {
-                    Params(q = it["q"], z = it["z"])
-                }
-        }
-
-        fun addMatcher(m: Matcher) {
-            matchGroupOrNull(m, "q")?.let { q = it }
-            matchGroupOrNull(m, "z")?.let { z = max(1, min(21, it.toDouble().roundToInt())).toString() }
-        }
-
-        fun toGeoUriQueryParams(uriQuote: UriQuote = DefaultUriQuote()): String =
-            mapOf("q" to q, "z" to z).filter { it.value != null }
-                .map { "${it.key}=${uriQuote.encode(it.value!!.replace('+', ' '))}" }.fastJoinToString("&")
-    }
-
     companion object {
-        fun fromGeoUri(geoUri: Uri, uriQuote: UriQuote = DefaultUriQuote()): Position? =
-            geoUri.takeIf { it.scheme == "geo" }?.let {
-                Position(
-                    Coords.fromGeoUri(it),
-                    Params.fromGeoUri(it, uriQuote),
-                )
+        fun fromGeoUri(geoUri: Uri, uriQuote: UriQuote = DefaultUriQuote()): Position? {
+            if (geoUri.scheme != "geo") {
+                return null
             }
+            var lat: String? = null
+            var lon: String? = null
+            var q: String? = null
+            var z: String? = null
+            geoUri.authority?.split(",")?.let {
+                lat = it.getOrNull(0)
+                lon = it.getOrNull(1)
+            }
+            getUrlQueryParams(geoUri.query, uriQuote).let {
+                q = it["q"]
+                z = it["z"]
+            }
+            return Position(lat, lon, q, z)
+        }
     }
 
     fun addMatcher(m: Matcher) {
-        coords.addMatcher(m)
-        params.addMatcher(m)
+        matchGroupOrNull(m, "lat")?.let { lat = it }
+        matchGroupOrNull(m, "lon")?.let { lon = it }
+        matchGroupOrNull(m, "q")?.let { q = it }
+        matchGroupOrNull(m, "z")?.let { z = max(1, min(21, it.toDouble().roundToInt())).toString() }
     }
 
-    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String =
-        "${coords.toGeoUriAuthority()}?${params.toGeoUriQueryParams(uriQuote)}".trimEnd('?')
+    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
+        val coords = "${lat ?: 0},${lon ?: 0}"
+        val params = mapOf(
+            "q" to (q ?: coords),
+            "z" to z,
+        )
+            .filter { it.value != null }
+            .map { "${it.key}=${uriQuote.encode(it.value!!.replace('+', ' '))}" }
+            .fastJoinToString("&")
+        return "geo:$coords?$params".trimEnd('?')
+    }
+
+    fun toDegString(): String = "${lat ?: 0}, ${lon ?: 0}"
 
     fun toGeoUri(uriQuote: UriQuote = DefaultUriQuote()): Uri = toGeoUriString(uriQuote).toUri()
 
-    fun toDegString(): String = coords.toDegString()
 }

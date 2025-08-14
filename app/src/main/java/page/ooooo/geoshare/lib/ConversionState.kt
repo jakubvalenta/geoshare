@@ -40,7 +40,7 @@ data class ReceivedIntent(
     override suspend fun transition(): State {
         val position = stateContext.intentTools.getIntentPosition(intent)
         if (position != null) {
-            return ConversionSucceeded(intent.data.toString(), position)
+            return ConversionSucceeded(intent.data.toString(), position) // FIXME
         }
         val inputUri = stateContext.intentTools.getIntentUriString(intent) ?: return ConversionFailed(
             R.string.conversion_failed_missing_url

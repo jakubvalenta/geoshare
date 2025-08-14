@@ -109,7 +109,7 @@ class GoogleMapsUrlConverter(
         val zoomMatcher = urlQueryParams["zoom"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
         zoomMatcher?.let { position.addMatcher(it) }
 
-        return if (position.coords.lat != null && position.coords.lon != null) {
+        return if (position.lat != null && position.lon != null) {
             log.i(null, "Google Maps URL converted $url > $position")
             ParseUrlResult.Parsed(position)
         } else {
