@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="main_result_geo_uri_copy">Copy geo:</string>
-    <string name="main_result_skip">Skip</string>
+    <string name="main_result_skip">Open original link</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>

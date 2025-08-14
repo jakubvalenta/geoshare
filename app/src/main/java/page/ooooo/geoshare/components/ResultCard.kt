@@ -13,12 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Position
@@ -31,6 +33,7 @@ fun ResultCard(
     position: Position,
     onCopy: () -> Unit,
     onShare: (String) -> Unit,
+    onSkip: () -> Unit,
 ) {
     Column {
         Card(
@@ -113,6 +116,19 @@ fun ResultCard(
                 }
             }
         }
+        Row(
+            Modifier
+                .padding(top = Spacing.small)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        ) {
+            SuggestionChip(
+                onClick = { onSkip() },
+                label = {
+                    Text(stringResource(R.string.main_result_skip))
+                },
+            )
+        }
     }
 }
 
@@ -121,11 +137,19 @@ fun ResultCard(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
             ResultCard(
-                geoUriApps = listOf(),
+                geoUriApps = listOf(
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                    ),
+                ),
                 position = Position(Position.Coords("50.123456", "11.123456")),
                 onCopy = {},
                 onShare = {},
+                onSkip = {},
             )
         }
     }
@@ -136,11 +160,19 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
             ResultCard(
-                geoUriApps = listOf(),
+                geoUriApps = listOf(
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                    ),
+                ),
                 position = Position(Position.Coords("50.123456", "11.123456")),
                 onCopy = {},
                 onShare = {},
+                onSkip = {},
             )
         }
     }

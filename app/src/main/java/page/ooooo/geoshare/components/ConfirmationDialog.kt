@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,8 +9,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationDialog(
     title: String,
@@ -22,7 +21,8 @@ fun ConfirmationDialog(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    ConfirmationLayout(
+    ConfirmationScaffold(
+        title,
         modifier,
         startButton = {
             OutlinedButton(
@@ -41,7 +41,6 @@ fun ConfirmationDialog(
             }
         },
     ) {
-        Text(title, Modifier.padding(bottom = Spacing.small), style = MaterialTheme.typography.headlineSmall)
         content()
     }
 }
