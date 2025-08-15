@@ -99,6 +99,11 @@ fun ConversionScreen(
                         )
                     }
                 },
+                startButton = {
+                    TextButton({ onSkip() }) {
+                        Text(stringResource(R.string.conversion_succeeded_skip))
+                    }
+                },
                 endButton = {
                     Button(onBack) {
                         Text(stringResource(R.string.conversion_done))
@@ -110,7 +115,6 @@ fun ConversionScreen(
                     currentState.position,
                     onCopy,
                     onShare,
-                    onSkip,
                 )
             }
         }

@@ -35,7 +35,6 @@ fun ResultCard(
     position: Position,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    onSkip: () -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -130,27 +129,21 @@ fun ResultCard(
             }
         }
 
-        Row(
+        Text(
+            stringResource(R.string.conversion_succeeded_apps_headline),
             Modifier
                 .padding(
-                    start = Spacing.small, top = Spacing.medium, end = Spacing.tiny, bottom = Spacing.small
-                )
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                stringResource(R.string.conversion_succeeded_apps_headline),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            TextButton({ onSkip() }) {
-                Text(stringResource(R.string.conversion_succeeded_skip))
-            }
-        }
+                    start = Spacing.small,
+                    top = Spacing.large,
+                    end = Spacing.small,
+                    bottom = Spacing.medium,
+                ),
+            style = MaterialTheme.typography.bodyLarge,
+        )
         if (geoUriApps.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(4),
-                modifier = Modifier.padding(horizontal = Spacing.small),
+                modifier = Modifier.padding(horizontal = Spacing.tiny),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.small),
                 verticalArrangement = Arrangement.spacedBy(Spacing.medium),
             ) {
@@ -205,7 +198,6 @@ private fun DefaultPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }
@@ -228,7 +220,6 @@ private fun DarkPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }
@@ -251,7 +242,6 @@ private fun ParamsPreview() {
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }
@@ -274,7 +264,6 @@ private fun DarkParamsPreview() {
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }
@@ -290,7 +279,6 @@ private fun NoAppsPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }
@@ -306,7 +294,6 @@ private fun DarkNoAppsPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onShare = {},
-                onSkip = {},
             )
         }
     }

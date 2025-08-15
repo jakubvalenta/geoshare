@@ -55,8 +55,8 @@ data class Position(
 
     fun toParamsString(): String = listOfNotNull(
         q?.takeIf { it.isNotEmpty() },
-        z?.takeIf { it.isNotEmpty() }?.let { "(z$it)" },
-    ).joinToString(" ")
+        z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
+    ).joinToString(" \u2022 ")
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String = "${lat ?: 0},${lon ?: 0}".let { coords ->
         formatUrl(
