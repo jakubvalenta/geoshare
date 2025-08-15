@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import io.ktor.client.engine.mock.*
@@ -33,7 +32,6 @@ class ConversionStateTest {
     private lateinit var urlConverters: List<UrlConverter>
     private lateinit var mockIntentTools: IntentTools
     private lateinit var mockNetworkTools: NetworkTools
-    private lateinit var mockXiaomiTools: XiaomiTools
     private lateinit var fakeUserPreferencesRepository: UserPreferencesRepository
 
     @Before
@@ -57,19 +55,6 @@ class ConversionStateTest {
         mockNetworkTools = Mockito.mock(NetworkTools::class.java)
         Mockito.`when`(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
         Mockito.`when`(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
-
-        mockXiaomiTools = Mockito.mock(XiaomiTools::class.java)
-        Mockito.`when`(
-            mockXiaomiTools.isBackgroundStartActivityPermissionGranted(
-                any<Context>()
-            )
-        ).thenThrow(NotImplementedError::class.java)
-        Mockito.`when`(
-            mockXiaomiTools.showPermissionEditor(
-                any<Context>(),
-                any<ManagedActivityResultLauncherWrapper>(),
-            )
-        ).thenThrow(NotImplementedError::class.java)
 
         fakeUserPreferencesRepository = FakeUserPreferencesRepository()
     }
@@ -95,7 +80,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedIntent(stateContext, mockIntent)
@@ -116,7 +100,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedIntent(stateContext, intent)
@@ -138,7 +121,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedIntent(stateContext, intent, fakeUriQuote)
@@ -156,7 +138,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
@@ -175,7 +156,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
@@ -198,7 +178,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
@@ -215,7 +194,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val inputUriString = ""
@@ -233,7 +211,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val inputUriString = "www.example.com/"
@@ -256,7 +233,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val inputUriString = "//www.example.com/"
@@ -279,7 +255,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val inputUriString = "ftp://www.example.com/"
@@ -304,7 +279,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val permission = Permission.NEVER
@@ -329,7 +303,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val permission = Permission.NEVER
@@ -368,7 +341,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             mockUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedUrl(
@@ -405,7 +377,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             mockUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedUrl(
@@ -442,7 +413,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             mockUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = ReceivedUrl(
@@ -472,7 +442,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = ReceivedUrl(
@@ -510,7 +479,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = ReceivedUrl(
@@ -548,7 +516,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = ReceivedUrl(
@@ -569,7 +536,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = RequestedUnshortenPermission(
@@ -600,7 +566,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedUnshortenPermission(
@@ -638,7 +603,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedUnshortenPermission(
@@ -676,7 +640,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedUnshortenPermission(
@@ -711,7 +674,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedUnshortenPermission(
@@ -741,7 +703,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedUnshortenPermission(
@@ -770,7 +731,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedUnshortenPermission(
@@ -799,7 +759,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedUnshortenPermission(
@@ -828,7 +787,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedUnshortenPermission(
@@ -855,7 +813,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = GrantedUnshortenPermission(
@@ -884,7 +841,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = DeniedConnectionPermission(stateContext, inputUriString, googleMapsUrlConverter)
@@ -908,7 +864,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = UnshortenedUrl(stateContext, inputUriString, googleMapsUrlConverter, url, Permission.ALWAYS)
@@ -934,7 +889,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state =
@@ -961,7 +915,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state =
@@ -988,7 +941,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state =
@@ -1021,7 +973,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1053,7 +1004,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1085,7 +1035,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1113,7 +1062,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(
@@ -1153,7 +1101,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(
@@ -1193,7 +1140,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(
@@ -1233,7 +1179,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1273,7 +1218,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1313,7 +1257,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1344,7 +1287,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             mockUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1375,7 +1317,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             mockUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
@@ -1394,7 +1335,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = RequestedParseHtmlPermission(
@@ -1425,7 +1365,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlPermission(
@@ -1468,7 +1407,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlPermission(
@@ -1511,7 +1449,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlPermission(
@@ -1548,7 +1485,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlPermission(
@@ -1582,7 +1518,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlPermission(
@@ -1613,7 +1548,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlPermission(
@@ -1644,7 +1578,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlPermission(
@@ -1675,7 +1608,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = GrantedParseHtmlPermission(
@@ -1708,7 +1640,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlPermission(
@@ -1743,7 +1674,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = GrantedParseHtmlPermission(
@@ -1767,7 +1697,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = RequestedParseHtmlToGetCoordsPermission(
@@ -1800,7 +1729,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlToGetCoordsPermission(
@@ -1846,7 +1774,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlToGetCoordsPermission(
@@ -1892,7 +1819,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlToGetCoordsPermission(
@@ -1931,7 +1857,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 mockUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = RequestedParseHtmlToGetCoordsPermission(
@@ -1967,7 +1892,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlToGetCoordsPermission(
@@ -2000,7 +1924,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlToGetCoordsPermission(
@@ -2033,7 +1956,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlToGetCoordsPermission(
@@ -2066,7 +1988,6 @@ class ConversionStateTest {
             mockIntentTools,
             mockNetworkTools,
             fakeUserPreferencesRepository,
-            mockXiaomiTools,
             log = fakeLog,
         )
         val state = GrantedParseHtmlToGetCoordsPermission(
@@ -2101,7 +2022,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlToGetCoordsPermission(
@@ -2140,7 +2060,6 @@ class ConversionStateTest {
                 mockIntentTools,
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
-                mockXiaomiTools,
                 log = fakeLog,
             )
             val state = GrantedParseHtmlToGetCoordsPermission(

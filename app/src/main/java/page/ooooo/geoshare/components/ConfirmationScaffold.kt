@@ -7,6 +7,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,7 +22,7 @@ fun ConfirmationScaffold(
     content: @Composable (ColumnScope.() -> Unit),
 ) {
     Scaffold(
-        modifier,
+        modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {

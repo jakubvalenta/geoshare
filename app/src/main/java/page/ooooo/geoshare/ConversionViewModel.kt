@@ -43,7 +43,6 @@ class ConversionViewModel @Inject constructor(
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
-        xiaomiTools = XiaomiTools(),
         onStateChange = { newState ->
             _currentState.value = newState
             when (newState) {

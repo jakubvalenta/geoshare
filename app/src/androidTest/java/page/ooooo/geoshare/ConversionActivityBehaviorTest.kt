@@ -6,7 +6,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
+class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun shareScreen_whenLongLinkIsShared_opensGoogleMaps() {
@@ -14,7 +14,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
     }
 
     @Test
@@ -27,7 +27,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(unshortenPermissionDialogSelector)
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -48,7 +48,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(By.res("geoShareUnshortenPermissionDialog"), doNotAsk = true)
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -57,7 +57,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
         // Google Maps shows precise location again
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs|52.484201,13.416727".toPattern())
     }
 
     @Test
@@ -68,6 +68,12 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Deny unshorten permission
         val unshortenPermissionDialogSelector = By.res("geoShareUnshortenPermissionDialog")
         waitAndDismissDialogAndAssertItIsClosed(unshortenPermissionDialogSelector)
+
+        // Error is visible
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
+
+        // Close the window (this is necessary, for some reason)
+        clickObject(By.res("geoShareConversionErrorDoneButton"))
 
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -84,11 +90,17 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Deny unshorten permission
         waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareUnshortenPermissionDialog"), doNotAsk = true)
 
+        // Error is visible
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
+
+        // Close the window (this is necessary, for some reason)
+        clickObject(By.res("geoShareConversionErrorDoneButton"))
+
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
-        // Google Maps does not open
-        assertGoogleMapsDoesNotOpenWithinTimeout()
+        // Error is visible again
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
     }
 
     @Test
@@ -98,6 +110,9 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Grant unshorten permission
         waitAndConfirmDialogAndAssertNewWindowIsOpen(By.res("geoShareUnshortenPermissionDialog"))
+
+        // Error is visible
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
     }
 
     @Test
@@ -110,7 +125,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(parseHtmlPermissionDialogSelector)
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -132,7 +147,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(parseHtmlPermissionDialogSelector, doNotAsk = true)
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -141,7 +156,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
 
         // Google Maps shows precise location again
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
     }
 
     @Test
@@ -152,6 +167,12 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Deny parse HTML permission
         val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlPermissionDialog")
         waitAndDismissDialogAndAssertItIsClosed(parseHtmlPermissionDialogSelector)
+
+        // Error is visible
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
+
+        // Close the window (this is necessary, for some reason)
+        clickObject(By.res("geoShareConversionErrorDoneButton"))
 
         // Share the Apple Maps place link with the app again
         shareUri("https://maps.apple.com/place?place-id=IE08A4F5FAA2F0502&_provider=9902")
@@ -169,11 +190,17 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlPermissionDialog")
         waitAndDismissDialogAndAssertItIsClosed(parseHtmlPermissionDialogSelector, doNotAsk = true)
 
+        // Error is visible
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
+
+        // Close the window (this is necessary, for some reason)
+        clickObject(By.res("geoShareConversionErrorDoneButton"))
+
         // Share another Apple Maps place link with the app
         shareUri("https://maps.apple.com/place?place-id=I263680A7B546CF16&_provider=9902")
 
-        // Google Maps does not open
-        assertGoogleMapsDoesNotOpenWithinTimeout()
+        // Error is visible
+        waitAndAssertObjectExists(By.res("geoShareConversionError"))
     }
 
     @Test
@@ -186,7 +213,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(parseHtmlPermissionDialogSelector)
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -210,7 +237,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         )
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -219,7 +246,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
 
         // Google Maps shows precise location again
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
     }
 
     @Test
@@ -232,7 +259,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndDismissDialogAndAssertItIsClosed(parseHtmlPermissionDialogSelector)
 
         // Google Maps shows location search
-        waitAndAssertGoogleMapsTextExists("""Hermannstr\. 30, Berlin""".toPattern())
+        clickGoogleMapsAndAssertItHasText("""Hermannstr\. 30, Berlin""".toPattern())
 
         // Share another Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+31,+Berlin/")
@@ -250,13 +277,13 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareParseHtmlToGetCoordsPermissionDialog"), doNotAsk = true)
 
         // Google Maps shows location search
-        waitAndAssertGoogleMapsTextExists("""Hermannstr\. 40, Berlin""".toPattern())
+        clickGoogleMapsAndAssertItHasText("""Hermannstr\. 40, Berlin""".toPattern())
 
         // Share another Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+41,+Berlin/")
 
         // Google Maps shows location search
-        waitAndAssertGoogleMapsTextExists("""Hermannstr\. 41, Berlin""".toPattern())
+        clickGoogleMapsAndAssertItHasText("""Hermannstr\. 41, Berlin""".toPattern())
     }
 
     @Test
@@ -268,7 +295,7 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(By.res("geoShareUnshortenPermissionDialog"))
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
     }
 
     @Test
@@ -280,13 +307,13 @@ class ShareActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareParseHtmlToGetCoordsPermissionDialog"))
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsTextExists("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
     }
 
     private fun shareUri(unsafeUriString: String) {
         // Use shell command instead of startActivity() to support Xiaomi
         executeShellCommand(
-            "am start -a android.intent.action.VIEW -d $unsafeUriString -n $packageName/page.ooooo.geoshare.ShareActivity $packageName"
+            "am start -a android.intent.action.VIEW -d $unsafeUriString -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
         )
     }
 }
