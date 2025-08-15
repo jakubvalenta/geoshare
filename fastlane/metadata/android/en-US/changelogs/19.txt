@@ -1,0 +1,6 @@
+- Replaced the default Android share menu with a custom interface that includes additional actions.
+- Replaced the "Copy geo:" share target with a button in the custom share interface.
+- Changed the resulting geo: URI format to show a pin in Google Maps.
+- Added button to open the original link unchanged (passthrough).
+- Added menu to copy coordinates in various formats including a magicearth: URI.
+- Added Portuguese (Portugal) translation.
