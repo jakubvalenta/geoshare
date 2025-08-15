@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="conversion_succeeded_copy_geo">Copier geo:</string>
-    <string name="share_activity">Ouvrir</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Retour à l’écran principal</string>
     <string name="intro_title">Intro</string>
@@ -30,16 +29,11 @@
     <string name="main_input_uri_clear_content_description">Effacer</string>
     <string name="main_input_uri_supporting_text">par ex. https://maps.app.goo.gl/… ou maps.apple.com/…</string>
     <string name="conversion_succeeded_copy_content_description">Copier</string>
-    <string name="main_result_geo_uri_share_content_description">Partager</string>
     <string name="main_create_geo_uri">Afficher les coordonnées</string>
     <string name="converter_google_maps_permission_title">Se connecter à Google ?</string>
     <string name="converter_apple_maps_permission_title">Se connecter à Apple ?</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Utiliser uniquement le nom de lieu</string>
-    <string name="conversion_permission_xiaomi_title">Permission manquante</string>
-    <string name="conversion_permission_xiaomi_grant">Ouvrir les paramètres Android</string>
-    <string name="conversion_permission_xiaomi_deny">Rejeter</string>
-    <string name="conversion_permission_xiaomi_text"><![CDATA[Pour permettre à %1$s d’ouvrir d’autres applications cartographiques, vous devez autoriser <b>Autres autorisations</b> &#8594; <b>Afficher des fenêtres contextuelles lors de l’exécution en arrière-plan</b> à %1$s.]]></string>
     <string name="about_title">À propos</string>
     <string name="about_app_icon_content_description">Icône de l’application</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -56,15 +50,11 @@
     <string name="user_preferences_connection_option_ask">Demandez avant de vous connecter</string>
     <string name="user_preferences_connection_option_never">Non</string>
     <string name="user_preferences_last_run_version_code_title">Quelle version de l’application a été exécutée en dernier ?</string>
-    <string name="conversion_failed_nothing_to_do">Rien à faire</string>
     <string name="conversion_failed_missing_url">URL manquante</string>
     <string name="conversion_failed_invalid_url">URL invalide</string>
     <string name="conversion_failed_unshorten_error">Impossible de résoudre le lien court</string>
     <string name="conversion_failed_unshorten_connection_error">Erreur de connexion lors de la résolution du lien court</string>
     <string name="conversion_failed_parse_url_error">Échec du traitement du lien</string>
-    <string name="sharing_failed_xiaomi_permission_show_editor_error">Échec de l’ouverture des paramètres d’autorisation</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Impossible d’ouvrir une autre application cartographique sans autorisation</string>
-    <string name="sharing_succeeded">Ouvert une autre application cartographique</string>
     <string name="conversion_succeeded_apps_not_found">Aucune application cartographique n’est installée</string>
     <string name="copying_finished">Copié coordonnées dans le presse-papiers</string>
     <string name="conversion_failed_connection_permission_denied">Ce lien n’est pas pris en charge sans connexion au service de cartographie</string>

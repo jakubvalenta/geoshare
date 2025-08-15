@@ -11,8 +11,6 @@
     <string name="faq_how_it_works_headline">Як це працює та міркування щодо приватності</string>
     <string name="conversion_succeeded_copy_geo">Копіювати гео:</string>
     <string name="nav_menu_content_description">Меню</string>
-    <string name="conversion_permission_xiaomi_grant">Відкрити налаштування Android</string>
-    <string name="share_activity">Відкрити</string>
     <string name="intro_title">Вступ</string>
     <string name="intro_how_to_share_headline">Як показати розташування на мапі в іншому картографічному застосунку</string>
     <string name="intro_how_to_share_app_content_description">Знімок екрана зі спільного доступу %1$s</string>
@@ -24,12 +22,10 @@
     <string name="intro_geo_links_copy_caption"><![CDATA[Оберіть <i>%1$s</i>, коли ділитеся розташуванням із картографічним застосунком.]]></string>
     <string name="intro_geo_links_form_caption">Або відкрийте %1$s та вставте туди ваше посилання на мапу.</string>
     <string name="intro_nav_finish">Почати</string>
-    <string name="main_result_geo_uri_share_content_description">Поділитися</string>
     <string name="main_create_geo_uri">Показати координати</string>
     <string name="main_navigate_to_intro">Дізнатися більше про функції застосунку</string>
     <string name="converter_google_maps_permission_title">Під’єднатися до Google?</string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Створити пошукове гео: посилання</string>
-    <string name="conversion_permission_xiaomi_deny">Відхилити</string>
     <string name="about_title">Про застосунок</string>
     <string name="about_app_icon_content_description">Значок застосунку</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -43,9 +39,7 @@
     <string name="main_input_uri_clear_content_description">Очистити</string>
     <string name="conversion_succeeded_copy_content_description">Копіювати</string>
     <string name="conversion_permission_common_grant">Гаразд</string>
-    <string name="conversion_permission_xiaomi_title">Бракує дозволу</string>
     <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат або назви населеного пункту. %2$s потрібно під’єднатися до Google, щоб отримати інформацію.]]></string>
-    <string name="conversion_permission_xiaomi_text"><![CDATA[Щоби дозволити %1$s відкривати інші картографічні програми, вам потрібно дозволити в розділі <b>Інші дозволи</b> &#8594; <b>Показ спливних вікон під час роботи у фоновому режимі</b> в %1$s.]]></string>
     <string name="intro_nav_next">Далі</string>
     <string name="intro_geo_links_copy_content_description">Змінок екрана спільного доступу з Google Maps</string>
     <string name="main_input_uri_label">Вставте посилання на мапу тут</string>
@@ -62,14 +56,10 @@
     <string name="user_preferences_connection_option_ask">Запитувати перед з’єднанням</string>
     <string name="user_preferences_connection_option_never">Ні</string>
     <string name="user_preferences_last_run_version_code_title">Яку версію застосунку ви використовували востаннє?</string>
-    <string name="conversion_failed_nothing_to_do">Нічого не робити</string>
     <string name="conversion_failed_missing_url">Помилкова адреса</string>
     <string name="conversion_failed_invalid_url">Невірна адреса</string>
     <string name="conversion_failed_unshorten_error">Не вдалося вирішити проблему з коротким посиланням</string>
     <string name="conversion_failed_parse_url_error">Не вдалося обробити посилання на мапу</string>
-    <string name="sharing_failed_xiaomi_permission_show_editor_error">Не вдалося відкрити налаштування дозволів</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Не можна відкрити інші картографічні застосунки без дозволу</string>
-    <string name="sharing_succeeded">Відкрито інший картографічний застосунок</string>
     <string name="conversion_succeeded_apps_not_found">Жодного картографічного застосунку не встановлено</string>
     <string name="copying_finished">Координати скопійовано до буфера обміну</string>
     <string name="conversion_failed_parse_html_error">Не вдалося завантажити вебсторінку з картографічного сервісу</string>

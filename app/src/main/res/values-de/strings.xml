@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="conversion_succeeded_copy_geo">geo: kopieren</string>
-    <string name="share_activity">geo: teilen</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="intro_how_to_share_google_maps_content_description">Bildschirmfoto von Google Maps share Sheet</string>
     <string name="intro_how_to_share_app_content_description">Bildschirmfoto von %1$s’s share sheet</string>
@@ -17,7 +16,6 @@
     <string name="main_input_uri_clear_content_description">Löschen</string>
     <string name="main_input_uri_supporting_text">z.B. https://google.com/maps/… oder maps.app.goo.gl/…</string>
     <string name="conversion_succeeded_copy_content_description">Kopieren</string>
-    <string name="main_result_geo_uri_share_content_description">Teilen</string>
     <string name="main_create_geo_uri">Erstelle geo: link</string>
     <string name="main_navigate_to_intro">Entdecke die Funktionen der App</string>
     <string name="converter_google_maps_permission_title">Mit Google Verbinden?</string>
@@ -25,9 +23,6 @@
     <string name="conversion_permission_common_deny">Abbrechen</string>
     <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten-Informationen oder Ortnamen. %2$s muss eine Verbindung zu Google aufbauen, um die Informationen zu bekommen.]]></string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Erstelle einen search geo: Link</string>
-    <string name="conversion_permission_xiaomi_title">Fehlende Berechtigung</string>
-    <string name="conversion_permission_xiaomi_grant">Öffne die Android Einstellungen</string>
-    <string name="conversion_permission_xiaomi_deny">Ignorieren</string>
     <string name="intro_how_to_share_headline">Wie öffnet man Google Maps Orte in anderen Apps</string>
     <string name="intro_nav_finish">Los gehts</string>
     <string name="intro_open_by_default_headline">Konfigurieren Sie Android so, dass Links zu Google Maps in alternativen Karten-Apps geöffnet werden (optional)</string>
