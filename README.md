@@ -125,12 +125,6 @@ a geo: URI:
 To permanently allow or deny connecting to the map service instead of always
 asking (the default), go to the app’s Preferences.
 
-## Compatibility with the GMaps WV app
-
-You don't need Geo Share when using the GMaps WV app, because that app already
-produces geo: links. So you can directly share a location from GMaps WV with
-another map app.
-
 ## Reporting issues
 
 Geo Share supports many types of Google Maps and Apple Maps links. If you still

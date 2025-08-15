@@ -63,12 +63,10 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Больше не спрашивать меня</string>
     <string name="faq_title">ЧаВо</string>
-    <string name="faq_gmaps_wv_headline">Совместимость с приложением GMaps WV</string>
     <string name="faq_item_collapse">Свернуть раздел</string>
     <string name="faq_item_expand">Развернуть раздел</string>
     <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису (Google, Apple и т.д.)?</string>
     <string name="user_preferences_title">Настройки</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Вам не нужен %1$s при использовании приложения GMaps WV, поскольку это приложение уже создаёт гео: ссылки. Таким образом, вы можете напрямую поделиться местоположением из GMaps WV с другим картографическим приложением.</p>]]></string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
     <string name="conversion_failed_invalid_url">Неправильный URL-адрес</string>
     <string name="conversion_failed_unshorten_connection_error">Ошибка подключения при открытии короткой ссылки</string>

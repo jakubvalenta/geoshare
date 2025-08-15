@@ -46,8 +46,6 @@
     <string name="permission_do_not_ask">Não me pergunte novamente</string>
     <string name="faq_title">Perguntas frequentes</string>
     <string name="faq_how_it_works_headline">Como funciona e considerações de privacidade</string>
-    <string name="faq_gmaps_wv_headline">Compatibilidade com o app GMaps WV</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Você não precisa do %1$s ao usar o app GMaps WV, porque aquele app já produz links geo:. Então você pode compartilhar uma localização diretamente do GMaps WV com outro app de mapa.</p>]]></string>
     <string name="faq_item_collapse">Retrair seção</string>
     <string name="faq_item_expand">Expandir seção</string>
     <string name="user_preferences_title">Preferências</string>

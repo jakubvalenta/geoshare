@@ -53,8 +53,6 @@
     <string name="permission_do_not_ask">Не запитувати знову</string>
     <string name="conversion_failed_connection_permission_denied">Це посилання не підтримується без з’єднання з Google</string>
     <string name="intro_how_to_share_google_maps_caption">Поділіться розташуванням із застосунку Google Maps або з веббраузера.</string>
-    <string name="faq_gmaps_wv_headline">Сумісність із застосунком GMaps WV</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Вам не потрібний %1$s при використанні застосунку GMaps WV, оскільки він вже створює гео: посилання. Таким чином, ви можете безпосередньо поділитися розташуванням з GMaps WV з іншим картографічним застосунком.</p>]]></string>
     <string name="faq_item_collapse">Згорнути розділ</string>
     <string name="faq_item_expand">Розгорнути розділ</string>
     <string name="user_preferences_title">Параметри</string>

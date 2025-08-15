@@ -39,8 +39,6 @@
     <string name="permission_do_not_ask">不要再询问我</string>
     <string name="faq_title">常见问题</string>
     <string name="faq_how_it_works_headline">工作原理和隐私考虑</string>
-    <string name="faq_gmaps_wv_headline">与 GMaps WV 应用的兼容性</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>使用 GMaps WV 应用时，您不需要 %1$s，因为该应用已经生成 geo: 链接。因此，您可以直接从 GMaps WV 与另一个地图应用分享位置。</p>]]></string>
     <string name="faq_item_collapse">折叠部分</string>
     <string name="faq_item_expand">展开部分</string>
     <string name="user_preferences_title">偏好设置</string>

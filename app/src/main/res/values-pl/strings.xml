@@ -44,8 +44,6 @@
     <string name="conversion_permission_xiaomi_deny">Odrzuć</string>
     <string name="faq_title">FAQ</string>
     <string name="faq_how_it_works_headline">Jak to działa i kwestie prywatności</string>
-    <string name="faq_gmaps_wv_headline">Kompatybilność z aplikacją GMaps WV</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Nie potrzebujesz %1$s podczas korzystania z aplikacji GMaps WV, ponieważ ta aplikacja już tworzy geo: linki. Możesz więc bezpośrednio udostępnić lokalizację z GMaps WV za pomocą innej aplikacji mapowej.</p>]]></string>
     <string name="about_title">O aplikacji</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="conversion_failed_unshorten_error">Nie udało się rozwiązać krótkiego linku</string>

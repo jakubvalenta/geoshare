@@ -39,8 +39,6 @@
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
     <string name="main_info_box"><![CDATA[%1s поддържа много видове връзки към Google Карти и Apple Карти. Ако все още намерите връзка, която не работи, моля, <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">съобщете за проблем</a>.]]></string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати или име на място. %2$s трябва да се свърже с Google, за да получи информацията.]]></string>
-    <string name="faq_gmaps_wv_headline">Съвместимост с приложението GMaps WV</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Не се нуждаете от %1$s, когато използвате приложението GMaps WV, защото това приложение вече създава гео: връзки. Така че можете директно да споделяте местоположение от GMaps WV с друго приложение за карти.</p>]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>
     <string name="user_preferences_connection_option_always">Да</string>
