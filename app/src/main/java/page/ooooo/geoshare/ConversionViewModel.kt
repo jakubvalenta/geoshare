@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
+import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -160,19 +162,12 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun copy(context: Context, clipboard: Clipboard) {
-        assert(stateContext.currentState is HasResult)
+    fun copy(context: Context, clipboard: Clipboard, text: String) {
         viewModelScope.launch {
-            (stateContext.currentState as HasResult).let { currentState ->
-                stateContext.clipboardTools.setPlainText(
-                    clipboard,
-                    "geo: URI",
-                    currentState.position.toGeoUriString(),
-                )
-                val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
-                if (!systemHasClipboardEditor) {
-                    Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
-                }
+            clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
+            val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
+            if (!systemHasClipboardEditor) {
+                Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
             }
         }
     }

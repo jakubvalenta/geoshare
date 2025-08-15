@@ -12,3 +12,12 @@ fun getUrlQueryParams(query: String?, uriQuote: UriQuote): Map<String, String> =
             paramName to paramValue
         }
     }
+
+private fun formatUrlQueryParams(params: Map<String, String?>, uriQuote: UriQuote): String =
+    params
+        .filter { it.value != null }
+        .map { "${it.key}=${uriQuote.encode(it.value!!.replace('+', ' '))}" }
+        .joinToString("&")
+
+fun formatUrl(scheme: String, host: String, params: Map<String, String?>, uriQuote: UriQuote): String =
+    "$scheme:$host?${formatUrlQueryParams(params, uriQuote)}".trimEnd('?')

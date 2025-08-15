@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib
 
-import androidx.compose.ui.util.fastJoinToString
 import com.google.re2j.Matcher
 import kotlin.math.max
 import kotlin.math.min
@@ -50,17 +49,52 @@ data class Position(
         matchGroupOrNull(m, "z")?.let { z = max(1, min(21, it.toDouble().roundToInt())).toString() }
     }
 
-    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
-        val coords = "${lat ?: 0},${lon ?: 0}"
-        val params = mapOf(
-            "q" to (q ?: coords),
-            "z" to z,
+    fun hasParams(): Boolean = !z.isNullOrEmpty() || !q.isNullOrEmpty()
+
+    fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
+
+    fun toParamsString(): String = listOfNotNull(
+        q?.takeIf { it.isNotEmpty() },
+        z?.takeIf { it.isNotEmpty() }?.let { "(z$it)" },
+    ).joinToString(" ")
+
+    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String = "${lat ?: 0},${lon ?: 0}".let { coords ->
+        formatUrl(
+            "geo",
+            coords,
+            mapOf(
+                "q" to (q ?: coords),
+                "z" to z,
+            ),
+            uriQuote,
         )
-            .filter { it.value != null }
-            .map { "${it.key}=${uriQuote.encode(it.value!!.replace('+', ' '))}" }
-            .fastJoinToString("&")
-        return "geo:$coords?$params".trimEnd('?')
     }
 
-    fun toDegString(): String = "${lat ?: 0}, ${lon ?: 0}"
+    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String = formatUrl(
+        "magicearth",
+        "//",
+        mapOf("lat" to lat, "lon" to lon, "q" to q, "zoom" to z),
+        uriQuote,
+    )
+
+    fun toNorthSouthWestEastDecCoordsString(): String = listOf(
+        coordToDeg(lat, "S", "N"),
+        coordToDeg(lon, "W", "E"),
+    ).joinToString(", ")
+
+    private fun coordToDeg(s: String?, directionNegative: String, directionPositive: String): String {
+        var abs: String
+        var direction: String
+        if (s == null) {
+            abs = "0"
+            direction = directionPositive
+        } else if (s.startsWith("-")) {
+            abs = s.substring(1)
+            direction = directionNegative
+        } else {
+            abs = s
+            direction = directionPositive
+        }
+        return "$abs\u00B0\u00A0$direction"
+    }
 }

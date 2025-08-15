@@ -9,7 +9,6 @@ data class ConversionStateContext(
     val intentTools: IntentTools,
     val networkTools: NetworkTools,
     val userPreferencesRepository: UserPreferencesRepository,
-    val clipboardTools: ClipboardTools = ClipboardTools(),
     val log: ILog = DefaultLog(),
     val onStateChange: (State) -> Unit = {},
     val getBuildVersionSdkInt: () -> Int = { Build.VERSION.SDK_INT },

@@ -10,13 +10,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,10 +33,12 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun ResultCard(
     geoUriApps: List<ConversionViewModel.App>,
     position: Position,
-    onCopy: () -> Unit,
+    onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
     Column {
         ElevatedCard(
             Modifier
@@ -53,18 +56,55 @@ fun ResultCard(
                     top = Spacing.tiny,
                     end = 4.dp,
                 ),
-                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(Modifier.weight(1f)) {
-                    SelectionContainer {
-                        Text(position.toDegString(), style = MaterialTheme.typography.bodyLarge)
+                Row(
+                    Modifier
+                        .weight(1f)
+                        .padding(top = 12.dp)
+                ) {
+                    Column {
+                        SelectionContainer {
+                            Text(
+                                position.toNorthSouthWestEastDecCoordsString(),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                        if (position.hasParams()) {
+                            SelectionContainer {
+                                Text(
+                                    position.toParamsString(),
+                                    fontStyle = FontStyle.Italic,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
                     }
                 }
-                IconButton({ onCopy() }) {
-                    Icon(
-                        painterResource(R.drawable.content_copy_24px),
-                        contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
-                    )
+                Box {
+                    IconButton({ menuExpanded = true }) {
+                        Icon(
+                            painterResource(R.drawable.content_copy_24px),
+                            contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }) {
+                        listOf(
+                            position.toCoordsDecString(),
+                            position.toNorthSouthWestEastDecCoordsString(),
+                            position.toGeoUriString(),
+                            position.toMagicEarthUriString()
+                        ).map { text ->
+                            DropdownMenuItem(
+                                text = { Text(text) },
+                                onClick = {
+                                    menuExpanded = false
+                                    onCopy(text)
+                                },
+                            )
+                        }
+                    }
                 }
             }
             Row(
@@ -74,7 +114,7 @@ fun ResultCard(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
                 SuggestionChip(
-                    onClick = { onCopy() },
+                    onClick = { onCopy(position.toGeoUriString()) },
                     label = {
                         Text(stringResource(R.string.conversion_succeeded_copy_geo))
                     },
@@ -116,10 +156,11 @@ fun ResultCard(
             ) {
                 geoUriApps.map {
                     item(it.packageName) {
-                        Column(Modifier
-                            .clickable { onShare(it.packageName) }
-                            .fillMaxWidth()
-                            .testTag("geoShareResultCardApp_${it.packageName}"),
+                        Column(
+                            Modifier
+                                .clickable { onShare(it.packageName) }
+                                .fillMaxWidth()
+                                .testTag("geoShareResultCardApp_${it.packageName}"),
                             verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
                             Image(
                                 rememberDrawablePainter(it.icon),
@@ -185,6 +226,52 @@ private fun DarkPreview() {
                     ),
                 ),
                 position = Position("50.123456", "11.123456"),
+                onCopy = {},
+                onShare = {},
+                onSkip = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ParamsPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            ResultCard(
+                geoUriApps = listOf(
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    ),
+                ),
+                position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
+                onCopy = {},
+                onShare = {},
+                onSkip = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkParamsPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            ResultCard(
+                geoUriApps = listOf(
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                    ),
+                ),
+                position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onShare = {},
                 onSkip = {},

@@ -51,8 +51,8 @@ fun ConversionScreen(
         onBack = onBack,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
-        onCopy = {
-            viewModel.copy(context, clipboard)
+        onCopy = { text ->
+            viewModel.copy(context, clipboard, text)
             onFinish()
         },
         onShare = { packageName ->
@@ -79,7 +79,7 @@ fun ConversionScreen(
     onBack: () -> Unit,
     onGrant: (Boolean) -> Unit,
     onDeny: (Boolean) -> Unit,
-    onCopy: () -> Unit,
+    onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
     onCancel: () -> Unit,
