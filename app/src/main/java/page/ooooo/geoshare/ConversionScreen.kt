@@ -3,11 +3,7 @@ package page.ooooo.geoshare
 import android.content.Context
 import android.content.res.Configuration
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -30,11 +26,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.ConfirmationScaffold
 import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.components.ResultCard
+import page.ooooo.geoshare.components.ResultErrorCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
 import java.net.URL
 
 @Composable
@@ -138,25 +134,7 @@ fun ConversionScreen(
                     }
                 },
             ) {
-                Card(
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag("geoShareConversionError"),
-                    shape = OutlinedTextFieldDefaults.shape,
-                    colors = CardDefaults.cardColors(
-                        MaterialTheme.colorScheme.errorContainer,
-                        MaterialTheme.colorScheme.onErrorContainer,
-                    ),
-                ) {
-                    Row(Modifier.padding(Spacing.small)) {
-                        SelectionContainer {
-                            Text(
-                                stringResource(currentState.errorMessageResId),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
-                    }
-                }
+                ResultErrorCard(currentState.errorMessageResId)
             }
         }
     }
@@ -243,7 +221,7 @@ fun ConversionScreen(
                 Modifier
                     .align(Alignment.CenterHorizontally)
                     .size(64.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }

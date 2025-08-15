@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,14 +37,14 @@ fun ResultCard(
     onSkip: () -> Unit,
 ) {
     Column {
-        Card(
+        ElevatedCard(
             Modifier
                 .fillMaxWidth()
                 .padding(top = Spacing.small),
             shape = OutlinedTextFieldDefaults.shape,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ),
         ) {
             Row(
@@ -53,7 +52,6 @@ fun ResultCard(
                     start = Spacing.small,
                     top = Spacing.tiny,
                     end = 4.dp,
-                    bottom = Spacing.tiny,
                 ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -69,46 +67,66 @@ fun ResultCard(
                     )
                 }
             }
-        }
-        Row(
-            Modifier
-                .padding(top = Spacing.tiny)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-        ) {
-            SuggestionChip(
-                onClick = { onCopy() },
-                label = {
-                    Text(stringResource(R.string.conversion_succeeded_copy_geo))
-                },
-            )
+            Row(
+                Modifier
+                    .padding(start = Spacing.small, bottom = Spacing.tiny)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            ) {
+                SuggestionChip(
+                    onClick = { onCopy() },
+                    label = {
+                        Text(stringResource(R.string.conversion_succeeded_copy_geo))
+                    },
+                    colors = SuggestionChipDefaults.suggestionChipColors(
+                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
+                    border = SuggestionChipDefaults.suggestionChipBorder(
+                        enabled = true,
+                        borderColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                )
+            }
         }
 
-        Text(
-            stringResource(R.string.conversion_succeeded_apps_headline),
-            Modifier.padding(top = Spacing.medium, bottom = Spacing.small),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        Row(
+            Modifier
+                .padding(
+                    start = Spacing.small, top = Spacing.medium, end = Spacing.tiny, bottom = Spacing.small
+                )
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                stringResource(R.string.conversion_succeeded_apps_headline),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            TextButton({ onSkip() }) {
+                Text(stringResource(R.string.conversion_succeeded_skip))
+            }
+        }
         if (geoUriApps.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(4),
+                modifier = Modifier.padding(horizontal = Spacing.small),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.small),
                 verticalArrangement = Arrangement.spacedBy(Spacing.medium),
             ) {
                 geoUriApps.map {
                     item(it.packageName) {
-                        Column(
-                            Modifier
-                                .clickable { onShare(it.packageName) }
-                                .fillMaxWidth()
-                                .testTag("geoShareResultCardApp_${it.packageName}"),
+                        Column(Modifier
+                            .clickable { onShare(it.packageName) }
+                            .fillMaxWidth()
+                            .testTag("geoShareResultCardApp_${it.packageName}"),
                             verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
                             Image(
                                 rememberDrawablePainter(it.icon),
                                 it.label,
                                 Modifier
                                     .align(Alignment.CenterHorizontally)
-                                    .widthIn(max = 48.dp),
+                                    .widthIn(max = 46.dp),
                             )
                             Text(
                                 it.label,
@@ -121,23 +139,9 @@ fun ResultCard(
                 }
             }
         } else {
-            Text(
+            InfoCard(
                 stringResource(R.string.conversion_succeeded_apps_not_found),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontStyle = FontStyle.Italic,
-            )
-        }
-        Row(
-            Modifier
-                .padding(top = Spacing.small)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-        ) {
-            SuggestionChip(
-                onClick = { onSkip() },
-                label = {
-                    Text(stringResource(R.string.conversion_succeeded_skip))
-                },
+                Modifier.padding(horizontal = Spacing.small),
             )
         }
     }
