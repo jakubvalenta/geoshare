@@ -47,6 +47,7 @@ class NullableIntUserPreference(
         OutlinedTextField(
             value = inputValue,
             onValueChange = {
+                @Suppress("AssignedValueIsNeverRead")
                 inputValue = it
                 onValueChange(fromString(it))
             },

@@ -26,7 +26,6 @@ import kotlin.coroutines.cancellation.CancellationException
 class ConversionStateTest {
 
     private lateinit var fakeLog: ILog
-    private lateinit var fakeOnMessage: (message: Message) -> Unit
     private lateinit var fakeUriQuote: FakeUriQuote
     private lateinit var googleMapsUrlConverter: GoogleMapsUrlConverter
     private lateinit var urlConverters: List<UrlConverter>
@@ -37,7 +36,6 @@ class ConversionStateTest {
     @Before
     fun before() = runTest {
         fakeLog = FakeLog()
-        fakeOnMessage = {}
         fakeUriQuote = FakeUriQuote()
 
         googleMapsUrlConverter = GoogleMapsUrlConverter(fakeLog, fakeUriQuote)
