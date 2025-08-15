@@ -35,6 +35,7 @@ class Initial : ConversionState()
 data class ReceivedIntent(
     val stateContext: ConversionStateContext,
     val intent: Intent,
+    private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : ConversionState() {
     override suspend fun transition(): State {
         val position = stateContext.intentTools.getIntentPosition(intent)
@@ -44,7 +45,7 @@ data class ReceivedIntent(
         val inputUriString = stateContext.intentTools.getIntentUriString(intent) ?: return ConversionFailed(
             R.string.conversion_failed_missing_url
         )
-        return ReceivedUrlString(stateContext, inputUriString, null)
+        return ReceivedUriString(stateContext, inputUriString, uriQuote)
     }
 }
 
@@ -58,23 +59,13 @@ data class ReceivedUriString(
         if (position != null) {
             return ConversionSucceeded(inputUriString, position)
         }
-        return ReceivedUrlString(stateContext, inputUriString, null)
-    }
-}
-
-data class ReceivedUrlString(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val permission: Permission?,
-) : ConversionState() {
-    override suspend fun transition(): State {
         val inputUriStringWithHttpsScheme = inputUriString.replace("^([a-z]+:)?(//)?(.)".toRegex(), "https://$3")
         val url = try {
             URL(inputUriStringWithHttpsScheme)
         } catch (_: MalformedURLException) {
             return ConversionFailed(R.string.conversion_failed_invalid_url)
         }
-        return ReceivedUrl(stateContext, inputUriString, url, permission)
+        return ReceivedUrl(stateContext, inputUriString, url, null)
     }
 }
 

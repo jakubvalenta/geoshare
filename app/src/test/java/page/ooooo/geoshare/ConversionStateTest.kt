@@ -127,7 +127,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedIntent_intentContainsUrl_returnsReceivedUrlStringWithPermissionNull() = runTest {
+    fun receivedIntent_intentContainsUrl_returnsReceivedUriString() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val intent = Intent()
         val mockIntentTools = Mockito.mock(IntentTools::class.java)
@@ -141,15 +141,15 @@ class ConversionStateTest {
             mockXiaomiTools,
             log = fakeLog,
         )
-        val state = ReceivedIntent(stateContext, intent)
+        val state = ReceivedIntent(stateContext, intent, fakeUriQuote)
         assertEquals(
-            ReceivedUrlString(stateContext, inputUriString, null),
+            ReceivedUriString(stateContext, inputUriString, fakeUriQuote),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUri_isGeoUri_returnsSucceeded() = runTest {
+    fun receivedUriString_isGeoUri_returnsSucceeded() = runTest {
         val inputUriString = "geo:1,2?q="
         val stateContext = ConversionStateContext(
             urlConverters,
@@ -167,43 +167,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUri_isNotGeoUri_returnsReceivedUrlStringWithPermissionNull() = runTest {
-        val inputUriString = "https://www.example.com/"
-        val stateContext = ConversionStateContext(
-            urlConverters,
-            mockIntentTools,
-            mockNetworkTools,
-            fakeUserPreferencesRepository,
-            mockXiaomiTools,
-            log = fakeLog,
-        )
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
-        assertEquals(
-            ReceivedUrlString(stateContext, inputUriString, null),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun receivedUri_isMissingScheme_returnsReceivedUrlStringWithPermissionNull() = runTest {
-        val inputUriString = "www.example.com"
-        val stateContext = ConversionStateContext(
-            urlConverters,
-            mockIntentTools,
-            mockNetworkTools,
-            fakeUserPreferencesRepository,
-            mockXiaomiTools,
-            log = fakeLog,
-        )
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
-        assertEquals(
-            ReceivedUrlString(stateContext, inputUriString, null),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun receivedUrlString_isValidUrl_returnsReceivedUrlAndPassesPermission() = runTest {
+    fun receivedUriString_isValidUrl_returnsReceivedUrlWithPermissionNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val url = URL(inputUriString)
         val stateContext = ConversionStateContext(
@@ -214,21 +178,20 @@ class ConversionStateTest {
             mockXiaomiTools,
             log = fakeLog,
         )
-        val permission = Permission.NEVER
-        val state = ReceivedUrlString(stateContext, inputUriString, permission)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ReceivedUrl(
                 stateContext,
                 inputUriString,
                 url,
-                permission,
+                null,
             ),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUrlString_isNotValidUrl_returnsFailed() = runTest {
+    fun receivedUriString_isNotValidUrl_returnsFailed() = runTest {
         val inputUriString = "https://[invalid:ipv6]/"
         val stateContext = ConversionStateContext(
             urlConverters,
@@ -238,8 +201,7 @@ class ConversionStateTest {
             mockXiaomiTools,
             log = fakeLog,
         )
-        val permission = Permission.NEVER
-        val state = ReceivedUrlString(stateContext, inputUriString, permission)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_invalid_url),
             state.transition(),
@@ -247,7 +209,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUrlString_isEmpty_returnsFailed() = runTest {
+    fun receivedUriString_isEmpty_returnsFailed() = runTest {
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -257,8 +219,7 @@ class ConversionStateTest {
             log = fakeLog,
         )
         val inputUriString = ""
-        val permission = Permission.NEVER
-        val state = ReceivedUrlString(stateContext, inputUriString, permission)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_invalid_url),
             state.transition(),
@@ -266,7 +227,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUrlString_isMissingScheme_returnsReceivedUrlWithSchemeAndPassesPermission() = runTest {
+    fun receivedUriString_isMissingScheme_returnsReceivedUrlWithSchemeAndPermissionNull() = runTest {
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -276,21 +237,20 @@ class ConversionStateTest {
             log = fakeLog,
         )
         val inputUriString = "www.example.com/"
-        val permission = Permission.NEVER
-        val state = ReceivedUrlString(stateContext, inputUriString, permission)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ReceivedUrl(
                 stateContext,
                 inputUriString,
                 URL("https://www.example.com/"),
-                permission,
+                null,
             ),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUrlString_isRelativeScheme_returnsReceivedUrlWithHttpsSchemeAndPassesPermission() = runTest {
+    fun receivedUriString_isRelativeScheme_returnsReceivedUrlWithHttpsSchemeAndPermissionNull() = runTest {
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -300,21 +260,20 @@ class ConversionStateTest {
             log = fakeLog,
         )
         val inputUriString = "//www.example.com/"
-        val permission = Permission.NEVER
-        val state = ReceivedUrlString(stateContext, inputUriString, permission)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ReceivedUrl(
                 stateContext,
                 inputUriString,
                 URL("https://www.example.com/"),
-                permission,
+                null,
             ),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUrlString_isNotHttpsScheme_returnsReceivedUrlWithHttpsSchemeAndPassesPermission() = runTest {
+    fun receivedUriString_isNotHttpsScheme_returnsReceivedUrlWithHttpsSchemeAndPermissionNull() = runTest {
         val stateContext = ConversionStateContext(
             urlConverters,
             mockIntentTools,
@@ -324,14 +283,13 @@ class ConversionStateTest {
             log = fakeLog,
         )
         val inputUriString = "ftp://www.example.com/"
-        val permission = Permission.NEVER
-        val state = ReceivedUrlString(stateContext, inputUriString, permission)
+        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
         assertEquals(
             ReceivedUrl(
                 stateContext,
                 inputUriString,
                 URL("https://www.example.com/"),
-                permission,
+                null,
             ),
             state.transition(),
         )

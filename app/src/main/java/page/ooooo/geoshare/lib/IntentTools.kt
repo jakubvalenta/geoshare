@@ -7,7 +7,7 @@ import android.util.Log
 
 class IntentTools {
 
-    private val intentUrlRegex = Regex("https?://\\S+")
+    private val intentUrlRegex = Regex("(https?://|geo:)\\S+")
 
     fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
         setPackage(packageName)
