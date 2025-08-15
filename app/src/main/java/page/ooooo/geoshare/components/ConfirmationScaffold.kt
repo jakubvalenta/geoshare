@@ -19,6 +19,7 @@ fun ConfirmationScaffold(
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
+    fill: Boolean = true,
     content: @Composable (ColumnScope.() -> Unit),
 ) {
     Scaffold(
@@ -43,7 +44,7 @@ fun ConfirmationScaffold(
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f, fill)
             ) {
                 content()
             }

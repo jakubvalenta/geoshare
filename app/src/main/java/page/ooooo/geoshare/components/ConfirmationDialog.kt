@@ -40,6 +40,7 @@ fun ConfirmationDialog(
                 Text(confirmText)
             }
         },
+        fill = false,
     ) {
         content()
     }
