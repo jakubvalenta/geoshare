@@ -40,7 +40,7 @@ fun IntroScreen(
     onCloseIntro: () -> Unit = {},
 ) {
     val appName = stringResource(R.string.app_name)
-    val pageCount = 3
+    val pageCount = 2
     var page by remember { mutableIntStateOf(initialPage) }
     val animatedProgress by animateFloatAsState(
         targetValue = (page + 1f) / pageCount,
@@ -150,25 +150,6 @@ fun IntroScreen(
                                 stringResource(R.string.intro_open_by_default_app_note),
                                 Modifier.fillMaxWidth(),
                             )
-                        }
-                    }
-
-                    2 -> IntroPage(
-                        stringResource(R.string.intro_geo_links_headline),
-                        page,
-                    ) {
-                        IntroFigure(
-                            stringResource(
-                                R.string.intro_geo_links_copy_caption,
-                                stringResource(R.string.conversion_succeeded_copy_geo),
-                            ),
-                        ) {
-                            ScreenshotMapAppCopy()
-                        }
-                        IntroFigure(
-                            stringResource(R.string.intro_geo_links_form_caption, appName),
-                        ) {
-                            ScreenshotMain()
                         }
                     }
                 }
@@ -291,22 +272,6 @@ private fun PageTwoPreview() {
 private fun DarkPageTwoPreview() {
     AppTheme {
         IntroScreen(initialPage = 1)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PageThreePreview() {
-    AppTheme {
-        IntroScreen(initialPage = 2)
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkPageThreePreview() {
-    AppTheme {
-        IntroScreen(initialPage = 2)
     }
 }
 
