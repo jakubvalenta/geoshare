@@ -49,12 +49,10 @@ data class Position(
         matchGroupOrNull(m, "z")?.let { z = max(1, min(21, it.toDouble().roundToInt())).toString() }
     }
 
-    fun hasParams(): Boolean = !z.isNullOrEmpty() || !q.isNullOrEmpty()
-
     fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
 
     fun toParamsString(): String = listOfNotNull(
-        q?.takeIf { it.isNotEmpty() },
+        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" },
         z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
     ).joinToString(" \u2022 ")
 

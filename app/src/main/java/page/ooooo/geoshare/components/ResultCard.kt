@@ -68,10 +68,10 @@ fun ResultCard(
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
-                        if (position.hasParams()) {
+                        position.toParamsString().takeIf { it.isNotEmpty() }?.let {
                             SelectionContainer {
                                 Text(
-                                    position.toParamsString(),
+                                    it,
                                     fontStyle = FontStyle.Italic,
                                     style = MaterialTheme.typography.bodySmall,
                                 )
