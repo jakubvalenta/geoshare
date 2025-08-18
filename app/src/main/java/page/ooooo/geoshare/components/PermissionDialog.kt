@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -45,10 +45,7 @@ fun PermissionDialog(
         onDismissRequest = { onDismissRequest(doNotAsk) },
         modifier = modifier,
     ) {
-        Column(
-            Modifier.padding(bottom = Spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(Spacing.tiny),
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
             content()
             Row(
                 Modifier.fillMaxWidth(),
@@ -76,7 +73,7 @@ private fun DefaultPreview() {
         val appName = stringResource(R.string.app_name)
         val url =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        Surface {
+        ConfirmationScaffold {
             PermissionDialog(
                 title = "Connect to Google?",
                 confirmText = "Allow",
@@ -105,7 +102,7 @@ private fun DarkPreview() {
         val appName = stringResource(R.string.app_name)
         val url =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        Surface {
+        ConfirmationScaffold {
             PermissionDialog(
                 title = "Connect to Google?",
                 confirmText = "Allow",
@@ -133,7 +130,7 @@ private fun ParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
         val url = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        Surface {
+        ConfirmationScaffold {
             PermissionDialog(
                 title = "Connect to Google?",
                 confirmText = "Allow",
@@ -161,7 +158,7 @@ private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
         val url = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        Surface {
+        ConfirmationScaffold {
             PermissionDialog(
                 title = "Connect to Google?",
                 confirmText = "Allow",

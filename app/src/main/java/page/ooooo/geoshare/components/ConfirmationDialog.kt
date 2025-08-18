@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -10,7 +12,6 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationDialog(
     title: String,
@@ -21,36 +22,35 @@ fun ConfirmationDialog(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    ConfirmationScaffold(
-        title,
-        modifier,
-        startButton = {
-            OutlinedButton(
-                { onDismissRequest() },
-                Modifier.testTag("geoShareConfirmationDialogDismissButton"),
-            ) {
-                Text(dismissText)
-            }
-        },
-        endButton = {
-            Button(
+    AlertDialog(
+        title = { Text(text = title) },
+        text = { content() },
+        onDismissRequest = { onDismissRequest() },
+        confirmButton = {
+            TextButton(
                 { onConfirmation() },
                 Modifier.testTag("geoShareConfirmationDialogConfirmButton"),
             ) {
                 Text(confirmText)
             }
         },
-        fill = false,
-    ) {
-        content()
-    }
+        dismissButton = {
+            TextButton(
+                { onDismissRequest() },
+                Modifier.testTag("geoShareConfirmationDialogDismissButton"),
+            ) {
+                Text(dismissText)
+            }
+        },
+        modifier = modifier,
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface {
+        ConfirmationScaffold {
             ConfirmationDialog(
                 title = "My title",
                 confirmText = "Confirm",
@@ -68,7 +68,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface {
+        ConfirmationScaffold {
             ConfirmationDialog(
                 title = "My title",
                 confirmText = "Confirm",

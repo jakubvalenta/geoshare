@@ -14,51 +14,56 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationScaffold(
-    title: String,
-    modifier: Modifier = Modifier,
+    title: String? = null,
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
     fill: Boolean = true,
-    content: @Composable (ColumnScope.() -> Unit),
+    content: (@Composable (ColumnScope.() -> Unit))? = null,
 ) {
     Scaffold(
-        modifier.semantics { testTagsAsResourceId = true },
+        Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             TopAppBar(
                 title = {
-                    Text(title)
+                    if (title != null) {
+                        Text(title)
+                    }
                 },
                 navigationIcon = navigationIcon,
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .imePadding()
-                .padding(horizontal = Spacing.windowPadding)
-                .padding(top = Spacing.small)
-        ) {
+        if (startButton != null || endButton != null || content != null) {
             Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill)
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding()
+                    .padding(horizontal = Spacing.windowPadding)
+                    .padding(top = Spacing.small)
             ) {
-                content()
-            }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = Spacing.tiny)
-            ) {
-                if (startButton != null) {
-                    startButton()
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill)
+                ) {
+                    if (content != null) {
+                        content()
+                    }
                 }
-                if (endButton != null) {
-                    Spacer(Modifier.weight(1f))
-                    endButton()
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = Spacing.tiny)
+                ) {
+                    if (startButton != null) {
+                        startButton()
+                    }
+                    if (endButton != null) {
+                        Spacer(Modifier.weight(1f))
+                        endButton()
+                    }
                 }
             }
         }
