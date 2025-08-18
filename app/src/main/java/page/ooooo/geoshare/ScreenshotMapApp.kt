@@ -68,7 +68,7 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
             for (icon in listOf(
                 Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_messaging)),
                 Icon(appName),
-                Icon("TODO"), // TODO Make new screenshots.
+                Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_whatsapp)),
                 Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_bluetooth)),
                 Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_chrome)),
             )) {
