@@ -73,7 +73,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndAssertObjectExists(By.res("geoShareConversionError"))
 
         // Close the window (this is necessary, for some reason)
-        clickObject(By.res("geoShareConversionErrorDoneButton"))
+        clickObject(By.res("geoShareConversionDoneButton"))
 
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -94,7 +94,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndAssertObjectExists(By.res("geoShareConversionError"))
 
         // Close the window (this is necessary, for some reason)
-        clickObject(By.res("geoShareConversionErrorDoneButton"))
+        clickObject(By.res("geoShareConversionDoneButton"))
 
         // Share the Google Maps short link with the app again
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -172,7 +172,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndAssertObjectExists(By.res("geoShareConversionError"))
 
         // Close the window (this is necessary, for some reason)
-        clickObject(By.res("geoShareConversionErrorDoneButton"))
+        clickObject(By.res("geoShareConversionDoneButton"))
 
         // Share the Apple Maps place link with the app again
         shareUri("https://maps.apple.com/place?place-id=IE08A4F5FAA2F0502&_provider=9902")
@@ -194,7 +194,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndAssertObjectExists(By.res("geoShareConversionError"))
 
         // Close the window (this is necessary, for some reason)
-        clickObject(By.res("geoShareConversionErrorDoneButton"))
+        clickObject(By.res("geoShareConversionDoneButton"))
 
         // Share another Apple Maps place link with the app
         shareUri("https://maps.apple.com/place?place-id=I263680A7B546CF16&_provider=9902")

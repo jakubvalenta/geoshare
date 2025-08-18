@@ -135,7 +135,7 @@ fun ConversionScreen(
         endButton = when (currentState) {
             is HasError, is HasResult -> {
                 {
-                    Button(onBack) {
+                    Button(onBack, Modifier.testTag("geoShareConversionDoneButton")) {
                         Text(stringResource(R.string.conversion_done))
                     }
                 }

@@ -22,7 +22,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         launchApplication()
 
         // Intro is still visible; go through all intro pages
-        for (page in 0..2) {
+        for (page in 0..1) {
             waitAndAssertObjectExists(By.res("geoShareIntroPage${page}HeadingText"))
             clickObject(By.res("geoShareIntroScreenNextButton"))
         }
