@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.ui.theme.ScreenshotTheme
@@ -89,6 +90,7 @@ fun ScreenshotText(
     modifier: Modifier = Modifier,
     color: Color = ScreenshotTheme.colors.textColor,
     fontWeight: FontWeight = FontWeight.Normal,
+    textAlign: TextAlign? = null,
     style: TextStyle = ScreenshotTheme.typography.textMedium,
 ) {
     with(LocalDensity.current) {
@@ -97,6 +99,7 @@ fun ScreenshotText(
             modifier,
             color = color,
             fontWeight = fontWeight,
+            textAlign = textAlign,
             style = style.copy(
                 fontSize = style.fontSize * 2.75 / this.density * scale,
                 lineHeight = style.lineHeight * 2.75 / this.density * scale,

@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,80 +13,85 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.ScreenshotTheme
 
 @Composable
 fun ScreenshotOpen() {
     val appName = stringResource(R.string.app_name)
     val density = LocalDensity.current
-    val mapApps = listOf("OsmAnd~", "Organic Maps", "Mapy")
     Screenshot(
         R.drawable.geo_share_open,
         stringResource(R.string.intro_how_to_share_app_content_description, appName),
-        IntSize(1080, 864),
+        IntSize(1080, 896),
     ) { scale ->
         ScreenshotRow(
             scale,
             1080,
-            x = 126,
-            y = 55,
+            x = 86,
+            y = 100,
         ) {
             ScreenshotText(
-                stringResource(R.string.intro_how_to_share_app_screenshot_title, mapApps[0]),
+                Position("42.5784957", "1.8955661").toNorthSouthWestEastDecCoordsString(),
                 scale,
-                fontWeight = FontWeight.Medium,
-                style = ScreenshotTheme.typography.textLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
         ScreenshotRow(
             scale,
             1080,
-            x = 78,
-            y = 265,
-            horizontalArrangement = Arrangement.End,
+            x = 86,
+            y = 220,
         ) {
             ScreenshotText(
-                stringResource(R.string.intro_how_to_share_app_screenshot_once),
+                stringResource(R.string.conversion_succeeded_copy_geo),
                 scale,
-                Modifier.padding(end = with(density) { 66.toDp() * scale }),
-                fontWeight = FontWeight.Medium,
-            )
-            ScreenshotText(
-                stringResource(R.string.intro_how_to_share_app_screenshot_always),
-                scale,
-                fontWeight = FontWeight.Medium,
+                Modifier
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
+                        MaterialTheme.shapes.large,
+                    )
+                    .padding(
+                        horizontal = with(density) { 44.toDp() * scale },
+                        vertical = with(density) { 17.toDp() * scale },
+                    ),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         ScreenshotRow(
             scale,
             1080,
-            x = 62,
-            y = 434,
+            x = 84,
+            y = 478,
         ) {
             ScreenshotText(
-                stringResource(R.string.intro_how_to_share_app_screenshot_different),
+                stringResource(R.string.conversion_succeeded_apps_headline),
                 scale,
-                fontWeight = FontWeight.Medium,
-                style = ScreenshotTheme.typography.textLarge,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
-        ScreenshotColumn(
+        ScreenshotRow(
             scale,
             1080,
-            x = 126,
-            y = 600,
-            verticalSpacing = 98,
+            x = 80,
+            y = 774,
+            horizontalArrangement = Arrangement.spacedBy(with(density) { 70.toDp() * scale }),
         ) {
-            for (text in mapApps.drop(1)) {
+            for (text in listOf("Maps", "Mapy.com", "Organic Maps", "OsmAnd~")) {
                 ScreenshotText(
                     text,
                     scale,
-                    style = ScreenshotTheme.typography.textLarge,
+                    Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
