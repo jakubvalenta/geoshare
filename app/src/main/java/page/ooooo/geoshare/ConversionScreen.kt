@@ -16,6 +16,8 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.fromHtml
@@ -159,7 +161,9 @@ fun ConversionScreen(
                     dismissText = stringResource(R.string.conversion_permission_common_deny),
                     onConfirmation = onGrant,
                     onDismissRequest = onDeny,
-                    modifier = Modifier.testTag("geoShareUnshortenPermissionDialog"),
+                    modifier = Modifier
+                        .semantics { testTagsAsResourceId = true }
+                        .testTag("geoShareUnshortenPermissionDialog"),
                 ) {
                     Text(
                         AnnotatedString.fromHtml(
@@ -181,7 +185,9 @@ fun ConversionScreen(
                     dismissText = stringResource(R.string.conversion_permission_common_deny),
                     onConfirmation = onGrant,
                     onDismissRequest = onDeny,
-                    modifier = Modifier.testTag("geoShareParseHtmlPermissionDialog"),
+                    modifier = Modifier
+                        .semantics { testTagsAsResourceId = true }
+                        .testTag("geoShareParseHtmlPermissionDialog"),
                 ) {
                     Text(
                         AnnotatedString.fromHtml(
@@ -203,7 +209,9 @@ fun ConversionScreen(
                     dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
                     onConfirmation = onGrant,
                     onDismissRequest = onDeny,
-                    modifier = Modifier.testTag("geoShareParseHtmlToGetCoordsPermissionDialog")
+                    modifier = Modifier
+                        .semantics { testTagsAsResourceId = true }
+                        .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")
                 ) {
                     Text(
                         AnnotatedString.fromHtml(
