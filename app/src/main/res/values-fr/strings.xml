@@ -67,7 +67,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS/MMS</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="conversion_succeeded_apps_headline">Ouvrir avec %1$s</string>
+    <string name="conversion_succeeded_apps_headline">Ouvrir avec…</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Choisir comment ouvrir les liens Web pour cette appli</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">Dans l’application</string>

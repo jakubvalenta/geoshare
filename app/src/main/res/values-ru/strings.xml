@@ -15,7 +15,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлен маркер</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Сообщения</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="conversion_succeeded_apps_headline">Открыть с помощью %1$s</string>
+    <string name="conversion_succeeded_apps_headline">Открыть с помощью…</string>
     <string name="intro_open_by_default_headline">Настройте Android на открытие ссылок на Google Maps в других картах (необязательно)</string>
     <string name="intro_how_to_share_app_content_description">Снимок экрана приложения %1$s с диалогом Поделиться ссылкой</string>
     <string name="intro_open_by_default_google_maps_button">Открыть настройки Google Maps</string>

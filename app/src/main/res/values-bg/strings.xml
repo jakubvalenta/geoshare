@@ -64,7 +64,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_title">Споделяне с</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Съобщения</string>
-    <string name="conversion_succeeded_apps_headline">Отвори с %1$s</string>
+    <string name="conversion_succeeded_apps_headline">Отвори с…</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">В приложението</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Във вашия браузър</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Отказ</string>

@@ -21,6 +21,7 @@
     <string name="conversion_permission_parse_html_to_get_coords_deny">Erstelle einen search geo: Link</string>
     <string name="intro_how_to_share_headline">Wie öffnet man Google Maps Orte in anderen Apps</string>
     <string name="intro_nav_finish">Los gehts</string>
+    <string name="conversion_succeeded_apps_headline">Öffnen mit…</string>
     <string name="intro_open_by_default_headline">Konfigurieren Sie Android so, dass Links zu Google Maps in alternativen Karten-Apps geöffnet werden (optional)</string>
     <string name="intro_title">Einführung</string>
     <string name="nav_back_content_description">Zurück zur Startseite</string>
