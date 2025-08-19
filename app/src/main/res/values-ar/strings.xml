@@ -24,12 +24,7 @@
     <string name="intro_open_by_default_app_caption"><![CDATA[ثم انتقل إلى الإعدادات &#8594; التطبيقات &#8594; %1$s &#8594; <i>فتح افتراضيًا</i>، وقم بتفعيل فتح الروابط في هذا التطبيق، وانقر على <i>إضافة روابط</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">لقطة شاشة لإعدادات فتح افتراضيًا في %1$s</string>
     <string name="intro_open_by_default_app_button">فتح إعدادات %1$s</string>
-    <string name="intro_geo_links_headline">كيفية نسخ الإحداثيات الجغرافية</string>
     <string name="intro_open_by_default_app_note"><![CDATA[حدد على الأقل <tt>maps.google.com</tt> و<tt>maps.app.goo.gl</tt>. إذا كانت بعض الروابط معطلة، فإن تطبيقات جوجل الأخرى مضبوطة لفتحها افتراضيًا. يمكنك العثور على هذه التطبيقات وإيقاف فتح الروابط لها، كما فعلنا مع خرائط جوجل.]]></string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[اختر <i>%1$s</i> عند مشاركة موقع من تطبيق خرائطك..]]></string>
-    <string name="intro_geo_links_copy_content_description">لقطة شاشة لشاشة المشاركة في خرائط جوجل</string>
-    <string name="intro_geo_links_form_caption">أو افتح %1$s والصق رابط خرائطك هناك.</string>
-    <string name="intro_geo_links_form_content_description">لقطة شاشة لنموذج الإحداثيات الجغرافية لـ %1$s</string>
     <string name="intro_nav_next">التالي</string>
     <string name="intro_nav_finish">ابدأ</string>
     <string name="intro_settings_activity_not_found">فشل في فتح الإعدادات</string>
@@ -69,10 +64,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">المراسلة</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">البلوتوث</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="intro_how_to_share_app_screenshot_title">افتح ب%1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">مرة واحدة</string>
-    <string name="intro_how_to_share_app_screenshot_always">دائمًا</string>
-    <string name="intro_how_to_share_app_screenshot_different">استخدم تطبيقًا آخر</string>
+    <string name="conversion_succeeded_apps_headline">افتح ب%1$s</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">خرائط</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">اختر كيفية فتح روابط الويب لهذا التطبيق</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">في التطبيق</string>

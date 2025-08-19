@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="main_input_uri_label">Pegue aquí un enlace Google Maps</string>
-    <string name="intro_geo_links_form_caption">O abra %1$s y pegue su enlace Google Maps aquí.</string>
     <string name="intro_title">Intro</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Luego vaya a Ajustes &#8594; Apps &#8594; %1$s &#8594; <i>Abrir por defecto</i>, active la apertura de enlaces en esta aplicación, y pulse <i>Añadir enlaces</i>.]]></string>
     <string name="nav_menu_content_description">Menú</string>
@@ -10,8 +9,6 @@
     <string name="user_preferences_connection_description">Para soportar enlaces cortos de Google Maps, y para obtener coordenadas de esa página web cuando el enlace no las contiene, %1$s puede conectarse a Google. Puede encontrar más información en la pantalla de preguntas frecuentes.</string>
     <string name="intro_how_to_share_headline">Cómo ver las ubicaciones de Google Maps en otras apps de mapas</string>
     <string name="intro_nav_finish">Empezar</string>
-    <string name="intro_geo_links_headline">Cómo crear enlaces geo:</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Seleccione <i>%1$s</i> cuando comparta desde Google Maps.]]></string>
     <string name="conversion_permission_common_deny">Cancelar</string>
     <string name="intro_how_to_share_google_maps_caption">Comparte una ubicación desde la app Google Maps o el navegador web.</string>
     <string name="intro_how_to_share_google_maps_content_description">Captura de pantalla de Google Maps</string>
@@ -22,8 +19,6 @@
     <string name="intro_open_by_default_google_maps_content_description">Captura de pantalla de la configuración predeterminada de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
     <string name="intro_open_by_default_app_content_description">Captura de pantalla de los ajustes de abrir por defecto de %1$s</string>
-    <string name="intro_geo_links_copy_content_description">Captura de pantalla de compartir de Google Maps</string>
-    <string name="intro_geo_links_form_content_description">Captura de pantalla del formulario de conversión geo: de %1$s</string>
     <string name="intro_nav_close">Cerrar</string>
     <string name="intro_nav_next">SIguiente</string>
     <string name="main_navigate_to_intro">Descubrir más características de la app</string>

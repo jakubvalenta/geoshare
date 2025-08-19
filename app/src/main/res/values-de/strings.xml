@@ -8,10 +8,6 @@
     <string name="intro_open_by_default_app_content_description">Screenshot von %1$s’s Standardmäßig öffnen Einstellungen</string>
     <string name="intro_open_by_default_app_button">Öffne die Einstellungen von %1$s</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Wählen Sie wenigstens <tt>maps.google.com</tt> und <tt>maps.app.goo.gl</tt> aus. Wenn manche Links ausgegraut sind, öffnen andere Google Apps diese Links Standardmäßig. Sie können diese Apps suchen und bei den das öffnen von Links unterbinden, so wie es zuvor bei Google Maps gemacht wurde.]]></string>
-    <string name="intro_geo_links_headline">Wie erstellt man geo: links</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Wählen Sie <i>%1$s</i> aus, wenn Sie Google Maps Links teilen.]]></string>
-    <string name="intro_geo_links_copy_content_description">Bildschirmfoto von Google Maps share Sheet</string>
-    <string name="intro_geo_links_form_content_description">Bildschirmfoto von %1$s geo: Link Konvertierungsseite</string>
     <string name="intro_nav_next">Weiter</string>
     <string name="main_input_uri_clear_content_description">Löschen</string>
     <string name="main_input_uri_supporting_text">z.B. https://google.com/maps/… oder maps.app.goo.gl/…</string>
@@ -26,7 +22,6 @@
     <string name="intro_how_to_share_headline">Wie öffnet man Google Maps Orte in anderen Apps</string>
     <string name="intro_nav_finish">Los gehts</string>
     <string name="intro_open_by_default_headline">Konfigurieren Sie Android so, dass Links zu Google Maps in alternativen Karten-Apps geöffnet werden (optional)</string>
-    <string name="intro_geo_links_form_caption">Oder öffne %1$s und füge hier den Google Maps Link ein.</string>
     <string name="intro_title">Einführung</string>
     <string name="nav_back_content_description">Zurück zur Startseite</string>
     <string name="main_input_uri_label">Füge einen Google Maps Link hier ein</string>

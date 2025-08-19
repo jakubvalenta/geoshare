@@ -17,10 +17,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_whatsapp">WhatsApp</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and the app will let you open the same location in any installed map app.]]></string>
     <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
-    <string name="intro_how_to_share_app_screenshot_title">Open with %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Just once</string>
-    <string name="intro_how_to_share_app_screenshot_always">Always</string>
-    <string name="intro_how_to_share_app_screenshot_different">Use a different app</string>
+    <string name="conversion_succeeded_apps_headline">Open with %1$s</string>
     <string name="intro_open_by_default_headline">Configure Android to open links to Google Maps in alternative maps (optional)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>Open by default</i> and turn off the opening of links in this app.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
@@ -40,11 +37,6 @@
     </plurals>
     <string name="intro_open_by_default_app_screenshot_cancel">Cancel</string>
     <string name="intro_open_by_default_app_screenshot_add">Add</string>
-    <string name="intro_geo_links_headline">How to copy geographic coordinates</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Choose <i>%1$s</i> when sharing a location from your map app.]]></string>
-    <string name="intro_geo_links_copy_content_description">Screenshot of Google Maps’ share screen</string>
-    <string name="intro_geo_links_form_caption">Or open %1$s and paste your map link there.</string>
-    <string name="intro_geo_links_form_content_description">Screenshot of %1$s’s geographic coordinates form</string>
     <string name="intro_nav_close">Close</string>
     <string name="intro_nav_next">Next</string>
     <string name="intro_nav_finish">Get started</string>
@@ -62,7 +54,6 @@
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
-    <string name="conversion_succeeded_apps_headline">Open with</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
     <string name="conversion_permission_common_grant">OK</string>

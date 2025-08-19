@@ -2,13 +2,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="conversion_succeeded_copy_geo">Копировать как geo:</string>
     <string name="nav_menu_content_description">Меню</string>
-    <string name="intro_geo_links_form_caption">Или откройте %1$s и вставьте туда ссылку на вашу карту.</string>
     <string name="conversion_succeeded_copy_content_description">Копировать</string>
     <string name="conversion_failed_parse_html_connection_error">Ошибка подключения при получении веб-страницы из картографического сервиса</string>
     <string name="main_create_geo_uri">Показать координаты</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Отменить</string>
     <string name="intro_open_by_default_app_screenshot_add">Добавить</string>
-    <string name="intro_how_to_share_app_screenshot_always">Всегда</string>
     <string name="nav_back_content_description">Назад на главную</string>
     <string name="intro_title">Введение</string>
     <string name="intro_how_to_share_headline">Как показать местоположение на карте в другом картографическом приложении</string>
@@ -17,9 +15,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлен маркер</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Сообщения</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="intro_how_to_share_app_screenshot_title">Открыть с помощью %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Только в этот раз</string>
-    <string name="intro_how_to_share_app_screenshot_different">Использовать другое приложение</string>
+    <string name="conversion_succeeded_apps_headline">Открыть с помощью %1$s</string>
     <string name="intro_open_by_default_headline">Настройте Android на открытие ссылок на Google Maps в других картах (необязательно)</string>
     <string name="intro_how_to_share_app_content_description">Снимок экрана приложения %1$s с диалогом Поделиться ссылкой</string>
     <string name="intro_open_by_default_google_maps_button">Открыть настройки Google Maps</string>
@@ -35,15 +31,12 @@
         <item quantity="many">%1$d поддерживаемых ссылок</item>
         <item quantity="other">%1$d поддерживаемых ссылок</item>
     </plurals>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Выберите <i>%1$s</i> при передаче местоположения из вашего картографического приложения.]]></string>
-    <string name="intro_geo_links_copy_content_description">Снимок экрана Google Maps с диалогом поделится ссылкой</string>
     <string name="intro_nav_close">Закрыть</string>
     <string name="intro_nav_next">Далее</string>
     <string name="intro_nav_finish">Приступим</string>
     <string name="intro_settings_activity_not_found">Не удалось открыть настройки</string>
     <string name="main_input_uri_label">Вставьте сюда ссылку на карту</string>
     <string name="intro_open_by_default_google_maps_content_description">Снимок экрана настроек Google Maps «Открыть по умолчанию»</string>
-    <string name="intro_geo_links_form_content_description">Снимок экрана формы географических координат %1$s</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в Настройки &#8594; Приложения &#8594; %1$s &#8594; <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
     <string name="main_navigate_to_intro">Узнать больше возможностей приложения</string>
     <string name="converter_google_maps_permission_title">Подключиться к Google?</string>
@@ -78,7 +71,6 @@
     <string name="about_title">О приложении</string>
     <string name="conversion_failed_parse_html_error">Не удалось получить веб-страницу из картографического сервиса</string>
     <string name="conversion_failed_connection_permission_denied">Эта ссылка не поддерживается без подключения к картографическому сервису</string>
-    <string name="intro_geo_links_headline">Как скопировать географические координаты</string>
     <string name="main_input_uri_supporting_text">Например, https://maps.app.goo.gl/… или maps.apple.com/…</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Выберете хотя бы <tt>maps.google.com</tt> и <tt>maps.app.goo.gl</tt>. Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Maps.]]></string>
     <string name="intro_open_by_default_app_content_description">Снимок экрана настроек %1$s «Открыть по умолчанию»</string>

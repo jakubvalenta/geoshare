@@ -14,10 +14,6 @@
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_open_by_default_app_content_description">Zrzut ekranu ustawień Otwórz domyślnie %1$s</string>
     <string name="intro_open_by_default_app_button">Otwórz ustawienia %1$s</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Wybierz <i>%1$s</i> podczas udostępniania z Map Google.]]></string>
-    <string name="intro_geo_links_copy_content_description">Zrzut ekranu udostępniania Map Google</string>
-    <string name="intro_geo_links_form_caption">Lub otwórz %1$s i wklej tam link z Map Google.</string>
-    <string name="intro_geo_links_form_content_description">Zrzut ekranu %1$s\'s geo: formularz konwersji linków</string>
     <string name="intro_nav_close">Zamknij</string>
     <string name="intro_nav_next">Dalej</string>
     <string name="intro_nav_finish">Rozpocznij</string>
@@ -28,7 +24,6 @@
     <string name="conversion_succeeded_copy_content_description">Skopiuj</string>
     <string name="main_create_geo_uri">Utwórz geo: link</string>
     <string name="main_navigate_to_intro">Odkryj więcej funkcji aplikacji</string>
-    <string name="intro_geo_links_headline">Jak utworzyć geo: linki</string>
     <string name="converter_google_maps_permission_title">Połączyć z Google?</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Anuluj</string>

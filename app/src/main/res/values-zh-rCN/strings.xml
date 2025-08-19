@@ -13,10 +13,6 @@
     <string name="intro_open_by_default_google_maps_button">打开 Google 地图设置</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[然后转到设置 &#8594; 应用 &#8594; %1$s &#8594; <i>默认打开</i>，打开此应用中链接的打开，然后点击<i>添加链接</i>。]]></string>
     <string name="intro_open_by_default_app_button">打开 %1$s 设置</string>
-    <string name="intro_geo_links_headline">如何复制地理坐标</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[从地图应用分享位置时选择<i>%1$s</i>。]]></string>
-    <string name="intro_geo_links_copy_content_description">Google 地图分享屏幕的屏幕截图</string>
-    <string name="intro_geo_links_form_content_description">%1$s 的地理坐标表单的屏幕截图</string>
     <string name="intro_nav_close">关闭</string>
     <string name="intro_nav_next">下一页</string>
     <string name="intro_nav_finish">开始</string>
@@ -57,7 +53,6 @@
     <string name="main_input_uri_supporting_text">例如：https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="intro_settings_activity_not_found">无法打开设置</string>
     <string name="intro_open_by_default_app_note"><![CDATA[至少选择 <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。如果某些链接显示为灰色，则其他谷歌应用设置为默认会打开它们。您可以找到这些应用并关闭它们的链接打开，就像我们为 Google 地图所做的那样。]]></string>
-    <string name="intro_geo_links_form_caption">或者打开 %1$s，将您的地图链接粘贴到那里。</string>
     <string name="main_create_geo_uri">显示坐标</string>
     <string name="main_info_box"><![CDATA[%1s 支持多种类型的 Google 地图和 Apple 地图链接。如果您仍然发现无法正常工作的链接，请<a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">报告问题</a>。]]></string>
     <string name="conversion_permission_common_grant">确定</string>
@@ -72,9 +67,6 @@
     <string name="intro_how_to_share_google_maps_screenshot_title">分享方式</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="converter_apple_maps_permission_title">连接到 Apple？</string>
-    <string name="intro_how_to_share_app_screenshot_once">仅此一次</string>
-    <string name="intro_how_to_share_app_screenshot_always">始终</string>
-    <string name="intro_how_to_share_app_screenshot_different">使用其他应用</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">地图</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">选择如何打开此应用的网络链接</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">在应用中</string>
@@ -86,7 +78,7 @@
     <string name="intro_open_by_default_app_screenshot_cancel">取消</string>
     <string name="intro_open_by_default_app_screenshot_add">添加</string>
     <string name="conversion_failed_unsupported_service">不支持的地图服务</string>
-    <string name="intro_how_to_share_app_screenshot_title">使用 %1$s 打开</string>
+    <string name="conversion_succeeded_apps_headline">使用 %1$s 打开</string>
     <string name="converter_google_maps_loading_indicator_title">正在连接到 Google…</string>
     <string name="converter_apple_maps_loading_indicator_title">正在连接到 Apple…</string>
     <string name="conversion_loading_indicator_cancel">取消</string>

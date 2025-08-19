@@ -3,7 +3,6 @@
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Спершу, перейдіть в Налаштування &#8594; Програми &#8594; Карти &#8594; <i>Відкривати по стандарту</i> й вимкніть відкриття посилань в цьому застосунку.]]></string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Потім перейдіть в Налаштування &#8594; Програми &#8594; %1$s &#8594; <i>Відкривати по стандарту</i>, ввімкніть відкриття посилань в цьому застосунку й натисніть <i>Додати посилання</i>.]]></string>
     <string name="intro_open_by_default_app_note"><![CDATA[Виберіть принаймні <tt>maps.google.com</tt> та <tt>maps.app.goo.gl</tt>. Якщо деякі посилання позначені сірим кольором, це означає, що типово їх відкривають інші застосунки Google. Ви можете знайти їх і вимкнути відкриття посилань для них, як зробили з Google Maps.]]></string>
-    <string name="intro_geo_links_form_content_description">Знімок екрана форми географічних координат %1$s</string>
     <string name="intro_settings_activity_not_found">Не вдалося відкрити налаштування</string>
     <string name="main_input_uri_supporting_text">наприклад, https://maps.app.goo.gl/… або maps.apple.com/…</string>
     <string name="main_info_box"><![CDATA[%1s підтримує багато типів посилань Google Карт і Apple Maps. Якщо ви все ще знаходите посилання, яке не працює <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">повідомте про проблему</a>.]]></string>
@@ -18,9 +17,6 @@
     <string name="intro_open_by_default_google_maps_button">Відкрити налаштування Google Maps</string>
     <string name="intro_open_by_default_app_content_description">Знімок екрана налаштування %1$s «Відкривати по стандарту»</string>
     <string name="intro_open_by_default_app_button">Відкрити налаштування %1$s</string>
-    <string name="intro_geo_links_headline">Як скопіювати географічні координати</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Оберіть <i>%1$s</i>, коли ділитеся розташуванням із картографічним застосунком.]]></string>
-    <string name="intro_geo_links_form_caption">Або відкрийте %1$s та вставте туди ваше посилання на мапу.</string>
     <string name="intro_nav_finish">Почати</string>
     <string name="main_create_geo_uri">Показати координати</string>
     <string name="main_navigate_to_intro">Дізнатися більше про функції застосунку</string>
@@ -41,7 +37,6 @@
     <string name="conversion_permission_common_grant">Гаразд</string>
     <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат або назви населеного пункту. %2$s потрібно під’єднатися до Google, щоб отримати інформацію.]]></string>
     <string name="intro_nav_next">Далі</string>
-    <string name="intro_geo_links_copy_content_description">Змінок екрана спільного доступу з Google Maps</string>
     <string name="main_input_uri_label">Вставте посилання на мапу тут</string>
     <string name="about_text"><![CDATA[<p>%1$s це безплатний застосунок з відкритим вихідним кодом, що розповсюджується під ліцензією <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> або пізнішої.</p><br><p>Ви можете знайти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, де також можете <a href="https://github.com/jakubvalenta/geoshare/issues">повідомити про помилку</a>.</p><br><p> Буду радий вашим відгукам. Ви можете зв’язатися зі мною за адресою <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="permission_do_not_ask">Не запитувати знову</string>
@@ -72,10 +67,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлено позначку</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="intro_how_to_share_app_screenshot_title">Відкрити за допомогою %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Лише цього разу</string>
-    <string name="intro_how_to_share_app_screenshot_always">Завжди</string>
-    <string name="intro_how_to_share_app_screenshot_different">Використовувати інший застосунок</string>
+    <string name="conversion_succeeded_apps_headline">Відкрити за допомогою %1$s</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Мапи</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Оберіть спосіб відкриття вебпосилань для цього застосунку</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">У застосунку</string>

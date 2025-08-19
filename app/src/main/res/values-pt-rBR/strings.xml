@@ -15,11 +15,6 @@
     <string name="intro_open_by_default_app_caption"><![CDATA[Depois, vá em Configurações &#8594; Apps &#8594; %1$s &#8594; <i>Abrir por padrão</i>, ative a abertura de links neste app, e toque em <i>Adicionar links</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">Captura de tela das configurações de Abrir por padrão do %1$s</string>
     <string name="intro_open_by_default_app_button">Abrir configurações do %1$s</string>
-    <string name="intro_geo_links_headline">Como copiar coordenadas geográficas</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Selecione <i>%1$s</i> ao compartilhar uma localização do seu app de mapa.]]></string>
-    <string name="intro_geo_links_copy_content_description">Captura de tela de compartilhamento do Google Maps</string>
-    <string name="intro_geo_links_form_caption">Ou abra o %1$s e cole seu link de mapa ali.</string>
-    <string name="intro_geo_links_form_content_description">Captura de tela do formulário de coordenadas geográficas do %1$s</string>
     <string name="intro_nav_close">Fechar</string>
     <string name="intro_nav_next">Avançar</string>
     <string name="intro_nav_finish">Vamos lá</string>
@@ -73,9 +68,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mensagens</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="intro_how_to_share_app_screenshot_title">Abrir com %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Só uma vez</string>
-    <string name="intro_how_to_share_app_screenshot_different">Usar um app diferente</string>
+    <string name="conversion_succeeded_apps_headline">Abrir com %1$s</string>
     <string name="intro_open_by_default_app_screenshot_title">Abrir por padrão</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d link suportado</item>
@@ -85,7 +78,6 @@
     <string name="converter_apple_maps_permission_title">Conectar à Apple?</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">No navegador</string>
     <string name="intro_open_by_default_app_screenshot_add">Adicionar</string>
-    <string name="intro_how_to_share_app_screenshot_always">Sempre</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">No app</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Cancelar</string>

@@ -16,11 +16,6 @@
     <string name="intro_open_by_default_app_content_description">Snímek obrazovky nastavení Otevírání ve výchozím nastavení pro aplikaci %1$s</string>
     <string name="intro_open_by_default_app_button">Otevřít nastavení %1$s</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Zaškrtněte alespoň <tt>maps.google.com</tt> a <tt>maps.app.goo.gl</tt>. Pokud některé odkazy nejdou zaškrtnout, jsou některé aplikace od Googlu nastavené, aby tyto odkazy otevíraly. Můžete tyto aplikace najít a změnit u nich <i>Otevírání ve výchozím nastavení</i>, jako jsme to udělali pro Google Mapy.]]></string>
-    <string name="intro_geo_links_headline">Jak zkopírovat zeměpisné souřadnice</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Vyberte <i>%1$s</i> při sdílení polohy z mapové aplikace.]]></string>
-    <string name="intro_geo_links_copy_content_description">Snímek obrazovky sdílení v Google Mapách</string>
-    <string name="intro_geo_links_form_caption">Nebo otevřete %1$s a vložte tam odkaz na mapu.</string>
-    <string name="intro_geo_links_form_content_description">Snímek obrazovky s formulářem zeměpisných souřadnic v aplikaci %1$s</string>
     <string name="intro_nav_close">Zavřít</string>
     <string name="intro_nav_next">Pokračovat</string>
     <string name="intro_nav_finish">Hotovo</string>
@@ -70,8 +65,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_title">Sdílení odkazu</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Umístěný špendlík</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS a MMS</string>
-    <string name="intro_how_to_share_app_screenshot_title">Otevřít v aplikaci %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Pouze jednou</string>
+    <string name="conversion_succeeded_apps_headline">Otevřít v aplikaci %1$s</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Určete, jak se v této aplikaci mají otevírat webové odkazy</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">V prohlížeči</string>
     <plurals name="intro_open_by_default_app_screenshot_links" tools:ignore="MissingQuantity">
@@ -81,8 +75,6 @@
     </plurals>
     <string name="intro_open_by_default_app_screenshot_cancel">Zrušit</string>
     <string name="intro_open_by_default_app_screenshot_add">Přidat</string>
-    <string name="intro_how_to_share_app_screenshot_always">Vždy</string>
-    <string name="intro_how_to_share_app_screenshot_different">Použít jinou aplikaci</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">V aplikaci</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_open_by_default_app_screenshot_title">Otevírání ve výchozím nastavení</string>
