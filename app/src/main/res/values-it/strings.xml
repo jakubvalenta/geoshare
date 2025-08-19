@@ -54,7 +54,7 @@
     <string name="intro_nav_close">Chiudi</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="user_preferences_connection_option_ask">Chiedi prima di connettersi</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Scegli <i>%1$s</i> e %2$s permette di aprire la posizione in qualsiasi applicazione di mappe installata.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Scegli <i>%1$s</i> e l’applicazione permette di aprire la posizione in qualsiasi applicazione di mappe installata.]]></string>
     <string name="main_info_box"><![CDATA[%1s supporta molti formati di URL di Google Maps. Se trovi un link che non funziona, puoi <a href="https://github.com/jakubvalenta/geoshare/issues">segnalare un problema</a>.]]></string>
     <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Il link <tt>%1$s</tt> non contiene coordinate. %2$s può connettersi a Google per ottenerle, oppure può creare un link geo: che porta a una ricerca del luogo per nome.]]></string>
     <string name="user_preferences_connection_description">Per supportare i link abbreviati a Google Maps e per ottenere le coordinate dalla pagina web di Google Maps quando il collegamento non le contiene, %1$s può collegarsi a Google. Per ulteriori informazioni, consulta la schermata delle FAQ.</string>

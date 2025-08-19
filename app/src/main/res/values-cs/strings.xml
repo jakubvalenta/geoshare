@@ -6,7 +6,7 @@
     <string name="intro_how_to_share_headline">Jak otevřít mapovou polohu v jiné mapové aplikaci</string>
     <string name="intro_how_to_share_google_maps_caption">Sdílejte polohu z mapové aplikace nebo webového prohlížeče.</string>
     <string name="intro_how_to_share_google_maps_content_description">Snímek obrazovky sdílení v Google Mapách</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Vyberte <i>%1$s</i> a %2$s vám nabídne otevřít tutéž polohu v jiné mapové aplikaci, kterou máte nainstalovanou.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Vyberte <i>%1$s</i> a aplikace vám nabídne otevřít tutéž polohu v jiné mapové aplikaci, kterou máte nainstalovanou.]]></string>
     <string name="intro_how_to_share_app_content_description">Snímek obrazovky sdílení v aplikaci %1$s</string>
     <string name="intro_open_by_default_headline">Jak nastavit Android, aby otevíral odkazy na Google Mapy v alternativních mapách (volitelné)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Nejdřív jděte do Nastavení &#8594; Aplikace &#8594; Mapy &#8594; <i>Otevírání ve výchozím nastavení</i> a vypněte otevírání odkazů v této aplikaci.]]></string>

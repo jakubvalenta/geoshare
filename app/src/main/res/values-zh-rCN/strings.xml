@@ -7,7 +7,7 @@
     <string name="intro_how_to_share_headline">如何在其他地图应用中显示地图位置</string>
     <string name="intro_how_to_share_google_maps_caption">从地图应用或您的网络浏览器分享位置。</string>
     <string name="intro_how_to_share_google_maps_content_description">Google 地图分享屏幕的屏幕截图</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[选择<i>%1$s</i>，%2$s 将允许您在任何已安装的地图应用中打开相同的位置。]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[选择<i>%1$s</i>，该应用将允许您在任何已安装的地图应用中打开相同的位置。]]></string>
     <string name="intro_how_to_share_app_content_description">%1$s 分享屏幕的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_content_description">Google 地图默认打开设置的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_button">打开 Google 地图设置</string>

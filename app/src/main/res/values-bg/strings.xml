@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_menu_content_description">Меню</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Изберете <i>%1$s</i> и %2$s ще ви позволи да отворите същото местоположение във всяко инсталирано приложение за карти.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Изберете <i>%1$s</i> и приложението ще ви позволи да отворите същото местоположение във всяко инсталирано приложение за карти.]]></string>
     <string name="intro_open_by_default_google_maps_button">Отворете настройките на Google Карти</string>
     <string name="intro_title">Въведение</string>
     <string name="intro_how_to_share_app_content_description">Екранна снимка на екрана за споделяне на %1$s</string>

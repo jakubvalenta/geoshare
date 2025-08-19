@@ -15,7 +15,7 @@
     <string name="intro_how_to_share_headline">كيفية إظهار موقع خريطة في تطبيق خرائط آخر</string>
     <string name="intro_how_to_share_google_maps_caption">شارك موقعًا من تطبيق الخرائط أو متصفح الويب الخاص بك.</string>
     <string name="intro_how_to_share_google_maps_content_description">لقطة شاشة لشاشة المشاركة في خرائط جوجل</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[اختر <i>%1$s</i> وسيسمح لك %2$s بفتح نفس الموقع في أي تطبيق خرائط مثبت.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[اختر <i>%1$s</i> وسيسمح لك التطبيق بفتح نفس الموقع في أي تطبيق خرائط مثبت.]]></string>
     <string name="intro_how_to_share_app_content_description">لقطة شاشة لشاشة المشاركة في %1$s</string>
     <string name="intro_open_by_default_headline">تكوين أندرويد لفتح روابط خرائط جوجل في خرائط بديلة (اختياري)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[أولاً، انتقل إلى الإعدادات &#8594; التطبيقات &#8594; الخرائط &#8594; <i>فتح افتراضيًا</i> وقم بإيقاف فتح الروابط في هذا التطبيق.]]></string>

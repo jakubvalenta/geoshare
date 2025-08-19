@@ -113,11 +113,7 @@ fun IntroScreen(
                             ScreenshotMapAppOpen()
                         }
                         IntroFigure(
-                            stringResource(
-                                R.string.intro_how_to_share_app_caption,
-                                appName,
-                                appName, // FIXME Update translations and remove this argument
-                            ),
+                            stringResource(R.string.intro_how_to_share_app_caption, appName),
                         ) {
                             ScreenshotOpen()
                         }

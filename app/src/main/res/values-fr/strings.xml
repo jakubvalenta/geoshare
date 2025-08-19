@@ -11,7 +11,7 @@
     <string name="main_info_box"><![CDATA[%1s prend en charge de nombreux types de liens Google Maps et Apple Plans. Si vous trouvez un lien qui ne fonctionne toujours pas, veuillez <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">signaler un problème</a>.]]></string>
     <string name="main_navigate_to_intro">Découvrez plus de fonctionnalités de l’appli</string>
     <string name="intro_how_to_share_app_content_description">Capture d’écran de l’écran de partage de %1$s</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choisissez <i>%1$s</i> et %2$s vous permettra d’ouvrir le même lieu dans n’importe quelle application cartographique installée.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Choisissez <i>%1$s</i> et l’application vous permettra d’ouvrir le même lieu dans n’importe quelle application cartographique installée.]]></string>
     <string name="intro_open_by_default_headline">Configurer Android pour ouvrir les liens vers Google Maps dans des cartes alternatives (facultatif)</string>
     <string name="intro_open_by_default_google_maps_content_description">Capture d’écran des paramètres d’ouverture par défaut de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Ouvrir les paramètres de Google Maps</string>

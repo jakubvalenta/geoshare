@@ -12,7 +12,7 @@
     <string name="conversion_permission_common_deny">Cancelar</string>
     <string name="intro_how_to_share_google_maps_caption">Comparte una ubicación desde la app Google Maps o el navegador web.</string>
     <string name="intro_how_to_share_google_maps_content_description">Captura de pantalla de Google Maps</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Eligir <i>%1$s</i> y %2$s te permitirá abrir la ubicación en cualquier aplicación de mapas instalada.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Elige <i>%1$s</i> y la aplicación te permitirá abrir la ubicación en cualquier aplicación de mapas instalada.]]></string>
     <string name="intro_how_to_share_app_content_description">Captura de pantalla de %1$s</string>
     <string name="intro_open_by_default_headline">Configurar Android para abrir enlaces a Google Maps en mapas alternativos (opcional)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes &#8594; Apps &#8594; Maps &#8594; <i>Abrir por defecto</i> y desactive la apertura de enlaces en esta aplicación.]]></string>

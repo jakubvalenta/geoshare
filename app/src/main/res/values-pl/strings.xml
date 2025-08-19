@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="intro_how_to_share_google_maps_caption">Włącz udostępnianie lokalizacji z aplikacji Mapy Google lub z przeglądarki internetowej.</string>
     <string name="intro_how_to_share_google_maps_content_description">Zrzut ekranu udostępniania Map Google</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Wybierz <i>%1$s</i>, a %2$s pozwoli ci otworzyć lokalizację w dowolnej zainstalowanej na urządzeniu aplikacji mapowej.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Wybierz <i>%1$s</i>, a aplikacja pozwoli ci otworzyć lokalizację w dowolnej zainstalowanej na urządzeniu aplikacji mapowej.]]></string>
     <string name="intro_how_to_share_app_content_description">Zrzut ekranu udostępniania %1$s</string>
     <string name="intro_open_by_default_headline">Konfiguracja Androida do otwierania linków do Map Google w alternatywnych mapach (opcjonalnie)</string>
     <string name="intro_how_to_share_headline">Jak wyświetlać lokalizacje z Map Google w innych aplikacjach mapowych?</string>
