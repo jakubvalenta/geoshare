@@ -38,6 +38,7 @@ android {
                 "fr",
                 "it",
                 "pl",
+                "pt",
                 "pt-rBR",
                 "uk",
                 "zh-rCN",
