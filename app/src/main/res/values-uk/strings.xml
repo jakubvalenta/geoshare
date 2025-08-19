@@ -66,7 +66,6 @@
     <string name="intro_how_to_share_google_maps_screenshot_title">Поділитися за допомогою</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлено позначку</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="conversion_succeeded_apps_headline">Відкрити за допомогою…</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Мапи</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Оберіть спосіб відкриття вебпосилань для цього застосунку</string>

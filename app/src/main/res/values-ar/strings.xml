@@ -63,7 +63,6 @@
     <string name="intro_how_to_share_google_maps_screenshot_place">الموقع المحدد</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">المراسلة</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">البلوتوث</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="conversion_succeeded_apps_headline">…افتح ب</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">خرائط</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">اختر كيفية فتح روابط الويب لهذا التطبيق</string>

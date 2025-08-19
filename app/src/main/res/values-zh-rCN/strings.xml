@@ -65,7 +65,6 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">短信</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">蓝牙</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">分享方式</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="converter_apple_maps_permission_title">连接到 Apple？</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">地图</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">选择如何打开此应用的网络链接</string>

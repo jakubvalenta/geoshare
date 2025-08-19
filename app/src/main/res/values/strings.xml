@@ -13,8 +13,8 @@
     <string name="intro_how_to_share_google_maps_screenshot_url" translatable="false">https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Messaging</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_whatsapp">WhatsApp</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_chrome" translatable="false">Chrome</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_firefox" translatable="false">Firefox</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> and the app will let you open the same location in any installed map app.]]></string>
     <string name="intro_how_to_share_app_content_description">Screenshot of %1$s’s share screen</string>
     <string name="conversion_succeeded_apps_headline">Open with…</string>
