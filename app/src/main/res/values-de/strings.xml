@@ -27,12 +27,12 @@
     <string name="main_input_uri_label">Füge einen Google Maps Link hier ein</string>
     <string name="intro_nav_close">Schließen</string>
     <string name="intro_settings_activity_not_found">Einstellung öffnen fehlgeschlagen</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten Informationen. %2$s kann sich mit Google verbinden, um die Koordinaten zu bekommen, oder %2$s kann sonst einen geo: Link erstellen, der zur Suche nach dem Ortname führt.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten Informationen. %2$s kann sich mit Google verbinden, um die Koordinaten zu bekommen, oder %2$s kann sonst einen geo: Link erstellen, der zur Suche nach dem Ortnamen führt.]]></string>
     <string name="intro_how_to_share_google_maps_caption">Teile den Google Maps Ort aus der App oder dem Browser.</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot von Google Maps’ Standardmäßig öffnen Einstellung</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Wähle <i>%1$s</i> und %2$s lässt Sie den Standort in jeder installierten Karten-App öffnen.]]></string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Als erstes Einstellungen öffnen &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das öffnen von Links für diese App aus.]]></string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffnen Sie die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, jetzt das öffnen von Links für in der App einschalten, und auf <i>Links hinzufügen</i> drücken.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Als erstes Einstellungen öffnen &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das Öffnen von Links für diese App aus.]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffnen Sie die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, jetzt das Öffnen von Links für in der App einschalten, und auf <i>Links hinzufügen</i> drücken.]]></string>
     <string name="conversion_permission_common_grant">Okay</string>
     <string name="main_info_box"><![CDATA[%1s unterstützt viele Google Maps URL Formate. Wenn du trotzdem einen Link findest, der nicht funktioniert, bitte <a href="https://github.com/jakubvalenta/geoshare/issues">melde das Problem</a>.]]></string>
     <string name="permission_do_not_ask">Nicht erneut fragen</string>
