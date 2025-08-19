@@ -118,7 +118,7 @@ fun ScreenshotMapAppOpen() {
 @Composable
 fun ScreenshotMapAppCopy() {
     ScreenshotMapApp(
-        stringResource(R.string.intro_geo_links_copy_content_description),
+        stringResource(R.string.intro_how_to_share_google_maps_content_description),
         highlightedIconIndex = 2
     )
 }
