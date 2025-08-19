@@ -5,3 +5,4 @@
 - Added button to open the original link unchanged (passthrough).
 - Added menu to copy coordinates in various formats including a magicearth: URI.
 - Added Portuguese (Portugal) translation.
+- Added Russian translation.

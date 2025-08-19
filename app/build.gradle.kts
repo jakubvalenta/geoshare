@@ -40,6 +40,7 @@ android {
                 "pl",
                 "pt",
                 "pt-rBR",
+                "ru",
                 "uk",
                 "zh-rCN",
             )
