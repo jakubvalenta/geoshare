@@ -1,26 +1,28 @@
 [versions]
-agp = "8.10.1"
+accompanistDrawablePainter = "0.37.3"
+agp = "8.11.0"
 androidxActivityCompose = "1.10.1"
-androidxComposeBom = "2025.07.00"
-androidxComposeMaterial3 = "1.5.0-alpha01"
-androidxCore = "1.16.0"
+androidxComposeBom = "2025.08.00"
+androidxComposeMaterial3 = "1.5.0-alpha02"
+androidxCore = "1.17.0"
 androidxDatastorePreferences = "1.1.7"
 androidxHiltNavigationCompose = "1.2.0"
 androidxNavigationCompose = "2.9.3"
-androidxTestExt = "1.2.1"
-androidxTestOrchestrator = "1.5.1"
-androidxTestRunner = "1.6.2"
+androidxTestExt = "1.3.0"
+androidxTestOrchestrator = "1.6.1"
+androidxTestRunner = "1.7.0"
 androidxTestUiAutomator = "2.3.0"
-hilt = "2.56.2"
+hilt = "2.57"
 junit = "4.13.2"
 kotlin = "2.1.0"
 kotlinxCoroutinesTest = "1.10.2"
 ksp = "2.1.0-1.0.29"
-ktor = "3.2.2"
-mockitoKotlin = "5.4.0"
-re2j = "1.7"
+ktor = "3.2.3"
+mockitoKotlin = "6.0.0"
+re2j = "1.8"
 
 [libraries]
+accompanist-drawableplainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablePainter" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core-android" }

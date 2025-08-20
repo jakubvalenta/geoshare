@@ -5,11 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class ConversionActivity : ComponentActivity() {
 
     private val viewModel: ConversionViewModel by viewModels()
 
@@ -18,7 +19,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                MainNavigation(viewModel)
+                LaunchedEffect(intent) {
+                    viewModel.start(intent)
+                }
+                ConversionScreen(onBack = { finish() }, onFinish = { finish() }, viewModel = viewModel)
             }
         }
     }

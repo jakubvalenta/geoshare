@@ -61,17 +61,6 @@ fun FaqScreen(
                     )
                 )
             }
-            FaqItem(
-                stringResource(R.string.faq_gmaps_wv_headline),
-                initialExpanded,
-            ) {
-                ParagraphHtml(
-                    stringResource(
-                        R.string.faq_gmaps_wv_text,
-                        appName
-                    )
-                )
-            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
-import page.ooooo.geoshare.lib.GeoUriBuilder
+import androidx.annotation.StringRes
+import page.ooooo.geoshare.lib.Position
 import java.net.URL
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
@@ -15,7 +16,11 @@ class AppleMapsUrlConverter(
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : UrlConverter {
     override val name = "Apple Maps"
+
+    @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
+
+    @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
 
     val fullUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
@@ -52,34 +57,34 @@ class AppleMapsUrlConverter(
     override fun isShortUrl(url: URL): Boolean = shortUrlPattern.matcher(url.toString()).matches()
 
     override fun parseUrl(url: URL): ParseUrlResult? {
-        val geoUriBuilder = GeoUriBuilder(uriQuote)
+        val position = Position()
 
-        val urlQueryParams = getUrlQueryParams(url, uriQuote)
+        val urlQueryParams = getUrlQueryParams(url.query, uriQuote)
         val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
             it.map { (paramName, paramPattern) ->
                 val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
                 paramPattern.matcher(paramValue).takeIf { m -> m.matches() } ?: return@firstNotNullOfOrNull null
             }
         }
-        urlQueryMatchers?.forEach { geoUriBuilder.fromMatcher(it) }
+        urlQueryMatchers?.forEach { position.addMatcher(it) }
 
         val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
-        zoomMatcher?.let { geoUriBuilder.fromMatcher(it) }
+        zoomMatcher?.let { position.addMatcher(it) }
 
-        return if (geoUriBuilder.coords.lat != null && geoUriBuilder.coords.lon != null) {
-            log.i(null, "Apple Maps URL converted $url > $geoUriBuilder")
-            ParseUrlResult.Parsed(geoUriBuilder)
+        return if (position.lat != null && position.lon != null) {
+            log.i(null, "Apple Maps URL converted $url > $position")
+            ParseUrlResult.Parsed(position)
         } else if (urlQueryParams["auid"] != null || urlQueryParams["place-id"] != null) {
-            if (geoUriBuilder.params.q != null) {
-                log.i(null, "Apple Maps URL converted but it requires HTML parsing to get coords $url > $geoUriBuilder")
-                ParseUrlResult.RequiresHtmlParsingToGetCoords(geoUriBuilder)
+            if (position.q != null) {
+                log.i(null, "Apple Maps URL converted but it requires HTML parsing to get coords $url > $position")
+                ParseUrlResult.RequiresHtmlParsingToGetCoords(position)
             } else {
                 log.i(null, "Apple Maps URL requires HTML parsing to get coordinates for place id $url")
                 ParseUrlResult.RequiresHtmlParsing()
             }
-        } else if (geoUriBuilder.params.q != null) {
-            log.i(null, "Apple Maps URL converted but it contains only query $url > $geoUriBuilder")
-            ParseUrlResult.Parsed(geoUriBuilder)
+        } else if (position.q != null) {
+            log.i(null, "Apple Maps URL converted but it contains only query $url > $position")
+            ParseUrlResult.Parsed(position)
         } else {
             log.i(null, "Apple Maps URL does not contain coordinates or query or place id $url")
             null
@@ -94,9 +99,9 @@ class AppleMapsUrlConverter(
             log.w(null, "Apple Maps HTML does not match any known pattern")
             return null
         }
-        val geoUriBuilder = GeoUriBuilder(uriQuote = uriQuote)
-        htmlMatchers.forEach { geoUriBuilder.fromMatcher(it) }
-        log.i(null, "Apple Maps HTML parsed $geoUriBuilder")
-        return ParseHtmlResult.Parsed(geoUriBuilder)
+        val position = Position()
+        htmlMatchers.forEach { position.addMatcher(it) }
+        log.i(null, "Apple Maps HTML parsed $position")
+        return ParseHtmlResult.Parsed(position)
     }
 }

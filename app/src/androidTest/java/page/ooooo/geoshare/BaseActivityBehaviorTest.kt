@@ -9,7 +9,6 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import org.junit.Assert.*
 import org.junit.Before
-import page.ooooo.geoshare.lib.XiaomiTools
 import java.lang.Thread.sleep
 import java.util.regex.Pattern
 
@@ -21,8 +20,6 @@ open class BaseActivityBehaviorTest {
     protected val googleMapsPackageName = "com.google.android.apps.maps"
     protected val launchTimeout = 10_000L
     protected val timeout = 10_000L
-
-    private var xiaomiTools: XiaomiTools = XiaomiTools()
 
     @Before
     fun goToLauncher() {
@@ -103,11 +100,6 @@ open class BaseActivityBehaviorTest {
         device.findObject(selector)?.click()
     }
 
-    protected fun waitAndClickObject(selector: BySelector) {
-        waitAndAssertObjectExists(selector)
-        clickObject(selector)
-    }
-
     protected fun waitAndConfirmDialogAndAssertNewWindowIsOpen(
         selector: BySelector,
         doNotAsk: Boolean = false,
@@ -124,47 +116,22 @@ open class BaseActivityBehaviorTest {
     ) {
         waitAndAssertObjectExists(selector)
         toggleDialogDoNotAsk(doNotAsk)
-        device.findObject(By.res("geoShareConfirmationDialogDismissButton"))
-            ?.click()
+        clickObject(By.res("geoShareConfirmationDialogDismissButton"))
         device.wait(Until.gone(selector), timeout)
         assertObjectDoesNotExist(selector)
     }
 
     protected fun toggleDialogDoNotAsk(doNotAsk: Boolean) {
         if (doNotAsk) {
-            device.findObject(By.res("geoShareConfirmationDialogDoNotAskSwitch"))
-                ?.click()
+            clickObject(By.res("geoShareConfirmationDialogDoNotAskSwitch"))
         }
     }
 
-    protected fun waitAndAssertGoogleMapsTextExists(textValue: Pattern) {
-        // Grant Xiaomi permission
-        if (xiaomiTools.isMiuiDevice()) {
-            val xiaomiPermissionDialogSelector =
-                By.res("geoShareXiaomiPermissionDialog")
-            if (waitForObject(xiaomiPermissionDialogSelector, 1000L)) {
-                waitAndConfirmDialogAndAssertNewWindowIsOpen(
-                    xiaomiPermissionDialogSelector
-                )
-                clickObject(By.text("Other permissions"))
-                waitAndClickObject(By.textStartsWith("Display pop-up windows while"))
-                waitAndClickObject(By.text("Always allow"))
-                device.pressBack()
-                device.pressBack()
-                device.pressBack()
-            }
-        }
-
-        // If the share menu opens, Select Google Maps from it
-        val shareMenuHeadingSelector = By.textStartsWith("Open with")
-        if (waitForObject(shareMenuHeadingSelector, 2000L)) {
-            if (device.hasObject(By.text("Open with Maps"))) {
-                clickObject(By.text("Just once"))
-            } else {
-                clickObject(By.text("Maps"))
-                clickObject(By.text("Just once"))
-            }
-        }
+    protected fun clickGoogleMapsAndAssertItHasText(textValue: Pattern) {
+        // Open the coordinates with Google Maps
+        val googleMapsApp = By.res("geoShareResultCardApp_$googleMapsPackageName")
+        waitAndAssertObjectExists(googleMapsApp)
+        clickObject(googleMapsApp)
 
         // If there is a Google Maps sign in screen, skip it
         val googleMapsSignInHeadline =
@@ -178,11 +145,5 @@ open class BaseActivityBehaviorTest {
 
         // Verify Google Maps content
         waitAndAssertObjectExists(By.pkg(googleMapsPackageName).text(textValue))
-    }
-
-    protected fun assertGoogleMapsDoesNotOpenWithinTimeout() {
-        assertFalse(
-            waitForObject(By.pkg(googleMapsPackageName).depth(0), 3000L)
-        )
     }
 }

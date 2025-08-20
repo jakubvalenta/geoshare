@@ -67,8 +67,8 @@ private fun ScreenshotMapApp(contentDescription: String, highlightedIconIndex: I
         ) {
             for (icon in listOf(
                 Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_messaging)),
-                Icon(appName, stringResource(R.string.share_activity)),
-                Icon(appName, stringResource(R.string.copy_activity)),
+                Icon(appName),
+                Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_firefox)),
                 Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_bluetooth)),
                 Icon(stringResource(R.string.intro_how_to_share_google_maps_screenshot_app_chrome)),
             )) {
@@ -118,7 +118,7 @@ fun ScreenshotMapAppOpen() {
 @Composable
 fun ScreenshotMapAppCopy() {
     ScreenshotMapApp(
-        stringResource(R.string.intro_geo_links_copy_content_description),
+        stringResource(R.string.intro_how_to_share_google_maps_content_description),
         highlightedIconIndex = 2
     )
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import page.ooooo.geoshare.components.MainScreen
 
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
@@ -43,9 +44,16 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("main") {
             MainScreen(
                 onNavigateToAboutScreen = { navController.navigate("about") },
+                onNavigateToConversionScreen = { navController.navigate("conversion") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("conversion") {
+            ConversionScreen(
+                onBack = { navController.navigate("main") },
                 viewModel = viewModel,
             )
         }

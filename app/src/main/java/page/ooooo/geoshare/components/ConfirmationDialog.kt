@@ -50,14 +50,16 @@ fun ConfirmationDialog(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        ConfirmationDialog(
-            title = "My title",
-            confirmText = "Confirm",
-            dismissText = "Dismiss",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+        ConfirmationScaffold {
+            ConfirmationDialog(
+                title = "My title",
+                confirmText = "Confirm",
+                dismissText = "Dismiss",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+            }
         }
     }
 }
@@ -66,14 +68,16 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        ConfirmationDialog(
-            title = "My title",
-            confirmText = "Confirm",
-            dismissText = "Dismiss",
-            onConfirmation = {},
-            onDismissRequest = {},
-        ) {
-            Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+        ConfirmationScaffold {
+            ConfirmationDialog(
+                title = "My title",
+                confirmText = "Confirm",
+                dismissText = "Dismiss",
+                onConfirmation = {},
+                onDismissRequest = {},
+            ) {
+                Text(AnnotatedString.fromHtml("My text <i>in italics</i>."))
+            }
         }
     }
 }

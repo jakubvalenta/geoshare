@@ -7,7 +7,7 @@ fun truncateMiddle(
 ): String = if (s.length > maxLength) {
     val partLength: Int = maxLength / 2
     "${
-        s.substring(0, partLength)
+        s.take(partLength)
     }${ellipsis}${
         s.substring(s.length - partLength)
     }"

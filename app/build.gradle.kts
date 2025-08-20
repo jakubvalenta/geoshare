@@ -8,12 +8,13 @@ plugins {
 
 android {
     namespace = "page.ooooo.geoshare"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "page.ooooo.geoshare"
         minSdk = 25
-        targetSdk = 35
+        // noinspection EditedTargetSdkVersion
+        targetSdk = 36
         versionCode = 18
         versionName = "4.0.0"
 
@@ -37,7 +38,9 @@ android {
                 "fr",
                 "it",
                 "pl",
+                "pt",
                 "pt-rBR",
+                "ru",
                 "uk",
                 "zh-rCN",
             )
@@ -83,6 +86,7 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
+    implementation(libs.accompanist.drawableplainter)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.material3)

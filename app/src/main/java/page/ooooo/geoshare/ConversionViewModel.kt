@@ -1,15 +1,25 @@
 package page.ooooo.geoshare
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
+import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -25,6 +35,8 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
+    data class App(val packageName: String, val label: String, val icon: Drawable)
+
     val stateContext = ConversionStateContext(
         urlConverters = listOf(
             GoogleMapsUrlConverter(),
@@ -33,19 +45,15 @@ class ConversionViewModel @Inject constructor(
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
-        xiaomiTools = XiaomiTools(),
-        onMessage = { _message.value = it },
         onStateChange = { newState ->
             _currentState.value = newState
             when (newState) {
-                is ConversionStateWithLoadingIndicator -> {
+                is HasLoadingIndicator -> {
                     loadingIndicatorJob?.cancel()
                     loadingIndicatorJob = viewModelScope.launch {
                         // Show loading indicator only if the state lasts longer than 200ms.
                         delay(200L)
-                        withMutableSnapshot {
-                            loadingIndicatorTitleResId = newState.urlConverter.loadingIndicatorTitleResId
-                        }
+                        _loadingIndicatorTitleResId.value = newState.urlConverter.loadingIndicatorTitleResId
                     }
                 }
 
@@ -54,27 +62,11 @@ class ConversionViewModel @Inject constructor(
                     loadingIndicatorJob = viewModelScope.launch {
                         // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
                         delay(200L)
-                        withMutableSnapshot {
-                            loadingIndicatorTitleResId = null
-                        }
+                        _loadingIndicatorTitleResId.value = null
                     }
                 }
             }
-            when (newState) {
-                is ConversionSucceeded -> {
-                    withMutableSnapshot {
-                        resultGeoUri = newState.geoUri
-                    }
-                }
-
-                is ConversionFailed -> {
-                    withMutableSnapshot {
-                        resultErrorMessageResId = newState.messageResId
-                    }
-                }
-            }
-        }
-    )
+        })
 
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
@@ -84,24 +76,9 @@ class ConversionViewModel @Inject constructor(
         "inputUriString",
         "",
     )
-    var loadingIndicatorTitleResId by SavableDelegate<Int?>(
-        savedStateHandle,
-        "loadingIndicatorTitleResId",
-        null,
-    )
-    var resultGeoUri by SavableDelegate(
-        savedStateHandle,
-        "resultGeoUri",
-        "",
-    )
-    var resultErrorMessageResId by SavableDelegate<Int?>(
-        savedStateHandle,
-        "resultErrorMessageResId",
-        null,
-    )
 
-    private val _message = MutableStateFlow<Message?>(null)
-    val message: StateFlow<Message?> = _message
+    private val _loadingIndicatorTitleResId = MutableStateFlow<Int?>(null)
+    val loadingIndicatorTitleResId: StateFlow<Int?> = _loadingIndicatorTitleResId
 
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
@@ -124,10 +101,6 @@ class ConversionViewModel @Inject constructor(
     )
 
     fun start() {
-        withMutableSnapshot {
-            resultGeoUri = ""
-            resultErrorMessageResId = null
-        }
         stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
         transition()
     }
@@ -153,14 +126,50 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun share(context: Context, settingsLauncherWrapper: ManagedActivityResultLauncherWrapper) {
-        stateContext.currentState = AcceptedSharing(stateContext, context, settingsLauncherWrapper, resultGeoUri)
-        transition()
+    fun queryGeoUriApps(packageManager: PackageManager): List<App> =
+        packageManager.queryIntentActivities(
+            Intent(Intent.ACTION_VIEW, "geo:0,0".toUri()),
+            PackageManager.MATCH_ALL,
+        )
+            .map {
+                App(
+                    it.activityInfo.packageName,
+                    it.activityInfo.loadLabel(packageManager).toString(),
+                    it.activityInfo.loadIcon(packageManager),
+                )
+            }
+            .filterNot { it.packageName == BuildConfig.APPLICATION_ID }
+            .sortedBy { it.label }
+
+    fun share(context: Context, packageName: String) {
+        assert(stateContext.currentState is HasResult)
+        (stateContext.currentState as HasResult).let { currentState ->
+            context.startActivity(
+                stateContext.intentTools.createViewIntent(
+                    packageName,
+                    currentState.position.toGeoUriString().toUri()
+                )
+            )
+        }
     }
 
-    fun copy(clipboard: Clipboard) {
-        stateContext.currentState = AcceptedCopying(stateContext, clipboard, resultGeoUri)
-        transition()
+    fun skip(context: Context) {
+        assert(stateContext.currentState is HasResult)
+        (stateContext.currentState as HasResult).let { currentState ->
+            context.startActivity(
+                stateContext.intentTools.createChooserIntent(currentState.inputUriString.toUri())
+            )
+        }
+    }
+
+    fun copy(context: Context, clipboard: Clipboard, text: String) {
+        viewModelScope.launch {
+            clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
+            val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
+            if (!systemHasClipboardEditor) {
+                Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun transition() {
@@ -177,17 +186,11 @@ class ConversionViewModel @Inject constructor(
     fun updateInput(newUriString: String) {
         withMutableSnapshot {
             inputUriString = newUriString
-            resultGeoUri = ""
-            resultErrorMessageResId = null
         }
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
             transition()
         }
-    }
-
-    fun dismissMessage() {
-        _message.value = null
     }
 
     fun setIntroShown() {

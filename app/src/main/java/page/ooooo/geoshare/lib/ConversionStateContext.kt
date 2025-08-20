@@ -9,10 +9,7 @@ data class ConversionStateContext(
     val intentTools: IntentTools,
     val networkTools: NetworkTools,
     val userPreferencesRepository: UserPreferencesRepository,
-    val xiaomiTools: XiaomiTools,
-    val clipboardTools: ClipboardTools = ClipboardTools(),
     val log: ILog = DefaultLog(),
-    val onMessage: (message: Message) -> Unit,
     val onStateChange: (State) -> Unit = {},
     val getBuildVersionSdkInt: () -> Int = { Build.VERSION.SDK_INT },
 ) : StateContext() {

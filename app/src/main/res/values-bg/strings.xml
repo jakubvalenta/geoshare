@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="intro_geo_links_copy_content_description">Екранна снимка на екрана за споделяне на Google Карти</string>
     <string name="nav_menu_content_description">Меню</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Изберете <i>%1$s</i> и %2$s ще ви позволи да отворите същото местоположение във всяко инсталирано приложение за карти.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Изберете <i>%1$s</i> и приложението ще ви позволи да отворите същото местоположение във всяко инсталирано приложение за карти.]]></string>
     <string name="intro_open_by_default_google_maps_button">Отворете настройките на Google Карти</string>
     <string name="intro_title">Въведение</string>
     <string name="intro_how_to_share_app_content_description">Екранна снимка на екрана за споделяне на %1$s</string>
     <string name="intro_open_by_default_google_maps_content_description">Екранна снимка на настройките за отваряне по подразбиране на Google Карти</string>
-    <string name="intro_geo_links_headline">Как да копирате географски координати</string>
     <string name="intro_open_by_default_app_content_description">Екранна снимка на настройките за отваряне по подразбиране на %1$s</string>
     <string name="intro_nav_next">Следващо</string>
     <string name="intro_nav_finish">Да започваме</string>
     <string name="main_input_uri_label">Поставете връзка към картата тук</string>
     <string name="main_input_uri_clear_content_description">Изчисти</string>
-    <string name="main_result_geo_uri_share_content_description">Споделяне</string>
-    <string name="main_result_geo_uri_copy_content_description">Копиране</string>
+    <string name="conversion_succeeded_copy_content_description">Копиране</string>
     <string name="main_create_geo_uri">Показване на координати</string>
     <string name="converter_google_maps_permission_title">Свързване с Google?</string>
     <string name="conversion_permission_common_grant">Добре</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Изберете <i>%1$s</i>, когато споделяте местоположение от приложението си за карти.]]></string>
-    <string name="copy_activity">Копиране на гео:</string>
+    <string name="conversion_succeeded_copy_geo">Копиране на гео:</string>
     <string name="intro_how_to_share_headline">Как да покажа местоположение на картата в друго приложение за карти</string>
-    <string name="share_activity">Отвори</string>
     <string name="nav_back_content_description">Връщане към основния екран</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Първо отидете на Настройки &#8594; Приложения &#8594; Карти &#8594; <i>Отваряне по подразбиране</i> и изключете отварянето на връзки в това приложение.]]></string>
     <string name="intro_open_by_default_headline">Конфигурирайте Android да отваря връзки към Google Карти в алтернативни карти (по избор)</string>
@@ -30,17 +25,13 @@
     <string name="intro_open_by_default_app_button">Отворете настройките на %1$s</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[След това отидете на Настройки &#8594; Приложения &#8594; %1$s &#8594; <i>Отваряне по подразбиране</i>, включете отварянето на връзки в това приложение и докоснете <i>Добавяне на връзки</i>.]]></string>
     <string name="intro_open_by_default_app_note"><![CDATA[Изберете поне <tt>maps.google.com</tt> и <tt>maps.app.goo.gl</tt>. Ако някои връзки са сиви, други приложения на Google са настроени да ги отварят по подразбиране. Можете да намерите тези приложения и да изключите отварянето на връзки за тях, както направихме за Google Карти.]]></string>
-    <string name="intro_geo_links_form_caption">Или отворете %1$s и поставете връзката към картата си там.</string>
     <string name="intro_nav_close">Затвори</string>
     <string name="intro_settings_activity_not_found">Неуспешно отваряне на настройките</string>
-    <string name="intro_geo_links_form_content_description">Екранна снимка на%1$s гео: форма за географски координати</string>
     <string name="conversion_permission_common_deny">Отказ</string>
     <string name="main_input_uri_supporting_text">напр. https://maps.app.goo.gl/… or maps.apple.com/…</string>
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
     <string name="main_info_box"><![CDATA[%1s поддържа много видове връзки към Google Карти и Apple Карти. Ако все още намерите връзка, която не работи, моля, <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">съобщете за проблем</a>.]]></string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати или име на място. %2$s трябва да се свърже с Google, за да получи информацията.]]></string>
-    <string name="faq_gmaps_wv_headline">Съвместимост с приложението GMaps WV</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Не се нуждаете от %1$s, когато използвате приложението GMaps WV, защото това приложение вече създава гео: връзки. Така че можете директно да споделяте местоположение от GMaps WV с друго приложение за карти.</p>]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>
     <string name="user_preferences_connection_option_always">Да</string>
@@ -50,13 +41,9 @@
     <string name="conversion_failed_missing_url">Липсващ URL адрес</string>
     <string name="conversion_failed_invalid_url">Невалиден URL адрес</string>
     <string name="conversion_failed_unshorten_error">Неуспешно разрешаване на кратката връзка</string>
-    <string name="sharing_failed_xiaomi_permission_show_editor_error">Неуспешно отваряне на настройките за разрешение</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Не може да се отвори друго приложение за карти без разрешение</string>
-    <string name="sharing_succeeded">Отваряне на друго приложение за карти</string>
-    <string name="sharing_failed_activity_not_found">Не е инсталирано приложение за карти</string>
+    <string name="conversion_succeeded_apps_not_found">Не е инсталирано приложение за карти</string>
     <string name="copying_finished">Координатите са копирани в клипборда</string>
     <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s може да се свърже с Google, за да ги получи, или вместо това може да създаде гео: връзка, водеща до търсене по име на място.]]></string>
-    <string name="conversion_permission_xiaomi_deny">Отхвърляне</string>
     <string name="about_title">Относно</string>
     <string name="about_app_icon_content_description">Икона на приложението</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -68,12 +55,8 @@
     <string name="conversion_failed_connection_permission_denied">Тази връзка не се поддържа без свързване с Google</string>
     <string name="conversion_failed_parse_url_error">Обработката на връзката към картата не бе успешна</string>
     <string name="conversion_failed_parse_html_error">Неуспешно извличане на уеб страница от услугата за карти</string>
-    <string name="conversion_permission_xiaomi_text"><![CDATA[За да позволите на %1$s да отваря други приложения за карти, трябва да разрешите <b>Други разрешения</b> &#8594; <b>Показване на изскачащи прозорци, докато работи във фонов режим</b> на %1$s.]]></string>
     <string name="faq_item_expand">Разширяване на раздела</string>
     <string name="user_preferences_title">Предпочитания</string>
-    <string name="conversion_failed_nothing_to_do">Нищо за правене</string>
-    <string name="conversion_permission_xiaomi_grant">Отворете настройките на Android</string>
-    <string name="conversion_permission_xiaomi_title">Липсва разрешение</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="user_preferences_connection_description">За да поддържа кратки връзки към Google Карти и да получава координати от уеб страницата на Google Карти, когато връзката не ги съдържа, %1$s може да се свърже с Google. Можете да намерите повече информация на екрана с ЧЗВ.</string>
     <string name="conversion_failed_parse_html_connection_error">Грешка във връзката при извличане на уеб страница от услугата за карти</string>
@@ -81,9 +64,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_title">Споделяне с</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Съобщения</string>
-    <string name="intro_how_to_share_app_screenshot_title">Отвори с %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Само веднъж</string>
-    <string name="intro_how_to_share_app_screenshot_always">Винаги</string>
+    <string name="conversion_succeeded_apps_headline">Отвори с…</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">В приложението</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Във вашия браузър</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Отказ</string>
@@ -93,12 +74,10 @@
         <item quantity="one">%1$d поддържана връзка</item>
         <item quantity="other">%1$d поддържани връзки</item>
     </plurals>
-    <string name="intro_how_to_share_app_screenshot_different">Използване на друго приложение</string>
     <string name="converter_apple_maps_permission_title">Свързване с Apple?</string>
     <string name="intro_open_by_default_app_screenshot_title">Отваряне по подразбиране</string>
     <string name="conversion_failed_unsupported_service">Неподдържана услуга за карти</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Карти</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставен маркер</string>
     <string name="converter_google_maps_loading_indicator_title">Свързване с Google…</string>
     <string name="converter_apple_maps_loading_indicator_title">Свързване с Apple…</string>

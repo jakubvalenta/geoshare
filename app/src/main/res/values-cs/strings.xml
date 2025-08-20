@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="copy_activity">Kopírovat geo:</string>
-    <string name="share_activity">Otevřít</string>
+    <string name="conversion_succeeded_copy_geo">Kopírovat geo:</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_title">Intro</string>
     <string name="intro_how_to_share_headline">Jak otevřít mapovou polohu v jiné mapové aplikaci</string>
     <string name="intro_how_to_share_google_maps_caption">Sdílejte polohu z mapové aplikace nebo webového prohlížeče.</string>
     <string name="intro_how_to_share_google_maps_content_description">Snímek obrazovky sdílení v Google Mapách</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Vyberte <i>%1$s</i> a %2$s vám nabídne otevřít tutéž polohu v jiné mapové aplikaci, kterou máte nainstalovanou.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Vyberte <i>%1$s</i> a aplikace vám nabídne otevřít tutéž polohu v jiné mapové aplikaci, kterou máte nainstalovanou.]]></string>
     <string name="intro_how_to_share_app_content_description">Snímek obrazovky sdílení v aplikaci %1$s</string>
     <string name="intro_open_by_default_headline">Jak nastavit Android, aby otevíral odkazy na Google Mapy v alternativních mapách (volitelné)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Nejdřív jděte do Nastavení &#8594; Aplikace &#8594; Mapy &#8594; <i>Otevírání ve výchozím nastavení</i> a vypněte otevírání odkazů v této aplikaci.]]></string>
@@ -17,11 +16,6 @@
     <string name="intro_open_by_default_app_content_description">Snímek obrazovky nastavení Otevírání ve výchozím nastavení pro aplikaci %1$s</string>
     <string name="intro_open_by_default_app_button">Otevřít nastavení %1$s</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Zaškrtněte alespoň <tt>maps.google.com</tt> a <tt>maps.app.goo.gl</tt>. Pokud některé odkazy nejdou zaškrtnout, jsou některé aplikace od Googlu nastavené, aby tyto odkazy otevíraly. Můžete tyto aplikace najít a změnit u nich <i>Otevírání ve výchozím nastavení</i>, jako jsme to udělali pro Google Mapy.]]></string>
-    <string name="intro_geo_links_headline">Jak zkopírovat zeměpisné souřadnice</string>
-    <string name="intro_geo_links_copy_caption"><![CDATA[Vyberte <i>%1$s</i> při sdílení polohy z mapové aplikace.]]></string>
-    <string name="intro_geo_links_copy_content_description">Snímek obrazovky sdílení v Google Mapách</string>
-    <string name="intro_geo_links_form_caption">Nebo otevřete %1$s a vložte tam odkaz na mapu.</string>
-    <string name="intro_geo_links_form_content_description">Snímek obrazovky s formulářem zeměpisných souřadnic v aplikaci %1$s</string>
     <string name="intro_nav_close">Zavřít</string>
     <string name="intro_nav_next">Pokračovat</string>
     <string name="intro_nav_finish">Hotovo</string>
@@ -29,8 +23,7 @@
     <string name="main_input_uri_label">Sem vložte odkaz na mapu</string>
     <string name="main_input_uri_clear_content_description">Vymazat</string>
     <string name="main_input_uri_supporting_text">Např. https://maps.app.goo.gl/… nebo maps.apple.com/…</string>
-    <string name="main_result_geo_uri_copy_content_description">Kopírovat</string>
-    <string name="main_result_geo_uri_share_content_description">Sdílet</string>
+    <string name="conversion_succeeded_copy_content_description">Kopírovat</string>
     <string name="main_create_geo_uri">Zobrazit souřadnice</string>
     <string name="main_navigate_to_intro">Objevte další funkce aplikace</string>
     <string name="main_info_box"><![CDATA[%1s podporuje mnoho typů odkazů na Google Mapy a Apple Mapy. Pokud přesto narazíte na odkaz, který nefunguje, <a href="https://github.com/jakubvalenta/geoshare/issues">nahlaste prosím problém</a>.]]></string>
@@ -41,10 +34,6 @@
     <string name="conversion_permission_common_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice ani název místa. %2$s se potřebuje spojit s danou mapovou službou, aby tyto informace získal.]]></string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Vytvořit hledací geo: odkaz</string>
     <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice. %2$s se může spojit s danou mapovou službou, aby je získal, nebo může vytvořit geo: odkaz vedoucí na vyhledávání místa podle názvu, což není tak přesné.]]></string>
-    <string name="conversion_permission_xiaomi_title">Chybí oprávnění</string>
-    <string name="conversion_permission_xiaomi_grant">Otevřít nastavení Androidu</string>
-    <string name="conversion_permission_xiaomi_deny">Zrušit</string>
-    <string name="conversion_permission_xiaomi_text"><![CDATA[Aby mohl %1$s otevřít jinou mapovou aplikaci, je třeba povolit <b>Další povolení</b> &#8594; <b>Zobrazovat vyskakovací okna během&#8230;</b> aplikaci %1$s.]]></string>
     <string name="about_title">O aplikaci</string>
     <string name="about_app_icon_content_description">Ikona aplikace</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -53,8 +42,6 @@
     <string name="faq_title">Nejčastější dotazy</string>
     <string name="faq_how_it_works_headline">Jak to funguje a ochrana soukromí</string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s převádí odkazy na mapy na geo: odkazy, které lze otevřít v jiných mapových aplikacích. Pro vytvoření geo: odkazu jsou potřeba zeměpisné souřadnice, které %1$s přečte z URL.</p><br><p>Avšak ne všechna URL obsahují souřadnice. V takových případech se vás %1$s <b>zeptá, jestli se může spojit s danou mapovou službou (Google Mapy, Apple Mapy atd.)</b> a získat souřadnice z HTTP hlaviček nebo HTML dokumentu daného odkazu.</p><br><p>Přesněji, když %1$s převádí URL na geo: odkaz, postupuje podle jednoho ze tří scénářů:</p><br><p><b>1.</b></p><br><p>Pokud URL už obsahuje zeměpisné souřadnice (např. <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), tak se souřadnice přečtou z něj a žádný požadavek na servery dané mapové služby se neprovede.</p><br><p><b>2.</b></p><br><p>Pokud URL neobsahuje zeměpisné souřadnice (např. <tt>https://www.google.com/maps/place/Central+Park/</tt>), tak se %1$s zeptá, jestli se může spojit s danou mapovou službou.</p><br><p>Když spojení povolíte, tak %1$s provede <b>požadavek HTTP GET</b> na Google Mapy (nebo Apple Mapy atd.) a přečte souřadnice z HTML kódu odpovědi. Můžete si to představit jako <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Když spojení s mapovou službou nepovolíte, tak %1$s vytvoří geo: odkaz vedoucí na vyhledávání místa podle názvu (např. <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Pokud je dané URL krátký odkaz (např. <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), tak se %1$s zeptá, jestli se může spojit s danou mapovou službou.</p><br><p>Když spojení s mapovou službou povolíte, tak %1$s provede <b>požadavek HTTP HEAD</b> na daný krátký odkaz a přečte plný odkaz z hlaviček odpovědi. Můžete si to představit jako <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. Pak %1$s pokračuje podle scénáře 1 nebo 2, podle toho jestli plný odkaz obsahuje souřadnice nebo ne. V případě scénáře 2 se provede další spojení s mapovou službou, ale tentokrát bez ptaní.</p><br><p>Když spojení s mapovou službou nepovolíte, tak %1$s ukončí vytváření geo: odkazu.</p><br><br><p>Pro trvalé povolení nebo zamítnutí spojení s mapovou službou místo ptaní (výchozí nastavení), jděte do Nastavení aplikace.</p>]]></string>
-    <string name="faq_gmaps_wv_headline">Kompatibilita s aplikací GMaps WV</string>
-    <string name="faq_gmaps_wv_text"><![CDATA[<p>Pokud používáte aplikaci GMaps WV, tak nepotřebujete %1$s, protože tato aplikace už vytváří geo: odkazy. Můžete tedy rovnou sdílet polohu z GMaps WV s jinou mapovou aplikací.</p>]]></string>
     <string name="faq_item_collapse">Sbalit sekci</string>
     <string name="faq_item_expand">Rozbalit sekci</string>
     <string name="user_preferences_title">Nastavení</string>
@@ -64,15 +51,11 @@
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
     <string name="user_preferences_connection_option_never">Ne</string>
     <string name="user_preferences_last_run_version_code_title">Jaká verze aplikace byla naposledy spuštěná?</string>
-    <string name="conversion_failed_nothing_to_do">Není, co by se dalo dělat</string>
     <string name="conversion_failed_missing_url">Chybí URL</string>
     <string name="conversion_failed_invalid_url">Neplatné URL</string>
     <string name="conversion_failed_unshorten_error">Nepodařilo se analyzovat krátký odkaz</string>
     <string name="conversion_failed_parse_url_error">Nepodařilo se zpracovat odkaz na mapu</string>
-    <string name="sharing_failed_xiaomi_permission_show_editor_error">Nepodařilo se otevřít nastavení oprávnění</string>
-    <string name="sharing_failed_xiaomi_permission_denied">Bez oprávnění nelze otevřít jinou mapovou aplikaci</string>
-    <string name="sharing_succeeded">Jiná mapová aplikace byla otevřena</string>
-    <string name="sharing_failed_activity_not_found">Není nainstalovaná žádná mapová aplikace</string>
+    <string name="conversion_succeeded_apps_not_found">Není nainstalovaná žádná mapová aplikace</string>
     <string name="copying_finished">Souřadnice byly zkopírovány do schránky</string>
     <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
     <string name="conversion_failed_parse_html_error">Nepodařilo se stáhnout webovou stránku mapové služky</string>
@@ -82,8 +65,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_title">Sdílení odkazu</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Umístěný špendlík</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS a MMS</string>
-    <string name="intro_how_to_share_app_screenshot_title">Otevřít v aplikaci %1$s</string>
-    <string name="intro_how_to_share_app_screenshot_once">Pouze jednou</string>
+    <string name="conversion_succeeded_apps_headline">Otevřít v aplikaci…</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Určete, jak se v této aplikaci mají otevírat webové odkazy</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">V prohlížeči</string>
     <plurals name="intro_open_by_default_app_screenshot_links" tools:ignore="MissingQuantity">
@@ -93,13 +75,10 @@
     </plurals>
     <string name="intro_open_by_default_app_screenshot_cancel">Zrušit</string>
     <string name="intro_open_by_default_app_screenshot_add">Přidat</string>
-    <string name="intro_how_to_share_app_screenshot_always">Vždy</string>
-    <string name="intro_how_to_share_app_screenshot_different">Použít jinou aplikaci</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">V aplikaci</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_open_by_default_app_screenshot_title">Otevírání ve výchozím nastavení</string>
     <string name="conversion_failed_unsupported_service">Nepodporovaná mapová služba</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_chrome">Chrome</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Mapy</string>
     <string name="converter_google_maps_loading_indicator_title">Spojování s Googlem…</string>
     <string name="converter_apple_maps_loading_indicator_title">Spojování s Applem…</string>
