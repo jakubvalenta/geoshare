@@ -50,11 +50,11 @@ class AppleMapsUrlConverter(
         Pattern.compile("""<meta property="place:location:longitude" content="$lonRegex""""),
     )
 
-    override fun isSupportedUrl(url: URL): Boolean = isFullUrl(url) || isShortUrl(url)
+    override fun isSupportedUrl(url: URL): Boolean =
+        fullUrlPattern.matcher(url.toString()).matches() || shortUrlPattern.matcher(url.toString()).matches()
 
-    private fun isFullUrl(url: URL): Boolean = fullUrlPattern.matcher(url.toString()).matches()
-
-    override fun isShortUrl(url: URL): Boolean = shortUrlPattern.matcher(url.toString()).matches()
+    override fun isShortUrl(url: URL): Boolean =
+        false // Treat all URLs as full URLs, because Apple Maps short URLs cannot be unshortened using a HEAD request.
 
     override fun parseUrl(url: URL): ParseUrlResult? {
         val position = Position()
@@ -85,6 +85,8 @@ class AppleMapsUrlConverter(
         } else if (position.q != null) {
             log.i(null, "Apple Maps URL converted but it contains only query $url > $position")
             ParseUrlResult.Parsed(position)
+        } else if (shortUrlPattern.matcher(url.toString()).matches()) {
+            ParseUrlResult.RequiresHtmlParsing()
         } else {
             log.i(null, "Apple Maps URL does not contain coordinates or query or place id $url")
             null
