@@ -35,15 +35,20 @@ class AppleMapsUrlConverterTest {
     }
 
     @Test
+    fun isSupportedUrl_supportedUrl() {
+        assertTrue(appleMapsUrlConverter.isSupportedUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")))
+    }
+
+    @Test
+    fun isSupportedUrl_shortUrl() {
+        assertTrue(appleMapsUrlConverter.isSupportedUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")))
+    }
+
+    @Test
     fun parseUrl_noPathOrKnownUrlQueryParams() {
         assertNull(appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com")))
         assertNull(appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/")))
         assertNull(appleMapsUrlConverter.parseUrl(URL("https://maps.apple.com/?spam=1")))
-    }
-
-    @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(appleMapsUrlConverter.isSupportedUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")))
     }
 
     @Test
@@ -153,6 +158,11 @@ class AppleMapsUrlConverterTest {
     }
 
     @Test
+    fun parseUrl_shortLink() {
+        assertTrue(appleMapsUrlConverter.parseUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")) is ParseUrlResult.RequiresHtmlParsing)
+    }
+
+    @Test
     fun parseHtml_success() {
         val html =
             this.javaClass.classLoader!!.getResource("I3B04EDEB21D5F86.html")!!
@@ -169,12 +179,7 @@ class AppleMapsUrlConverterTest {
     }
 
     @Test
-    fun isShortUrl_mapsApple_returnsTrue() {
-        assertTrue(appleMapsUrlConverter.isShortUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")))
-    }
-
-    @Test
-    fun isShortUrl_mapsAppleCom_returnsFalse() {
-        assertFalse(appleMapsUrlConverter.isShortUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")))
+    fun isShortUrl_alwaysReturnsFalse() {
+        assertFalse(appleMapsUrlConverter.isShortUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")))
     }
 }
