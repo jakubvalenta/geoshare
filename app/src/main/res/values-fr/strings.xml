@@ -84,4 +84,8 @@
     <string name="converter_apple_maps_loading_indicator_title">Connexion à Apple…</string>
     <string name="conversion_loading_indicator_cancel">Annuler</string>
     <string name="conversion_failed_cancelled">Annulé</string>
+    <string name="conversion_succeeded_skip">Ouvrir le lien original</string>
+    <string name="conversion_done">Fermer</string>
+    <string name="conversion_succeeded_title">Coordonnées</string>
+    <string name="conversion_error_title">Erreur</string>
 </resources>
