@@ -84,4 +84,8 @@
     <string name="converter_apple_maps_loading_indicator_title">Spojování s Applem…</string>
     <string name="conversion_loading_indicator_cancel">Zrušit</string>
     <string name="conversion_failed_cancelled">Zrušeno</string>
+    <string name="conversion_succeeded_skip">Otevřít původní odkaz</string>
+    <string name="conversion_done">Hotovo</string>
+    <string name="conversion_succeeded_title">Souřadnice</string>
+    <string name="conversion_error_title">Chyba</string>
 </resources>
