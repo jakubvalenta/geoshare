@@ -85,4 +85,8 @@
     <string name="converter_apple_maps_loading_indicator_title">Подключение к Apple…</string>
     <string name="conversion_loading_indicator_cancel">Отмена</string>
     <string name="conversion_failed_cancelled">Отменено</string>
+    <string name="conversion_succeeded_skip">Открыть изначальную ссылку</string>
+    <string name="conversion_done">Готово</string>
+    <string name="conversion_succeeded_title">Координаты</string>
+    <string name="conversion_error_title">Ошибка</string>
 </resources>
