@@ -29,9 +29,8 @@ class YandexMapsUrlConverter(
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
 
     val urlPathPlacePattern: Pattern = Pattern.compile("""^/maps/org/\d+/.*$""")
-    val urlQueryPatterns = listOf(
-        mapOf("ll" to coordPattern),
-        mapOf("z" to coordPattern),
+    val urlQueryPatterns = mapOf(
+        "ll" to coordPattern,
     )
     val htmlPattern: Pattern = Pattern.compile("""data-coordinates="$coordRegex"""")
 
@@ -42,15 +41,17 @@ class YandexMapsUrlConverter(
     override fun parseUrl(url: URL): ParseUrlResult? {
         val position = Position()
 
+        // First add coordinates from query param '?ll=<lon>,<lat>'.
         val urlQueryParams = getUrlQueryParams(url.query, uriQuote)
-        val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
-            it.map { (paramName, paramPattern) ->
-                val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
-                paramPattern.matcher(paramValue).takeIf { m -> m.matches() } ?: return@firstNotNullOfOrNull null
+        urlQueryPatterns.map { (paramName, paramPattern) ->
+            urlQueryParams[paramName]?.let { paramValue ->
+                paramPattern.matcher(paramValue).takeIf { m -> m.matches() }?.let { m ->
+                    position.addMatcher(m)
+                }
             }
         }
-        urlQueryMatchers?.forEach { position.addMatcher(it) }
 
+        // THen add zoom from query param '?z=<z>'.
         val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
         zoomMatcher?.let { position.addMatcher(it) }
 
@@ -58,6 +59,7 @@ class YandexMapsUrlConverter(
             log.i(null, "Yandex Maps URL converted $url > $position")
             ParseUrlResult.Parsed(position)
         } else {
+            // If this is a place URL '/maps/org/<id>', then parse coordinates from HTML.
             val urlPath = uriQuote.decode(url.path)
             if (urlPathPlacePattern.matches(urlPath)) {
                 log.i(null, "Yandex Maps URL requires HTML parsing to get coordinates for place id $url")
