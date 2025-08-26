@@ -52,6 +52,8 @@
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
+    <string name="converter_here_we_go_permission_title">Connect to HERE WeGo?</string>
+    <string name="converter_here_we_go_loading_indicator_title">Connecting to HERE WeGo…</string>
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
