@@ -28,10 +28,10 @@ class GoogleMapsUrlConverter(
     val shortUrlPattern: Pattern =
         Pattern.compile("""^https?://(maps\.app\.goo\.gl/|(app\.)?goo\.gl/maps/|g.co/kgs/).+$""")
 
-    val coordRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
+    val coordRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
     val coordPattern: Pattern = Pattern.compile(coordRegex)
-    val dataCoordRegex = """!3d(?P<lat>-?\d{1,2}(\.\d{1,15})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
-    val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,15})?)"""
+    val dataCoordRegex = """!3d(?P<lat>-?\d{1,2}(\.\d{1,16})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
+    val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
     val placeRegex = """(?P<q>[^/]+)"""
@@ -56,6 +56,7 @@ class GoogleMapsUrlConverter(
         Pattern.compile("""^/maps/dir/.*/$coordRegex/data[^/]*$"""),
         Pattern.compile("""^/maps/dir/.*/$placeRegex/data[^/]*$"""),
         Pattern.compile("""^/maps/dir/.*/$coordRegex$"""),
+        Pattern.compile("""^/maps/dir/.*/@$coordRegex,${zoomRegex}z.*$"""),
         Pattern.compile("""^/maps/dir/.*/$placeRegex$"""),
         Pattern.compile("""^/maps/dir/$"""),
         Pattern.compile("""^/maps/?$"""),
