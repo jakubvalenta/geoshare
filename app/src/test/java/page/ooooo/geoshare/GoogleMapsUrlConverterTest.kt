@@ -270,6 +270,14 @@ class GoogleMapsUrlConverterTest {
     }
 
     @Test
+    fun parseUrl_directionsPlaceAndCoordinates() {
+        assertEquals(
+            ParseUrlResult.Parsed(Position("48.83887481689453", "2.2740750312805176", z = "8")),
+            googleMapsUrlConverter.parseUrl(URL("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/"))
+        )
+    }
+
+    @Test
     fun toGeoUri_directionsFromTo() {
         assertEquals(
             ParseUrlResult.RequiresHtmlParsingToGetCoords(Position(null, null, q = "Los Angeles, CA")),
