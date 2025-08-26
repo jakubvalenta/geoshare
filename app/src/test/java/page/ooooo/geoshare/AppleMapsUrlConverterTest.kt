@@ -116,6 +116,7 @@ class AppleMapsUrlConverterTest {
         )
     }
 
+    @Suppress("SpellCheckingInspection")
     @Test
     fun parseUrl_parameterAddressTakesPrecedence() {
         assertEquals(
@@ -128,6 +129,7 @@ class AppleMapsUrlConverterTest {
         )
     }
 
+    @Suppress("SpellCheckingInspection")
     @Test
     fun parseUrl_parameterNamesTakesPrecedenceOverQ() {
         assertEquals(
@@ -162,6 +164,7 @@ class AppleMapsUrlConverterTest {
         assertTrue(appleMapsUrlConverter.parseUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")) is ParseUrlResult.RequiresHtmlParsing)
     }
 
+    @Suppress("SpellCheckingInspection")
     @Test
     fun parseHtml_success() {
         val html =
