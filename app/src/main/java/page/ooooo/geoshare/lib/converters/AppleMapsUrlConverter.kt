@@ -26,11 +26,11 @@ class AppleMapsUrlConverter(
     val fullUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
     val shortUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple/p/.+$""")
 
-    val latRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,15})?)"""
-    val lonRegex = """\+?(?P<lon>-?\d{1,3}(\.\d{1,15})?)"""
+    val latRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?)"""
+    val lonRegex = """\+?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
     val coordRegex = "$latRegex,$lonRegex"
     val coordPattern: Pattern = Pattern.compile(coordRegex)
-    val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,15})?)"""
+    val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
 
