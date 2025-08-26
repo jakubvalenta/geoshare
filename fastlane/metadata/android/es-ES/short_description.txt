@@ -1,1 +1,1 @@
-Abre Google Maps en otras aplicaciones de mapas y crea enlaces geo:
+Abre enlaces de mapas en otras aplicaciones de mapas y copia las coordenadas
