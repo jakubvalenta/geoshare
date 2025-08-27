@@ -1,14 +1,9 @@
 package page.ooooo.geoshare.lib.converters
 
-import android.R.attr.host
-import android.R.attr.path
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.Position
 import java.net.URL
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 interface UrlConverter {
     val name: String
@@ -36,39 +31,46 @@ sealed class ParseHtmlResult {
 }
 
 abstract class UrlMatcher {
-    abstract fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position
+    abstract fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): List<Matcher>?
 }
 
 class UrlHostMatcher(val host: Pattern) : UrlMatcher() {
-    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
-        host.matcher(urlHost)?.takeIf { it.matches() }?.let { Position().apply { addMatcher(it) } }
-
+    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): List<Matcher>? =
+        host.matcher(urlHost)?.takeIf { it.matches() }?.let { listOf(it) }
 }
 
 class UrlPathMatcher(val path: Pattern) : UrlMatcher() {
-    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
-        path.matcher(urlPath)?.takeIf { it.matches() }?.let { Position().apply { addMatcher(it) } }
+    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): List<Matcher>? =
+        path.matcher(urlPath)?.takeIf { it.matches() }?.let { listOf(it) }
 }
 
 class UrlQueryParamsMatcher(val queryParams: Map<String, Pattern>) : UrlMatcher() {
-    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
-        Position().apply {
-            for ((paramName, paramPattern) in queryParams) {
-                urlQueryParams[paramName]?.let { paramPattern.matcher(it) }?.takeIf { it.matches() }
-                    ?.let { addMatcher(it) } ?: return null
-            }
+    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): List<Matcher>? =
+        queryParams.map { (paramName, paramPattern) ->
+            urlQueryParams[paramName]?.let { paramPattern.matcher(it) }?.takeIf { it.matches() } ?: return@run null
         }
 }
 
-class All {
-    val children = arrayListOf<UrlMatcher>()
-    fun evaluate(): Position? {
-        TODO("Not implemented yet")
-    }
+class UrlFirstMatcher(val children: MutableList<UrlMatcher> = mutableListOf()) : UrlMatcher() {
+    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): List<Matcher>? =
+        children.firstNotNullOfOrNull { it.run(urlHost, urlPath, urlQueryParams) }
 }
 
-fun all(init: All.() -> Unit): All {
-    val all = All()
+class UrlAllMatcher(val children: MutableList<UrlMatcher> = mutableListOf()) : UrlMatcher() {
+    fun first() {}
+
+    override fun run(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): List<Matcher>? =
+        children.mapNotNull { it.run(urlHost, urlPath, urlQueryParams) }.flatten().takeIf { it.isNotEmpty() }
+}
+
+fun all(init: UrlAllMatcher.() -> Unit): UrlAllMatcher {
+    val all = UrlAllMatcher()
+    all.init()
+    return all
+}
+
+fun first(init: UrlFirstMatcher.() -> Unit): UrlFirstMatcher {
+    val all = UrlFirstMatcher()
     all.init()
     return all
 }
