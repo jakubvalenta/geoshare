@@ -6,7 +6,6 @@ import kotlinx.coroutines.CancellationException
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
-import page.ooooo.geoshare.lib.converters.ParseHtmlResult
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
@@ -231,22 +230,16 @@ data class GrantedParseHtmlPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
-        return when (val parseHtmlResult = urlConverter.parseHtml?.invoke(html)) {
-            is ParseHtmlResult.Parsed -> {
-                stateContext.log.i(null, "HTML parsed ${parseHtmlResult.position}")
-                return ConversionSucceeded(inputUriString, parseHtmlResult.position)
-            }
-
-            is ParseHtmlResult.Redirect -> {
-                stateContext.log.w(null, "HTML contains a redirect to ${parseHtmlResult.url}")
-                ReceivedUrl(stateContext, inputUriString, parseHtmlResult.url, Permission.ALWAYS)
-            }
-
-            null -> {
-                stateContext.log.w(null, "HTML could not be parsed")
-                return ConversionFailed(R.string.conversion_failed_parse_html_error)
-            }
+        urlConverter.htmlPattern?.matches(html)?.let { position ->
+            stateContext.log.i(null, "HTML parsed $position")
+            return@transition ConversionSucceeded(inputUriString, position)
         }
+        urlConverter.htmlRedirectPattern?.matches(html)?.let {
+            stateContext.log.w(null, "HTML contains a redirect to $redirectUrl")
+            return@transition ReceivedUrl(stateContext, inputUriString, redirectUrl, Permission.ALWAYS)
+        }
+        stateContext.log.w(null, "HTML could not be parsed")
+        return ConversionFailed(R.string.conversion_failed_parse_html_error)
     }
 }
 
@@ -291,22 +284,16 @@ data class GrantedParseHtmlToGetCoordsPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
-        return when (val parseHtmlResult = urlConverter.parseHtml?.invoke(html)) {
-            is ParseHtmlResult.Parsed -> {
-                stateContext.log.i(null, "HTML parsed ${parseHtmlResult.position}")
-                return ConversionSucceeded(inputUriString, parseHtmlResult.position)
-            }
-
-            is ParseHtmlResult.Redirect -> {
-                stateContext.log.w(null, "HTML contains a redirect to ${parseHtmlResult.url}")
-                ReceivedUrl(stateContext, inputUriString, parseHtmlResult.url, Permission.ALWAYS)
-            }
-
-            null -> {
-                stateContext.log.w(null, "HTML could not be parsed; returning position from URL")
-                return ConversionSucceeded(inputUriString, positionFromUrl)
-            }
+        urlConverter.htmlPattern?.matches(html)?.let { position ->
+            stateContext.log.i(null, "HTML parsed $position")
+            return@transition ConversionSucceeded(inputUriString, position)
         }
+        urlConverter.htmlRedirectPattern?.matches(html)?.let {
+            stateContext.log.w(null, "HTML contains a redirect to $redirectUrl")
+            return@transition ReceivedUrl(stateContext, inputUriString, redirectUrl, Permission.ALWAYS)
+        }
+        stateContext.log.w(null, "HTML could not be parsed; returning position from URL")
+        return ConversionSucceeded(inputUriString, positionFromUrl)
     }
 }
 
