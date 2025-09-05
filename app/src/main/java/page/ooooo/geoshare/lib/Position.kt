@@ -12,10 +12,10 @@ private fun matchGroupOrNull(m: Matcher, name: String): String? = try {
 }
 
 data class Position(
-    var lat: String? = null,
-    var lon: String? = null,
-    var q: String? = null,
-    var z: String? = null,
+    val lat: String? = null,
+    val lon: String? = null,
+    val q: String? = null,
+    val z: String? = null,
 ) {
     companion object {
         fun fromGeoUriString(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Position? {
@@ -40,14 +40,21 @@ data class Position(
             }
             return Position(lat, lon, q, z)
         }
+
+        fun fromMatcher(m: Matcher): Position = Position(
+            lat = matchGroupOrNull(m, "lat"),
+            lon = matchGroupOrNull(m, "lon"),
+            q = matchGroupOrNull(m, "q"),
+            z = matchGroupOrNull(m, "z")?.let { max(1, min(21, it.toDouble().roundToInt())).toString() },
+        )
     }
 
-    fun addMatcher(m: Matcher) {
-        matchGroupOrNull(m, "lat")?.let { lat = it }
-        matchGroupOrNull(m, "lon")?.let { lon = it }
-        matchGroupOrNull(m, "q")?.let { q = it }
-        matchGroupOrNull(m, "z")?.let { z = max(1, min(21, it.toDouble().roundToInt())).toString() }
-    }
+    fun union(other: Position) = Position(
+        lat = lat ?: other.lat,
+        lon = lon ?: other.lon,
+        q = q ?: other.q,
+        z = z ?: other.z,
+    )
 
     fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
 

@@ -5,22 +5,13 @@ import java.net.URL
 
 interface UrlConverter {
     val name: String
+    val hosts: List<String>
+    val shortUrlHosts: List<String>
+    val pattern: UrlPattern
     val permissionTitleResId: Int
     val loadingIndicatorTitleResId: Int
 
-    fun isSupportedUrl(url: URL): Boolean
-
-    fun isShortUrl(url: URL): Boolean
-
-    fun parseUrl(url: URL): ParseUrlResult?
-
     fun parseHtml(html: String): ParseHtmlResult?
-}
-
-sealed class ParseUrlResult {
-    data class Parsed(val position: Position) : ParseUrlResult()
-    class RequiresHtmlParsing() : ParseUrlResult()
-    data class RequiresHtmlParsingToGetCoords(val position: Position) : ParseUrlResult()
 }
 
 sealed class ParseHtmlResult {

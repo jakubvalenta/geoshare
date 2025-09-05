@@ -1,30 +1,56 @@
 package page.ooooo.geoshare.lib.converters
 
+import android.R.attr.queryPattern
 import androidx.annotation.StringRes
-import page.ooooo.geoshare.lib.Position
-import java.net.URL
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.ILog
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.getUrlQueryParams
+import page.ooooo.geoshare.lib.*
+import java.net.URL
 
 class AppleMapsUrlConverter(
     private val log: ILog = DefaultLog(),
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : UrlConverter {
     override val name = "Apple Maps"
+    override val hosts = listOf("maps.apple.com", "maps.apple")
+    override val shortUrlHosts = emptyList<String>()
+    override val pattern = all {
+        queryParam("z", zoomPattern)
+        first {
+            all {
+                host(Pattern.compile("maps.apple"))
+                path(Pattern.compile("/p/.+"))
+            }
+            queryParam("ll", coordPattern)
+            queryParam("coordinate", coordPattern)
+            queryParam("q", coordPattern)
+            queryParam("address", queryPattern)
+            queryParam("name", queryPattern)
+            all(supportsHtmlParsing = true) {
+                queryParam("auid", ".")
+                queryParam("q", "<q>")
+            }
+            all(supportsHtmlParsing = true) {
+                queryParam("place-id", ".")
+                queryParam("q", "<q>")
+            }
+            queryParam("auid", ".", supportsHtmlParsing = true)
+            queryParam("place-id", ".", supportsHtmlParsing = true)
+            all {
+                queryParam("q", queryPattern)
+                queryParam("sll", coordPattern)
+            }
+            queryParam("q", queryPattern)
+            queryParam("sll", coordPattern)
+            queryParam("center", coordPattern)
+        }
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
-
-    val fullUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple\.com/.+$""")
-    val shortUrlPattern: Pattern = Pattern.compile("""^https?://maps\.apple/p/.+$""")
 
     val latRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?)"""
     val lonRegex = """\+?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
@@ -34,27 +60,10 @@ class AppleMapsUrlConverter(
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
 
-    val urlQueryPatterns = listOf(
-        mapOf("ll" to coordPattern),
-        mapOf("coordinate" to coordPattern),
-        mapOf("q" to coordPattern),
-        mapOf("address" to queryPattern),
-        mapOf("name" to queryPattern),
-        mapOf("q" to queryPattern, "sll" to coordPattern),
-        mapOf("q" to queryPattern),
-        mapOf("sll" to coordPattern),
-        mapOf("center" to coordPattern),
-    )
     val htmlPatterns = listOf(
         Pattern.compile("""<meta property="place:location:latitude" content="$latRegex""""),
         Pattern.compile("""<meta property="place:location:longitude" content="$lonRegex""""),
     )
-
-    override fun isSupportedUrl(url: URL): Boolean =
-        fullUrlPattern.matcher(url.toString()).matches() || shortUrlPattern.matcher(url.toString()).matches()
-
-    override fun isShortUrl(url: URL): Boolean =
-        false // Treat all URLs as full URLs, because Apple Maps short URLs cannot be unshortened using a HEAD request.
 
     override fun parseUrl(url: URL): ParseUrlResult? {
         val position = Position()
@@ -67,9 +76,6 @@ class AppleMapsUrlConverter(
             }
         }
         urlQueryMatchers?.forEach { position.addMatcher(it) }
-
-        val zoomMatcher = urlQueryParams["z"]?.let { zoomPattern.matcher(it).takeIf { m -> m.matches() } }
-        zoomMatcher?.let { position.addMatcher(it) }
 
         return if (position.lat != null && position.lon != null) {
             log.i(null, "Apple Maps URL converted $url > $position")
