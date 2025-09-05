@@ -1,48 +1,43 @@
 package page.ooooo.geoshare.lib.converters
 
-import android.R.attr.queryPattern
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
-import java.net.URL
+import page.ooooo.geoshare.lib.Position
 
-class AppleMapsUrlConverter(
-    private val log: ILog = DefaultLog(),
-    private val uriQuote: UriQuote = DefaultUriQuote(),
-) : UrlConverter {
+class AppleMapsUrlConverter() : UrlConverter {
     override val name = "Apple Maps"
-    override val hosts = listOf("maps.apple.com", "maps.apple")
-    override val shortUrlHosts = emptyList<String>()
+    override val host: Pattern = Pattern.compile("""maps\.apple(\.com)?""")
+    override val shortUrlHost = null
     override val pattern = all {
-        queryParam("z", zoomPattern)
+        query("z", zoomPattern)
         first {
             all {
                 host(Pattern.compile("maps.apple"))
                 path(Pattern.compile("/p/.+"))
             }
-            queryParam("ll", coordPattern)
-            queryParam("coordinate", coordPattern)
-            queryParam("q", coordPattern)
-            queryParam("address", queryPattern)
-            queryParam("name", queryPattern)
-            all(supportsHtmlParsing = true) {
-                queryParam("auid", ".")
-                queryParam("q", "<q>")
-            }
-            all(supportsHtmlParsing = true) {
-                queryParam("place-id", ".")
-                queryParam("q", "<q>")
-            }
-            queryParam("auid", ".", supportsHtmlParsing = true)
-            queryParam("place-id", ".", supportsHtmlParsing = true)
+            query("ll", coordPattern)
+            query("coordinate", coordPattern)
+            query("q", coordPattern)
+            query("address", queryPattern)
+            query("name", queryPattern)
             all {
-                queryParam("q", queryPattern)
-                queryParam("sll", coordPattern)
+                query("auid", anyPattern)
+                query("q", queryPattern)
             }
-            queryParam("q", queryPattern)
-            queryParam("sll", coordPattern)
-            queryParam("center", coordPattern)
+            all {
+                query("place-id", anyPattern)
+                query("q", queryPattern)
+            }
+            query("auid", anyPattern)
+            query("place-id", anyPattern)
+            all {
+                query("q", queryPattern)
+                query("sll", coordPattern)
+            }
+            query("q", queryPattern)
+            query("sll", coordPattern)
+            query("center", coordPattern)
         }
     }
 
@@ -59,57 +54,15 @@ class AppleMapsUrlConverter(
     val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
     val zoomPattern: Pattern = Pattern.compile(zoomRegex)
     val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
+    val anyPattern: Pattern = Pattern.compile(".")
 
     val htmlPatterns = listOf(
         Pattern.compile("""<meta property="place:location:latitude" content="$latRegex""""),
         Pattern.compile("""<meta property="place:location:longitude" content="$lonRegex""""),
     )
 
-    override fun parseUrl(url: URL): ParseUrlResult? {
-        val position = Position()
-
-        val urlQueryParams = getUrlQueryParams(url.query, uriQuote)
-        val urlQueryMatchers = urlQueryPatterns.firstNotNullOfOrNull {
-            it.map { (paramName, paramPattern) ->
-                val paramValue = urlQueryParams[paramName] ?: return@firstNotNullOfOrNull null
-                paramPattern.matcher(paramValue).takeIf { m -> m.matches() } ?: return@firstNotNullOfOrNull null
-            }
-        }
-        urlQueryMatchers?.forEach { position.addMatcher(it) }
-
-        return if (position.lat != null && position.lon != null) {
-            log.i(null, "Apple Maps URL converted $url > $position")
-            ParseUrlResult.Parsed(position)
-        } else if (urlQueryParams["auid"] != null || urlQueryParams["place-id"] != null) {
-            if (position.q != null) {
-                log.i(null, "Apple Maps URL converted but it requires HTML parsing to get coords $url > $position")
-                ParseUrlResult.RequiresHtmlParsingToGetCoords(position)
-            } else {
-                log.i(null, "Apple Maps URL requires HTML parsing to get coordinates for place id $url")
-                ParseUrlResult.RequiresHtmlParsing()
-            }
-        } else if (position.q != null) {
-            log.i(null, "Apple Maps URL converted but it contains only query $url > $position")
-            ParseUrlResult.Parsed(position)
-        } else if (shortUrlPattern.matcher(url.toString()).matches()) {
-            ParseUrlResult.RequiresHtmlParsing()
-        } else {
-            log.i(null, "Apple Maps URL does not contain coordinates or query or place id $url")
-            null
-        }
-    }
-
-    override fun parseHtml(html: String): ParseHtmlResult? {
-        val htmlMatchers = htmlPatterns.mapNotNull {
-            it.matcher(html).takeIf { m -> m.find() }
-        }
-        if (htmlMatchers.isEmpty()) {
-            log.w(null, "Apple Maps HTML does not match any known pattern")
-            return null
-        }
-        val position = Position()
-        htmlMatchers.forEach { position.addMatcher(it) }
-        log.i(null, "Apple Maps HTML parsed $position")
-        return ParseHtmlResult.Parsed(position)
+    override val parseHtml = { html: String ->
+        htmlPatterns.mapNotNull { it.matcher(html).takeIf { m -> m.find() }?.let { m -> Position.fromMatcher(m) } }
+            .reduceRightOrNull { sum, element -> sum.union(element) }?.let { ParseHtmlResult.Parsed(it) }
     }
 }
