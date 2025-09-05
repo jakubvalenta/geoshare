@@ -3,15 +3,15 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Position
 
 class GoogleMapsUrlConverter() : UrlConverter {
     override val name = "Google Maps"
+
     override val host: Pattern = Pattern.compile("""((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}""")
     override val shortUrlHost: Pattern = Pattern.compile("""(maps\.)?(app\.)?goo\.gl""")
 
     @Suppress("SpellCheckingInspection")
-    override val pattern: UrlPattern = all {
+    override val urlPattern: UrlPattern = all {
         query("zoom", zoomPattern)
         first {
             query("destination", coordPattern)
@@ -51,28 +51,26 @@ class GoogleMapsUrlConverter() : UrlConverter {
         }
     }
 
+    override val htmlPattern = html {
+        text(Pattern.compile("""/@$coordRegex"""))
+        text(Pattern.compile("""\[null,null,$coordRegex\]"""))
+    }
+
+    override val htmlRedirectPattern = html {
+        text(Pattern.compile("""data-url="(?P<url>[^"]+)"""))
+    }
+
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
 
-    val coordRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
-    val coordPattern: Pattern = Pattern.compile(coordRegex)
-    val dataCoordRegex = """!3d(?P<lat>-?\d{1,2}(\.\d{1,16})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
-    val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
-    val zoomPattern: Pattern = Pattern.compile(zoomRegex)
-    val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
-    val placeRegex = """(?P<q>[^/]+)"""
-
-    val htmlPatterns = listOf(
-        Pattern.compile("""/@$coordRegex"""),
-        Pattern.compile("""\[null,null,$coordRegex\]"""),
-        Pattern.compile("""data-url="(?P<url>[^"]+)"""),
-    )
-
-    override val parseHtml = { html: String ->
-        htmlPatterns.mapNotNull { it.matcher(html).takeIf { m -> m.find() }?.let { m -> Position.fromMatcher(m) } }
-            .reduceRightOrNull { sum, element -> sum.union(element) }?.let { ParseHtmlResult.Parsed(it) }
-    }
+    private val coordRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
+    private val coordPattern: Pattern = Pattern.compile(coordRegex)
+    private val dataCoordRegex = """!3d(?P<lat>-?\d{1,2}(\.\d{1,16})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
+    private val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
+    private val zoomPattern: Pattern = Pattern.compile(zoomRegex)
+    private val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
+    private val placeRegex = """(?P<q>[^/]+)"""
 }
