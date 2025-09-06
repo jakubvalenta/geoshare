@@ -150,7 +150,7 @@ data class UnshortenedUrl(
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val position = urlConverter.urlPattern.matches(
+        val position = urlConverter.conversionUrlPattern.matches(
             url.host,
             uriQuote.decode(url.path),
             getUrlQueryParams(url.query, uriQuote),

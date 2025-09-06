@@ -3,6 +3,8 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.allHtmlPattern
+import page.ooooo.geoshare.lib.allUrlPattern
 
 class AppleMapsUrlConverter() : UrlConverter {
     override val name = "Apple Maps"
@@ -10,41 +12,42 @@ class AppleMapsUrlConverter() : UrlConverter {
     override val host: Pattern = Pattern.compile("""maps\.apple(\.com)?""")
     override val shortUrlHost = null
 
-    override val urlPattern = all {
-        query("z", zoomPattern)
+    @Suppress("SpellCheckingInspection")
+    override val conversionUrlPattern = allUrlPattern {
+        query("z", z)
         first {
             all {
-                host(Pattern.compile("maps.apple"))
-                path(Pattern.compile("/p/.+"))
+                host("maps.apple")
+                path("/p/.+")
             }
-            query("ll", coordPattern)
-            query("coordinate", coordPattern)
-            query("q", coordPattern)
-            query("address", queryPattern)
-            query("name", queryPattern)
+            query("ll", "$lat,$lon")
+            query("coordinate", "$lat,$lon")
+            query("q", "$lat,$lon")
+            query("address", q)
+            query("name", q)
             all {
-                query("auid", anyPattern)
-                query("q", queryPattern)
+                query("auid", ".")
+                query("q", q)
             }
             all {
-                query("place-id", anyPattern)
-                query("q", queryPattern)
+                query("place-id", ".")
+                query("q", q)
             }
-            query("auid", anyPattern)
-            query("place-id", anyPattern)
+            query("auid", ".")
+            query("place-id", ".")
             all {
-                query("q", queryPattern)
-                query("sll", coordPattern)
+                query("q", q)
+                query("sll", "$lat,$lon")
             }
-            query("q", queryPattern)
-            query("sll", coordPattern)
-            query("center", coordPattern)
+            query("q", q)
+            query("sll", "$lat,$lon")
+            query("center", "$lat,$lon")
         }
     }
 
-    override val htmlPattern = html {
-        text(Pattern.compile("""<meta property="place:location:latitude" content="$latRegex""""))
-        text(Pattern.compile("""<meta property="place:location:longitude" content="$lonRegex""""))
+    override val htmlPattern = allHtmlPattern {
+        html("""<meta property="place:location:latitude" content="$lat"""")
+        html("""<meta property="place:location:longitude" content="$lon"""")
     }
 
     override val htmlRedirectPattern = null
@@ -54,13 +57,4 @@ class AppleMapsUrlConverter() : UrlConverter {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
-
-    private val latRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?)"""
-    private val lonRegex = """\+?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
-    private val coordRegex = "$latRegex,$lonRegex"
-    private val coordPattern: Pattern = Pattern.compile(coordRegex)
-    private val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
-    private val zoomPattern: Pattern = Pattern.compile(zoomRegex)
-    private val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
-    private val anyPattern: Pattern = Pattern.compile(".")
 }

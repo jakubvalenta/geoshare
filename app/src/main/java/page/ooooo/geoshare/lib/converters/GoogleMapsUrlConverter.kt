@@ -3,6 +3,9 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ConversionUrlPattern
+import page.ooooo.geoshare.lib.allHtmlPattern
+import page.ooooo.geoshare.lib.allUrlPattern
 
 class GoogleMapsUrlConverter() : UrlConverter {
     override val name = "Google Maps"
@@ -11,53 +14,55 @@ class GoogleMapsUrlConverter() : UrlConverter {
     override val shortUrlHost: Pattern = Pattern.compile("""(maps\.)?(app\.)?goo\.gl""")
 
     @Suppress("SpellCheckingInspection")
-    override val urlPattern: UrlPattern = all {
-        query("zoom", zoomPattern)
+    override val conversionUrlPattern: ConversionUrlPattern = allUrlPattern {
+        val data = """!3d(?P$lat-?\d{1,2}(\.\d{1,16})?)!4d(?P$lon-?\d{1,3}(\.\d{1,16})?)"""
+
+        query("zoom", z)
         first {
-            query("destination", coordPattern)
-            query("destination", queryPattern)
-            query("q", coordPattern)
-            query("q", queryPattern)
-            query("query", coordPattern)
-            query("query", queryPattern)
-            query("viewpoint", coordPattern)
-            query("center", coordPattern)
+            query("destination", "$lat,$lon")
+            query("destination", q)
+            query("q", "$lat,$lon")
+            query("q", q)
+            query("query", "$lat,$lon")
+            query("query", q)
+            query("viewpoint", "$lat,$lon")
+            query("center", "$lat,$lon")
         }
         first {
-            path(Pattern.compile("""^/maps/.*/@[\d.,+-]+,${zoomRegex}z/data=.*$dataCoordRegex.*$"""))
-            path(Pattern.compile("""^/maps/.*/data=.*$dataCoordRegex.*$"""))
-            path(Pattern.compile("""^/maps/@$coordRegex,${zoomRegex}z.*$"""))
-            path(Pattern.compile("""^/maps/@$coordRegex.*$"""))
-            path(Pattern.compile("""^/maps/@$"""))
-            path(Pattern.compile("""^/maps/place/$coordRegex/@[\d.,+-]+,${zoomRegex}z.*$"""))
-            path(Pattern.compile("""^/maps/place/$placeRegex/@$coordRegex,${zoomRegex}z.*$"""))
-            path(Pattern.compile("""^/maps/place/$placeRegex/@$coordRegex.*$"""))
-            path(Pattern.compile("""^/maps/place/$coordRegex.*$"""))
-            path(Pattern.compile("""^/maps/place/$placeRegex.*$"""))
-            path(Pattern.compile("""^/maps/place//.*$"""))
-            path(Pattern.compile("""^/maps/placelists/list/.*$"""))
-            path(Pattern.compile("""^/maps/search/$coordRegex.*$"""))
-            path(Pattern.compile("""^/maps/search/$placeRegex.*$"""))
-            path(Pattern.compile("""^/maps/search/$"""))
-            path(Pattern.compile("""^/maps/dir/.*/$coordRegex/data[^/]*$"""))
-            path(Pattern.compile("""^/maps/dir/.*/$placeRegex/data[^/]*$"""))
-            path(Pattern.compile("""^/maps/dir/.*/$coordRegex$"""))
-            path(Pattern.compile("""^/maps/dir/.*/@$coordRegex,${zoomRegex}z.*$"""))
-            path(Pattern.compile("""^/maps/dir/.*/$placeRegex$"""))
-            path(Pattern.compile("""^/maps/dir/$"""))
-            path(Pattern.compile("""^/maps/?$"""))
-            path(Pattern.compile("""^/search/?$"""))
-            path(Pattern.compile("""^/?$"""))
+            path("""^/maps/.*/@[\d.,+-]+,${z}z/data=.*$data.*$""")
+            path("""^/maps/.*/data=.*$data.*$""")
+            path("""^/maps/@$lat,$lon,${z}z.*$""")
+            path("""^/maps/@$lat,$lon.*$""")
+            path("""^/maps/@$""")
+            path("""^/maps/place/$lat,$lon/@[\d.,+-]+,${z}z.*$""")
+            path("""^/maps/place/$q/@$lat,$lon,${z}z.*$""")
+            path("""^/maps/place/$q/@$lat,$lon.*$""")
+            path("""^/maps/place/$lat,$lon.*$""")
+            path("""^/maps/place/$q.*$""")
+            path("""^/maps/place//.*$""")
+            path("""^/maps/placelists/list/.*$""")
+            path("""^/maps/search/$lat,$lon.*$""")
+            path("""^/maps/search/$q.*$""")
+            path("""^/maps/search/$""")
+            path("""^/maps/dir/.*/$lat,$lon/data[^/]*$""")
+            path("""^/maps/dir/.*/$q/data[^/]*$""")
+            path("""^/maps/dir/.*/$lat,$lon$""")
+            path("""^/maps/dir/.*/@$lat,$lon,${z}z.*$""")
+            path("""^/maps/dir/.*/$q$""")
+            path("""^/maps/dir/$""")
+            path("""^/maps/?$""")
+            path("""^/search/?$""")
+            path("""^/?$""")
         }
     }
 
-    override val htmlPattern = html {
-        text(Pattern.compile("""/@$coordRegex"""))
-        text(Pattern.compile("""\[null,null,$coordRegex\]"""))
+    override val htmlPattern = allHtmlPattern {
+        html("""/@$lat,$lon""")
+        html("""\[null,null,$lat,$lon\]""")
     }
 
-    override val htmlRedirectPattern = html {
-        text(Pattern.compile("""data-url="(?P<url>[^"]+)"""))
+    override val htmlRedirectPattern = allHtmlPattern {
+        html("""data-url="(?P<url>[^"]+""") // FIXME Return matcher instead of Position and read matcher["url"] in ConversionState.
     }
 
     @StringRes
@@ -65,12 +70,4 @@ class GoogleMapsUrlConverter() : UrlConverter {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
-
-    private val coordRegex = """\+?(?P<lat>-?\d{1,2}(\.\d{1,16})?),[+\s]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
-    private val coordPattern: Pattern = Pattern.compile(coordRegex)
-    private val dataCoordRegex = """!3d(?P<lat>-?\d{1,2}(\.\d{1,16})?)!4d(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
-    private val zoomRegex = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
-    private val zoomPattern: Pattern = Pattern.compile(zoomRegex)
-    private val queryPattern: Pattern = Pattern.compile("""(?P<q>.+)""")
-    private val placeRegex = """(?P<q>[^/]+)"""
 }
