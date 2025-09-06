@@ -150,12 +150,13 @@ data class UnshortenedUrl(
     private val uriQuote: UriQuote = DefaultUriQuote(),
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val position = urlConverter.conversionUrlPattern.matches(
+        val conversionMatcher = urlConverter.conversionUrlPattern.matches(
             url.host,
             uriQuote.decode(url.path),
             getUrlQueryParams(url.query, uriQuote),
         )
-        if (position != null) {
+        if (conversionMatcher != null) {
+            val position = conversionMatcher.toPosition()
             if (position.lat != null && position.lon != null) {
                 stateContext.log.i(null, "URL converted to position with coordinates $url > $position")
                 return ConversionSucceeded(inputUriString, position)
@@ -230,11 +231,13 @@ data class GrantedParseHtmlPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
-        urlConverter.htmlPattern?.matches(html)?.let { position ->
+        urlConverter.htmlPattern?.matches(html)?.let { conversionMatcher ->
+            val position = conversionMatcher.toPosition()
             stateContext.log.i(null, "HTML parsed $position")
             return@transition ConversionSucceeded(inputUriString, position)
         }
-        urlConverter.htmlRedirectPattern?.matches(html)?.let {
+        urlConverter.htmlRedirectPattern?.matches(html)?.let { conversionMatcher ->
+            val redirectUrl = URL(conversionMatcher.getGroupOrNull("url")) // FIXME Is the URL(redirectUrl) corret?
             stateContext.log.w(null, "HTML contains a redirect to $redirectUrl")
             return@transition ReceivedUrl(stateContext, inputUriString, redirectUrl, Permission.ALWAYS)
         }
@@ -284,11 +287,13 @@ data class GrantedParseHtmlToGetCoordsPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_error)
         }
-        urlConverter.htmlPattern?.matches(html)?.let { position ->
+        urlConverter.htmlPattern?.matches(html)?.let { conversionMatcher ->
+            val position = conversionMatcher.toPosition()
             stateContext.log.i(null, "HTML parsed $position")
             return@transition ConversionSucceeded(inputUriString, position)
         }
-        urlConverter.htmlRedirectPattern?.matches(html)?.let {
+        urlConverter.htmlRedirectPattern?.matches(html)?.let { conversionMatcher ->
+            val redirectUrl = URL(conversionMatcher.getGroupOrNull("url")) // FIXME Is the URL(redirectUrl) corret?
             stateContext.log.w(null, "HTML contains a redirect to $redirectUrl")
             return@transition ReceivedUrl(stateContext, inputUriString, redirectUrl, Permission.ALWAYS)
         }

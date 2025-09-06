@@ -8,7 +8,7 @@ abstract class ConversionHtmlPattern() {
 
     val children: MutableList<ConversionHtmlPattern> = mutableListOf()
 
-    abstract fun matches(html: String): Position?
+    abstract fun matches(html: String): ConversionMatcher?
 
     protected fun <T : ConversionHtmlPattern> initMatcher(conversionPattern: T, init: T.() -> Unit = {}): T {
         conversionPattern.init()
@@ -20,15 +20,16 @@ abstract class ConversionHtmlPattern() {
 class ConversionHtmlUrlPattern(htmlRegex: String) : ConversionHtmlPattern() {
     val htmlPattern: Pattern = Pattern.compile(htmlRegex)
 
-    override fun matches(html: String): Position? =
-        htmlPattern.matcher(html)?.takeIf { it.matches() }?.let { Position.fromMatcher(it) }
+    override fun matches(html: String): ConversionMatcher? =
+        htmlPattern.matcher(html)?.takeIf { it.matches() }?.let { ConversionMatcher(listOf(it)) }
 }
 
 class ConversionAllHtmlPattern() : ConversionHtmlPattern() {
     fun html(htmlRegex: String) = initMatcher(ConversionHtmlUrlPattern(htmlRegex))
 
-    override fun matches(html: String): Position? =
-        children.firstNotNullOfOrNull { it.matches(html) }
+    override fun matches(html: String): ConversionMatcher? =
+        children.mapNotNull { it.matches(html) }.takeIf { it.size == children.size }
+            ?.let { ConversionMatcher.fromConversionMatchers(it) }
 }
 
 fun allHtmlPattern(init: ConversionAllHtmlPattern.() -> Unit): ConversionAllHtmlPattern {

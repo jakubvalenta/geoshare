@@ -1,16 +1,5 @@
 package page.ooooo.geoshare.lib
 
-import com.google.re2j.Matcher
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
-
-private fun matchGroupOrNull(m: Matcher, name: String): String? = try {
-    m.group(name)
-} catch (_: IllegalArgumentException) {
-    null
-}
-
 data class Position(
     val lat: String? = null,
     val lon: String? = null,
@@ -40,21 +29,7 @@ data class Position(
             }
             return Position(lat, lon, q, z)
         }
-
-        fun fromMatcher(m: Matcher): Position = Position(
-            lat = matchGroupOrNull(m, "lat"),
-            lon = matchGroupOrNull(m, "lon"),
-            q = matchGroupOrNull(m, "q"),
-            z = matchGroupOrNull(m, "z")?.let { max(1, min(21, it.toDouble().roundToInt())).toString() },
-        )
     }
-
-    fun union(other: Position) = Position(
-        lat = lat ?: other.lat,
-        lon = lon ?: other.lon,
-        q = q ?: other.q,
-        z = z ?: other.z,
-    )
 
     fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
 

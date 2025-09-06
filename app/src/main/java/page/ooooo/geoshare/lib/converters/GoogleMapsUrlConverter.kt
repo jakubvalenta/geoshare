@@ -62,7 +62,7 @@ class GoogleMapsUrlConverter() : UrlConverter {
     }
 
     override val htmlRedirectPattern = allHtmlPattern {
-        html("""data-url="(?P<url>[^"]+""") // FIXME Return matcher instead of Position and read matcher["url"] in ConversionState.
+        html("""data-url="(?P<url>[^"]+""")
     }
 
     @StringRes

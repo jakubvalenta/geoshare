@@ -10,7 +10,7 @@ abstract class ConversionUrlPattern() {
 
     val children: MutableList<ConversionUrlPattern> = mutableListOf()
 
-    abstract fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position?
+    abstract fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): ConversionMatcher?
 
     protected fun <T : ConversionUrlPattern> initMatcher(conversionPattern: T, init: T.() -> Unit = {}): T {
         conversionPattern.init()
@@ -22,8 +22,8 @@ abstract class ConversionUrlPattern() {
 class ConversionHostUrlPattern(hostRegex: String) : ConversionUrlPattern() {
     val hostPattern: Pattern = Pattern.compile(hostRegex)
 
-    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
-        hostPattern.matcher(urlHost)?.takeIf { it.matches() }?.let { Position.fromMatcher(it) }
+    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): ConversionMatcher? =
+        hostPattern.matcher(urlHost)?.takeIf { it.matches() }?.let { ConversionMatcher(listOf(it)) }
 }
 
 class ConversionPathUrlPattern(pathRegex: String) : ConversionUrlPattern() {
@@ -31,16 +31,16 @@ class ConversionPathUrlPattern(pathRegex: String) : ConversionUrlPattern() {
 
     val pathPattern: Pattern = Pattern.compile(pathRegex)
 
-    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
-        pathPattern.matcher(urlPath)?.takeIf { it.matches() }?.let { Position.fromMatcher(it) }
+    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): ConversionMatcher? =
+        pathPattern.matcher(urlPath)?.takeIf { it.matches() }?.let { ConversionMatcher(listOf(it)) }
 }
 
 class ConversionQueryParamUrlPattern(val name: String, valueRegex: String) : ConversionUrlPattern() {
     val valuePattern: Pattern = Pattern.compile(valueRegex)
 
-    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
+    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): ConversionMatcher? =
         urlQueryParams[name]?.let { valuePattern.matcher(it) }?.takeIf { it.matches() }
-            ?.let { Position.fromMatcher(it) }
+            ?.let { ConversionMatcher(listOf(it)) }
 }
 
 class ConversionAllUrlPattern() : ConversionUrlPattern() {
@@ -49,9 +49,9 @@ class ConversionAllUrlPattern() : ConversionUrlPattern() {
     fun path(pathRegex: String) = initMatcher(ConversionPathUrlPattern(pathRegex))
     fun query(name: String, valueRegex: String) = initMatcher(ConversionQueryParamUrlPattern(name, valueRegex))
 
-    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
-        children.mapNotNull { it.matches(urlHost, urlPath, urlQueryParams) }.takeIf { it.isNotEmpty() }
-            ?.reduceRight { sum, element -> sum.union(element) }
+    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): ConversionMatcher? =
+        children.mapNotNull { it.matches(urlHost, urlPath, urlQueryParams) }.takeIf { it.size == children.size }
+            ?.let { ConversionMatcher.fromConversionMatchers(it) }
 }
 
 class ConversionFirstUrlPattern() : ConversionUrlPattern() {
@@ -59,7 +59,7 @@ class ConversionFirstUrlPattern() : ConversionUrlPattern() {
     fun path(pathRegex: String) = initMatcher(ConversionPathUrlPattern(pathRegex))
     fun query(name: String, valueRegex: String) = initMatcher(ConversionQueryParamUrlPattern(name, valueRegex))
 
-    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): Position? =
+    override fun matches(urlHost: String, urlPath: String, urlQueryParams: Map<String, String>): ConversionMatcher? =
         children.firstNotNullOfOrNull { it.matches(urlHost, urlPath, urlQueryParams) }
 }
 
