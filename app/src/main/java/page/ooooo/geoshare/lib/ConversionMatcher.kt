@@ -1,31 +1,32 @@
 package page.ooooo.geoshare.lib
 
-import androidx.compose.ui.util.fastForEachReversed
 import com.google.re2j.Matcher
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
+import com.google.re2j.Pattern
 
-data class ConversionMatcher(val matchers: List<Matcher>) {
-    companion object {
-        fun fromConversionMatchers(other: List<ConversionMatcher>) = ConversionMatcher(other.flatMap { it.matchers })
-    }
+data class ConversionMatcher(
+    val matcher: Matcher,
+    val transform: ((name: String, value: String?) -> String?)? = null,
+) {
+    constructor(
+        pattern: Pattern,
+        input: String,
+        transform: ((name: String, value: String?) -> String?)? = null,
+    ) : this(pattern.matcher(input), transform)
 
-    fun toPosition() = Position(
-        lat = getGroupOrNull("lat"),
-        lon = getGroupOrNull("lon"),
-        q = getGroupOrNull("q"),
-        z = getGroupOrNull("z")?.let { max(1, min(21, it.toDouble().roundToInt())).toString() },
-    )
+    fun matches(): Boolean = matcher.matches()
 
-    fun getGroupOrNull(name: String): String? {
-        matchers.fastForEachReversed {
-            try {
-                return@getGroupOrNull it.group(name)
-            } catch (_: IllegalArgumentException) {
-                // Do nothing
-            }
+    fun groupOrNull(name: String): String? {
+        val value = try {
+            matcher.group(name)
+        } catch (_: IllegalArgumentException) {
+            null
         }
-        return null
+        return if (transform != null) {
+            transform(name, value)
+        } else {
+            value
+        }
     }
 }
+
+fun List<ConversionMatcher>.groupOrNull(name: String): String? = this.lastNotNullOrNull { it.groupOrNull(name) }

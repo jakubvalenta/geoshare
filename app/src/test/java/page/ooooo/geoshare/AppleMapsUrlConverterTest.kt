@@ -145,7 +145,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeIdAndQuery() {
         assertEquals(
-            Position(),
+            Position(q = "Central Park"),
             parseUrl(URL("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"))
         )
     }

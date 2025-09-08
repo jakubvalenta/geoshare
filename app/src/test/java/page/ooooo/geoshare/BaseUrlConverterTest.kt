@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import page.ooooo.geoshare.lib.getUrlQueryParams
+import page.ooooo.geoshare.lib.groupOrNull
 import java.net.URL
 
 open class BaseUrlConverterTest() {
@@ -25,10 +26,23 @@ open class BaseUrlConverterTest() {
         url.host,
         uriQuote.decode(url.path),
         getUrlQueryParams(url.query, uriQuote),
-    )?.toPosition()
+    )?.let { conversionMatchers ->
+        Position(
+            conversionMatchers.groupOrNull("lat"),
+            conversionMatchers.groupOrNull("lon"),
+            conversionMatchers.groupOrNull("q"),
+            conversionMatchers.groupOrNull("z")
+        )
+    }
 
-    fun parseHtml(html: String): Position? = urlConverter.htmlPattern?.matches(html)?.toPosition()
+    fun parseHtml(html: String): Position? = urlConverter.htmlPattern?.matches(html)?.let { conversionMatchers ->
+        Position(
+            conversionMatchers.groupOrNull("lat"),
+            conversionMatchers.groupOrNull("lon"),
+            conversionMatchers.groupOrNull("q"),
+            conversionMatchers.groupOrNull("z")
+        )
+    }
 
-    fun parseHtmlRedirect(html: String): String? =
-        urlConverter.htmlRedirectPattern?.matches(html)?.getGroupOrNull("url")
+    fun parseHtmlRedirect(html: String): String? = urlConverter.htmlRedirectPattern?.matches(html)?.groupOrNull("url")
 }

@@ -123,10 +123,11 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
-        val state = ReceivedIntent(stateContext, intent, fakeUriQuote)
+        val state = ReceivedIntent(stateContext, intent)
         assertEquals(
-            ReceivedUriString(stateContext, inputUriString, fakeUriQuote),
+            ReceivedUriString(stateContext, inputUriString),
             state.transition(),
         )
     }
@@ -140,8 +141,9 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionSucceeded(inputUriString, Position("1", "2", q = "")),
             state.transition(),
@@ -158,8 +160,9 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ReceivedUrl(
                 stateContext,
@@ -180,8 +183,9 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_invalid_url),
             state.transition(),
@@ -196,9 +200,10 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val inputUriString = ""
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_invalid_url),
             state.transition(),
@@ -213,9 +218,10 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val inputUriString = "www.example.com/"
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ReceivedUrl(
                 stateContext,
@@ -235,9 +241,10 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val inputUriString = "//www.example.com/"
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ReceivedUrl(
                 stateContext,
@@ -257,9 +264,10 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val inputUriString = "ftp://www.example.com/"
-        val state = ReceivedUriString(stateContext, inputUriString, fakeUriQuote)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ReceivedUrl(
                 stateContext,
@@ -704,8 +712,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val url = URL(inputUriString)
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(SocketTimeoutException::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(SocketTimeoutException::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 urlConverters,
@@ -732,8 +739,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val url = URL(inputUriString)
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(MalformedURLException::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(MalformedURLException::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 urlConverters,
@@ -760,8 +766,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val url = URL(inputUriString)
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(UnexpectedResponseCodeException::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(UnexpectedResponseCodeException::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 urlConverters,
@@ -846,6 +851,7 @@ class ConversionStateTest {
             mockNetworkTools,
             fakeUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val state = UnshortenedUrl(stateContext, inputUriString, googleMapsUrlConverter, url, Permission.ALWAYS)
         assertEquals(
@@ -861,14 +867,13 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val mockUrlMatcher: Matcher = mock()
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -876,9 +881,9 @@ class ConversionStateTest {
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
-            val state =
-                UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.ALWAYS)
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.ALWAYS)
             assertEquals(
                 GrantedParseHtmlPermission(stateContext, inputUriString, mockGoogleMapsUrlConverter, url),
                 state.transition(),
@@ -892,14 +897,13 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val mockUrlMatcher: Matcher = mock()
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -907,9 +911,9 @@ class ConversionStateTest {
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
-            val state =
-                UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.ASK)
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.ASK)
             assertEquals(
                 RequestedParseHtmlPermission(stateContext, inputUriString, mockGoogleMapsUrlConverter, url),
                 state.transition(),
@@ -923,14 +927,13 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val mockUrlMatcher: Matcher = mock()
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -938,9 +941,9 @@ class ConversionStateTest {
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
-            val state =
-                UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.NEVER)
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.NEVER)
             assertEquals(
                 DeniedConnectionPermission(stateContext, inputUriString, mockGoogleMapsUrlConverter),
                 state.transition(),
@@ -954,14 +957,13 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val mockUrlMatcher: Matcher = mock()
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock()
             whenever(
@@ -973,6 +975,7 @@ class ConversionStateTest {
                 mockNetworkTools,
                 mockUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
@@ -988,14 +991,13 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val mockUrlMatcher: Matcher = mock()
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock()
             whenever(
@@ -1007,6 +1009,7 @@ class ConversionStateTest {
                 mockNetworkTools,
                 mockUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
@@ -1022,14 +1025,13 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val mockUrlMatcher: Matcher = mock()
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock()
             whenever(
@@ -1041,6 +1043,7 @@ class ConversionStateTest {
                 mockNetworkTools,
                 mockUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
@@ -1059,14 +1062,13 @@ class ConversionStateTest {
                 on { group("q") } doReturn positionFromUrl.q
             }
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1074,14 +1076,9 @@ class ConversionStateTest {
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
-            val state = UnshortenedUrl(
-                stateContext,
-                inputUriString,
-                mockGoogleMapsUrlConverter,
-                url,
-                Permission.ALWAYS,
-            )
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.ALWAYS)
             assertEquals(
                 GrantedParseHtmlToGetCoordsPermission(
                     stateContext,
@@ -1104,14 +1101,13 @@ class ConversionStateTest {
                 on { group("q") } doReturn positionFromUrl.q
             }
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1119,14 +1115,9 @@ class ConversionStateTest {
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
-            val state = UnshortenedUrl(
-                stateContext,
-                inputUriString,
-                mockGoogleMapsUrlConverter,
-                url,
-                Permission.ASK,
-            )
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.ASK)
             assertEquals(
                 RequestedParseHtmlToGetCoordsPermission(
                     stateContext,
@@ -1149,14 +1140,13 @@ class ConversionStateTest {
                 on { group("q") } doReturn positionFromUrl.q
             }
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -1164,14 +1154,9 @@ class ConversionStateTest {
                 mockNetworkTools,
                 fakeUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
-            val state = UnshortenedUrl(
-                stateContext,
-                inputUriString,
-                mockGoogleMapsUrlConverter,
-                url,
-                Permission.NEVER,
-            )
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, Permission.NEVER)
             assertEquals(
                 DeniedParseHtmlToGetCoordsPermission(inputUriString, positionFromUrl),
                 state.transition(),
@@ -1188,14 +1173,13 @@ class ConversionStateTest {
                 on { group("q") } doReturn positionFromUrl.q
             }
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock()
             whenever(
@@ -1207,6 +1191,7 @@ class ConversionStateTest {
                 mockNetworkTools,
                 mockUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
@@ -1231,14 +1216,13 @@ class ConversionStateTest {
                 on { group("q") } doReturn positionFromUrl.q
             }
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock()
             whenever(
@@ -1250,6 +1234,7 @@ class ConversionStateTest {
                 mockNetworkTools,
                 mockUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
@@ -1274,14 +1259,13 @@ class ConversionStateTest {
                 on { group("q") } doReturn positionFromUrl.q
             }
             val mockUrlPattern: ConversionAllUrlPattern = mock {
-                on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+                on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { urlPattern }.doReturn(mockUrlPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(any<URL>())).thenThrow(NotImplementedError::class.java)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock()
             whenever(
@@ -1293,6 +1277,7 @@ class ConversionStateTest {
                 mockNetworkTools,
                 mockUserPreferencesRepository,
                 log = fakeLog,
+                uriQuote = fakeUriQuote,
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
             assertEquals(
@@ -1312,7 +1297,7 @@ class ConversionStateTest {
             on { group("q") } doReturn positionFromUrl.q
         }
         val mockUrlPattern: ConversionAllUrlPattern = mock {
-            on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+            on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
         }
         val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { urlPattern }.doReturn(mockUrlPattern)
@@ -1330,6 +1315,7 @@ class ConversionStateTest {
             mockNetworkTools,
             mockUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
         assertEquals(
@@ -1349,7 +1335,7 @@ class ConversionStateTest {
             on { group("q") } doReturn positionFromUrl.q
         }
         val mockUrlPattern: ConversionAllUrlPattern = mock {
-            on { matches(any(), any(), any()) } doReturn ConversionMatcher(listOf(mockUrlMatcher))
+            on { matches(any(), any(), any()) } doReturn listOf(ConversionMatcher(mockUrlMatcher))
         }
         val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { urlPattern }.doReturn(mockUrlPattern)
@@ -1367,6 +1353,7 @@ class ConversionStateTest {
             mockNetworkTools,
             mockUserPreferencesRepository,
             log = fakeLog,
+            uriQuote = fakeUriQuote,
         )
         val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, url, null)
         assertEquals(
@@ -1549,8 +1536,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.apple.com/foo"
             val url = URL(inputUriString)
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenThrow(
                 CancellationException()::class.java
             )
@@ -1579,8 +1565,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.apple.com/foo"
             val url = URL(inputUriString)
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenThrow(
                 SocketTimeoutException::class.java
             )
@@ -1609,8 +1594,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.apple.com/foo"
             val url = URL(inputUriString)
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenThrow(
                 UnexpectedResponseCodeException::class.java
             )
@@ -1640,12 +1624,12 @@ class ConversionStateTest {
         val html = "<html></html>"
         val positionFromHtml = Position("1", "2", q = "fromHtml")
         val mockHtmlMatcher: Matcher = mock {
-            on { group("lat") } doReturn "1"
-            on { group("lon") } doReturn "1"
-            on { group("q") } doReturn "fromHtml"
+            on { group("lat") } doReturn positionFromHtml.lat
+            on { group("lon") } doReturn positionFromHtml.lon
+            on { group("q") } doReturn positionFromHtml.q
         }
-        val mockHtmlPattern: ConversionAllHtmlPattern = mock {
-            on { matches(any()) } doReturn ConversionMatcher(listOf(mockHtmlMatcher))
+        val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
+            on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlMatcher))
         }
         val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { htmlPattern }.doReturn(mockHtmlPattern)
@@ -1678,23 +1662,21 @@ class ConversionStateTest {
             val inputUriString = "https://maps.apple.com/foo"
             val url = URL(inputUriString)
             val html = "<html></html>"
-            val mockHtmlMatcher: Matcher = mock()
             val mockHtmlRedirectMatcher: Matcher = mock {
                 on { group("url") } doReturn "https://maps.apple.com/foo-redirect"
             }
-            val mockHtmlPattern: ConversionAllHtmlPattern = mock {
-                on { matches(any()) } doReturn ConversionMatcher(listOf(mockHtmlMatcher))
+            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
+                on { matches(any()) } doReturn null
             }
-            val mockHtmlRedirectPattern: ConversionAllHtmlPattern = mock {
-                on { matches(any()) } doReturn ConversionMatcher(listOf(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
+                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
             }
             val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { htmlPattern }.doReturn(mockHtmlPattern)
                 on { htmlRedirectPattern }.doReturn(mockHtmlRedirectPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenReturn(html)
             val stateContext = ConversionStateContext(
                 listOf(mockAppleMapsUrlConverter),
@@ -1725,8 +1707,12 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val url = URL(inputUriString)
         val html = "<html></html>"
-        val mockHtmlPattern: ConversionAllHtmlPattern = mock()
-        val mockHtmlRedirectPattern: ConversionAllHtmlPattern = mock()
+        val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
+            on { matches(any()) } doReturn null
+        }
+        val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
+            on { matches(any()) } doReturn null
+        }
         val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { htmlPattern }.doReturn(mockHtmlPattern)
             on { htmlRedirectPattern }.doReturn(mockHtmlRedirectPattern)
@@ -1939,8 +1925,7 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val positionFromUrl = Position(q = "fromUrl")
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenThrow(
                 CancellationException()::class.java
             )
@@ -1971,8 +1956,7 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val positionFromUrl = Position(q = "fromUrl")
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenThrow(
                 SocketTimeoutException::class.java
             )
@@ -2003,8 +1987,7 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val positionFromUrl = Position(q = "fromUrl")
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenThrow(
                 UnexpectedResponseCodeException::class.java
             )
@@ -2036,10 +2019,10 @@ class ConversionStateTest {
         val positionFromUrl = Position(q = "fromUrl")
         val positionFromHtml = Position(q = "fromHtml")
         val mockHtmlMatcher: Matcher = mock {
-            on { group("q") } doReturn "fromHtml"
+            on { group("q") } doReturn positionFromHtml.q
         }
-        val mockHtmlPattern: ConversionAllHtmlPattern = mock {
-            on { matches(any()) } doReturn ConversionMatcher(listOf(mockHtmlMatcher))
+        val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
+            on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlMatcher))
         }
         val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { htmlPattern }.doReturn(mockHtmlPattern)
@@ -2074,20 +2057,21 @@ class ConversionStateTest {
             val url = URL(inputUriString)
             val html = "<html></html>"
             val positionFromUrl = Position(q = "fromUrl")
-            val mockHtmlPattern: ConversionAllHtmlPattern = mock()
+            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
+                on { matches(any()) } doReturn null
+            }
             val mockHtmlRedirectMatcher: Matcher = mock {
                 on { group("url") } doReturn inputUriString
             }
-            val mockHtmlRedirectPattern: ConversionAllHtmlPattern = mock {
-                on { matches(any()) } doReturn ConversionMatcher(listOf(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
+                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { htmlPattern }.doReturn(mockHtmlPattern)
                 on { htmlRedirectPattern }.doReturn(mockHtmlRedirectPattern)
             }
             val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
+            whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
             whenever(mockNetworkTools.getText(url)).thenReturn(html)
             val stateContext = ConversionStateContext(
                 listOf(mockGoogleMapsUrlConverter),
@@ -2115,44 +2099,43 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlToGetCoordsPermission_parseHtmlFails_returnsSucceededWithGeoUriFromUrl() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val url = URL(inputUriString)
-            val html = "<html></html>"
-            val positionFromUrl = Position(q = "fromUrl")
-            val mockHtmlPattern: ConversionAllHtmlPattern = mock()
-            val mockHtmlRedirectMatcher: Matcher = mock()
-            val mockHtmlRedirectPattern: ConversionAllHtmlPattern = mock {
-                on { matches(any()) } doReturn ConversionMatcher(listOf(mockHtmlRedirectMatcher))
-            }
-            val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
-                on { htmlPattern }.doReturn(mockHtmlPattern)
-                on { htmlRedirectPattern }.doReturn(mockHtmlRedirectPattern)
-            }
-            val mockNetworkTools: NetworkTools = mock()
-            whenever(mockNetworkTools.requestLocationHeader(any<URL>()))
-                .thenThrow(NotImplementedError::class.java)
-            whenever(mockNetworkTools.getText(url)).thenReturn(html)
-            val stateContext = ConversionStateContext(
-                listOf(mockGoogleMapsUrlConverter),
-                mockIntentTools,
-                mockNetworkTools,
-                fakeUserPreferencesRepository,
-                log = fakeLog,
-            )
-            val state = GrantedParseHtmlToGetCoordsPermission(
-                stateContext,
-                inputUriString,
-                mockGoogleMapsUrlConverter,
-                url,
-                positionFromUrl,
-            )
-            assertEquals(
-                ConversionSucceeded(inputUriString, positionFromUrl),
-                state.transition(),
-            )
+    fun grantedParseHtmlToGetCoordsPermission_parseHtmlFails_returnsSucceededWithGeoUriFromUrl() = runTest {
+        val inputUriString = "https://maps.apple.com/foo"
+        val url = URL(inputUriString)
+        val html = "<html></html>"
+        val positionFromUrl = Position(q = "fromUrl")
+        val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
+            on { matches(any()) } doReturn null
         }
+        val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
+            on { matches(any()) } doReturn null
+        }
+        val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
+            on { htmlPattern }.doReturn(mockHtmlPattern)
+            on { htmlRedirectPattern }.doReturn(mockHtmlRedirectPattern)
+        }
+        val mockNetworkTools: NetworkTools = mock()
+        whenever(mockNetworkTools.requestLocationHeader(any<URL>())).thenThrow(NotImplementedError::class.java)
+        whenever(mockNetworkTools.getText(url)).thenReturn(html)
+        val stateContext = ConversionStateContext(
+            listOf(mockGoogleMapsUrlConverter),
+            mockIntentTools,
+            mockNetworkTools,
+            fakeUserPreferencesRepository,
+            log = fakeLog,
+        )
+        val state = GrantedParseHtmlToGetCoordsPermission(
+            stateContext,
+            inputUriString,
+            mockGoogleMapsUrlConverter,
+            url,
+            positionFromUrl,
+        )
+        assertEquals(
+            ConversionSucceeded(inputUriString, positionFromUrl),
+            state.transition(),
+        )
+    }
 
     @Test
     fun deniedParseHtmlToGetCoordsPermission_returnsSucceededWithGeoUriFromUrl() = runTest {

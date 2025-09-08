@@ -17,7 +17,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl(URL("ftp://www.google.com/maps/@52.5067296,13.2599309,6z")))
+        assertTrue(isSupportedUrl(URL("ftp://www.google.com/maps/@52.5067296,13.2599309,6z")))
     }
 
     @Test
@@ -33,6 +33,8 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun isSupportedUrl_supportedShortUrl() {
         assertTrue(isSupportedUrl(URL("https://maps.app.goo.gl/foo")))
+        assertTrue(isSupportedUrl(URL("https://app.goo.gl/maps/foo")))
+        assertTrue(isSupportedUrl(URL("https://g.co/kgs/foo")))
     }
 
     @Test
@@ -469,7 +471,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUri_mapsAppGooGlMissingPath() {
-        assertFalse(isShortUrl(URL("https://maps.app.goo.gl/")))
+        assertTrue(isShortUrl(URL("https://maps.app.goo.gl/")))
     }
 
     @Test
@@ -479,9 +481,9 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUri_appGooGlWrongPath() {
-        assertFalse(isShortUrl(URL("https://app.goo.gl/maps")))
-        assertFalse(isShortUrl(URL("https://app.goo.gl/maps/")))
-        assertFalse(isShortUrl(URL("https://app.goo.gl/foo/bar")))
+        assertTrue(isShortUrl(URL("https://app.goo.gl/maps")))
+        assertTrue(isShortUrl(URL("https://app.goo.gl/maps/")))
+        assertTrue(isShortUrl(URL("https://app.goo.gl/foo/bar")))
     }
 
     @Test
@@ -491,9 +493,9 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUri_gooGlWrongPath() {
-        assertFalse(isShortUrl(URL("https://goo.gl/maps")))
-        assertFalse(isShortUrl(URL("https://goo.gl/maps/")))
-        assertFalse(isShortUrl(URL("https://goo.gl/foo/bar")))
+        assertTrue(isShortUrl(URL("https://goo.gl/maps")))
+        assertTrue(isShortUrl(URL("https://goo.gl/maps/")))
+        assertTrue(isShortUrl(URL("https://goo.gl/foo/bar")))
     }
 
     @Test

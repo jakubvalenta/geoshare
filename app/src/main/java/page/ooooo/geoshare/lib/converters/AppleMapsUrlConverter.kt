@@ -14,7 +14,9 @@ class AppleMapsUrlConverter() : UrlConverter {
 
     @Suppress("SpellCheckingInspection")
     override val urlPattern = allUrlPattern {
-        query("z", z)
+        optional {
+            query("z", z, sanitizeZoom)
+        }
         first {
             all {
                 host("maps.apple")
@@ -46,8 +48,8 @@ class AppleMapsUrlConverter() : UrlConverter {
     }
 
     override val htmlPattern = allHtmlPattern {
-        html("""<meta property="place:location:latitude" content="$lat"""")
-        html("""<meta property="place:location:longitude" content="$lon"""")
+        html(""".*?<meta property="place:location:latitude" content="$lat".*""")
+        html(""".*?<meta property="place:location:longitude" content="$lon".*""")
     }
 
     override val htmlRedirectPattern = null
