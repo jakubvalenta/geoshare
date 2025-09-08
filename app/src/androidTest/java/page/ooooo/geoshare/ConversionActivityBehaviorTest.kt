@@ -27,7 +27,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(unshortenPermissionDialogSelector)
 
         // Google Maps shows precise location
-        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs|52.484201,13.416727".toPattern())
 
         // Return to the home screen
         device.pressHome()
@@ -48,7 +48,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndConfirmDialogAndAssertNewWindowIsOpen(By.res("geoShareUnshortenPermissionDialog"), doNotAsk = true)
 
         // Google Maps shows precise location
-        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())
+        clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs|52.484201,13.416727".toPattern())
 
         // Return to the home screen
         device.pressHome()
