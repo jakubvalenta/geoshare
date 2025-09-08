@@ -8,7 +8,7 @@ interface UrlConverter {
     val name: String
     val host: Pattern
     val shortUrlHost: Pattern?
-    val conversionUrlPattern: ConversionUrlPattern
+    val urlPattern: ConversionUrlPattern
     val htmlPattern: ConversionHtmlPattern?
     val htmlRedirectPattern: ConversionHtmlPattern?
     val permissionTitleResId: Int

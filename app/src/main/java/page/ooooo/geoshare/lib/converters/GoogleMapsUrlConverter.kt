@@ -14,7 +14,7 @@ class GoogleMapsUrlConverter() : UrlConverter {
     override val shortUrlHost: Pattern = Pattern.compile("""(maps\.)?(app\.)?goo\.gl""")
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUrlPattern: ConversionUrlPattern = allUrlPattern {
+    override val urlPattern: ConversionUrlPattern = allUrlPattern {
         val data = """!3d(?P$lat-?\d{1,2}(\.\d{1,16})?)!4d(?P$lon-?\d{1,3}(\.\d{1,16})?)"""
 
         query("zoom", z)

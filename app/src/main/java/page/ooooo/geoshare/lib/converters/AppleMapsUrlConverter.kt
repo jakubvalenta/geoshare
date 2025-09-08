@@ -13,7 +13,7 @@ class AppleMapsUrlConverter() : UrlConverter {
     override val shortUrlHost = null
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUrlPattern = allUrlPattern {
+    override val urlPattern = allUrlPattern {
         query("z", z)
         first {
             all {
@@ -26,15 +26,15 @@ class AppleMapsUrlConverter() : UrlConverter {
             query("address", q)
             query("name", q)
             all {
-                query("auid", ".")
+                query("auid", ".+")
                 query("q", q)
             }
             all {
-                query("place-id", ".")
+                query("place-id", ".+")
                 query("q", q)
             }
-            query("auid", ".")
-            query("place-id", ".")
+            query("auid", ".+")
+            query("place-id", ".+")
             all {
                 query("q", q)
                 query("sll", "$lat,$lon")
