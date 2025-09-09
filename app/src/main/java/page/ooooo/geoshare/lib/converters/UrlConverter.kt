@@ -2,15 +2,15 @@ package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.ConversionHtmlPattern
-import page.ooooo.geoshare.lib.ConversionUrlPattern
+import page.ooooo.geoshare.lib.ConversionUriPattern
 
 interface UrlConverter {
     val name: String
-    val host: Pattern
-    val shortUrlPattern: Pattern?
-    val urlPattern: ConversionUrlPattern
-    val htmlPattern: ConversionHtmlPattern?
-    val htmlRedirectPattern: ConversionHtmlPattern?
+    val uriPattern: Pattern
+    val shortUriPattern: Pattern?
+    val conversionUriPattern: ConversionUriPattern
+    val conversionHtmlPattern: ConversionHtmlPattern?
+    val conversionHtmlRedirectPattern: ConversionHtmlPattern?
     val permissionTitleResId: Int
     val loadingIndicatorTitleResId: Int
 }

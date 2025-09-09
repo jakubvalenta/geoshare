@@ -16,30 +16,30 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isSupportedUrl_unknownProtocol() {
-        assertTrue(isSupportedUrl(URL("ftp://?drive_to&lat=48.85649&lon=2.35216.")))
+        assertFalse(isSupportedUrl("ftp://?drive_to&lat=48.85649&lon=2.35216."))
     }
 
     @Test
     fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl(URL("https://www.example.com/")))
+        assertFalse(isSupportedUrl("https://www.example.com/"))
     }
 
     @Test
     fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl(URL("magicearth://?drive_to&lat=48.85649&lon=2.35216")))
+        assertTrue(isSupportedUrl("magicearth://?drive_to&lat=48.85649&lon=2.35216"))
     }
 
     @Test
     fun parseUrl_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUrl(URL("magicearth://")))
-        assertNull(parseUrl(URL("magicearth://?spam=1")))
+        assertNull(parseUrl("magicearth://"))
+        assertNull(parseUrl("magicearth://?spam=1"))
     }
 
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
             Position("48.85649", "2.35216"),
-            parseUrl(URL("magicearth://?drive_to&lat=48.85649&lon=2.35216"))
+            parseUrl("magicearth://?drive_to&lat=48.85649&lon=2.35216")
         )
     }
 
@@ -47,7 +47,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_place() {
         assertEquals(
             Position(q = "Central Park"),
-            parseUrl(URL("magicearth://?name=Central Park"))
+            parseUrl("magicearth://?name=Central Park")
         )
     }
 
@@ -55,7 +55,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_search() {
         assertEquals(
             Position(q = "Paris", z = "5"),
-            parseUrl(URL("magicearth://?q=Paris&mapmode=standard&z=5"))
+            parseUrl("magicearth://?q=Paris&mapmode=standard&z=5")
         )
     }
 
@@ -63,7 +63,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_destinationAddress() {
         assertEquals(
             Position(q = "CH1 6BJ United Kingdom"),
-            parseUrl(URL("magicearth://?daddr=CH1+6BJ+United+Kingdom"))
+            parseUrl("magicearth://?daddr=CH1+6BJ+United+Kingdom")
         )
     }
 
@@ -71,7 +71,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_parametersLatAndLonTakePrecedenceOverQ() {
         assertEquals(
             Position("-17.2165721", "-149.9470294"),
-            parseUrl(URL("magicearth://?lat=-17.2165721&lon=-149.9470294&q=Central Park"))
+            parseUrl("magicearth://?lat=-17.2165721&lon=-149.9470294&q=Central Park")
         )
     }
 
@@ -79,7 +79,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_parameterDestinationAddressTakesPrecedenceOverQ() {
         assertEquals(
             Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUrl(URL("magicearth://?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"))
+            parseUrl("magicearth://?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
     }
 
@@ -87,7 +87,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
             Position(q = "Reuterplatz"),
-            parseUrl(URL("magicearth://?name=Reuterplatz&q=Central%20Park"))
+            parseUrl("magicearth://?name=Reuterplatz&q=Central%20Park")
         )
     }
 
@@ -98,6 +98,6 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUrl_alwaysReturnsFalse() {
-        assertFalse(isShortUrl(URL("magicearth://?drive_to&lat=48.85649&lon=2.35216")))
+        assertFalse(isShortUrl("magicearth://?drive_to&lat=48.85649&lon=2.35216"))
     }
 }

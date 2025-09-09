@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.allUrlPattern
+import page.ooooo.geoshare.lib.allUriPattern
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -11,11 +11,11 @@ class HereWeGoUrlConverter() : UrlConverter {
     override val name = "HERE WeGo"
 
     @Suppress("SpellCheckingInspection")
-    override val host: Pattern = Pattern.compile("""(share|wego)\.here\.com""")
-    override val shortUrlPattern = null
+    override val uriPattern: Pattern = Pattern.compile("""https?://(share|wego)\.here\.com/.+""")
+    override val shortUriPattern = null
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val urlPattern = allUrlPattern {
+    override val conversionUriPattern = allUriPattern {
         val simpleBase64Regex = """[A-Za-z0-9+/]+=*"""
         val coordStringLatPattern = Pattern.compile("""(lat=|"latitude":)$lat""")
         val coordStringLonPattern = Pattern.compile("""(lon=|"longitude":)$lon""")
@@ -59,8 +59,8 @@ class HereWeGoUrlConverter() : UrlConverter {
         }
     }
 
-    override val htmlPattern = null
-    override val htmlRedirectPattern = null
+    override val conversionHtmlPattern = null
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_here_we_go_permission_title

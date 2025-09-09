@@ -3,19 +3,19 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionUrlPattern
+import page.ooooo.geoshare.lib.ConversionUriPattern
 import page.ooooo.geoshare.lib.firstHtmlPattern
-import page.ooooo.geoshare.lib.allUrlPattern
+import page.ooooo.geoshare.lib.allUriPattern
 
 class GoogleMapsUrlConverter() : UrlConverter {
     override val name = "Google Maps"
 
-    override val host: Pattern =
-        Pattern.compile("""((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}|(maps\.)?(app\.)?goo\.gl|g.co""")
-    override val shortUrlPattern: Pattern = Pattern.compile("""https://((maps\.)?(app\.)?goo\.gl|g.co)/.+""")
+    override val uriPattern: Pattern =
+        Pattern.compile("""https?://(((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}|(maps\.)?(app\.)?goo\.gl|g\.co)/.+""")
+    override val shortUriPattern: Pattern = Pattern.compile("""https?://((maps\.)?(app\.)?goo\.gl|g.co)/.+""")
 
     @Suppress("SpellCheckingInspection")
-    override val urlPattern: ConversionUrlPattern = allUrlPattern {
+    override val conversionUriPattern: ConversionUriPattern = allUriPattern {
         optional {
             query("zoom", z, sanitizeZoom)
             first {
@@ -60,12 +60,12 @@ class GoogleMapsUrlConverter() : UrlConverter {
         }
     }
 
-    override val htmlPattern = firstHtmlPattern {
+    override val conversionHtmlPattern = firstHtmlPattern {
         html(""".*?/@$lat,$lon.*""")
         html(""".*?\[null,null,$lat,$lon\].*""")
     }
 
-    override val htmlRedirectPattern = firstHtmlPattern {
+    override val conversionHtmlRedirectPattern = firstHtmlPattern {
         html(
             """.*?data-url="(?P<url>[^"]+)".*"""
         ) { name, value ->

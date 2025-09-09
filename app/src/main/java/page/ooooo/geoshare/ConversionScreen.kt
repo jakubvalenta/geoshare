@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -33,7 +34,6 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
-import java.net.URL
 
 @Composable
 fun ConversionScreen(
@@ -169,7 +169,7 @@ fun ConversionScreen(
                         AnnotatedString.fromHtml(
                             stringResource(
                                 R.string.conversion_permission_common_text,
-                                currentState.url.toString(),
+                                currentState.uri.toString(),
                                 appName,
                             )
                         ),
@@ -193,7 +193,7 @@ fun ConversionScreen(
                         AnnotatedString.fromHtml(
                             stringResource(
                                 R.string.conversion_permission_common_text,
-                                currentState.url.toString(),
+                                currentState.uri.toString(),
                                 appName,
                             )
                         ),
@@ -217,7 +217,7 @@ fun ConversionScreen(
                         AnnotatedString.fromHtml(
                             stringResource(
                                 R.string.conversion_permission_parse_html_to_get_coords_text,
-                                truncateMiddle(currentState.url.toString()),
+                                truncateMiddle(currentState.uri.toString()),
                                 appName,
                                 currentState.urlConverter.name,
                             )
@@ -301,7 +301,7 @@ private fun PermissionPreview() {
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
-                URL("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -330,7 +330,7 @@ private fun DarkPermissionPreview() {
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
-                URL("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
