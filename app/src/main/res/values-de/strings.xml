@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="conversion_succeeded_copy_geo">geo: kopieren</string>
+    <string name="conversion_succeeded_copy_geo">geo kopieren</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="intro_how_to_share_google_maps_content_description">Bildschirmfoto von Google Maps share Sheet</string>
     <string name="intro_how_to_share_app_content_description">Bildschirmfoto von %1$s’s share sheet</string>
@@ -19,7 +19,7 @@
     <string name="conversion_permission_common_deny">Abbrechen</string>
     <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten-Informationen oder Ortnamen. %2$s muss eine Verbindung zu Google aufbauen, um die Informationen zu bekommen.]]></string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Erstelle einen search geo: Link</string>
-    <string name="intro_how_to_share_headline">Wie öffnet man Google Maps Orte in anderen Apps</string>
+    <string name="intro_how_to_share_headline">Wie öffnet man Karten Orte in anderen App</string>
     <string name="intro_nav_finish">Los gehts</string>
     <string name="conversion_succeeded_apps_headline">Öffnen mit…</string>
     <string name="intro_open_by_default_headline">Konfigurieren Sie Android so, dass Links zu Google Maps in alternativen Karten-Apps geöffnet werden (optional)</string>
@@ -28,11 +28,11 @@
     <string name="main_input_uri_label">Füge einen Google Maps Link hier ein</string>
     <string name="intro_nav_close">Schließen</string>
     <string name="intro_settings_activity_not_found">Einstellung öffnen fehlgeschlagen</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten Informationen. %2$s kann sich mit Google verbinden, um die Koordinaten zu bekommen, oder %2$s kann sonst einen geo: Link erstellen, der zur Suche nach dem Ortnamen führt.]]></string>
+    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten Informationen. %2$s kann sich mit Google verbinden, um die Koordinaten zu bekommen, oder kann sonst einen geo: Link erstellen, der zur Suche nach dem Ortnamen führt.]]></string>
     <string name="intro_how_to_share_google_maps_caption">Teile den Google Maps Ort aus der App oder dem Browser.</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot von Google Maps’ Standardmäßig öffnen Einstellung</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Wähle <i>%1$s</i> und die App lässt Sie den Standort in jeder installierten Karten-App öffnen.]]></string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Als erstes Einstellungen öffnen &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das Öffnen von Links für diese App aus.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Erstens öffnen Sie &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das öffnen von Links für diese App aus.]]></string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffnen Sie die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, jetzt das Öffnen von Links für in der App einschalten, und auf <i>Links hinzufügen</i> drücken.]]></string>
     <string name="conversion_permission_common_grant">Okay</string>
     <string name="main_info_box"><![CDATA[%1s unterstützt viele Google Maps URL Formate. Wenn du trotzdem einen Link findest, der nicht funktioniert, bitte <a href="https://github.com/jakubvalenta/geoshare/issues">melde das Problem</a>.]]></string>
@@ -53,4 +53,18 @@
     <string name="conversion_done">Erledigt</string>
     <string name="conversion_succeeded_title">Koordinaten</string>
     <string name="conversion_error_title">Fehler</string>
+    <string name="intro_how_to_share_google_maps_screenshot_title">Teilen mit</string>
+    <string name="intro_how_to_share_google_maps_screenshot_place">Ausgewählter Standort</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
+    <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
+    <string name="intro_open_by_default_google_maps_screenshot_choose">Wähle wie diese App Weblinks öffnet</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_the_app">In der App</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">In deinem Browser</string>
+    <string name="intro_open_by_default_app_screenshot_title">Standardmäßig öffnen</string>
+    <plurals name="intro_open_by_default_app_screenshot_links">
+        <item quantity="one">%1$d unterstützter Link</item>
+        <item quantity="other">%1$d unterstützte Links</item>
+    </plurals>
+    <string name="intro_open_by_default_app_screenshot_add">Hinzufügen</string>
 </resources>
