@@ -157,6 +157,16 @@
                         android:host="wego.here.com"
                         android:scheme="https"/>
             </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="yandex.com"
+                        android:scheme="https"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
 
