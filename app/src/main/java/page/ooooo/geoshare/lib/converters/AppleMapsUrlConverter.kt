@@ -10,7 +10,7 @@ class AppleMapsUrlConverter() : UrlConverter {
     override val name = "Apple Maps"
 
     override val host: Pattern = Pattern.compile("""maps\.apple(\.com)?""")
-    override val shortUrlHost = null
+    override val shortUrlPattern = null
 
     @Suppress("SpellCheckingInspection")
     override val urlPattern = allUrlPattern {

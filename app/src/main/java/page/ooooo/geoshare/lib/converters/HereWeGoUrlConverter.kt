@@ -12,7 +12,7 @@ class HereWeGoUrlConverter() : UrlConverter {
 
     @Suppress("SpellCheckingInspection")
     override val host: Pattern = Pattern.compile("""(share|wego)\.here\.com""")
-    override val shortUrlHost = null
+    override val shortUrlPattern = null
 
     @OptIn(ExperimentalEncodingApi::class)
     override val urlPattern = allUrlPattern {

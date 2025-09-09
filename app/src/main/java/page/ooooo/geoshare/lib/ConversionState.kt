@@ -75,7 +75,7 @@ data class ReceivedUrl(
         val urlConverter = stateContext.urlConverters.find { it.host.matches(url.host) } ?: return ConversionFailed(
             R.string.conversion_failed_unsupported_service
         )
-        if (urlConverter.shortUrlHost?.matches(url.host) != true) {
+        if (urlConverter.shortUrlPattern?.matches(url.toString()) != true) {
             return UnshortenedUrl(stateContext, inputUriString, urlConverter, url, permission)
         }
         return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {

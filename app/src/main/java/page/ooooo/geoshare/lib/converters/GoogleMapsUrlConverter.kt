@@ -12,7 +12,7 @@ class GoogleMapsUrlConverter() : UrlConverter {
 
     override val host: Pattern =
         Pattern.compile("""((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}|(maps\.)?(app\.)?goo\.gl|g.co""")
-    override val shortUrlHost: Pattern = Pattern.compile("""(maps\.)?(app\.)?goo\.gl|g.co""")
+    override val shortUrlPattern: Pattern = Pattern.compile("""https://((maps\.)?(app\.)?goo\.gl|g.co)/.+""")
 
     @Suppress("SpellCheckingInspection")
     override val urlPattern: ConversionUrlPattern = allUrlPattern {
