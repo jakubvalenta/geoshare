@@ -94,4 +94,6 @@
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
+    <string name="converter_magic_earth_permission_title">Connect to Magic Earth?</string>
+    <string name="converter_magic_earth_loading_indicator_title">Connecting to Magic Earth…</string>
 </resources>

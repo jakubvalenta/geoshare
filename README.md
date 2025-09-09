@@ -19,6 +19,7 @@ map app.
 - Google Maps
 - Apple Maps (beta)
 - HERE WeGo (beta)
+- Magic Earth (beta)
 - Yandex Maps (beta)
 
 **Example use cases**
