@@ -118,7 +118,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun parseUrl_parameterNamesTakesPrecedenceOverQ() {
+    fun parseUrl_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
             Position(null, null, q = "Reuterplatz"),
             parseUrl(URL("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park"))
