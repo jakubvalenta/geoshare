@@ -28,6 +28,7 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
+import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
 import javax.inject.Inject
 
@@ -44,6 +45,7 @@ class ConversionViewModel @Inject constructor(
             GoogleMapsUrlConverter(),
             AppleMapsUrlConverter(),
             HereWeGoUrlConverter(),
+            MagicEarthUrlConverter(),
             YandexMapsUrlConverter(),
         ),
         intentTools = IntentTools(),
