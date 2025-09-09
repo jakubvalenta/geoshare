@@ -18,6 +18,7 @@ map app.
 
 - Google Maps
 - Apple Maps (beta)
+- HERE WeGo (beta)
 
 **Example use cases**
 
@@ -218,6 +219,7 @@ Coordinates links:
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?address=Boddinstra%C3%9Fe%2C+Hermannstra%C3%9Fe+36%E2%80%9337%2C+12049+Berlin%2C+Germany\&coordinate=52.4804611%2C13.4250923\&name=Marked+Location' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://wego.here.com/?map=50.21972,-0.68453,6.93' page.ooooo.geoshare.debug
 ```
 
 Place links:
@@ -225,6 +227,7 @@ Place links:
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?place-id=I1E40915DF4BA1C96\&address=Reuterplatz+3,+12047+Berlin,+Germany\&coordinate=52.4890246,13.4295963\&name=Reuterplatz\&_provider=9902' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30=' page.ooooo.geoshare.debug
 ```
 
 Map view links:
