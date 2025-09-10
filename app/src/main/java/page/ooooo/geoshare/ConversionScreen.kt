@@ -156,7 +156,7 @@ fun ConversionScreen(
 
             currentState is RequestedUnshortenPermission -> {
                 PermissionDialog(
-                    title = stringResource(currentState.urlConverter.permissionTitleResId),
+                    title = stringResource(currentState.permissionTitleResId),
                     confirmText = stringResource(R.string.conversion_permission_common_grant),
                     dismissText = stringResource(R.string.conversion_permission_common_deny),
                     onConfirmation = onGrant,
@@ -180,7 +180,7 @@ fun ConversionScreen(
 
             currentState is RequestedParseHtmlPermission -> {
                 PermissionDialog(
-                    title = stringResource(currentState.urlConverter.permissionTitleResId),
+                    title = stringResource(currentState.permissionTitleResId),
                     confirmText = stringResource(R.string.conversion_permission_common_grant),
                     dismissText = stringResource(R.string.conversion_permission_common_deny),
                     onConfirmation = onGrant,
@@ -204,7 +204,7 @@ fun ConversionScreen(
 
             currentState is RequestedParseHtmlToGetCoordsPermission -> {
                 PermissionDialog(
-                    title = stringResource(currentState.urlConverter.permissionTitleResId),
+                    title = stringResource(currentState.permissionTitleResId),
                     confirmText = stringResource(R.string.conversion_permission_common_grant),
                     dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
                     onConfirmation = onGrant,

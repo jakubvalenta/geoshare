@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.allUriPattern
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class HereWeGoUrlConverter() : UrlConverter {
+class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
     override val name = "HERE WeGo"
 
     @Suppress("SpellCheckingInspection")

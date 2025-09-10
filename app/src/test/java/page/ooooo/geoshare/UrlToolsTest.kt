@@ -6,7 +6,6 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.getUrlQueryParams
 
 class UrlToolsTest {
-
     private val uriQuote = FakeUriQuote()
 
     @Test

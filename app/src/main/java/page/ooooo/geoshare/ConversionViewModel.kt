@@ -61,7 +61,7 @@ class ConversionViewModel @Inject constructor(
                     loadingIndicatorJob = viewModelScope.launch {
                         // Show loading indicator only if the state lasts longer than 200ms.
                         delay(200L)
-                        _loadingIndicatorTitleResId.value = newState.urlConverter.loadingIndicatorTitleResId
+                        _loadingIndicatorTitleResId.value = newState.loadingIndicatorTitleResId
                     }
                 }
 
