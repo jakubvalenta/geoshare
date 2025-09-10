@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
-import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.allUriPattern
 
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {

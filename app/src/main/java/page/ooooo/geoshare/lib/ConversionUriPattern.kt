@@ -177,7 +177,6 @@ class ConversionFirstUriPattern() : ConversionUriPattern() {
     fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
-    @Suppress("unused")
     fun fragment(fragmentRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionFragmentUriPattern(fragmentRegex, transform))
 

@@ -34,6 +34,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
+import androidx.core.net.toUri
 
 @Composable
 fun ConversionScreen(
@@ -300,7 +301,7 @@ private fun PermissionPreview() {
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
-                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -329,7 +330,7 @@ private fun DarkPermissionPreview() {
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
-                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
