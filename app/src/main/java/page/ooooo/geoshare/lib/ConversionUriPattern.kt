@@ -11,7 +11,7 @@ abstract class ConversionUriPattern() {
     open val lon = """[\+ ]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
     open val z = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
     open val q = """(?P<q>.+)"""
-    open val sanitizeZoom = { name: String, value: String? ->
+    open val sanitizeZoom: TransformFunc = { name, value ->
         if (name == "z") {
             value?.let { max(1, min(21, it.toDouble().roundToInt())).toString() }
         } else {
@@ -36,16 +36,19 @@ abstract class ConversionUriPattern() {
     }
 }
 
-class ConversionHostUriPattern(hostRegex: String) : ConversionUriPattern() {
+class ConversionHostUriPattern(
+    hostRegex: String,
+    val transform: TransformFunc = null,
+) : ConversionUriPattern() {
     val hostPattern: Pattern = Pattern.compile(hostRegex)
 
     override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
-        ConversionMatcher(hostPattern, host).takeIf { it.matches() }?.let { listOf(it) }
+        ConversionMatcher(hostPattern, host, transform).takeIf { it.matches() }?.let { listOf(it) }
 }
 
 class ConversionPathUriPattern(
     pathRegex: String,
-    val transform: ((String, String?) -> String?)? = null,
+    val transform: TransformFunc = null,
 ) : ConversionUriPattern() {
     val pathPattern: Pattern = Pattern.compile(pathRegex)
 
@@ -56,7 +59,7 @@ class ConversionPathUriPattern(
 class ConversionQueryParamUriPattern(
     val name: String,
     valueRegex: String,
-    val transform: ((String, String?) -> String?)? = null,
+    val transform: TransformFunc = null,
 ) : ConversionUriPattern() {
     val valuePattern: Pattern = Pattern.compile(valueRegex)
 
@@ -73,7 +76,7 @@ class ConversionQueryParamUriPattern(
 
 class ConversionOptionalUriPattern : ConversionUriPattern() {
     fun first(init: ConversionFirstUriPattern.() -> Unit) = initMatcher(ConversionFirstUriPattern(), init)
-    fun query(name: String, valueRegex: String, transform: ((String, String?) -> String?)? = null) =
+    fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
     override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher> =
@@ -83,11 +86,13 @@ class ConversionOptionalUriPattern : ConversionUriPattern() {
 class ConversionAllUriPattern() : ConversionUriPattern() {
     fun first(init: ConversionFirstUriPattern.() -> Unit) = initMatcher(ConversionFirstUriPattern(), init)
     fun optional(init: ConversionOptionalUriPattern.() -> Unit) = initMatcher(ConversionOptionalUriPattern(), init)
-    fun host(hostRegex: String) = initMatcher(ConversionHostUriPattern(hostRegex))
-    fun path(pathRegex: String, transform: ((String, String?) -> String?)? = null) =
+    fun host(hostRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionHostUriPattern(hostRegex, transform))
+
+    fun path(pathRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionPathUriPattern(pathRegex, transform))
 
-    fun query(name: String, valueRegex: String, transform: ((String, String?) -> String?)? = null) =
+    fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
     override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
@@ -96,10 +101,17 @@ class ConversionAllUriPattern() : ConversionUriPattern() {
 
 class ConversionFirstUriPattern() : ConversionUriPattern() {
     fun all(init: ConversionAllUriPattern.() -> Unit) = initMatcher(ConversionAllUriPattern(), init)
-    fun path(pathRegex: String, transform: ((String, String?) -> String?)? = null) =
+
+    @Suppress("unused")
+    fun optional(init: ConversionOptionalUriPattern.() -> Unit) = initMatcher(ConversionOptionalUriPattern(), init)
+
+    fun host(hostRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionHostUriPattern(hostRegex, transform))
+
+    fun path(pathRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionPathUriPattern(pathRegex, transform))
 
-    fun query(name: String, valueRegex: String, transform: ((String, String?) -> String?)? = null) =
+    fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
     override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =

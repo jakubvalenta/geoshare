@@ -26,6 +26,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.CoordinatesUrlConverter
 import page.ooooo.geoshare.lib.converters.GeoUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
@@ -49,6 +50,7 @@ class ConversionViewModel @Inject constructor(
             HereWeGoUrlConverter(),
             MagicEarthUrlConverter(),
             YandexMapsUrlConverter(),
+            CoordinatesUrlConverter(),
         ),
         intentTools = IntentTools(),
         networkTools = NetworkTools(),

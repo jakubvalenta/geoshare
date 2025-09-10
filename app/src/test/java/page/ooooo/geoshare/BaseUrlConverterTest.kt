@@ -11,7 +11,8 @@ import page.ooooo.geoshare.lib.converters.UrlConverter
 import page.ooooo.geoshare.lib.groupOrNull
 
 fun mockUri(uriString: String): Uri =
-    Pattern.compile("""(?P<scheme>[^:]*):?(//)?(?P<host>[^/?]*)(?P<path>[^?]*)(\?(?P<query>.*))?""").matcher(uriString)
+    Pattern.compile("""((?P<scheme>[^:]*):)?(//)?(?P<host>[^/?]*)(?P<path>[^?]*)(\?(?P<query>.*))?""")
+        .matcher(uriString)
         ?.takeIf { it.matches() }?.let { m ->
             mock {
                 on { scheme } doReturn m.group("scheme")

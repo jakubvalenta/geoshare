@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
-import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.allUriPattern
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -28,27 +26,20 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
                 optional {
                     query("map", "$lat,$lon,$z", sanitizeZoom)
                 }
-                path("""/p/[a-z]-(?P<lat>$simpleBase64Regex)""") { name, value ->
-                    if (name == "lat" && value != null) {
-                        val decoded = Base64.decode(value).decodeToString()
-                        val m = coordStringLatPattern.matcher(decoded)?.takeIf { it.find() }
-                        try {
-                            m?.group("lat")
-                        } catch (_: IllegalArgumentException) {
-                            null
-                        }
-                    } else {
-                        value
-                    }
-                }
-                path("""/p/[a-z]-(?P<lon>$simpleBase64Regex)""") { name, value ->
-                    if (name == "lon" && value != null) {
-                        val decoded = Base64.decode(value).decodeToString()
-                        val m = coordStringLonPattern.matcher(decoded)?.takeIf { it.find() }
-                        try {
-                            m?.group("lon")
-                        } catch (_: IllegalArgumentException) {
-                            null
+                path("""/p/[a-z]-(?P<encoded>$simpleBase64Regex)""") { name, value ->
+                    if (name == "lat" || name == "lon") {
+                        val encoded = groupOrNull(matcher, "encoded")
+                        if (encoded != null) {
+                            val decoded = Base64.decode(encoded).decodeToString()
+                            val pattern = if (name == "lat") coordStringLatPattern else coordStringLonPattern
+                            val m = pattern.matcher(decoded)
+                            if (m.find()) {
+                                groupOrNull(m, name)
+                            } else {
+                                value
+                            }
+                        } else {
+                            value
                         }
                     } else {
                         value
