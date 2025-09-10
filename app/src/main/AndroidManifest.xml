@@ -183,6 +183,26 @@
 
                 <data android:scheme="magicearth"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="osmand.net"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.openstreetmap.org"
+                        android:scheme="https"/>
+            </intent-filter>
         </activity>
         <activity
                 android:name="page.ooooo.geoshare.MainActivity"

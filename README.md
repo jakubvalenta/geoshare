@@ -20,6 +20,8 @@ map app.
 - Apple Maps (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- OpenStreetMap (beta)
+- OsmAnd (beta)
 - Yandex Maps (beta)
 - coordinates
 
@@ -224,6 +226,8 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https:/
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?address=Boddinstra%C3%9Fe%2C+Hermannstra%C3%9Fe+36%E2%80%9337%2C+12049+Berlin%2C+Germany\&coordinate=52.4804611%2C13.4250923\&name=Marked+Location' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://wego.here.com/?map=50.21972,-0.68453,6.93' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'magicearth://?drive_to&lat=48.85649&lon=2.35216' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.openstreetmap.org/#map=16/51.49/-0.13' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://osmand.net/map?pin=52.51628,13.37771#15/52.51628/13.37771' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'geo:50.123456,-11.123456?q=foo%20bar&z=3.4' page.ooooo.geoshare.debug
 ```
 

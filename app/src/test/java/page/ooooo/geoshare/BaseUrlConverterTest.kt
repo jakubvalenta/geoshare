@@ -11,7 +11,7 @@ import page.ooooo.geoshare.lib.converters.UrlConverter
 import page.ooooo.geoshare.lib.groupOrNull
 
 fun mockUri(uriString: String): Uri =
-    Pattern.compile("""((?P<scheme>[^:]*):)?(//)?(?P<host>[^/?]*)(?P<path>[^?]*)(\?(?P<query>.*))?""")
+    Pattern.compile("""((?P<scheme>[^:]*):)?(//)?(?P<host>[^/?#]*)(?P<path>[^?#]*)(\?(?P<query>[^#]*))?(#(?P<fragment>.*))?""")
         .matcher(uriString)
         ?.takeIf { it.matches() }?.let { m ->
             mock {
@@ -19,6 +19,7 @@ fun mockUri(uriString: String): Uri =
                 on { host } doReturn m.group("host")
                 on { path } doReturn m.group("path")
                 on { query } doReturn m.group("query")
+                on { fragment } doReturn m.group("fragment")
                 on { toString() } doReturn uriString
             }
         } ?: throw Exception("Invalid URI")

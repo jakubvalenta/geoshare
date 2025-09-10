@@ -21,12 +21,18 @@ abstract class ConversionUriPattern() {
 
     val children: MutableList<ConversionUriPattern> = mutableListOf()
 
-    abstract fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>?
+    abstract fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>?
 
     fun matches(uri: Uri, uriQuote: UriQuote = DefaultUriQuote()): List<ConversionMatcher>? = matches(
         uri.host ?: "",
         uriQuote.decode(uri.path ?: ""),
         getUrlQueryParams(uri.query, uriQuote),
+        uri.fragment ?: "",
     )
 
     protected fun <T : ConversionUriPattern> initMatcher(conversionPattern: T, init: T.() -> Unit = {}): T {
@@ -42,7 +48,12 @@ class ConversionHostUriPattern(
 ) : ConversionUriPattern() {
     val hostPattern: Pattern = Pattern.compile(hostRegex)
 
-    override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>? =
         ConversionMatcher(hostPattern, host, transform).takeIf { it.matches() }?.let { listOf(it) }
 }
 
@@ -52,7 +63,12 @@ class ConversionPathUriPattern(
 ) : ConversionUriPattern() {
     val pathPattern: Pattern = Pattern.compile(pathRegex)
 
-    override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>? =
         ConversionMatcher(pathPattern, path, transform).takeIf { it.matches() }?.let { listOf(it) }
 }
 
@@ -63,7 +79,12 @@ class ConversionQueryParamUriPattern(
 ) : ConversionUriPattern() {
     val valuePattern: Pattern = Pattern.compile(valueRegex)
 
-    override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>? =
         queryParams[name]?.let { value ->
             ConversionMatcher(
                 valuePattern,
@@ -74,13 +95,46 @@ class ConversionQueryParamUriPattern(
             ?.let { listOf(it) }
 }
 
+class ConversionFragmentUriPattern(
+    fragmentRegex: String,
+    val transform: TransformFunc = null,
+) : ConversionUriPattern() {
+    val fragmentPattern: Pattern = Pattern.compile(fragmentRegex)
+
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>? =
+        ConversionMatcher(fragmentPattern, fragment, transform).takeIf { it.matches() }?.let { listOf(it) }
+}
+
 class ConversionOptionalUriPattern : ConversionUriPattern() {
     fun first(init: ConversionFirstUriPattern.() -> Unit) = initMatcher(ConversionFirstUriPattern(), init)
+
+    @Suppress("unused")
+    fun host(hostRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionHostUriPattern(hostRegex, transform))
+
+    @Suppress("unused")
+    fun path(pathRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionPathUriPattern(pathRegex, transform))
+
     fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
-    override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher> =
-        children.mapNotNull { it.matches(host, path, queryParams) }.flatten()
+    @Suppress("unused")
+    fun fragment(fragmentRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionFragmentUriPattern(fragmentRegex, transform))
+
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher> =
+        children.mapNotNull { it.matches(host, path, queryParams, fragment) }.flatten()
 }
 
 class ConversionAllUriPattern() : ConversionUriPattern() {
@@ -95,8 +149,17 @@ class ConversionAllUriPattern() : ConversionUriPattern() {
     fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
-    override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
-        children.mapNotNull { it.matches(host, path, queryParams) }.takeIf { it.size == children.size }?.flatten()
+    fun fragment(fragmentRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionFragmentUriPattern(fragmentRegex, transform))
+
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>? =
+        children.mapNotNull { it.matches(host, path, queryParams, fragment) }.takeIf { it.size == children.size }
+            ?.flatten()
 }
 
 class ConversionFirstUriPattern() : ConversionUriPattern() {
@@ -114,8 +177,17 @@ class ConversionFirstUriPattern() : ConversionUriPattern() {
     fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
 
-    override fun matches(host: String, path: String, queryParams: Map<String, String>): List<ConversionMatcher>? =
-        children.firstNotNullOfOrNull { it.matches(host, path, queryParams) }
+    @Suppress("unused")
+    fun fragment(fragmentRegex: String, transform: TransformFunc = null) =
+        initMatcher(ConversionFragmentUriPattern(fragmentRegex, transform))
+
+    override fun matches(
+        host: String,
+        path: String,
+        queryParams: Map<String, String>,
+        fragment: String,
+    ): List<ConversionMatcher>? =
+        children.firstNotNullOfOrNull { it.matches(host, path, queryParams, fragment) }
 }
 
 fun allUriPattern(init: ConversionAllUriPattern.() -> Unit): ConversionAllUriPattern {
