@@ -5,8 +5,6 @@ import page.ooooo.geoshare.lib.allUriPattern
 import java.math.RoundingMode
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
-    override val name = "coordinates"
-
     override val uriPattern: Pattern = Pattern.compile("""[\d\s\.,°"'-]+""")
 
     override val conversionUriPattern = allUriPattern {

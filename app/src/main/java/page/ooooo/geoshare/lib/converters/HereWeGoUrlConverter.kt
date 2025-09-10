@@ -6,8 +6,6 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
-    override val name = "HERE WeGo"
-
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""https?://(share|wego)\.here\.com/.+""")
 

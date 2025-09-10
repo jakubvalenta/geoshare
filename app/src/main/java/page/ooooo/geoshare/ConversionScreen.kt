@@ -219,7 +219,6 @@ fun ConversionScreen(
                                 R.string.conversion_permission_parse_html_to_get_coords_text,
                                 truncateMiddle(currentState.uri.toString()),
                                 appName,
-                                currentState.urlConverter.name,
                             )
                         ),
                         style = TextStyle(lineBreak = LineBreak.Paragraph),

@@ -9,8 +9,6 @@ import page.ooooo.geoshare.lib.allUriPattern
 
 class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
-    override val name = "Google Maps"
-
     override val uriPattern: Pattern =
         Pattern.compile("""https?://(((www|maps)\.)?google(\.[a-z]{2,3})?\.[a-z]{2,3}|(maps\.)?(app\.)?goo\.gl|g\.co)/.+""")
     override val shortUriPattern: Pattern = Pattern.compile("""https?://((maps\.)?(app\.)?goo\.gl|g.co)/.+""")

@@ -8,8 +8,6 @@ import page.ooooo.geoshare.lib.allUriPattern
 
 class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
-    override val name = "Yandex Maps"
-
     override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/.+""")
     override val shortUriPattern: Pattern = Pattern.compile("""https?://yandex\.com/maps/-/.+""")
 

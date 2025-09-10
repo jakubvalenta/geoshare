@@ -4,7 +4,6 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.allUriPattern
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {
-    override val name = "geo: URI"
     override val uriPattern: Pattern = Pattern.compile("""geo:.+""")
     override val conversionUriPattern = allUriPattern {
         host("""$lat,$lon""")
