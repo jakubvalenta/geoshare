@@ -12,7 +12,6 @@ class HereWeGoUrlConverter() : UrlConverter {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""https?://(share|wego)\.here\.com/.+""")
-    override val shortUriPattern = null
 
     @OptIn(ExperimentalEncodingApi::class)
     override val conversionUriPattern = allUriPattern {
@@ -58,13 +57,4 @@ class HereWeGoUrlConverter() : UrlConverter {
             }
         }
     }
-
-    override val conversionHtmlPattern = null
-    override val conversionHtmlRedirectPattern = null
-
-    @StringRes
-    override val permissionTitleResId = R.string.converter_here_we_go_permission_title
-
-    @StringRes
-    override val loadingIndicatorTitleResId = R.string.converter_here_we_go_loading_indicator_title
 }

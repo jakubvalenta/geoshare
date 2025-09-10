@@ -6,7 +6,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.allHtmlPattern
 import page.ooooo.geoshare.lib.allUriPattern
 
-class YandexMapsUrlConverter() : UrlConverter {
+class YandexMapsUrlConverter() : UrlConverter, HasShortUri, HasHtmlPattern {
     override val name = "Yandex Maps"
 
     override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/.+""")
@@ -25,7 +25,6 @@ class YandexMapsUrlConverter() : UrlConverter {
     override val conversionHtmlPattern = allHtmlPattern {
         html(""".*?data-coordinates="$lon,$lat".*""")
     }
-    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title
