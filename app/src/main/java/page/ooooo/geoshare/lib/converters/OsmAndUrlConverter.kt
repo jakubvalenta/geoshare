@@ -4,7 +4,8 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.allUriPattern
 
 class OsmAndUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?osmand\.net/.+""")
+    @Suppress("SpellCheckingInspection")
+    override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?osmand\.net/\S+""")
 
     override val conversionUriPattern = allUriPattern {
         first {

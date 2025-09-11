@@ -4,7 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.allUriPattern
 
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?openstreetmap\.org/.+""")
+    override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?openstreetmap\.org/\S+""")
 
     override val conversionUriPattern = allUriPattern {
         fragment("""map=$z/$lat/$lon.*""")

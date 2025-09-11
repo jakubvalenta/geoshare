@@ -46,20 +46,25 @@ data class ReceivedUriString(
     val inputUriString: String,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val uri = Uri.parse(inputUriString, stateContext.uriQuote)
-        return ReceivedUri(stateContext, inputUriString, uri, null)
+        for (urlConverter in stateContext.urlConverters) {
+            val m = urlConverter.uriPattern.matcher(inputUriString)
+            if (m.find()) {
+                val uri = Uri.parse(m.group(), stateContext.uriQuote)
+                return ReceivedUri(stateContext, inputUriString, urlConverter, uri, null)
+            }
+        }
+        return ConversionFailed(R.string.conversion_failed_unsupported_service)
     }
 }
 
 data class ReceivedUri(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
+    val urlConverter: UrlConverter,
     val uri: Uri,
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val urlConverter = stateContext.urlConverters.find { it.uriPattern.matches(uri.toString()) }
-            ?: return ConversionFailed(R.string.conversion_failed_unsupported_service)
         if (urlConverter is UrlConverter.WithShortUriPattern && urlConverter.shortUriPattern.matches(uri.toString())) {
             return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
                 Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, inputUriString, urlConverter, uri)
@@ -252,7 +257,13 @@ data class GrantedParseHtmlPermission(
             if (redirectUriString != null) {
                 stateContext.log.w(null, "HTML contains a redirect to $redirectUriString")
                 val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote)
-                return@transition ReceivedUri(stateContext, inputUriString, redirectUri, Permission.ALWAYS)
+                return@transition ReceivedUri(
+                    stateContext,
+                    inputUriString,
+                    urlConverter,
+                    redirectUri,
+                    Permission.ALWAYS,
+                )
             }
         }
         stateContext.log.w(null, "HTML could not be parsed")
@@ -322,7 +333,13 @@ data class GrantedParseHtmlToGetCoordsPermission(
             if (redirectUriString != null) {
                 stateContext.log.w(null, "HTML contains a redirect to $redirectUriString")
                 val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote)
-                return@transition ReceivedUri(stateContext, inputUriString, redirectUri, Permission.ALWAYS)
+                return@transition ReceivedUri(
+                    stateContext,
+                    inputUriString,
+                    urlConverter,
+                    redirectUri,
+                    Permission.ALWAYS,
+                )
             }
         }
         stateContext.log.w(null, "HTML could not be parsed; returning position from URL")

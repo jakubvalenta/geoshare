@@ -2,3 +2,4 @@
 - Added Magic Earth support.
 - Added Yandex Maps support.
 - Added support for text coordinates.
+- Removed support for URIs without scheme.
