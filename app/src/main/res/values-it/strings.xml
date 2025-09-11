@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="conversion_failed_invalid_url">URL non valido</string>
     <string name="faq_item_collapse">Comprimi sezione</string>
     <string name="faq_title">FAQ</string>
     <string name="nav_menu_content_description">Menu</string>

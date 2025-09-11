@@ -72,7 +72,6 @@
     <string name="user_preferences_connection_option_never">Não</string>
     <string name="user_preferences_last_run_version_code_title">Qual versão da app foi executada na última vez?</string>
     <string name="conversion_failed_missing_url">URL faltando</string>
-    <string name="conversion_failed_invalid_url">URL inválida</string>
     <string name="conversion_failed_unshorten_error">Falha ao traduzir uma ligação curta</string>
     <string name="conversion_failed_unshorten_connection_error">Erro de conexão ao traduzir uma ligação curta</string>
     <string name="conversion_failed_parse_url_error">Falha ao processar a ligação de mapa</string>

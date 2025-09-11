@@ -52,7 +52,6 @@
     <string name="user_preferences_connection_option_never">Ні</string>
     <string name="user_preferences_last_run_version_code_title">Яку версію застосунку ви використовували востаннє?</string>
     <string name="conversion_failed_missing_url">Помилкова адреса</string>
-    <string name="conversion_failed_invalid_url">Невірна адреса</string>
     <string name="conversion_failed_unshorten_error">Не вдалося вирішити проблему з коротким посиланням</string>
     <string name="conversion_failed_parse_url_error">Не вдалося обробити посилання на мапу</string>
     <string name="conversion_succeeded_apps_not_found">Жодного картографічного застосунку не встановлено</string>

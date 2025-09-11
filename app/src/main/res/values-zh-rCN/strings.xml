@@ -40,7 +40,6 @@
     <string name="user_preferences_connection_option_never">否</string>
     <string name="user_preferences_last_run_version_code_title">该应用上次运行的版本是什么？</string>
     <string name="conversion_failed_missing_url">缺少 URL</string>
-    <string name="conversion_failed_invalid_url">URL 无效</string>
     <string name="conversion_failed_unshorten_error">无法解析短链接</string>
     <string name="conversion_failed_parse_url_error">无法处理地图链接</string>
     <string name="conversion_succeeded_apps_not_found">未安装地图应用</string>

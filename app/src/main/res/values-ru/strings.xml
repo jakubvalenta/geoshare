@@ -55,7 +55,6 @@
     <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису (Google, Apple и т.д.)?</string>
     <string name="user_preferences_title">Настройки</string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
-    <string name="conversion_failed_invalid_url">Неправильный URL-адрес</string>
     <string name="conversion_failed_unshorten_connection_error">Ошибка подключения при открытии короткой ссылки</string>
     <string name="copying_finished">Координаты скопированы в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>

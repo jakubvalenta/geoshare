@@ -46,7 +46,6 @@
     <string name="user_preferences_connection_option_never">Non</string>
     <string name="user_preferences_last_run_version_code_title">Quelle version de l’application a été exécutée en dernier ?</string>
     <string name="conversion_failed_missing_url">URL manquante</string>
-    <string name="conversion_failed_invalid_url">URL invalide</string>
     <string name="conversion_failed_unshorten_error">Impossible de résoudre le lien court</string>
     <string name="conversion_failed_unshorten_connection_error">Erreur de connexion lors de la résolution du lien court</string>
     <string name="conversion_failed_parse_url_error">Échec du traitement du lien</string>
