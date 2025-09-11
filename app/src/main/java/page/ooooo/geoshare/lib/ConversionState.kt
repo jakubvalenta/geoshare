@@ -163,25 +163,29 @@ data class UnshortenedUrl(
                 stateContext.log.i(null, "URL converted to position with coordinates $uri > $position")
                 return ConversionSucceeded(inputUriString, position)
             }
-            if (position.q != null && urlConverter is UrlConverter.WithHtmlPattern) {
-                stateContext.log.i(
-                    null,
-                    "URL converted to position with place query; coordinates can be retrieved by parsing HTML $uri > $position"
-                )
-                return when (permission
-                    ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
-                    Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
-                        stateContext, inputUriString, urlConverter, uri, position
+            if (position.q != null) {
+                if (urlConverter is UrlConverter.WithHtmlPattern) {
+                    stateContext.log.i(
+                        null,
+                        "URL converted to position with place query; coordinates can be retrieved by parsing HTML $uri > $position"
                     )
+                    return when (permission
+                        ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
+                        Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
+                            stateContext, inputUriString, urlConverter, uri, position
+                        )
 
-                    Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
-                        stateContext, inputUriString, urlConverter, uri, position
-                    )
+                        Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
+                            stateContext, inputUriString, urlConverter, uri, position
+                        )
 
-                    Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(
-                        inputUriString, position
-                    )
+                        Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(
+                            inputUriString, position
+                        )
+                    }
                 }
+                stateContext.log.i(null, "URL converted to position with place query $uri > $position")
+                return ConversionSucceeded(inputUriString, position)
             }
         }
         if (urlConverter is UrlConverter.WithHtmlPattern) {

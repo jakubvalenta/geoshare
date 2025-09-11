@@ -820,6 +820,31 @@ class ConversionStateTest {
         }
 
     @Test
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsQueryAndConverterDoesNotSupportHtml_returnsSucceeded() =
+        runTest {
+            val inputUriString = "geo:foo"
+            val uri = Uri.parse(inputUriString, fakeUriQuote)
+            val positionFromUrl = Position(q = "fromUrl")
+            val mockUriMatcher: Matcher = mock {
+                on { group("q") } doReturn positionFromUrl.q
+            }
+            val mockUriPattern: ConversionAllUriPattern = mock {
+                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            }
+            val mockGoogleMapsUrlConverter: GeoUrlConverter = mock {
+                on { conversionUriPattern }.doReturn(mockUriPattern)
+            }
+            val stateContext = mockStateContext(
+                urlConverters = listOf(mockGoogleMapsUrlConverter),
+            )
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, uri, null)
+            assertEquals(
+                ConversionSucceeded(inputUriString, positionFromUrl),
+                state.transition(),
+            )
+        }
+
+    @Test
     fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNonZeroLat_returnsSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, fakeUriQuote)
