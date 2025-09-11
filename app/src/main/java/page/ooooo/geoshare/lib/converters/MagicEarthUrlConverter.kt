@@ -4,7 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.allUriPattern
 
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""magicearth://\?\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""https?://magicearth.com/\?\S+""")
 
     override val conversionUriPattern = allUriPattern {
         optional {
