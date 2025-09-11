@@ -286,7 +286,7 @@ Link shared as a SEND Intent:
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/" page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188\&center=52.49115540927951,13.42595574770533" page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "41°24'12.2\"N 2°10'26.5\"E" page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "N-68.648556,E-152.775879" page.ooooo.geoshare.debug
 ```
 
 ## Contributing
