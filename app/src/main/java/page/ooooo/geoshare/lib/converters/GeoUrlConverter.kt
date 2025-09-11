@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.allUriPattern
 class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""geo:.+""")
     override val conversionUriPattern = allUriPattern {
-        host("""$lat,$lon""")
+        path("""$lat,$lon""")
         optional {
             query("q", q)
         }
