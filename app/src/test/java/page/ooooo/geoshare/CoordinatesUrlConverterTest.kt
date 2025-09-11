@@ -5,7 +5,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.CoordinatesUrlConverter
 
-class CoordsUrlConverterTest : BaseUrlConverterTest() {
+class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = CoordinatesUrlConverter()
 
     @Test
@@ -13,6 +13,14 @@ class CoordsUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("41.40338", "2.17403"),
             parseUrl("41.40338, 2.17403")
+        )
+    }
+
+    @Test
+    fun parseUrl_decimalDegreeSign() {
+        assertEquals(
+            Position("50.21972", "-0.68453"),
+            parseUrl("50.21972° N, 0.68453° W")
         )
     }
 
