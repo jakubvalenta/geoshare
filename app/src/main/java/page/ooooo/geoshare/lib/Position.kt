@@ -13,24 +13,21 @@ data class Position(
         z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
     ).joinToString(" \u2022 ")
 
-    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String = "${lat ?: 0},${lon ?: 0}".let { coords ->
-        formatUrl(
-            "geo",
-            coords,
-            mapOf(
-                "q" to (q ?: coords),
-                "z" to z,
-            ),
-            uriQuote,
-        )
+    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
+        val coords = "${lat ?: 0},${lon ?: 0}"
+        val queryParams = mutableMapOf("q" to (q ?: coords))
+        z?.let { queryParams["z"] = z }
+        return Uri(scheme = "geo", path = coords, queryParams = queryParams, uriQuote = uriQuote).toString()
     }
 
-    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String = formatUrl(
-        "magicearth",
-        "//",
-        mapOf("lat" to lat, "lon" to lon, "q" to q, "zoom" to z),
-        uriQuote,
-    )
+    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
+        val queryParams = mutableMapOf<String, String>()
+        lat?.let { queryParams["lat"] = lat }
+        lon?.let { queryParams["lon"] = lon }
+        q?.let { queryParams["q"] = q }
+        z?.let { queryParams["zoom"] = z }
+        return Uri(scheme = "magicearth", path = "//", queryParams = queryParams, uriQuote = uriQuote).toString()
+    }
 
     fun toNorthSouthWestEastDecCoordsString(): String = listOf(
         coordToDeg(lat, "S", "N"),

@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib
 
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import kotlinx.coroutines.CancellationException
 import page.ooooo.geoshare.R
@@ -47,7 +46,7 @@ data class ReceivedUriString(
     val inputUriString: String,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val uri = stateContext.parseUri(ensureHttpsScheme(inputUriString))
+        val uri = Uri.parse(inputUriString, stateContext.uriQuote)
         return ReceivedUri(stateContext, inputUriString, uri, null)
     }
 }
@@ -121,7 +120,7 @@ data class GrantedUnshortenPermission(
             stateContext,
             inputUriString,
             urlConverter,
-            stateContext.parseUri(locationHeaderUrl.toString()),
+            Uri.parse(locationHeaderUrl.toString(), stateContext.uriQuote),
             Permission.ALWAYS,
         )
     }
@@ -144,7 +143,7 @@ data class UnshortenedUrl(
 ) : ConversionState() {
     override suspend fun transition(): State {
         if (urlConverter is UrlConverter.WithUriPattern) {
-            val conversionMatchers = urlConverter.conversionUriPattern.matches(uri, stateContext.uriQuote)
+            val conversionMatchers = urlConverter.conversionUriPattern.matches(uri)
             if (conversionMatchers == null) {
                 stateContext.log.i(null, "URL could not be converted $uri")
                 return ConversionFailed(R.string.conversion_failed_parse_url_error)
@@ -252,7 +251,7 @@ data class GrantedParseHtmlPermission(
             val redirectUriString = conversionMatchers.groupOrNull("url")
             if (redirectUriString != null) {
                 stateContext.log.w(null, "HTML contains a redirect to $redirectUriString")
-                val redirectUri = stateContext.parseUri(redirectUriString)
+                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote)
                 return@transition ReceivedUri(stateContext, inputUriString, redirectUri, Permission.ALWAYS)
             }
         }
@@ -322,7 +321,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
             val redirectUriString = conversionMatchers.groupOrNull("url")
             if (redirectUriString != null) {
                 stateContext.log.w(null, "HTML contains a redirect to $redirectUriString")
-                val redirectUri = stateContext.parseUri(redirectUriString)
+                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote)
                 return@transition ReceivedUri(stateContext, inputUriString, redirectUri, Permission.ALWAYS)
             }
         }

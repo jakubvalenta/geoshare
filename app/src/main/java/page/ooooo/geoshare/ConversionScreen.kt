@@ -2,7 +2,6 @@ package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -34,7 +33,6 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
-import androidx.core.net.toUri
 
 @Composable
 fun ConversionScreen(
@@ -301,7 +299,7 @@ private fun PermissionPreview() {
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
+                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -330,7 +328,7 @@ private fun DarkPermissionPreview() {
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
-                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA".toUri(),
+                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
