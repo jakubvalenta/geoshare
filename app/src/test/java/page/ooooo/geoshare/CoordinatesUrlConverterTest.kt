@@ -1,12 +1,31 @@
 package page.ooooo.geoshare
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.CoordinatesUrlConverter
 
 class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = CoordinatesUrlConverter()
+
+    @Test
+    fun isSupportedUrl_supportedUrl() {
+        assertTrue(isSupportedUrl("50.21972° N, 0.68453° W"))
+    }
+
+    @Test
+    fun isSupportedUrl_unknownPath() {
+        assertFalse(isSupportedUrl("spam"))
+    }
+
+    @Test
+    fun parseUrl_noKnownPath() {
+        assertNull(parseUrl(""))
+        assertNull(parseUrl("spam"))
+    }
 
     @Test
     fun parseUrl_decimal() {

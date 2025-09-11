@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.allUriPattern
 import java.math.RoundingMode
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""[\d\s\.,°"'-]+""")
+    override val uriPattern: Pattern = Pattern.compile("""[\p{Zs}\d\.,°"'NSWE-]+""")
 
     override val conversionUriPattern = allUriPattern {
         first {
@@ -25,7 +25,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             val lonSec = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
 
             // Decimal, e.g. `N 41.40338, E 2.17403`
-            host("""$space$northSouthBefore$space$latSig$latDeg°?$space$northSouthAfter$space$comma$space$westEastBefore$space$lonSig$lonDeg°?$space$westEastAfter$space""") { name, value ->
+            path("""$space$northSouthBefore$space$latSig$latDeg°?$space$northSouthAfter$space$comma$space$westEastBefore$space$lonSig$lonDeg°?$space$westEastAfter$space""") { name, value ->
                 when (name) {
                     "lat" -> degToDec(
                         groupOrNull(matcher, "latSig"),
@@ -46,7 +46,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             }
 
             // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-            host("""$space$northSouthBefore$space$latSig$latDeg°$space$latMin'$space$latSec"?$space$northSouthAfter$space$comma$space$westEastBefore$space$lonSig$lonDeg°$space$lonMin'$space$lonSec"?$space$westEastAfter$space""") { name, value ->
+            path("""$space$northSouthBefore$space$latSig$latDeg°$space$latMin'$space$latSec"?$space$northSouthAfter$space$comma$space$westEastBefore$space$lonSig$lonDeg°$space$lonMin'$space$lonSec"?$space$westEastAfter$space""") { name, value ->
                 when (name) {
                     "lat" -> degToDec(
                         groupOrNull(matcher, "latSig"),
@@ -71,7 +71,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             }
 
             // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-            host(
+            path(
                 """$space$latSig$latDeg$space$latMin$space$comma$space$lonSig$lonDeg$space$lonMin$space"""
             ) { name, value ->
                 when (name) {
