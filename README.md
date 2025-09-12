@@ -239,6 +239,7 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https:/
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?place-id=I1E40915DF4BA1C96\&address=Reuterplatz+3,+12047+Berlin,+Germany\&coordinate=52.4890246,13.4295963\&name=Reuterplatz\&_provider=9902' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30=' page.ooooo.geoshare.debug
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://magicearth.com/?name=Central+Park' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://yandex.com/maps/100513/osnabruck/?ll=8.055899%2C52.280743&mode=whatshere&whatshere%5Bpoint%5D=8.065475%2C52.294001&whatshere%5Bzoom%5D=13.24&z=13.24' page.ooooo.geoshare.debug
 ```
 
 Map view links:

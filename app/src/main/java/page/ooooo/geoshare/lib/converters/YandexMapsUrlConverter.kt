@@ -11,11 +11,16 @@ class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/\S+""")
     override val shortUriPattern: Pattern = Pattern.compile("""https?://yandex\.com/maps/-/\S+""")
 
+    @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = allUriPattern {
         optional {
-            query("z", z, sanitizeZoom)
+            first {
+                query("whatshere%5Bzoom%5D", z, sanitizeZoom)
+                query("z", z, sanitizeZoom)
+            }
         }
         first {
+            query("whatshere%5Bpoint%5D", "$lon,$lat")
             query("ll", "$lon,$lat")
             path("""/maps/org/\d+/.*""")
         }
