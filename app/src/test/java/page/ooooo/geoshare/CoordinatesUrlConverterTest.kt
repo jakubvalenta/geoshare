@@ -14,6 +14,7 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun isSupportedUrl_supportedUrl() {
         assertTrue(isSupportedUrl("50.21972° N, 0.68453° W"))
+        assertTrue(isSupportedUrl("31°57′N 35°56′E"))
     }
 
     @Test
@@ -68,17 +69,13 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun parseUrl_degreesMinutesSeconds() {
-        assertEquals(
-            Position("31", "36.5"),
-            parseUrl("""31° 0′ 0″ N, 36° 30′ 0″ E""")
-        )
-    }
-
-    @Test
     fun parseUrl_degreesMinutesSecondsTypographic() {
         assertEquals(
-            Position("31", "36.5"),
+            Position("31.0", "36.5"),
+            parseUrl("""31° 0′ 0″ N, 36° 30′ 0″ E""")
+        )
+        assertEquals(
+            Position("31.95", "35.933333"),
             parseUrl("""31°57′N 35°56′E""")
         )
     }
@@ -112,6 +109,14 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("41.40338", "2.17403"),
             parseUrl("41 24.2028, 2 10.4418")
+        )
+    }
+
+    @Test
+    fun parseUrl_degreesMinutesWhole() {
+        assertEquals(
+            Position("31.95", "35.933333"),
+            parseUrl("31°57′N 35°56′E")
         )
     }
 
