@@ -68,6 +68,22 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_degreesMinutesSeconds() {
+        assertEquals(
+            Position("31", "36.5"),
+            parseUrl("""31° 0′ 0″ N, 36° 30′ 0″ E""")
+        )
+    }
+
+    @Test
+    fun parseUrl_degreesMinutesSecondsTypographic() {
+        assertEquals(
+            Position("31", "36.5"),
+            parseUrl("""31°57′N 35°56′E""")
+        )
+    }
+
+    @Test
     fun parseUrl_degreesMinutesSecondsNorthEastAfter() {
         assertEquals(
             Position("41.403389", "2.174028"),

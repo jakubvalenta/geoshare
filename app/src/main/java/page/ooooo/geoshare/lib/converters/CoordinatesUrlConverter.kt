@@ -5,12 +5,15 @@ import page.ooooo.geoshare.lib.allUriPattern
 import java.math.RoundingMode
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""[\p{Zs}\d\.,°"'NSWE-]+""")
+    override val uriPattern: Pattern = Pattern.compile("""[\p{Zs}\d\.,°'′"″NSWE-]+""")
 
     override val conversionUriPattern = allUriPattern {
         first {
-            val comma = """,?"""
+            val comma = """[,p{Zs}]+"""
             val space = """\p{Zs}*"""
+            val degree = """°"""
+            val prime = """['′\p{Zs}]"""
+            val doublePrime = """["″\p{Zs}]"""
             val northSouthBefore = """(?P<northSouthBefore>[NS]?)"""
             val northSouthAfter = """(?P<northSouthAfter>[NS]?)"""
             val latSig = """(?P<latSig>-?)"""
@@ -25,7 +28,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             val lonSec = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
 
             // Decimal, e.g. `N 41.40338, E 2.17403`
-            path("""$space$northSouthBefore$space$latSig$latDeg°?$space$northSouthAfter$space$comma$space$westEastBefore$space$lonSig$lonDeg°?$space$westEastAfter$space""") { name, value ->
+            path("""$space$northSouthBefore$space$latSig$latDeg$degree?$northSouthAfter$comma$westEastBefore$space$lonSig$lonDeg$degree?$westEastAfter$space""") { name, value ->
                 when (name) {
                     "lat" -> degToDec(
                         groupOrNull(matcher, "latSig"),
@@ -46,7 +49,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             }
 
             // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-            path("""$space$northSouthBefore$space$latSig$latDeg°$space$latMin'$space$latSec"?$space$northSouthAfter$space$comma$space$westEastBefore$space$lonSig$lonDeg°$space$lonMin'$space$lonSec"?$space$westEastAfter$space""") { name, value ->
+            path("""$space$northSouthBefore$space$latSig$latDeg$degree$latMin$prime$latSec$doublePrime$northSouthAfter$comma$westEastBefore$space$lonSig$lonDeg$degree$lonMin$prime$lonSec$doublePrime$westEastAfter$space""") { name, value ->
                 when (name) {
                     "lat" -> degToDec(
                         groupOrNull(matcher, "latSig"),
@@ -72,7 +75,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
 
             // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
             path(
-                """$space$latSig$latDeg$space$latMin$space$comma$space$lonSig$lonDeg$space$lonMin$space"""
+                """$space$latSig$latDeg$latMin$comma$lonSig$lonDeg$lonMin$space"""
             ) { name, value ->
                 when (name) {
                     "lat" -> degToDec(
