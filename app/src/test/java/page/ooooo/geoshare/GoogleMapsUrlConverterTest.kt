@@ -471,7 +471,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUri_mapsAppGooGlMissingPath() {
-        assertTrue(isShortUrl(URL("https://maps.app.goo.gl/")))
+        assertFalse(isShortUrl(URL("https://maps.app.goo.gl/")))
     }
 
     @Test

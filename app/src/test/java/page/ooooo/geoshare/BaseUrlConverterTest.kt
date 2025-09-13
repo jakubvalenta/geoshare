@@ -20,7 +20,7 @@ open class BaseUrlConverterTest() {
 
     fun isSupportedUrl(url: URL): Boolean = urlConverter.host.matches(url.host)
 
-    fun isShortUrl(url: URL): Boolean = urlConverter.shortUrlHost?.matches(url.host) == true
+    fun isShortUrl(url: URL): Boolean = urlConverter.shortUrlPattern?.matches(url.toString()) == true
 
     fun parseUrl(url: URL): Position? = urlConverter.urlPattern.matches(
         url.host,

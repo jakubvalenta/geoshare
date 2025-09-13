@@ -1,1 +1,2 @@
 - Added HERE WeGo support.
+- Added Yandex Maps support.

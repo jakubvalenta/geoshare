@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.ConversionUrlPattern
 interface UrlConverter {
     val name: String
     val host: Pattern
-    val shortUrlHost: Pattern?
+    val shortUrlPattern: Pattern?
     val urlPattern: ConversionUrlPattern
     val htmlPattern: ConversionHtmlPattern?
     val htmlRedirectPattern: ConversionHtmlPattern?
