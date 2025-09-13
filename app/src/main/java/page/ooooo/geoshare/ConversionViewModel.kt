@@ -27,6 +27,7 @@ import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,6 +42,7 @@ class ConversionViewModel @Inject constructor(
         urlConverters = listOf(
             GoogleMapsUrlConverter(),
             AppleMapsUrlConverter(),
+            HereWeGoUrlConverter(),
         ),
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
