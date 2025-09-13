@@ -8,10 +8,8 @@ import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.UnexpectedResponseCodeException
 import java.net.MalformedURLException
@@ -19,18 +17,12 @@ import java.net.SocketTimeoutException
 import java.net.URL
 
 class NetworkToolsTest {
-
-    private lateinit var log: ILog
-
-    @Before
-    fun before() {
-        log = FakeLog()
-    }
+    private val log = FakeLog()
 
     @Test
     fun requestLocationHeader_301Response() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.MovedPermanently,
@@ -50,7 +42,7 @@ class NetworkToolsTest {
     @Test
     fun requestLocationHeader_302Response() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.Found,
@@ -70,7 +62,7 @@ class NetworkToolsTest {
     @Test
     fun requestLocationHeader_302ResponseMissingLocation() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.Found,
@@ -93,7 +85,7 @@ class NetworkToolsTest {
     @Test
     fun requestLocationHeader_200Response() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.OK,
@@ -120,7 +112,7 @@ class NetworkToolsTest {
     @Test
     fun requestLocationHeader_500Response() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.InternalServerError,
@@ -147,7 +139,7 @@ class NetworkToolsTest {
     @Test
     fun requestLocationHeader_invalidLocationUrl() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.Found,
@@ -218,7 +210,7 @@ class NetworkToolsTest {
     @Test
     fun getText_200Response() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "test content",
                 status = HttpStatusCode.OK,
@@ -238,7 +230,7 @@ class NetworkToolsTest {
     @Test
     fun getText_500Response() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             respond(
                 content = "test content",
                 status = HttpStatusCode.InternalServerError,
@@ -277,7 +269,7 @@ class NetworkToolsTest {
     @Test
     fun getText_connectTimeoutException() = runTest {
         val url = URL("https://example.com/")
-        val mockEngine = MockEngine { request ->
+        val mockEngine = MockEngine { _ ->
             throw ConnectTimeoutException("Connect timeout")
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)

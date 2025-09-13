@@ -1,17 +1,12 @@
 package page.ooooo.geoshare
 
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
-import java.net.URL
 
 class YandexMapsUrlConverterTest : BaseUrlConverterTest() {
-    @Before
-    fun before2() {
-        urlConverter = YandexMapsUrlConverter()
-    }
+    override val urlConverter = YandexMapsUrlConverter()
 
     @Test
     fun isSupportedUrl_unknownProtocol() {

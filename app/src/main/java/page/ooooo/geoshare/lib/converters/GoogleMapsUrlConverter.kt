@@ -7,7 +7,8 @@ import page.ooooo.geoshare.lib.ConversionUriPattern
 import page.ooooo.geoshare.lib.firstHtmlPattern
 import page.ooooo.geoshare.lib.allUriPattern
 
-class GoogleMapsUrlConverter() : UrlConverter {
+class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
+    UrlConverter.WithHtmlPattern {
     override val name = "Google Maps"
 
     override val uriPattern: Pattern =

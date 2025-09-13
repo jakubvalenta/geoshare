@@ -1,17 +1,12 @@
 package page.ooooo.geoshare
 
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
-import java.net.URL
 
 class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
-    @Before
-    fun before2() {
-        urlConverter = AppleMapsUrlConverter()
-    }
+    override val urlConverter = AppleMapsUrlConverter()
 
     @Test
     fun isSupportedUrl_unknownProtocol() {
@@ -172,10 +167,5 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseHtml_failure() {
         assertNull(parseHtml("spam"))
-    }
-
-    @Test
-    fun isShortUrl_alwaysReturnsFalse() {
-        assertFalse(isShortUrl("https://maps.apple/p/7E-Brjrk_THN14"))
     }
 }

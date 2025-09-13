@@ -6,31 +6,6 @@ data class Position(
     val q: String? = null,
     val z: String? = null,
 ) {
-    companion object {
-        fun fromGeoUriString(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Position? {
-            if (!uriString.startsWith("geo:")) {
-                return null
-            }
-            val schemeAndRest = uriString.split(":", limit = 2)
-            val hostAndQuery = schemeAndRest.getOrNull(1)?.split("?", limit = 2)
-            val host = hostAndQuery?.get(0)
-            val query = hostAndQuery?.getOrNull(1)
-            var lat: String? = null
-            var lon: String? = null
-            var q: String? = null
-            var z: String? = null
-            host?.split(",")?.let {
-                lat = it.getOrNull(0)
-                lon = it.getOrNull(1)
-            }
-            getUrlQueryParams(query, uriQuote).let {
-                q = it["q"]
-                z = it["z"]
-            }
-            return Position(lat, lon, q, z)
-        }
-    }
-
     fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
 
     fun toParamsString(): String = listOfNotNull(

@@ -1,19 +1,13 @@
 package page.ooooo.geoshare
 
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import java.net.URL
 
 @Suppress("SpellCheckingInspection")
 class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
-
-    @Before
-    fun before2() {
-        urlConverter = GoogleMapsUrlConverter()
-    }
+    override val urlConverter = GoogleMapsUrlConverter()
 
     @Test
     fun isSupportedUrl_unknownProtocol() {

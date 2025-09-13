@@ -1,17 +1,12 @@
 package page.ooooo.geoshare
 
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
-import java.net.URL
 
 class HereWeGoUrlConverterTest : BaseUrlConverterTest() {
-    @Before
-    fun before2() {
-        urlConverter = HereWeGoUrlConverter()
-    }
+    override val urlConverter = HereWeGoUrlConverter()
 
     @Test
     fun isSupportedUrl_unknownProtocol() {
@@ -70,15 +65,5 @@ class HereWeGoUrlConverterTest : BaseUrlConverterTest() {
             Position("-38.14749", "145.14347"),
             parseUrl("https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30=")
         )
-    }
-
-    @Test
-    fun parseHtml_alwaysReturnsNull() {
-        assertNull(parseHtml("<html></html>"))
-    }
-
-    @Test
-    fun isShortUrl_alwaysReturnsFalse() {
-        assertFalse(isShortUrl("https://maps.apple/p/7E-Brjrk_THN14"))
     }
 }

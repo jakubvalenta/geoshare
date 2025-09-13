@@ -26,6 +26,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.GeoUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
@@ -42,6 +43,7 @@ class ConversionViewModel @Inject constructor(
 
     val stateContext = ConversionStateContext(
         urlConverters = listOf(
+            GeoUrlConverter(),
             GoogleMapsUrlConverter(),
             AppleMapsUrlConverter(),
             HereWeGoUrlConverter(),
@@ -59,7 +61,7 @@ class ConversionViewModel @Inject constructor(
                     loadingIndicatorJob = viewModelScope.launch {
                         // Show loading indicator only if the state lasts longer than 200ms.
                         delay(200L)
-                        _loadingIndicatorTitleResId.value = newState.urlConverter.loadingIndicatorTitleResId
+                        _loadingIndicatorTitleResId.value = newState.loadingIndicatorTitleResId
                     }
                 }
 
@@ -171,7 +173,7 @@ class ConversionViewModel @Inject constructor(
     fun copy(context: Context, clipboard: Clipboard, text: String) {
         viewModelScope.launch {
             clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
-            val systemHasClipboardEditor = stateContext.getBuildVersionSdkInt() >= Build.VERSION_CODES.TIRAMISU
+            val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
             if (!systemHasClipboardEditor) {
                 Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
             }

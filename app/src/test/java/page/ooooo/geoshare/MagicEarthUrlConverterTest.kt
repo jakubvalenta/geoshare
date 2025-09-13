@@ -1,18 +1,13 @@
 package page.ooooo.geoshare
 
-import org.junit.Before
-import org.junit.Test
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 import org.junit.Assert.*
+import org.junit.Test
 import page.ooooo.geoshare.lib.Position
-import java.net.URL
+import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
 @Suppress("SpellCheckingInspection")
 class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
-    @Before
-    fun before2() {
-        urlConverter = MagicEarthUrlConverter()
-    }
+    override val urlConverter = MagicEarthUrlConverter()
 
     @Test
     fun isSupportedUrl_unknownProtocol() {
@@ -89,15 +84,5 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
             Position(q = "Reuterplatz"),
             parseUrl("magicearth://?name=Reuterplatz&q=Central%20Park")
         )
-    }
-
-    @Test
-    fun parseHtml_alwaysReturnsNull() {
-        assertNull(parseHtml("<html></html>"))
-    }
-
-    @Test
-    fun isShortUrl_alwaysReturnsFalse() {
-        assertFalse(isShortUrl("magicearth://?drive_to&lat=48.85649&lon=2.35216"))
     }
 }
