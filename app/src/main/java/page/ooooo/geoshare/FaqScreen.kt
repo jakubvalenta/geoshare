@@ -51,14 +51,19 @@ fun FaqScreen(
             verticalArrangement = Arrangement.spacedBy(Spacing.small)
         ) {
             FaqItem(
+                headline = stringResource(R.string.faq_supported_inputs_headline),
+                initialExpanded,
+            ) {
+                ParagraphHtml(
+                    stringResource(R.string.faq_supported_inputs_text, appName)
+                )
+            }
+            FaqItem(
                 stringResource(R.string.faq_how_it_works_headline),
                 initialExpanded,
             ) {
                 ParagraphHtml(
-                    stringResource(
-                        R.string.faq_how_it_works_text,
-                        appName
-                    )
+                    stringResource(R.string.faq_how_it_works_text, appName)
                 )
             }
         }
