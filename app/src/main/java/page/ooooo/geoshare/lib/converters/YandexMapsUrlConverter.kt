@@ -3,22 +3,24 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionHtmlPattern
 import page.ooooo.geoshare.lib.allHtmlPattern
 import page.ooooo.geoshare.lib.allUriPattern
 
 class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
-    override val name = "Yandex Maps"
+    override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/\S+""")
+    override val shortUriPattern: Pattern = Pattern.compile("""https?://yandex\.com/maps/-/\S+""")
 
-    override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/.+""")
-    override val shortUriPattern: Pattern = Pattern.compile("""https?://yandex\.com/maps/-/.+""")
-
+    @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = allUriPattern {
         optional {
-            query("z", z, sanitizeZoom)
+            first {
+                query("whatshere%5Bzoom%5D", z, sanitizeZoom)
+                query("z", z, sanitizeZoom)
+            }
         }
         first {
+            query("whatshere%5Bpoint%5D", "$lon,$lat")
             query("ll", "$lon,$lat")
             path("""/maps/org/\d+/.*""")
         }

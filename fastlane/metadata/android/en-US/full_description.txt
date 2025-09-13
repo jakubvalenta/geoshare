@@ -6,7 +6,10 @@ Share a map link with Geo Share and the app will open it in another installed ma
 - Apple Maps (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- OpenStreetMap (beta)
+- OsmAnd (beta)
 - Yandex Maps (beta)
+- coordinates
 
 <b>Example use cases</b>
 

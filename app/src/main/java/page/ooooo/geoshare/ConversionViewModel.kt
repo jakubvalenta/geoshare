@@ -26,10 +26,13 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.CoordinatesUrlConverter
 import page.ooooo.geoshare.lib.converters.GeoUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
+import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
 import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
 import javax.inject.Inject
 
@@ -48,7 +51,10 @@ class ConversionViewModel @Inject constructor(
             AppleMapsUrlConverter(),
             HereWeGoUrlConverter(),
             MagicEarthUrlConverter(),
+            OpenStreetMapUrlConverter(),
+            OsmAndUrlConverter(),
             YandexMapsUrlConverter(),
+            CoordinatesUrlConverter(),
         ),
         intentTools = IntentTools(),
         networkTools = NetworkTools(),

@@ -7,8 +7,6 @@ import android.util.Log
 
 class IntentTools {
 
-    private val intentUrlRegex = Regex("(https?://|geo:)\\S+")
-
     fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
         setPackage(packageName)
     }
@@ -41,12 +39,7 @@ class IntentTools {
                     Log.w(null, "Missing intent extra text")
                     return null
                 }
-                val intentUrlMatch = intentUrlRegex.find(intentText)
-                if (intentUrlMatch == null) {
-                    Log.w(null, "Intent extra text does not contain a URL")
-                    return null
-                }
-                return intentUrlMatch.value
+                return intentText
             }
 
             else -> {

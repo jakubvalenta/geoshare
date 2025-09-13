@@ -5,7 +5,6 @@ import page.ooooo.geoshare.lib.ConversionHtmlPattern
 import page.ooooo.geoshare.lib.ConversionUriPattern
 
 sealed interface UrlConverter {
-    val name: String
     val uriPattern: Pattern
 
     interface WithShortUriPattern : UrlConverter {

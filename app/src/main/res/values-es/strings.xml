@@ -40,7 +40,6 @@
     <string name="user_preferences_connection_option_never">No</string>
     <string name="user_preferences_last_run_version_code_title">¿Qué versión de la aplicación se ejecutó por última vez?</string>
     <string name="conversion_failed_missing_url">URL ausente</string>
-    <string name="conversion_failed_invalid_url">URL inválida</string>
     <string name="conversion_failed_unshorten_error">Error al resolver el enlace corto</string>
     <string name="conversion_failed_unshorten_connection_error">Error de conexión al resolver el enlace corto</string>
     <string name="conversion_failed_parse_url_error">Error al procesar el enlace de mapa</string>

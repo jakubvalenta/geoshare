@@ -19,7 +19,7 @@ abstract class ConversionHtmlPattern() {
 
 class ConversionHtmlContentPattern(
     contentRegex: String,
-    val transform: ((String, String?) -> String?)? = null,
+    val transform: TransformFunc = null,
 ) : ConversionHtmlPattern() {
     val contentPattern: Pattern = Pattern.compile(contentRegex, Pattern.DOTALL)
 
@@ -28,7 +28,7 @@ class ConversionHtmlContentPattern(
 }
 
 class ConversionAllHtmlPattern() : ConversionHtmlPattern() {
-    fun html(contentRegex: String, transform: ((String, String?) -> String?)? = null) =
+    fun html(contentRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionHtmlContentPattern(contentRegex, transform))
 
     override fun matches(content: String): List<ConversionMatcher>? =
@@ -36,7 +36,7 @@ class ConversionAllHtmlPattern() : ConversionHtmlPattern() {
 }
 
 class ConversionFirstHtmlPattern() : ConversionHtmlPattern() {
-    fun html(contentRegex: String, transform: ((String, String?) -> String?)? = null) =
+    fun html(contentRegex: String, transform: TransformFunc = null) =
         initMatcher(ConversionHtmlContentPattern(contentRegex, transform))
 
     override fun matches(content: String): List<ConversionMatcher>? =

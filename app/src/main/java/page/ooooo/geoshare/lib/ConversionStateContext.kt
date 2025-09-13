@@ -1,7 +1,5 @@
 package page.ooooo.geoshare.lib
 
-import android.net.Uri
-import androidx.core.net.toUri
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.converters.UrlConverter
 
@@ -13,7 +11,6 @@ data class ConversionStateContext(
     val log: ILog = DefaultLog(),
     val onStateChange: (State) -> Unit = {},
     val uriQuote: UriQuote = DefaultUriQuote(),
-    val parseUri: (uriString: String) -> Uri = { it.toUri() },
 ) : StateContext() {
     override var currentState: State = Initial()
         set(value) {

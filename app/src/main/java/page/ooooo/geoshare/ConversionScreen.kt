@@ -2,7 +2,6 @@ package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -219,7 +218,6 @@ fun ConversionScreen(
                                 R.string.conversion_permission_parse_html_to_get_coords_text,
                                 truncateMiddle(currentState.uri.toString()),
                                 appName,
-                                currentState.urlConverter.name,
                             )
                         ),
                         style = TextStyle(lineBreak = LineBreak.Paragraph),

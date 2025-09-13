@@ -47,7 +47,6 @@
     <string name="user_preferences_connection_option_never">Não</string>
     <string name="user_preferences_last_run_version_code_title">Qual versão do app foi executada na última vez?</string>
     <string name="conversion_failed_missing_url">URL faltando</string>
-    <string name="conversion_failed_invalid_url">URL inválida</string>
     <string name="conversion_failed_unshorten_error">Falha ao traduzir link curto</string>
     <string name="conversion_failed_parse_url_error">Falha ao processar o link de mapa</string>
     <string name="conversion_succeeded_apps_not_found">Nenhum app de mapa está instalado</string>
