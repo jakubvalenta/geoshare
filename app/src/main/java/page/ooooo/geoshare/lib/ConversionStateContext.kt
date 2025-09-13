@@ -12,6 +12,7 @@ data class ConversionStateContext(
     val log: ILog = DefaultLog(),
     val onStateChange: (State) -> Unit = {},
     val getBuildVersionSdkInt: () -> Int = { Build.VERSION.SDK_INT },
+    val uriQuote: UriQuote = DefaultUriQuote(),
 ) : StateContext() {
     override var currentState: State = Initial()
         set(value) {
