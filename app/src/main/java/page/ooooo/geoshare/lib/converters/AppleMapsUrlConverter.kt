@@ -4,16 +4,16 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.allHtmlPattern
-import page.ooooo.geoshare.lib.allUrlPattern
+import page.ooooo.geoshare.lib.allUriPattern
 
 class AppleMapsUrlConverter() : UrlConverter {
     override val name = "Apple Maps"
 
-    override val host: Pattern = Pattern.compile("""maps\.apple(\.com)?""")
-    override val shortUrlPattern = null
+    override val uriPattern: Pattern = Pattern.compile("""https?://maps\.apple(\.com)?/.+""")
+    override val shortUriPattern = null
 
     @Suppress("SpellCheckingInspection")
-    override val urlPattern = allUrlPattern {
+    override val conversionUriPattern = allUriPattern {
         optional {
             query("z", z, sanitizeZoom)
         }
@@ -47,12 +47,12 @@ class AppleMapsUrlConverter() : UrlConverter {
         }
     }
 
-    override val htmlPattern = allHtmlPattern {
+    override val conversionHtmlPattern = allHtmlPattern {
         html(""".*?<meta property="place:location:latitude" content="$lat".*""")
         html(""".*?<meta property="place:location:longitude" content="$lon".*""")
     }
 
-    override val htmlRedirectPattern = null
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title

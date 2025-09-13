@@ -4,15 +4,15 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.allHtmlPattern
-import page.ooooo.geoshare.lib.allUrlPattern
+import page.ooooo.geoshare.lib.allUriPattern
 
 class YandexMapsUrlConverter() : UrlConverter {
     override val name = "Yandex Maps"
 
-    override val host: Pattern = Pattern.compile("""yandex.com""")
-    override val shortUrlPattern: Pattern = Pattern.compile("""https://yandex\.com/maps/-/.+""")
+    override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/.+""")
+    override val shortUriPattern: Pattern = Pattern.compile("""https?://yandex\.com/maps/-/.+""")
 
-    override val urlPattern = allUrlPattern {
+    override val conversionUriPattern = allUriPattern {
         optional {
             query("z", z, sanitizeZoom)
         }
@@ -22,10 +22,10 @@ class YandexMapsUrlConverter() : UrlConverter {
         }
     }
 
-    override val htmlPattern = allHtmlPattern {
+    override val conversionHtmlPattern = allHtmlPattern {
         html(""".*?data-coordinates="$lon,$lat".*""")
     }
-    override val htmlRedirectPattern = null
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

@@ -15,36 +15,36 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isSupportedUrl_unknownProtocol() {
-        assertTrue(isSupportedUrl(URL("ftp://maps.apple.com/?ll=50.894967,4.341626")))
+        assertFalse(isSupportedUrl("ftp://maps.apple.com/?ll=50.894967,4.341626"))
     }
 
     @Test
     fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl(URL("https://www.example.com/")))
+        assertFalse(isSupportedUrl("https://www.example.com/"))
     }
 
     @Test
     fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626")))
+        assertTrue(isSupportedUrl("https://maps.apple.com/?ll=50.894967,4.341626"))
     }
 
     @Test
     fun isSupportedUrl_shortUrl() {
-        assertTrue(isSupportedUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")))
+        assertTrue(isSupportedUrl("https://maps.apple/p/7E-Brjrk_THN14"))
     }
 
     @Test
     fun parseUrl_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUrl(URL("https://maps.apple.com")))
-        assertNull(parseUrl(URL("https://maps.apple.com/")))
-        assertNull(parseUrl(URL("https://maps.apple.com/?spam=1")))
+        assertNull(parseUrl("https://maps.apple.com"))
+        assertNull(parseUrl("https://maps.apple.com/"))
+        assertNull(parseUrl("https://maps.apple.com/?spam=1"))
     }
 
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
             Position("50.894967", "4.341626"),
-            parseUrl(URL("https://maps.apple.com/?ll=50.894967,4.341626"))
+            parseUrl("https://maps.apple.com/?ll=50.894967,4.341626")
         )
     }
 
@@ -52,7 +52,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_place() {
         assertEquals(
             Position("52.4890246", "13.4295963"),
-            parseUrl(URL("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902"))
+            parseUrl("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
         )
     }
 
@@ -60,7 +60,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_view() {
         assertEquals(
             Position("52.49115540927951", "13.42595574770533"),
-            parseUrl(URL("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533"))
+            parseUrl("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")
         )
     }
 
@@ -69,7 +69,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_search() {
         assertEquals(
             Position(null, null, q = "Central Park"),
-            parseUrl(URL("https://maps.apple.com/?q=Central+Park"))
+            parseUrl("https://maps.apple.com/?q=Central+Park")
         )
     }
 
@@ -77,7 +77,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_searchLocation() {
         assertEquals(
             Position("50.894967", "4.341626", q = "Central Park", z = "10"),
-            parseUrl(URL("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s"))
+            parseUrl("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
         )
     }
 
@@ -85,7 +85,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_searchLocationWithInvalidZoom() {
         assertEquals(
             Position("50.894967", "4.341626", q = "Central Park"),
-            parseUrl(URL("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s"))
+            parseUrl("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
         )
     }
 
@@ -93,15 +93,15 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_parameterLlTakesPrecedence() {
         assertEquals(
             Position("-17.2165721", "-149.9470294"),
-            parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533"))
+            parseUrl("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")
         )
         assertEquals(
             Position("-17.2165721", "-149.9470294"),
-            parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&"))
+            parseUrl("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")
         )
         assertEquals(
             Position("-17.2165721", "-149.9470294"),
-            parseUrl(URL("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533"))
+            parseUrl("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")
         )
     }
 
@@ -109,19 +109,19 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_parameterAddressTakesPrecedence() {
         assertEquals(
             Position(null, null, q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUrl(URL("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"))
+            parseUrl("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
         assertEquals(
             Position(null, null, q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUrl(URL("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz"))
+            parseUrl("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")
         )
     }
 
     @Test
-    fun parseUrl_parameterNamesTakesPrecedenceOverQ() {
+    fun parseUrl_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
             Position(null, null, q = "Reuterplatz"),
-            parseUrl(URL("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park"))
+            parseUrl("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")
         )
     }
 
@@ -130,7 +130,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_AuidOnly() {
         assertEquals(
             Position(),
-            parseUrl(URL("https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"))
+            parseUrl("https://maps.apple.com/place?auid=17017496253231963769&lsp=7618")
         )
     }
 
@@ -138,7 +138,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_placeIdOnly() {
         assertEquals(
             Position(),
-            parseUrl(URL("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"))
+            parseUrl("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902")
         )
     }
 
@@ -146,7 +146,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_placeIdAndQuery() {
         assertEquals(
             Position(q = "Central Park"),
-            parseUrl(URL("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"))
+            parseUrl("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park")
         )
     }
 
@@ -154,7 +154,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_shortLink() {
         assertEquals(
             Position(),
-            parseUrl(URL("https://maps.apple/p/7E-Brjrk_THN14"))
+            parseUrl("https://maps.apple/p/7E-Brjrk_THN14")
         )
     }
 
@@ -176,6 +176,6 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUrl_alwaysReturnsFalse() {
-        assertFalse(isShortUrl(URL("https://maps.apple/p/7E-Brjrk_THN14")))
+        assertFalse(isShortUrl("https://maps.apple/p/7E-Brjrk_THN14"))
     }
 }
