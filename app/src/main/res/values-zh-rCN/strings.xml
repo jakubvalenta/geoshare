@@ -53,7 +53,7 @@
     <string name="intro_settings_activity_not_found">无法打开设置</string>
     <string name="intro_open_by_default_app_note"><![CDATA[至少选择 <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。如果某些链接显示为灰色，则其他谷歌应用设置为默认会打开它们。您可以找到这些应用并关闭它们的链接打开，就像我们为 Google 地图所做的那样。]]></string>
     <string name="main_create_geo_uri">显示坐标</string>
-    <string name="main_info_box"><![CDATA[%1s 支持多种类型的 Google 地图和 Apple 地图链接。如果您仍然发现无法正常工作的链接，请<a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">报告问题</a>。]]></string>
+    <string name="main_info_box"><![CDATA[%1s 支持多种类型的 Google 地图、Apple 地图、HERE WeGo、OpenStreetMap、OsmAnd 和 Yandex 地图链接。如果您仍然发现无法正常工作的链接，请<a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">报告问题</a>。]]></string>
     <string name="conversion_permission_common_grant">确定</string>
     <string name="conversion_permission_common_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标或地名。%2$s 需要连接到 Google 才能获取信息。]]></string>
     <string name="about_text"><![CDATA[<p>%1$s 是根据 <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> 或更高版本许可协议分发的自由及开源应用。</p><br><p>您可以在 <a href="https://github.com/jakubvalenta/geoshare">GitHub</a> 找到代码，也可以在那里<a href="https://github.com/jakubvalenta/geoshare/issues">报告问题</a>。</p><br><p>欢迎您的反馈。您可以通过 <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>与我联系。</p>]]></string>
@@ -85,4 +85,8 @@
     <string name="conversion_done">完成</string>
     <string name="conversion_succeeded_title">坐标</string>
     <string name="conversion_error_title">错误</string>
+    <string name="converter_yandex_maps_permission_title">连接到 Yandex？</string>
+    <string name="converter_yandex_maps_loading_indicator_title">正在连接到 Yandex…</string>
+    <string name="faq_supported_inputs_headline">支持的地图服务</string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中：</p><p>Google 地图<br />Apple 地图<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex 地图<br />坐标（例如 41°24′12.2″N 2°10′26.5″E）<br />geo: URI</p>]]></string>
 </resources>
