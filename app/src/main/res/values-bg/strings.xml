@@ -86,10 +86,6 @@
     <string name="conversion_done">Готово</string>
     <string name="conversion_succeeded_title">Координати</string>
     <string name="conversion_error_title">Грешка</string>
-    <string name="converter_here_we_go_permission_title">Свържете се с HERE WeGo?</string>
-    <string name="converter_here_we_go_loading_indicator_title">Свързване с HERE WeGo…</string>
     <string name="converter_yandex_maps_permission_title">Свържете се с Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Свързване с Yandex…</string>
-    <string name="converter_magic_earth_permission_title">Свържете се с Magic Earth?</string>
-    <string name="converter_magic_earth_loading_indicator_title">Свързване с Магическата Земя…</string>
 </resources>
