@@ -88,4 +88,6 @@
     <string name="conversion_error_title">Грешка</string>
     <string name="converter_yandex_maps_permission_title">Свържете се с Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Свързване с Yandex…</string>
+    <string name="faq_supported_inputs_headline">Поддържани картографски услуги</string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението:</p><p>Google Карти<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />координати (напр. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
 </resources>
