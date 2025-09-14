@@ -4,6 +4,12 @@ Compartilhe um link de mapa com o Geo Share e o app abrirá ele em outro app de 
 
 - Google Maps
 - Apple Maps (em beta)
+- HERE WeGo (em beta)
+- Magic Earth (em beta)
+- OpenStreetMap (em beta)
+- OsmAnd (em beta)
+- Yandex Maps (em beta)
+- Coordenadas
 
 <b>Exemplos de como usar</b>
 
