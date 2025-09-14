@@ -10,9 +10,9 @@
     <string name="intro_open_by_default_app_note"><![CDATA[Wählen Sie wenigstens <tt>maps.google.com</tt> und <tt>maps.app.goo.gl</tt> aus. Wenn manche Links ausgegraut sind, öffnen andere Google Apps diese Links Standardmäßig. Sie können diese Apps suchen und bei den das öffnen von Links unterbinden, so wie es zuvor bei Google Maps gemacht wurde.]]></string>
     <string name="intro_nav_next">Weiter</string>
     <string name="main_input_uri_clear_content_description">Löschen</string>
-    <string name="main_input_uri_supporting_text">z.B. https://google.com/maps/… oder maps.app.goo.gl/…</string>
+    <string name="main_input_uri_supporting_text">z.B. https://maps.app.goo.gl/… oder maps.apple.com/…</string>
     <string name="conversion_succeeded_copy_content_description">Kopieren</string>
-    <string name="main_create_geo_uri">Erstelle geo: link</string>
+    <string name="main_create_geo_uri">Koordinaten anzeigen</string>
     <string name="main_navigate_to_intro">Entdecke die Funktionen der App</string>
     <string name="converter_google_maps_permission_title">Mit Google Verbinden?</string>
     <string name="converter_apple_maps_permission_title">Mit Apple Verbinden?</string>
@@ -35,7 +35,7 @@
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Erstens öffnen Sie &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das öffnen von Links für diese App aus.]]></string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffnen Sie die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, jetzt das Öffnen von Links für in der App einschalten, und auf <i>Links hinzufügen</i> drücken.]]></string>
     <string name="conversion_permission_common_grant">Okay</string>
-    <string name="main_info_box"><![CDATA[%1s unterstützt viele Google Maps URL Formate. Wenn du trotzdem einen Link findest, der nicht funktioniert, bitte <a href="https://github.com/jakubvalenta/geoshare/issues">melde das Problem</a>.]]></string>
+    <string name="main_info_box"><![CDATA[%1s unterstützt viele Google Maps, Apple Maps, HERE WeGo, OpenStreetMap, OsmAnd und Yandex Links. Wenn du trotzdem einen Link findest, der nicht funktioniert, bitte <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">melde das Problem</a>.]]></string>
     <string name="permission_do_not_ask">Nicht erneut fragen</string>
     <string name="about_title">Über</string>
     <string name="about_app_icon_content_description">App Icon</string>
@@ -67,4 +67,27 @@
         <item quantity="other">%1$d unterstützte Links</item>
     </plurals>
     <string name="intro_open_by_default_app_screenshot_add">Hinzufügen</string>
+    <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
+    <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
+    <string name="faq_supported_inputs_headline">Unterstützte Kartendienste</string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />Koordinaten (z.B. 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
+    <string name="faq_item_collapse">Abschnitt zuklappen</string>
+    <string name="faq_item_expand">Abschnitt ausklappen</string>
+    <string name="user_preferences_title">Einstellungen</string>
+    <string name="user_preferences_connection_option_always">Ja</string>
+    <string name="user_preferences_connection_option_ask">Vor dem Verbinden fragen</string>
+    <string name="user_preferences_connection_option_never">Nein</string>
+    <string name="user_preferences_last_run_version_code_title">Welche Version der App wurde zuletzt gestartet?</string>
+    <string name="conversion_failed_missing_url">Fehlende URL</string>
+    <string name="conversion_failed_unshorten_error">Kurzlink konnte nicht aufgelöst werden</string>
+    <string name="conversion_failed_unshorten_connection_error">Verbindungsfehler beim Auflösen eines Kurzlinks</string>
+    <string name="conversion_failed_parse_url_error">Kartenlink konnte nicht verarbeitet werden</string>
+    <string name="conversion_succeeded_apps_not_found">Es ist keine Karten-App installiert</string>
+    <string name="copying_finished">Koordinaten wurden in die Zwischenablage kopiert</string>
+    <string name="conversion_failed_connection_permission_denied">Dieser Link wird ohne Verbindung zum Kartendienst nicht unterstützt</string>
+    <string name="conversion_failed_parse_html_error">Das Herunterladen der Webseite vom Kartendienst ist fehlgeschlagen.</string>
+    <string name="conversion_failed_parse_html_connection_error">Verbindungsfehler beim Herunterladen der Webseite des Kartendienstes</string>
+    <string name="conversion_failed_unsupported_service">Nicht unterstützter Kartendienst</string>
+    <string name="user_preferences_connection_title">Verbindung zu Kartendienst (Google, Apple usw.) zulassen?</string>
+    <string name="user_preferences_connection_description">Um kurze Kartenlinks zu unterstützen und Koordinaten von der Webseite des Kartendienstes zu bekommen, wenn der Link sie nicht enthält, kann %1$s sich mit dem Kartendienst verbinden. Mehr Infos findest du auf dem FAQ-Bildschirm.</string>
 </resources>

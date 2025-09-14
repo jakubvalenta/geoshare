@@ -4,6 +4,12 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 
 - Google Mapy
 - Apple Mapy (beta)
+- HERE WeGo (beta)
+- Magic Earth (beta)
+- OpenStreetMap (beta)
+- OsmAnd (beta)
+- Yandex Maps (beta)
+- souřadnice
 
 <b>Příklady použití</b>
 

@@ -26,7 +26,7 @@
     <string name="conversion_succeeded_copy_content_description">Kopírovat</string>
     <string name="main_create_geo_uri">Zobrazit souřadnice</string>
     <string name="main_navigate_to_intro">Objevte další funkce aplikace</string>
-    <string name="main_info_box"><![CDATA[%1s podporuje mnoho typů odkazů na Google Mapy a Apple Mapy. Pokud přesto narazíte na odkaz, který nefunguje, <a href="https://github.com/jakubvalenta/geoshare/issues">nahlaste prosím problém</a>.]]></string>
+    <string name="main_info_box"><![CDATA[%1s podporuje mnoho typů odkazů na Google Mapy, Apple Mapy, HERE WeGo, OpenStreetMap, OsmAnd a Yandex. Pokud přesto narazíte na odkaz, který nefunguje, <a href="https://github.com/jakubvalenta/geoshare/issues">nahlaste prosím problém</a>.]]></string>
     <string name="converter_google_maps_permission_title">Spojit se s Googlem?</string>
     <string name="converter_apple_maps_permission_title">Spojit se s Applem?</string>
     <string name="conversion_permission_common_grant">OK</string>
@@ -87,4 +87,8 @@
     <string name="conversion_done">Hotovo</string>
     <string name="conversion_succeeded_title">Souřadnice</string>
     <string name="conversion_error_title">Chyba</string>
+    <string name="converter_yandex_maps_permission_title">Spojit se s Yandexem?</string>
+    <string name="converter_yandex_maps_loading_indicator_title">Spojování s Yandexem…</string>
+    <string name="faq_supported_inputs_headline">Podporované mapové služby</string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit:</p><p>Google Mapy<br />Apple Mapy<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />souřadnice (např. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
 </resources>

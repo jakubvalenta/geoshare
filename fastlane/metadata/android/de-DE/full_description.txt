@@ -6,6 +6,17 @@ Wenn Sie gerne Orte auf Google Maps finden, aber eine andere App für die Naviga
 
 Sie können die App auch verwenden, um Google Maps-Links als geo: Links in Ihre Zwischenablage zu kopieren.
 
+<b>Unterstützte Links</b>
+
+- Google Maps
+- Apple Maps (Beta)
+- HERE WeGo (beta)
+- Magic Earth (beta)
+- OpenStreetMap (beta)
+- OsmAnd (beta)
+- Yandex Maps (beta)
+- Koordinaten
+
 <b> Funktionsweise und Datenschutbedenken</b>
 
 Geo Share wandelt Google Maps-Links in geo:-Links um, die von anderen Karten-App geöffnet werden können. Um einen geo:-Link zu erstellen, werden geografische Koordinaten benötigt. Geo Share extrahiert diese aus der Google Maps-URL.
