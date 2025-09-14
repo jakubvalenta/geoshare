@@ -32,6 +32,24 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun uriPattern_matchesShortUriWithoutQueryString() {
+        assertEquals(
+            "https://maps.app.goo.gl/foo",
+            urlConverter.uriPattern.matcher("https://maps.app.goo.gl/foo?g_st=isi")
+                .takeIf { it.find() }?.group(),
+        )
+    }
+
+    @Test
+    fun uriPattern_matchesShortUriWithoutInvalidTralingCharacters() {
+        assertEquals(
+            "https://maps.app.goo.gl/jVuuNEZAuFQ3UGhX7",
+            urlConverter.uriPattern.matcher("https://maps.app.goo.gl/jVuuNEZAuFQ3UGhX7%3C/a%3E%3C/p%3E")
+                .takeIf { it.find() }?.group(),
+        )
+    }
+
+    @Test
     fun parseUrl_noPathOrKnownUrlQueryParams() {
         assertEquals(
             Position(null, null),
@@ -460,7 +478,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUri_mapsAppGooGlWithQueryStringCorrect() {
-        assertTrue(isShortUrl("https://maps.app.goo.gl/foo?g_st=isi"))
+        assertFalse(isShortUrl("https://maps.app.goo.gl/foo?g_st=isi"))
     }
 
     @Test
