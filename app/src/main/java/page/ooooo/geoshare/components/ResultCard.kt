@@ -94,6 +94,7 @@ fun ResultCard(
                             position.toNorthSouthWestEastDecCoordsString(),
                             position.toGeoUriString(),
                             position.toGoogleMapsUriString(),
+                            position.toAppleMapsUriString(),
                             position.toMagicEarthUriString()
                         ).map { text ->
                             DropdownMenuItem(

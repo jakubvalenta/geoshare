@@ -9,23 +9,31 @@ class PositionTest {
     private val uriQuote = FakeUriQuote()
 
     @Test
-    fun toNorthSouthWestEastDecCoordsString_returnsSouthWestForNegativeCoordinates() {
+    fun toAppleMapsUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
-            "17.2165721° S, 149.9470294° W",
-            Position("-17.2165721", "-149.9470294").toNorthSouthWestEastDecCoordsString(),
+            "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=3.4",
+            Position("50.123456", "-11.123456", z = "3.4").toAppleMapsUriString(uriQuote),
         )
     }
 
     @Test
-    fun toNorthSouthWestEastDecCoordsString_returnsNorthEastForPositiveCoordinates() {
+    fun toAppleMapsUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
-            "52.5067296° N, 13.2599309° E",
-            Position("52.5067296", "13.2599309").toNorthSouthWestEastDecCoordsString(),
+            "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=3.4",
+            Position("50.123456", "-11.123456", q = "foo bar", z = "3.4").toAppleMapsUriString(uriQuote),
         )
     }
 
     @Test
-    fun toGoogleMapsUriString_whenUriHasCoordinatesOnly_returnsCoordinatesAsQueryAndZoom() {
+    fun toAppleMapsUriString_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
+        assertEquals(
+            "https://maps.apple.com/?q=foo%20bar&z=3.4",
+            Position(q = "foo bar", z = "3.4").toAppleMapsUriString(uriQuote),
+        )
+    }
+
+    @Test
+    fun toGoogleMapsUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAsQueryAndZoom() {
         assertEquals(
             "https://www.google.com/maps?q=50.123456%2C-11.123456&z=3.4",
             Position("50.123456", "-11.123456", z = "3.4").toGoogleMapsUriString(uriQuote),
@@ -33,7 +41,7 @@ class PositionTest {
     }
 
     @Test
-    fun toGoogleMapsUriString_whenUriHasQueryOnly_returnsQueryAndZoom() {
+    fun toGoogleMapsUriString_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         assertEquals(
             "https://www.google.com/maps?q=foo%20bar&z=3.4",
             Position(q = "foo bar", z = "3.4").toGoogleMapsUriString(uriQuote),
@@ -49,7 +57,7 @@ class PositionTest {
     }
 
     @Test
-    fun toMagicEarthUriString_whenUriHasCoordinatesOnly_returnsCoordinatesAndZoom() {
+    fun toMagicEarthUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
             "magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4",
             Position("50.123456", "-11.123456", z = "3.4").toMagicEarthUriString(uriQuote),
@@ -61,6 +69,22 @@ class PositionTest {
         assertEquals(
             "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
             Position("50.123456", "-11.123456", q = "foo bar", z = "3.4").toMagicEarthUriString(uriQuote),
+        )
+    }
+
+    @Test
+    fun toNorthSouthWestEastDecCoordsString_returnsSouthWestForNegativeCoordinates() {
+        assertEquals(
+            "17.2165721° S, 149.9470294° W",
+            Position("-17.2165721", "-149.9470294").toNorthSouthWestEastDecCoordsString(),
+        )
+    }
+
+    @Test
+    fun toNorthSouthWestEastDecCoordsString_returnsNorthEastForPositiveCoordinates() {
+        assertEquals(
+            "52.5067296° N, 13.2599309° E",
+            Position("52.5067296", "13.2599309").toNorthSouthWestEastDecCoordsString(),
         )
     }
 }
