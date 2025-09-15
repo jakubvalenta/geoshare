@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.lib
 
-import kotlin.text.indexOf
+import java.net.URL
 
 /**
  * Like android.net.Uri but correctly sets path for non-hierarchical URIs, so it can be used for geo: URIs.
@@ -87,6 +87,26 @@ data class Uri(
             }
     }
 
+    fun toAbsoluteUrl(defaultScheme: String, defaultHost: String, defaultPath: String): URL = URL(
+        (if (host.isEmpty()) {
+            if (path.startsWith("//")) {
+                // Protocol-relative URL
+                this.copy(scheme = defaultScheme)
+            } else if (path.startsWith("/")) {
+                // Absolute URL
+                this.copy(scheme = defaultScheme, host = defaultHost)
+            } else {
+                // Relative URL with only one part
+                this.copy(scheme = defaultScheme, host = defaultHost, path = "$defaultPath/$path")
+            }
+        } else if (scheme.isEmpty()) {
+            // Relative URL with multiple parts
+            this.copy(scheme = defaultScheme, host = defaultHost, path = "$defaultPath/$host$path")
+        } else {
+            this
+        }).toString()
+    )
+
     private fun formatQueryParams(): String =
         queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }.joinToString("&")
 
@@ -97,7 +117,7 @@ data class Uri(
         if (host.isNotEmpty()) {
             append("//$host")
         }
-        append(path)
+        append(uriQuote.encode(path, allow = "+,/="))
         if (queryParams.isNotEmpty()) {
             append("?${formatQueryParams()}")
         }

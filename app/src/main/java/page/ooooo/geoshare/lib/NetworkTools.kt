@@ -17,8 +17,11 @@ import java.net.URL
 
 class UnexpectedResponseCodeException : Exception("Unexpected response code")
 
-class NetworkTools(private val engine: HttpClientEngine = CIO.create(), private val log: ILog = DefaultLog()) {
-
+class NetworkTools(
+    private val engine: HttpClientEngine = CIO.create(),
+    private val log: ILog = DefaultLog(),
+    private val uriQuote: UriQuote = DefaultUriQuote(),
+) {
     @Throws(
         ConnectTimeoutException::class,
         HttpRequestTimeoutException::class,
@@ -26,26 +29,29 @@ class NetworkTools(private val engine: HttpClientEngine = CIO.create(), private 
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )
-    suspend fun requestLocationHeader(url: URL): URL =
-        withContext(Dispatchers.IO) {
-            connect(
-                engine,
-                url,
-                methodParam = HttpMethod.Head,
-                followRedirectsParam = false,
-                expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
-            ) { response ->
-                val locationUrlString: String? = response.headers["Location"]
-                val locationUrl = try {
-                    URL(locationUrlString)
-                } catch (e: MalformedURLException) {
-                    log.w(null, "Invalid location URL $locationUrlString")
-                    throw e
+    suspend fun requestLocationHeader(url: URL): URL = withContext(Dispatchers.IO) {
+        connect(
+            engine,
+            url,
+            methodParam = HttpMethod.Head,
+            followRedirectsParam = false,
+            expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
+        ) { response ->
+            val locationUrlString: String? = response.headers["Location"]
+            val locationUrl = try {
+                if (locationUrlString == null) {
+                    throw MalformedURLException()
                 }
-                log.i(null, "Resolved short URL $url to $locationUrlString")
-                locationUrl
+                val locationUri = Uri.parse(locationUrlString, uriQuote)
+                locationUri.toAbsoluteUrl(url.protocol, url.host, url.path)
+            } catch (e: MalformedURLException) {
+                log.w(null, "Invalid location URL $locationUrlString")
+                throw e
             }
+            log.i(null, "Resolved short URL $url to $locationUrlString")
+            locationUrl
         }
+    }
 
     @Throws(
         ConnectTimeoutException::class,
@@ -53,13 +59,12 @@ class NetworkTools(private val engine: HttpClientEngine = CIO.create(), private 
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )
-    suspend fun getText(url: URL): String =
-        withContext(Dispatchers.IO) {
-            connect(engine, url) { response ->
-                val text: String = response.body()
-                text
-            }
+    suspend fun getText(url: URL): String = withContext(Dispatchers.IO) {
+        connect(engine, url) { response ->
+            val text: String = response.body()
+            text
         }
+    }
 
     private suspend fun <T> connect(
         engine: HttpClientEngine,
