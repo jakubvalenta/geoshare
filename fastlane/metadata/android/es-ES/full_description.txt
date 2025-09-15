@@ -4,13 +4,18 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 
 - Google Maps
 - Apple Maps (beta)
+- HERE WeGo (beta)
+- Magic Earth (beta)
+- OpenStreetMap (beta)
+- OsmAnd (beta)
+- Yandex Maps (beta)
+- coordinadas
 
 <b>Ejemplo de casos de uso</b>
 
 Cuando alguien te envía un enlace de Google Maps, pero prefieres usar OpenStreetMap, puedes rápidamente abrir la misma localización en OsmAnd u Organic Maps.
 
 Cuando te gusta Google Maps para encontrar lugares, pero prefieres una aplicación diferente para navegar, puedes fácilmente cambiar de Google Maps a tu aplicación de navegación favorita.
-
 
 <b>Otras funcionalidades</b>
 
