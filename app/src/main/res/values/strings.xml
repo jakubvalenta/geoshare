@@ -54,6 +54,8 @@
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
+    <string name="converter_waze_permission_title">Connect to Waze?</string>
+    <string name="converter_waze_loading_indicator_title">Connecting to Waze…</string>
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
