@@ -140,6 +140,7 @@ class UriTest {
     @Test
     fun parse_schemeAndHostAndPathAndQueryAndFragment() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Uri(
                 scheme = "https",
                 host = "osmand.net",
@@ -327,6 +328,16 @@ class UriTest {
         assertEquals(
             Uri(queryParams = mapOf("foo" to "bar", "" to "", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&&baz=1", uriQuote)
+        )
+    }
+
+    @Test
+    fun toString_encodesPath() {
+        val uriString =
+            "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd#my-fragment"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
         )
     }
 }

@@ -16,9 +16,9 @@ data class Uri(
     companion object {
         fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Uri {
             val schemeSepIndex = uriString.indexOf(':').takeIf { it > -1 }
-            val hostSepIndex = schemeSepIndex
-                ?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
-                ?.let { it + 2 }
+            val hostSepIndex =
+                schemeSepIndex?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
+                    ?.let { it + 2 }
             val hostStartIndex = hostSepIndex?.let { it + 1 } ?: schemeSepIndex?.let { it + 1 } ?: 0
             val fragmentSepIndex = uriString.indexOf('#', hostStartIndex).takeIf { it > -1 }
             val queryEndIndex = fragmentSepIndex ?: uriString.length
@@ -88,8 +88,7 @@ data class Uri(
     }
 
     private fun formatQueryParams(): String =
-        queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }
-            .joinToString("&")
+        queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }.joinToString("&")
 
     override fun toString() = StringBuilder().apply {
         if (scheme.isNotEmpty()) {
