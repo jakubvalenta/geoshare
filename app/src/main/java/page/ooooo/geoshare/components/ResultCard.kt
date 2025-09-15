@@ -93,6 +93,7 @@ fun ResultCard(
                             position.toCoordsDecString(),
                             position.toNorthSouthWestEastDecCoordsString(),
                             position.toGeoUriString(),
+                            position.toGoogleMapsUriString(),
                             position.toMagicEarthUriString()
                         ).map { text ->
                             DropdownMenuItem(
@@ -116,6 +117,20 @@ fun ResultCard(
                     onClick = { onCopy(position.toGeoUriString()) },
                     label = {
                         Text(stringResource(R.string.conversion_succeeded_copy_geo))
+                    },
+                    colors = SuggestionChipDefaults.suggestionChipColors(
+                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
+                    border = SuggestionChipDefaults.suggestionChipBorder(
+                        enabled = true,
+                        borderColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                )
+                SuggestionChip(
+                    onClick = { onCopy(position.toGoogleMapsUriString()) },
+                    label = {
+                        Text(stringResource(R.string.conversion_succeeded_copy_google_maps))
                     },
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         labelColor = MaterialTheme.colorScheme.onSecondaryContainer,

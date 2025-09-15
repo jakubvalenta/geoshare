@@ -20,6 +20,23 @@ data class Position(
         return Uri(scheme = "geo", path = coords, queryParams = queryParams, uriQuote = uriQuote).toString()
     }
 
+    fun toGoogleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
+        val queryParams = mutableMapOf<String, String>()
+        if (lat != null && lon != null) {
+            queryParams["q"] = "$lat,$lon"
+        } else if (q != null) {
+            queryParams["q"] = q
+        }
+        z?.let { queryParams["z"] = z }
+        return Uri(
+            scheme = "https",
+            host = "www.google.com",
+            "/maps",
+            queryParams = queryParams,
+            uriQuote = uriQuote,
+        ).toString()
+    }
+
     fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
         val queryParams = mutableMapOf<String, String>()
         lat?.let { queryParams["lat"] = lat }

@@ -3,6 +3,9 @@ package page.ooooo.geoshare.lib.converters
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.allUriPattern
 
+/**
+ * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
+ */
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""https?://magicearth.com/\?\S+""")
 
