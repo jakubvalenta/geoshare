@@ -22,6 +22,7 @@ map app.
 - Magic Earth (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
+- Waze (beta)
 - Yandex Maps (beta)
 - coordinates
 
