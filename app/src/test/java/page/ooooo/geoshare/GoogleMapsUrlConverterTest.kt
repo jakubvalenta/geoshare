@@ -43,8 +43,8 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_matchesShortUriWithoutInvalidTralingCharacters() {
         assertEquals(
-            "https://maps.app.goo.gl/jVuuNEZAuFQ3UGhX7",
-            urlConverter.uriPattern.matcher("https://maps.app.goo.gl/jVuuNEZAuFQ3UGhX7%3C/a%3E%3C/p%3E")
+            "https://maps.app.goo.gl/jVuuNEZ_-FQ3UGhX7",
+            urlConverter.uriPattern.matcher("https://maps.app.goo.gl/jVuuNEZ_-FQ3UGhX7%3C/a%3E%3C/p%3E")
                 .takeIf { it.find() }?.group(),
         )
     }
