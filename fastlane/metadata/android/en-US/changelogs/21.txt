@@ -1,1 +1,2 @@
 - Added Waze support.
+- Added options to copy Google Maps and Apple Maps links to conversion result screen.
