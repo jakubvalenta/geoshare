@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.allHtmlPattern
-import page.ooooo.geoshare.lib.allUriPattern
+import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
@@ -13,21 +13,23 @@ class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val shortUriReplacement: String? = null
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUriPattern = allUriPattern {
-        optional {
-            first {
-                query("whatshere%5Bzoom%5D", z, sanitizeZoom)
-                query("z", z, sanitizeZoom)
+    override val conversionUriPattern = uriPattern {
+        all {
+            optional {
+                first {
+                    query("whatshere%5Bzoom%5D", z, sanitizeZoom)
+                    query("z", z, sanitizeZoom)
+                }
             }
-        }
-        first {
-            query("whatshere%5Bpoint%5D", "$lon,$lat")
-            query("ll", "$lon,$lat")
-            path("""/maps/org/\d+/.*""")
+            first {
+                query("whatshere%5Bpoint%5D", "$lon,$lat")
+                query("ll", "$lon,$lat")
+                path("""/maps/org/\d+/.*""")
+            }
         }
     }
 
-    override val conversionHtmlPattern = allHtmlPattern {
+    override val conversionHtmlPattern = htmlPattern {
         html(""".*?data-coordinates="$lon,$lat".*""")
     }
     override val conversionHtmlRedirectPattern = null

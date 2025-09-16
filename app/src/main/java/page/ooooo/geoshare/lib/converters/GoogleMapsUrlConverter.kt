@@ -4,8 +4,8 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ConversionUriPattern
-import page.ooooo.geoshare.lib.firstHtmlPattern
-import page.ooooo.geoshare.lib.allUriPattern
+import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
@@ -17,57 +17,59 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val shortUriReplacement: String? = null
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUriPattern: ConversionUriPattern = allUriPattern {
-        optional {
-            query("zoom", z, sanitizeZoom)
-            first {
-                query("destination", "$lat,$lon")
-                query("destination", q)
-                query("q", "$lat,$lon")
-                query("q", q)
-                query("query", "$lat,$lon")
-                query("query", q)
-                query("viewpoint", "$lat,$lon")
-                query("center", "$lat,$lon")
+    override val conversionUriPattern: ConversionUriPattern = uriPattern {
+        all {
+            optional {
+                query("zoom", z, sanitizeZoom)
+                first {
+                    query("destination", "$lat,$lon")
+                    query("destination", q)
+                    query("q", "$lat,$lon")
+                    query("q", q)
+                    query("query", "$lat,$lon")
+                    query("query", q)
+                    query("viewpoint", "$lat,$lon")
+                    query("center", "$lat,$lon")
+                }
             }
-        }
-        first {
-            val data = """!3d$lat!4d$lon"""
-            val q = """(?P<q>[^/]+)"""
+            first {
+                val data = """!3d$lat!4d$lon"""
+                val q = """(?P<q>[^/]+)"""
 
-            path("""/maps/.*/@[\d.,+-]+,${z}z/data=.*$data.*""", sanitizeZoom)
-            path("""/maps/.*/data=.*$data.*""")
-            path("""/maps/@$lat,$lon,${z}z.*""", sanitizeZoom)
-            path("""/maps/@$lat,$lon.*""")
-            path("""/maps/@""")
-            path("""/maps/place/$lat,$lon/@[\d.,+-]+,${z}z.*""", sanitizeZoom)
-            path("""/maps/place/$q/@$lat,$lon,${z}z.*""", sanitizeZoom)
-            path("""/maps/place/$q/@$lat,$lon.*""")
-            path("""/maps/place/$lat,$lon.*""")
-            path("""/maps/place/$q.*""")
-            path("""/maps/place//.*""")
-            path("""/maps/placelists/list/.*""")
-            path("""/maps/search/$lat,$lon.*""")
-            path("""/maps/search/$q.*""")
-            path("""/maps/search/""")
-            path("""/maps/dir/.*/$lat,$lon/data[^/]*""")
-            path("""/maps/dir/.*/$q/data[^/]*""")
-            path("""/maps/dir/.*/$lat,$lon""")
-            path("""/maps/dir/.*/@$lat,$lon,${z}z.*""", sanitizeZoom)
-            path("""/maps/dir/.*/$q""")
-            path("""/maps/dir/""")
-            path("""/maps/?""")
-            path("""/search/?""")
-            path("""/?""")
+                path("""/maps/.*/@[\d.,+-]+,${z}z/data=.*$data.*""", sanitizeZoom)
+                path("""/maps/.*/data=.*$data.*""")
+                path("""/maps/@$lat,$lon,${z}z.*""", sanitizeZoom)
+                path("""/maps/@$lat,$lon.*""")
+                path("""/maps/@""")
+                path("""/maps/place/$lat,$lon/@[\d.,+-]+,${z}z.*""", sanitizeZoom)
+                path("""/maps/place/$q/@$lat,$lon,${z}z.*""", sanitizeZoom)
+                path("""/maps/place/$q/@$lat,$lon.*""")
+                path("""/maps/place/$lat,$lon.*""")
+                path("""/maps/place/$q.*""")
+                path("""/maps/place//.*""")
+                path("""/maps/placelists/list/.*""")
+                path("""/maps/search/$lat,$lon.*""")
+                path("""/maps/search/$q.*""")
+                path("""/maps/search/""")
+                path("""/maps/dir/.*/$lat,$lon/data[^/]*""")
+                path("""/maps/dir/.*/$q/data[^/]*""")
+                path("""/maps/dir/.*/$lat,$lon""")
+                path("""/maps/dir/.*/@$lat,$lon,${z}z.*""", sanitizeZoom)
+                path("""/maps/dir/.*/$q""")
+                path("""/maps/dir/""")
+                path("""/maps/?""")
+                path("""/search/?""")
+                path("""/?""")
+            }
         }
     }
 
-    override val conversionHtmlPattern = firstHtmlPattern {
+    override val conversionHtmlPattern = htmlPattern {
         html(""".*?/@$lat,$lon.*""")
         html(""".*?\[null,null,$lat,$lon\].*""")
     }
 
-    override val conversionHtmlRedirectPattern = firstHtmlPattern {
+    override val conversionHtmlRedirectPattern = htmlPattern {
         html(""".*?data-url="(?P<url>[^"]+)".*""")
     }
 

@@ -3,50 +3,54 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.allHtmlPattern
-import page.ooooo.geoshare.lib.allUriPattern
+import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     override val uriPattern: Pattern = Pattern.compile("""https?://maps\.apple(\.com)?/\S+""")
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUriPattern = allUriPattern {
-        optional {
-            query("z", z, sanitizeZoom)
-        }
-        first {
-            all {
-                host("maps.apple")
-                path("/p/.+")
+    override val conversionUriPattern = uriPattern {
+        all {
+            optional {
+                query("z", z, sanitizeZoom)
             }
-            query("ll", "$lat,$lon")
-            query("coordinate", "$lat,$lon")
-            query("q", "$lat,$lon")
-            query("address", q)
-            query("name", q)
-            all {
+            first {
+                all {
+                    host("maps.apple")
+                    path("/p/.+")
+                }
+                query("ll", "$lat,$lon")
+                query("coordinate", "$lat,$lon")
+                query("q", "$lat,$lon")
+                query("address", q)
+                query("name", q)
+                all {
+                    query("auid", ".+")
+                    query("q", q)
+                }
+                all {
+                    query("place-id", ".+")
+                    query("q", q)
+                }
                 query("auid", ".+")
-                query("q", q)
-            }
-            all {
                 query("place-id", ".+")
-                query("q", q)
-            }
-            query("auid", ".+")
-            query("place-id", ".+")
-            all {
+                all {
+                    query("q", q)
+                    query("sll", "$lat,$lon")
+                }
                 query("q", q)
                 query("sll", "$lat,$lon")
+                query("center", "$lat,$lon")
             }
-            query("q", q)
-            query("sll", "$lat,$lon")
-            query("center", "$lat,$lon")
         }
     }
 
-    override val conversionHtmlPattern = allHtmlPattern {
-        html(""".*?<meta property="place:location:latitude" content="$lat".*""")
-        html(""".*?<meta property="place:location:longitude" content="$lon".*""")
+    override val conversionHtmlPattern = htmlPattern {
+        all {
+            html(""".*?<meta property="place:location:latitude" content="$lat".*""")
+            html(""".*?<meta property="place:location:longitude" content="$lon".*""")
+        }
     }
 
     override val conversionHtmlRedirectPattern = null

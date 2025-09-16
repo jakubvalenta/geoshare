@@ -1,12 +1,12 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
-import page.ooooo.geoshare.lib.allUriPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?openstreetmap\.org/\S+""")
 
-    override val conversionUriPattern = allUriPattern {
+    override val conversionUriPattern = uriPattern {
         fragment("""map=$z/$lat/$lon.*""")
     }
 }
