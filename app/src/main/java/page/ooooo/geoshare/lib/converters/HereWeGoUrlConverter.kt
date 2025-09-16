@@ -16,6 +16,7 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
         val coordStringLonPattern = Pattern.compile("""(lon=|"longitude":)$lon""")
 
         first {
+            path("/l/$lat,$lon")
             all {
                 path("/")
                 query("map", "$lat,$lon,$z", sanitizeZoom)

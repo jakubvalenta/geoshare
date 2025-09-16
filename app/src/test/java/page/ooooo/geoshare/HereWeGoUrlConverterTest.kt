@@ -36,7 +36,15 @@ class HereWeGoUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun parseUrl_coordinates() {
+    fun parseUrl_coordinatesPath() {
+        assertEquals(
+            Position("52.536213398175434", "13.417085409306102"),
+            parseUrl("https://share.here.com/l/52.536213398175434,13.417085409306102")
+        )
+    }
+
+    @Test
+    fun parseUrl_coordinatesQueryParam() {
         assertEquals(
             Position("50.21972", "-0.68453", z = "7"),
             parseUrl("https://wego.here.com/?map=50.21972,-0.68453,6.93")
