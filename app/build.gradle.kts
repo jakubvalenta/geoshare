@@ -15,8 +15,8 @@ android {
         minSdk = 25
         // noinspection EditedTargetSdkVersion
         targetSdk = 36
-        versionCode = 19
-        versionName = "5.0.0"
+        versionCode = 20
+        versionName = "5.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
