@@ -87,25 +87,26 @@ data class Uri(
             }
     }
 
-    fun toAbsoluteUrl(defaultScheme: String, defaultHost: String, defaultPath: String): URL = URL(
-        (if (host.isEmpty()) {
+    fun toAbsoluteUri(baseUri: Uri): Uri =
+        if (host.isEmpty()) {
             if (path.startsWith("//")) {
                 // Protocol-relative URL
-                this.copy(scheme = defaultScheme)
+                this.copy(scheme = baseUri.scheme)
             } else if (path.startsWith("/")) {
                 // Absolute URL
-                this.copy(scheme = defaultScheme, host = defaultHost)
+                this.copy(scheme = baseUri.scheme, host = baseUri.host)
             } else {
                 // Relative URL with only one part
-                this.copy(scheme = defaultScheme, host = defaultHost, path = "$defaultPath/$path")
+                this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$path")
             }
         } else if (scheme.isEmpty()) {
             // Relative URL with multiple parts
-            this.copy(scheme = defaultScheme, host = defaultHost, path = "$defaultPath/$host$path")
+            this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$host$path")
         } else {
             this
-        }).toString()
-    )
+        }
+
+    fun toUrl(): URL = URL(toString())
 
     private fun formatQueryParams(): String =
         queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }.joinToString("&")

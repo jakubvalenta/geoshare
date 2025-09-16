@@ -68,15 +68,7 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     }
 
     override val conversionHtmlRedirectPattern = firstHtmlPattern {
-        html(
-            """.*?data-url="(?P<url>[^"]+)".*"""
-        ) { name, value ->
-            if (name == "url") {
-                value?.let { Pattern.compile("^/").matcher(it).replaceAll("https://www.google.com/") }
-            } else {
-                value
-            }
-        }
+        html(""".*?data-url="(?P<url>[^"]+)".*""")
     }
 
     @StringRes

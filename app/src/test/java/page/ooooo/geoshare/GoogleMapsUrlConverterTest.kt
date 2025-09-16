@@ -446,10 +446,10 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsAbsoluteUrl() {
+    fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() {
         val html = this.javaClass.classLoader!!.getResource("91UYXud.html")!!.readText()
         assertEquals(
-            "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
+            "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
             parseHtmlRedirect(html)
         )
     }

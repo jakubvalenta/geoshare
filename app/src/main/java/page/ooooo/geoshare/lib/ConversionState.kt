@@ -9,7 +9,6 @@ import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
-import java.net.URL
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -117,8 +116,8 @@ data class GrantedUnshortenPermission(
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
-        val locationHeaderUrl = try {
-            stateContext.networkTools.requestLocationHeader(URL(uri.toString()))
+        val locationHeader = try {
+            stateContext.networkTools.requestLocationHeader(uri.toUrl())
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled)
         } catch (_: MalformedURLException) {
@@ -130,13 +129,13 @@ data class GrantedUnshortenPermission(
             // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_unshorten_error)
         }
-        return UnshortenedUrl(
-            stateContext,
-            inputUriString,
-            urlConverter,
-            Uri.parse(locationHeaderUrl.toString(), stateContext.uriQuote),
-            Permission.ALWAYS,
-        )
+        if (locationHeader == null) {
+            stateContext.log.w(null, "Missing location URL")
+            return ConversionFailed(R.string.conversion_failed_unshorten_error)
+        }
+        val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
+        stateContext.log.i(null, "Resolved short URL $uri to $unshortenedUri")
+        return UnshortenedUrl(stateContext, inputUriString, urlConverter, unshortenedUri, Permission.ALWAYS)
     }
 }
 
@@ -243,7 +242,7 @@ data class GrantedParseHtmlPermission(
 
     override suspend fun transition(): State {
         val html = try {
-            stateContext.networkTools.getText(URL(uri.toString()))
+            stateContext.networkTools.getText(uri.toUrl())
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled)
         } catch (_: MalformedURLException) {
@@ -269,7 +268,7 @@ data class GrantedParseHtmlPermission(
             val redirectUriString = conversionMatchers.groupOrNull("url")
             if (redirectUriString != null) {
                 stateContext.log.w(null, "HTML contains a redirect to $redirectUriString")
-                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote)
+                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                 return@transition ReceivedUri(
                     stateContext,
                     inputUriString,
@@ -319,7 +318,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
 
     override suspend fun transition(): State {
         val html = try {
-            stateContext.networkTools.getText(URL(uri.toString()))
+            stateContext.networkTools.getText(uri.toUrl())
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled)
         } catch (_: MalformedURLException) {
@@ -345,7 +344,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
             val redirectUriString = conversionMatchers.groupOrNull("url")
             if (redirectUriString != null) {
                 stateContext.log.w(null, "HTML contains a redirect to $redirectUriString")
-                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote)
+                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                 return@transition ReceivedUri(
                     stateContext,
                     inputUriString,
