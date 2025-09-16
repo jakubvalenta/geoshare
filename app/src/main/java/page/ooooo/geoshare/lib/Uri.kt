@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.lib
 
-import kotlin.text.indexOf
+import java.net.URL
 
 /**
  * Like android.net.Uri but correctly sets path for non-hierarchical URIs, so it can be used for geo: URIs.
@@ -16,9 +16,9 @@ data class Uri(
     companion object {
         fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Uri {
             val schemeSepIndex = uriString.indexOf(':').takeIf { it > -1 }
-            val hostSepIndex = schemeSepIndex
-                ?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
-                ?.let { it + 2 }
+            val hostSepIndex =
+                schemeSepIndex?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
+                    ?.let { it + 2 }
             val hostStartIndex = hostSepIndex?.let { it + 1 } ?: schemeSepIndex?.let { it + 1 } ?: 0
             val fragmentSepIndex = uriString.indexOf('#', hostStartIndex).takeIf { it > -1 }
             val queryEndIndex = fragmentSepIndex ?: uriString.length
@@ -87,9 +87,28 @@ data class Uri(
             }
     }
 
+    fun toAbsoluteUrl(defaultScheme: String, defaultHost: String, defaultPath: String): URL = URL(
+        (if (host.isEmpty()) {
+            if (path.startsWith("//")) {
+                // Protocol-relative URL
+                this.copy(scheme = defaultScheme)
+            } else if (path.startsWith("/")) {
+                // Absolute URL
+                this.copy(scheme = defaultScheme, host = defaultHost)
+            } else {
+                // Relative URL with only one part
+                this.copy(scheme = defaultScheme, host = defaultHost, path = "$defaultPath/$path")
+            }
+        } else if (scheme.isEmpty()) {
+            // Relative URL with multiple parts
+            this.copy(scheme = defaultScheme, host = defaultHost, path = "$defaultPath/$host$path")
+        } else {
+            this
+        }).toString()
+    )
+
     private fun formatQueryParams(): String =
-        queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }
-            .joinToString("&")
+        queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }.joinToString("&")
 
     override fun toString() = StringBuilder().apply {
         if (scheme.isNotEmpty()) {
@@ -98,7 +117,7 @@ data class Uri(
         if (host.isNotEmpty()) {
             append("//$host")
         }
-        append(path)
+        append(uriQuote.encode(path, allow = "+,/="))
         if (queryParams.isNotEmpty()) {
             append("?${formatQueryParams()}")
         }

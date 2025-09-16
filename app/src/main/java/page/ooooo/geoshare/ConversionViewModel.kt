@@ -33,6 +33,7 @@ import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
+import page.ooooo.geoshare.lib.converters.WazeUrlConverter
 import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
 import javax.inject.Inject
 
@@ -53,6 +54,7 @@ class ConversionViewModel @Inject constructor(
             MagicEarthUrlConverter(),
             OpenStreetMapUrlConverter(),
             OsmAndUrlConverter(),
+            WazeUrlConverter(),
             YandexMapsUrlConverter(),
             CoordinatesUrlConverter(),
         ),

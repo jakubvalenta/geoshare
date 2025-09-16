@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
+import java.net.URL
 
 class UriTest {
     private val uriQuote = FakeUriQuote()
@@ -140,6 +141,7 @@ class UriTest {
     @Test
     fun parse_schemeAndHostAndPathAndQueryAndFragment() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Uri(
                 scheme = "https",
                 host = "osmand.net",
@@ -327,6 +329,92 @@ class UriTest {
         assertEquals(
             Uri(queryParams = mapOf("foo" to "bar", "" to "", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&&baz=1", uriQuote)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasSchemeAndHost() {
+        assertEquals(
+            URL("https://www.example.com/my-path"),
+            Uri.parse("https://www.example.com/my-path", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasMissingSchemeAndMissingHostAndRelativePathWithOnePart_returnsUrlWithDefaultSchemeAndHostAndPath() {
+        assertEquals(
+            URL("https://example.com/default/my-relative"),
+            Uri.parse("my-relative", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasMissingSchemeAndMissingHostAndRelativePathWithMultipleParts_returnsUrlWithDefaultSchemeAndHostAndPath() {
+        assertEquals(
+            URL("https://example.com/default/my-relative/path"),
+            Uri.parse("my-relative/path", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasMissingSchemeAndMissingHostAndAbsolutePath_returnsUrlWithDefaultSchemeAndHost() {
+        assertEquals(
+            URL("https://example.com/my-absolute/path"),
+            Uri.parse("/my-absolute/path", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasRelativeScheme_returnsUrlWithDefaultScheme() {
+        assertEquals(
+            URL("https://my-host.example.com/my-path"),
+            Uri.parse("//my-host.example.com/my-path", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasHttpsSchemeAndHost_returnsUrlUnchanged() {
+        assertEquals(
+            URL("https://my-host"),
+            Uri.parse("https://my-host", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasHttpsSchemeAndHostAndPath_returnsUrlUnchanged() {
+        assertEquals(
+            URL("https://my-host/my-path"),
+            Uri.parse("https://my-host/my-path", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+        assertEquals(
+            URL("https://my-host/my-long/path"),
+            Uri.parse("https://my-host/my-long/path", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlHasFtpSchemeAndHost_returnUrlUnchanged() {
+        assertEquals(
+            URL("ftp://my-host"),
+            Uri.parse("ftp://my-host", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toAbsoluteUrl_inputUrlIsGeoUri_returnHttpsUrl() {
+        assertEquals(
+            URL("https://example.com/default/1,2"),
+            Uri.parse("geo:1,2", uriQuote).toAbsoluteUrl("https", "example.com", "/default")
+        )
+    }
+
+    @Test
+    fun toString_encodesPath() {
+        val uriString =
+            "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd#my-fragment"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
         )
     }
 }

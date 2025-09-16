@@ -164,6 +164,36 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
+                        android:host="waze.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.waze.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="ul.waze.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
                         android:host="yandex.com"
                         android:scheme="https"/>
             </intent-filter>

@@ -65,11 +65,20 @@ data class ReceivedUri(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        if (urlConverter is UrlConverter.WithShortUriPattern && urlConverter.shortUriPattern.matches(uri.toString())) {
-            return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
-                Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, inputUriString, urlConverter, uri)
-                Permission.ASK -> RequestedUnshortenPermission(stateContext, inputUriString, urlConverter, uri)
-                Permission.NEVER -> DeniedConnectionPermission(stateContext, inputUriString, urlConverter)
+        if (urlConverter is UrlConverter.WithShortUriPattern) {
+            val m = urlConverter.shortUriPattern.matcher(uri.toString())
+            if (m.matches()) {
+                val uriString = if (urlConverter.shortUriReplacement != null) {
+                    m.replaceFirst(urlConverter.shortUriReplacement)
+                } else {
+                    m.group()
+                }
+                val uri = Uri.parse(uriString, stateContext.uriQuote)
+                return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
+                    Permission.ALWAYS -> GrantedUnshortenPermission(stateContext, inputUriString, urlConverter, uri)
+                    Permission.ASK -> RequestedUnshortenPermission(stateContext, inputUriString, urlConverter, uri)
+                    Permission.NEVER -> DeniedConnectionPermission(stateContext, inputUriString, urlConverter)
+                }
             }
         }
         return UnshortenedUrl(stateContext, inputUriString, urlConverter, uri, permission)

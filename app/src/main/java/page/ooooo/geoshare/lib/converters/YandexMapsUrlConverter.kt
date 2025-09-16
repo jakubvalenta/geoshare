@@ -10,6 +10,7 @@ class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     UrlConverter.WithHtmlPattern {
     override val uriPattern: Pattern = Pattern.compile("""https?://yandex\.com/\S+""")
     override val shortUriPattern: Pattern = Pattern.compile("""https?://yandex\.com/maps/-/\S+""")
+    override val shortUriReplacement: String? = null
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = allUriPattern {
