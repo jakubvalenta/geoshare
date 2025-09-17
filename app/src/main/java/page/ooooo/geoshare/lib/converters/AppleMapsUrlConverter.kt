@@ -3,6 +3,11 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
@@ -13,43 +18,43 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
     override val conversionUriPattern = uriPattern {
         all {
             optional {
-                query("z", z, sanitizeZoom)
+                query("z", PositionRegex(Z))
             }
             first {
                 all {
-                    host("maps.apple")
-                    path("/p/.+")
+                    host(PositionRegex("maps.apple"))
+                    path(PositionRegex("/p/.+"))
                 }
-                query("ll", "$lat,$lon")
-                query("coordinate", "$lat,$lon")
-                query("q", "$lat,$lon")
-                query("address", q)
-                query("name", q)
+                query("ll", PositionRegex("$LAT,$LON"))
+                query("coordinate", PositionRegex("$LAT,$LON"))
+                query("q", PositionRegex("$LAT,$LON"))
+                query("address", PositionRegex(Q_PARAM))
+                query("name", PositionRegex(Q_PARAM))
                 all {
-                    query("auid", ".+")
-                    query("q", q)
+                    query("auid", PositionRegex(".+"))
+                    query("q", PositionRegex(Q_PARAM))
                 }
                 all {
-                    query("place-id", ".+")
-                    query("q", q)
+                    query("place-id", PositionRegex(".+"))
+                    query("q", PositionRegex(Q_PARAM))
                 }
-                query("auid", ".+")
-                query("place-id", ".+")
+                query("auid", PositionRegex(".+"))
+                query("place-id", PositionRegex(".+"))
                 all {
-                    query("q", q)
-                    query("sll", "$lat,$lon")
+                    query("q", PositionRegex(Q_PARAM))
+                    query("sll", PositionRegex("$LAT,$LON"))
                 }
-                query("q", q)
-                query("sll", "$lat,$lon")
-                query("center", "$lat,$lon")
+                query("q", PositionRegex(Q_PARAM))
+                query("sll", PositionRegex("$LAT,$LON"))
+                query("center", PositionRegex("$LAT,$LON"))
             }
         }
     }
 
     override val conversionHtmlPattern = htmlPattern {
         all {
-            html(""".*?<meta property="place:location:latitude" content="$lat".*""")
-            html(""".*?<meta property="place:location:longitude" content="$lon".*""")
+            content(PositionRegex("""<meta property="place:location:latitude" content="$LAT""""))
+            content(PositionRegex("""<meta property="place:location:longitude" content="$LON""""))
         }
     }
 

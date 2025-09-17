@@ -1,6 +1,11 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import page.ooooo.geoshare.lib.uriPattern
 
 /**
@@ -12,17 +17,17 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     override val conversionUriPattern = uriPattern {
         all {
             optional {
-                query("z", z, sanitizeZoom)
+                query("z", PositionRegex(Z))
             }
             first {
                 all {
-                    query("lat", lat)
-                    query("lon", lon)
+                    query("lat", PositionRegex(LAT))
+                    query("lon", PositionRegex(LON))
                 }
-                query("name", q)
+                query("name", PositionRegex(Q_PARAM))
                 @Suppress("SpellCheckingInspection")
-                query("daddr", q)
-                query("q", q)
+                query("daddr", PositionRegex(Q_PARAM))
+                query("q", PositionRegex(Q_PARAM))
             }
         }
     }

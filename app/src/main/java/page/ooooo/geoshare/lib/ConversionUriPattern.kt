@@ -1,111 +1,82 @@
 package page.ooooo.geoshare.lib
 
-import com.google.re2j.Pattern
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
-
-abstract class ConversionUriPattern {
-    val lat = """[\+ ]?(?P<lat>-?\d{1,2}(\.\d{1,16})?)"""
-    val lon = """[\+ ]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
-    val z = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
-    val q = """(?P<q>.+)"""
-    val sanitizeZoom: TransformFunc = { name, value ->
-        if (name == "z") {
-            value?.let { max(1, min(21, it.toDouble().roundToInt())).toString() }
-        } else {
-            value
-        }
-    }
-
-    abstract fun matches(uri: Uri): List<ConversionMatcher>?
+interface ConversionUriPattern<T : ConversionRegex> {
+    fun matches(uri: Uri): List<T>?
 }
 
-class ConversionHostUriPattern(
-    hostRegex: String,
-    val transform: TransformFunc = null,
-) : ConversionUriPattern() {
-    val hostPattern: Pattern = Pattern.compile(hostRegex)
-
-    override fun matches(uri: Uri): List<ConversionMatcher>? =
-        ConversionMatcher(hostPattern, uri.host, transform).takeIf { it.matches() }?.let { listOf(it) }
+class ConversionHostUriPattern<T : ConversionRegex>(val conversionRegex: T) : ConversionUriPattern<T> {
+    override fun matches(uri: Uri): List<T>? =
+        conversionRegex.takeIf { it.matches(uri.host) }?.let { listOf(it) }
 }
 
-class ConversionPathUriPattern(
-    pathRegex: String,
-    val transform: TransformFunc = null,
-) : ConversionUriPattern() {
-    val pathPattern: Pattern = Pattern.compile(pathRegex)
-
-    override fun matches(uri: Uri): List<ConversionMatcher>? =
-        ConversionMatcher(pathPattern, uri.path, transform).takeIf { it.matches() }?.let { listOf(it) }
+class ConversionPathUriPattern<T : ConversionRegex>(val conversionRegex: T) : ConversionUriPattern<T> {
+    override fun matches(uri: Uri): List<T>? =
+        conversionRegex.takeIf { it.matches(uri.path) }?.let { listOf(it) }
 }
 
-class ConversionQueryParamUriPattern(
+class ConversionQueryParamUriPattern<T : ConversionRegex>(
     val name: String,
-    valueRegex: String,
-    val transform: TransformFunc = null,
-) : ConversionUriPattern() {
-    val valuePattern: Pattern = Pattern.compile(valueRegex)
-
-    override fun matches(uri: Uri): List<ConversionMatcher>? = uri.queryParams[name]?.let { value ->
-        ConversionMatcher(valuePattern, value, transform).takeIf { it.matches() }
-    }?.let { listOf(it) }
+    val conversionRegex: T,
+) : ConversionUriPattern<T> {
+    override fun matches(uri: Uri): List<T>? =
+        uri.queryParams[name]?.let { value ->
+            conversionRegex.takeIf { it.matches(value) }
+        }?.let { listOf(it) }
 }
 
-class ConversionFragmentUriPattern(
-    fragmentRegex: String,
-    val transform: TransformFunc = null,
-) : ConversionUriPattern() {
-    val fragmentPattern: Pattern = Pattern.compile(fragmentRegex)
-
-    override fun matches(uri: Uri): List<ConversionMatcher>? =
-        ConversionMatcher(fragmentPattern, uri.fragment, transform).takeIf { it.matches() }?.let { listOf(it) }
+class ConversionFragmentUriPattern<T : ConversionRegex>(val conversionRegex: T) : ConversionUriPattern<T> {
+    override fun matches(uri: Uri): List<T>? =
+        conversionRegex.takeIf { it.matches(uri.fragment) }?.let { listOf(it) }
 }
 
-abstract class ConversionGroupUriPattern : ConversionUriPattern() {
-    val children: MutableList<ConversionUriPattern> = mutableListOf()
+abstract class ConversionGroupUriPattern<T : ConversionRegex> : ConversionUriPattern<T> {
+    val children: MutableList<ConversionUriPattern<T>> = mutableListOf()
 
-    fun all(init: ConversionAllUriPattern.() -> Unit) = initMatcher(ConversionAllUriPattern(), init)
+    fun all(init: ConversionAllUriPattern<T>.() -> Unit) =
+        initMatcher(ConversionAllUriPattern(), init)
 
-    fun first(init: ConversionFirstUriPattern.() -> Unit) = initMatcher(ConversionFirstUriPattern(), init)
+    fun first(init: ConversionFirstUriPattern<T>.() -> Unit) =
+        initMatcher(ConversionFirstUriPattern(), init)
 
-    fun optional(init: ConversionOptionalUriPattern.() -> Unit) = initMatcher(ConversionOptionalUriPattern(), init)
+    fun optional(init: ConversionOptionalUriPattern<T>.() -> Unit) =
+        initMatcher(ConversionOptionalUriPattern(), init)
 
-    fun host(hostRegex: String, transform: TransformFunc = null) =
-        initMatcher(ConversionHostUriPattern(hostRegex, transform))
+    fun host(conversionRegex: T) =
+        initMatcher(ConversionHostUriPattern(conversionRegex))
 
-    fun path(pathRegex: String, transform: TransformFunc = null) =
-        initMatcher(ConversionPathUriPattern(pathRegex, transform))
+    fun path(conversionRegex: T) =
+        initMatcher(ConversionPathUriPattern(conversionRegex))
 
-    fun query(name: String, valueRegex: String, transform: TransformFunc = null) =
-        initMatcher(ConversionQueryParamUriPattern(name, valueRegex, transform))
+    fun query(name: String, conversionRegex: T) =
+        initMatcher(ConversionQueryParamUriPattern(name, conversionRegex))
 
-    fun fragment(fragmentRegex: String, transform: TransformFunc = null) =
-        initMatcher(ConversionFragmentUriPattern(fragmentRegex, transform))
+    fun fragment(conversionRegex: T) =
+        initMatcher(ConversionFragmentUriPattern(conversionRegex))
 
-    private fun <T : ConversionUriPattern> initMatcher(conversionPattern: T, init: T.() -> Unit = {}): T {
+    private fun <U : ConversionUriPattern<T>> initMatcher(conversionPattern: U, init: U.() -> Unit = {}): U {
         conversionPattern.init()
         children.add(conversionPattern)
         return conversionPattern
     }
 }
 
-class ConversionOptionalUriPattern : ConversionGroupUriPattern() {
-    override fun matches(uri: Uri): List<ConversionMatcher> = children.mapNotNull { it.matches(uri) }.flatten()
+class ConversionOptionalUriPattern<T : ConversionRegex> : ConversionGroupUriPattern<T>() {
+    override fun matches(uri: Uri): List<T> =
+        children.mapNotNull { it.matches(uri) }.flatten()
 }
 
-class ConversionAllUriPattern : ConversionGroupUriPattern() {
-    override fun matches(uri: Uri): List<ConversionMatcher>? =
+class ConversionAllUriPattern<T : ConversionRegex> : ConversionGroupUriPattern<T>() {
+    override fun matches(uri: Uri): List<T>? =
         children.mapNotNull { it.matches(uri) }.takeIf { it.size == children.size }?.flatten()
 }
 
-class ConversionFirstUriPattern : ConversionGroupUriPattern() {
-    override fun matches(uri: Uri): List<ConversionMatcher>? = children.firstNotNullOfOrNull { it.matches(uri) }
+class ConversionFirstUriPattern<T : ConversionRegex> : ConversionGroupUriPattern<T>() {
+    override fun matches(uri: Uri): List<T>? =
+        children.firstNotNullOfOrNull { it.matches(uri) }
 }
 
-fun uriPattern(init: ConversionFirstUriPattern.() -> Unit): ConversionFirstUriPattern {
-    val conversionPattern = ConversionFirstUriPattern()
+fun <T : ConversionRegex> uriPattern(init: ConversionFirstUriPattern<T>.() -> Unit): ConversionFirstUriPattern<T> {
+    val conversionPattern = ConversionFirstUriPattern<T>()
     conversionPattern.init()
     return conversionPattern
 }

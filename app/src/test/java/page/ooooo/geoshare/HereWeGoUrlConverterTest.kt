@@ -46,7 +46,7 @@ class HereWeGoUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesQueryParam() {
         assertEquals(
-            Position("50.21972", "-0.68453", z = "7"),
+            Position("50.21972", "-0.68453", z = "6.93"),
             parseUrl("https://wego.here.com/?map=50.21972,-0.68453,6.93")
         )
     }

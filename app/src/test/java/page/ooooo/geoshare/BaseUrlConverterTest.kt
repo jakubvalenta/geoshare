@@ -5,7 +5,8 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.UrlConverter
-import page.ooooo.geoshare.lib.groupOrNull
+import page.ooooo.geoshare.lib.toPosition
+import page.ooooo.geoshare.lib.toUrlString
 
 abstract class BaseUrlConverterTest() {
     protected abstract val urlConverter: UrlConverter
@@ -36,33 +37,19 @@ abstract class BaseUrlConverterTest() {
 
     fun parseUrl(uriString: String): Position? = if (urlConverter is UrlConverter.WithUriPattern) {
         (urlConverter as UrlConverter.WithUriPattern).conversionUriPattern.matches(Uri.parse(uriString, uriQuote))
-            ?.let { conversionMatchers ->
-                Position(
-                    conversionMatchers.groupOrNull("lat"),
-                    conversionMatchers.groupOrNull("lon"),
-                    conversionMatchers.groupOrNull("q"),
-                    conversionMatchers.groupOrNull("z")
-                )
-            }
+            ?.toPosition()
     } else {
         throw NotImplementedError()
     }
 
-    fun parseHtml(html: String): Position? = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.matches(html)?.let { conversionMatchers ->
-            Position(
-                conversionMatchers.groupOrNull("lat"),
-                conversionMatchers.groupOrNull("lon"),
-                conversionMatchers.groupOrNull("q"),
-                conversionMatchers.groupOrNull("z")
-            )
-        }
+    fun parseHtml(content: String): Position? = if (urlConverter is UrlConverter.WithHtmlPattern) {
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.find(content)?.toPosition()
     } else {
         throw NotImplementedError()
     }
 
     fun parseHtmlRedirect(html: String) = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.matches(html)?.groupOrNull("url")
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.find(html)?.toUrlString()
     } else {
         throw NotImplementedError()
     }

@@ -119,7 +119,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndFractionalZoom() {
         assertEquals(
-            Position("52.5067296", "13.2599309", q = "Berlin, Germany", z = "6"),
+            Position("52.5067296", "13.2599309", q = "Berlin, Germany", z = "6.33"),
             parseUrl("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,6.33z/")
         )
     }
@@ -135,9 +135,8 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndPositiveCoordinatesAndPositiveDataCoordinates() {
         assertEquals(
-            Position("44.4490541", "26.0888398", z = "11"),
+            Position("44.4490541", "26.0888398", z = "11.42"),
             parseUrl("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
-
         )
     }
 

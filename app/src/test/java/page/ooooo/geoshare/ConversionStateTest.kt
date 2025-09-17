@@ -1,10 +1,10 @@
 package page.ooooo.geoshare
 
 import android.content.Intent
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.*
 import page.ooooo.geoshare.data.UserPreferencesRepository
@@ -206,7 +206,7 @@ class ConversionStateTest {
 
         class MockUrlConverter : UrlConverter.WithUriPattern {
             override val uriPattern: Pattern = Pattern.compile(".")
-            override val conversionUriPattern = uriPattern {}
+            override val conversionUriPattern: ConversionUriPattern<PositionRegex> = uriPattern {}
         }
 
         val mockUrlConverter = MockUrlConverter()
@@ -587,7 +587,7 @@ class ConversionStateTest {
     fun unshortenedUrl_uriPatternDoesNotMatchInputUriString_returnsFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, fakeUriQuote)
-        val mockUriPattern: ConversionFirstUriPattern = mock {
+        val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
             on { matches(any()) } doReturn null
         }
         val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
@@ -606,9 +606,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val mockUriMatcher: Matcher = mock()
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern } doReturn mockUriPattern
@@ -626,9 +627,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val mockUriMatcher: Matcher = mock()
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern } doReturn mockUriPattern
@@ -646,9 +648,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val mockUriMatcher: Matcher = mock()
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -666,9 +669,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val mockUriMatcher: Matcher = mock()
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -692,9 +696,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val mockUriMatcher: Matcher = mock()
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -718,9 +723,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val mockUriMatcher: Matcher = mock()
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -745,12 +751,12 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(lat = "0", q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("lat") } doReturn positionFromUrl.lat
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val lat = positionFromUrl.lat
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -775,12 +781,12 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(lon = "0", q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("lon") } doReturn positionFromUrl.lon
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val lon = positionFromUrl.lon
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -805,11 +811,11 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -834,11 +840,11 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -857,11 +863,11 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -892,11 +898,11 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -927,11 +933,11 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -956,11 +962,11 @@ class ConversionStateTest {
             val inputUriString = "geo:foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val positionFromUrl = Position(q = "fromUrl")
-            val mockUriMatcher: Matcher = mock {
-                on { group("q") } doReturn positionFromUrl.q
-            }
-            val mockUriPattern: ConversionFirstUriPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                    override fun matches(input: String) = false
+                    override val q = positionFromUrl.q
+                })
             }
             val mockGoogleMapsUrlConverter: GeoUrlConverter = mock {
                 on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -980,13 +986,13 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, fakeUriQuote)
         val positionFromUrl = Position(lat = "1", lon = "2", q = "fromUrl")
-        val mockUriMatcher: Matcher = mock {
-            on { group("lat") } doReturn positionFromUrl.lat
-            on { group("lon") } doReturn positionFromUrl.lon
-            on { group("q") } doReturn positionFromUrl.q
-        }
-        val mockUriPattern: ConversionFirstUriPattern = mock {
-            on { matches(any()) } doReturn listOf(ConversionMatcher(mockUriMatcher))
+        val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
+            on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
+                override fun matches(input: String) = false
+                override val lat = positionFromUrl.lat
+                override val lon = positionFromUrl.lon
+                override val q = positionFromUrl.q
+            })
         }
         val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { conversionUriPattern }.doReturn(mockUriPattern)
@@ -1200,13 +1206,13 @@ class ConversionStateTest {
         val uri = Uri.parse(inputUriString, fakeUriQuote)
         val html = "<html></html>"
         val positionFromHtml = Position("1", "2", q = "fromHtml")
-        val mockHtmlMatcher: Matcher = mock {
-            on { group("lat") } doReturn positionFromHtml.lat
-            on { group("lon") } doReturn positionFromHtml.lon
-            on { group("q") } doReturn positionFromHtml.q
-        }
-        val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-            on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlMatcher))
+        val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+            on { find(any()) } doReturn listOf(object : PositionRegex("mock") {
+                override fun matches(input: String) = true
+                override val lat = positionFromHtml.lat
+                override val lon = positionFromHtml.lon
+                override val q = positionFromHtml.q
+            })
         }
         val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1234,14 +1240,14 @@ class ConversionStateTest {
             val redirectUriString = "https://maps.apple.com/foo-redirect"
             val redirectUri = Uri.parse(redirectUriString, fakeUriQuote)
             val html = "<html></html>"
-            val mockHtmlRedirectMatcher: Matcher = mock {
-                on { group("url") } doReturn redirectUriString
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val url = redirectUriString
+                })
             }
             val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1270,14 +1276,14 @@ class ConversionStateTest {
             val redirectUriString = "foo-redirect"
             val redirectUri = Uri.parse("$inputUriString/$redirectUriString", fakeUriQuote)
             val html = "<html></html>"
-            val mockHtmlRedirectMatcher: Matcher = mock {
-                on { group("url") } doReturn redirectUriString
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val url = redirectUriString
+                })
             }
             val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1304,14 +1310,14 @@ class ConversionStateTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val html = "<html></html>"
-            val mockHtmlRedirectMatcher: Matcher = mock {
-                on { group("url") } doThrow IllegalArgumentException()
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val url = null
+                })
             }
             val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1338,11 +1344,11 @@ class ConversionStateTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val html = "<html></html>"
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn null
             }
             val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1641,11 +1647,11 @@ class ConversionStateTest {
         val html = "<html></html>"
         val positionFromUrl = Position(q = "fromUrl")
         val positionFromHtml = Position(q = "fromHtml")
-        val mockHtmlMatcher: Matcher = mock {
-            on { group("q") } doReturn positionFromHtml.q
-        }
-        val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-            on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlMatcher))
+        val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+            on { find(any()) } doReturn listOf(object : PositionRegex("mock") {
+                override fun matches(input: String) = true
+                override val q = positionFromHtml.q
+            })
         }
         val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
             on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1680,14 +1686,14 @@ class ConversionStateTest {
             val redirectUri = Uri.parse(redirectUriString, fakeUriQuote)
             val html = "<html></html>"
             val positionFromUrl = Position(q = "fromUrl")
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlRedirectMatcher: Matcher = mock {
-                on { group("url") } doReturn redirectUriString
-            }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val url = redirectUriString
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1723,14 +1729,14 @@ class ConversionStateTest {
             val redirectUri = Uri.parse("$inputUriString/$redirectUriString", fakeUriQuote)
             val html = "<html></html>"
             val positionFromUrl = Position(q = "fromUrl")
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlRedirectMatcher: Matcher = mock {
-                on { group("url") } doReturn redirectUriString
-            }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val url = redirectUriString
+                })
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1764,14 +1770,14 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val html = "<html></html>"
             val positionFromUrl = Position(q = "fromUrl")
-            val mockHtmlRedirectMatcher: Matcher = mock {
-                on { group("url") } doThrow IllegalArgumentException()
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn listOf(ConversionMatcher(mockHtmlRedirectMatcher))
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                    override fun matches(input: String) = true
+                    override val url = null
+                })
             }
             val mockAppleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)
@@ -1805,11 +1811,11 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, fakeUriQuote)
             val html = "<html></html>"
             val positionFromUrl = Position(q = "fromUrl")
-            val mockHtmlPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
+            val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
+                on { find(any()) } doReturn null
             }
-            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern = mock {
-                on { matches(any()) } doReturn null
+            val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
+                on { find(any()) } doReturn null
             }
             val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
                 on { conversionHtmlPattern }.doReturn(mockHtmlPattern)

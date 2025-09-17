@@ -1,48 +1,66 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import page.ooooo.geoshare.lib.uriPattern
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
+    companion object {
+        const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
+        val DECODED_LAT_PATTERN: Pattern = Pattern.compile("""(lat=|"latitude":)$LAT""")
+        val DECODED_LON_PATTERN: Pattern = Pattern.compile("""(lon=|"longitude":)$LON""")
+    }
+
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""https?://(share|wego)\.here\.com/\S+""")
 
     @OptIn(ExperimentalEncodingApi::class)
     override val conversionUriPattern = uriPattern {
-        path("/l/$lat,$lon")
+        path(PositionRegex("/l/$LAT,$LON"))
         all {
-            path("/")
-            query("map", "$lat,$lon,$z", sanitizeZoom)
+            path(PositionRegex("/"))
+            query("map", PositionRegex("$LAT,$LON,$Z"))
         }
         all {
-            val simpleBase64Regex = """[A-Za-z0-9+/]+=*"""
-            val coordStringLatPattern = Pattern.compile("""(lat=|"latitude":)$lat""")
-            val coordStringLonPattern = Pattern.compile("""(lon=|"longitude":)$lon""")
-
             optional {
-                query("map", "$lat,$lon,$z", sanitizeZoom)
+                query("map", PositionRegex("$LAT,$LON,$Z"))
             }
-            path("""/p/[a-z]-(?P<encoded>$simpleBase64Regex)""") { name, value ->
-                if (name == "lat" || name == "lon") {
-                    val encoded = groupOrNull(matcher, "encoded")
-                    if (encoded != null) {
-                        val decoded = Base64.decode(encoded).decodeToString()
-                        val pattern = if (name == "lat") coordStringLatPattern else coordStringLonPattern
+            path(object : PositionRegex("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""") {
+                var decodedCache: String? = null
+                val decoded: String?
+                    get() {
+                        if (decodedCache == null) {
+                            val encoded = groupOrNull("encoded")
+                            if (encoded != null) {
+                                decodedCache = Base64.decode(encoded).decodeToString()
+                            }
+                        }
+                        return decodedCache
+                    }
+
+                override val lat: String? get() = getDecodedValue(DECODED_LAT_PATTERN, "lat")
+
+                override val lon: String? get() = getDecodedValue(DECODED_LON_PATTERN, "lon")
+
+                private fun getDecodedValue(pattern: Pattern, name: String): String? {
+                    if (decoded != null) {
                         val m = pattern.matcher(decoded)
                         if (m.find()) {
-                            groupOrNull(m, name)
-                        } else {
-                            value
+                            try {
+                                return m.group(name)
+                            } catch (_: IllegalArgumentException) {
+                                // Passthrough
+                            }
                         }
-                    } else {
-                        value
                     }
-                } else {
-                    value
+                    return null
                 }
-            }
+            })
         }
     }
 }
