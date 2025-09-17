@@ -84,7 +84,7 @@ fun IntroScreen(
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
     ) { innerPadding ->
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = Spacing.windowPadding)

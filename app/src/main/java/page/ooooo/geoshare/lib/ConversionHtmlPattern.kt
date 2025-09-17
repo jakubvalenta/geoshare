@@ -1,56 +1,49 @@
 package page.ooooo.geoshare.lib
 
-import com.google.re2j.Pattern
+import kotlin.collections.firstNotNullOfOrNull
+import kotlin.collections.flatten
+import kotlin.collections.mapNotNull
 
-abstract class ConversionHtmlPattern() {
-    val lat = """[\+ ]?(?P<lat>-?\d{1,2}(\.\d{1,16})?)"""
-    val lon = """[\+ ]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
+interface ConversionHtmlPattern<T : ConversionRegex> {
+    fun find(content: String): List<T>?
+}
 
-    val children: MutableList<ConversionHtmlPattern> = mutableListOf()
+class ConversionHtmlContentPattern<T : ConversionRegex>(val conversionRegex: T) : ConversionHtmlPattern<T> {
+    override fun find(content: String): List<T>? =
+        conversionRegex.takeIf { it.find(content) }?.let { listOf(it) }
+}
 
-    abstract fun matches(content: String): List<ConversionMatcher>?
+abstract class ConversionGroupHtmlPattern<T : ConversionRegex> : ConversionHtmlPattern<T> {
+    val children: MutableList<ConversionHtmlPattern<T>> = mutableListOf()
 
-    protected fun <T : ConversionHtmlPattern> initMatcher(conversionPattern: T, init: T.() -> Unit = {}): T {
+    fun all(init: ConversionAllHtmlPattern<T>.() -> Unit) =
+        initMatcher(ConversionAllHtmlPattern(), init)
+
+    fun first(init: ConversionFirstHtmlPattern<T>.() -> Unit) =
+        initMatcher(ConversionFirstHtmlPattern(), init)
+
+    fun content(conversionRegex: T) =
+        initMatcher(ConversionHtmlContentPattern(conversionRegex))
+
+    private fun <U : ConversionHtmlPattern<T>> initMatcher(conversionPattern: U, init: U.() -> Unit = {}): U {
         conversionPattern.init()
         children.add(conversionPattern)
         return conversionPattern
     }
 }
 
-class ConversionHtmlContentPattern(
-    contentRegex: String,
-    val transform: TransformFunc = null,
-) : ConversionHtmlPattern() {
-    val contentPattern: Pattern = Pattern.compile(contentRegex, Pattern.DOTALL)
-
-    override fun matches(content: String): List<ConversionMatcher>? =
-        ConversionMatcher(contentPattern, content, transform).takeIf { it.matches() }?.let { listOf(it) }
+class ConversionAllHtmlPattern<T : ConversionRegex> : ConversionGroupHtmlPattern<T>() {
+    override fun find(content: String): List<T>? =
+        children.mapNotNull { it.find(content) }.takeIf { it.size == children.size }?.flatten()
 }
 
-class ConversionAllHtmlPattern() : ConversionHtmlPattern() {
-    fun html(contentRegex: String, transform: TransformFunc = null) =
-        initMatcher(ConversionHtmlContentPattern(contentRegex, transform))
-
-    override fun matches(content: String): List<ConversionMatcher>? =
-        children.mapNotNull { it.matches(content) }.takeIf { it.size == children.size }?.flatten()
+class ConversionFirstHtmlPattern<T : ConversionRegex> : ConversionGroupHtmlPattern<T>() {
+    override fun find(content: String): List<T>? =
+        children.firstNotNullOfOrNull { it.find(content) }
 }
 
-class ConversionFirstHtmlPattern() : ConversionHtmlPattern() {
-    fun html(contentRegex: String, transform: TransformFunc = null) =
-        initMatcher(ConversionHtmlContentPattern(contentRegex, transform))
-
-    override fun matches(content: String): List<ConversionMatcher>? =
-        children.firstNotNullOfOrNull { it.matches(content) }
-}
-
-fun allHtmlPattern(init: ConversionAllHtmlPattern.() -> Unit): ConversionAllHtmlPattern {
-    val conversionPattern = ConversionAllHtmlPattern()
-    conversionPattern.init()
-    return conversionPattern
-}
-
-fun firstHtmlPattern(init: ConversionFirstHtmlPattern.() -> Unit): ConversionFirstHtmlPattern {
-    val conversionPattern = ConversionFirstHtmlPattern()
+fun <T : ConversionRegex> htmlPattern(init: ConversionFirstHtmlPattern<T>.() -> Unit): ConversionFirstHtmlPattern<T> {
+    val conversionPattern = ConversionFirstHtmlPattern<T>()
     conversionPattern.init()
     return conversionPattern
 }

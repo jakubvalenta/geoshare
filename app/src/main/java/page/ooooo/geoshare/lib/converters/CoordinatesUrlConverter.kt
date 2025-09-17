@@ -1,88 +1,82 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
-import page.ooooo.geoshare.lib.allUriPattern
+import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.uriPattern
 import java.math.RoundingMode
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
+    companion object {
+        const val CHARS = """[\p{Zs},°'′"″NSWE]"""
+        const val SPACE = """\p{Zs}*"""
+        const val LAT_SIG = """(?P<latSig>-?)"""
+        const val LAT_DEG = """(?P<latDeg>\d{1,2}(\.\d{1,16})?)"""
+        const val LAT_MIN = """(?P<latMin>\d{1,2}(\.\d{1,16})?)"""
+        const val LAT_SEC = """(?P<latSec>\d{1,2}(\.\d{1,16})?)"""
+        const val LON_SIG = """(?P<lonSig>-?)"""
+        const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,16})?)"""
+        const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,16})?)"""
+        const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
+    }
+
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
 
-    override val conversionUriPattern = allUriPattern {
-        first {
-            val chars = """[\p{Zs},°'′"″NSWE]"""
-            val space = """\p{Zs}*"""
-            val latSig = """(?P<latSig>-?)"""
-            val latDeg = """(?P<latDeg>\d{1,2}(\.\d{1,16})?)"""
-            val latMin = """(?P<latMin>\d{1,2}(\.\d{1,16})?)"""
-            val latSec = """(?P<latSec>\d{1,2}(\.\d{1,16})?)"""
-            val lonSig = """(?P<lonSig>-?)"""
-            val lonDeg = """(?P<lonDeg>\d{1,3}(\.\d{1,16})?)"""
-            val lonMin = """(?P<lonMin>\d{1,2}(\.\d{1,16})?)"""
-            val lonSec = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
+    override val conversionUriPattern = uriPattern {
+        // Decimal, e.g. `N 41.40338, E 2.17403`
+        path(object : PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") {
+            override val lat: String
+                get() = degToDec(
+                    groupOrNull()?.contains('S') == true,
+                    groupOrNull("latSig"),
+                    groupOrNull("latDeg"),
+                )
+            override val lon: String
+                get() = degToDec(
+                    groupOrNull()?.contains('W') == true,
+                    groupOrNull("lonSig"),
+                    groupOrNull("lonDeg"),
+                )
+        })
 
-            // Decimal, e.g. `N 41.40338, E 2.17403`
-            path("""$chars*$latSig$latDeg$chars+$lonSig$lonDeg$chars*""") { name, value ->
-                when (name) {
-                    "lat" -> degToDec(
-                        "S" in matcher.group(),
-                        groupOrNull(matcher, "latSig"),
-                        groupOrNull(matcher, "latDeg"),
-                    )
+        // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
+        path(object :
+            PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") {
+            override val lat: String
+                get() = degToDec(
+                    groupOrNull()?.contains('S') == true,
+                    groupOrNull("latSig"),
+                    groupOrNull("latDeg"),
+                    groupOrNull("latMin"),
+                    groupOrNull("latSec"),
+                )
+            override val lon: String
+                get() = degToDec(
+                    groupOrNull()?.contains('W') == true,
+                    groupOrNull("lonSig"),
+                    groupOrNull("lonDeg"),
+                    groupOrNull("lonMin"),
+                    groupOrNull("lonSec"),
+                )
+        })
 
-                    "lon" -> degToDec(
-                        "W" in matcher.group(),
-                        groupOrNull(matcher, "lonSig"),
-                        groupOrNull(matcher, "lonDeg"),
-                    )
-
-                    else -> value
-                }
-            }
-
-            // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-            path("""$chars*$latSig$latDeg$chars+$latMin$chars+$latSec$chars+$space$lonSig$lonDeg$chars+$lonMin$chars+$lonSec$chars*""") { name, value ->
-                when (name) {
-                    "lat" -> degToDec(
-                        "S" in matcher.group(),
-                        groupOrNull(matcher, "latSig"),
-                        groupOrNull(matcher, "latDeg"),
-                        groupOrNull(matcher, "latMin"),
-                        groupOrNull(matcher, "latSec"),
-                    )
-
-                    "lon" -> degToDec(
-                        "W" in matcher.group(),
-                        groupOrNull(matcher, "lonSig"),
-                        groupOrNull(matcher, "lonDeg"),
-                        groupOrNull(matcher, "lonMin"),
-                        groupOrNull(matcher, "lonSec"),
-                    )
-
-                    else -> value
-                }
-            }
-
-            // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-            path("""$chars*$latSig$latDeg$chars+$latMin$chars+$lonSig$lonDeg$chars+$lonMin$chars*""") { name, value ->
-                when (name) {
-                    "lat" -> degToDec(
-                        "S" in matcher.group(),
-                        groupOrNull(matcher, "latSig"),
-                        groupOrNull(matcher, "latDeg"),
-                        groupOrNull(matcher, "latMin"),
-                    )
-
-                    "lon" -> degToDec(
-                        "W" in matcher.group(),
-                        groupOrNull(matcher, "lonSig"),
-                        groupOrNull(matcher, "lonDeg"),
-                        groupOrNull(matcher, "lonMin"),
-                    )
-
-                    else -> value
-                }
-            }
-        }
+        // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
+        path(object :
+            PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") {
+            override val lat: String
+                get() = degToDec(
+                    groupOrNull()?.contains('S') == true,
+                    groupOrNull("latSig"),
+                    groupOrNull("latDeg"),
+                    groupOrNull("latMin"),
+                )
+            override val lon: String
+                get() = degToDec(
+                    groupOrNull()?.contains('W') == true,
+                    groupOrNull("lonSig"),
+                    groupOrNull("lonDeg"),
+                    groupOrNull("lonMin"),
+                )
+        })
     }
 
     private fun degToDec(

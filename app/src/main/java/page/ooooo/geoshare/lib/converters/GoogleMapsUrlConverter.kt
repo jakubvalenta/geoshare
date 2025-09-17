@@ -3,9 +3,15 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionUriPattern
-import page.ooooo.geoshare.lib.firstHtmlPattern
-import page.ooooo.geoshare.lib.allUriPattern
+import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PATH
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.RedirectRegex
+import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
@@ -17,66 +23,76 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val shortUriReplacement: String? = null
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUriPattern: ConversionUriPattern = allUriPattern {
-        optional {
-            query("zoom", z, sanitizeZoom)
+    override val conversionUriPattern = uriPattern {
+        all {
+            optional {
+                query("zoom", PositionRegex(Z))
+                first {
+                    query("destination", PositionRegex("$LAT,$LON"))
+                    query("destination", PositionRegex(Q_PARAM))
+                    query("q", PositionRegex("$LAT,$LON"))
+                    query("q", PositionRegex(Q_PARAM))
+                    query("query", PositionRegex("$LAT,$LON"))
+                    query("query", PositionRegex(Q_PARAM))
+                    query("viewpoint", PositionRegex("$LAT,$LON"))
+                    query("center", PositionRegex("$LAT,$LON"))
+                }
+            }
             first {
-                query("destination", "$lat,$lon")
-                query("destination", q)
-                query("q", "$lat,$lon")
-                query("q", q)
-                query("query", "$lat,$lon")
-                query("query", q)
-                query("viewpoint", "$lat,$lon")
-                query("center", "$lat,$lon")
-            }
-        }
-        first {
-            val data = """!3d$lat!4d$lon"""
-            val q = """(?P<q>[^/]+)"""
+                val data = """!3d$LAT!4d$LON"""
 
-            path("""/maps/.*/@[\d.,+-]+,${z}z/data=.*$data.*""", sanitizeZoom)
-            path("""/maps/.*/data=.*$data.*""")
-            path("""/maps/@$lat,$lon,${z}z.*""", sanitizeZoom)
-            path("""/maps/@$lat,$lon.*""")
-            path("""/maps/@""")
-            path("""/maps/place/$lat,$lon/@[\d.,+-]+,${z}z.*""", sanitizeZoom)
-            path("""/maps/place/$q/@$lat,$lon,${z}z.*""", sanitizeZoom)
-            path("""/maps/place/$q/@$lat,$lon.*""")
-            path("""/maps/place/$lat,$lon.*""")
-            path("""/maps/place/$q.*""")
-            path("""/maps/place//.*""")
-            path("""/maps/placelists/list/.*""")
-            path("""/maps/search/$lat,$lon.*""")
-            path("""/maps/search/$q.*""")
-            path("""/maps/search/""")
-            path("""/maps/dir/.*/$lat,$lon/data[^/]*""")
-            path("""/maps/dir/.*/$q/data[^/]*""")
-            path("""/maps/dir/.*/$lat,$lon""")
-            path("""/maps/dir/.*/@$lat,$lon,${z}z.*""", sanitizeZoom)
-            path("""/maps/dir/.*/$q""")
-            path("""/maps/dir/""")
-            path("""/maps/?""")
-            path("""/search/?""")
-            path("""/?""")
+                path(PositionRegex("""/maps/.*/@[\d.,+-]+,${Z}z/data=.*$data.*"""))
+                path(PositionRegex("""/maps/.*/data=.*$data.*"""))
+                path(PositionRegex("""/maps/@$LAT,$LON,${Z}z.*"""))
+                path(PositionRegex("""/maps/@$LAT,$LON.*"""))
+                path(PositionRegex("""/maps/@"""))
+                path(PositionRegex("""/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*"""))
+                path(PositionRegex("""/maps/place/$Q_PATH/@$LAT,$LON,${Z}z.*"""))
+                path(PositionRegex("""/maps/place/$Q_PATH/@$LAT,$LON.*"""))
+                path(PositionRegex("""/maps/place/$LAT,$LON.*"""))
+                path(PositionRegex("""/maps/place/$Q_PATH.*"""))
+                path(PositionRegex("""/maps/place//.*"""))
+                path(PositionRegex("""/maps/placelists/list/.*"""))
+                path(PositionRegex("""/maps/search/$LAT,$LON.*"""))
+                path(PositionRegex("""/maps/search/$Q_PATH.*"""))
+                path(PositionRegex("""/maps/search/"""))
+                path(PositionRegex("""/maps/dir/.*/$LAT,$LON/data[^/]*"""))
+                path(PositionRegex("""/maps/dir/.*/$Q_PATH/data[^/]*"""))
+                path(PositionRegex("""/maps/dir/.*/$LAT,$LON"""))
+                path(PositionRegex("""/maps/dir/.*/@$LAT,$LON,${Z}z.*"""))
+                path(PositionRegex("""/maps/dir/.*/$Q_PATH"""))
+                path(PositionRegex("""/maps/dir/"""))
+                all {
+                    path(PositionRegex("""/maps/d/(edit|viewer)"""))
+                    query("mid", PositionRegex(".+"))
+                }
+                path(PositionRegex("""/maps/?"""))
+                path(PositionRegex("""/search/?"""))
+                path(PositionRegex("""/?"""))
+            }
         }
     }
 
-    override val conversionHtmlPattern = firstHtmlPattern {
-        html(""".*?/@$lat,$lon.*""")
-        html(""".*?\[null,null,$lat,$lon\].*""")
+    override val conversionHtmlPattern = htmlPattern {
+        content(PositionRegex("""/@$LAT,$LON"""))
+        content(object : PositionRegex("""\[(null,null,|null,\[)$LAT,$LON\]""") {
+            override val points: List<Pair<String, String>>
+                get() = pattern.matcher(input).let { pointsMatcher ->
+                    mutableListOf<Pair<String, String>>().apply {
+                        while (pointsMatcher.find()) {
+                            try {
+                                add(pointsMatcher.group("lat") to pointsMatcher.group("lon"))
+                            } catch (_: IllegalArgumentException) {
+                                // Do nothing
+                            }
+                        }
+                    }
+                }
+        })
     }
 
-    override val conversionHtmlRedirectPattern = firstHtmlPattern {
-        html(
-            """.*?data-url="(?P<url>[^"]+)".*"""
-        ) { name, value ->
-            if (name == "url") {
-                value?.let { Pattern.compile("^/").matcher(it).replaceAll("https://www.google.com/") }
-            } else {
-                value
-            }
-        }
+    override val conversionHtmlRedirectPattern = htmlPattern {
+        content(RedirectRegex("""data-url="(?P<url>[^"]+)""""))
     }
 
     @StringRes

@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,7 +20,6 @@ fun ConfirmationScaffold(
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
-    fill: Boolean = true,
     content: (@Composable (ColumnScope.() -> Unit))? = null,
 ) {
     Scaffold(
@@ -36,7 +37,7 @@ fun ConfirmationScaffold(
     ) { innerPadding ->
         if (startButton != null || endButton != null || content != null) {
             Column(
-                modifier = Modifier
+                Modifier
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .imePadding()
@@ -46,7 +47,8 @@ fun ConfirmationScaffold(
                 Column(
                     Modifier
                         .fillMaxWidth()
-                        .weight(1f, fill)
+                        .weight(1f, true)
+                        .verticalScroll(rememberScrollState()),
                 ) {
                     if (content != null) {
                         content()

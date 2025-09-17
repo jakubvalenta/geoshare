@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,8 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
@@ -35,6 +38,8 @@ import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
 import page.ooooo.geoshare.lib.converters.WazeUrlConverter
 import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -142,28 +147,23 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun queryGeoUriApps(packageManager: PackageManager): List<App> =
-        packageManager.queryIntentActivities(
-            Intent(Intent.ACTION_VIEW, "geo:0,0".toUri()),
-            PackageManager.MATCH_ALL,
+    fun queryGeoUriApps(packageManager: PackageManager): List<App> = packageManager.queryIntentActivities(
+        Intent(Intent.ACTION_VIEW, "geo:0,0".toUri()),
+        PackageManager.MATCH_ALL,
+    ).map {
+        App(
+            it.activityInfo.packageName,
+            it.activityInfo.loadLabel(packageManager).toString(),
+            it.activityInfo.loadIcon(packageManager),
         )
-            .map {
-                App(
-                    it.activityInfo.packageName,
-                    it.activityInfo.loadLabel(packageManager).toString(),
-                    it.activityInfo.loadIcon(packageManager),
-                )
-            }
-            .filterNot { it.packageName == BuildConfig.APPLICATION_ID }
-            .sortedBy { it.label }
+    }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
 
     fun share(context: Context, packageName: String) {
         assert(stateContext.currentState is HasResult)
         (stateContext.currentState as HasResult).let { currentState ->
             context.startActivity(
                 stateContext.intentTools.createViewIntent(
-                    packageName,
-                    currentState.position.toGeoUriString().toUri()
+                    packageName, currentState.position.toGeoUriString().toUri()
                 )
             )
         }
@@ -184,6 +184,35 @@ class ConversionViewModel @Inject constructor(
             val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
             if (!systemHasClipboardEditor) {
                 Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun launchSave(context: Context, launcher: ActivityResultLauncher<Intent>) {
+        @Suppress("SpellCheckingInspection")
+        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
+        val filename = context.resources.getString(
+            R.string.conversion_succeeded_save_gpx_filename,
+            context.resources.getString(R.string.app_name),
+            timestamp,
+        )
+        launcher.launch(
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "text/xml"
+                putExtra(Intent.EXTRA_TITLE, filename)
+            },
+        )
+    }
+
+    fun save(context: Context, result: ActivityResult) {
+        result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
+            context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                val writer = outputStream.writer()
+                if (stateContext.currentState is HasResult) {
+                    (stateContext.currentState as HasResult).position.toGpx(writer)
+                }
+                writer.close()
             }
         }
     }

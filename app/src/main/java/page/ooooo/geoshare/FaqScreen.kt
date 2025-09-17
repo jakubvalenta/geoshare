@@ -27,28 +27,30 @@ fun FaqScreen(
     initialExpanded: Boolean = false,
     onNavigateToMainScreen: () -> Unit = {},
 ) {
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(stringResource(R.string.faq_title)) },
-            navigationIcon = {
-                IconButton(onClick = onNavigateToMainScreen) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            },
-        )
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.faq_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateToMainScreen) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.nav_back_content_description)
+                        )
+                    }
+                },
+            )
+        },
+    ) { innerPadding ->
         val appName = stringResource(R.string.app_name)
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = Spacing.windowPadding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacing.small)
+            verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             FaqItem(
                 headline = stringResource(R.string.faq_supported_inputs_headline),

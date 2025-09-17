@@ -3,8 +3,13 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.allUriPattern
-import page.ooooo.geoshare.lib.firstHtmlPattern
+import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
+import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -15,24 +20,26 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
         Pattern.compile("""https?://(www\.)?waze\.com/(ul/h|live-map\?h=)(?P<id>[A-Za-z0-9_-]+)""")
     override val shortUriReplacement = "https://www.waze.com/live-map?h=\${id}"
 
-    override val conversionUriPattern = allUriPattern {
-        optional {
-            query("z", z, sanitizeZoom)
-        }
-        first {
-            query("to", """ll\.$lat,$lon""")
-            query("ll", "$lat,$lon")
-            @Suppress("SpellCheckingInspection")
-            query("latlng", "$lat,$lon")
-            query("q", q)
-            query("venue_id", ".+")
-            query("place", ".+")
-            query("to", """place\..+""")
+    override val conversionUriPattern = uriPattern {
+        all {
+            optional {
+                query("z", PositionRegex(Z))
+            }
+            first {
+                query("to", PositionRegex("""ll\.$LAT,$LON"""))
+                query("ll", PositionRegex("$LAT,$LON"))
+                @Suppress("SpellCheckingInspection")
+                query("latlng", PositionRegex("$LAT,$LON"))
+                query("q", PositionRegex(Q_PARAM))
+                query("venue_id", PositionRegex(".+"))
+                query("place", PositionRegex(".+"))
+                query("to", PositionRegex("""place\..+"""))
+            }
         }
     }
 
-    override val conversionHtmlPattern = firstHtmlPattern {
-        html(""".*?"latLng":{"lat":$lat,"lng":$lon}.*""")
+    override val conversionHtmlPattern = htmlPattern {
+        content(PositionRegex(""""latLng":{"lat":$LAT,"lng":$LON}"""))
     }
 
     override val conversionHtmlRedirectPattern = null

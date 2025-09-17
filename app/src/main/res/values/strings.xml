@@ -2,6 +2,8 @@
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>
+    <string name="conversion_succeeded_save_gpx">Save GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_skip">Open original link</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
@@ -96,4 +98,5 @@
     <string name="conversion_failed_parse_html_connection_error">Connection error when fetching web page from the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
+    <string name="conversion_succeeded_point_number">point %1$d</string>
 </resources>

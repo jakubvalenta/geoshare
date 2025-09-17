@@ -20,7 +20,6 @@ class UnexpectedResponseCodeException : Exception("Unexpected response code")
 class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog(),
-    private val uriQuote: UriQuote = DefaultUriQuote(),
 ) {
     @Throws(
         ConnectTimeoutException::class,
@@ -29,7 +28,7 @@ class NetworkTools(
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )
-    suspend fun requestLocationHeader(url: URL): URL = withContext(Dispatchers.IO) {
+    suspend fun requestLocationHeader(url: URL): String? = withContext(Dispatchers.IO) {
         connect(
             engine,
             url,
@@ -37,19 +36,7 @@ class NetworkTools(
             followRedirectsParam = false,
             expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
         ) { response ->
-            val locationUrlString: String? = response.headers["Location"]
-            val locationUrl = try {
-                if (locationUrlString == null) {
-                    throw MalformedURLException()
-                }
-                val locationUri = Uri.parse(locationUrlString, uriQuote)
-                locationUri.toAbsoluteUrl(url.protocol, url.host, url.path)
-            } catch (e: MalformedURLException) {
-                log.w(null, "Invalid location URL $locationUrlString")
-                throw e
-            }
-            log.i(null, "Resolved short URL $url to $locationUrlString")
-            locationUrl
+            response.headers["Location"]
         }
     }
 
