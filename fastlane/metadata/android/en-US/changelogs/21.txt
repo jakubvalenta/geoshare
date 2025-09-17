@@ -1,2 +1,5 @@
 - Added Waze support.
 - Added options to copy Google Maps and Apple Maps links to conversion result screen.
+- Added support for Google Maps place lists.
+- Added option to save result as GPX.
+- Improved resulting geo: URI by not rounding the zoom value.
