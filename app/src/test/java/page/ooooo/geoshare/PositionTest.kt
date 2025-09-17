@@ -13,8 +13,6 @@ class PositionTest {
         assertEquals(
             "foo bar \u2022 z3.4",
             Position(
-                lat = "50.123456",
-                lon = "11.123456",
                 q = "foo bar",
                 z = "3.4",
                 points = listOf(
@@ -158,10 +156,7 @@ class PositionTest {
 </gpx>
 """,
             StringBuilder().apply {
-                Position(
-                    lat = "52.5067296",
-                    lon = "13.2599309",
-                ).toGpx(this, uriQuote)
+                Position().toGpx(this, uriQuote)
             }.toString()
         )
     }

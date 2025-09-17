@@ -273,9 +273,22 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_directionsCoordinatesWithCenter() {
+        assertEquals(
+            Position("34.0522", "-118.2437", z = "16"),
+            parseUrl("https://www.google.com/maps/dir/40.7128,-74.0060/34.0522,-118.2437/@52.4844406,13.4217121,16z/")
+        )
+    }
+
+    @Test
     fun parseUrl_directionsPlaceAndCoordinates() {
         assertEquals(
-            Position("48.83887481689453", "2.2740750312805176", z = "8"),
+            Position(
+                "48.83887481689453",
+                "2.2740750312805176",
+                q = "Hôpital Européen Georges Pompidou Assistance Publique-Hôpitaux de Paris,20 r Leblanc, 75015 Paris",
+                z = "8",
+            ),
             @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/")
         )
@@ -290,6 +303,14 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_directionsFromToWithInvalidData() {
+        assertEquals(
+            Position(q = "Potsdam"),
+            parseUrl("https://www.google.com/maps/dir/Berlin/Potsdam/data=spam")
+        )
+    }
+
+    @Test
     fun parseUrl_directionsFromToVia() {
         assertEquals(
             Position(q = "Washington, DC"),
@@ -298,10 +319,25 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun parseUrl_directionsFromToWithData() {
+    fun parseUrl_directionsFromToViaWithCenter() {
         assertEquals(
-            Position(q = "Potsdam"),
-            parseUrl("https://www.google.com/maps/dir/Berlin/Potsdam/data=abcd")
+            Position("52.4844406", "13.4217121", q = "Reuterstraße 1, Berlin-Neukölln, Germany", z = "16"),
+            parseUrl("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
+        )
+    }
+
+    @Test
+    fun parseUrl_directionsFromToViaWithCoordinatesInData() {
+        assertEquals(
+            Position(
+                z = "16",
+                points = listOf(
+                    "52.4858222" to "13.4236883",
+                    "52.4881038" to "13.4255518",
+                    "52.4807739" to "13.4300356",
+                ),
+            ),
+            parseUrl("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2")
         )
     }
 
@@ -461,8 +497,6 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_placeList() {
         assertEquals(
             Position(
-                lat = "59.1293656",
-                lon = "11.4585672",
                 points = listOf(
                     "59.1293656" to "11.4585672",
                     "59.4154007" to "11.659710599999999",
@@ -488,8 +522,6 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_myMaps() {
         assertEquals(
             Position(
-                lat = "52.49016",
-                lon = "13.434500000000071",
                 points = listOf(
                     "52.49016" to "13.434500000000071",
                     "52.49534999999999" to "13.431890000000067",
@@ -520,13 +552,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseHtml_placeListOnePoint() {
         assertEquals(
-            Position(
-                lat = "59.1293656",
-                lon = "11.4585672",
-                points = listOf(
-                    "59.1293656" to "11.4585672",
-                ),
-            ),
+            Position("59.1293656", "11.4585672"),
             @Suppress("SpellCheckingInspection")
             parseHtml(
                 """<html>

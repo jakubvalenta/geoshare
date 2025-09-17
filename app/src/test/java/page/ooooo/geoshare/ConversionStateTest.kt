@@ -746,45 +746,15 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsQueryAndOnlyLatAndPermissionIsAlways_returnsGrantedParseHtmlToGetCoordsPermission() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsQueryOnlyAndPermissionIsAlways_returnsGrantedParseHtmlToGetCoordsPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val positionFromUrl = Position(lat = "0", q = "fromUrl")
+            val positionFromUrl = Position(q = "fromUrl")
             val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
                     override fun matches(input: String) = true
-                    override val lat = positionFromUrl.lat
-                    override val q = positionFromUrl.q
-                })
-            }
-            val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
-                on { conversionUriPattern }.doReturn(mockUriPattern)
-            }
-            val stateContext = mockStateContext(urlConverters = listOf(mockGoogleMapsUrlConverter))
-            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, uri, Permission.ALWAYS)
-            assertEquals(
-                GrantedParseHtmlToGetCoordsPermission(
-                    stateContext,
-                    inputUriString,
-                    mockGoogleMapsUrlConverter,
-                    uri,
-                    positionFromUrl,
-                ),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsQueryAndOnlyLonAndPermissionIsAlways_returnsGrantedParseHtmlToGetCoordsPermission() =
-        runTest {
-            val inputUriString = "https://maps.google.com/foo"
-            val uri = Uri.parse(inputUriString, fakeUriQuote)
-            val positionFromUrl = Position(lon = "0", q = "fromUrl")
-            val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
-                on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
-                    override fun matches(input: String) = false
-                    override val lon = positionFromUrl.lon
+                    override val points = positionFromUrl.points
                     override val q = positionFromUrl.q
                 })
             }
@@ -989,8 +959,7 @@ class ConversionStateTest {
         val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
             on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
                 override fun matches(input: String) = false
-                override val lat = positionFromUrl.lat
-                override val lon = positionFromUrl.lon
+                override val points = positionFromUrl.points
                 override val q = positionFromUrl.q
             })
         }
@@ -1209,8 +1178,7 @@ class ConversionStateTest {
         val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
             on { find(any()) } doReturn listOf(object : PositionRegex("mock") {
                 override fun matches(input: String) = true
-                override val lat = positionFromHtml.lat
-                override val lon = positionFromHtml.lon
+                override val points = positionFromHtml.points
                 override val q = positionFromHtml.q
             })
         }

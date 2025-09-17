@@ -1,82 +1,119 @@
 package page.ooooo.geoshare.lib
 
+typealias Point = Pair<String, String>
+
 data class Position(
-    val lat: String? = null,
-    val lon: String? = null,
+    val points: List<Point>? = null,
     val q: String? = null,
     val z: String? = null,
-    val points: List<Pair<String, String>>? = null,
 ) {
-    fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
+    constructor(
+        lat: String,
+        lon: String,
+        q: String? = null,
+        z: String? = null,
+    ) : this(listOf(lat to lon), q, z)
 
-    fun toParamsString(): String = listOfNotNull(
-        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" },
-        z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
-    ).joinToString(" \u2022 ")
+    val mainPoint: Point? get() = points?.lastOrNull()
 
-    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
-        val coords = "${lat ?: 0},${lon ?: 0}"
-        val queryParams = mutableMapOf("q" to (q ?: coords))
-        z?.let { queryParams["z"] = z }
-        return Uri(scheme = "geo", path = coords, queryParams = queryParams, uriQuote = uriQuote).toString()
-    }
+    fun toCoordsDecString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) -> "$lat, $lon" }
+
+    fun toParamsString(): String = mutableListOf<String>().apply {
+        q.takeUnless { it.isNullOrEmpty() }?.let { q ->
+            (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
+                val coords = "$lat,$lon"
+                if (q != coords) {
+                    add(q)
+                }
+            }
+        }
+        z.takeUnless { it.isNullOrEmpty() }?.let { z ->
+            add("z$z")
+        }
+    }.joinToString(" \u2022 ")
+
+    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String =
+        (mainPoint ?: ("0" to "0")).let { (lat, lon) -> "$lat,$lon" }.let { coords ->
+            Uri(
+                scheme = "geo",
+                path = coords,
+                queryParams = mutableMapOf<String, String>().apply {
+                    set("q", q ?: coords)
+                    z?.let { z ->
+                        set("z", z)
+                    }
+                },
+                uriQuote = uriQuote,
+            ).toString()
+        }
 
     /**
      * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
      */
-    fun toAppleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
-        val queryParams = mutableMapOf<String, String>()
-        if (lat != null && lon != null) {
-            queryParams["ll"] = "$lat,$lon"
-        } else if (q != null) {
-            queryParams["q"] = q
-        }
-        z?.let { queryParams["z"] = z }
-        return Uri(
-            scheme = "https",
-            host = "maps.apple.com",
-            "/",
-            queryParams = queryParams,
-            uriQuote = uriQuote,
-        ).toString()
-    }
+    fun toAppleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+        scheme = "https",
+        host = "maps.apple.com",
+        path = "/",
+        queryParams = mutableMapOf<String, String>().apply {
+            mainPoint?.let { (lat, lon) ->
+                set("ll", "$lat,$lon")
+            } ?: q?.let { q ->
+                set("q", q)
+            }
+            z?.let { z ->
+                set("z", z)
+            }
+        },
+        uriQuote = uriQuote,
+    ).toString()
 
     /**
      * See https://developers.google.com/maps/documentation/urls/get-started
      */
-    fun toGoogleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
-        val queryParams = mutableMapOf<String, String>()
-        if (lat != null && lon != null) {
-            queryParams["q"] = "$lat,$lon"
-        } else if (q != null) {
-            queryParams["q"] = q
-        }
-        z?.let { queryParams["z"] = z }
-        return Uri(
-            scheme = "https",
-            host = "www.google.com",
-            "/maps",
-            queryParams = queryParams,
-            uriQuote = uriQuote,
-        ).toString()
-    }
+    fun toGoogleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+        scheme = "https",
+        host = "www.google.com",
+        path = "/maps",
+        queryParams = mutableMapOf<String, String>().apply {
+            mainPoint?.let { (lat, lon) ->
+                set("q", "$lat,$lon")
+            } ?: q?.let { q ->
+                set("q", q)
+            }
+            z?.let { z ->
+                set("z", z)
+            }
+        },
+        uriQuote = uriQuote,
+    ).toString()
 
     /**
      * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
      */
-    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
-        val queryParams = mutableMapOf<String, String>()
-        lat?.let { queryParams["lat"] = lat }
-        lon?.let { queryParams["lon"] = lon }
-        q?.let { queryParams["q"] = q }
-        z?.let { queryParams["zoom"] = z }
-        return Uri(scheme = "magicearth", path = "//", queryParams = queryParams, uriQuote = uriQuote).toString()
-    }
+    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+        scheme = "magicearth",
+        path = "//",
+        queryParams = mutableMapOf<String, String>().apply {
+            mainPoint?.let { (lat, lon) ->
+                set("lat", lat)
+                set("lon", lon)
+            }
+            q?.let { q ->
+                set("q", q)
+            }
+            z?.let { z ->
+                set("zoom", z)
+            }
+        },
+        uriQuote = uriQuote,
+    ).toString()
 
-    fun toNorthSouthWestEastDecCoordsString(): String = listOf(
-        coordToDeg(lat, "S", "N"),
-        coordToDeg(lon, "W", "E"),
-    ).joinToString(", ")
+    fun toNorthSouthWestEastDecCoordsString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
+        listOf(
+            coordToDeg(lat, "S", "N"),
+            coordToDeg(lon, "W", "E"),
+        ).joinToString(", ")
+    }
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
@@ -89,13 +126,10 @@ data class Position(
         append("</gpx>\n")
     }
 
-    private fun coordToDeg(s: String?, directionNegative: String, directionPositive: String): String {
+    private fun coordToDeg(s: String, directionNegative: String, directionPositive: String): String {
         var abs: String
         var direction: String
-        if (s == null) {
-            abs = "0"
-            direction = directionPositive
-        } else if (s.startsWith("-")) {
+        if (s.startsWith("-")) {
             abs = s.substring(1)
             direction = directionNegative
         } else {

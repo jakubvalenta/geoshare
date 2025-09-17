@@ -77,7 +77,7 @@ fun ResultCard(
                                 )
                             }
                         }
-                        position.points?.mapIndexed { i, (lat, lon) ->
+                        position.points?.takeIf { it.size > 1 }?.mapIndexed { i, (lat, lon) ->
                             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
                                 Text(
                                     stringResource(R.string.conversion_succeeded_point_number, i + 1),
@@ -371,8 +371,6 @@ private fun PointsPreview() {
                     ),
                 ),
                 position = Position(
-                    lat = "50.123456",
-                    lon = "11.123456",
                     points = listOf(
                         "59.1293656" to "11.4585672",
                         "59.4154007" to "11.659710599999999",
@@ -402,8 +400,6 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 position = Position(
-                    lat = "50.123456",
-                    lon = "11.123456",
                     points = listOf(
                         "59.1293656" to "11.4585672",
                         "59.4154007" to "11.659710599999999",

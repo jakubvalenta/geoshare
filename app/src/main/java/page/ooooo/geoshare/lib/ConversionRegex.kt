@@ -37,13 +37,17 @@ abstract class ConversionRegex(regex: String) {
 
 open class PositionRegex(regex: String) : ConversionRegex(regex) {
     companion object {
-        const val LAT = """[\+ ]?(?P<lat>-?\d{1,2}(\.\d{1,16})?)"""
-        const val LON = """[\+ ]?(?P<lon>-?\d{1,3}(\.\d{1,16})?)"""
+        const val LAT_NUM = """-?\d{1,2}(\.\d{1,16})?"""
+        const val LON_NUM = """-?\d{1,3}(\.\d{1,16})?"""
+        const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
+        const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
         const val Z = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
         const val Q_PARAM = """(?P<q>.+)"""
         const val Q_PATH = """(?P<q>[^/]+)"""
     }
 
+    open val points: List<Point>?
+        get() = lat?.let { lat -> lon?.let { lon -> listOf(lat to lon) } }
     open val lat: String?
         get() = groupOrNull("lat")
     open val lon: String?
@@ -51,18 +55,25 @@ open class PositionRegex(regex: String) : ConversionRegex(regex) {
     open val q: String?
         get() = groupOrNull("q")
     open val z: String?
-        get() = groupOrNull("z")?.toDouble()
-            ?.let { max(1.0, min(21.0, it)) }
-            ?.toTrimmedString()
-    open val points: List<Pair<String, String>>? = null
+        get() = groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
 }
 
+/**
+ * Create a position from a list of regexes.
+ *
+ * Get points from the last regex that has not null `points` property. If such a regex doesn't exist, find the last
+ * regex that has not null `lat` property and the last regex that has not null `lon` property and create a point from
+ * them.
+ */
 fun List<PositionRegex>.toPosition() = Position(
-    this.lastNotNullOrNull { it.lat },
-    this.lastNotNullOrNull { it.lon },
+    this.lastNotNullOrNull { it.points }
+        ?: this.lastNotNullOrNull { it.lat }?.let { lat ->
+            this.lastNotNullOrNull { it.lon }?.let { lon ->
+                listOf(lat to lon)
+            }
+        },
     this.lastNotNullOrNull { it.q },
     this.lastNotNullOrNull { it.z },
-    this.lastNotNullOrNull { it.points },
 )
 
 open class RedirectRegex(regex: String) : ConversionRegex(regex) {

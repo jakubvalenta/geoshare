@@ -161,14 +161,8 @@ data class UnshortenedUrl(
                 stateContext.log.i(null, "URL could not be converted $uri")
                 return ConversionFailed(R.string.conversion_failed_parse_url_error)
             }
-            val position = Position(
-                conversionMatchers.lastNotNullOrNull { it.lat },
-                conversionMatchers.lastNotNullOrNull { it.lon },
-                conversionMatchers.lastNotNullOrNull { it.q },
-                conversionMatchers.lastNotNullOrNull { it.z },
-                conversionMatchers.lastNotNullOrNull { it.points },
-            )
-            if (position.lat != null && position.lon != null) {
+            val position = conversionMatchers.toPosition()
+            if (position.points?.isNotEmpty() == true) {
                 stateContext.log.i(null, "URL converted to position with coordinates $uri > $position")
                 return ConversionSucceeded(inputUriString, position)
             }
