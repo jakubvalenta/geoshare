@@ -57,7 +57,7 @@
     <string name="conversion_failed_parse_url_error">فشل في معالجة رابط الخريطة</string>
     <string name="conversion_succeeded_apps_not_found">لم يتم تثبيت تطبيق الخرائط</string>
     <string name="conversion_failed_parse_html_error">فشل جلب صفحة الويب من خدمة الخرائط</string>
-    <string name="main_info_box"><![CDATA[يدعم %1s العديد من أنواع روابط خرائط Google وخرائط Apple وHERE WeGo وMagic Earth وMaze وOpenStreetMap وOsmAnd وخرائط Yandex. إذا وجدت رابطًا لا يزال لا يعمل، فيُرجى <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">الإبلاغ عن مشكلة</a>.]]></string>
+    <string name="main_info_box"><![CDATA[يدعم %1s العديد من أنواع روابط خرائط Google وخرائط Apple وHERE WeGo وMagic Earth وWaze وOpenStreetMap وOsmAnd وخرائط Yandex. إذا وجدت رابطًا لا يزال لا يعمل، فيُرجى <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">الإبلاغ عن مشكلة</a>.]]></string>
     <string name="intro_how_to_share_google_maps_screenshot_title">مشاركة مع</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">الموقع المحدد</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">المراسلة</string>
