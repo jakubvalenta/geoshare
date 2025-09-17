@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -39,6 +38,8 @@ import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
 import page.ooooo.geoshare.lib.converters.WazeUrlConverter
 import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -188,14 +189,12 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun launchSave(context: Context, launcher: ActivityResultLauncher<Intent>) {
+        @Suppress("SpellCheckingInspection")
+        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
         val filename = context.resources.getString(
             R.string.conversion_succeeded_save_gpx_filename,
             context.resources.getString(R.string.app_name),
-            DateUtils.formatDateTime(
-                context,
-                System.currentTimeMillis(),
-                DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_DATE,
-            ),
+            timestamp,
         )
         launcher.launch(
             Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -210,8 +209,8 @@ class ConversionViewModel @Inject constructor(
         result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.writer()
-                if (currentState is HasResult) {
-                    (currentState as HasResult).position.toGpx(writer)
+                if (stateContext.currentState is HasResult) {
+                    (stateContext.currentState as HasResult).position.toGpx(writer)
                 }
                 writer.close()
             }

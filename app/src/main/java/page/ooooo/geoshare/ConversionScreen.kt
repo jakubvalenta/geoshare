@@ -48,6 +48,7 @@ fun ConversionScreen(
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.save(context, it)
+        onFinish()
     }
 
     ConversionScreen(
@@ -63,7 +64,6 @@ fun ConversionScreen(
         },
         onSave = {
             viewModel.launchSave(context, saveLauncher)
-            onFinish()
         },
         onShare = { packageName ->
             viewModel.share(context, packageName)
