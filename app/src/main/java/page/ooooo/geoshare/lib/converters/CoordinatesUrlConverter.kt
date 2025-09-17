@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.uriPattern
 import java.math.RoundingMode
@@ -24,58 +25,64 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     override val conversionUriPattern = uriPattern {
         // Decimal, e.g. `N 41.40338, E 2.17403`
         path(object : PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") {
-            override val lat: String
-                get() = degToDec(
-                    groupOrNull()?.contains('S') == true,
-                    groupOrNull("latSig"),
-                    groupOrNull("latDeg"),
-                )
-            override val lon: String
-                get() = degToDec(
-                    groupOrNull()?.contains('W') == true,
-                    groupOrNull("lonSig"),
-                    groupOrNull("lonDeg"),
-                )
+            override val points: List<Point>
+                get() {
+                    val lat = degToDec(
+                        groupOrNull()?.contains('S') == true,
+                        groupOrNull("latSig"),
+                        groupOrNull("latDeg"),
+                    )
+                    val lon = degToDec(
+                        groupOrNull()?.contains('W') == true,
+                        groupOrNull("lonSig"),
+                        groupOrNull("lonDeg"),
+                    )
+                    return listOf(lat to lon)
+                }
         })
 
         // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
         path(object :
             PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") {
-            override val lat: String
-                get() = degToDec(
-                    groupOrNull()?.contains('S') == true,
-                    groupOrNull("latSig"),
-                    groupOrNull("latDeg"),
-                    groupOrNull("latMin"),
-                    groupOrNull("latSec"),
-                )
-            override val lon: String
-                get() = degToDec(
-                    groupOrNull()?.contains('W') == true,
-                    groupOrNull("lonSig"),
-                    groupOrNull("lonDeg"),
-                    groupOrNull("lonMin"),
-                    groupOrNull("lonSec"),
-                )
+            override val points: List<Point>
+                get() {
+                    val lat = degToDec(
+                        groupOrNull()?.contains('S') == true,
+                        groupOrNull("latSig"),
+                        groupOrNull("latDeg"),
+                        groupOrNull("latMin"),
+                        groupOrNull("latSec"),
+                    )
+                    val lon = degToDec(
+                        groupOrNull()?.contains('W') == true,
+                        groupOrNull("lonSig"),
+                        groupOrNull("lonDeg"),
+                        groupOrNull("lonMin"),
+                        groupOrNull("lonSec"),
+                    )
+                    return listOf(lat to lon)
+                }
         })
 
         // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
         path(object :
             PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") {
-            override val lat: String
-                get() = degToDec(
-                    groupOrNull()?.contains('S') == true,
-                    groupOrNull("latSig"),
-                    groupOrNull("latDeg"),
-                    groupOrNull("latMin"),
-                )
-            override val lon: String
-                get() = degToDec(
-                    groupOrNull()?.contains('W') == true,
-                    groupOrNull("lonSig"),
-                    groupOrNull("lonDeg"),
-                    groupOrNull("lonMin"),
-                )
+            override val points: List<Point>
+                get() {
+                    val lat = degToDec(
+                        groupOrNull()?.contains('S') == true,
+                        groupOrNull("latSig"),
+                        groupOrNull("latDeg"),
+                        groupOrNull("latMin"),
+                    )
+                    val lon = degToDec(
+                        groupOrNull()?.contains('W') == true,
+                        groupOrNull("lonSig"),
+                        groupOrNull("lonDeg"),
+                        groupOrNull("lonMin"),
+                    )
+                    return listOf(lat to lon)
+                }
         })
     }
 

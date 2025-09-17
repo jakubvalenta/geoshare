@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
@@ -31,35 +32,26 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
                 query("map", PositionRegex("$LAT,$LON,$Z"))
             }
             path(object : PositionRegex("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""") {
-                var decodedCache: String? = null
-                val decoded: String?
+                override val points: List<Point>?
                     get() {
-                        if (decodedCache == null) {
-                            val encoded = groupOrNull("encoded")
-                            if (encoded != null) {
-                                decodedCache = Base64.decode(encoded).decodeToString()
-                            }
-                        }
-                        return decodedCache
-                    }
-
-                override val lat: String? get() = getDecodedValue(DECODED_LAT_PATTERN, "lat")
-
-                override val lon: String? get() = getDecodedValue(DECODED_LON_PATTERN, "lon")
-
-                private fun getDecodedValue(pattern: Pattern, name: String): String? {
-                    if (decoded != null) {
-                        val m = pattern.matcher(decoded)
-                        if (m.find()) {
+                        val encoded = groupOrNull("encoded") ?: return null
+                        val decoded = Base64.decode(encoded).decodeToString()
+                        val lat = DECODED_LAT_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
                             try {
-                                return m.group(name)
+                                m.group("lat")
                             } catch (_: IllegalArgumentException) {
-                                // Passthrough
+                                null
                             }
-                        }
+                        } ?: return null
+                        val lon = DECODED_LON_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
+                            try {
+                                m.group("lon")
+                            } catch (_: IllegalArgumentException) {
+                                null
+                            }
+                        } ?: return null
+                        return listOf(lat to lon)
                     }
-                    return null
-                }
             })
         }
     }

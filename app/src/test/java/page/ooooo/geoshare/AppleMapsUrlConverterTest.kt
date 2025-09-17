@@ -63,7 +63,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_search() {
         assertEquals(
-            Position(null, null, q = "Central Park"),
+            Position(q = "Central Park"),
             parseUrl("https://maps.apple.com/?q=Central+Park")
         )
     }
@@ -103,11 +103,11 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterAddressTakesPrecedence() {
         assertEquals(
-            Position(null, null, q = "Reuterplatz 3, 12047 Berlin, Germany"),
+            Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
             parseUrl("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
         assertEquals(
-            Position(null, null, q = "Reuterplatz 3, 12047 Berlin, Germany"),
+            Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
             parseUrl("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")
         )
     }
@@ -115,7 +115,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
-            Position(null, null, q = "Reuterplatz"),
+            Position(q = "Reuterplatz"),
             parseUrl("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")
         )
     }

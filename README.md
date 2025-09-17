@@ -285,6 +285,13 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https:/
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://goo.gl/maps/HcikiDXFwN2coeFN8' page.ooooo.geoshare.debug
 ```
 
+Google Maps directions link:
+
+```shell
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2
+' page.ooooo.geoshare.debug
+```
+
 Google Search link:
 
 ```shell

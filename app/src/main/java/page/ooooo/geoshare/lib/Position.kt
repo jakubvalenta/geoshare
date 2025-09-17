@@ -1,23 +1,41 @@
 package page.ooooo.geoshare.lib
 
+import kotlin.collections.firstOrNull
+import kotlin.collections.map
+
+typealias PartialPoint = Pair<String?, String?>
+typealias Point = Pair<String, String>
+
 data class Position(
-    val lat: String? = null,
-    val lon: String? = null,
+    val points: List<Point>? = null,
     val q: String? = null,
     val z: String? = null,
-    val points: List<Pair<String, String>>? = null,
 ) {
-    fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
+    constructor(
+        lat: String,
+        lon: String,
+        q: String? = null,
+        z: String? = null,
+    ) : this(listOf(lat to lon), q, z)
 
-    fun toParamsString(): String = listOfNotNull(
-        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" },
-        z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
-    ).joinToString(" \u2022 ")
+    fun toCoordsDecString(): String = (points?.firstOrNull() ?: ("0" to "0")).let { (lat, lon) -> "$lat, $lon" }
+
+    fun toParamsString(): String = mutableListOf<String>().apply {
+        if (!q.isNullOrEmpty()) {
+            val coords = (points?.firstOrNull() ?: ("0" to "0")).let { (lat, lon) -> "$lat,$lon" }
+            if (q != coords) {
+                add(q)
+            }
+        }
+        if (!z.isNullOrEmpty()) {
+            add("z$z")
+        }
+    }.joinToString(" \u2022 ")
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
-        val coords = "${lat ?: 0},${lon ?: 0}"
+        val coords = (points?.firstOrNull() ?: ("0" to "0")).let { (lat, lon) -> "$lat,$lon" }
         val queryParams = mutableMapOf("q" to (q ?: coords))
-        z?.let { queryParams["z"] = z }
+        z?.let { queryParams["z"] = it }
         return Uri(scheme = "geo", path = coords, queryParams = queryParams, uriQuote = uriQuote).toString()
     }
 
@@ -26,7 +44,9 @@ data class Position(
      */
     fun toAppleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
         val queryParams = mutableMapOf<String, String>()
-        if (lat != null && lon != null) {
+        val firstPoint = points?.firstOrNull()
+        if (firstPoint != null) {
+            val (lat, lon) = firstPoint
             queryParams["ll"] = "$lat,$lon"
         } else if (q != null) {
             queryParams["q"] = q
@@ -46,7 +66,9 @@ data class Position(
      */
     fun toGoogleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
         val queryParams = mutableMapOf<String, String>()
-        if (lat != null && lon != null) {
+        val firstPoint = points?.firstOrNull()
+        if (firstPoint != null) {
+            val (lat, lon) = firstPoint
             queryParams["q"] = "$lat,$lon"
         } else if (q != null) {
             queryParams["q"] = q
@@ -66,17 +88,22 @@ data class Position(
      */
     fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
         val queryParams = mutableMapOf<String, String>()
-        lat?.let { queryParams["lat"] = lat }
-        lon?.let { queryParams["lon"] = lon }
-        q?.let { queryParams["q"] = q }
-        z?.let { queryParams["zoom"] = z }
+        points?.firstOrNull()?.let { (lat, lon) ->
+            queryParams["lat"] = lat
+            queryParams["lon"] = lon
+        }
+        q?.let { queryParams["q"] = it }
+        z?.let { queryParams["zoom"] = it }
         return Uri(scheme = "magicearth", path = "//", queryParams = queryParams, uriQuote = uriQuote).toString()
     }
 
-    fun toNorthSouthWestEastDecCoordsString(): String = listOf(
-        coordToDeg(lat, "S", "N"),
-        coordToDeg(lon, "W", "E"),
-    ).joinToString(", ")
+    fun toNorthSouthWestEastDecCoordsString(): String {
+        val (lat, lon) = points?.firstOrNull() ?: ("0" to "0")
+        return listOf(
+            coordToDeg(lat, "S", "N"),
+            coordToDeg(lon, "W", "E"),
+        ).joinToString(", ")
+    }
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
@@ -89,13 +116,10 @@ data class Position(
         append("</gpx>\n")
     }
 
-    private fun coordToDeg(s: String?, directionNegative: String, directionPositive: String): String {
+    private fun coordToDeg(s: String, directionNegative: String, directionPositive: String): String {
         var abs: String
         var direction: String
-        if (s == null) {
-            abs = "0"
-            direction = directionPositive
-        } else if (s.startsWith("-")) {
+        if (s.startsWith("-")) {
             abs = s.substring(1)
             direction = directionNegative
         } else {
