@@ -424,16 +424,24 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun parseHtml_link() {
-        val html = this.javaClass.classLoader!!.getResource("TmbeHMiLEfTBws9EA.html")!!.readText()
         assertEquals(
             Position("44.4490541", "26.0888398"),
-            parseHtml(html),
+            parseHtml(
+                """<html>
+<head>
+  <script>
+    (function(){var kEI='_H8_Z8OhH_Pr7_UP-_zakAI';window.APP_OPTIONS=[];window.APP_INITIALIZATION_STATE=[[[2848.2250748641354,26.088839800000002,44.449054100000005],[0,0,0],[1024,768],13.1],[[["m",[17,75028,47427],13,[713465651,713465651,713465651,713465663,713465663,713465663,713465663,713465663,7134",null,\"EvgDKYQi49-NlUMIDwAAAAEAAAMAAAAAAAAAAAAABBABAAAAAA\",null,null,[[[1,91]],1,null,69,24]],null,\"Calea Victoriei 202 București, Bucuresti 010098, Roemenië\",null,null,\"https://www.google.com/maps/preview/place/RAI+-+Romantic+%26+Intimate,+Calea+Victoriei+202+Bucure%C8%99ti,+Bucuresti+010098,+Roemeni%C3%AB/@44.4490541,26.0888398,2848a,13.1y/data\\u003d!4m2!3m1!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929\",1,null,null,[[[\"AF1QipOa7QuHeDgFndxr0ak-_H\",10,12,\"\",null,590.6734,[\"https://lh5.googleusercontent.com/p/AF1QipOa7QuHedw203-h152-k-no\",\"RAI - Romantic \\u0026 Intimate\",[4624,3468],[203,100]],null,[[3,26.088l,null,[\"en\"],[[\"Recently opened for business\",null,[0,28]]]],[null,null,null,null,null,\"https://business.google.ckpRMEZuU1VOd2RqaG1ZbGQ6QClEWFhOJxUdI7F4YqrX\\u0026entry\\u003dugca\"],[null,0,null,[\"https://www.google.com/maps/@/data\\u003d!4m7!23m6!1m5!1sChdDSUhNMG5d3929!3m1!1s2@1:CIHM0ogKEICAgpwM%7C?hl\\u003dnl"],[900,900]],null,["sc2","per","mo","b"]]]];
+  </script>
+</head>
+<body></body>
+</html>
+"""
+            ),
         )
     }
 
     @Test
     fun parseHtml_array() {
-        val html = this.javaClass.classLoader!!.getResource("mfmnkPs6RuGyp0HOmXLSKg.html")!!.readText()
         assertEquals(
             Position(
                 points = listOf(
@@ -442,7 +450,17 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
                     "59.147731699999994" to "11.550661199999999"
                 )
             ),
-            parseHtml(html),
+            parseHtml(
+                """<html>
+<head>
+  <script nonce="Msfg7QHf3gC81FVE-L5WPQ">
+    (function(){var kEI='6LdIZ6T8G6Tt7_UP2uiGWQ';window.APP_OPTIONS=["[[[\"mfmnkPs6RuGyp0HOmXLSKg\",1,null,1,1],4,[2,1,\"https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg\"],[\"Lea Luithle\",\"https://lh3.googleusercontent.com/\"],\"RW24 Vortour\",\"\",null,null,[[null,[null,null,\"\",null,\"\",[null,null,59.1293656,11.4585672],[\"5063292292208158623\",\"-8209508828443931886\"]],\"The Ford\",\"\",null,null,null,[],[[1],[\"5063292292208158623\",\"-8209508828443931886\"]],[1718363560,896197000],[1718363560,896197000],null,[\"Lea Luithle\",\"https://lh3.googleusercontent.com/\"]],[null,[null,null,\"\",null,\"\",[null,null,59.4154007,11.659710599999999],[\"5063044840345374559\",\"-4449205876271392420\"]],\"Kirkebyøya\",\"\",null,null,null,[],[[1],[\"5063044840345374559\",\"-4449205876271392420\"]],[1718287605,621247000],[1718287605,621247000],null,[\"Lea Luithle\",\"https://lh3.googleusercontent.com/\"]],[null,[null,null,\"\",null,\"\",[null,null,59.147731699999994,11.550661199999999],[\"5063299310147010735\",\"8191888888476196124\"]],\"Gapahuk\",\"\",null,null,null,[],[[1],[\"5063299310147010735\",\"8191888888476196124\"]],[1718284910,232913000],[1718284910,232913000],null,[\"Lea Luithle\",\"https://lh3.googleusercontent.com/\"]]],[null,null,null,[21,\"21\"]],[1718284909,570276000],[1718729026,705637000],8],\"\",null,null,null,null,\"MjQyNDM2NjAyNg\\u003d\\u003d\"]"];window.ES5DGURL='/maps/@/data\x3d!3m1!4b1!4m2!11m1!2smfmmXLSKg?g_ep\x3dCAISDT0ICREU%3D\x26ucbcb\x3d1\x26dg\x3des5';
+  </script>
+</head>
+<body></body>
+</html>
+"""
+            ),
         )
     }
 
@@ -458,10 +476,19 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() {
-        val html = this.javaClass.classLoader!!.getResource("91UYXud.html")!!.readText()
         assertEquals(
             "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
-            parseHtmlRedirect(html)
+            parseHtmlRedirect(
+                """<html>
+<body>
+  <a
+    href="/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=1t:8290&amp;hl=de&amp;gl=de&amp;ictx=111"
+    data-url="/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de"
+  >Camino del Quinto</a>
+</body>
+</html>
+"""
+            )
         )
     }
 

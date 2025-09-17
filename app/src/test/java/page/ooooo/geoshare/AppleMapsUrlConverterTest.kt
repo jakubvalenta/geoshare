@@ -155,12 +155,19 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun parseHtml_success() {
-        val html =
-            this.javaClass.classLoader!!.getResource("I3B04EDEB21D5F86.html")!!
-                .readText()
         assertEquals(
             Position("52.4735927", "13.4050798"),
-            parseHtml(html)
+            parseHtml(
+                """<html>
+<head>
+  <title>Tempelhofer Feld</title>
+  <meta property="place:location:latitude" content="52.4735927" />
+  <meta property="place:location:longitude" content="13.4050798" />
+</head>
+<body></body>
+</html>
+"""
+            )
         )
     }
 
