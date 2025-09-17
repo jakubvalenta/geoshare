@@ -2,6 +2,8 @@ package page.ooooo.geoshare
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -44,6 +46,9 @@ fun ConversionScreen(
     val context = LocalContext.current
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
+    val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.save(context, it)
+    }
 
     ConversionScreen(
         currentState,
@@ -54,6 +59,10 @@ fun ConversionScreen(
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onCopy = { text ->
             viewModel.copy(context, clipboard, text)
+            onFinish()
+        },
+        onSave = {
+            viewModel.launchSave(context, saveLauncher)
             onFinish()
         },
         onShare = { packageName ->
@@ -81,6 +90,7 @@ fun ConversionScreen(
     onGrant: (Boolean) -> Unit,
     onDeny: (Boolean) -> Unit,
     onCopy: (String) -> Unit,
+    onSave: () -> Unit,
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
     onCancel: () -> Unit,
@@ -234,6 +244,7 @@ fun ConversionScreen(
                     queryGeoUriApps(context),
                     currentState.position,
                     onCopy,
+                    onSave,
                     onShare,
                 )
             }
@@ -256,6 +267,7 @@ private fun DefaultPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -278,6 +290,7 @@ private fun DarkPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -307,6 +320,7 @@ private fun PermissionPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -336,6 +350,7 @@ private fun DarkPermissionPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -357,6 +372,7 @@ private fun ErrorPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -378,6 +394,7 @@ private fun DarkErrorPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -397,6 +414,7 @@ private fun LoadingIndicatorPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -416,6 +434,7 @@ private fun DarkLoadingIndicatorPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -435,6 +454,7 @@ private fun InitialPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},
@@ -454,6 +474,7 @@ private fun DarkInitialPreview() {
             onGrant = {},
             onDeny = {},
             onCopy = {},
+            onSave = {},
             onShare = {},
             onSkip = {},
             onCancel = {},

@@ -9,6 +9,27 @@ class PositionTest {
     private val uriQuote = FakeUriQuote()
 
     @Test
+    fun toParamsString_returnsQueryAndZoomAndPoints() {
+        assertEquals(
+            "foo bar \u2022 z3.4 \u2022 " +
+                    "59.1293656, 11.4585672 \u2022 " +
+                    "59.4154007, 11.659710599999999 \u2022 " +
+                    "59.147731699999994, 11.550661199999999",
+            Position(
+                lat = "50.123456",
+                lon = "11.123456",
+                q = "foo bar",
+                z = "3.4",
+                points = listOf(
+                    "59.1293656" to "11.4585672",
+                    "59.4154007" to "11.659710599999999",
+                    "59.147731699999994" to "11.550661199999999",
+                ),
+            ).toParamsString(),
+        )
+    }
+
+    @Test
     fun toAppleMapsUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
             "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=3.4",
@@ -99,12 +120,14 @@ class PositionTest {
 <wpt lat="52.5067296" lon="13.2599309" />
 </gpx>
 """,
-            Position(
-                points = listOf(
-                    "50.123456" to "-11.123456",
-                    "52.5067296" to "13.2599309",
-                )
-            ).toGpx(uriQuote)
+            StringBuilder().apply {
+                Position(
+                    points = listOf(
+                        "50.123456" to "-11.123456",
+                        "52.5067296" to "13.2599309",
+                    ),
+                ).toGpx(this, uriQuote)
+            }.toString()
         )
     }
 
@@ -118,11 +141,13 @@ class PositionTest {
 <wpt lat="%22" lon="%3C" />
 </gpx>
 """,
-            Position(
-                points = listOf(
-                    "\"" to "<",
-                )
-            ).toGpx(uriQuote)
+            StringBuilder().apply {
+                Position(
+                    points = listOf(
+                        "\"" to "<",
+                    ),
+                ).toGpx(this, uriQuote)
+            }.toString()
         )
     }
 
@@ -135,7 +160,12 @@ class PositionTest {
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
 </gpx>
 """,
-            Position("52.5067296", "13.2599309").toGpx(uriQuote)
+            StringBuilder().apply {
+                Position(
+                    lat = "52.5067296",
+                    lon = "13.2599309",
+                ).toGpx(this, uriQuote)
+            }.toString()
         )
     }
 }

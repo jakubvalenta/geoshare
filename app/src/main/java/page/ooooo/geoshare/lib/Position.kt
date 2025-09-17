@@ -9,10 +9,11 @@ data class Position(
 ) {
     fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
 
-    fun toParamsString(): String = listOfNotNull(
-        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" },
-        z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
-    ).joinToString(" \u2022 ")
+    fun toParamsString(): String = mutableListOf<String>().apply {
+        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" }?.let { add(q) }
+        z?.takeIf { it.isNotEmpty() }?.let { add("z$it") }
+        points?.forEach { (lat, lon) -> add(Position(lat, lon).toCoordsDecString()) }
+    }.joinToString(" \u2022 ")
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
         val coords = "${lat ?: 0},${lon ?: 0}"
@@ -78,7 +79,7 @@ data class Position(
         coordToDeg(lon, "W", "E"),
     ).joinToString(", ")
 
-    fun toGpx(uriQuote: UriQuote = DefaultUriQuote()): String = StringBuilder().apply {
+    fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
         append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
         append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
@@ -87,7 +88,7 @@ data class Position(
             append("<wpt lat=\"${uriQuote.encode(lat)}\" lon=\"${uriQuote.encode(lon)}\" />\n")
         }
         append("</gpx>\n")
-    }.toString()
+    }
 
     private fun coordToDeg(s: String?, directionNegative: String, directionPositive: String): String {
         var abs: String

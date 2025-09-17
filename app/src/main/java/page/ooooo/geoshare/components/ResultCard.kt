@@ -34,6 +34,7 @@ fun ResultCard(
     geoUriApps: List<ConversionViewModel.App>,
     position: Position,
     onCopy: (String) -> Unit,
+    onSave: () -> Unit,
     onShare: (String) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -143,9 +144,9 @@ fun ResultCard(
                     shape = MaterialTheme.shapes.medium,
                 )
                 SuggestionChip(
-                    onClick = { onCopy(position.toGpx()) },
+                    onClick = { onSave() },
                     label = {
-                        Text(stringResource(R.string.conversion_succeeded_copy_gpx))
+                        Text(stringResource(R.string.conversion_succeeded_save_gpx))
                     },
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -227,6 +228,7 @@ private fun DefaultPreview() {
                 ),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onSave = {},
                 onShare = {},
             )
         }
@@ -249,6 +251,7 @@ private fun DarkPreview() {
                 ),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onSave = {},
                 onShare = {},
             )
         }
@@ -271,6 +274,7 @@ private fun ParamsPreview() {
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onSave = {},
                 onShare = {},
             )
         }
@@ -293,6 +297,69 @@ private fun DarkParamsPreview() {
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onSave = {},
+                onShare = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PointsPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            ResultCard(
+                geoUriApps = listOf(
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    ),
+                ),
+                position = Position(
+                    lat = "50.123456",
+                    lon = "11.123456",
+                    points = listOf(
+                        "59.1293656" to "11.4585672",
+                        "59.4154007" to "11.659710599999999",
+                        "59.147731699999994" to "11.550661199999999",
+                    ),
+                ),
+                onCopy = {},
+                onSave = {},
+                onShare = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPointsPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            ResultCard(
+                geoUriApps = listOf(
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                    ),
+                ),
+                position = Position(
+                    lat = "50.123456",
+                    lon = "11.123456",
+                    points = listOf(
+                        "59.1293656" to "11.4585672",
+                        "59.4154007" to "11.659710599999999",
+                        "59.147731699999994" to "11.550661199999999",
+                    ),
+                ),
+                onCopy = {},
+                onSave = {},
                 onShare = {},
             )
         }
@@ -308,6 +375,7 @@ private fun NoAppsPreview() {
                 geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onSave = {},
                 onShare = {},
             )
         }
@@ -323,6 +391,7 @@ private fun DarkNoAppsPreview() {
                 geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onSave = {},
                 onShare = {},
             )
         }
