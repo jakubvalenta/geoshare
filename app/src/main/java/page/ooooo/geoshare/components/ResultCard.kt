@@ -5,8 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
@@ -37,6 +35,7 @@ fun ResultCard(
     onSave: () -> Unit,
     onShare: (String) -> Unit,
 ) {
+    val columnCount = 4
     var menuExpanded by remember { mutableStateOf(false) }
 
     Column {
@@ -157,33 +156,38 @@ fun ResultCard(
             style = MaterialTheme.typography.bodyLarge,
         )
         if (geoUriApps.isNotEmpty()) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                modifier = Modifier.padding(horizontal = Spacing.tiny),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Spacing.tiny),
                 verticalArrangement = Arrangement.spacedBy(Spacing.medium),
             ) {
-                geoUriApps.map {
-                    item(it.packageName) {
-                        Column(
-                            Modifier
-                                .clickable { onShare(it.packageName) }
-                                .fillMaxWidth()
-                                .testTag("geoShareResultCardApp_${it.packageName}"),
-                            verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
-                            Image(
-                                rememberDrawablePainter(it.icon),
-                                it.label,
+                for (geoUriAppsChunk in geoUriApps.chunked(columnCount)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                        for (geoUriApp in geoUriAppsChunk) {
+                            Column(
                                 Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .widthIn(max = 46.dp),
-                            )
-                            Text(
-                                it.label,
-                                Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
+                                    .clickable { onShare(geoUriApp.packageName) }
+                                    .weight(1f)
+                                    .testTag("geoShareResultCardApp_${geoUriApp.packageName}"),
+                                verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                                Image(
+                                    rememberDrawablePainter(geoUriApp.icon),
+                                    geoUriApp.label,
+                                    Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .widthIn(max = 46.dp),
+                                )
+                                Text(
+                                    geoUriApp.label,
+                                    Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
+                        repeat(columnCount - geoUriAppsChunk.size) {
+                            Box(Modifier.weight(1f))
                         }
                     }
                 }
@@ -221,6 +225,52 @@ private fun DefaultPreview() {
         Surface {
             val context = LocalContext.current
             ResultCard(
+                geoUriApps = List(4) { index ->
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map ${index + 1}",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    )
+                },
+                position = Position("50.123456", "11.123456"),
+                onCopy = {},
+                onSave = {},
+                onShare = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            ResultCard(
+                geoUriApps = List(4) { index ->
+                    ConversionViewModel.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map ${index + 1}",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    )
+                },
+                position = Position("50.123456", "11.123456"),
+                onCopy = {},
+                onSave = {},
+                onShare = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OneAppPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            ResultCard(
                 geoUriApps = listOf(
                     ConversionViewModel.App(
                         BuildConfig.APPLICATION_ID,
@@ -239,7 +289,7 @@ private fun DefaultPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkPreview() {
+private fun DarkOneAppPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
@@ -248,7 +298,7 @@ private fun DarkPreview() {
                     ConversionViewModel.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
-                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
                 position = Position("50.123456", "11.123456"),
@@ -294,7 +344,7 @@ private fun DarkParamsPreview() {
                     ConversionViewModel.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
-                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
@@ -348,7 +398,7 @@ private fun DarkPointsPreview() {
                     ConversionViewModel.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
-                        icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!,
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
                 position = Position(

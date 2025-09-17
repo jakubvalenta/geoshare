@@ -282,6 +282,7 @@ Google Maps place list link:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg' page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://goo.gl/maps/HcikiDXFwN2coeFN8' page.ooooo.geoshare.debug
 ```
 
 Google Search link:

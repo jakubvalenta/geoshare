@@ -26,21 +26,23 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun AboutScreen(
     onNavigateToMainScreen: () -> Unit = {},
 ) {
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(stringResource(R.string.about_title)) },
-            navigationIcon = {
-                IconButton(onClick = onNavigateToMainScreen) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            },
-        )
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.about_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateToMainScreen) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.nav_back_content_description)
+                        )
+                    }
+                },
+            )
+        },
+    ) { innerPadding ->
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = Spacing.windowPadding)
