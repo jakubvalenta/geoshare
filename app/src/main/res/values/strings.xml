@@ -98,4 +98,5 @@
     <string name="conversion_failed_parse_html_connection_error">Connection error when fetching web page from the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
+    <string name="conversion_succeeded_point_number">point %1$d</string>
 </resources>

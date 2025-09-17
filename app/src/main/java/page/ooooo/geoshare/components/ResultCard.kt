@@ -78,6 +78,21 @@ fun ResultCard(
                                 )
                             }
                         }
+                        position.points?.mapIndexed { i, (lat, lon) ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                                Text(
+                                    stringResource(R.string.conversion_succeeded_point_number, i + 1),
+                                    fontStyle = FontStyle.Italic,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                                SelectionContainer {
+                                    Text(
+                                        Position(lat, lon).toCoordsDecString(),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 Box {
@@ -115,48 +130,18 @@ fun ResultCard(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
-                SuggestionChip(
-                    onClick = { onCopy(position.toGeoUriString()) },
-                    label = {
-                        Text(stringResource(R.string.conversion_succeeded_copy_geo))
-                    },
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-                    border = SuggestionChipDefaults.suggestionChipBorder(
-                        enabled = true,
-                        borderColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                )
-                SuggestionChip(
-                    onClick = { onCopy(position.toGoogleMapsUriString()) },
-                    label = {
-                        Text(stringResource(R.string.conversion_succeeded_copy_google_maps))
-                    },
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-                    border = SuggestionChipDefaults.suggestionChipBorder(
-                        enabled = true,
-                        borderColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                )
-                SuggestionChip(
-                    onClick = { onSave() },
-                    label = {
-                        Text(stringResource(R.string.conversion_succeeded_save_gpx))
-                    },
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-                    border = SuggestionChipDefaults.suggestionChipBorder(
-                        enabled = true,
-                        borderColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                )
+                ResultCardChip(stringResource(R.string.conversion_succeeded_copy_geo)) {
+                    onCopy(position.toGeoUriString())
+                }
+                ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
+                    onCopy(position.toGoogleMapsUriString())
+                }
+                ResultCardChip(
+                    stringResource(R.string.conversion_succeeded_save_gpx),
+                    Modifier.padding(end = Spacing.small),
+                ) {
+                    onSave()
+                }
             }
         }
 
@@ -210,6 +195,23 @@ fun ResultCard(
             )
         }
     }
+}
+
+@Composable
+private fun ResultCardChip(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    SuggestionChip(
+        onClick = onClick,
+        label = { Text(text) },
+        modifier = modifier,
+        colors = SuggestionChipDefaults.suggestionChipColors(
+            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+        border = SuggestionChipDefaults.suggestionChipBorder(
+            enabled = true,
+            borderColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
+        ),
+        shape = MaterialTheme.shapes.medium,
+    )
 }
 
 @Preview(showBackground = true)

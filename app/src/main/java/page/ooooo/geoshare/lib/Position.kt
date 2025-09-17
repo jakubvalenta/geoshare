@@ -9,11 +9,10 @@ data class Position(
 ) {
     fun toCoordsDecString(): String = "${lat ?: 0}, ${lon ?: 0}"
 
-    fun toParamsString(): String = mutableListOf<String>().apply {
-        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" }?.let { add(q) }
-        z?.takeIf { it.isNotEmpty() }?.let { add("z$it") }
-        points?.forEach { (lat, lon) -> add(Position(lat, lon).toCoordsDecString()) }
-    }.joinToString(" \u2022 ")
+    fun toParamsString(): String = listOfNotNull(
+        q?.takeIf { it.isNotEmpty() && q != "${lat ?: 0},${lon ?: 0}" },
+        z?.takeIf { it.isNotEmpty() }?.let { "z$it" },
+    ).joinToString(" \u2022 ")
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String {
         val coords = "${lat ?: 0},${lon ?: 0}"

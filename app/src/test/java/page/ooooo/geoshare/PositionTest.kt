@@ -9,12 +9,9 @@ class PositionTest {
     private val uriQuote = FakeUriQuote()
 
     @Test
-    fun toParamsString_returnsQueryAndZoomAndPoints() {
+    fun toParamsString_returnsQueryAndZoomButNotPoints() {
         assertEquals(
-            "foo bar \u2022 z3.4 \u2022 " +
-                    "59.1293656, 11.4585672 \u2022 " +
-                    "59.4154007, 11.659710599999999 \u2022 " +
-                    "59.147731699999994, 11.550661199999999",
+            "foo bar \u2022 z3.4",
             Position(
                 lat = "50.123456",
                 lon = "11.123456",
