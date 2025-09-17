@@ -30,7 +30,7 @@
     <string name="conversion_permission_common_deny">Отказ</string>
     <string name="main_input_uri_supporting_text">напр. https://maps.app.goo.gl/… or maps.apple.com/…</string>
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
-    <string name="main_info_box"><![CDATA[%1s поддържа много видове връзки към Google Карти, Apple Maps, HERE WeGo и Yandex Maps. Ако все още намерите връзка, която не работи, моля, <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">съобщи за проблем</a>.]]></string>
+    <string name="main_info_box"><![CDATA[%1s поддържа много видове връзки към Google Maps, Apple Maps, HERE WeGo, Magic Earth, OpenStreetMap, OsmAnd, Waze и Yandex Maps. Ако все още намерите връзка, която не работи, моля, <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">съобщете за проблем</a>.]]></string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати или име на място. %2$s трябва да се свърже с Google, за да получи информацията.]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>
@@ -89,5 +89,7 @@
     <string name="converter_yandex_maps_permission_title">Свържете се с Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Свързване с Yandex…</string>
     <string name="faq_supported_inputs_headline">Поддържани картографски услуги</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението:</p><p>Google Карти<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />координати (напр. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />координати (напр. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
+    <string name="converter_waze_permission_title">Свързване с Waze?</string>
+    <string name="converter_waze_loading_indicator_title">Свързване с Waze…</string>
 </resources>
