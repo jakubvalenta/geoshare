@@ -8,6 +8,7 @@
 - Magic Earth (бета-версія)
 - OpenStreetMap (бета-версія)
 - OsmAnd (бета-версія)
+- Waze (бета-версія)
 - Yandex Maps (бета-версія)
 - координати
 
