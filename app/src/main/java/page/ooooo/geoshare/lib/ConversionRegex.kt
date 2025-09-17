@@ -8,10 +8,19 @@ import kotlin.math.min
 abstract class ConversionRegex(regex: String) {
     protected val pattern: Pattern = Pattern.compile(regex)
     protected var matcher: Matcher? = null
+    protected var input: String? = null
 
-    open fun matches(input: String): Boolean = pattern.matcher(input).also { matcher = it }.matches()
+    open fun matches(input: String): Boolean {
+        this.input = input
+        matcher = pattern.matcher(input)
+        return matcher?.matches() == true
+    }
 
-    open fun find(input: String): Boolean = pattern.matcher(input).also { matcher = it }.find()
+    open fun find(input: String): Boolean {
+        this.input = input
+        matcher = pattern.matcher(input)
+        return matcher?.find() == true
+    }
 
     protected fun groupOrNull(): String? = try {
         matcher?.group()

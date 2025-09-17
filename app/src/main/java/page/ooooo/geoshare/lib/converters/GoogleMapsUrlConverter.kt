@@ -72,20 +72,17 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex("""/@$LAT,$LON"""))
         content(object : PositionRegex("""\[null,null,$LAT,$LON\]""") {
-            override val lat = null
-            override val lon = null
-            override val points: List<Pair<String, String>>?
-                get() = matcher?.let { matcher ->
-                    matcher.reset()
-                    val newPoints = mutableListOf<Pair<String, String>>()
-                    while (matcher.find()) {
-                        val lat = groupOrNull("lat")
-                        val lon = groupOrNull("lon")
-                        if (lat != null && lon != null) {
-                            newPoints.add(lat to lon)
+            override val points: List<Pair<String, String>>
+                get() = pattern.matcher(input).let { pointsMatcher ->
+                    mutableListOf<Pair<String, String>>().apply {
+                        while (pointsMatcher.find()) {
+                            try {
+                                add(pointsMatcher.group("lat") to pointsMatcher.group("lon"))
+                            } catch (_: IllegalArgumentException) {
+                                // Do nothing
+                            }
                         }
                     }
-                    newPoints
                 }
         })
     }
