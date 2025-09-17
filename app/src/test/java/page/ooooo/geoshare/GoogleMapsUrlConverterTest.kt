@@ -425,13 +425,25 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseHtml_link() {
         val html = this.javaClass.classLoader!!.getResource("TmbeHMiLEfTBws9EA.html")!!.readText()
-        assertEquals(Position("44.4490541", "26.0888398"), parseHtml(html))
+        assertEquals(
+            Position("44.4490541", "26.0888398"),
+            parseHtml(html),
+        )
     }
 
     @Test
     fun parseHtml_array() {
         val html = this.javaClass.classLoader!!.getResource("mfmnkPs6RuGyp0HOmXLSKg.html")!!.readText()
-        assertEquals(Position("59.1293656", "11.4585672"), parseHtml(html))
+        assertEquals(
+            Position(
+                points = listOf(
+                    "59.1293656" to "11.4585672",
+                    "59.4154007" to "11.659710599999999",
+                    "59.147731699999994" to "11.550661199999999"
+                )
+            ),
+            parseHtml(html),
+        )
     }
 
     @Test

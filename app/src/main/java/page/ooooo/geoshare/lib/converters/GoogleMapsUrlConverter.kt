@@ -71,7 +71,23 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
 
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex("""/@$LAT,$LON"""))
-        content(PositionRegex("""\[null,null,$LAT,$LON\]"""))
+        content(object : PositionRegex("""\[null,null,$LAT,$LON\]""") {
+            override val lat = null
+            override val lon = null
+            override val points: List<Pair<String, String>>?
+                get() = matcher?.let { matcher ->
+                    matcher.reset()
+                    val newPoints = mutableListOf<Pair<String, String>>()
+                    while (matcher.find()) {
+                        val lat = groupOrNull("lat")
+                        val lon = groupOrNull("lon")
+                        if (lat != null && lon != null) {
+                            newPoints.add(lat to lon)
+                        }
+                    }
+                    newPoints
+                }
+        })
     }
 
     override val conversionHtmlRedirectPattern = htmlPattern {
