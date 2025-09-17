@@ -62,6 +62,10 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
                 path(PositionRegex("""/maps/dir/.*/@$LAT,$LON,${Z}z.*"""))
                 path(PositionRegex("""/maps/dir/.*/$Q_PATH"""))
                 path(PositionRegex("""/maps/dir/"""))
+                all {
+                    path(PositionRegex("""/maps/d/(edit|viewer)"""))
+                    query("mid", PositionRegex(".+"))
+                }
                 path(PositionRegex("""/maps/?"""))
                 path(PositionRegex("""/search/?"""))
                 path(PositionRegex("""/?"""))
@@ -71,7 +75,7 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
 
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex("""/@$LAT,$LON"""))
-        content(object : PositionRegex("""\[null,null,$LAT,$LON\]""") {
+        content(object : PositionRegex("""\[(null,null,|null,\[)$LAT,$LON\]""") {
             override val points: List<Pair<String, String>>
                 get() = pattern.matcher(input).let { pointsMatcher ->
                     mutableListOf<Pair<String, String>>().apply {
