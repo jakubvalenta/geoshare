@@ -1,4 +1,5 @@
 - Added Waze support.
 - Added support for Google Maps place lists, direction points and My Maps.
 - Added options to save resulting position as GPX and to copy it as Google Maps or Apple Maps links.
+- Added Try again, Report issue and Supported map services buttons to error screen.
 - Improved resulting geo: URI by not rounding the zoom value.
