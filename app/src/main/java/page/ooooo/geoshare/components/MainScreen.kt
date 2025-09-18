@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
+import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
@@ -25,7 +26,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun MainScreen(
     onNavigateToAboutScreen: () -> Unit = {},
     onNavigateToConversionScreen: () -> Unit = {},
-    onNavigateToFaqScreen: () -> Unit = {},
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit = {},
     onNavigateToIntroScreen: () -> Unit = {},
     onNavigateToUserPreferencesScreen: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
@@ -50,7 +51,7 @@ fun MainScreen(
     onStart: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
 ) {
@@ -88,7 +89,7 @@ fun MainScreen(
                                 text = { Text(stringResource(R.string.faq_title)) },
                                 onClick = {
                                     menuExpanded = false
-                                    onNavigateToFaqScreen()
+                                    onNavigateToFaqScreen(null)
                                 },
                             )
                             DropdownMenuItem(

@@ -10,15 +10,23 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "conversion") {
-        composable("faq") {
+        composable("faq/{itemId}") { backStackEntry ->
+            val initialExpandedItemId = backStackEntry.arguments?.getString("itemId")?.let {
+                try {
+                    FaqItemId.valueOf(it)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            }
             FaqScreen(
-                onNavigateToMainScreen = onFinish,
+                initialExpandedItemId = initialExpandedItemId,
+                onBack = { navController.navigate("conversion") },
             )
         }
         composable("conversion") {
             ConversionScreen(
                 onBack = onFinish,
-                onNavigateToFaqScreen = { navController.navigate("faq") },
+                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onFinish = onFinish,
                 viewModel = viewModel,
             )

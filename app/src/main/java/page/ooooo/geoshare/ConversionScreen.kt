@@ -39,7 +39,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @Composable
 fun ConversionScreen(
     onBack: () -> Unit,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onFinish: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
@@ -95,7 +95,7 @@ fun ConversionScreen(
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: (Context) -> List<ConversionViewModel.App>,
     onBack: () -> Unit,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onGrant: (Boolean) -> Unit,
     onDeny: (Boolean) -> Unit,
     onCopy: (String) -> Unit,

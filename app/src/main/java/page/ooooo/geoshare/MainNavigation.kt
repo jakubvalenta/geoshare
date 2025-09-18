@@ -28,9 +28,17 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToMainScreen = { navController.navigate("main") },
             )
         }
-        composable("faq") {
+        composable("faq/{itemId}") { backStackEntry ->
+            val initialExpandedItemId = backStackEntry.arguments?.getString("itemId")?.let {
+                try {
+                    FaqItemId.valueOf(it)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            }
             FaqScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
+                initialExpandedItemId = initialExpandedItemId,
+                onBack = { navController.navigate("main") },
             )
         }
         composable("intro") {
@@ -45,7 +53,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
             MainScreen(
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToConversionScreen = { navController.navigate("conversion") },
-                onNavigateToFaqScreen = { navController.navigate("faq") },
+                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
@@ -54,7 +62,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("conversion") {
             ConversionScreen(
                 onBack = { navController.navigate("main") },
-                onNavigateToFaqScreen = { navController.navigate("faq") },
+                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 viewModel = viewModel,
             )
         }

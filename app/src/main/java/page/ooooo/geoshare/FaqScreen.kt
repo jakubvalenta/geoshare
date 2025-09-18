@@ -21,18 +21,25 @@ import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
+enum class FaqItemId {
+    SUPPORTED,
+    HOW_IT_WORKS,
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun FaqScreen(
-    initialExpanded: Boolean = false,
-    onNavigateToMainScreen: () -> Unit = {},
+    initialExpandedItemId: FaqItemId? = null,
+    onBack: () -> Unit = {},
 ) {
+    var expandedItemId by remember { mutableStateOf(initialExpandedItemId) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.faq_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateToMainScreen) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description)
@@ -53,16 +60,20 @@ fun FaqScreen(
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             FaqItem(
+                itemId = FaqItemId.SUPPORTED,
+                expandedItemId = expandedItemId,
+                onSetExpandedItemId = { expandedItemId = it },
                 headline = stringResource(R.string.faq_supported_inputs_headline),
-                initialExpanded,
             ) {
                 ParagraphHtml(
                     stringResource(R.string.faq_supported_inputs_text, appName)
                 )
             }
             FaqItem(
+                itemId = FaqItemId.HOW_IT_WORKS,
+                expandedItemId = expandedItemId,
+                onSetExpandedItemId = { expandedItemId = it },
                 stringResource(R.string.faq_how_it_works_headline),
-                initialExpanded,
             ) {
                 ParagraphHtml(
                     stringResource(R.string.faq_how_it_works_text, appName)
@@ -74,11 +85,13 @@ fun FaqScreen(
 
 @Composable
 fun FaqItem(
+    itemId: FaqItemId,
+    expandedItemId: FaqItemId?,
+    onSetExpandedItemId: (FaqItemId?) -> Unit,
     headline: String,
-    initialExpanded: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(initialExpanded) }
+    val expanded = itemId == expandedItemId
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
         Row(
             Modifier
@@ -86,7 +99,7 @@ fun FaqItem(
                 .padding(top = Spacing.tiny)
                 .clickable(
                     onClickLabel = stringResource(if (expanded) R.string.faq_item_collapse else R.string.faq_item_expand),
-                    onClick = { expanded = !expanded },
+                    onClick = { onSetExpandedItemId(if (expanded) null else itemId) },
                 ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -116,7 +129,7 @@ fun FaqItem(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        FaqScreen(initialExpanded = true)
+        FaqScreen()
     }
 }
 
@@ -124,6 +137,38 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        FaqScreen(initialExpanded = true)
+        FaqScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SupportedDefaultPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.SUPPORTED)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkSupportedPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.SUPPORTED)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HowItWorksPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkHowItWorksPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
     }
 }

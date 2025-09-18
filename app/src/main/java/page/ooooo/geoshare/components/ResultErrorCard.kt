@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
@@ -24,7 +25,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun ResultErrorCard(
     @StringRes errorMessageResId: Int,
     inputUriString: String,
-    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -44,7 +45,7 @@ fun ResultErrorCard(
                 modifier = Modifier.padding(end = Spacing.small),
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
             ) {
-                onNavigateToFaqScreen()
+                onNavigateToFaqScreen(FaqItemId.SUPPORTED)
             }
         },
     ) {
