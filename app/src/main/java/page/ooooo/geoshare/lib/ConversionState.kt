@@ -25,6 +25,7 @@ interface HasResult {
 
 interface HasError {
     val errorMessageResId: Int
+    val inputUriString: String
 }
 
 class Initial : ConversionState()
@@ -35,7 +36,7 @@ data class ReceivedIntent(
 ) : ConversionState() {
     override suspend fun transition(): State {
         val inputUriString = stateContext.intentTools.getIntentUriString(intent)
-            ?: return ConversionFailed(R.string.conversion_failed_missing_url)
+            ?: return ConversionFailed(R.string.conversion_failed_missing_url, "")
         return ReceivedUriString(stateContext, inputUriString)
     }
 }
@@ -52,7 +53,7 @@ data class ReceivedUriString(
                 return ReceivedUri(stateContext, inputUriString, urlConverter, uri, null)
             }
         }
-        return ConversionFailed(R.string.conversion_failed_unsupported_service)
+        return ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString)
     }
 }
 
@@ -119,19 +120,19 @@ data class GrantedUnshortenPermission(
         val locationHeader = try {
             stateContext.networkTools.requestLocationHeader(uri.toUrl())
         } catch (_: CancellationException) {
-            return ConversionFailed(R.string.conversion_failed_cancelled)
+            return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
         } catch (_: MalformedURLException) {
-            return ConversionFailed(R.string.conversion_failed_unshorten_error)
+            return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
-            return ConversionFailed(R.string.conversion_failed_unshorten_connection_error)
+            return ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString)
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(R.string.conversion_failed_unshorten_error)
+            return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         if (locationHeader == null) {
             stateContext.log.w(null, "Missing location URL")
-            return ConversionFailed(R.string.conversion_failed_unshorten_error)
+            return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
         stateContext.log.i(null, "Resolved short URL $uri to $unshortenedUri")
@@ -144,7 +145,8 @@ data class DeniedConnectionPermission(
     val inputUriString: String,
     val urlConverter: UrlConverter,
 ) : ConversionState() {
-    override suspend fun transition(): State = ConversionFailed(R.string.conversion_failed_connection_permission_denied)
+    override suspend fun transition(): State =
+        ConversionFailed(R.string.conversion_failed_connection_permission_denied, inputUriString)
 }
 
 data class UnshortenedUrl(
@@ -159,7 +161,7 @@ data class UnshortenedUrl(
             val conversionMatchers = urlConverter.conversionUriPattern.matches(uri)
             if (conversionMatchers == null) {
                 stateContext.log.i(null, "URL could not be converted $uri")
-                return ConversionFailed(R.string.conversion_failed_parse_url_error)
+                return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
             }
             val position = conversionMatchers.toPosition()
             if (position.points?.isNotEmpty() == true) {
@@ -199,7 +201,7 @@ data class UnshortenedUrl(
             }
         }
         stateContext.log.i(null, "URL converter supports neither URI nor HTML pattern $uri")
-        return ConversionFailed(R.string.conversion_failed_parse_url_error)
+        return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
     }
 }
 
@@ -238,15 +240,15 @@ data class GrantedParseHtmlPermission(
         val html = try {
             stateContext.networkTools.getText(uri.toUrl())
         } catch (_: CancellationException) {
-            return ConversionFailed(R.string.conversion_failed_cancelled)
+            return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
         } catch (_: MalformedURLException) {
-            return ConversionFailed(R.string.conversion_failed_parse_html_error)
+            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_connection_error)
+            return ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_error)
+            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
             stateContext.log.i(null, "HTML parsed $position")
@@ -258,7 +260,7 @@ data class GrantedParseHtmlPermission(
             return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
         }
         stateContext.log.w(null, "HTML could not be parsed")
-        return ConversionFailed(R.string.conversion_failed_parse_html_error)
+        return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
     }
 }
 
@@ -299,15 +301,15 @@ data class GrantedParseHtmlToGetCoordsPermission(
         val html = try {
             stateContext.networkTools.getText(uri.toUrl())
         } catch (_: CancellationException) {
-            return ConversionFailed(R.string.conversion_failed_cancelled)
+            return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
         } catch (_: MalformedURLException) {
-            return ConversionFailed(R.string.conversion_failed_parse_html_error)
+            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         } catch (_: IOException) {
             // Catches SocketTimeoutException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_connection_error)
+            return ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
         } catch (_: Exception) {
             // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_error)
+            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
             stateContext.log.i(null, "HTML parsed $position")
@@ -337,4 +339,5 @@ data class ConversionSucceeded(
 
 data class ConversionFailed(
     @param:StringRes override val errorMessageResId: Int,
+    override val inputUriString: String,
 ) : ConversionState(), HasError

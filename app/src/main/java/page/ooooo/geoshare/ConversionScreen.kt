@@ -54,7 +54,6 @@ fun ConversionScreen(
 
     ConversionScreen(
         currentState = currentState,
-        inputUriString = viewModel.inputUriString,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
         queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
@@ -91,7 +90,6 @@ fun ConversionScreen(
 @Composable
 fun ConversionScreen(
     currentState: State,
-    inputUriString: String,
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: (Context) -> List<ConversionViewModel.App>,
     onBack: () -> Unit,
@@ -256,7 +254,7 @@ fun ConversionScreen(
             currentState is HasError -> {
                 ResultErrorCard(
                     currentState.errorMessageResId,
-                    inputUriString,
+                    currentState.inputUriString,
                     onNavigateToFaqScreen,
                 )
             }
@@ -283,7 +281,6 @@ private fun DefaultPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
             ),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -309,7 +306,6 @@ private fun DarkPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
             ),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -342,7 +338,6 @@ private fun PermissionPreview() {
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -375,7 +370,6 @@ private fun DarkPermissionPreview() {
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -399,8 +393,8 @@ private fun ErrorPreview() {
         ConversionScreen(
             currentState = ConversionFailed(
                 R.string.conversion_failed_parse_url_error,
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -424,8 +418,8 @@ private fun DarkErrorPreview() {
         ConversionScreen(
             currentState = ConversionFailed(
                 R.string.conversion_failed_parse_url_error,
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -448,7 +442,6 @@ private fun LoadingIndicatorPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -471,7 +464,6 @@ private fun DarkLoadingIndicatorPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -494,7 +486,6 @@ private fun InitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
@@ -517,7 +508,6 @@ private fun DarkInitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
-            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
