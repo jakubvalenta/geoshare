@@ -255,7 +255,7 @@ data class GrantedParseHtmlPermission(
             return@transition ConversionSucceeded(inputUriString, position)
         }
         urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUrlString ->
-            stateContext.log.w(null, "HTML contains a redirect to $redirectUrlString")
+            stateContext.log.i(null, "HTML contains a redirect to $redirectUrlString")
             val redirectUri = Uri.parse(redirectUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
             return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
         }
@@ -316,7 +316,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
             return@transition ConversionSucceeded(inputUriString, position)
         }
         urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUrlString ->
-            stateContext.log.w(null, "HTML contains a redirect to $redirectUrlString")
+            stateContext.log.i(null, "HTML contains a redirect to $redirectUrlString")
             val redirectUri = Uri.parse(redirectUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
             return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
         }

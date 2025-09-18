@@ -1,12 +1,14 @@
 package page.ooooo.geoshare
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -147,34 +149,47 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun queryGeoUriApps(packageManager: PackageManager): List<App> = packageManager.queryIntentActivities(
-        Intent(Intent.ACTION_VIEW, "geo:0,0".toUri()),
-        PackageManager.MATCH_ALL,
-    ).map {
-        App(
-            it.activityInfo.packageName,
-            it.activityInfo.loadLabel(packageManager).toString(),
-            it.activityInfo.loadIcon(packageManager),
-        )
-    }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
-
-    fun share(context: Context, packageName: String) {
-        assert(stateContext.currentState is HasResult)
-        (stateContext.currentState as HasResult).let { currentState ->
-            context.startActivity(
-                stateContext.intentTools.createViewIntent(
-                    packageName, currentState.position.toGeoUriString().toUri()
-                )
+    fun queryGeoUriApps(packageManager: PackageManager): List<App> {
+        val resolveInfos = try {
+            packageManager.queryIntentActivities(
+                Intent(Intent.ACTION_VIEW, "geo:".toUri()),
+                PackageManager.MATCH_DEFAULT_ONLY,
             )
+        } catch (e: Exception) {
+            Log.e(null, "Error when querying apps that support geo: URIs", e)
+            return emptyList()
+        }
+        return resolveInfos.mapNotNull {
+            try {
+                App(
+                    it.activityInfo.packageName,
+                    it.activityInfo.loadLabel(packageManager).toString(),
+                    it.activityInfo.loadIcon(packageManager),
+                )
+            } catch (e: Exception) {
+                Log.e(null, "Error when loading info about an app that supports geo: URIs", e)
+                null
+            }
+        }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
+    }
+
+    fun openApp(context: Context, packageName: String, uriString: String) {
+        try {
+            context.startActivity(
+                stateContext.intentTools.createViewIntent(packageName, uriString.toUri())
+            )
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun skip(context: Context) {
-        assert(stateContext.currentState is HasResult)
-        (stateContext.currentState as HasResult).let { currentState ->
+    fun openChooser(context: Context, uriString: String) {
+        try {
             context.startActivity(
-                stateContext.intentTools.createChooserIntent(currentState.inputUriString.toUri())
+                stateContext.intentTools.createChooserIntent(uriString.toUri())
             )
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -189,8 +204,8 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun launchSave(context: Context, launcher: ActivityResultLauncher<Intent>) {
-        @Suppress("SpellCheckingInspection")
-        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
+        @Suppress("SpellCheckingInspection") val timestamp =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
         val filename = context.resources.getString(
             R.string.conversion_succeeded_save_gpx_filename,
             context.resources.getString(R.string.app_name),
