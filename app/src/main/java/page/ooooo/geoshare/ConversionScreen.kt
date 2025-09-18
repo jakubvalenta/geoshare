@@ -69,12 +69,12 @@ fun ConversionScreen(
         onSave = {
             viewModel.launchSave(context, saveLauncher)
         },
-        onShare = { packageName ->
-            viewModel.share(context, packageName)
+        onOpenApp = { packageName, uriString ->
+            viewModel.openApp(context, packageName, uriString)
             onFinish()
         },
-        onSkip = {
-            viewModel.skip(context)
+        onOpenChooser = { uriString ->
+            viewModel.openChooser(context, uriString)
             onFinish()
         },
         onRetry = { newUriString ->
@@ -93,16 +93,16 @@ fun ConversionScreen(
 fun ConversionScreen(
     currentState: State,
     @StringRes loadingIndicatorTitleResId: Int?,
-    queryGeoUriApps: (Context) -> List<ConversionViewModel.App>,
+    queryGeoUriApps: (context: Context) -> List<ConversionViewModel.App>,
     onBack: () -> Unit,
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
-    onGrant: (Boolean) -> Unit,
-    onDeny: (Boolean) -> Unit,
-    onCopy: (String) -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
+    onGrant: (doNotAsk: Boolean) -> Unit,
+    onDeny: (doNotAsk: Boolean) -> Unit,
+    onOpenApp: (packageName: String, uriString: String) -> Unit,
+    onOpenChooser: (uriString: String) -> Unit,
+    onCopy: (text: String) -> Unit,
     onSave: () -> Unit,
-    onShare: (String) -> Unit,
-    onSkip: () -> Unit,
-    onRetry: (String) -> Unit,
+    onRetry: (newUriString: String) -> Unit,
     onCancel: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
@@ -161,7 +161,7 @@ fun ConversionScreen(
 
             currentState is HasResult -> {
                 {
-                    TextButton({ onSkip() }) {
+                    TextButton({ onOpenChooser(currentState.inputUriString) }) {
                         Text(stringResource(R.string.conversion_succeeded_skip))
                     }
                 }
@@ -172,7 +172,7 @@ fun ConversionScreen(
         endButton = when (currentState) {
             is HasError, is HasResult -> {
                 {
-                    Button(onBack, Modifier.testTag("geoShareConversionDoneButton")) {
+                    OutlinedButton(onBack, Modifier.testTag("geoShareConversionDoneButton")) {
                         Text(stringResource(R.string.conversion_done))
                     }
                 }
@@ -284,9 +284,12 @@ fun ConversionScreen(
                 ResultSuccessCard(
                     queryGeoUriApps(context),
                     currentState.position,
-                    onCopy,
-                    onSave,
-                    onShare,
+                    onCopy = onCopy,
+                    onOpenApp = { packageName ->
+                        onOpenApp(packageName, currentState.position.toGeoUriString())
+                    },
+                    onOpenChooser = { onOpenChooser(currentState.inputUriString) },
+                    onSave = onSave,
                 )
             }
         }
@@ -308,10 +311,10 @@ private fun DefaultPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -333,10 +336,10 @@ private fun DarkPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -365,10 +368,10 @@ private fun PermissionPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -397,10 +400,10 @@ private fun DarkPermissionPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -422,10 +425,10 @@ private fun ErrorPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -447,10 +450,10 @@ private fun DarkErrorPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -469,10 +472,10 @@ private fun LoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -491,10 +494,10 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -513,10 +516,10 @@ private fun InitialPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )
@@ -535,10 +538,10 @@ private fun DarkInitialPreview() {
             onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onCopy = {},
             onSave = {},
-            onShare = {},
-            onSkip = {},
             onRetry = {},
             onCancel = {},
         )

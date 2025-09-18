@@ -30,8 +30,9 @@ fun ResultSuccessCard(
     geoUriApps: List<ConversionViewModel.App>,
     position: Position,
     onCopy: (String) -> Unit,
+    onOpenApp: (String) -> Unit,
+    onOpenChooser: () -> Unit,
     onSave: () -> Unit,
-    onShare: (String) -> Unit,
 ) {
     val columnCount = 4
     var menuExpanded by remember { mutableStateOf(false) }
@@ -127,48 +128,44 @@ fun ResultSuccessCard(
                 ),
             style = MaterialTheme.typography.bodyLarge,
         )
-        if (geoUriApps.isNotEmpty()) {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Spacing.tiny),
-                verticalArrangement = Arrangement.spacedBy(Spacing.medium),
-            ) {
-                for (geoUriAppsChunk in geoUriApps.chunked(columnCount)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                        for (geoUriApp in geoUriAppsChunk) {
-                            Column(
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.tiny),
+            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        ) {
+            for (geoUriAppsChunk in geoUriApps.chunked(columnCount)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+                    for (geoUriApp in geoUriAppsChunk) {
+                        Column(
+                            Modifier
+                                .clickable { onOpenApp(geoUriApp.packageName) }
+                                .weight(1f)
+                                .testTag("geoShareResultCardApp_${geoUriApp.packageName}"),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                            Image(
+                                rememberDrawablePainter(geoUriApp.icon),
+                                geoUriApp.label,
                                 Modifier
-                                    .clickable { onShare(geoUriApp.packageName) }
-                                    .weight(1f)
-                                    .testTag("geoShareResultCardApp_${geoUriApp.packageName}"),
-                                verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
-                                Image(
-                                    rememberDrawablePainter(geoUriApp.icon),
-                                    geoUriApp.label,
-                                    Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .widthIn(max = 46.dp),
-                                )
-                                Text(
-                                    geoUriApp.label,
-                                    Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+                                    .align(Alignment.CenterHorizontally)
+                                    .widthIn(max = 46.dp),
+                            )
+                            Text(
+                                geoUriApp.label,
+                                Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
                         }
-                        repeat(columnCount - geoUriAppsChunk.size) {
-                            Box(Modifier.weight(1f))
-                        }
+                    }
+                    repeat(columnCount - geoUriAppsChunk.size) {
+                        Box(Modifier.weight(1f))
                     }
                 }
             }
-        } else {
-            InfoCard(
-                stringResource(R.string.conversion_succeeded_apps_not_found),
-                Modifier.padding(horizontal = Spacing.small),
-            )
+            Button({ onOpenChooser() }, Modifier.padding(horizontal = Spacing.tiny)) {
+                Text(stringResource(R.string.conversion_succeeded_share))
+            }
         }
     }
 }
@@ -191,8 +188,9 @@ private fun DefaultPreview() {
                 },
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -214,8 +212,9 @@ private fun DarkPreview() {
                 },
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -237,8 +236,9 @@ private fun OneAppPreview() {
                 ),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -260,8 +260,9 @@ private fun DarkOneAppPreview() {
                 ),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -283,8 +284,9 @@ private fun ParamsPreview() {
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -306,8 +308,9 @@ private fun DarkParamsPreview() {
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -335,8 +338,9 @@ private fun PointsPreview() {
                     ),
                 ),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -364,8 +368,9 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -380,8 +385,9 @@ private fun NoAppsPreview() {
                 geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
@@ -396,8 +402,9 @@ private fun DarkNoAppsPreview() {
                 geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenApp = {},
+                onOpenChooser = {},
                 onSave = {},
-                onShare = {},
             )
         }
     }
