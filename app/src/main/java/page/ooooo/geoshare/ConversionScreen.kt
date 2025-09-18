@@ -108,7 +108,7 @@ fun ConversionScreen(
     val appName = stringResource(R.string.app_name)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    var retryLoadingIndicatorVisible by mutableStateOf(false)
+    var retryLoadingIndicatorVisible by remember { mutableStateOf(false) }
 
     ConfirmationScaffold(
         title = when {
