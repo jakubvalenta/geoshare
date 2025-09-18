@@ -9,19 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun InfoCard(text: String, modifier: Modifier = Modifier) {
-    InfoCard(modifier) {
-        Text(text, style = MaterialTheme.typography.bodySmall)
-    }
-}
-
-@Composable
-fun InfoCard(text: AnnotatedString, modifier: Modifier = Modifier) {
     InfoCard(modifier) {
         Text(text, style = MaterialTheme.typography.bodySmall)
     }
