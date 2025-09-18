@@ -30,7 +30,7 @@
     <string name="conversion_permission_common_deny">Отказ</string>
     <string name="main_input_uri_supporting_text">напр. https://maps.app.goo.gl/… or maps.apple.com/…</string>
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
-    <string name="main_info_box"><![CDATA[%1s поддържа много видове връзки към Google Maps, Apple Maps, HERE WeGo, Magic Earth, OpenStreetMap, OsmAnd, Waze и Yandex Maps. Ако все още намерите връзка, която не работи, моля, <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">съобщете за проблем</a>.]]></string>
+    <string name="conversion_error_report">съобщете за проблем</string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати или име на място. %2$s трябва да се свърже с Google, за да получи информацията.]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>

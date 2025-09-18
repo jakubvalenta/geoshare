@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -27,18 +26,22 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ConfirmationScaffold
 import page.ooooo.geoshare.components.PermissionDialog
-import page.ooooo.geoshare.components.ResultCard
 import page.ooooo.geoshare.components.ResultErrorCard
+import page.ooooo.geoshare.components.ResultSuccessCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
 fun ConversionScreen(
     onBack: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onFinish: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
@@ -52,10 +55,11 @@ fun ConversionScreen(
     }
 
     ConversionScreen(
-        currentState,
-        loadingIndicatorTitleResId,
+        currentState = currentState,
+        loadingIndicatorTitleResId = loadingIndicatorTitleResId,
         queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
+        onNavigateToFaqScreen = onNavigateToFaqScreen,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onCopy = { text ->
@@ -73,6 +77,10 @@ fun ConversionScreen(
             viewModel.skip(context)
             onFinish()
         },
+        onRetry = { newUriString ->
+            viewModel.updateInput(newUriString)
+            viewModel.start()
+        },
         onCancel = {
             viewModel.cancel()
             onFinish()
@@ -87,16 +95,20 @@ fun ConversionScreen(
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: (Context) -> List<ConversionViewModel.App>,
     onBack: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onGrant: (Boolean) -> Unit,
     onDeny: (Boolean) -> Unit,
     onCopy: (String) -> Unit,
     onSave: () -> Unit,
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
+    onRetry: (String) -> Unit,
     onCancel: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var retryLoadingIndicatorVisible by remember { mutableStateOf(false) }
 
     ConfirmationScaffold(
         title = when {
@@ -127,6 +139,22 @@ fun ConversionScreen(
                 {
                     OutlinedButton(onCancel) {
                         Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                    }
+                }
+            }
+
+            currentState is HasError -> {
+                {
+                    TextButton({
+                        coroutineScope.launch {
+                            // Show a loading indicator for a while to indicate that conversion is being retried.
+                            retryLoadingIndicatorVisible = true
+                            delay(1000)
+                            retryLoadingIndicatorVisible = false
+                            onRetry(currentState.inputUriString)
+                        }
+                    }) {
+                        Text(stringResource(R.string.conversion_error_retry))
                     }
                 }
             }
@@ -236,11 +264,24 @@ fun ConversionScreen(
             }
 
             currentState is HasError -> {
-                ResultErrorCard(currentState.errorMessageResId)
+                if (!retryLoadingIndicatorVisible) {
+                    ResultErrorCard(
+                        currentState.errorMessageResId,
+                        currentState.inputUriString,
+                        onNavigateToFaqScreen,
+                    )
+                } else {
+                    LoadingIndicator(
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .size(64.dp),
+                        color = MaterialTheme.colorScheme.errorContainer,
+                    )
+                }
             }
 
             currentState is HasResult -> {
-                ResultCard(
+                ResultSuccessCard(
                     queryGeoUriApps(context),
                     currentState.position,
                     onCopy,
@@ -264,12 +305,14 @@ private fun DefaultPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -287,12 +330,14 @@ private fun DarkPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -317,12 +362,14 @@ private fun PermissionPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -347,12 +394,14 @@ private fun DarkPermissionPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -365,16 +414,19 @@ private fun ErrorPreview() {
         ConversionScreen(
             currentState = ConversionFailed(
                 R.string.conversion_failed_parse_url_error,
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -387,16 +439,19 @@ private fun DarkErrorPreview() {
         ConversionScreen(
             currentState = ConversionFailed(
                 R.string.conversion_failed_parse_url_error,
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -411,12 +466,14 @@ private fun LoadingIndicatorPreview() {
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -431,12 +488,14 @@ private fun DarkLoadingIndicatorPreview() {
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -451,12 +510,14 @@ private fun InitialPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }
@@ -471,12 +532,14 @@ private fun DarkInitialPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToFaqScreen = {},
             onGrant = {},
             onDeny = {},
             onCopy = {},
             onSave = {},
             onShare = {},
             onSkip = {},
+            onRetry = {},
             onCancel = {},
         )
     }

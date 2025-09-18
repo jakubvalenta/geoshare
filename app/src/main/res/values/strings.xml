@@ -50,7 +50,6 @@
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
-    <string name="main_info_box"><![CDATA[%1s supports many types of Google Maps, Apple Maps, HERE WeGo, Magic Earth, OpenStreetMap, OsmAnd, Waze and Yandex Maps links. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">report an issue</a>.]]></string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
@@ -62,6 +61,8 @@
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
+    <string name="conversion_error_report">Report issue</string>
+    <string name="conversion_error_retry">Try again</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>

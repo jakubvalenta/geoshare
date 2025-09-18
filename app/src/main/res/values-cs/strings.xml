@@ -26,7 +26,8 @@
     <string name="conversion_succeeded_copy_content_description">Kopírovat</string>
     <string name="main_create_geo_uri">Zobrazit souřadnice</string>
     <string name="main_navigate_to_intro">Objevte další funkce aplikace</string>
-    <string name="main_info_box"><![CDATA[%1s podporuje mnoho typů odkazů na Google Mapy, Apple Mapy, HERE WeGo, OpenStreetMap, OsmAnd a Yandex. Pokud přesto narazíte na odkaz, který nefunguje, <a href="https://github.com/jakubvalenta/geoshare/issues">nahlaste prosím problém</a>.]]></string>
+    <string name="conversion_error_report">Nahlásit problém</string>
+    <string name="conversion_error_retry">Zkusit znovu</string>
     <string name="converter_google_maps_permission_title">Spojit se s Googlem?</string>
     <string name="converter_apple_maps_permission_title">Spojit se s Applem?</string>
     <string name="conversion_permission_common_grant">OK</string>

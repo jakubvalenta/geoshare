@@ -5,7 +5,7 @@
     <string name="intro_open_by_default_app_note"><![CDATA[Виберіть принаймні <tt>maps.google.com</tt> та <tt>maps.app.goo.gl</tt>. Якщо деякі посилання позначені сірим кольором, це означає, що типово їх відкривають інші застосунки Google. Ви можете знайти їх і вимкнути відкриття посилань для них, як зробили з Google Maps.]]></string>
     <string name="intro_settings_activity_not_found">Не вдалося відкрити налаштування</string>
     <string name="main_input_uri_supporting_text">наприклад, https://maps.app.goo.gl/… або maps.apple.com/…</string>
-    <string name="main_info_box"><![CDATA[%1s supports many types of Google Maps, Apple Maps, HERE WeGo, Magic Earth, OpenStreetMap, OsmAnd, Waze and Yandex Maps links. If you still find a link that doesn’t work, please <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">повідомити про проблему</a>.]]></string>
+    <string name="conversion_error_report">повідомити про проблему</string>
     <string name="conversion_permission_common_deny">Скасувати</string>
     <string name="faq_how_it_works_headline">Як це працює та міркування щодо приватності</string>
     <string name="conversion_succeeded_copy_geo">Копіювати гео:</string>

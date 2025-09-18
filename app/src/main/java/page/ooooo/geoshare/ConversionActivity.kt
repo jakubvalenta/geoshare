@@ -11,7 +11,6 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class ConversionActivity : ComponentActivity() {
-
     private val viewModel: ConversionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +21,7 @@ class ConversionActivity : ComponentActivity() {
                 LaunchedEffect(intent) {
                     viewModel.start(intent)
                 }
-                ConversionScreen(onBack = { finish() }, onFinish = { finish() }, viewModel = viewModel)
+                ConversionNavigation(viewModel, onFinish = { finish() })
             }
         }
     }
