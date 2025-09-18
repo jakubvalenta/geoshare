@@ -288,7 +288,7 @@ fun ConversionScreen(
                     onOpenApp = { packageName ->
                         onOpenApp(packageName, currentState.position.toGeoUriString())
                     },
-                    onOpenChooser = { onOpenChooser(currentState.inputUriString) },
+                    onShare = { onOpenChooser(currentState.position.toGeoUriString()) },
                     onSave = onSave,
                 )
             }

@@ -31,7 +31,7 @@ fun ResultSuccessCard(
     position: Position,
     onCopy: (String) -> Unit,
     onOpenApp: (String) -> Unit,
-    onOpenChooser: () -> Unit,
+    onShare: () -> Unit,
     onSave: () -> Unit,
 ) {
     val columnCount = 4
@@ -163,7 +163,7 @@ fun ResultSuccessCard(
                     }
                 }
             }
-            Button({ onOpenChooser() }, Modifier.padding(horizontal = Spacing.tiny)) {
+            Button({ onShare() }, Modifier.padding(horizontal = Spacing.tiny)) {
                 Text(stringResource(R.string.conversion_succeeded_share))
             }
         }
@@ -189,7 +189,7 @@ private fun DefaultPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -213,7 +213,7 @@ private fun DarkPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -237,7 +237,7 @@ private fun OneAppPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -261,7 +261,7 @@ private fun DarkOneAppPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -285,7 +285,7 @@ private fun ParamsPreview() {
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -309,7 +309,7 @@ private fun DarkParamsPreview() {
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -339,7 +339,7 @@ private fun PointsPreview() {
                 ),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -369,7 +369,7 @@ private fun DarkPointsPreview() {
                 ),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -386,7 +386,7 @@ private fun NoAppsPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }
@@ -403,7 +403,7 @@ private fun DarkNoAppsPreview() {
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onOpenApp = {},
-                onOpenChooser = {},
+                onShare = {},
                 onSave = {},
             )
         }

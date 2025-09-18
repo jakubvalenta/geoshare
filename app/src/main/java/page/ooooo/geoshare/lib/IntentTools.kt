@@ -17,7 +17,8 @@ class IntentTools {
     ).apply {
         putExtra(
             Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
-                ComponentName("page.ooooo.geoshare", "ConversionActivity"),
+                ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity"),
+                ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity"),
             )
         )
     }
