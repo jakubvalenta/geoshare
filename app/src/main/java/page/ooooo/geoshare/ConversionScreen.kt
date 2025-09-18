@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -27,12 +26,15 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ConfirmationScaffold
 import page.ooooo.geoshare.components.PermissionDialog
-import page.ooooo.geoshare.components.ResultSuccessCard
 import page.ooooo.geoshare.components.ResultErrorCard
+import page.ooooo.geoshare.components.ResultSuccessCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -75,9 +77,9 @@ fun ConversionScreen(
             viewModel.skip(context)
             onFinish()
         },
-        onRetry = {
+        onRetry = { newUriString ->
+            viewModel.updateInput(newUriString)
             viewModel.start()
-            onFinish()
         },
         onCancel = {
             viewModel.cancel()
@@ -100,11 +102,13 @@ fun ConversionScreen(
     onSave: () -> Unit,
     onShare: (String) -> Unit,
     onSkip: () -> Unit,
-    onRetry: () -> Unit,
+    onRetry: (String) -> Unit,
     onCancel: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var retryLoadingIndicatorVisible by mutableStateOf(false)
 
     ConfirmationScaffold(
         title = when {
@@ -141,7 +145,15 @@ fun ConversionScreen(
 
             currentState is HasError -> {
                 {
-                    TextButton({ onRetry() }) {
+                    TextButton({
+                        coroutineScope.launch {
+                            // Show a loading indicator for a while to indicate that conversion is being retried.
+                            retryLoadingIndicatorVisible = true
+                            delay(1000)
+                            retryLoadingIndicatorVisible = false
+                            onRetry(currentState.inputUriString)
+                        }
+                    }) {
                         Text(stringResource(R.string.conversion_error_retry))
                     }
                 }
@@ -252,11 +264,20 @@ fun ConversionScreen(
             }
 
             currentState is HasError -> {
-                ResultErrorCard(
-                    currentState.errorMessageResId,
-                    currentState.inputUriString,
-                    onNavigateToFaqScreen,
-                )
+                if (!retryLoadingIndicatorVisible) {
+                    ResultErrorCard(
+                        currentState.errorMessageResId,
+                        currentState.inputUriString,
+                        onNavigateToFaqScreen,
+                    )
+                } else {
+                    LoadingIndicator(
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .size(64.dp),
+                        color = MaterialTheme.colorScheme.errorContainer,
+                    )
+                }
             }
 
             currentState is HasResult -> {
