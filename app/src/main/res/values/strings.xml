@@ -62,6 +62,8 @@
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
+    <string name="conversion_error_report">Report issue</string>
+    <string name="conversion_error_retry">Try again</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>

@@ -54,6 +54,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("conversion") {
             ConversionScreen(
                 onBack = { navController.navigate("main") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
                 viewModel = viewModel,
             )
         }

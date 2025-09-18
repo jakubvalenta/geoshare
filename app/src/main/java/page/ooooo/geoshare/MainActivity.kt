@@ -10,7 +10,6 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     private val viewModel: ConversionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

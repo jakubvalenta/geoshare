@@ -1,55 +1,160 @@
 package page.ooooo.geoshare.components
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun ResultErrorCard(
     @StringRes errorMessageResId: Int,
+    inputUriString: String,
+    onNavigateToFaqScreen: () -> Unit,
 ) {
-    val appName = stringResource(R.string.app_name)
+    val uriHandler = LocalUriHandler.current
 
-    Card(
-        Modifier
-            .fillMaxWidth()
-            .testTag("geoShareConversionError"),
-        shape = OutlinedTextFieldDefaults.shape,
-        colors = CardDefaults.cardColors(
-            MaterialTheme.colorScheme.errorContainer,
-            MaterialTheme.colorScheme.onErrorContainer,
-        ),
+    ResultCard(
+        containerColor = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        chips = {
+            ResultCardChip(
+                stringResource(R.string.conversion_error_report),
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            ) {
+                uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+            }
+            ResultCardChip(
+                stringResource(R.string.faq_supported_inputs_headline),
+                modifier = Modifier.padding(end = Spacing.small),
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            ) {
+                onNavigateToFaqScreen()
+            }
+        },
     ) {
-        Row(Modifier.padding(Spacing.small)) {
+        SelectionContainer {
+            Text(
+                stringResource(errorMessageResId),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+        if (inputUriString.isNotEmpty()) {
             SelectionContainer {
-                Text(
-                    stringResource(errorMessageResId),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+                if (inputUriString.startsWith("https://")) {
+                    Text(
+                        inputUriString,
+                        modifier = Modifier.clickable { uriHandler.openUri(inputUriString) },
+                        textDecoration = TextDecoration.Underline,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                } else {
+                    Text(
+                        inputUriString,
+                        fontStyle = FontStyle.Italic,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
         }
     }
-    InfoCard(
-        AnnotatedString.fromHtml(
-            stringResource(R.string.main_info_box, appName),
-            linkStyles = TextLinkStyles(
-                SpanStyle(textDecoration = TextDecoration.Underline)
-            ),
-        ),
-        Modifier.padding(top = Spacing.medium),
-    )
+}
+
+// Previews
+
+@Preview(showBackground = true)
+@Composable
+private fun DefaultPreview() {
+    AppTheme {
+        Surface {
+            ResultErrorCard(
+                R.string.conversion_failed_parse_url_error,
+                "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                onNavigateToFaqScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPreview() {
+    AppTheme {
+        Surface {
+            ResultErrorCard(
+                R.string.conversion_failed_parse_url_error,
+                "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
+                onNavigateToFaqScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CoordinatesPreview() {
+    AppTheme {
+        Surface {
+            ResultErrorCard(
+                R.string.conversion_failed_parse_url_error,
+                "41°24′12.2″N 2°10′26.5″E",
+                onNavigateToFaqScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkCoordinatesPreview() {
+    AppTheme {
+        Surface {
+            ResultErrorCard(
+                R.string.conversion_failed_parse_url_error,
+                "41°24′12.2″N 2°10′26.5″E",
+                onNavigateToFaqScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyPreview() {
+    AppTheme {
+        Surface {
+            ResultErrorCard(
+                R.string.conversion_failed_parse_url_error,
+                "",
+                onNavigateToFaqScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkEmptyPreview() {
+    AppTheme {
+        Surface {
+            ResultErrorCard(
+                R.string.conversion_failed_parse_url_error,
+                "",
+                onNavigateToFaqScreen = {},
+            )
+        }
+    }
 }
