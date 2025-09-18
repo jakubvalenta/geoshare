@@ -25,7 +25,6 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
             Pattern.compile("""!3d$LAT!4d$LON"""),
             Pattern.compile("""!1d$LON!2d$LAT"""),
         )
-
     }
 
     /**
