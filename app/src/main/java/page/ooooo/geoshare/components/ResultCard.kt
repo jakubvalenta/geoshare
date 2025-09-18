@@ -18,6 +18,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun ResultCard(
+    modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     after: (@Composable () -> Unit)? = null,
@@ -25,7 +26,7 @@ fun ResultCard(
     main: @Composable () -> Unit,
 ) {
     ElevatedCard(
-        Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(top = Spacing.small),
         shape = OutlinedTextFieldDefaults.shape,
