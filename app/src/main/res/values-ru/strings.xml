@@ -44,7 +44,7 @@
     <string name="conversion_permission_common_deny">Отмена</string>
     <string name="main_input_uri_clear_content_description">Очистить</string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Используйте только название места</string>
-    <string name="main_info_box"><![CDATA[%1s поддерживает множество типов ссылок Google Maps и Apple Maps. Если вы все ещё найдете ссылку, которая не работает, пожалуйста, <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">сообщите о проблеме</a>.]]></string>
+    <string name="conversion_error_report">сообщите о проблеме</string>
     <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат, но содержит название места. %2$s может подключиться к картографическому сервису, чтобы получить координаты, или использовать название места, что менее точно.]]></string>
     <string name="about_app_icon_content_description">Значок приложения</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

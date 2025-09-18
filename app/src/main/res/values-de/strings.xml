@@ -35,7 +35,8 @@
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Erstens öffnen Sie &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das öffnen von Links für diese App aus.]]></string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffnen Sie die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, jetzt das Öffnen von Links für in der App einschalten, und auf <i>Links hinzufügen</i> drücken.]]></string>
     <string name="conversion_permission_common_grant">Okay</string>
-    <string name="main_info_box"><![CDATA[%1s unterstützt viele Google Maps, Apple Maps, HERE WeGo, OpenStreetMap, OsmAnd und Yandex Links. Wenn du trotzdem einen Link findest, der nicht funktioniert, bitte <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">melde das Problem</a>.]]></string>
+    <string name="conversion_error_report">Problem melden</string>
+    <string name="conversion_error_retry">Erneut versuchen</string>
     <string name="permission_do_not_ask">Nicht erneut fragen</string>
     <string name="about_title">Über</string>
     <string name="about_app_icon_content_description">App Icon</string>

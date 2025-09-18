@@ -43,7 +43,7 @@
     <string name="main_input_uri_supporting_text">ex: https://maps.app.goo.gl/… ou maps.apple.com/…</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="main_navigate_to_intro">Conheça mais recursos da app</string>
-    <string name="main_info_box"><![CDATA[O %1s suporta vários tipos de ligações do Google Maps e do Apple Maps. Se encontrar uma ligação que não funciona, por favor <a href="https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml">informe sobre esse erro</a>.]]></string>
+    <string name="conversion_error_report">informe sobre esse erro</string>
     <string name="converter_google_maps_permission_title">Conectar ao Google?</string>
     <string name="converter_google_maps_loading_indicator_title">A conectar ao Google…</string>
     <string name="converter_apple_maps_permission_title">Conectar à Apple?</string>
