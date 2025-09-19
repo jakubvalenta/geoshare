@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.uriPattern
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""https?://magicearth.com/\?\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?magicearth.com/\?\S+""")
 
     override val conversionUriPattern = uriPattern {
         all {

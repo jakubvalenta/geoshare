@@ -9,23 +9,27 @@ class HereWeGoUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = HereWeGoUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30="))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://wego.here.com/?map=50.21972,-0.68453,6.93"))
+        @Suppress("SpellCheckingInspection")
+        assertTrue(doesUriPatternMatch("wego.here.com/?map=50.21972,-0.68453,6.93"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30="))
+        @Suppress("SpellCheckingInspection")
+        assertTrue(doesUriPatternMatch("share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30="))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://wego.here.com/?map=50.21972,-0.68453,6.93"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30="))
     }
 
     @Test
-    fun isSupportedUrl_shortUrl() {
-        assertTrue(isSupportedUrl("https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30="))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://wego.here.com/?map=50.21972,-0.68453,6.93"))
     }
 
     @Test

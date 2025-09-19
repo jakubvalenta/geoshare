@@ -12,18 +12,18 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = CoordinatesUrlConverter()
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("50.21972° N, 0.68453° W"))
-        assertTrue(isSupportedUrl("31°57′N 35°56′E"))
+    fun uriPattern_supportedUrl() {
+        assertTrue(doesUriPatternMatch("50.21972° N, 0.68453° W"))
+        assertTrue(doesUriPatternMatch("31°57′N 35°56′E"))
     }
 
     @Test
-    fun isSupportedUrl_unknownPath() {
-        assertFalse(isSupportedUrl("spam"))
+    fun uriPattern_unknownPath() {
+        assertFalse(doesUriPatternMatch("spam"))
     }
 
     @Test
-    fun parseUrl_noKnownPath() {
+    fun parseUrl_unknownPath() {
         assertNull(parseUrl(""))
         assertNull(parseUrl("spam"))
     }

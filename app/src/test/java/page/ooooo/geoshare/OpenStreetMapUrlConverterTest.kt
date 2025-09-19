@@ -9,18 +9,20 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = OpenStreetMapUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://www.openstreetmap.org/#map=16/51.49/-0.13"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/#map=16/51.49/-0.13"))
+        assertTrue(doesUriPatternMatch("www.openstreetmap.org/#map=16/51.49/-0.13"))
+        assertTrue(doesUriPatternMatch("openstreetmap.org/#map=16/51.49/-0.13"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.org/#map=16/51.49/-0.13"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://www.openstreetmap.org/#map=16/51.49/-0.13"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://www.openstreetmap.org/#map=16/51.49/-0.13"))
     }
 
     @Test

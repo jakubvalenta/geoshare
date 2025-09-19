@@ -9,18 +9,19 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = MagicEarthUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345."))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
+        assertTrue(doesUriPatternMatch("magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
     }
 
     @Test

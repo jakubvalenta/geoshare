@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.uriPattern
 
 class OsmAndUrlConverter : UrlConverter.WithUriPattern {
     @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?osmand\.net/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
 
     override val conversionUriPattern = uriPattern {
         all {

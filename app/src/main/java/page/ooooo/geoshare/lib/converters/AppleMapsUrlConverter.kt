@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
-    override val uriPattern: Pattern = Pattern.compile("""https?://maps\.apple(\.com)?/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?/\S+""")
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {

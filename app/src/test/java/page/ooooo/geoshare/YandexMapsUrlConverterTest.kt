@@ -9,23 +9,26 @@ class YandexMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = YandexMapsUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
+        @Suppress("SpellCheckingInspection")
+        assertTrue(doesUriPatternMatch("yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://yandex.com/maps/-/CLAvMI18"))
+        assertTrue(doesUriPatternMatch("yandex.com/maps/-/CLAvMI18"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
     }
 
     @Test
-    fun isSupportedUrl_shortUrl() {
-        assertTrue(isSupportedUrl("https://yandex.com/maps/-/CLAvMI18"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
     }
 
     @Test

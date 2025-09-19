@@ -16,7 +16,7 @@ abstract class BaseUrlConverterTest() {
     fun getUri(uriString: String): String? =
         urlConverter.uriPattern.matcher(uriString)?.takeIf { it.find() }?.group()
 
-    fun isSupportedUrl(uriString: String): Boolean = urlConverter.uriPattern.matches(uriString)
+    fun doesUriPatternMatch(uriString: String): Boolean = urlConverter.uriPattern.matches(uriString)
 
     fun getShortUri(uriString: String): String? =
         if (urlConverter is UrlConverter.WithShortUriPattern) {

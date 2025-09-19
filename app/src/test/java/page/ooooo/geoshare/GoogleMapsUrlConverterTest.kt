@@ -9,25 +9,29 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = GoogleMapsUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://www.google.com/maps/@52.5067296,13.2599309,6z"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://www.google.com/maps/@52.5067296,13.2599309,6z"))
+        assertTrue(doesUriPatternMatch("google.com/maps/@52.5067296,13.2599309,6z"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://maps.app.goo.gl/foo"))
+        assertTrue(doesUriPatternMatch("https://app.goo.gl/maps/foo"))
+        assertTrue(doesUriPatternMatch("https://g.co/kgs/foo"))
+        assertTrue(doesUriPatternMatch("maps.app.goo.gl/foo"))
+        assertTrue(doesUriPatternMatch("app.goo.gl/maps/foo"))
+        assertTrue(doesUriPatternMatch("g.co/kgs/foo"))
     }
 
     @Test
-    fun isSupportedUrl_supportedFullUrl() {
-        assertTrue(isSupportedUrl("https://www.google.com/maps/@52.5067296,13.2599309,6z"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/maps/@52.5067296,13.2599309,6z"))
     }
 
     @Test
-    fun isSupportedUrl_supportedShortUrl() {
-        assertTrue(isSupportedUrl("https://maps.app.goo.gl/foo"))
-        assertTrue(isSupportedUrl("https://app.goo.gl/maps/foo"))
-        assertTrue(isSupportedUrl("https://g.co/kgs/foo"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://www.google.com/maps/@52.5067296,13.2599309,6z"))
     }
 
     @Test
@@ -471,6 +475,14 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("52.5067296", "13.2599309", q = "Berlin, Germany", z = "11"),
             parseUrl("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
+        )
+    }
+
+    @Test
+    fun parseUrl_noScheme() {
+        assertEquals(
+            Position("52.5067296", "13.2599309", q = "Berlin, Germany", z = "11"),
+            parseUrl("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
 
