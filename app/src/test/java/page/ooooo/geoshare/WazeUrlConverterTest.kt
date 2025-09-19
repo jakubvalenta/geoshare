@@ -9,36 +9,39 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = WazeUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
+        assertTrue(doesUriPatternMatch("waze.com/ul?ll=45.6906304,-120.810983&z=10"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.183894452.1839010060.260192"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"))
+        assertTrue(doesUriPatternMatch("https://ul.waze.com/ul?venue_id=183894452.1839010060.260192&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/ul?venue_id=183894452.1839010060.260192"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://waze.com/ul/hu00uswvn3"))
+        @Suppress("SpellCheckingInspection")
+        assertTrue(doesUriPatternMatch("waze.com/ul/hu00uswvn3"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/ul/hu00uswvn3"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map?h=u00uswvn3"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
-        assertTrue(isSupportedUrl("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983"))
-        assertTrue(isSupportedUrl("https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192"))
-        assertTrue(isSupportedUrl("https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"))
-        assertTrue(isSupportedUrl("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.183894452.1839010060.260192"))
-        assertTrue(isSupportedUrl("https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"))
-        assertTrue(isSupportedUrl("https://ul.waze.com/ul?venue_id=183894452.1839010060.260192&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"))
-        assertTrue(isSupportedUrl("https://www.waze.com/ul?venue_id=183894452.1839010060.260192"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/ul?ll=45.6906304,-120.810983&z=10"))
     }
 
     @Test
-    fun isSupportedUrl_shortUrl() {
-        assertTrue(isSupportedUrl("https://waze.com/ul/hu00uswvn3"))
-        assertTrue(isSupportedUrl("https://www.waze.com/ul/hu00uswvn3"))
-        assertTrue(isSupportedUrl("https://www.waze.com/live-map?h=u00uswvn3"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
     }
 
     @Test
-    fun isSupportedUrl_replacement() {
+    fun uriPattern_replacement() {
         assertEquals(
             "https://waze.com/ul/hu00uswvn3",
             getUri("Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3")

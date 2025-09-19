@@ -9,18 +9,20 @@ class OsmAndUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = OsmAndUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://osmand.net/map?pin=52.51628,13.37771"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://osmand.net/map?pin=52.51628,13.37771"))
+        @Suppress("SpellCheckingInspection")
+        assertTrue(doesUriPatternMatch("osmand.net/map?pin=52.51628,13.37771"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://osmand.net/map?pin=52.51628,13.37771"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://osmand.net/map?pin=52.51628,13.37771"))
     }
 
     @Test

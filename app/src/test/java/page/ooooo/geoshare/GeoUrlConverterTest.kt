@@ -13,18 +13,23 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter: UrlConverter = GeoUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+    fun uriPattern_geoUri() {
+        assertTrue(doesUriPatternMatch("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_noScheme() {
+        assertFalse(doesUriPatternMatch("50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+    fun uriPattern_nonGeoScheme() {
+        assertFalse(doesUriPatternMatch("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+    }
+
+    @Test
+    fun uriPattern_unknownPath() {
+        assertTrue(doesUriPatternMatch("geo:example?q=foo%20bar&z=3.4"))
     }
 
     @Test

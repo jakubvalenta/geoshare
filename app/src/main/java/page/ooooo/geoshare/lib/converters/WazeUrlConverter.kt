@@ -15,9 +15,9 @@ import page.ooooo.geoshare.lib.uriPattern
  * See https://developers.google.com/waze/deeplinks/
  */
 class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern, UrlConverter.WithHtmlPattern {
-    override val uriPattern: Pattern = Pattern.compile("""https?://((www|ul)\.)?waze\.com/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
     override val shortUriPattern: Pattern =
-        Pattern.compile("""https?://(www\.)?waze\.com/(ul/h|live-map\?h=)(?P<id>[A-Za-z0-9_-]+)""")
+        Pattern.compile("""(https?://)?(www\.)?waze\.com/(ul/h|live-map\?h=)(?P<id>[A-Za-z0-9_-]+)""")
     override val shortUriReplacement = "https://www.waze.com/live-map?h=\${id}"
 
     override val conversionUriPattern = uriPattern {

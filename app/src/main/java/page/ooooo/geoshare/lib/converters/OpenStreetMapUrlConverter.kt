@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import page.ooooo.geoshare.lib.uriPattern
 
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern {
-    override val uriPattern: Pattern = Pattern.compile("""https?://(www\.)?openstreetmap\.org/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?openstreetmap\.org/\S+""")
 
     override val conversionUriPattern = uriPattern {
         fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))

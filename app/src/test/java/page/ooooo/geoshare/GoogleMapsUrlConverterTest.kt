@@ -9,25 +9,29 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = GoogleMapsUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://www.google.com/maps/@52.5067296,13.2599309,6z"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://www.google.com/maps/@52.5067296,13.2599309,6z"))
+        assertTrue(doesUriPatternMatch("google.com/maps/@52.5067296,13.2599309,6z"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://maps.app.goo.gl/foo"))
+        assertTrue(doesUriPatternMatch("https://app.goo.gl/maps/foo"))
+        assertTrue(doesUriPatternMatch("https://g.co/kgs/foo"))
+        assertTrue(doesUriPatternMatch("maps.app.goo.gl/foo"))
+        assertTrue(doesUriPatternMatch("app.goo.gl/maps/foo"))
+        assertTrue(doesUriPatternMatch("g.co/kgs/foo"))
     }
 
     @Test
-    fun isSupportedUrl_supportedFullUrl() {
-        assertTrue(isSupportedUrl("https://www.google.com/maps/@52.5067296,13.2599309,6z"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/maps/@52.5067296,13.2599309,6z"))
     }
 
     @Test
-    fun isSupportedUrl_supportedShortUrl() {
-        assertTrue(isSupportedUrl("https://maps.app.goo.gl/foo"))
-        assertTrue(isSupportedUrl("https://app.goo.gl/maps/foo"))
-        assertTrue(isSupportedUrl("https://g.co/kgs/foo"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://www.google.com/maps/@52.5067296,13.2599309,6z"))
     }
 
     @Test
@@ -322,6 +326,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_directionsFromToViaWithCenter() {
         assertEquals(
             Position("52.4844406", "13.4217121", q = "Reuterstraße 1, Berlin-Neukölln, Germany", z = "16"),
+            @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
         )
     }
@@ -337,6 +342,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
                     "52.4807739" to "13.4300356",
                 ),
             ),
+            @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2")
         )
     }
@@ -471,6 +477,14 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("52.5067296", "13.2599309", q = "Berlin, Germany", z = "11"),
             parseUrl("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
+        )
+    }
+
+    @Test
+    fun parseUrl_noScheme() {
+        assertEquals(
+            Position("52.5067296", "13.2599309", q = "Berlin, Germany", z = "11"),
+            parseUrl("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
 

@@ -9,23 +9,26 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = AppleMapsUrlConverter()
 
     @Test
-    fun isSupportedUrl_unknownProtocol() {
-        assertFalse(isSupportedUrl("ftp://maps.apple.com/?ll=50.894967,4.341626"))
+    fun uriPattern_fullUrl() {
+        assertTrue(doesUriPatternMatch("https://maps.apple.com/?ll=50.894967,4.341626"))
+        assertTrue(doesUriPatternMatch("maps.apple.com/?ll=50.894967,4.341626"))
     }
 
     @Test
-    fun isSupportedUrl_unknownHost() {
-        assertFalse(isSupportedUrl("https://www.example.com/"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://maps.apple/p/7E-Brjrk_THN14"))
+        @Suppress("SpellCheckingInspection")
+        assertTrue(doesUriPatternMatch("maps.apple/p/7E-Brjrk_THN14"))
     }
 
     @Test
-    fun isSupportedUrl_supportedUrl() {
-        assertTrue(isSupportedUrl("https://maps.apple.com/?ll=50.894967,4.341626"))
+    fun uriPattern_unknownHost() {
+        assertFalse(doesUriPatternMatch("https://www.example.com/?ll=50.894967,4.341626"))
     }
 
     @Test
-    fun isSupportedUrl_shortUrl() {
-        assertTrue(isSupportedUrl("https://maps.apple/p/7E-Brjrk_THN14"))
+    fun uriPattern_unknownScheme() {
+        assertFalse(doesUriPatternMatch("ftp://maps.apple.com/?ll=50.894967,4.341626"))
     }
 
     @Test

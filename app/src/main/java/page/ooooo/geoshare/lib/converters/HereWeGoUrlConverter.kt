@@ -18,7 +18,7 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
     }
 
     @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""https?://(share|wego)\.here\.com/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
 
     @OptIn(ExperimentalEncodingApi::class)
     override val conversionUriPattern = uriPattern {
