@@ -5,7 +5,7 @@
     <string name="intro_open_by_default_app_note"><![CDATA[Виберіть принаймні <tt>maps.google.com</tt> та <tt>maps.app.goo.gl</tt>. Якщо деякі посилання позначені сірим кольором, це означає, що типово їх відкривають інші застосунки Google. Ви можете знайти їх і вимкнути відкриття посилань для них, як зробили з Google Maps.]]></string>
     <string name="intro_settings_activity_not_found">Не вдалося відкрити налаштування</string>
     <string name="main_input_uri_supporting_text">наприклад, https://maps.app.goo.gl/… або maps.apple.com/…</string>
-    <string name="conversion_error_report">повідомити про проблему</string>
+    <string name="conversion_error_report">Повідомити про проблему</string>
     <string name="conversion_permission_common_deny">Скасувати</string>
     <string name="faq_how_it_works_headline">Як це працює та міркування щодо приватності</string>
     <string name="conversion_succeeded_copy_geo">Копіювати гео:</string>
@@ -98,4 +98,6 @@
     <string name="conversion_succeeded_save_gpx">Зберегти GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Результат %1$s %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
+    <string name="conversion_succeeded_share">Поділитися</string>
+    <string name="conversion_error_retry">Спробуйте ще раз</string>
 </resources>
