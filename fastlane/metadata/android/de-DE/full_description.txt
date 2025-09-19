@@ -14,6 +14,7 @@ Sie können die App auch verwenden, um Google Maps-Links als geo: Links in Ihre 
 - Magic Earth (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
+- Waze (beta)
 - Yandex Maps (beta)
 - Koordinaten
 

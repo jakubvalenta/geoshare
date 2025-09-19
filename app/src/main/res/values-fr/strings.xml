@@ -91,5 +91,12 @@
     <string name="converter_yandex_maps_permission_title">Se connecter à Yandex ?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connexion à Yandex…</string>
     <string name="faq_supported_inputs_headline">Services cartographiques pris en charge</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application :</p><p>Google Maps<br />Apple Plans<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />coordonnées (par exemple 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application :</p><p>Google Maps<br />Apple Plans<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />coordonnées (par exemple 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
+    <string name="conversion_succeeded_copy_google_maps">Copier Google Maps</string>
+    <string name="conversion_succeeded_save_gpx">Sauvegarder GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s résultat %2$s.gpx</string>
+    <string name="conversion_succeeded_share">Partager</string>
+    <string name="converter_waze_permission_title">Se connecter à Waze ?</string>
+    <string name="converter_waze_loading_indicator_title">Connexion à Waze…</string>
+    <string name="conversion_succeeded_point_number">point %1$d</string>
 </resources>

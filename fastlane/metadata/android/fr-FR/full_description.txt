@@ -8,6 +8,7 @@ Partagez un lien cartographique avec Geo Share et l’application l’ouvrira da
 - Magic Earth (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
+- Waze (beta)
 - Yandex Maps (beta)
 - coordonnées
 
