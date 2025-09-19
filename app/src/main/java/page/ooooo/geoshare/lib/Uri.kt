@@ -1,5 +1,10 @@
 package page.ooooo.geoshare.lib
 
+import android.R.attr.fragment
+import android.R.attr.host
+import android.R.attr.path
+import android.R.attr.scheme
+import java.net.MalformedURLException
 import java.net.URL
 
 /**
@@ -87,26 +92,37 @@ data class Uri(
             }
     }
 
-    fun toAbsoluteUri(baseUri: Uri): Uri =
-        if (host.isEmpty()) {
-            if (path.startsWith("//")) {
-                // Protocol-relative URL
-                this.copy(scheme = baseUri.scheme)
-            } else if (path.startsWith("/")) {
-                // Absolute URL
-                this.copy(scheme = baseUri.scheme, host = baseUri.host)
-            } else {
-                // Relative URL with only one part
-                this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$path")
-            }
-        } else if (scheme.isEmpty()) {
-            // Relative URL with multiple parts
-            this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$host$path")
+    fun toAbsoluteUri(baseUri: Uri): Uri = if (host.isEmpty()) {
+        if (path.startsWith("//")) {
+            // Protocol-relative URL
+            this.copy(scheme = baseUri.scheme)
+        } else if (path.startsWith("/")) {
+            // Absolute URL
+            this.copy(scheme = baseUri.scheme, host = baseUri.host)
         } else {
-            this
+            // Relative URL with only one part
+            this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$path")
         }
+    } else if (scheme.isEmpty()) {
+        // Relative URL with multiple parts
+        this.copy(scheme = baseUri.scheme, host = baseUri.host, path = "${baseUri.path}/$host$path")
+    } else {
+        this
+    }
 
-    fun toUrl(): URL = URL(toString())
+    @Throws(MalformedURLException::class)
+    fun toUrl(): URL = URL(
+        if (host.isEmpty()) {
+            path.trimStart('/').let { path ->
+                if (path.isEmpty()) {
+                    throw MalformedURLException("Missing host or path")
+                }
+                this.copy(scheme = scheme.ifEmpty { "https" }, host = path, path = "")
+            }
+        } else {
+            this.copy(scheme = scheme.ifEmpty { "https" })
+        }.toString()
+    )
 
     private fun formatQueryParams(): String =
         queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }.joinToString("&")
