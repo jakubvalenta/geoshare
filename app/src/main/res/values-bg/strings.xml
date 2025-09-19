@@ -30,7 +30,7 @@
     <string name="conversion_permission_common_deny">Отказ</string>
     <string name="main_input_uri_supporting_text">напр. https://maps.app.goo.gl/… or maps.apple.com/…</string>
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
-    <string name="conversion_error_report">съобщете за проблем</string>
+    <string name="conversion_error_report">Докладване на проблем</string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати или име на място. %2$s трябва да се свърже с Google, за да получи информацията.]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>
@@ -92,4 +92,10 @@
     <string name="faq_supported_inputs_text"><![CDATA[<p>Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />координати (напр. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
     <string name="converter_waze_permission_title">Свързване с Waze?</string>
     <string name="converter_waze_loading_indicator_title">Свързване с Waze…</string>
+    <string name="conversion_succeeded_copy_google_maps">Копиране на Google Карти</string>
+    <string name="conversion_succeeded_save_gpx">Запазване на GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s резултат %2$s.gpx</string>
+    <string name="conversion_succeeded_point_number">точка %1$d</string>
+    <string name="conversion_succeeded_share">Споделяне</string>
+    <string name="conversion_error_retry">Опитайте отново</string>
 </resources>
