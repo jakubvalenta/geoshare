@@ -22,7 +22,7 @@
     <string name="intro_nav_close">Cerrar</string>
     <string name="intro_nav_next">SIguiente</string>
     <string name="main_navigate_to_intro">Descubrir más características de la app</string>
-    <string name="conversion_error_report">reporte un incidente</string>
+    <string name="conversion_error_report">Reportar incidente</string>
     <string name="converter_google_maps_permission_title">¿Conectarse a Google?</string>
     <string name="conversion_permission_common_grant">Aceptar</string>
     <string name="conversion_permission_parse_html_to_get_coords_deny">Crear un enlace geo: de búsqueda</string>
@@ -90,5 +90,13 @@
     <string name="converter_yandex_maps_permission_title">¿Conectarse a Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Conectándose a Yandex…</string>
     <string name="faq_supported_inputs_headline">Servicios de mapa soportados</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />coordenadas (p.e. 41°24′12.2″N 2°10′26.5″E)<br />URIs de geo:</p>]]></string>
+    <string name="faq_supported_inputs_text"><br/><![CDATA[<p>Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />coordenadas (p.e. 41°24′12.2″N 2°10′26.5″E)<br />URIs de geo:</p>]]></string>
+    <string name="conversion_succeeded_copy_google_maps">Copiar Google Maps</string>
+    <string name="conversion_succeeded_save_gpx">Guardar GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s resultado %2$s.gpx</string>
+    <string name="conversion_succeeded_share">Compartir</string>
+    <string name="converter_waze_permission_title">¿Conectarse a Waze?</string>
+    <string name="converter_waze_loading_indicator_title">Conectándose a Waze…</string>
+    <string name="conversion_error_retry">Intentar de nuevo</string>
+    <string name="conversion_succeeded_point_number">punto %1$d</string>
 </resources>

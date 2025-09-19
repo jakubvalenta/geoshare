@@ -8,6 +8,7 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 - Magic Earth (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
+- Waze (beta)
 - Yandex Maps (beta)
 - coordinadas
 
