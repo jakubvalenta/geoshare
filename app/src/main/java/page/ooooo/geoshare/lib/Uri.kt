@@ -1,9 +1,5 @@
 package page.ooooo.geoshare.lib
 
-import android.R.attr.fragment
-import android.R.attr.host
-import android.R.attr.path
-import android.R.attr.scheme
 import java.net.MalformedURLException
 import java.net.URL
 

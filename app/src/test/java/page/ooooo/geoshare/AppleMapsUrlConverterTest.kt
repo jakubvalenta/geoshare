@@ -17,6 +17,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_shortUrl() {
         assertTrue(doesUriPatternMatch("https://maps.apple/p/7E-Brjrk_THN14"))
+        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("maps.apple/p/7E-Brjrk_THN14"))
     }
 
