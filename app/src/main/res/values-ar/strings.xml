@@ -96,4 +96,8 @@
     <string name="faq_supported_inputs_text"><![CDATA[<p>يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق:</p><p>خرائط جوجل<br />خرائط Apple<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />خرائط Yandex<br />الإحداثيات (مثال: 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
     <string name="converter_waze_permission_title">الاتصال ب Waze؟</string>
     <string name="converter_waze_loading_indicator_title">جارِ الاتصال ب Waze…</string>
+    <string name="conversion_succeeded_copy_google_maps">انسخ خرائط جوجل</string>
+    <string name="conversion_succeeded_save_gpx">احفظ GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s نتيجة %2$s.gpx</string>
+    <string name="conversion_succeeded_point_number">نقطة %1$d</string>
 </resources>
