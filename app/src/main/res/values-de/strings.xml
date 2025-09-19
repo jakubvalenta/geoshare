@@ -86,9 +86,13 @@
     <string name="conversion_succeeded_apps_not_found">Es ist keine Karten-App installiert</string>
     <string name="copying_finished">Koordinaten wurden in die Zwischenablage kopiert</string>
     <string name="conversion_failed_connection_permission_denied">Dieser Link wird ohne Verbindung zum Kartendienst nicht unterstützt</string>
-    <string name="conversion_failed_parse_html_error">Das Herunterladen der Webseite vom Kartendienst ist fehlgeschlagen.</string>
+    <string name="conversion_failed_parse_html_error">Das Herunterladen der Webseite vom Kartendienst ist fehlgeschlagen</string>
     <string name="conversion_failed_parse_html_connection_error">Verbindungsfehler beim Herunterladen der Webseite des Kartendienstes</string>
     <string name="conversion_failed_unsupported_service">Nicht unterstützter Kartendienst</string>
     <string name="user_preferences_connection_title">Verbindung zu Kartendienst (Google, Apple usw.) zulassen?</string>
     <string name="user_preferences_connection_description">Um kurze Kartenlinks zu unterstützen und Koordinaten von der Webseite des Kartendienstes zu bekommen, wenn der Link sie nicht enthält, kann %1$s sich mit dem Kartendienst verbinden. Mehr Infos findest du auf dem FAQ-Bildschirm.</string>
+    <string name="conversion_succeeded_copy_google_maps">Google Maps kopieren</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s Ergebnis %2$s.gpx</string>
+    <string name="conversion_succeeded_share">Teilen</string>
+    <string name="conversion_succeeded_point_number">Punkt %1$d</string>
 </resources>
