@@ -88,5 +88,13 @@
     <string name="converter_yandex_maps_permission_title">连接到 Yandex？</string>
     <string name="converter_yandex_maps_loading_indicator_title">正在连接到 Yandex…</string>
     <string name="faq_supported_inputs_headline">支持的地图服务</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中：</p><p>Google 地图<br />Apple 地图<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex 地图<br />坐标（例如 41°24′12.2″N 2°10′26.5″E）<br />geo: URI</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中：</p><p>Google 地图<br />Apple 地图<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex 地图<br />坐标（例如 41°24′12.2″N 2°10′26.5″E）<br />geo: URI</p>]]></string>
+    <string name="conversion_succeeded_copy_google_maps">复制 Google 地图</string>
+    <string name="conversion_succeeded_save_gpx">保存 GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s 结果 %2$s.gpx</string>
+    <string name="conversion_succeeded_share">分享</string>
+    <string name="converter_waze_permission_title">连接到 Waze？</string>
+    <string name="converter_waze_loading_indicator_title">正在连接到 Waze…</string>
+    <string name="conversion_error_retry">重试</string>
+    <string name="conversion_succeeded_point_number">点 %1$d</string>
 </resources>
