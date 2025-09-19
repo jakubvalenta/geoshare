@@ -8,6 +8,7 @@
 - Magic Earth（测试）
 - OpenStreetMap（测试）
 - OsmAnd（测试）
+- Waze（测试）
 - Yandex 地图（测试）
 - 坐标
 
