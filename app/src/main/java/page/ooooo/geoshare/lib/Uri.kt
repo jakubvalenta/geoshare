@@ -126,9 +126,12 @@ data class Uri(
     override fun toString() = StringBuilder().apply {
         if (scheme.isNotEmpty()) {
             append("$scheme:")
+            if (host.isNotEmpty()) {
+                append("//")
+            }
         }
         if (host.isNotEmpty()) {
-            append("//$host")
+            append(host)
         }
         append(uriQuote.encode(path, allow = "+,/="))
         if (queryParams.isNotEmpty()) {

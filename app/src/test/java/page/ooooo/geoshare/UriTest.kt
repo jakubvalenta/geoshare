@@ -418,6 +418,23 @@ class UriTest {
     }
 
     @Test
+    fun toString_formatsSchemeAndHostAndPath() {
+        for (uriString in listOf(
+            "",
+            "geo:",
+            "geo:foo",
+            "https://foo/bar",
+            "https://foo",
+            "foo/bar",
+            "foo",
+            "/foo/bar",
+            "/foo",
+        )) {
+            assertEquals(uriString, Uri.parse(uriString, uriQuote).toString())
+        }
+    }
+
+    @Test
     fun toString_encodesPath() {
         val uriString =
             "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd#my-fragment"
