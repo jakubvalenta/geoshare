@@ -57,7 +57,7 @@
     <string name="conversion_failed_parse_url_error">فشل في معالجة رابط الخريطة</string>
     <string name="conversion_succeeded_apps_not_found">لم يتم تثبيت تطبيق الخرائط</string>
     <string name="conversion_failed_parse_html_error">فشل جلب صفحة الويب من خدمة الخرائط</string>
-    <string name="conversion_error_report">الإبلاغ عن مشكلة</string>
+    <string name="conversion_error_report">بلّغ عن مشكلة</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">مشاركة مع</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">الموقع المحدد</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">المراسلة</string>
@@ -100,4 +100,6 @@
     <string name="conversion_succeeded_save_gpx">احفظ GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s نتيجة %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">نقطة %1$d</string>
+    <string name="conversion_succeeded_share">شارك</string>
+    <string name="conversion_error_retry">حاول مجددًا</string>
 </resources>
