@@ -131,11 +131,11 @@ data class GrantedUnshortenPermission(
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         if (locationHeader == null) {
-            stateContext.log.w(null, "Missing location URL")
+            stateContext.log.w(null, "Unshorten: Missing location header")
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
-        stateContext.log.i(null, "Resolved short URL $uri to $unshortenedUri")
+        stateContext.log.i(null, "Unshorten: Resolved short URI $uri to $unshortenedUri")
         return UnshortenedUrl(stateContext, inputUriString, urlConverter, unshortenedUri, Permission.ALWAYS)
     }
 }
@@ -157,50 +157,33 @@ data class UnshortenedUrl(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        if (urlConverter is UrlConverter.WithUriPattern) {
+        val position = if (urlConverter is UrlConverter.WithUriPattern) {
             val conversionMatchers = urlConverter.conversionUriPattern.matches(uri)
             if (conversionMatchers == null) {
-                stateContext.log.i(null, "URL could not be converted $uri")
+                stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
                 return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
             }
             val position = conversionMatchers.toPosition()
+            stateContext.log.i(null, "URI Pattern: Converted $uri to $position")
             if (position.points?.isNotEmpty() == true) {
-                stateContext.log.i(null, "URL converted to position with coordinates $uri > $position")
                 return ConversionSucceeded(inputUriString, position)
             }
-            if (position.q != null) {
-                if (urlConverter is UrlConverter.WithHtmlPattern) {
-                    stateContext.log.i(
-                        null,
-                        "URL converted to position with place query; coordinates can be retrieved by parsing HTML $uri > $position"
-                    )
-                    return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
-                        Permission.ALWAYS -> GrantedParseHtmlToGetCoordsPermission(
-                            stateContext, inputUriString, urlConverter, uri, position
-                        )
-
-                        Permission.ASK -> RequestedParseHtmlToGetCoordsPermission(
-                            stateContext, inputUriString, urlConverter, uri, position
-                        )
-
-                        Permission.NEVER -> DeniedParseHtmlToGetCoordsPermission(
-                            inputUriString, position
-                        )
-                    }
-                }
-                stateContext.log.i(null, "URL converted to position with place query $uri > $position")
-                return ConversionSucceeded(inputUriString, position)
-            }
+            position
+        } else {
+            null
         }
         if (urlConverter is UrlConverter.WithHtmlPattern) {
-            stateContext.log.i(null, "URL will be downloaded and its HTML parsed $uri")
+            val htmlUri = urlConverter.getHtmlUri(uri, position, stateContext.uriQuote)
+            if (uri !== htmlUri) {
+                stateContext.log.i(null, "HTML Pattern: Replaced $uri with HTML URI $htmlUri")
+            }
             return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
-                Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, inputUriString, urlConverter, uri)
-                Permission.ASK -> RequestedParseHtmlPermission(stateContext, inputUriString, urlConverter, uri)
+                Permission.ALWAYS -> GrantedParseHtmlPermission(stateContext, inputUriString, urlConverter, htmlUri)
+                Permission.ASK -> RequestedParseHtmlPermission(stateContext, inputUriString, urlConverter, htmlUri)
                 Permission.NEVER -> DeniedConnectionPermission(stateContext, inputUriString, urlConverter)
             }
         }
-        stateContext.log.i(null, "URL converter supports neither URI nor HTML pattern $uri")
+        stateContext.log.w(null, "URI Pattern: Converter supports neither URI nor HTML pattern $uri")
         return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
     }
 }
@@ -238,6 +221,7 @@ data class GrantedParseHtmlPermission(
 
     override suspend fun transition(): State {
         val html = try {
+            stateContext.log.i(null, "HTML Pattern: Downloading $uri")
             stateContext.networkTools.getText(uri.toUrl())
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
@@ -251,86 +235,23 @@ data class GrantedParseHtmlPermission(
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
-            stateContext.log.i(null, "HTML parsed $position")
+            stateContext.log.i(null, "HTML Pattern: parsed $uri to $position")
             return@transition ConversionSucceeded(inputUriString, position)
         }
-        urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUrlString ->
-            stateContext.log.i(null, "HTML contains a redirect to $redirectUrlString")
-            val redirectUri = Uri.parse(redirectUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
-            return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
+        urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUriString ->
+            stateContext.log.i(null, "HTML Redirect Pattern: parsed $uri to redirect URI $redirectUriString")
+            val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
+            return@transition ReceivedUri(
+                stateContext,
+                inputUriString,
+                urlConverter,
+                redirectUri,
+                Permission.ALWAYS
+            )
         }
         stateContext.log.w(null, "HTML could not be parsed")
         return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
     }
-}
-
-data class RequestedParseHtmlToGetCoordsPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val urlConverter: UrlConverter.WithHtmlPattern,
-    val uri: Uri,
-    val positionFromUrl: Position,
-) : ConversionState(), PermissionState {
-    override val permissionTitleResId: Int = urlConverter.permissionTitleResId
-
-    override suspend fun grant(doNotAsk: Boolean): State {
-        if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
-        }
-        return GrantedParseHtmlToGetCoordsPermission(stateContext, inputUriString, urlConverter, uri, positionFromUrl)
-    }
-
-    override suspend fun deny(doNotAsk: Boolean): State {
-        if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
-        }
-        return DeniedParseHtmlToGetCoordsPermission(inputUriString, positionFromUrl)
-    }
-}
-
-data class GrantedParseHtmlToGetCoordsPermission(
-    val stateContext: ConversionStateContext,
-    val inputUriString: String,
-    val urlConverter: UrlConverter.WithHtmlPattern,
-    val uri: Uri,
-    val positionFromUrl: Position,
-) : ConversionState(), HasLoadingIndicator {
-    override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
-
-    override suspend fun transition(): State {
-        val html = try {
-            // TODO Replace uri with https://www.google.com/maps?q=${encode(position.query)}
-            stateContext.networkTools.getText(uri.toUrl())
-        } catch (_: CancellationException) {
-            return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
-        } catch (_: MalformedURLException) {
-            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-        } catch (_: IOException) {
-            // Catches SocketTimeoutException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
-        } catch (_: Exception) {
-            // Catches UnexpectedResponseCodeException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-        }
-        urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
-            stateContext.log.i(null, "HTML parsed $position")
-            return@transition ConversionSucceeded(inputUriString, position)
-        }
-        urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUrlString ->
-            stateContext.log.i(null, "HTML contains a redirect to $redirectUrlString")
-            val redirectUri = Uri.parse(redirectUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
-            return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
-        }
-        stateContext.log.w(null, "HTML could not be parsed; returning position from URL")
-        return ConversionSucceeded(inputUriString, positionFromUrl)
-    }
-}
-
-data class DeniedParseHtmlToGetCoordsPermission(
-    val inputUriString: String,
-    val positionFromUrl: Position,
-) : ConversionState() {
-    override suspend fun transition(): State = ConversionSucceeded(inputUriString, positionFromUrl)
 }
 
 data class ConversionSucceeded(

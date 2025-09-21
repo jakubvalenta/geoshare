@@ -1,37 +1,30 @@
 package page.ooooo.geoshare
 
-import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.UrlConverter
-import page.ooooo.geoshare.lib.toPosition
-import page.ooooo.geoshare.lib.toUrlString
 
 abstract class BaseUrlConverterTest() {
     protected abstract val urlConverter: UrlConverter
 
     private var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? =
-        urlConverter.uriPattern.matcher(uriString)?.takeIf { it.find() }?.group()
+    fun getUri(uriString: String): String? = urlConverter.uriPattern.matcher(uriString)?.takeIf { it.find() }?.group()
 
     fun doesUriPatternMatch(uriString: String): Boolean = urlConverter.uriPattern.matches(uriString)
 
-    fun getShortUri(uriString: String): String? =
-        if (urlConverter is UrlConverter.WithShortUriPattern) {
-            (urlConverter as UrlConverter.WithShortUriPattern).let { urlConverter ->
-                urlConverter.shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.let {
-                    if (urlConverter.shortUriReplacement != null) {
-                        it.replaceFirst(urlConverter.shortUriReplacement)
-                    } else {
-                        it.group()
-                    }
+    fun getShortUri(uriString: String): String? = if (urlConverter is UrlConverter.WithShortUriPattern) {
+        (urlConverter as UrlConverter.WithShortUriPattern).let { urlConverter ->
+            urlConverter.shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.let {
+                if (urlConverter.shortUriReplacement != null) {
+                    it.replaceFirst(urlConverter.shortUriReplacement)
+                } else {
+                    it.group()
                 }
             }
-        } else {
-            throw NotImplementedError()
         }
+    } else {
+        throw NotImplementedError()
+    }
 
     fun isShortUrl(uriString: String): Boolean = getShortUri(uriString) != null
 
@@ -50,6 +43,16 @@ abstract class BaseUrlConverterTest() {
 
     fun parseHtmlRedirect(html: String) = if (urlConverter is UrlConverter.WithHtmlPattern) {
         (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.find(html)?.toUrlString()
+    } else {
+        throw NotImplementedError()
+    }
+
+    fun getHtmlUri(q: String?): String = if (urlConverter is UrlConverter.WithHtmlPattern) {
+        (urlConverter as UrlConverter.WithHtmlPattern).getHtmlUri(
+            Uri.parse("https://www.example.com/unchanged", uriQuote),
+            Position(q = q),
+            uriQuote,
+        ).toString()
     } else {
         throw NotImplementedError()
     }

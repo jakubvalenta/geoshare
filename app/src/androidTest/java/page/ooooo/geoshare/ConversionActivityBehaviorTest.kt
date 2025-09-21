@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
-    fun shareScreen_whenLongLinkIsShared_opensGoogleMaps() {
+    fun shareScreen_whenFullUriIsShared_opensGoogleMaps() {
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
@@ -18,7 +18,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenShortLinkIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_opensGoogleMapsAndShowsTheDialogTheSecondTime() {
+    fun shareScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_opensGoogleMapsAndShowsTheDialogTheSecondTime() {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
@@ -40,7 +40,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenShortLinkIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_opensGoogleMapsAndDoesNotShowTheDialogTheSecondTime() {
+    fun shareScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_opensGoogleMapsAndDoesNotShowTheDialogTheSecondTime() {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
@@ -61,7 +61,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenShortLinkIsSharedAndUnshortenPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() {
+    fun shareScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
@@ -83,7 +83,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenShortLinkIsSharedAndUnshortenPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() {
+    fun shareScreen_whenShortUriIsSharedAndUnshortenPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
 
@@ -104,7 +104,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenNonexistentShortLinkIsSharedAndUnshortenPermissionIsDismissed_closesTheDialogAndDoesNothing() {
+    fun shareScreen_whenNonexistentShortUriIsSharedAndUnshortenPermissionIsDismissed_closesTheDialogAndDoesNothing() {
         // Share a Google Maps short non-existent link with the app
         shareUri("https://maps.app.goo.gl/spam")
 
@@ -204,12 +204,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenLinkThatAllowsHtmlParsingToGetCoordsIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_opensGoogleMapsAndShowsTheDialogTheSecondTime() {
+    fun shareScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_opensGoogleMapsAndShowsTheDialogTheSecondTime() {
         // Share a Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
         // Grant parse HTML permission
-        val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlToGetCoordsPermissionDialog")
+        val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlPermissionDialog")
         waitAndConfirmDialogAndAssertNewWindowIsOpen(parseHtmlPermissionDialogSelector)
 
         // Google Maps shows precise location
@@ -226,13 +226,13 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenLinkThatAllowsHtmlParsingToGetCoordsIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_opensGoogleMapsAndDoesNotShowTheDialogTheSecondTime() {
+    fun shareScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_opensGoogleMapsAndDoesNotShowTheDialogTheSecondTime() {
         // Share a Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
 
         // Grant parse HTML permission and check "Don't ask me again"
         waitAndConfirmDialogAndAssertNewWindowIsOpen(
-            By.res("geoShareParseHtmlToGetCoordsPermissionDialog"),
+            By.res("geoShareParseHtmlPermissionDialog"),
             doNotAsk = true,
         )
 
@@ -250,12 +250,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenLinkThatAllowsHtmlParsingToGetCoordsIsSharedAndParseHtmlPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() {
+    fun shareScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() {
         // Share a Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
 
         // Deny parse HTML permission
-        val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlToGetCoordsPermissionDialog")
+        val parseHtmlPermissionDialogSelector = By.res("geoShareParseHtmlPermissionDialog")
         waitAndDismissDialogAndAssertItIsClosed(parseHtmlPermissionDialogSelector)
 
         // Google Maps shows location search
@@ -269,12 +269,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenLinkThatAllowsHtmlParsingToGetCoordsIsSharedAndParseHtmlPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() {
+    fun shareScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() {
         // Share a Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
 
         // Deny parse HTML permission
-        waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareParseHtmlToGetCoordsPermissionDialog"), doNotAsk = true)
+        waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareParseHtmlPermissionDialog"), doNotAsk = true)
 
         // Google Maps shows location search
         clickGoogleMapsAndAssertItHasText("""Hermannstr\. 40, Berlin""".toPattern())
@@ -287,7 +287,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun shareScreen_whenShortLinkWithCoordinatesInHtmlIsSharedAndUnshortenPermissionDialogIsConfirmed_doesNotAskForParseHtmlPermission() {
+    fun shareScreen_whenShortUriWithCoordinatesInHtmlIsSharedAndUnshortenPermissionDialogIsConfirmed_doesNotAskForParseHtmlPermission() {
         // Share a Google Maps short link with the app
         shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
 
@@ -304,7 +304,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/search?sca_esv=14988c4722c11c49&hl=de&gl=de&output=search&kgmid=/g/11w7ktq4x8&q=ALDI&shndl=30&shem=uaasie&source=sh/x/loc/uni/m1/2&kgs=988b2ac8a0d6f02b")
 
         // Deny parse HTML permission
-        waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareParseHtmlToGetCoordsPermissionDialog"))
+        waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareSearchPermissionDialog"))
 
         // Google Maps shows precise location
         clickGoogleMapsAndAssertItHasText("Search here|Try gas stations, ATMs".toPattern())

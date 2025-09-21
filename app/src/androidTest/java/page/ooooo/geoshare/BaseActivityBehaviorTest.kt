@@ -12,8 +12,7 @@ import org.junit.Before
 import java.lang.Thread.sleep
 import java.util.regex.Pattern
 
-open class BaseActivityBehaviorTest {
-
+abstract class BaseActivityBehaviorTest {
     protected lateinit var device: UiDevice
 
     protected val packageName = "page.ooooo.geoshare.debug"

@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT_NUM
@@ -13,11 +14,16 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PATH
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import page.ooooo.geoshare.lib.RedirectRegex
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
-class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
+class GoogleMapsUrlConverter() :
+    UrlConverter.WithUriPattern,
+    UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
+
     companion object {
         const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
         const val DATA = """data=(?P<data>.*(!3d$LAT_NUM!4d$LON_NUM|!1d$LON_NUM!2d$LAT_NUM).*)"""
@@ -130,6 +136,17 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val conversionHtmlRedirectPattern = htmlPattern {
         content(RedirectRegex("""data-url="(?P<url>[^"]+)""""))
     }
+
+    override fun getHtmlUri(uri: Uri, position: Position?, uriQuote: UriQuote) =
+        position?.q?.takeIf { it.isNotEmpty() }?.let { q ->
+            Uri(
+                scheme = "https",
+                host = "www.google.com",
+                path = "/maps",
+                queryParams = mapOf("q" to q),
+                uriQuote = uriQuote,
+            )
+        } ?: uri
 
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title

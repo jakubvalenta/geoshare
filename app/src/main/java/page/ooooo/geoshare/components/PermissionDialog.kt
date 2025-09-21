@@ -13,13 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.truncateMiddle
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -64,26 +65,29 @@ fun PermissionDialog(
     }
 }
 
+// Preview
+
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
-        val url =
+        val uriString =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
         ConfirmationScaffold {
             PermissionDialog(
-                title = "Connect to Google?",
-                confirmText = "Allow",
-                dismissText = "Create a search geo: link",
+                title = stringResource(R.string.converter_google_maps_permission_title),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
                 onDismissRequest = {},
             ) {
                 Text(
                     AnnotatedString.fromHtml(
-                        "The link <tt>%s</tt>  doesn't contain coordinates. %s can connect to Google to get them, or it can create a geo: link with a search term instead.".format(
-                            truncateMiddle(url),
-                            appName
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            uriString,
+                            appName,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -98,21 +102,22 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
-        val url =
+        val uriString =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
         ConfirmationScaffold {
             PermissionDialog(
-                title = "Connect to Google?",
-                confirmText = "Allow",
-                dismissText = "Create a search geo: link",
+                title = stringResource(R.string.converter_google_maps_permission_title),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
                 onDismissRequest = {},
             ) {
                 Text(
                     AnnotatedString.fromHtml(
-                        "The link <tt>%s</tt> doesn't contain coordinates. %s can connect to Google to get them, or it can create a geo: link with a search term instead.".format(
-                            truncateMiddle(url),
-                            appName
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            uriString,
+                            appName,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -127,20 +132,24 @@ private fun DarkPreview() {
 private fun ParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
-        val url = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         ConfirmationScaffold {
             PermissionDialog(
-                title = "Connect to Google?",
-                confirmText = "Allow",
-                dismissText = "Quit",
+                title = stringResource(R.string.converter_google_maps_permission_title),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
                 onDismissRequest = {},
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareParseHtmlPermissionDialog"),
             ) {
                 Text(
                     AnnotatedString.fromHtml(
-                        "The link <tt>%s</tt> doesn't contain coordinates or place name. %s must connect to Google to get the information.".format(
-                            truncateMiddle(url),
-                            appName
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            uriString,
+                            appName,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
@@ -155,20 +164,24 @@ private fun ParseHtmlPermissionPreview() {
 private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
-        val url = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+        val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         ConfirmationScaffold {
             PermissionDialog(
-                title = "Connect to Google?",
-                confirmText = "Allow",
-                dismissText = "Quit",
+                title = stringResource(R.string.converter_google_maps_permission_title),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
                 onConfirmation = {},
                 onDismissRequest = {},
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareParseHtmlPermissionDialog"),
             ) {
                 Text(
                     AnnotatedString.fromHtml(
-                        "The link <tt>%s</tt> doesn't contain coordinates or place name. %s must connect to Google to get the information.".format(
-                            truncateMiddle(url),
-                            appName
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            uriString,
+                            appName,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),

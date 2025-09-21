@@ -239,30 +239,6 @@ fun ConversionScreen(
                 }
             }
 
-            currentState is RequestedParseHtmlToGetCoordsPermission -> {
-                PermissionDialog(
-                    title = stringResource(currentState.permissionTitleResId),
-                    confirmText = stringResource(R.string.conversion_permission_common_grant),
-                    dismissText = stringResource(R.string.conversion_permission_parse_html_to_get_coords_deny),
-                    onConfirmation = onGrant,
-                    onDismissRequest = onDeny,
-                    modifier = Modifier
-                        .semantics { testTagsAsResourceId = true }
-                        .testTag("geoShareParseHtmlToGetCoordsPermissionDialog")
-                ) {
-                    Text(
-                        AnnotatedString.fromHtml(
-                            stringResource(
-                                R.string.conversion_permission_parse_html_to_get_coords_text,
-                                truncateMiddle(currentState.uri.toString()),
-                                appName,
-                            )
-                        ),
-                        style = TextStyle(lineBreak = LineBreak.Paragraph),
-                    )
-                }
-            }
-
             currentState is HasError -> {
                 if (!retryLoadingIndicatorVisible) {
                     ResultErrorCard(
