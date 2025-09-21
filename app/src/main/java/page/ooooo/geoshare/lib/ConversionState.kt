@@ -299,6 +299,7 @@ data class GrantedParseHtmlToGetCoordsPermission(
 
     override suspend fun transition(): State {
         val html = try {
+            // TODO Replace uri with https://www.google.com/maps?q=${encode(position.query)}
             stateContext.networkTools.getText(uri.toUrl())
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
