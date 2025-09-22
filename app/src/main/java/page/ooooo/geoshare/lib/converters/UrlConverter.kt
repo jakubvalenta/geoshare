@@ -25,7 +25,6 @@ sealed interface UrlConverter {
     }
 
     interface WithHtmlPattern : UrlConverter {
-        fun getHtmlUri(uri: Uri, position: Position?, uriQuote: UriQuote = DefaultUriQuote()): Uri
         val conversionHtmlPattern: ConversionHtmlPattern<PositionRegex>?
         val conversionHtmlRedirectPattern: ConversionHtmlPattern<RedirectRegex>?
         val permissionTitleResId: Int

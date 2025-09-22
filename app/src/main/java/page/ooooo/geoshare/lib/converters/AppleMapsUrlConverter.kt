@@ -54,8 +54,6 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
         }
     }
 
-    override fun getHtmlUri(uri: Uri, position: Position?, uriQuote: UriQuote) = uri
-
     override val conversionHtmlPattern = htmlPattern {
         all {
             content(PositionRegex("""<meta property="place:location:latitude" content="$LAT""""))

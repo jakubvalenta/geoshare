@@ -137,17 +137,6 @@ class GoogleMapsUrlConverter() :
         content(RedirectRegex("""data-url="(?P<url>[^"]+)""""))
     }
 
-    override fun getHtmlUri(uri: Uri, position: Position?, uriQuote: UriQuote) =
-        position?.q?.takeIf { it.isNotEmpty() }?.let { q ->
-            Uri(
-                scheme = "https",
-                host = "www.google.com",
-                path = "/maps",
-                queryParams = mapOf("q" to q),
-                uriQuote = uriQuote,
-            )
-        } ?: uri
-
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
 

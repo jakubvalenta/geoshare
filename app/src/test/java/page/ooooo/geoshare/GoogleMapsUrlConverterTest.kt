@@ -678,11 +678,4 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun isShortUri_unknownDomain() {
         assertFalse(isShortUrl("https://www.example.com/foo"))
     }
-
-    @Test
-    fun getHtmlPattern_returnsSearchUriIfPositionHasQuery() {
-        assertEquals("https://www.example.com/unchanged", getHtmlUri(null))
-        assertEquals("https://www.example.com/unchanged", getHtmlUri(""))
-        assertEquals("https://www.google.com/maps?q=foo%20bar", getHtmlUri("foo bar"))
-    }
 }

@@ -3,14 +3,11 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
@@ -39,8 +36,6 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
             }
         }
     }
-
-    override fun getHtmlUri(uri: Uri, position: Position?, uriQuote: UriQuote) = uri
 
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex(""""latLng":{"lat":$LAT,"lng":$LON}"""))

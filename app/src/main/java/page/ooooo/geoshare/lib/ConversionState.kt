@@ -173,16 +173,12 @@ data class UnshortenedUrl(
             null
         }
         if (urlConverter is UrlConverter.WithHtmlPattern) {
-            val htmlUri = urlConverter.getHtmlUri(uri, positionFromUri, stateContext.uriQuote)
-            if (uri !== htmlUri) {
-                stateContext.log.i(null, "HTML Pattern: Replaced $uri with HTML URI $htmlUri")
-            }
             return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlPermission(
                     stateContext,
                     inputUriString,
                     urlConverter,
-                    htmlUri,
+                    uri,
                     positionFromUri
                 )
 
@@ -190,7 +186,7 @@ data class UnshortenedUrl(
                     stateContext,
                     inputUriString,
                     urlConverter,
-                    htmlUri,
+                    uri,
                     positionFromUri
                 )
 
@@ -267,7 +263,10 @@ data class ParseHtmlFailed(
     val inputUriString: String,
     val positionFromUri: Position?,
 ) : ConversionState() {
-    override suspend fun transition() = if (positionFromUri != null) {
+    override suspend fun transition() = if (
+        positionFromUri != null &&
+        (!positionFromUri.points.isNullOrEmpty() || !positionFromUri.q.isNullOrEmpty())
+    ) {
         ConversionSucceeded(inputUriString, positionFromUri)
     } else {
         ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
