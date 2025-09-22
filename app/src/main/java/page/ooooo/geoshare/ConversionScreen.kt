@@ -206,7 +206,7 @@ fun ConversionScreen(
                         AnnotatedString.fromHtml(
                             stringResource(
                                 R.string.conversion_permission_common_text,
-                                currentState.uri.toString(),
+                                truncateMiddle(currentState.uri.toString()),
                                 appName,
                             )
                         ),
@@ -230,7 +230,7 @@ fun ConversionScreen(
                         AnnotatedString.fromHtml(
                             stringResource(
                                 R.string.conversion_permission_common_text,
-                                currentState.uri.toString(),
+                                truncateMiddle(currentState.uri.toString()),
                                 appName,
                             )
                         ),
