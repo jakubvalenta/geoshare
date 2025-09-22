@@ -5,6 +5,9 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 
+/**
+ * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
+ */
 class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = AppleMapsUrlConverter()
 
@@ -64,9 +67,9 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
 
 
     @Test
-    fun parseUrl_search() {
+    fun parseUrl_searchQuery() {
         assertEquals(
-            Position(q = "Central Park"),
+            Position(lat = "0", lon = "0", q = "Central Park"),
             parseUrl("https://maps.apple.com/?q=Central+Park")
         )
     }
@@ -74,13 +77,21 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_searchLocation() {
         assertEquals(
+            Position("50.894967", "4.341626"),
+            parseUrl("https://maps.apple.com/?sll=50.894967,4.341626")
+        )
+    }
+
+    @Test
+    fun parseUrl_searchLocationAndQuery() {
+        assertEquals(
             Position("50.894967", "4.341626", q = "Central Park", z = "10"),
             parseUrl("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
         )
     }
 
     @Test
-    fun parseUrl_searchLocationWithInvalidZoom() {
+    fun parseUrl_searchLocationAndQueryWithInvalidZoom() {
         assertEquals(
             Position("50.894967", "4.341626", q = "Central Park"),
             parseUrl("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
@@ -143,7 +154,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeIdAndQuery() {
         assertEquals(
-            Position(q = "Central Park"),
+            Position(),
             parseUrl("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park")
         )
     }

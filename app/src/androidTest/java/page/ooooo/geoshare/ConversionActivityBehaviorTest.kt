@@ -15,11 +15,11 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309"))
+        waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
 
         // Google Maps shows precise location
         clickMapApp(googleMapsPackageName)
-        assertGoogleMapsHasText("Search here|Try gas stations, ATMs".toPattern())
+        assertGoogleMapsHasText("Westend".toPattern())
     }
 
     @Test

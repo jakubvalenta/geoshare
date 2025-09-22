@@ -26,7 +26,7 @@ class YandexUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
 
         // Short URI
         testUri(
-            Position("50.111192", "8.668963"),
+            Position("50.111192", "8.668963", z = "14.19"),
             "https://yandex.com/maps/-/CLAvMI18",
         )
     }

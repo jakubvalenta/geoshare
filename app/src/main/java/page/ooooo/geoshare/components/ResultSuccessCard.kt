@@ -50,6 +50,7 @@ fun ResultSuccessCard(
                     SelectionContainer {
                         Text(
                             it,
+                            Modifier.testTag("geoShareConversionSuccessPositionParams"),
                             fontStyle = FontStyle.Italic,
                             style = MaterialTheme.typography.bodySmall,
                         )
