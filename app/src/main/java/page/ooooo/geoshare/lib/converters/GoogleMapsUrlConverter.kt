@@ -3,9 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT_NUM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
@@ -13,11 +11,6 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.LON_NUM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PATH
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.RedirectRegex
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.htmlPattern
-import page.ooooo.geoshare.lib.uriPattern
 
 class GoogleMapsUrlConverter() :
     UrlConverter.WithUriPattern,

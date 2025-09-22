@@ -46,14 +46,4 @@ abstract class BaseUrlConverterTest() {
     } else {
         throw NotImplementedError()
     }
-
-    fun getHtmlUri(q: String?): String = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).getHtmlUri(
-            Uri.parse("https://www.example.com/unchanged", uriQuote),
-            Position(q = q),
-            uriQuote,
-        ).toString()
-    } else {
-        throw NotImplementedError()
-    }
 }

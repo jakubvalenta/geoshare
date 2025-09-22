@@ -2,13 +2,9 @@ package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.ConversionHtmlPattern
-import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.ConversionUriPattern
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.RedirectRegex
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 
 sealed interface UrlConverter {
     val uriPattern: Pattern

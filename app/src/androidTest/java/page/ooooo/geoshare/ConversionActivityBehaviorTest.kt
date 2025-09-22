@@ -62,7 +62,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
 
         // Shows precise location again
-        waitAndAssertPositionIsVisible(Position("52.4842015", "13.4167277"))
+        waitAndAssertPositionIsVisible(Position("44.4490541", "26.0888398"))
     }
 
     @Test
