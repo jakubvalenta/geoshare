@@ -22,8 +22,6 @@
     <string name="main_navigate_to_intro">发现更多应用功能</string>
     <string name="converter_google_maps_permission_title">连接到 Google？</string>
     <string name="conversion_permission_common_deny">取消</string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">创建搜索 geo: 链接</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[链接 <tt>%1$s</tt> 不包含坐标。%2$s 可以连接到 Google 获取它们，也可以创建 geo: 链接，通过地名进行搜索。]]></string>
     <string name="about_title">关于</string>
     <string name="about_app_icon_content_description">应用程序图标</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

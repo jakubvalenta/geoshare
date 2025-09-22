@@ -52,8 +52,6 @@
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
     <string name="conversion_permission_common_text"><![CDATA[A ligação <tt>%1$s</tt> não contém coordenadas ou o nome do lugar. O %2$s precisa conectar ao Google para conseguir as informações.]]></string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">Criar uma ligação geo: de pesquisa</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[A ligação <tt>%1$s</tt> não contém coordenadas. O %2$s pode conectar ao Google para obté-las ou pode criar uma ligação geo: que direciona a uma pesquisa pelo nome do lugar.]]></string>
     <string name="about_title">Sobre</string>
     <string name="about_app_icon_content_description">Ícone do aplicação</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

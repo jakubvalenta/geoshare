@@ -21,13 +21,11 @@
     <string name="main_create_geo_uri">Показати координати</string>
     <string name="main_navigate_to_intro">Дізнатися більше про функції застосунку</string>
     <string name="converter_google_maps_permission_title">Під’єднатися до Google?</string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">Створити пошукове гео: посилання</string>
     <string name="about_title">Про застосунок</string>
     <string name="about_app_icon_content_description">Значок застосунку</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="faq_title">ЧаПи</string>
     <string name="nav_back_content_description">Назад на головний екран</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат. %2$s може під’єднатися до Google, щоб отримати їх, або ж створити гео: посилання, яке веде до пошуку за назвою населеного пункту.]]></string>
     <string name="intro_how_to_share_google_maps_content_description">Знімок екрана спільного доступу до Google Maps</string>
     <string name="intro_nav_close">Закрити</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Виберіть <i>%1$s</i>, і програма дозволить вам відкрити те саме місце в будь-якій встановленій картографічній програмі.]]></string>
