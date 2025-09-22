@@ -1,2 +1,2 @@
-- Added support for Google Maps search links.
-- Removed dialog asking whether to parse HTML to get precise coordinates; always do it when connection to map service is allowed.
+- Replaced search queries in certain resulting geo: URIs with map center coordinates, which are less precise but more reliable.
+- Removed dialog button to create search-only geo: URIs; handle it automatically if connection permission is granted.
