@@ -1,0 +1,2 @@
+- Added support for Google Maps search links.
+- Removed dialog asking whether to parse HTML to get precise coordinates; always do it when connection to map service is allowed.
