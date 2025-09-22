@@ -9,6 +9,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import org.junit.Assert.*
 import org.junit.Before
+import page.ooooo.geoshare.lib.Position
 import java.lang.Thread.sleep
 import java.util.regex.Pattern
 
@@ -95,8 +96,36 @@ abstract class BaseActivityBehaviorTest {
         assertTrue(waitForObject(selector))
     }
 
+    protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) {
+        expectedPosition.takeIf { it.points?.isNotEmpty() == true }?.let { expectedPosition ->
+            waitAndAssertObjectExists(By.text(expectedPosition.toNorthSouthWestEastDecCoordsString()))
+        }
+        expectedPosition.q.takeIf { it?.isNotEmpty() == true }?.let { q ->
+            waitAndAssertObjectExists(By.text(expectedPosition.toParamsString()))
+        }
+    }
+
     protected fun clickObject(selector: BySelector) {
         device.findObject(selector)?.click()
+    }
+
+    protected fun shareUri(unsafeUriString: String) {
+        // Use shell command instead of startActivity() to support Xiaomi
+        executeShellCommand(
+            "am start -a android.intent.action.VIEW -d $unsafeUriString -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
+        )
+    }
+
+    protected fun testUri(expectedPosition: Position, unsafeUriString: String) {
+        shareUri(unsafeUriString)
+        waitAndAssertPositionIsVisible(expectedPosition)
+    }
+
+    protected fun testTextUri(expectedPosition: Position, unsafeUriString: String) {
+        executeShellCommand(
+            "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeUriString -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
+        )
+        waitAndAssertPositionIsVisible(expectedPosition)
     }
 
     protected fun waitAndConfirmDialogAndAssertNewWindowIsOpen(
@@ -126,12 +155,31 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun clickGoogleMapsAndAssertItHasText(textValue: Pattern) {
+    protected fun clickIntroCloseButton() {
+        val button = By.res("geoShareIntroScreenCloseButton")
+        waitAndAssertObjectExists(button)
+        clickObject(button)
+    }
+
+    protected fun setUserPreferenceConnectionPermissionToAlways() {
+        clickObject(By.res("geoShareMainMenuButton"))
+        val menuButton = By.res("geoShareMainMenuUserPreferences")
+        waitAndAssertObjectExists(menuButton)
+        clickObject(menuButton)
+        val option = By.res("geoShareUserPreferenceConnectionPermissionAlways")
+        waitAndAssertObjectExists(option)
+        clickObject(option)
+    }
+
+    @Suppress("SameParameterValue")
+    protected fun clickMapApp(packageName: String) {
         // Open the coordinates with Google Maps
-        val googleMapsApp = By.res("geoShareResultCardApp_$googleMapsPackageName")
+        val googleMapsApp = By.res("geoShareResultCardApp_$packageName")
         waitAndAssertObjectExists(googleMapsApp)
         clickObject(googleMapsApp)
+    }
 
+    protected fun assertGoogleMapsHasText(textValue: Pattern) {
         // If there is a Google Maps sign in screen, skip it
         val googleMapsSignInHeadline =
             By.pkg(googleMapsPackageName).text("Make it your map")

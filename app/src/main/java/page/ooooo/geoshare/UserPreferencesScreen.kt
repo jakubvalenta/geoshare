@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,18 +34,22 @@ fun UserPreferencesScreen(
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(stringResource(R.string.user_preferences_title)) },
-            navigationIcon = {
-                IconButton(onClick = onNavigateToMainScreen) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.nav_back_content_description),
-                    )
-                }
-            })
-    }) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.user_preferences_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateToMainScreen) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.nav_back_content_description),
+                        )
+                    }
+                },
+            )
+        },
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)

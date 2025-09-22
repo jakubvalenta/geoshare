@@ -1,0 +1,35 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="instrumentedTests.converters" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
+    <module name="Geo_Share.app" />
+    <option name="ANDROID_TEST_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
+    <option name="TESTING_TYPE" value="1" />
+    <option name="METHOD_NAME" value="" />
+    <option name="CLASS_NAME" value="" />
+    <option name="PACKAGE_NAME" value="page.ooooo.geoshare.converters" />
+    <option name="TEST_NAME_REGEX" value="" />
+    <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+    <option name="EXTRA_OPTIONS" value="" />
+    <option name="RETENTION_ENABLED" value="No" />
+    <option name="RETENTION_MAX_SNAPSHOTS" value="2" />
+    <option name="RETENTION_COMPRESS_SNAPSHOTS" value="false" />
+    <option name="CLEAR_LOGCAT" value="false" />
+    <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+    <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+    <option name="DEBUGGER_TYPE" value="Java" />
+    <Java>
+      <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+      <option name="DEBUG_SANDBOX_SDK" value="false" />
+    </Java>
+    <Profilers>
+      <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+      <option name="STARTUP_PROFILING_ENABLED" value="false" />
+      <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+      <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+      <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+      <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+    </Profilers>
+    <method v="2">
+      <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
