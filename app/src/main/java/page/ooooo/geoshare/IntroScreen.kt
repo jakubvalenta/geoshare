@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.provider.Settings
+import android.text.BidiFormatter
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -124,7 +125,7 @@ fun IntroScreen(
                         page,
                     ) {
                         IntroFigure(
-                            stringResource(R.string.intro_open_by_default_google_maps_caption),
+                            stringResource(R.string.intro_open_by_default_google_maps_caption).toSupportArrowForStringRTL(),
                         ) {
                             ScreenshotOpenByDefaultMapApp()
                             IntroOutlinedButton({
@@ -134,7 +135,7 @@ fun IntroScreen(
                             }
                         }
                         IntroFigure(
-                            stringResource(R.string.intro_open_by_default_app_caption, appName),
+                            stringResource(R.string.intro_open_by_default_app_caption, appName).toSupportArrowForStringRTL(),
                         ) {
                             ScreenshotOpenByDefault()
                             IntroOutlinedButton({
@@ -209,6 +210,15 @@ fun IntroPage(
         ) {
             content()
         }
+    }
+}
+
+fun String.toSupportArrowForStringRTL(): String {
+    val bidiFormatter = BidiFormatter.getInstance()
+    return if (bidiFormatter.isRtlContext) {
+        this.replace("&#8594;","&#8592;")
+    } else {
+        this
     }
 }
 
