@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.converters
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.lib.uriPattern
-import java.math.RoundingMode
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     companion object {
@@ -98,6 +98,6 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         val min = (min?.toDouble() ?: 0.0) / 60
         val sec = (sec?.toDouble() ?: 0.0) / 3600
         val dec = (sig * (deg + min + sec))
-        return dec.toBigDecimal().setScale(6, RoundingMode.HALF_UP).toDouble().toString()
+        return dec.toScale(6).toString()
     }
 }

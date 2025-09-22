@@ -123,6 +123,22 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun isShortUrl_shortLink() {
+        assertEquals(
+            Position("45.829189", "1.259372"),
+            parseUrl("https://waze.com/ul/hu00uswvn3")
+        )
+        assertEquals(
+            Position("45.829189", "1.259372"),
+            parseUrl("https://www.waze.com/ul/hu00uswvn3")
+        )
+        assertEquals(
+            Position("45.829189", "1.259372"),
+            parseUrl("https://www.waze.com/live-map?h=u00uswvn3")
+        )
+    }
+
+    @Test
     fun parseHtml_containsLatLngJSON_returnsPosition() {
         assertEquals(
             Position("43.64265563", "-79.387202798"),
@@ -160,40 +176,5 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
         assertNull(
             parseHtml("""<html></html>""")
         )
-    }
-
-    @Test
-    fun isShortUrl_correct() {
-        assertTrue(isShortUrl("https://waze.com/ul/hu00uswvn3"))
-        assertTrue(isShortUrl("https://www.waze.com/ul/hu00uswvn3"))
-        assertTrue(isShortUrl("https://www.waze.com/live-map?h=u00uswvn3"))
-    }
-
-    @Test
-    fun isShortUrl_replacement() {
-        assertEquals(
-            "https://www.waze.com/live-map?h=u00uswvn3",
-            getShortUri("https://waze.com/ul/hu00uswvn3")
-        )
-        assertEquals(
-            "https://www.waze.com/live-map?h=u00uswvn3",
-            getShortUri("https://www.waze.com/live-map?h=u00uswvn3")
-        )
-    }
-
-    @Test
-    fun isShortUri_wrongPath() {
-        assertFalse(isShortUrl("https://waze.com/"))
-        assertFalse(isShortUrl("https://waze.com/foo"))
-        assertFalse(isShortUrl("https://waze.com/ul"))
-        assertFalse(isShortUrl("https://waze.com/ul/"))
-        assertFalse(isShortUrl("https://waze.com/live-map"))
-        assertFalse(isShortUrl("https://waze.com/live-map/"))
-        assertFalse(isShortUrl("https://waze.com/live-map/?spam=1"))
-    }
-
-    @Test
-    fun isShortUri_unknownDomain() {
-        assertFalse(isShortUrl("https://www.example.com/foo"))
     }
 }

@@ -14,13 +14,7 @@ abstract class BaseUrlConverterTest() {
 
     fun getShortUri(uriString: String): String? = if (urlConverter is UrlConverter.WithShortUriPattern) {
         (urlConverter as UrlConverter.WithShortUriPattern).let { urlConverter ->
-            urlConverter.shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.let {
-                if (urlConverter.shortUriReplacement != null) {
-                    it.replaceFirst(urlConverter.shortUriReplacement)
-                } else {
-                    it.group()
-                }
-            }
+            urlConverter.shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.group()
         }
     } else {
         throw NotImplementedError()

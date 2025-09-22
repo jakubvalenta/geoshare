@@ -3,22 +3,31 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.htmlPattern
-import page.ooooo.geoshare.lib.uriPattern
 
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
-class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern, UrlConverter.WithHtmlPattern {
+class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
+    companion object {
+        @Suppress("SpellCheckingInspection")
+        const val BASE32 = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
+    }
+
+    class GeoHashRegex(regex: String) : PositionRegex(regex) {
+        override val points: List<Point>?
+            get() = groupOrNull("hash")?.let { hash ->
+                decodeGeoHash(hash).let { (lat, lon) ->
+                    listOf(lat.toString() to lon.toString())
+                }
+            }
+    }
+
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
-    override val shortUriPattern: Pattern =
-        Pattern.compile("""(https?://)?(www\.)?waze\.com/(ul/h|live-map\?h=)(?P<id>[A-Za-z0-9_-]+)""")
-    override val shortUriReplacement = "https://www.waze.com/live-map?h=\${id}"
 
     override val conversionUriPattern = uriPattern {
         all {
@@ -26,6 +35,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
                 query("z", PositionRegex(Z))
             }
             first {
+                path(GeoHashRegex("""/ul/h$BASE32"""))
+                query("h", GeoHashRegex(BASE32))
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
                 @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))

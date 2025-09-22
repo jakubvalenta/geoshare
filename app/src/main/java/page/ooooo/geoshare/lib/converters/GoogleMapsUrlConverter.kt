@@ -69,7 +69,6 @@ class GoogleMapsUrlConverter() :
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?((www|maps)\.)?(google(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+|$SHORT_URL)""")
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
-    override val shortUriReplacement: String? = null
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {
