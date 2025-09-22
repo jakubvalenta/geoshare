@@ -106,7 +106,7 @@ class GoogleMapsUrlConverter() :
                 path(PositionRegex("""/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$LAT,$LON/data[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$LAT,$LON/?"""))
-                path(PositionRegex("""/maps/dir/.*/$Q_PATH/@[\d.,+-]+,${Z}z/?[^/]*"""))
+                path(PositionRegex("""/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$Q_PATH/data[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$Q_PATH/?"""))
                 path(PositionRegex("""/maps/dir/"""))

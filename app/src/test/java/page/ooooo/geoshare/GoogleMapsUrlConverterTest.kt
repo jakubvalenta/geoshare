@@ -287,10 +287,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_directionsPlaceAndCoordinates() {
         assertEquals(
-            Position(
-                q = "Hôpital Européen Georges Pompidou Assistance Publique-Hôpitaux de Paris,20 r Leblanc, 75015 Paris",
-                z = "8",
-            ),
+            Position("48.83887481689453", "2.2740750312805176", z = "8"),
             @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/")
         )
@@ -323,7 +320,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_directionsFromToViaWithCenter() {
         assertEquals(
-            Position(q = "Reuterstraße 1, Berlin-Neukölln, Germany", z = "16"),
+            Position("52.4844406", "13.4217121", z = "16"),
             @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
         )
