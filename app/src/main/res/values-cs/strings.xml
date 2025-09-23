@@ -32,7 +32,7 @@
     <string name="converter_apple_maps_permission_title">Spojit se s Applem?</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Zrušit</string>
-    <string name="conversion_permission_common_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice ani název místa. %2$s se potřebuje spojit s danou mapovou službou, aby tyto informace získal.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice. %2$s se musí spojit s danou mapovou službou, aby je získal.]]></string>
     <string name="about_title">O aplikaci</string>
     <string name="about_app_icon_content_description">Ikona aplikace</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -45,7 +45,7 @@
     <string name="faq_item_expand">Rozbalit sekci</string>
     <string name="user_preferences_title">Nastavení</string>
     <string name="user_preferences_connection_title">Povolit spojení s mapovou službou (Google, Apple atd.)?</string>
-    <string name="user_preferences_connection_description">Pro podporu krátkých odkazů na Google Mapy a pro získání souřadnic z webové stránky Google Map, když odkaz souřadnice neobsahuje, se %1$s může spojit s Googlem. Více informací najdete na obrazovce Nejčastější dotazy.</string>
+    <string name="user_preferences_connection_description">Pro podporu krátkých odkazů a pro získání souřadnic z webové stránky mapové služby, když odkaz souřadnice neobsahuje, se %1$s může spojit s danou mapovou službou. Více informací najdete na obrazovce Nejčastější dotazy.</string>
     <string name="user_preferences_connection_option_always">Ano</string>
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
     <string name="user_preferences_connection_option_never">Ne</string>

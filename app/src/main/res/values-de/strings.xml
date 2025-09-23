@@ -3,11 +3,11 @@
     <string name="conversion_succeeded_copy_geo">geo: kopieren</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="intro_how_to_share_google_maps_content_description">Bildschirmfoto von Google Maps share Sheet</string>
-    <string name="intro_how_to_share_app_content_description">Bildschirmfoto von %1$s’s share sheet</string>
+    <string name="intro_how_to_share_app_content_description">Bildschirmfoto von %1$s share Sheet</string>
     <string name="intro_open_by_default_google_maps_button">Google Maps Einstellung öffnen</string>
-    <string name="intro_open_by_default_app_content_description">Screenshot von %1$s’s Standardmäßig öffnen Einstellungen</string>
+    <string name="intro_open_by_default_app_content_description">Bildschirmfoto von %1$s Standardmäßig öffnen Einstellungen</string>
     <string name="intro_open_by_default_app_button">Öffne die Einstellungen von %1$s</string>
-    <string name="intro_open_by_default_app_note"><![CDATA[Wählen Sie wenigstens <tt>maps.google.com</tt> und <tt>maps.app.goo.gl</tt> aus. Wenn manche Links ausgegraut sind, öffnen andere Google Apps diese Links Standardmäßig. Sie können diese Apps suchen und bei den das öffnen von Links unterbinden, so wie es zuvor bei Google Maps gemacht wurde.]]></string>
+    <string name="intro_open_by_default_app_note"><![CDATA[Wähle wenigstens <tt>maps.google.com</tt> und <tt>maps.app.goo.gl</tt> aus. Wenn manche Links ausgegraut sind, öffnen andere Google Apps diese Links Standardmäßig. Du kannst diese Apps suchen und bei den das Öffnen von Links unterbinden, so wie es zuvor bei Google Maps gemacht wurde.]]></string>
     <string name="intro_nav_next">Weiter</string>
     <string name="main_input_uri_clear_content_description">Löschen</string>
     <string name="main_input_uri_supporting_text">z.B. https://maps.app.goo.gl/… oder maps.apple.com/…</string>
@@ -17,21 +17,21 @@
     <string name="converter_google_maps_permission_title">Mit Google Verbinden?</string>
     <string name="converter_apple_maps_permission_title">Mit Apple Verbinden?</string>
     <string name="conversion_permission_common_deny">Abbrechen</string>
-    <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> hat keine Koordinaten-Informationen oder Ortnamen. %2$s muss eine Verbindung zu Google aufbauen, um die Informationen zu bekommen.]]></string>
-    <string name="intro_how_to_share_headline">Wie öffnet man Karten Orte in anderen App</string>
-    <string name="intro_nav_finish">Los gehts</string>
+    <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> enthält keine Koordinaten. %2$s muss sich mit dem Kartendienst verbinden, um sie zu erhalten.]]></string>
+    <string name="intro_how_to_share_headline">Wie öffnet man Karten Orte in einer anderen App</string>
+    <string name="intro_nav_finish">Los geht’s</string>
     <string name="conversion_succeeded_apps_headline">Öffnen mit…</string>
-    <string name="intro_open_by_default_headline">Konfigurieren Sie Android so, dass Links zu Google Maps in alternativen Karten-Apps geöffnet werden (optional)</string>
+    <string name="intro_open_by_default_headline">Konfiguriere Android so, dass Links zu Google Maps in alternativen Karten-Apps geöffnet werden (optional)</string>
     <string name="intro_title">Einführung</string>
     <string name="nav_back_content_description">Zurück zur Startseite</string>
-    <string name="main_input_uri_label">Füge einen Google Maps Link hier ein</string>
+    <string name="main_input_uri_label">Füge einen Kartenlink hier ein</string>
     <string name="intro_nav_close">Schließen</string>
     <string name="intro_settings_activity_not_found">Einstellung öffnen fehlgeschlagen</string>
-    <string name="intro_how_to_share_google_maps_caption">Teile den Google Maps Ort aus der App oder dem Browser.</string>
-    <string name="intro_open_by_default_google_maps_content_description">Screenshot von Google Maps’ Standardmäßig öffnen Einstellung</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Wähle <i>%1$s</i> und die App lässt Sie den Standort in jeder installierten Karten-App öffnen.]]></string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Erstens öffnen Sie &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalten sie das öffnen von Links für diese App aus.]]></string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffnen Sie die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, jetzt das Öffnen von Links für in der App einschalten, und auf <i>Links hinzufügen</i> drücken.]]></string>
+    <string name="intro_how_to_share_google_maps_caption">Teile einen Standort aus einer Karten-App oder Webbrowser.</string>
+    <string name="intro_open_by_default_google_maps_content_description">Bildschirmfoto von Google Maps Standardmäßig öffnen Einstellung</string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Wähle <i>%1$s</i> und die App lässt dich den Standort in jeder installierten Karten-App öffnen.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Erstens öffne &#8594; Apps &#8594; Maps &#8594; <i>Standardmäßig öffnen</i> und schalte das Öffnen von Links für diese App aus.]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffne die Einstellungen &#8594; Apps &#8594; %1$s &#8594; <i>Standardmäßig öffnen</i>, schalte das Öffnen von Links für <i>In der App</i> ein, und drücke <i>Links hinzufügen</i>.]]></string>
     <string name="conversion_permission_common_grant">Okay</string>
     <string name="conversion_error_report">Problem melden</string>
     <string name="conversion_error_retry">Erneut versuchen</string>
@@ -42,7 +42,7 @@
     <string name="faq_title">FAQ</string>
     <string name="faq_how_it_works_headline">Funktionsweise und Hinweise zum Datenschutz</string>
     <string name="about_text"><![CDATA[<p>%1$s ist eine Kostenlose und quelloffene App veröffentlicht unter der <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> oder späterer Lizenz.</p><br><p>Den Code findest du unter <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, wo du auch <a href="https://github.com/jakubvalenta/geoshare/issues">einen Fehler Melden kannst</a>.</p><br><p>Du kannst gerne hier Feedback hinterlassen. Erreichen kannst du mich per E-Mail unter <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s wandelt Google Maps-Links in geo:-Links um, die von anderen Kartenanwendungen geöffnet werden können. Um einen geo:-Link zu erstellen, sind geografische Koordinaten erforderlich. %1$s extrahiert sie aus der Google Maps-URL.</p><br><p>Allerdings enthalten nicht alle Google Maps-URLs Koordinaten. In solchen Fällen, wird %1$s <b>Sie um Erlaubnis bitten, sich mit Google zu verbinden</b> und die Koordinaten entweder aus den HTTP-Headern oder dem HTML-Dokument des Links abrufen.</p><br><p>Genauer gesagt, gibt es drei Szenarien, wie %1$s eine Google Maps URL in einen geo: Link wandelt.</p><br><p><b>1.</b></p><br><p>Wenn die Google Maps-URL bereits geografische Koordinaten enthält (zum Beispiel <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), dann wird sie geparst und es wird keine Anfrage an die Google-Server gestellt.</p><br><p><b>2.</b></p><br><p>Wenn die Google Maps-URL keine geografischen Koordinaten enthält (zum Beispiel <tt>https://www.google.com/maps/place/Central+Park/</tt>), dann fragt %1$s Sie, ob es eine Verbindung zu Google herstellen kann.</p><br><p>Wenn Sie eine Verbindung zu Google zulassen, dann stellt %1$s eine <b>HTTP GET-Anfrage</b> an Google Maps und analysiert die Koordinaten aus der HTML-Antwort. Sie können sich das so vorstellen: <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>. Wenn Sie die Verbindung zu Google nicht zulassen, erstellt %1$s einen geo: Link mit einem Ortssuchbegriff (zum Beispiel <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Wenn die Google Maps-URL ein kurzer Link ist (z. B. <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), fragt %1$s, ob eine Verbindung zu Google hergestellt werden kann.</p><br><p>Wenn Sie eine Verbindung zu Google zulassen, stellt %1$s eine <b>HTTP HEAD-Anfrage</b> an den Kurzlink und liest den vollständigen Link aus den Antwort-Headern. Sie können sich das so vorstellen: <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt> Dann fährt %1$s mit Szenario 1 oder 2 fort, je nachdem, ob der vollständige Link Koordinaten enthält oder nicht. Im Falle von Szenario 2 wird eine weitere Verbindung zu Google hergestellt, aber diesmal ohne Nachfrage.</p><br><p>Wenn Sie die Verbindung zu Google nicht zulassen, bricht %1$s die Erstellung des geo:-Links ab.</p><br><br><p>Um die Verbindung mit Google dauerhaft zu erlauben oder zu verweigern, anstatt immer zu fragen (Standardeinstellung), gehen Sie zu den Einstellungen der App.</p>]]></string>
+    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s wandelt Kartenlinks in geo:-Links um, die von anderen Karten-Apps geöffnet werden können. Um einen geo:-Link zu erstellen, sind geografische Koordinaten erforderlich. %1$s extrahiert sie aus der Karten-URL.</p><br><p>Allerdings enthalten nicht alle Karten-URLs Koordinaten. In solchen Fällen, wird %1$s <b>dich um Erlaubnis bitten, sich mit dem Kartendienst (Google Maps, Apple Maps usw.) zu verbinden</b> und die Koordinaten entweder aus den HTTP-Headern oder dem HTML-Dokument des Links abzurufen.</p><br><p>Genauer gesagt, gibt es drei Szenarien, wie %1$s eine Karten-URL in einen geo:-Link wandelt.</p><br><p><b>1.</b></p><br><p>Wenn die Karten-URL bereits geografische Koordinaten enthält (zum Beispiel <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), dann wird sie geparst und es wird keine Anfrage an die Server des Kartendienstes gestellt.</p><br><p><b>2.</b></p><br><p>Wenn die Karten-URL keine geografischen Koordinaten enthält (zum Beispiel <tt>https://www.google.com/maps/place/Central+Park/</tt>), dann fragt %1$s dich, ob es eine Verbindung zum Kartendienst herstellen kann.</p><br><p>Wenn du eine Verbindung zu Google zulässt, dann stellt %1$s eine <b>HTTP GET-Anfrage</b> an Google Maps (oder Apple Maps usw.) und analysiert die Koordinaten aus der HTML-Antwort. Du kannst dich das so vorstellen: <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>. Wenn du die Verbindung zum Kartendienst nicht zulässt, erstellt %1$s einen geo:-Link mit einem Ortssuchbegriff (zum Beispiel <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Wenn die Karten-URL ein Kurzlink ist (zum Beispiel <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), fragt %1$s, ob eine Verbindung zum Kartendienst hergestellt werden kann.</p><br><p>Wenn du eine Verbindung zum Kartendienst zulässt, stellt %1$s eine <b>HTTP HEAD-Anfrage</b> an den Kurzlink und liest den vollständigen Link aus den Antwort-Headern. Du kannst dich das so vorstellen: <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt> Dann fährt %1$s mit Szenario 1 oder 2 fort, je nachdem, ob der vollständige Link Koordinaten enthält oder nicht. Im Falle von Szenario 2 wird eine weitere Verbindung zum Kartendienst hergestellt, aber diesmal ohne Nachfrage.</p><br><p>Wenn du die Verbindung zum Kartendienst nicht zulässt, bricht %1$s die Erstellung des geo:-Links ab.</p><br><br><p>Um die Verbindung mit Kartendienst zu erlauben oder zu verweigern, anstatt immer zu fragen (Standardeinstellung), gehe zu den Einstellungen der App.</p>]]></string>
     <string name="converter_google_maps_loading_indicator_title">Verbindung mit Google…</string>
     <string name="converter_apple_maps_loading_indicator_title">Verbindung mit Apple…</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Abbrechen</string>
@@ -52,9 +52,9 @@
     <string name="conversion_done">Erledigt</string>
     <string name="conversion_succeeded_title">Koordinaten</string>
     <string name="conversion_error_title">Fehler</string>
-    <string name="intro_how_to_share_google_maps_screenshot_title">Teilen mit</string>
-    <string name="intro_how_to_share_google_maps_screenshot_place">Ausgewählter Standort</string>
-    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS</string>
+    <string name="intro_how_to_share_google_maps_screenshot_title">Link wird geteilt</string>
+    <string name="intro_how_to_share_google_maps_screenshot_place">Gesetzte Markierung</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS/MMS</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Wähle wie diese App Weblinks öffnet</string>
@@ -69,7 +69,7 @@
     <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
     <string name="faq_supported_inputs_headline">Unterstützte Kartendienste</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Yandex Maps<br />Koordinaten (z.B. 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />Koordinaten (z.B. 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
     <string name="faq_item_collapse">Abschnitt zuklappen</string>
     <string name="faq_item_expand">Abschnitt ausklappen</string>
     <string name="user_preferences_title">Einstellungen</string>
@@ -93,4 +93,7 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s Ergebnis %2$s.gpx</string>
     <string name="conversion_succeeded_share">Teilen</string>
     <string name="conversion_succeeded_point_number">Punkt %1$d</string>
+    <string name="conversion_succeeded_save_gpx">GPX speichern</string>
+    <string name="converter_waze_permission_title">Mit Waze Verbinden?</string>
+    <string name="converter_waze_loading_indicator_title">Verbindung mit Waze…</string>
 </resources>
