@@ -59,7 +59,7 @@
     <string name="main_input_uri_label">Collez un lien de carte ici</string>
     <string name="conversion_permission_common_deny">Annuler</string>
     <string name="about_text"><![CDATA[<p>%1$s est une application gratuite et open source distribuée sous licence <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou ultérieure.</p><br><p>Vous trouverez le code sur <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, où vous pouvez également <a href="https://github.com/jakubvalenta/geoshare/issues">signaler des problèmes</a>.</p><br><p>Vos commentaires sont les bienvenus. Vous pouvez me contacter à <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="conversion_permission_common_text"><![CDATA[Le lien <tt>%1$s</tt> ne contient ni coordonnées ni nom de lieu. %2$s doit se connecter au service de cartographie pour obtenir les informations.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[Le lien <tt>%1$s</tt> ne contient pas de coordonnées. %2$s doit se connecter au service de cartographie pour les obtenir.]]></string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Partage du lien…</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Repère placé</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS/MMS</string>
