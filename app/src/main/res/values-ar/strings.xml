@@ -37,7 +37,7 @@
     <string name="converter_google_maps_permission_title">الاتصال بجوجل؟</string>
     <string name="conversion_permission_common_grant">موافق</string>
     <string name="conversion_permission_common_deny">إلغاء</string>
-    <string name="conversion_permission_common_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات أو اسم مكان. يحتاج %2$s إلى الاتصال بخدمة الخرائط للحصول على المعلومات.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات. يحتاج %2$s إلى الاتصال بخدمة الخرائط للحصول عليهم.]]></string>
     <string name="about_text"><![CDATA[<p>%1$s هو تطبيق مجاني ومفتوح المصدر يتم توزيعه بموجب رخصة <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> أو أحدث.</p><br><p>يمكنك العثور على الكود على <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>، حيث يمكنك أيضًا <a href="https://github.com/jakubvalenta/geoshare/issues">الإبلاغ عن المشكلات</a>.</p><br><p>ملاحظاتك مرحب بها. يمكنك التواصل معي على <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="faq_title">الأسئلة الشائعة</string>
     <string name="faq_how_it_works_headline">كيف يعمل واعتبارات الخصوصية</string>
