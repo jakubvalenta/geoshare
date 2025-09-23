@@ -38,13 +38,13 @@
     <string name="main_input_uri_label">Вставте посилання на мапу тут</string>
     <string name="about_text"><![CDATA[<p>%1$s це безплатний застосунок з відкритим вихідним кодом, що розповсюджується під ліцензією <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> або пізнішої.</p><br><p>Ви можете знайти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, де також можете <a href="https://github.com/jakubvalenta/geoshare/issues">повідомити про помилку</a>.</p><br><p> Буду радий вашим відгукам. Ви можете зв’язатися зі мною за адресою <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="permission_do_not_ask">Не запитувати знову</string>
-    <string name="conversion_failed_connection_permission_denied">Це посилання не підтримується без з’єднання з Google</string>
-    <string name="intro_how_to_share_google_maps_caption">Поділіться розташуванням із застосунку Google Maps або з веббраузера.</string>
+    <string name="conversion_failed_connection_permission_denied">Це посилання не підтримується без підключення до картографічного сервісу</string>
+    <string name="intro_how_to_share_google_maps_caption">Поділіться місцезнаходженням зі своєї картографічної програми або веббраузера.</string>
     <string name="faq_item_collapse">Згорнути розділ</string>
     <string name="faq_item_expand">Розгорнути розділ</string>
     <string name="user_preferences_title">Параметри</string>
-    <string name="user_preferences_connection_title">Дозволити з’єднання з Google?</string>
-    <string name="user_preferences_connection_description">Для підтримки коротких посилань і отримання координат з вебсторінки Google Maps, якщо посилання їх не містить, %1$s може під’єднатися до Google. Додаткову інформацію можна знайти на сторінці «ЧаПи».</string>
+    <string name="user_preferences_connection_title">Дозволити підключення до картографічного сервісу (Google, Apple тощо)?</string>
+    <string name="user_preferences_connection_description">Для підтримки коротких посилань на карти та отримання координат з веб-сторінки картографічного сервісу, якщо посилання їх не містить, %1$s може підключитися до картографічного сервісу. Більш детальну інформацію можна знайти на екрані FAQ.</string>
     <string name="user_preferences_connection_option_always">Так</string>
     <string name="user_preferences_connection_option_ask">Запитувати перед з’єднанням</string>
     <string name="user_preferences_connection_option_never">Ні</string>
