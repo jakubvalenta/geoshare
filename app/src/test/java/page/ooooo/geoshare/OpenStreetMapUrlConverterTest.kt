@@ -32,4 +32,12 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
             parseUrl("https://www.openstreetmap.org/#map=16/51.49/-0.13")
         )
     }
+
+    @Test
+    fun parseUrl_coordinatesEncoded() {
+        assertEquals(
+            Position("51.49", "-0.13", z = "16"),
+            parseUrl("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13")
+        )
+    }
 }
