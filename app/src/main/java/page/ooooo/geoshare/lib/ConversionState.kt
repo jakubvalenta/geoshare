@@ -119,10 +119,9 @@ data class GrantedUnshortenPermission(
         } catch (_: MalformedURLException) {
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         } catch (_: IOException) {
-            // Catches SocketTimeoutException too.
+            // Catches SocketTimeoutException and UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString)
         } catch (_: Exception) {
-            // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         if (locationHeader == null) {
@@ -234,10 +233,9 @@ data class GrantedParseHtmlPermission(
         } catch (_: MalformedURLException) {
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         } catch (_: IOException) {
-            // Catches SocketTimeoutException too.
+            // Catches SocketTimeoutException and UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
         } catch (_: Exception) {
-            // Catches UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->

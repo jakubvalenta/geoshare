@@ -12,10 +12,11 @@ import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
 
-class UnexpectedResponseCodeException : Exception("Unexpected response code")
+class UnexpectedResponseCodeException : IOException("Unexpected response code")
 
 class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
