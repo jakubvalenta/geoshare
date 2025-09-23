@@ -31,7 +31,7 @@
     <string name="main_input_uri_supporting_text">напр. https://maps.app.goo.gl/… or maps.apple.com/…</string>
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
     <string name="conversion_error_report">Докладване на проблем</string>
-    <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати или име на място. %2$s трябва да се свърже с Google, за да получи информацията.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Разрешаване на свързване с Google?</string>
     <string name="user_preferences_connection_option_always">Да</string>
