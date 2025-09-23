@@ -33,6 +33,7 @@ android {
                 "ar",
                 "bg",
                 "cs",
+                "de",
                 "en",
                 "es",
                 "fr",

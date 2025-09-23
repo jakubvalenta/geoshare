@@ -3,3 +3,4 @@
 - Improved OSM link supporting URL-encoded fragment.
 - Improved Waze short link support by decoding the links offline.
 - Improved connection error messages.
+- Added German translation (beta).
