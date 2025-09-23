@@ -33,8 +33,6 @@
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Zrušit</string>
     <string name="conversion_permission_common_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice ani název místa. %2$s se potřebuje spojit s danou mapovou službou, aby tyto informace získal.]]></string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">Vytvořit hledací geo: odkaz</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice. %2$s se může spojit s danou mapovou službou, aby je získal, nebo může vytvořit geo: odkaz vedoucí na vyhledávání místa podle názvu, což není tak přesné.]]></string>
     <string name="about_title">O aplikaci</string>
     <string name="about_app_icon_content_description">Ikona aplikace</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

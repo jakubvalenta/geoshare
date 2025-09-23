@@ -29,8 +29,6 @@
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
     <string name="conversion_permission_common_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas ou o nome do lugar. O %2$s precisa se conectar ao Google para conseguir essas informações.]]></string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">Criar um link geo: de pesquisa</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas. O %2$s pode se conectar ao Google para obter elas, ou também pode criar um link geo: que direciona a uma pesquisa pelo nome do lugar.]]></string>
     <string name="about_title">Sobre</string>
     <string name="about_app_icon_content_description">Ícone do aplicativo</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -106,22 +107,16 @@ val connectionPermission = PermissionUserPreference(
     options = listOf(
         RadioButtonOption(
             Permission.ALWAYS,
-            @Composable {
-                stringResource(R.string.user_preferences_connection_option_always)
-            }
-        ),
-        RadioButtonOption(
-            Permission.ASK,
-            @Composable {
-                stringResource(R.string.user_preferences_connection_option_ask)
-            }
-        ),
-        RadioButtonOption(
-            Permission.NEVER,
-            @Composable {
-                stringResource(R.string.user_preferences_connection_option_never)
-            }
-        ),
+            modifier = Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
+        ) {
+            stringResource(R.string.user_preferences_connection_option_always)
+        },
+        RadioButtonOption(Permission.ASK) {
+            stringResource(R.string.user_preferences_connection_option_ask)
+        },
+        RadioButtonOption(Permission.NEVER) {
+            stringResource(R.string.user_preferences_connection_option_never)
+        },
     ),
 )
 

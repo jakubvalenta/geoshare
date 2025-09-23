@@ -19,6 +19,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 data class RadioButtonOption<T>(
     val value: T,
+    val modifier: Modifier = Modifier,
     val text: @Composable () -> String,
 )
 
@@ -32,25 +33,25 @@ fun <T> RadioButtonGroup(
     // Note that Modifier.selectableGroup() is essential to ensure correct
     // accessibility behavior
     Column(modifier.selectableGroup()) {
-        options.forEach { (value, text) ->
+        options.forEach { option ->
             Row(
-                Modifier
+                option.modifier
                     .fillMaxWidth()
                     .padding(vertical = Spacing.tiny)
                     .selectable(
-                        selected = (value == selectedValue),
-                        onClick = { onSelect(value) },
+                        selected = (option.value == selectedValue),
+                        onClick = { onSelect(option.value) },
                         role = Role.RadioButton
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = (value == selectedValue),
+                    selected = (option.value == selectedValue),
                     // Null recommended for accessibility with screen readers
                     onClick = null
                 )
                 Text(
-                    text = text(),
+                    text = option.text(),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = Spacing.small)
                 )
@@ -68,12 +69,12 @@ private fun DefaultPreview() {
         RadioButtonGroup(
             options = listOf(
                 RadioButtonOption(
-                    1,
-                    { "Foo bar" },
+                    value = 1,
+                    text = { "Foo bar" },
                 ),
                 RadioButtonOption(
-                    2,
-                    { "Kotlin is a modern but already mature programming language designed to make developers happier." },
+                    value = 2,
+                    text = { "Kotlin is a modern but already mature programming language designed to make developers happier." },
                 ),
             ),
             selectedValue = 2,

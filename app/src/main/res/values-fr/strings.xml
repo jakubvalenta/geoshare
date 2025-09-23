@@ -29,7 +29,6 @@
     <string name="converter_google_maps_permission_title">Se connecter à Google ?</string>
     <string name="converter_apple_maps_permission_title">Se connecter à Apple ?</string>
     <string name="conversion_permission_common_grant">OK</string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">Utiliser uniquement le nom de lieu</string>
     <string name="about_title">À propos</string>
     <string name="about_app_icon_content_description">Icône de l’application</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -58,7 +57,6 @@
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Tout d’abord, allez dans Paramètres &#8594; Applications &#8594; Cartes &#8594; <i>Ouvrir par défaut</i> et désactivez l’ouverture des liens dans cette application.]]></string>
     <string name="intro_open_by_default_app_note"><![CDATA[Sélectionnez au moins <tt>maps.google.com</tt> et <tt>maps.app.goo.gl</tt>. Si certains liens sont grisés, cela signifie que d’autres applications Google les ouvrent par défaut. Vous pouvez les trouver et désactiver l’ouverture des liens, comme nous l’avons fait pour Google Maps.]]></string>
     <string name="main_input_uri_label">Collez votre lien ici</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[Le lien <tt>%1$s</tt> ne contient pas de coordonnées, mais un nom de lieu. %2$s peut se connecter au service de cartographie pour obtenir les coordonnées, ou utiliser le nom de lieu, qui est moins précis.]]></string>
     <string name="conversion_permission_common_deny">Annuler</string>
     <string name="about_text"><![CDATA[<p>%1$s est une application gratuite et open source distribuée sous licence <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou ultérieure.</p><br><p>Vous trouverez le code sur <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, où vous pouvez également <a href="https://github.com/jakubvalenta/geoshare/issues">signaler des problèmes</a>.</p><br><p>Vos commentaires sont les bienvenus. Vous pouvez me contacter à <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="conversion_permission_common_text"><![CDATA[Le lien <tt>%1$s</tt> ne contient ni coordonnées ni nom de lieu. %2$s doit se connecter au service de cartographie pour obtenir les informations.]]></string>

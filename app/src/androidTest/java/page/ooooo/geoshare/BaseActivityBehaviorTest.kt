@@ -7,13 +7,14 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import org.junit.Assert.*
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import page.ooooo.geoshare.lib.Position
 import java.lang.Thread.sleep
 import java.util.regex.Pattern
 
-open class BaseActivityBehaviorTest {
-
+abstract class BaseActivityBehaviorTest {
     protected lateinit var device: UiDevice
 
     protected val packageName = "page.ooooo.geoshare.debug"
@@ -24,8 +25,7 @@ open class BaseActivityBehaviorTest {
     @Before
     fun goToLauncher() {
         // Initialize UiDevice instance
-        device =
-            UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         // Start from the home screen
         device.pressHome()
@@ -49,11 +49,7 @@ open class BaseActivityBehaviorTest {
             // On newer Android, swipe up to close the most recent app
             sleep(1000) // Crude way to make sure recent apps finished loading
             device.swipe(
-                device.displayWidth / 2,
-                device.displayHeight / 2,
-                device.displayWidth / 2,
-                0,
-                5
+                device.displayWidth / 2, device.displayHeight / 2, device.displayWidth / 2, 0, 5
             )
         } else {
             // On older Android, swipe right to close the most recent app
@@ -68,8 +64,7 @@ open class BaseActivityBehaviorTest {
                     10
                 )
                 val success = device.wait(
-                    Until.gone(By.text("clear all".toPattern(Pattern.CASE_INSENSITIVE))),
-                    3000L
+                    Until.gone(By.text("clear all".toPattern(Pattern.CASE_INSENSITIVE))), 3000L
                 )
                 if (success) {
                     break
@@ -96,8 +91,37 @@ open class BaseActivityBehaviorTest {
         assertTrue(waitForObject(selector))
     }
 
+    protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) {
+        waitAndAssertObjectExists(By.text(expectedPosition.toNorthSouthWestEastDecCoordsString()))
+        val paramsBox = By.res("geoShareConversionSuccessPositionParams")
+        if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
+            waitAndAssertObjectExists(paramsBox.text(expectedPosition.toParamsString()))
+        } else {
+            assertObjectDoesNotExist(paramsBox)
+        }
+    }
+
     protected fun clickObject(selector: BySelector) {
         device.findObject(selector)?.click()
+    }
+
+    protected fun shareUri(unsafeUriString: String) {
+        // Use shell command instead of startActivity() to support Xiaomi
+        executeShellCommand(
+            "am start -a android.intent.action.VIEW -d $unsafeUriString -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
+        )
+    }
+
+    protected fun testUri(expectedPosition: Position, unsafeUriString: String) {
+        shareUri(unsafeUriString)
+        waitAndAssertPositionIsVisible(expectedPosition)
+    }
+
+    protected fun testTextUri(expectedPosition: Position, unsafeUriString: String) {
+        executeShellCommand(
+            "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeUriString -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
+        )
+        waitAndAssertPositionIsVisible(expectedPosition)
     }
 
     protected fun waitAndConfirmDialogAndAssertNewWindowIsOpen(
@@ -106,8 +130,7 @@ open class BaseActivityBehaviorTest {
     ) {
         waitAndAssertObjectExists(selector)
         toggleDialogDoNotAsk(doNotAsk)
-        device.findObject(By.res("geoShareConfirmationDialogConfirmButton"))
-            ?.clickAndWait(Until.newWindow(), timeout)
+        device.findObject(By.res("geoShareConfirmationDialogConfirmButton"))?.clickAndWait(Until.newWindow(), timeout)
     }
 
     protected fun waitAndDismissDialogAndAssertItIsClosed(
@@ -127,19 +150,36 @@ open class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun clickGoogleMapsAndAssertItHasText(textValue: Pattern) {
+    protected fun clickIntroCloseButton() {
+        val button = By.res("geoShareIntroScreenCloseButton")
+        waitAndAssertObjectExists(button)
+        clickObject(button)
+    }
+
+    protected fun setUserPreferenceConnectionPermissionToAlways() {
+        clickObject(By.res("geoShareMainMenuButton"))
+        val menuButton = By.res("geoShareMainMenuUserPreferences")
+        waitAndAssertObjectExists(menuButton)
+        clickObject(menuButton)
+        val option = By.res("geoShareUserPreferenceConnectionPermissionAlways")
+        waitAndAssertObjectExists(option)
+        clickObject(option)
+    }
+
+    @Suppress("SameParameterValue")
+    protected fun clickMapApp(packageName: String) {
         // Open the coordinates with Google Maps
-        val googleMapsApp = By.res("geoShareResultCardApp_$googleMapsPackageName")
+        val googleMapsApp = By.res("geoShareResultCardApp_$packageName")
         waitAndAssertObjectExists(googleMapsApp)
         clickObject(googleMapsApp)
+    }
 
+    protected fun assertGoogleMapsHasText(textValue: Pattern) {
         // If there is a Google Maps sign in screen, skip it
-        val googleMapsSignInHeadline =
-            By.pkg(googleMapsPackageName).text("Make it your map")
+        val googleMapsSignInHeadline = By.pkg(googleMapsPackageName).text("Make it your map")
         if (waitForObject(googleMapsSignInHeadline, 5000L)) {
             clickObject(
-                By.pkg(googleMapsPackageName)
-                    .text("skip".toPattern(Pattern.CASE_INSENSITIVE))
+                By.pkg(googleMapsPackageName).text("skip".toPattern(Pattern.CASE_INSENSITIVE))
             )
         }
 

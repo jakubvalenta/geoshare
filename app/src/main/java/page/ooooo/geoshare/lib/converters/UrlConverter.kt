@@ -2,8 +2,8 @@ package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.ConversionHtmlPattern
-import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.ConversionUriPattern
+import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.RedirectRegex
 
 sealed interface UrlConverter {

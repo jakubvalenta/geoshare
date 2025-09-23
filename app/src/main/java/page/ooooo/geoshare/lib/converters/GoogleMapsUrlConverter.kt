@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT_NUM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
@@ -12,12 +11,12 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.LON_NUM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PATH
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.RedirectRegex
-import page.ooooo.geoshare.lib.htmlPattern
-import page.ooooo.geoshare.lib.uriPattern
 
-class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
+class GoogleMapsUrlConverter() :
+    UrlConverter.WithUriPattern,
+    UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
+
     companion object {
         const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
         const val DATA = """data=(?P<data>.*(!3d$LAT_NUM!4d$LON_NUM|!1d$LON_NUM!2d$LAT_NUM).*)"""
@@ -95,8 +94,8 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
                 path(PositionRegex("""/maps/@$LAT,$LON.*"""))
                 path(PositionRegex("""/maps/@"""))
                 path(PositionRegex("""/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*"""))
-                path(PositionRegex("""/maps/place/$Q_PATH/@$LAT,$LON,${Z}z.*"""))
-                path(PositionRegex("""/maps/place/$Q_PATH/@$LAT,$LON.*"""))
+                path(PositionRegex("""/maps/place/.*/@$LAT,$LON,${Z}z.*"""))
+                path(PositionRegex("""/maps/place/.*/@$LAT,$LON.*"""))
                 path(PositionRegex("""/maps/place/$LAT,$LON.*"""))
                 path(PositionRegex("""/maps/place/$Q_PATH.*"""))
                 path(PositionRegex("""/maps/place//.*"""))
@@ -107,7 +106,7 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
                 path(PositionRegex("""/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$LAT,$LON/data[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$LAT,$LON/?"""))
-                path(PositionRegex("""/maps/dir/.*/$Q_PATH/@$LAT,$LON,${Z}z/?[^/]*"""))
+                path(PositionRegex("""/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$Q_PATH/data[^/]*"""))
                 path(PositionRegex("""/maps/dir/.*/$Q_PATH/?"""))
                 path(PositionRegex("""/maps/dir/"""))

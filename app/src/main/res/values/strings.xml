@@ -67,9 +67,7 @@
     <string name="conversion_loading_indicator_cancel">Cancel</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
-    <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates or place name. %2$s needs to connect to the map service to get the information.]]></string>
-    <string name="conversion_permission_parse_html_to_get_coords_deny">Use place name only</string>
-    <string name="conversion_permission_parse_html_to_get_coords_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates, but it contains a place name. %2$s can connect to the map service to get the coordinates, or it can use the place name, which is less precise.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>
     <string name="about_title">About</string>
     <string name="about_app_icon_content_description">Application icon</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

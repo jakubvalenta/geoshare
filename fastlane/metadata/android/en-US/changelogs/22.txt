@@ -1,0 +1,2 @@
+- Replaced search queries in certain resulting geo: URIs with map center coordinates, which are less precise but more reliable.
+- Removed dialog button to create search-only geo: URIs; handle it automatically if connection permission is granted.

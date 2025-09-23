@@ -218,91 +218,20 @@ package_name("page.ooooo.geoshare")
 fastlane metadata
 ```
 
-### Testing various map links
+### Manual testing
 
-Coordinates links:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?address=Boddinstra%C3%9Fe%2C+Hermannstra%C3%9Fe+36%E2%80%9337%2C+12049+Berlin%2C+Germany\&coordinate=52.4804611%2C13.4250923\&name=Marked+Location' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://wego.here.com/?map=50.21972,-0.68453,6.93' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://magicearth.com/?show_on_map\&lat=48.85649\&lon=2.35216\&name=48.85649,+2.35216\&img_id=12345' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.openstreetmap.org/#map=16/51.49/-0.13' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://osmand.net/map?pin=52.51628,13.37771#15/52.51628/13.37771' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://waze.com/ul?ll=45.6906304,-120.810983\&z=10' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://yandex.com/maps?ll=144.96315783657042%2C-37.81384550094835\&z=17.852003' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'geo:50.123456,-11.123456?q=foo%20bar\&z=3.4' page.ooooo.geoshare.debug
-```
-
-Place links:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?place-id=I1E40915DF4BA1C96\&address=Reuterplatz+3,+12047+Berlin,+Germany\&coordinate=52.4890246,13.4295963\&name=Reuterplatz\&_provider=9902' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30=' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://yandex.com/maps/100513/osnabruck/?ll=8.055899%2C52.280743\&mode=whatshere\&whatshere%5Bpoint%5D=8.065475%2C52.294001\&whatshere%5Bzoom%5D=13.24\&z=13.24' page.ooooo.geoshare.debug
-```
-
-Map view links:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188\&center=52.49115540927951,13.42595574770533' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983' page.ooooo.geoshare.debug
-```
-
-Search links:
+To share a URI input with the app running in emulator, run:
 
 ```shell
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/?q=Central+Park\&sll=50.894967,4.341626\&z=10\&t=s' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://magicearth.com/?q=Paris\&mapmode=standard\&z=5' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://magicearth.com/?name=Central+Park' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://waze.com/ul?q=66%20Acacia%20Avenue' page.ooooo.geoshare.debug
 ```
 
-Short links:
+Don't forget to escape the `&` character.
+
+To share a text input, run:
 
 ```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple/p/7E-Brjrk_THN14' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://waze.com/ul/hu00uswvn3' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://yandex.com/maps/-/CLAvMI18' page.ooooo.geoshare.debug
-```
-
-Links with coordinates only in HTML:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/place/Berlin,+Germany/' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?place-id=I3B04EDEB21D5F86\&_provider=9902' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/place?auid=17017496253231963769\&lsp=7618' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://ul.waze.com/ul?venue_id=183894452.1839010060.260192' page.ooooo.geoshare.debug
-```
-
-Google Maps place list link:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg' page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://goo.gl/maps/HcikiDXFwN2coeFN8' page.ooooo.geoshare.debug
-```
-
-Google Maps directions link:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2' page.ooooo.geoshare.debug
-```
-
-Google Search link:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://g.co/kgs/91UYXud' page.ooooo.geoshare.debug
-```
-
-Link shared as a SEND Intent:
-
-```shell
-adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/" page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188\&center=52.49115540927951,13.42595574770533" page.ooooo.geoshare.debug
-adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT "N-68.648556,E-152.775879" page.ooooo.geoshare.debug
+adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT 'N-68.648556,E-152.775879' page.ooooo.geoshare.debug
 ```
 
 ## Contributing

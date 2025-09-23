@@ -156,7 +156,10 @@ fun IntroScreen(
                     .padding(vertical = Spacing.tiny),
             ) {
                 if (page != pageCount - 1) {
-                    TextButton({ onCloseIntro() }) {
+                    TextButton(
+                        { onCloseIntro() },
+                        Modifier.testTag("geoShareIntroScreenCloseButton"),
+                    ) {
                         Text(stringResource(R.string.intro_nav_close))
                     }
                 }

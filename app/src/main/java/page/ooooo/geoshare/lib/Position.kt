@@ -23,7 +23,7 @@ data class Position(
             (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
                 val coords = "$lat,$lon"
                 if (q != coords) {
-                    add(q)
+                    add(q.replace('+', ' '))
                 }
             }
         }

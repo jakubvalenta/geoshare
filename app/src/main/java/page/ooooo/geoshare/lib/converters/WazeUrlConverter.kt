@@ -28,8 +28,7 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
             first {
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
-                @Suppress("SpellCheckingInspection")
-                query("latlng", PositionRegex("$LAT,$LON"))
+                @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))
                 query("q", PositionRegex(Q_PARAM))
                 query("venue_id", PositionRegex(".+"))
                 query("place", PositionRegex(".+"))

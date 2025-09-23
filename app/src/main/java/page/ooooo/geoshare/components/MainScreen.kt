@@ -68,7 +68,9 @@ fun MainScreen(
                     Box {
                         IconButton(
                             { menuExpanded = true },
-                            Modifier.padding(end = Spacing.windowPadding - Spacing.builtInTopBarPaddingEnd),
+                            Modifier
+                                .padding(end = Spacing.windowPadding - Spacing.builtInTopBarPaddingEnd)
+                                .testTag("geoShareMainMenuButton"),
                         ) {
                             Icon(
                                 Icons.Default.MoreVert,
@@ -77,9 +79,12 @@ fun MainScreen(
                         }
                         DropdownMenu(
                             expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }) {
+                            onDismissRequest = { menuExpanded = false },
+                            modifier = Modifier.semantics { testTagsAsResourceId = true },
+                        ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.user_preferences_title)) },
+                                modifier = Modifier.testTag("geoShareMainMenuUserPreferences"),
                                 onClick = {
                                     menuExpanded = false
                                     onNavigateToUserPreferencesScreen()
