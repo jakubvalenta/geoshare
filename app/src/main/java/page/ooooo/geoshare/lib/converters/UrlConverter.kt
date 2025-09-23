@@ -11,7 +11,6 @@ sealed interface UrlConverter {
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern
-        val shortUriReplacement: String?
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }

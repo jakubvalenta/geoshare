@@ -219,31 +219,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsAlways_returnsGrantedUnshortenPermission() = runTest {
-        val inputUriString = "https://example.com/foo/bar"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val replacedUriString = "https://example.com/replaced-foo/bar"
-        val replacedUri = Uri.parse(replacedUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(connectionPermission)) } doThrow NotImplementedError()
-        }
-        val mockGoogleMapsUrlConverter: GoogleMapsUrlConverter = mock {
-            on { shortUriPattern } doReturn Pattern.compile("""https://example\.com/(?P<path>\w+)/\w+""")
-            on { shortUriReplacement } doReturn "https://example.com/replaced-\${path}/bar"
-        }
-        val stateContext = mockStateContext(
-            userPreferencesRepository = mockUserPreferencesRepository,
-            urlConverters = listOf(mockGoogleMapsUrlConverter),
-        )
-        val state = ReceivedUri(stateContext, inputUriString, mockGoogleMapsUrlConverter, uri, Permission.ALWAYS)
-        assertEquals(
-            GrantedUnshortenPermission(stateContext, inputUriString, mockGoogleMapsUrlConverter, replacedUri),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun receivedUri_uriIsShortUrlAndConverterHasShortUriReplacementAndPermissionIsAlways_returnsGrantedUnshortenPermissionWithReplacedShortUri() =
+    fun receivedUri_uriIsShortUrlAndPermissionIsAlways_returnsGrantedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -824,7 +800,6 @@ class ConversionStateTest {
             class MockUrlConverter : UrlConverter.WithShortUriPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val shortUriPattern: Pattern = Pattern.compile(".")
-                override val shortUriReplacement: String? = null
                 override val permissionTitleResId: Int = -1
                 override val loadingIndicatorTitleResId: Int = -1
             }
