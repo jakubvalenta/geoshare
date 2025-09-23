@@ -12,7 +12,7 @@
     <string name="conversion_error_retry">Réessayer</string>
     <string name="main_navigate_to_intro">Découvrez plus de fonctionnalités de l’appli</string>
     <string name="intro_how_to_share_app_content_description">Capture d’écran de l’écran de partage de %1$s</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choisissez <i>%1$s</i> et l'application vous permettra d'ouvrir le même emplacement dans n'importe quelle application de carte installée.]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[Choisissez <i>%1$s</i> et l’application vous permettra d’ouvrir le même emplacement dans n’importe quelle application de carte installée.]]></string>
     <string name="intro_open_by_default_headline">Configurer Android pour ouvrir les liens vers Google Maps dans des cartes alternatives (facultatif)</string>
     <string name="intro_open_by_default_google_maps_content_description">Capture d’écran des paramètres d’ouverture par défaut de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Ouvrir les paramètres de Google Maps</string>
@@ -82,7 +82,7 @@
     <string name="converter_apple_maps_loading_indicator_title">Connexion à Apple…</string>
     <string name="conversion_loading_indicator_cancel">Annuler</string>
     <string name="conversion_failed_cancelled">Annulé</string>
-    <string name="conversion_succeeded_skip">Ouvrir le lien d\'origine</string>
+    <string name="conversion_succeeded_skip">Ouvrir le lien d’origine</string>
     <string name="conversion_done">Fermer</string>
     <string name="conversion_succeeded_title">Coordonnées</string>
     <string name="conversion_error_title">Erreur</string>
