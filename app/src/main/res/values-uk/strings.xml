@@ -33,7 +33,7 @@
     <string name="main_input_uri_clear_content_description">Очистити</string>
     <string name="conversion_succeeded_copy_content_description">Копіювати</string>
     <string name="conversion_permission_common_grant">Гаразд</string>
-    <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат або назви населеного пункту. %2$s потрібно під’єднатися до Google, щоб отримати інформацію.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат. %2$s потребує підключення до картографічного сервісу, щоб отримати їх.]]></string>
     <string name="intro_nav_next">Далі</string>
     <string name="main_input_uri_label">Вставте посилання на мапу тут</string>
     <string name="about_text"><![CDATA[<p>%1$s це безплатний застосунок з відкритим вихідним кодом, що розповсюджується під ліцензією <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> або пізнішої.</p><br><p>Ви можете знайти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, де також можете <a href="https://github.com/jakubvalenta/geoshare/issues">повідомити про помилку</a>.</p><br><p> Буду радий вашим відгукам. Ви можете зв’язатися зі мною за адресою <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
