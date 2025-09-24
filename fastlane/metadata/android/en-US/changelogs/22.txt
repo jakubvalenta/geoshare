@@ -1,5 +1,6 @@
 - Replaced search queries in certain resulting geo: URIs with map center coordinates, which are less precise but more reliable.
 - Removed dialog button to create search-only geo: URIs; handle it automatically if connection permission is granted.
+- Added support for more Yandex domains.
 - Improved OSM link supporting URL-encoded fragment.
 - Improved Waze short link support by decoding the links offline.
 - Improved connection error messages.

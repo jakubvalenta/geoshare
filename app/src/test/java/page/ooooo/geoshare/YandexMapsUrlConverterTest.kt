@@ -80,6 +80,14 @@ class YandexMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_trDomain() {
+        assertEquals(
+            Position("-37.81384550094835", "144.96315783657042", z = "17.852003"),
+            parseUrl("https://yandex.com.tr/maps?ll=144.96315783657042%2C-37.81384550094835&z=17.852003")
+        )
+    }
+
+    @Test
     fun parseHtml_containsDataCoordinates_returnsPosition() {
         assertEquals(
             Position("50.106376", "8.664164"),
