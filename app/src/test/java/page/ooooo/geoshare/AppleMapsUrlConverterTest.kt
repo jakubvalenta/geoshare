@@ -25,6 +25,11 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun uriPattern_noPath() {
+        assertTrue(doesUriPatternMatch("https://maps.apple.com?q=foo"))
+    }
+
+    @Test
     fun uriPattern_unknownHost() {
         assertFalse(doesUriPatternMatch("https://www.example.com/?ll=50.894967,4.341626"))
     }
