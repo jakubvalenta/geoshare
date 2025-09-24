@@ -18,6 +18,11 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun uriPattern_noPath() {
+        assertTrue(doesUriPatternMatch("geo:?q=foo"))
+    }
+
+    @Test
     fun uriPattern_noScheme() {
         assertFalse(doesUriPatternMatch("50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
@@ -34,8 +39,14 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun parseUrl_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUrl("geo:"))
-        assertNull(parseUrl("geo:?spam=1"))
+        assertEquals(
+            Position(),
+            parseUrl("geo:"),
+        )
+        assertEquals(
+            Position(),
+            parseUrl("geo:?spam=1"),
+        )
     }
 
     @Test
@@ -43,6 +54,14 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"),
             parseUrl("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
+        )
+    }
+
+    @Test
+    fun parseUrl_returnsQOnly() {
+        assertEquals(
+            Position(q = "foo bar"),
+            parseUrl("geo:?q=foo%20bar"),
         )
     }
 }

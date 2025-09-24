@@ -12,7 +12,9 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
     override val conversionUriPattern = uriPattern {
         all {
-            path(PositionRegex("""$LAT,$LON"""))
+            optional {
+                path(PositionRegex("""$LAT,$LON"""))
+            }
             optional {
                 query("q", PositionRegex(Q_PARAM))
             }
