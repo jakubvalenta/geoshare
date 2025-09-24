@@ -44,6 +44,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     fun uriPattern_replacement() {
         assertEquals(
             "https://waze.com/ul/hu00uswvn3",
+            @Suppress("SpellCheckingInspection")
             getUri("Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3")
         )
     }

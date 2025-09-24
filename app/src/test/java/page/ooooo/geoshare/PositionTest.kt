@@ -75,6 +75,7 @@ class PositionTest {
     @Test
     fun toMagicEarthUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             "magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4",
             Position("50.123456", "-11.123456", z = "3.4").toMagicEarthUriString(uriQuote),
         )
@@ -83,6 +84,7 @@ class PositionTest {
     @Test
     fun toMagicEarthUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndQueryAndZoom() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
             Position("50.123456", "-11.123456", q = "foo bar", z = "3.4").toMagicEarthUriString(uriQuote),
         )

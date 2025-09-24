@@ -25,6 +25,11 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun uriPattern_noPath() {
+        assertTrue(doesUriPatternMatch("https://maps.apple.com?q=foo"))
+    }
+
+    @Test
     fun uriPattern_unknownHost() {
         assertFalse(doesUriPatternMatch("https://www.example.com/?ll=50.894967,4.341626"))
     }
@@ -117,10 +122,12 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterAddressTakesPrecedence() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
             parseUrl("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
             parseUrl("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")
         )
@@ -129,6 +136,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz"),
             parseUrl("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")
         )
@@ -171,6 +179,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_success() {
         assertEquals(
             Position("52.4735927", "13.4050798"),
+            @Suppress("SpellCheckingInspection")
             parseHtml(
                 """<html>
 <head>
