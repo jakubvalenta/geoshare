@@ -431,6 +431,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_qParameterPlaceWithoutPath() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(q = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
             parseUrl("https://maps.google.com?q=Caf%C3%A9+Heinemann,+Bismarckstra%C3%9Fe+91,+41061+M%C3%B6nchengladbach")
         )
@@ -595,6 +596,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
             @Suppress("SpellCheckingInspection")
             parseHtmlRedirect(

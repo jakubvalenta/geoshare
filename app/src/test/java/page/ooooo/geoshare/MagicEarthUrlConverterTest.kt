@@ -11,6 +11,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_fullUrl() {
         assertTrue(doesUriPatternMatch("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
+        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
     }
 
@@ -73,6 +74,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterDestinationAddressTakesPrecedenceOverQ() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
             parseUrl("https://magicearth.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
@@ -81,6 +83,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz"),
             parseUrl("https://magicearth.com/?name=Reuterplatz&q=Central%20Park")
         )

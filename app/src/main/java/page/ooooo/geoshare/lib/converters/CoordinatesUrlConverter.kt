@@ -8,6 +8,7 @@ import page.ooooo.geoshare.lib.uriPattern
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     companion object {
+        @Suppress("SpellCheckingInspection")
         const val CHARS = """[\p{Zs},°'′"″NSWE]"""
         const val SPACE = """\p{Zs}*"""
         const val LAT_SIG = """(?P<latSig>-?)"""
@@ -20,6 +21,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
     }
 
+    @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
 
     override val conversionUriPattern = uriPattern {
