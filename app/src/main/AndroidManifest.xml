@@ -145,6 +145,18 @@
 
                 <data
                         android:host="share.here.com"
+                        android:pathPrefix="/l/"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="share.here.com"
+                        android:pathPrefix="/p/"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -155,6 +167,18 @@
 
                 <data
                         android:host="wego.here.com"
+                        android:path="/"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="wego.here.com"
+                        android:pathPrefix="/p/"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -165,6 +189,18 @@
 
                 <data
                         android:host="waze.com"
+                        android:pathPrefix="/live-map"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="waze.com"
+                        android:pathPrefix="/ul"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -175,6 +211,18 @@
 
                 <data
                         android:host="www.waze.com"
+                        android:pathPrefix="/live-map"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.waze.com"
+                        android:pathPrefix="/ul*"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -185,6 +233,7 @@
 
                 <data
                         android:host="ul.waze.com"
+                        android:pathPrefix="/ul"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -195,6 +244,7 @@
 
                 <data
                         android:host="ya.ru"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -205,6 +255,7 @@
 
                 <data
                         android:host="yandex.az"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -215,6 +266,7 @@
 
                 <data
                         android:host="yandex.by"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -225,6 +277,7 @@
 
                 <data
                         android:host="yandex.co.il"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -235,6 +288,7 @@
 
                 <data
                         android:host="yandex.com"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -245,6 +299,7 @@
 
                 <data
                         android:host="yandex.com.am"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -255,6 +310,7 @@
 
                 <data
                         android:host="yandex.com.ge"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -265,6 +321,7 @@
 
                 <data
                         android:host="yandex.com.tr"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -275,6 +332,7 @@
 
                 <data
                         android:host="yandex.ee"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -285,6 +343,7 @@
 
                 <data
                         android:host="yandex.eu"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -295,6 +354,7 @@
 
                 <data
                         android:host="yandex.fr"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -305,6 +365,7 @@
 
                 <data
                         android:host="yandex.kg"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -315,6 +376,7 @@
 
                 <data
                         android:host="yandex.kz"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -325,6 +387,7 @@
 
                 <data
                         android:host="yandex.lt"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -335,6 +398,7 @@
 
                 <data
                         android:host="yandex.lv"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -345,6 +409,7 @@
 
                 <data
                         android:host="yandex.md"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -355,6 +420,7 @@
 
                 <data
                         android:host="yandex.ru"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -365,6 +431,7 @@
 
                 <data
                         android:host="yandex.tj"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -375,6 +442,7 @@
 
                 <data
                         android:host="yandex.tm"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -385,6 +453,7 @@
 
                 <data
                         android:host="yandex.ua"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -395,6 +464,7 @@
 
                 <data
                         android:host="yandex.uz"
+                        android:pathPrefix="/maps"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter>
@@ -413,6 +483,7 @@
 
                 <data
                         android:host="magicearth.com"
+                        android:path="/"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -423,6 +494,7 @@
 
                 <data
                         android:host="osmand.net"
+                        android:path="/map"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -433,6 +505,7 @@
 
                 <data
                         android:host="www.openstreetmap.org"
+                        android:path="/"
                         android:scheme="https"/>
             </intent-filter>
         </activity>
