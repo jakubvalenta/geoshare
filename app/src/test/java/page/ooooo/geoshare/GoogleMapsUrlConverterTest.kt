@@ -25,6 +25,11 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun uriPattern_noPath() {
+        assertTrue(doesUriPatternMatch("https://maps.google.com?q=foo"))
+    }
+
+    @Test
     fun uriPattern_unknownHost() {
         assertFalse(doesUriPatternMatch("https://www.example.com/maps/@52.5067296,13.2599309,6z"))
     }
