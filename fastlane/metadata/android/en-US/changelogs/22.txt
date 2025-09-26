@@ -1,9 +1,10 @@
-- Replaced search queries in certain resulting geo: URIs with map center coordinates, which are less precise but more reliable.
-- Removed dialog button to create search-only geo: URIs; handle it automatically if connection permission is granted.
-- Fixed support for Google Maps links without the path component.
 - Added support for more Yandex domains.
-- Improved OSM link supporting URL-encoded fragment.
+- Removed question whether to create a search-only geo: URI; handle it automatically.
+- Improved Google Maps search link support by using map center coordinates.
 - Improved Waze short link support by decoding the links offline.
+- Improved intent filters, so that the app doesn't try to open non-map links.
 - Improved connection error messages.
-- Improved intent filters to not open certain non-map links in the app.
+- Fixed support for Google Maps links without the path component.
+- Fixed support for OSM links with URL-encoded fragment.
+- Fixed opening links in Threema.
 - Added German translation (beta).
