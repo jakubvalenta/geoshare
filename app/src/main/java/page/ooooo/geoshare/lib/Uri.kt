@@ -69,7 +69,7 @@ data class Uri(
                 host = host,
                 path = uriQuote.decode(path),
                 queryParams = parseQueryParams(query, uriQuote),
-                fragment = fragment,
+                fragment = uriQuote.decode(fragment),
                 uriQuote = uriQuote,
             )
         }

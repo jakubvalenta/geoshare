@@ -11,6 +11,6 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?openstreetmap\.org/\S+""")
 
     override val conversionUriPattern = uriPattern {
-        fragment(PositionRegex("""map(=|%3D)$Z(/|%2F)$LAT(/|%2F)$LON.*"""))
+        fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
     }
 }
