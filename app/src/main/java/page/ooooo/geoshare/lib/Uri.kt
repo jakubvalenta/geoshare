@@ -69,7 +69,7 @@ data class Uri(
                 host = host,
                 path = uriQuote.decode(path),
                 queryParams = parseQueryParams(query, uriQuote),
-                fragment = fragment,
+                fragment = uriQuote.decode(fragment),
                 uriQuote = uriQuote,
             )
         }
@@ -120,8 +120,9 @@ data class Uri(
         }.toString()
     )
 
-    private fun formatQueryParams(): String =
-        queryParams.map { "${it.key}=${uriQuote.encode(it.value.replace('+', ' '))}" }.joinToString("&")
+    private fun formatQueryParams(): String = queryParams.map {
+        "${it.key}=${uriQuote.encode(it.value.replace('+', ' '), allow = ",")}"
+    }.joinToString("&")
 
     override fun toString() = StringBuilder().apply {
         if (scheme.isNotEmpty()) {

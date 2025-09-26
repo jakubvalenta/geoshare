@@ -27,7 +27,7 @@ class PositionTest {
     @Test
     fun toAppleMapsUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
-            "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=3.4",
+            "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
             Position("50.123456", "-11.123456", z = "3.4").toAppleMapsUriString(uriQuote),
         )
     }
@@ -35,7 +35,7 @@ class PositionTest {
     @Test
     fun toAppleMapsUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
-            "https://maps.apple.com/?ll=50.123456%2C-11.123456&z=3.4",
+            "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
             Position("50.123456", "-11.123456", q = "foo bar", z = "3.4").toAppleMapsUriString(uriQuote),
         )
     }
@@ -51,7 +51,7 @@ class PositionTest {
     @Test
     fun toGoogleMapsUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAsQueryAndZoom() {
         assertEquals(
-            "https://www.google.com/maps?q=50.123456%2C-11.123456&z=3.4",
+            "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
             Position("50.123456", "-11.123456", z = "3.4").toGoogleMapsUriString(uriQuote),
         )
     }
@@ -67,7 +67,7 @@ class PositionTest {
     @Test
     fun toGoogleMapsUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
-            "https://www.google.com/maps?q=50.123456%2C-11.123456&z=3.4",
+            "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
             Position("50.123456", "-11.123456", q = "foo bar", z = "3.4").toGoogleMapsUriString(uriQuote),
         )
     }

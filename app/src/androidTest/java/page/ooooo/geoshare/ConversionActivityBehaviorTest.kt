@@ -264,6 +264,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndDismissDialogAndAssertItIsClosed(parseHtmlPermissionDialogSelector)
 
         // Shows location search
+        @Suppress("SpellCheckingInspection")
         waitAndAssertPositionIsVisible(Position(q = "Hermannstr. 30, Berlin"))
 
         // Share another Google Maps place link with the app
@@ -282,12 +283,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitAndDismissDialogAndAssertItIsClosed(By.res("geoShareParseHtmlPermissionDialog"), doNotAsk = true)
 
         // Shows location search
+        @Suppress("SpellCheckingInspection")
         waitAndAssertPositionIsVisible(Position(q = "Hermannstr. 40, Berlin"))
 
         // Share another Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Hermannstr.+41,+Berlin/")
 
         // Shows location search
+        @Suppress("SpellCheckingInspection")
         waitAndAssertPositionIsVisible(Position(q = "Hermannstr. 41, Berlin"))
     }
 
