@@ -445,6 +445,15 @@ class UriTest {
     }
 
     @Test
+    fun toString_doesNotEncodeCommaInQuery() {
+        val uriString = "geo:52.3675734,4.9041389?q=52.3675734%2C4.9041389"
+        assertEquals(
+            "geo:52.3675734,4.9041389?q=52.3675734,4.9041389",
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
     fun toUrl_addsHttpsSchemeIfNecessary() {
         assertEquals("https://foo/bar", Uri.parse("https://foo/bar", uriQuote).toUrl().toString())
         assertEquals("https://foo", Uri.parse("https://foo", uriQuote).toUrl().toString())
