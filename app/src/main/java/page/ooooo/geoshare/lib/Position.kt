@@ -90,6 +90,7 @@ data class Position(
     /**
      * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
      */
+    @Suppress("SpellCheckingInspection")
     fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
         scheme = "magicearth",
         path = "//",

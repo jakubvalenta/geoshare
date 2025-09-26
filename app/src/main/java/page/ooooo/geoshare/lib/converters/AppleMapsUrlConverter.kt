@@ -22,7 +22,6 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
 
-    @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {
         all {
             optional {

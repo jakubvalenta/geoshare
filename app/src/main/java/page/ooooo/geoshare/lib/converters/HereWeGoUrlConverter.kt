@@ -17,7 +17,6 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
         val DECODED_LON_PATTERN: Pattern = Pattern.compile("""(lon=|"longitude":)$LON""")
     }
 
-    @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
 
     @OptIn(ExperimentalEncodingApi::class)

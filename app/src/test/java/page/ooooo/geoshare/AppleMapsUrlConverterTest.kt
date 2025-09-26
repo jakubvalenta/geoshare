@@ -142,7 +142,6 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
         )
     }
 
-    @Suppress("SpellCheckingInspection")
     @Test
     fun parseUrl_AuidOnly() {
         assertEquals(

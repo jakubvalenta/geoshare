@@ -45,6 +45,7 @@ class WazeUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
         // Text
         testTextUri(
             Position("45.829189", "1.259372"),
+            @Suppress("SpellCheckingInspection")
             "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
         )
     }
