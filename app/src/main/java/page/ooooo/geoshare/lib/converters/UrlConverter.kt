@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import io.ktor.http.HttpMethod
 import page.ooooo.geoshare.lib.ConversionHtmlPattern
 import page.ooooo.geoshare.lib.ConversionUriPattern
 import page.ooooo.geoshare.lib.PositionRegex
@@ -11,6 +12,7 @@ sealed interface UrlConverter {
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern
+        val shortUriHttpMethod: HttpMethod
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }

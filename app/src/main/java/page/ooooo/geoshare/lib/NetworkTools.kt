@@ -29,13 +29,17 @@ class NetworkTools(
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )
-    suspend fun requestLocationHeader(url: URL): String? = withContext(Dispatchers.IO) {
+    suspend fun requestLocationHeader(url: URL, httpMethod: HttpMethod): String? = withContext(Dispatchers.IO) {
         connect(
             engine,
             url,
-            methodParam = HttpMethod.Head,
-            followRedirectsParam = false,
-            expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
+            httpMethod,
+            followRedirectsParam = httpMethod != HttpMethod.Head,
+            expectedStatusCodes = if (httpMethod != HttpMethod.Head) {
+                listOf(HttpStatusCode.OK)
+            } else {
+                listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)
+            },
         ) { response ->
             response.headers["Location"]
         }
@@ -57,7 +61,7 @@ class NetworkTools(
     private suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
-        methodParam: HttpMethod = HttpMethod.Get,
+        httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
         requestTimeoutMillisParam: Long = 45_000L,
@@ -72,7 +76,7 @@ class NetworkTools(
         }.use { client ->
             try {
                 val response = client.request(url) {
-                    method = methodParam
+                    method = httpMethod
                     timeout {
                         requestTimeoutMillis = requestTimeoutMillisParam
                     }

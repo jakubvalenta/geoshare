@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import io.ktor.http.HttpMethod
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
@@ -18,6 +19,7 @@ class YandexMapsUrlConverter() :
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val shortUriHttpMethod = HttpMethod.Head
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {

@@ -113,7 +113,7 @@ data class GrantedUnshortenPermission(
 
     override suspend fun transition(): State {
         val locationHeader = try {
-            stateContext.networkTools.requestLocationHeader(uri.toUrl())
+            stateContext.networkTools.requestLocationHeader(uri.toUrl(), urlConverter.shortUriHttpMethod)
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
         } catch (_: MalformedURLException) {
