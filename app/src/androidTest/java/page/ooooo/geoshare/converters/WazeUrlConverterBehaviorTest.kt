@@ -38,15 +38,16 @@ class WazeUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
 
         // Short URI
         testUri(
-            Position("45.829189", "1.259372"),
-            "https://waze.com/ul/hu00uswvn3",
+            Position("19.402564", "-99.165666"),
+            "https://waze.com/ul/h9g3qrkju0",
         )
 
         // Text
-        testTextUri(
-            Position("45.829189", "1.259372"),
-            @Suppress("SpellCheckingInspection")
-            "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
-        )
+        // TODO Test this when we figure out how to pass extra text with spaces.
+        // testTextUri(
+        //     Position("45.829189", "1.259372"),
+        //     @Suppress("SpellCheckingInspection")
+        //     "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
+        // )
     }
 }

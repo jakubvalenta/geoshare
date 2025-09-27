@@ -38,5 +38,13 @@ class MapyComUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
             Position("50.0858554", "14.4624724", z = "17"),
             "https://mapy.cz/s/jetucaputu",
         )
+
+        // Text
+        // TODO Test this when we figure out how to pass extra text with spaces.
+        // testTextUri(
+        //     Position("41.9966006", "-6.1223825"),
+        //     @Suppress("SpellCheckingInspection")
+        //     "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha",
+        // )
     }
 }
