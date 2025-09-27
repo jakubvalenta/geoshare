@@ -36,6 +36,7 @@ import page.ooooo.geoshare.lib.converters.GeoUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.converters.MapyComUrlConverter
 import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
 import page.ooooo.geoshare.lib.converters.WazeUrlConverter
@@ -59,6 +60,7 @@ class ConversionViewModel @Inject constructor(
             AppleMapsUrlConverter(),
             HereWeGoUrlConverter(),
             MagicEarthUrlConverter(),
+            MapyComUrlConverter(),
             OpenStreetMapUrlConverter(),
             OsmAndUrlConverter(),
             WazeUrlConverter(),
