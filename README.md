@@ -20,6 +20,7 @@ map app.
 - Apple Maps (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- Mapy.com (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
 - Waze (beta)
