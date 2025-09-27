@@ -18,6 +18,7 @@ class YandexMapsUrlConverter() :
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val shortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {

@@ -140,6 +140,14 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun isShortUrl_shortLinkNegative() {
+        assertEquals(
+            Position("19.402564", "-99.165666"),
+            parseUrl("https://waze.com/ul/h9g3qrkju0")
+        )
+    }
+
+    @Test
     fun parseHtml_containsLatLngJSON_returnsPosition() {
         assertEquals(
             Position("43.64265563", "-79.387202798"),

@@ -45,6 +45,14 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_decimalNorthEastAfter() {
+        assertEquals(
+            Position("41.996601", "6.122383"),
+            parseUrl("41.9966006N, 6.1223825E")
+        )
+    }
+
+    @Test
     fun parseUrl_decimalNorthEastBefore() {
         assertEquals(
             Position("41.40338", "2.17403"),
@@ -65,6 +73,14 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("-68.648556", "-152.775879"),
             parseUrl("S 68.648556 W 152.775879")
+        )
+    }
+
+    @Test
+    fun parseUrl_decimalSouthEastAfter() {
+        assertEquals(
+            Position("-41.996601", "-6.122383"),
+            parseUrl("41.9966006S, 6.1223825W")
         )
     }
 

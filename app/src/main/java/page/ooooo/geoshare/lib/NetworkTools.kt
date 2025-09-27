@@ -33,7 +33,7 @@ class NetworkTools(
         connect(
             engine,
             url,
-            methodParam = HttpMethod.Head,
+            httpMethod = HttpMethod.Head,
             followRedirectsParam = false,
             expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
         ) { response ->
@@ -54,10 +54,26 @@ class NetworkTools(
         }
     }
 
+    @Throws(
+        ConnectTimeoutException::class,
+        HttpRequestTimeoutException::class,
+        MalformedURLException::class,
+        SocketTimeoutException::class,
+        UnexpectedResponseCodeException::class,
+    )
+    suspend fun getRedirectUrlString(url: URL): String = withContext(Dispatchers.IO) {
+        connect(
+            engine,
+            url,
+        ) { response ->
+            response.request.url.toString()
+        }
+    }
+
     private suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
-        methodParam: HttpMethod = HttpMethod.Get,
+        httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
         requestTimeoutMillisParam: Long = 45_000L,
@@ -72,7 +88,7 @@ class NetworkTools(
         }.use { client ->
             try {
                 val response = client.request(url) {
-                    method = methodParam
+                    method = httpMethod
                     timeout {
                         requestTimeoutMillis = requestTimeoutMillisParam
                     }

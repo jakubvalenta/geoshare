@@ -117,9 +117,9 @@ abstract class BaseActivityBehaviorTest {
         waitAndAssertPositionIsVisible(expectedPosition)
     }
 
-    protected fun testTextUri(expectedPosition: Position, unsafeUriString: String) {
+    protected fun testTextUri(expectedPosition: Position, unsafeTextWithoutSpaces: String) {
         executeShellCommand(
-            "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeUriString -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
+            "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeTextWithoutSpaces -n $packageName/page.ooooo.geoshare.ConversionActivity $packageName"
         )
         waitAndAssertPositionIsVisible(expectedPosition)
     }

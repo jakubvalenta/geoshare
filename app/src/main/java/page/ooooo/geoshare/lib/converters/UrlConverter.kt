@@ -6,11 +6,14 @@ import page.ooooo.geoshare.lib.ConversionUriPattern
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.RedirectRegex
 
+enum class ShortUriMethod { GET, HEAD }
+
 sealed interface UrlConverter {
     val uriPattern: Pattern
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern
+        val shortUriMethod: ShortUriMethod
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }

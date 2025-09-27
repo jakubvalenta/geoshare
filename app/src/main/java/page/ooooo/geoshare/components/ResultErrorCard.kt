@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -35,7 +36,7 @@ fun ResultErrorCard(
     val uriHandler = LocalUriHandler.current
 
     if (retryLoadingIndicatorVisible) {
-        Column {
+        Column(Modifier.fillMaxWidth()) {
             LoadingIndicator(
                 Modifier
                     .align(Alignment.CenterHorizontally)
