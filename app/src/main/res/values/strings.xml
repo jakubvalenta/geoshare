@@ -5,7 +5,7 @@
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_share">Share</string>
-    <string name="conversion_succeeded_skip">Open original link</string>
+    <string name="conversion_succeeded_skip">Copy original link</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>

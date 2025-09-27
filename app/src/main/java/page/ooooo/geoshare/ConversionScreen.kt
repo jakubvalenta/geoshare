@@ -145,23 +145,15 @@ fun ConversionScreen(
 
             currentState is HasError -> {
                 {
-                    TextButton({
-                        coroutineScope.launch {
-                            // Show a loading indicator for a while to indicate that conversion is being retried.
-                            retryLoadingIndicatorVisible = true
-                            delay(1000)
-                            retryLoadingIndicatorVisible = false
-                            onRetry(currentState.inputUriString)
-                        }
-                    }) {
-                        Text(stringResource(R.string.conversion_error_retry))
+                    TextButton({ onCopy(currentState.inputUriString) }) {
+                        Text(stringResource(R.string.conversion_succeeded_skip))
                     }
                 }
             }
 
             currentState is HasResult -> {
                 {
-                    TextButton({ onOpenChooser(currentState.inputUriString) }) {
+                    TextButton({ onCopy(currentState.inputUriString) }) {
                         Text(stringResource(R.string.conversion_succeeded_skip))
                     }
                 }
@@ -240,20 +232,21 @@ fun ConversionScreen(
             }
 
             currentState is HasError -> {
-                if (!retryLoadingIndicatorVisible) {
-                    ResultErrorCard(
-                        currentState.errorMessageResId,
-                        currentState.inputUriString,
-                        onNavigateToFaqScreen,
-                    )
-                } else {
-                    LoadingIndicator(
-                        Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .size(64.dp),
-                        color = MaterialTheme.colorScheme.errorContainer,
-                    )
-                }
+                ResultErrorCard(
+                    currentState.errorMessageResId,
+                    currentState.inputUriString,
+                    retryLoadingIndicatorVisible,
+                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                    onRetry = {
+                        coroutineScope.launch {
+                            // Show a loading indicator for a while to indicate that conversion is being retried.
+                            retryLoadingIndicatorVisible = true
+                            delay(1000)
+                            retryLoadingIndicatorVisible = false
+                            onRetry(currentState.inputUriString)
+                        }
+                    },
+                )
             }
 
             currentState is HasResult -> {
