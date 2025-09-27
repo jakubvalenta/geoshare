@@ -493,6 +493,26 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
+                        android:host="mapy.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="mapy.cz"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
                         android:host="osmand.net"
                         android:path="/map"
                         android:scheme="https"/>
