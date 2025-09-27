@@ -1,0 +1,1 @@
+- Replaced the "Open original link" button with "Copy original link" and added it to the error screen too.
