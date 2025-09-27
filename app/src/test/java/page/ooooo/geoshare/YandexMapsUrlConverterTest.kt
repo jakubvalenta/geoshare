@@ -75,7 +75,15 @@ class YandexMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_orgOnly() {
         assertEquals(
             Position(),
+            parseUrl("https://yandex.com/maps/org/94933420809")
+        )
+        assertEquals(
+            Position(),
             parseUrl("https://yandex.com/maps/org/94933420809/")
+        )
+        assertEquals(
+            Position(),
+            parseUrl("https://yandex.com/maps/org/94933420809?spam")
         )
     }
 

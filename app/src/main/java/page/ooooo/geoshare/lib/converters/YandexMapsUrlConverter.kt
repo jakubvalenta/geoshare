@@ -31,7 +31,7 @@ class YandexMapsUrlConverter() :
             first {
                 query("whatshere%5Bpoint%5D", PositionRegex("$LON,$LAT"))
                 query("ll", PositionRegex("$LON,$LAT"))
-                path(PositionRegex("""/maps/org/\d+/.*"""))
+                path(PositionRegex("""/maps/org/\d+([/?#].*|$)"""))
             }
         }
     }
