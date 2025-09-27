@@ -4,7 +4,7 @@ import org.junit.Test
 import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
-class YandexUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class YandexMapsUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
     @Test
     fun test() {
         // Launch app and set connection permission to Always
