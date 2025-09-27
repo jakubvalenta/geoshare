@@ -29,17 +29,13 @@ class NetworkTools(
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )
-    suspend fun requestLocationHeader(url: URL, httpMethod: HttpMethod): String? = withContext(Dispatchers.IO) {
+    suspend fun requestLocationHeader(url: URL): String? = withContext(Dispatchers.IO) {
         connect(
             engine,
             url,
-            httpMethod,
-            followRedirectsParam = httpMethod != HttpMethod.Head,
-            expectedStatusCodes = if (httpMethod != HttpMethod.Head) {
-                listOf(HttpStatusCode.OK)
-            } else {
-                listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found)
-            },
+            httpMethod = HttpMethod.Head,
+            followRedirectsParam = false,
+            expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
         ) { response ->
             response.headers["Location"]
         }
@@ -55,6 +51,22 @@ class NetworkTools(
         connect(engine, url) { response ->
             val text: String = response.body()
             text
+        }
+    }
+
+    @Throws(
+        ConnectTimeoutException::class,
+        HttpRequestTimeoutException::class,
+        MalformedURLException::class,
+        SocketTimeoutException::class,
+        UnexpectedResponseCodeException::class,
+    )
+    suspend fun getRedirectUrlString(url: URL): String = withContext(Dispatchers.IO) {
+        connect(
+            engine,
+            url,
+        ) { response ->
+            response.request.url.toString()
         }
     }
 

@@ -19,7 +19,7 @@ class NetworkToolsTest {
     private val log = FakeLog()
 
     @Test
-    fun requestLocationHeader_head_301Response() = runTest {
+    fun requestLocationHeader_301Response() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -34,7 +34,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
             "https://maps.apple.com/place?address=Thomash%C3%B6he%2C+12053+Berlin%2C+Germany&coordinate=52.4737758%2C13.4373898",
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         )
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
@@ -43,7 +43,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_head_302Response() = runTest {
+    fun requestLocationHeader_302Response() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -58,7 +58,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
             "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd",
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         )
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
@@ -67,7 +67,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_head_302ResponseMissingLocation() = runTest {
+    fun requestLocationHeader_302ResponseMissingLocation() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -76,11 +76,11 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        assertNull(mockNetworkTools.requestLocationHeader(url, HttpMethod.Head))
+        assertNull(mockNetworkTools.requestLocationHeader(url))
     }
 
     @Test
-    fun requestLocationHeader_head_200Response() = runTest {
+    fun requestLocationHeader_200Response() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -95,7 +95,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         } catch (_: UnexpectedResponseCodeException) {
             threw = true
         }
@@ -107,7 +107,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_head_500Response() = runTest {
+    fun requestLocationHeader_500Response() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -122,7 +122,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         } catch (_: UnexpectedResponseCodeException) {
             threw = true
         }
@@ -134,7 +134,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_head_httpRequestTimeoutException() = runTest {
+    fun requestLocationHeader_httpRequestTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { request ->
             throw HttpRequestTimeoutException(request)
@@ -142,7 +142,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         } catch (_: HttpRequestTimeoutException) {
             threw = true
         }
@@ -150,7 +150,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_head_connectTimeoutException() = runTest {
+    fun requestLocationHeader_connectTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine {
             throw ConnectTimeoutException("Connect timeout")
@@ -158,7 +158,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         } catch (_: ConnectTimeoutException) {
             threw = true
         }
@@ -166,7 +166,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_head_socketTimeoutException() = runTest {
+    fun requestLocationHeader_socketTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine {
             throw SocketTimeoutException()
@@ -174,7 +174,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Head)
+            mockNetworkTools.requestLocationHeader(url)
         } catch (_: SocketTimeoutException) {
             threw = true
         }
@@ -182,22 +182,18 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_get_200Response() = runTest {
-        val url = URL("https://example.com/")
+    fun getRedirectUrlString_200Response() = runTest {
+        val url = URL("https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17")
         val mockEngine = MockEngine { _ ->
             respond(
                 content = "",
                 status = HttpStatusCode.OK,
-                headers = headersOf(
-                    HttpHeaders.Location,
-                    "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"
-                ),
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
             "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17",
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Get)
+            mockNetworkTools.getRedirectUrlString(url)
         )
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
@@ -206,20 +202,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_get_200ResponseMissingLocation() = runTest {
-        val url = URL("https://example.com/")
-        val mockEngine = MockEngine { _ ->
-            respond(
-                content = "",
-                status = HttpStatusCode.OK,
-            )
-        }
-        val mockNetworkTools = NetworkTools(mockEngine, log)
-        assertNull(mockNetworkTools.requestLocationHeader(url, HttpMethod.Get))
-    }
-
-    @Test
-    fun requestLocationHeader_get_500Response() = runTest {
+    fun getRedirectUrlString_500Response() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -234,7 +217,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Get)
+            mockNetworkTools.getRedirectUrlString(url)
         } catch (_: UnexpectedResponseCodeException) {
             threw = true
         }
@@ -246,7 +229,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_get_httpRequestTimeoutException() = runTest {
+    fun getRedirectUrlString_httpRequestTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { request ->
             throw HttpRequestTimeoutException(request)
@@ -254,7 +237,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Get)
+            mockNetworkTools.getRedirectUrlString(url)
         } catch (_: HttpRequestTimeoutException) {
             threw = true
         }
@@ -262,7 +245,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_get_connectTimeoutException() = runTest {
+    fun getRedirectUrlString_connectTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine {
             throw ConnectTimeoutException("Connect timeout")
@@ -270,7 +253,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Get)
+            mockNetworkTools.getRedirectUrlString(url)
         } catch (_: ConnectTimeoutException) {
             threw = true
         }
@@ -278,7 +261,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun requestLocationHeader_get_socketTimeoutException() = runTest {
+    fun getRedirectUrlString_socketTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine {
             throw SocketTimeoutException()
@@ -286,7 +269,7 @@ class NetworkToolsTest {
         val mockNetworkTools = NetworkTools(mockEngine, log)
         var threw = false
         try {
-            mockNetworkTools.requestLocationHeader(url, HttpMethod.Get)
+            mockNetworkTools.getRedirectUrlString(url)
         } catch (_: SocketTimeoutException) {
             threw = true
         }

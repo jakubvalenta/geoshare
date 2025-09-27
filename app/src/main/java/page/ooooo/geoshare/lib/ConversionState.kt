@@ -6,6 +6,7 @@ import kotlinx.coroutines.CancellationException
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
+import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
 import java.net.MalformedURLException
@@ -113,7 +114,11 @@ data class GrantedUnshortenPermission(
 
     override suspend fun transition(): State {
         val locationHeader = try {
-            stateContext.networkTools.requestLocationHeader(uri.toUrl(), urlConverter.shortUriHttpMethod)
+            val url = uri.toUrl()
+            when (urlConverter.shortUriMethod) {
+                ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url)
+                ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url)
+            }
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
         } catch (_: MalformedURLException) {
