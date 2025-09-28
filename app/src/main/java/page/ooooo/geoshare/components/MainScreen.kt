@@ -6,7 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -57,7 +56,6 @@ fun MainScreen(
 ) {
     val appName = stringResource(R.string.app_name)
     var errorMessageResId by remember { mutableStateOf<Int?>(null) }
-    var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -65,54 +63,13 @@ fun MainScreen(
             CenterAlignedTopAppBar(
                 title = { Text(appName) },
                 actions = {
-                    Box {
-                        IconButton(
-                            { menuExpanded = true },
-                            Modifier
-                                .padding(end = Spacing.windowPadding - Spacing.builtInTopBarPaddingEnd)
-                                .testTag("geoShareMainMenuButton"),
-                        ) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.nav_menu_content_description),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false },
-                            modifier = Modifier.semantics { testTagsAsResourceId = true },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.user_preferences_title)) },
-                                modifier = Modifier.testTag("geoShareMainMenuUserPreferences"),
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToUserPreferencesScreen()
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.faq_title)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToFaqScreen(null)
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.intro_title)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToIntroScreen()
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.about_title)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToAboutScreen()
-                                },
-                            )
-                        }
-                    }
+                    MainMenu(
+                        whatIsNewBadged = false, // TODO Set whatIsNewBadged
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                    )
                 },
             )
         },

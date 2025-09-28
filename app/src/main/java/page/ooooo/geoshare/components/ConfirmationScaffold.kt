@@ -31,6 +31,16 @@ fun ConfirmationScaffold(
                         Text(title)
                     }
                 },
+                actions = {
+                    MainMenu(
+                        whatIsNewBadged = true, // TODO Set whatIsNewBadged
+                        // TODO Pass navigation callbacks
+                        onNavigateToUserPreferencesScreen = {},
+                        onNavigateToFaqScreen = {},
+                        onNavigateToIntroScreen = {},
+                        onNavigateToAboutScreen = {},
+                    )
+                },
                 navigationIcon = navigationIcon,
             )
         },
