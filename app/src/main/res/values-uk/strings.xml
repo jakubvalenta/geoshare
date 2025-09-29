@@ -89,7 +89,7 @@
     <string name="converter_yandex_maps_permission_title">Підключитися до Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Підключення до Yandex…</string>
     <string name="faq_supported_inputs_headline">Підтримувані картографічні сервіси</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Ви можете поділитися наступними посиланнями на карти з %1$s або вставити їх у застосунок:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />координати (наприклад, 41°24′12.2″ пн. ш. 2°10′26.5″ сх. д.)<br />гео: URI</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br / >Waze<br />Yandex Maps<br />координати (наприклад, 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
     <string name="converter_waze_permission_title">Підключитися до Waze?</string>
     <string name="converter_waze_loading_indicator_title">Підключення до Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">Копіювати Карти Google</string>
@@ -98,4 +98,6 @@
     <string name="conversion_succeeded_point_number">точка %1$d</string>
     <string name="conversion_succeeded_share">Поділитися</string>
     <string name="conversion_error_retry">Спробуйте ще раз</string>
+    <string name="converter_mapy_com_permission_title">Підключитися до Mapy.com?</string>
+    <string name="converter_mapy_com_loading_indicator_title">Підключення до Mapy.com…</string>
 </resources>
