@@ -82,19 +82,21 @@
     <string name="converter_apple_maps_loading_indicator_title">Spojování s Applem…</string>
     <string name="conversion_loading_indicator_cancel">Zrušit</string>
     <string name="conversion_failed_cancelled">Zrušeno</string>
-    <string name="conversion_succeeded_skip">Otevřít původní odkaz</string>
+    <string name="conversion_succeeded_skip">Kopírovat původní odkaz</string>
     <string name="conversion_done">Hotovo</string>
     <string name="conversion_succeeded_title">Souřadnice</string>
     <string name="conversion_error_title">Chyba</string>
     <string name="converter_yandex_maps_permission_title">Spojit se s Yandexem?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Spojování s Yandexem…</string>
     <string name="faq_supported_inputs_headline">Podporované mapové služby</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit:</p><p>Google Mapy<br />Apple Mapy<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />souřadnice (např. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
-    <string name="conversion_succeeded_copy_google_maps">Kpírovat odkaz na Google Mapy</string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit:</p><p>Google Mapy<br />Apple Mapy<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />souřadnice (např. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
+    <string name="conversion_succeeded_copy_google_maps">Kopírovat odkaz na Google Mapy</string>
     <string name="conversion_succeeded_save_gpx">Uložit GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s výsledek %2$s.gpx</string>
     <string name="conversion_succeeded_share">Sdílet</string>
     <string name="converter_waze_permission_title">Spojit se s Wazem?</string>
     <string name="converter_waze_loading_indicator_title">Spojování s Wazem…</string>
     <string name="conversion_succeeded_point_number">bod %1$d</string>
+    <string name="converter_mapy_com_permission_title">Spojit se s Mapy.com?</string>
+    <string name="converter_mapy_com_loading_indicator_title">Spojování s Mapy.com…</string>
 </resources>

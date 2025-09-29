@@ -6,6 +6,7 @@ Partagez un lien cartographique avec Geo Share et l’application l’ouvrira da
 - Apple Plans (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- Mapy.com (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
 - Waze (beta)

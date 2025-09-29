@@ -6,6 +6,7 @@ Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen insta
 - Apple Maps (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- Mapy.com (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
 - Waze (beta)
