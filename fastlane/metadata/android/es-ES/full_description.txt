@@ -6,6 +6,7 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 - Apple Maps (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- Mapy.com (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
 - Waze (beta)
