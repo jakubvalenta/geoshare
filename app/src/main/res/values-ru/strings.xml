@@ -43,7 +43,7 @@
     <string name="conversion_permission_common_grant">Хорошо</string>
     <string name="conversion_permission_common_deny">Отмена</string>
     <string name="main_input_uri_clear_content_description">Очистить</string>
-    <string name="conversion_error_report">сообщите о проблеме</string>
+    <string name="conversion_error_report">Сообщите о проблеме</string>
     <string name="about_app_icon_content_description">Значок приложения</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Больше не спрашивать меня</string>
@@ -71,7 +71,7 @@
     <string name="intro_open_by_default_app_note"><![CDATA[Выберете хотя бы <tt>maps.google.com</tt> и <tt>maps.app.goo.gl</tt>. Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Maps.]]></string>
     <string name="intro_open_by_default_app_content_description">Снимок экрана настроек %1$s «Открыть по умолчанию»</string>
     <string name="conversion_failed_missing_url">Отсутствует URL-адрес</string>
-    <string name="conversion_permission_common_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат или названия места. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить информацию.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить их.]]></string>
     <string name="intro_how_to_share_app_caption"><![CDATA[Выберете <i>%1$s</i> и приложение позволит вам открыть то же место в любом установленном приложении для работы с картами.]]></string>
     <string name="conversion_failed_unshorten_error">Не удалось открыть короткую ссылку</string>
     <string name="about_text"><![CDATA[<p>%1$s — это бесплатное приложение с открытым исходным кодом, распространяемое по лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или более поздней версии.</p><br><p>Вы можете найти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, где вы также можете <a href="https://github.com/jakubvalenta/geoshare/issues">сообщать о проблемах</a>.</p><br><p>Мы будем рады вашим отзывам. Вы можете связаться со мной по адресу <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
@@ -82,8 +82,22 @@
     <string name="converter_apple_maps_loading_indicator_title">Подключение к Apple…</string>
     <string name="conversion_loading_indicator_cancel">Отмена</string>
     <string name="conversion_failed_cancelled">Отменено</string>
-    <string name="conversion_succeeded_skip">Открыть изначальную ссылку</string>
+    <string name="conversion_succeeded_skip">Копировать изначальную ссылку</string>
     <string name="conversion_done">Готово</string>
     <string name="conversion_succeeded_title">Координаты</string>
     <string name="conversion_error_title">Ошибка</string>
+    <string name="conversion_succeeded_copy_google_maps">Копировать ссылку на Карты Google</string>
+    <string name="conversion_succeeded_save_gpx">Сохранить как GPX</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s результат %2$s.gpx</string>
+    <string name="conversion_succeeded_share">Поделиться</string>
+    <string name="converter_mapy_com_permission_title">Подключиться к Mapy.com?</string>
+    <string name="conversion_succeeded_point_number">точка %1$d</string>
+    <string name="converter_mapy_com_loading_indicator_title">Подключение к Mapy.com…</string>
+    <string name="converter_yandex_maps_permission_title">Подключиться к Яндексу?</string>
+    <string name="converter_yandex_maps_loading_indicator_title">Подключение к Яндексу…</string>
+    <string name="converter_waze_permission_title">Подключиться к Waze?</string>
+    <string name="converter_waze_loading_indicator_title">Подключение к Waze…</string>
+    <string name="conversion_error_retry">Попробуйте снова</string>
+    <string name="faq_supported_inputs_headline">Поддерживаемые карты</string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Вы можете поделиться следующими ссылками на карту с %1$s или вставить их в приложение:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Яндекс Карты<br />координаты (например, 41°24′12.2″N 2°10′26.5″E)<br />geo: URI-адресы</p>]]></string>
 </resources>
