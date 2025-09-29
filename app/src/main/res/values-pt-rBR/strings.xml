@@ -81,14 +81,14 @@
     <string name="converter_apple_maps_loading_indicator_title">Conectando-se à Apple…</string>
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
     <string name="conversion_failed_cancelled">Cancelado</string>
-    <string name="conversion_succeeded_skip">Abrir link original</string>
+    <string name="conversion_succeeded_skip">Copiar link original</string>
     <string name="conversion_done">Pronto</string>
     <string name="conversion_succeeded_title">Coordenadas</string>
     <string name="conversion_error_title">Erro</string>
     <string name="converter_yandex_maps_permission_title">Conectar ao Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Conectando-se ao Yandex…</string>
     <string name="faq_supported_inputs_headline">Serviços de mapa suportados</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Wave <br />Yandex Maps<br />coordenadas (por exemplo, 41°24′12.2″N 2°10′26.5″E)<br />URIs geo:</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Wave <br />Yandex Maps<br />coordenadas (por exemplo, 41°24′12.2″N 2°10′26.5″E)<br />URIs geo:</p>]]></string>
     <string name="converter_waze_permission_title">Conectar ao Wave?</string>
     <string name="converter_waze_loading_indicator_title">Conectando-se ao Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">Copiar Google Maps</string>
@@ -97,4 +97,6 @@
     <string name="conversion_succeeded_point_number">%1$dº ponto</string>
     <string name="conversion_succeeded_share">Compartilhar</string>
     <string name="conversion_error_retry">Tentar novamente</string>
+    <string name="converter_mapy_com_permission_title">Conectar ao Mapy.com?</string>
+    <string name="converter_mapy_com_loading_indicator_title">Conectando-se ao Mapy.com…</string>
 </resources>
