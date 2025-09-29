@@ -6,6 +6,7 @@
 - Apple Maps (бета-версія)
 - HERE WeGo (бета-версія)
 - Magic Earth (бета-версія)
+- Mapy.com (beta)
 - OpenStreetMap (бета-версія)
 - OsmAnd (бета-версія)
 - Waze (бета-версія)
