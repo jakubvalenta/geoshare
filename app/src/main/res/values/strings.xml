@@ -57,6 +57,8 @@
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
     <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
     <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
+    <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
+    <string name="converter_open_street_map_loading_indicator_title">Connecting to OpenStreetMap…</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
     <string name="converter_waze_permission_title">Connect to Waze?</string>

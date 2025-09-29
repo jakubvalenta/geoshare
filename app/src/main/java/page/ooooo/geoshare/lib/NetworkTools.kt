@@ -13,7 +13,6 @@ import io.ktor.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.net.MalformedURLException
 import java.net.URL
 
 class UnexpectedResponseCodeException : IOException("Unexpected response code")
@@ -25,7 +24,6 @@ class NetworkTools(
     @Throws(
         ConnectTimeoutException::class,
         HttpRequestTimeoutException::class,
-        MalformedURLException::class,
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )
@@ -57,7 +55,6 @@ class NetworkTools(
     @Throws(
         ConnectTimeoutException::class,
         HttpRequestTimeoutException::class,
-        MalformedURLException::class,
         SocketTimeoutException::class,
         UnexpectedResponseCodeException::class,
     )

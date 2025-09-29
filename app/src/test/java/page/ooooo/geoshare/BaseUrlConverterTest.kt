@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.converters.UrlConverter
 abstract class BaseUrlConverterTest() {
     protected abstract val urlConverter: UrlConverter
 
-    private var uriQuote: UriQuote = FakeUriQuote()
+    protected var uriQuote: UriQuote = FakeUriQuote()
 
     fun getUri(uriString: String): String? = urlConverter.uriPattern.matcher(uriString)?.takeIf { it.find() }?.group()
 
