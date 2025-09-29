@@ -1,1 +1,1 @@
-Apri Google Maps in altre applicazioni di mappe e creare link geo:
+Apri link di mappe in altre applicazioni di mappe e copia coordinate
