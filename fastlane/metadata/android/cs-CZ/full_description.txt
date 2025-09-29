@@ -6,6 +6,7 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 - Apple Mapy (beta)
 - HERE WeGo (beta)
 - Magic Earth (beta)
+- Mapy.com (beta)
 - OpenStreetMap (beta)
 - OsmAnd (beta)
 - Waze (beta)

@@ -48,7 +48,7 @@
     <string name="intro_open_by_default_app_screenshot_cancel">Abbrechen</string>
     <string name="conversion_loading_indicator_cancel">Abbrechen</string>
     <string name="conversion_failed_cancelled">Abgebrochen</string>
-    <string name="conversion_succeeded_skip">Original-Link öffnen</string>
+    <string name="conversion_succeeded_skip">Original-Link kopieren</string>
     <string name="conversion_done">Erledigt</string>
     <string name="conversion_succeeded_title">Koordinaten</string>
     <string name="conversion_error_title">Fehler</string>
@@ -69,7 +69,7 @@
     <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
     <string name="faq_supported_inputs_headline">Unterstützte Kartendienste</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />Koordinaten (z.B. 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />Koordinaten (z.B. 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
     <string name="faq_item_collapse">Abschnitt zuklappen</string>
     <string name="faq_item_expand">Abschnitt ausklappen</string>
     <string name="user_preferences_title">Einstellungen</string>
@@ -96,4 +96,6 @@
     <string name="conversion_succeeded_save_gpx">GPX speichern</string>
     <string name="converter_waze_permission_title">Mit Waze Verbinden?</string>
     <string name="converter_waze_loading_indicator_title">Verbindung mit Waze…</string>
+    <string name="converter_mapy_com_permission_title">Mit Mapy.com Verbinden?</string>
+    <string name="converter_mapy_com_loading_indicator_title">Verbindung mit Mapy.com…</string>
 </resources>
