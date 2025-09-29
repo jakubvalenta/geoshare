@@ -84,14 +84,14 @@
     <string name="converter_apple_maps_loading_indicator_title">يتصل ب Apple…</string>
     <string name="conversion_loading_indicator_cancel">ألغِ</string>
     <string name="conversion_failed_cancelled">أُلغِيَ</string>
-    <string name="conversion_succeeded_skip">افتح الرابط الأصلي</string>
+    <string name="conversion_succeeded_skip">انسخ الرابط الأصلي</string>
     <string name="conversion_done">تم</string>
     <string name="conversion_succeeded_title">إحداثيات</string>
     <string name="conversion_error_title">خطأ</string>
     <string name="converter_yandex_maps_permission_title">اتصل ب Yandex؟</string>
     <string name="converter_yandex_maps_loading_indicator_title">يتصل ب Yandex…</string>
     <string name="faq_supported_inputs_headline">خدمات الخرائط المدعومة</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق:</p><p>خرائط جوجل<br />خرائط Apple<br />HERE WeGo<br />Magic Earth<br />OpenStreetMap<br />OsmAnd<br />Waze<br />خرائط Yandex<br />الإحداثيات (مثال: 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
+    <string name="faq_supported_inputs_text"><![CDATA[<p>يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق:</p><p>خرائط جوجل<br />خرائط أبل<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />خرائط Yandex<br />الإحداثيات (مثال: 41°24′12.2″N 2°10′26.5″E)<br />معرفات الموارد الموحدة (URIs) الجغرافية</p>]]></string>
     <string name="converter_waze_permission_title">الاتصال ب Waze؟</string>
     <string name="converter_waze_loading_indicator_title">جارِ الاتصال ب Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">انسخ خرائط جوجل</string>
@@ -100,4 +100,6 @@
     <string name="conversion_succeeded_point_number">نقطة %1$d</string>
     <string name="conversion_succeeded_share">شارك</string>
     <string name="conversion_error_retry">حاول مجددًا</string>
+    <string name="converter_mapy_com_permission_title">الاتصال بـ Mapy.com؟</string>
+    <string name="converter_mapy_com_loading_indicator_title">يتصل ب Mapy.com…</string>
 </resources>
