@@ -1,10 +1,10 @@
 package page.ooooo.geoshare
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
-import java.net.MalformedURLException
 
 class UriTest {
     private val uriQuote = FakeUriQuote()

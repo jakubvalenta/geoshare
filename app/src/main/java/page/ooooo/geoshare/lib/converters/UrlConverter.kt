@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.*
-import java.net.MalformedURLException
 import java.net.URL
 
 enum class ShortUriMethod { GET, HEAD }
