@@ -48,28 +48,9 @@ class GoogleMapsUrlConverter() :
             }
     }
 
-    /**
-     * Repeatedly searches for LAT and LON in the input to get points.
-     */
-    class PointsPositionRegex(regex: String) : PositionRegex(regex) {
-        override val points: List<Point>
-            get() = pattern.matcher(input).let { m ->
-                mutableListOf<Point>().apply {
-                    while (m.find()) {
-                        try {
-                            add(m.group("lat") to m.group("lon"))
-                        } catch (_: IllegalArgumentException) {
-                            // Do nothing
-                        }
-                    }
-                }
-            }
-    }
-
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?((www|maps)\.)?(google(\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
-    override val shortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {

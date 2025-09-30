@@ -106,19 +106,22 @@ data class Uri(
         this
     }
 
-    @Throws(MalformedURLException::class)
-    fun toUrl(): URL = URL(
-        if (host.isEmpty()) {
-            path.trimStart('/').let { path ->
-                if (path.isEmpty()) {
-                    throw MalformedURLException("Missing host or path")
+    fun toUrl(): URL? = try {
+        URL(
+            if (host.isEmpty()) {
+                path.trimStart('/').let { path ->
+                    if (path.isEmpty()) {
+                        throw MalformedURLException("Missing host or path")
+                    }
+                    this.copy(scheme = scheme.ifEmpty { "https" }, host = path, path = "")
                 }
-                this.copy(scheme = scheme.ifEmpty { "https" }, host = path, path = "")
-            }
-        } else {
-            this.copy(scheme = scheme.ifEmpty { "https" })
-        }.toString()
-    )
+            } else {
+                this.copy(scheme = scheme.ifEmpty { "https" })
+            }.toString()
+        )
+    } catch (_: MalformedURLException) {
+        null
+    }
 
     private fun formatQueryParams(): String = queryParams.map {
         "${it.key}=${uriQuote.encode(it.value.replace('+', ' '), allow = ",")}"

@@ -18,7 +18,6 @@ class YandexMapsUrlConverter() :
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
-    override val shortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {
@@ -40,7 +39,6 @@ class YandexMapsUrlConverter() :
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex("""data-coordinates="$LON,$LAT""""))
     }
-    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

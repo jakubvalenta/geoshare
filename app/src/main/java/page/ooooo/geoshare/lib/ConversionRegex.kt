@@ -59,6 +59,24 @@ open class PositionRegex(regex: String) : ConversionRegex(regex) {
 }
 
 /**
+ * Repeatedly searches for LAT and LON in the input to get points.
+ */
+class PointsPositionRegex(regex: String) : PositionRegex(regex) {
+    override val points: List<Point>
+        get() = pattern.matcher(input).let { m ->
+            mutableListOf<Point>().apply {
+                while (m.find()) {
+                    try {
+                        add(m.group("lat") to m.group("lon"))
+                    } catch (_: IllegalArgumentException) {
+                        // Do nothing
+                    }
+                }
+            }
+        }
+}
+
+/**
  * Create a position from a list of regexes.
  *
  * Get points from the last regex that has not null `points` property. If such a regex doesn't exist, find the last

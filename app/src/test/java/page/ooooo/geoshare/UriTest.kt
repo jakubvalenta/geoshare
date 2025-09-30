@@ -1,10 +1,10 @@
 package page.ooooo.geoshare
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
-import java.net.MalformedURLException
 
 class UriTest {
     private val uriQuote = FakeUriQuote()
@@ -464,21 +464,11 @@ class UriTest {
     }
 
     @Test
-    fun toUrl_uriHasNoHost_throwsMalformedUrlException() {
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("https://", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("https:", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("/", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse(":", uriQuote).toUrl()
-        }
+    fun toUrl_uriHasNoHost_returnsNull() {
+        assertNull(Uri.parse("https://", uriQuote).toUrl())
+        assertNull(Uri.parse("https:", uriQuote).toUrl())
+        assertNull(Uri.parse("", uriQuote).toUrl())
+        assertNull(Uri.parse("/", uriQuote).toUrl())
+        assertNull(Uri.parse(":", uriQuote).toUrl())
     }
 }

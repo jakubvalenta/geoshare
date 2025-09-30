@@ -1,10 +1,8 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
-import page.ooooo.geoshare.lib.ConversionHtmlPattern
-import page.ooooo.geoshare.lib.ConversionUriPattern
-import page.ooooo.geoshare.lib.PositionRegex
-import page.ooooo.geoshare.lib.RedirectRegex
+import page.ooooo.geoshare.lib.*
+import java.net.URL
 
 enum class ShortUriMethod { GET, HEAD }
 
@@ -13,7 +11,7 @@ sealed interface UrlConverter {
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern
-        val shortUriMethod: ShortUriMethod
+        val shortUriMethod: ShortUriMethod get() = ShortUriMethod.HEAD
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }
@@ -23,8 +21,9 @@ sealed interface UrlConverter {
     }
 
     interface WithHtmlPattern : UrlConverter {
-        val conversionHtmlPattern: ConversionHtmlPattern<PositionRegex>?
-        val conversionHtmlRedirectPattern: ConversionHtmlPattern<RedirectRegex>?
+        val conversionHtmlPattern: ConversionHtmlPattern<PositionRegex>? get() = null
+        val conversionHtmlRedirectPattern: ConversionHtmlPattern<RedirectRegex>? get() = null
+        fun getHtmlUrl(uri: Uri): URL? = uri.toUrl()
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }

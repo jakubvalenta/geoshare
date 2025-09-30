@@ -9,7 +9,6 @@ import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
-import java.net.MalformedURLException
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -113,16 +112,18 @@ data class GrantedUnshortenPermission(
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
+        val url = uri.toUrl()
+        if (url == null) {
+            stateContext.log.e(null, "HTML Pattern: Failed to get URL for $uri")
+            return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
+        }
         val locationHeader = try {
-            val url = uri.toUrl()
             when (urlConverter.shortUriMethod) {
                 ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url)
                 ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url)
             }
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
-        } catch (_: MalformedURLException) {
-            return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         } catch (_: IOException) {
             // Catches SocketTimeoutException and UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString)
@@ -174,19 +175,11 @@ data class UnshortenedUrl(
         if (urlConverter is UrlConverter.WithHtmlPattern) {
             return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlPermission(
-                    stateContext,
-                    inputUriString,
-                    urlConverter,
-                    uri,
-                    positionFromUri
+                    stateContext, inputUriString, urlConverter, uri, positionFromUri
                 )
 
                 Permission.ASK -> RequestedParseHtmlPermission(
-                    stateContext,
-                    inputUriString,
-                    urlConverter,
-                    uri,
-                    positionFromUri
+                    stateContext, inputUriString, urlConverter, uri, positionFromUri
                 )
 
                 Permission.NEVER -> ParseHtmlFailed(inputUriString, positionFromUri)
@@ -230,13 +223,16 @@ data class GrantedParseHtmlPermission(
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
+        val htmlUrl = urlConverter.getHtmlUrl(uri)
+        if (htmlUrl == null) {
+            stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri")
+            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+        }
         val html = try {
-            stateContext.log.i(null, "HTML Pattern: Downloading $uri")
-            stateContext.networkTools.getText(uri.toUrl())
+            stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
+            stateContext.networkTools.getText(htmlUrl)
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
-        } catch (_: MalformedURLException) {
-            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         } catch (_: IOException) {
             // Catches SocketTimeoutException and UnexpectedResponseCodeException too.
             return ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
@@ -244,15 +240,15 @@ data class GrantedParseHtmlPermission(
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
-            stateContext.log.i(null, "HTML Pattern: parsed $uri to $position")
+            stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
             return@transition ConversionSucceeded(inputUriString, position)
         }
         urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUriString ->
-            stateContext.log.i(null, "HTML Redirect Pattern: parsed $uri to redirect URI $redirectUriString")
+            stateContext.log.i(null, "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString")
             val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
             return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
         }
-        stateContext.log.w(null, "HTML Pattern: Failed to parse $uri")
+        stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
         return ParseHtmlFailed(inputUriString, positionFromUri)
     }
 }
@@ -261,14 +257,12 @@ data class ParseHtmlFailed(
     val inputUriString: String,
     val positionFromUri: Position?,
 ) : ConversionState() {
-    override suspend fun transition() = if (
-        positionFromUri != null &&
-        (!positionFromUri.points.isNullOrEmpty() || !positionFromUri.q.isNullOrEmpty())
-    ) {
-        ConversionSucceeded(inputUriString, positionFromUri)
-    } else {
-        ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-    }
+    override suspend fun transition() =
+        if (positionFromUri != null && (!positionFromUri.points.isNullOrEmpty() || !positionFromUri.q.isNullOrEmpty())) {
+            ConversionSucceeded(inputUriString, positionFromUri)
+        } else {
+            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+        }
 }
 
 data class ConversionSucceeded(

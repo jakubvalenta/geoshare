@@ -51,10 +51,11 @@ class GoogleMapsUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
         )
 
         // Place list
-        testUri(
-            Position("59.147731699999994", "11.550661199999999"),
-            "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
-        )
+        // TODO Replace place list URL with one that doesn't return 404.
+        // testUri(
+        //     Position("59.147731699999994", "11.550661199999999"),
+        //     "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
+        // )
 
         // Directions
         testUri(

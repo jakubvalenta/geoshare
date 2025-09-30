@@ -57,8 +57,6 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
         }
     }
 
-    override val conversionHtmlRedirectPattern = null
-
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
 
