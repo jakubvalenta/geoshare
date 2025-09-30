@@ -7,7 +7,6 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import java.net.MalformedURLException
 import java.net.URL
 
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
@@ -26,17 +25,21 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         content(PointsPositionRegex(""""lat":$LAT,"lon":$LON"""))
     }
 
-    @Throws(
-        IllegalArgumentException::class,
-        MalformedURLException::class,
-    )
-    override fun getHtmlUrl(uri: Uri): URL {
+    override fun getHtmlUrl(uri: Uri): URL? {
         val m = Pattern.compile(ELEMENT_PATH).matcher(uri.path)
         if (!m.matches()) {
-            throw IllegalArgumentException("URI path does not match an OpenStreetMap element URI path")
+            return null
         }
-        val type = m.group("type")
-        val id = m.group("id")
+        val type = try {
+            m.group("type")
+        } catch (_: IllegalArgumentException) {
+            return null
+        }
+        val id = try {
+            m.group("id")
+        } catch (_: IllegalArgumentException) {
+            return null
+        }
         return URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")
     }
 

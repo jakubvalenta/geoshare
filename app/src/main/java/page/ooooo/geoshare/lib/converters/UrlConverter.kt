@@ -24,12 +24,7 @@ sealed interface UrlConverter {
     interface WithHtmlPattern : UrlConverter {
         val conversionHtmlPattern: ConversionHtmlPattern<PositionRegex>? get() = null
         val conversionHtmlRedirectPattern: ConversionHtmlPattern<RedirectRegex>? get() = null
-
-        @Throws(MalformedURLException::class)
-        fun getHtmlUrl(uri: Uri): URL {
-            return uri.toUrl()
-        }
-
+        fun getHtmlUrl(uri: Uri): URL? = uri.toUrl()
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }

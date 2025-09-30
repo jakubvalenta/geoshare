@@ -464,21 +464,11 @@ class UriTest {
     }
 
     @Test
-    fun toUrl_uriHasNoHost_throwsMalformedUrlException() {
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("https://", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("https:", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse("/", uriQuote).toUrl()
-        }
-        assertThrows(MalformedURLException::class.java) {
-            Uri.parse(":", uriQuote).toUrl()
-        }
+    fun toUrl_uriHasNoHost_returnsNull() {
+        assertNull(Uri.parse("https://", uriQuote).toUrl())
+        assertNull(Uri.parse("https:", uriQuote).toUrl())
+        assertNull(Uri.parse("", uriQuote).toUrl())
+        assertNull(Uri.parse("/", uriQuote).toUrl())
+        assertNull(Uri.parse(":", uriQuote).toUrl())
     }
 }

@@ -9,7 +9,6 @@ import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
-import java.net.MalformedURLException
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -113,9 +112,9 @@ data class GrantedUnshortenPermission(
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
-        val url = try {
-            uri.toUrl()
-        } catch (_: MalformedURLException) {
+        val url = uri.toUrl()
+        if (url == null) {
+            stateContext.log.e(null, "HTML Pattern: Failed to get URL for $uri")
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         val locationHeader = try {
@@ -224,10 +223,9 @@ data class GrantedParseHtmlPermission(
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
-        val htmlUrl = try {
-            urlConverter.getHtmlUrl(uri)
-        } catch (e: Exception) {
-            stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri", e)
+        val htmlUrl = urlConverter.getHtmlUrl(uri)
+        if (htmlUrl == null) {
+            stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri")
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
         val html = try {

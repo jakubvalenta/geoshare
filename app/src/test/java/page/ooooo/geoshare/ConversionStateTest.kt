@@ -1137,7 +1137,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun grantedParseHtmlPermission_htmlPatternMatchesHtmlAndGetHtmlUrlThrowsException_returnsConversionFailedWithGenericMessage() =
+    fun grantedParseHtmlPermission_htmlPatternMatchesHtmlAndGetHtmlUrlReturnsNull_returnsConversionFailedWithGenericMessage() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1162,11 +1162,7 @@ class ConversionStateTest {
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val conversionHtmlPattern = mockHtmlPattern
-
-                override fun getHtmlUrl(uri: Uri): URL {
-                    throw IllegalArgumentException()
-                }
-
+                override fun getHtmlUrl(uri: Uri) = null
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
             }
