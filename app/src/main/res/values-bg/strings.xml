@@ -98,4 +98,6 @@
     <string name="conversion_error_retry">Опитайте отново</string>
     <string name="converter_mapy_com_permission_title">Свързване с Mapy.com?</string>
     <string name="converter_mapy_com_loading_indicator_title">Свързване с Mapy.com…</string>
+    <string name="converter_open_street_map_permission_title">Свързване с OpenStreetMap?</string>
+    <string name="converter_open_street_map_loading_indicator_title">Свързване с OpenStreetMap…</string>
 </resources>
