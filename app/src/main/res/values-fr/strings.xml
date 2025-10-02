@@ -99,4 +99,6 @@
     <string name="conversion_succeeded_point_number">point %1$d</string>
     <string name="converter_mapy_com_permission_title">Se connecter à Mapy.com ?</string>
     <string name="converter_mapy_com_loading_indicator_title">Connexion à Mapy.com…</string>
+    <string name="converter_open_street_map_permission_title">Se connecter à OpenStreetMap ?</string>
+    <string name="converter_open_street_map_loading_indicator_title">Connexion à OpenStreetMap…</string>
 </resources>
