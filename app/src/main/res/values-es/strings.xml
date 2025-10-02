@@ -6,7 +6,7 @@
     <string name="nav_menu_content_description">Menú</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="intro_open_by_default_app_button">Abrir ajustes de %1$s</string>
-    <string name="user_preferences_connection_description">Para soportar enlaces cortos de Google Maps, y para obtener coordenadas de esa página web cuando el enlace no las contiene, %1$s puede conectarse a Google. Puede encontrar más información en la pantalla de preguntas frecuentes.</string>
+    <string name="user_preferences_connection_description">Para soportar enlaces cortos de mapas, y para obtener coordenadas de la página web del servicio de mapas cuando el enlace no las contiene, %1$s puede conectarse al servicio de mapas. Puedes encontrar más información en la pantalla de preguntas frecuentes (FAQ).</string>
     <string name="intro_how_to_share_headline">Cómo mostrar la ubicación del mapa en otra aplicación de mapas</string>
     <string name="intro_nav_finish">Empezar</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
@@ -42,9 +42,9 @@
     <string name="conversion_failed_unshorten_error">Error al resolver el enlace corto</string>
     <string name="conversion_failed_unshorten_connection_error">Error de conexión al resolver el enlace corto</string>
     <string name="conversion_failed_parse_url_error">Error al procesar el enlace de mapa</string>
-    <string name="conversion_succeeded_apps_not_found">No hay ninguna aplicación instalada que pueda abrir enlaces geo:</string>
+    <string name="conversion_succeeded_apps_not_found">No hay ninguna aplicación de mapas instalada</string>
     <string name="copying_finished">Se copiaron las coordenadas al portapapeles</string>
-    <string name="conversion_failed_connection_permission_denied">Este enlace no es compatible sin conectarse a Google</string>
+    <string name="conversion_failed_connection_permission_denied">Este enlace no es compatible sin conectarse al servicio de mapas</string>
     <string name="conversion_failed_parse_html_connection_error">Error de conexión al obtener la página web del servicio de mapas</string>
     <string name="conversion_succeeded_copy_geo">Copiar geo:</string>
     <string name="nav_back_content_description">Volver a la pantalla principal</string>
@@ -99,4 +99,6 @@
     <string name="conversion_succeeded_point_number">punto %1$d</string>
     <string name="converter_mapy_com_permission_title">¿Conectarse a Mapy.com?</string>
     <string name="converter_mapy_com_loading_indicator_title">Conectándose a Mapy.com…</string>
+    <string name="converter_open_street_map_permission_title">¿Conectarse a OpenStreetMap?</string>
+    <string name="converter_open_street_map_loading_indicator_title">Conectándose a OpenStreetMap…</string>
 </resources>
