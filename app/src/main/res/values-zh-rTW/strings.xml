@@ -1,3 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="conversion_succeeded_save_gpx">儲存GPX</string>
+    <string name="nav_back_content_description">返回主畫面</string>
+    <string name="conversion_succeeded_share">分享</string>
+    <string name="intro_how_to_share_headline">如何在其他地圖應用程式中顯示地圖位置</string>
+    <string name="intro_how_to_share_google_maps_caption">從地圖應用程式和網路瀏覽器分享位置。</string>
+    <string name="intro_how_to_share_google_maps_content_description">Google地圖分享螢幕的螢幕截圖</string>
+    <string name="intro_how_to_share_google_maps_screenshot_title">分享給</string>
+    <string name="intro_open_by_default_google_maps_screenshot_app">地圖</string>
+    <string name="intro_open_by_default_google_maps_screenshot_choose">選擇要如何在此應用程式中開啟網頁連結</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_the_app">在本應用程式中</string>
+    <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">在你的瀏覽器中</string>
+    <string name="intro_open_by_default_app_screenshot_cancel">取消</string>
+    <string name="intro_open_by_default_app_screenshot_add">添加</string>
+    <string name="intro_nav_close">關閉</string>
+    <string name="converter_mapy_com_permission_title">連接至Mapy.com？</string>
+    <string name="converter_open_street_map_permission_title">連接至OpenStreetMap？</string>
+    <string name="converter_open_street_map_loading_indicator_title">連結OpenStreetMap中…</string>
+    <string name="converter_yandex_maps_permission_title">連結至Yandex？</string>
+    <string name="conversion_error_retry">再試一次</string>
+    <string name="conversion_loading_indicator_cancel">取消</string>
+    <string name="conversion_permission_common_grant">好</string>
+    <string name="conversion_permission_common_deny">取消</string>
+    <string name="conversion_succeeded_skip">複製原始連結</string>
+    <string name="nav_menu_content_description">選單</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">藍芽</string>
+    <string name="main_input_uri_clear_content_description">清除</string>
+    <string name="main_input_uri_supporting_text">例如 https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
+    <string name="conversion_succeeded_copy_content_description">複製</string>
+    <string name="conversion_done">完成</string>
+    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s 將地圖連結轉換為其他地圖應用可以打開的 geo: 連結。要創建 geo: 連結，需要地理座標。%1$s 從地圖 URL 中提取它們。</p><br><p>然而，並非所有地圖 URL 都包含座標。在這種情況下，%1$s 將<b>提示您獲得連接到地圖服務（Google 地圖、Apple 地圖等）的許可權</b>並從 HTTP 標頭或連結的 HTML 文檔中檢索座標。</p><br><p>更準確地說，%1$s 將地圖 URL 轉換為 geo: URI 有三種場景：</p><br><p><b>1.</b></p><br><p>如果地圖 URL 已經包含地理座標（例如 <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>），然後對其進行解析，不會向地圖服務的伺服器發出任何請求。</p><br><p><b>2.</b></p><br><p>如果地圖 URL 不包含地理座標（例如 <tt>https://www.google.com/maps/place/Central+Park/</tt>），則 %1$s 會詢問您是否可以連接到地圖服務。</p><br><p>如果您允許連接到地圖服務，則 %1$s 會向 Google 地圖（或 Apple 地圖等）發出 <b>HTTP GET 請求</b>並從 HTML 回應中解析座標。您可以將其想像為 <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>。</p><br><p>如果您不允許連接到地圖服務，則 %1$s 會創建帶有地點搜索詞的 geo: 連結（例如 <tt>geo:0,0?q=Central%%20Park</tt>）。</p><br><p><b>3.</b></p><br><p>如果地圖 URL 是短連結（例如 <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>），則 %1$s 會詢問您是否可以連接到地圖服務。</p><br><p>如果您允許連接到地圖服務，則 %1$s 會向短連結發出 <b>HTTP HEAD 請求</b>並從回應標頭中讀取完整連結。您可以將其想像為 <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>。然後 %1$s 繼續場景 1 或 2，具體取決於完整連結是否包含座標。在場景 2 的情況下，將與地圖服務建立另一個連接，但這次沒有詢問。</p><br><p>如果您不允許連接到地圖服務，則 %1$s 會取消 geo: 連結的創建。</p><br><br><p>要永久允許或拒絕連接到地圖服務，而不是始終詢問（默認設置），請轉到應用的偏好設置。</p>]]></string>
+    <string name="faq_supported_inputs_headline">支援的地圖服務</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_messaging">簡訊</string>
 </resources>
