@@ -28,7 +28,7 @@
     <string name="converter_google_maps_permission_title">Conectar ao Google?</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
-    <string name="conversion_permission_common_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas. O %2$s precisa conectar-se ao serviço de mapas para obtê-las.]]></string>
+    <string name="conversion_permission_common_text"><![CDATA[O link <tt>%1$s</tt> não contém coordenadas. O %2$s precisa conectar ao mapa para obtê-las.]]></string>
     <string name="about_title">Sobre</string>
     <string name="about_app_icon_content_description">Ícone do aplicativo</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -38,8 +38,8 @@
     <string name="faq_item_collapse">Retrair seção</string>
     <string name="faq_item_expand">Expandir seção</string>
     <string name="user_preferences_title">Preferências</string>
-    <string name="user_preferences_connection_title">Permitir conectar ao serviço de mapas (Google, Apple, etc.)?</string>
-    <string name="user_preferences_connection_description">Para suportar links curtos, e obter coordenadas da página web do serviço de mapas quando o link não as contém, o %1$s pode conectar-se ao serviço de mapas. Você pode encontrar mais informações na tela de perguntas frequentes.</string>
+    <string name="user_preferences_connection_title">Permitir conectar ao mapa (Google, Apple, etc.)?</string>
+    <string name="user_preferences_connection_description">Para suportar links curtos, e obter coordenadas da página web do mapa quando o link não tem elas, o %1$s pode conectar ao serviço de mapas. Você pode encontrar mais informações na tela de perguntas frequentes.</string>
     <string name="user_preferences_connection_option_always">Sim</string>
     <string name="user_preferences_connection_option_ask">Perguntar antes de conectar</string>
     <string name="user_preferences_connection_option_never">Não</string>
@@ -49,17 +49,17 @@
     <string name="conversion_failed_parse_url_error">Falha ao processar o link de mapa</string>
     <string name="conversion_succeeded_apps_not_found">Nenhum app de mapa está instalado</string>
     <string name="copying_finished">Coordenadas copiadas para a área de transferência</string>
-    <string name="conversion_failed_connection_permission_denied">O link não é suportado sem conectar ao serviço de mapas</string>
-    <string name="conversion_failed_parse_html_error">Falha ao solicitar a página web do serviço de mapas</string>
+    <string name="conversion_failed_connection_permission_denied">O link não é suportado sem conectar ao mapa</string>
+    <string name="conversion_failed_parse_html_error">Falha ao solicitar a página web do mapa</string>
     <string name="nav_back_content_description">Voltar para a tela inicial</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primeiro, vá em Configurações &#8594; Apps &#8594; Maps &#8594; <i>Abrir por padrão</i> e desative a abertura de links neste app.]]></string>
     <string name="conversion_error_report">Relatar problema</string>
     <string name="about_text"><![CDATA[<p>O %1$s é um app livre e de código aberto distribuído sob a licença <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou mais nova.</p><br><p>Você pode encontrar o código-fonte no <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, aonde você também pode <a href="https://github.com/jakubvalenta/geoshare/issues">relatar problemas</a>.</p><br><p>Seu retorno é bem vindo. Você pode me contatar em <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>O %1$s converte links de mapa em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</p><br><p>Porém, nem todas as URLs de mapa contêm coordenadas. Nestes casos, O %1$s te <b>pedirá permissão para conectar-se ao serviço de mapas (Google Maps, Apple Maps, etc.)</b> e obter as coordenadas dos cabeçalhos HTTP ou do documento HTML do link.</p><br><p>Mais precisamente, há três cenários de como o %1$s pode converter uma URL de mapa em uma URI geo: :</p><br><p><b>1.</b></p><br><p>Se a URL já contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), então elas são extraídas e nenhuma conexão é feita com os servidores do serviço de mapas.</p><br><p><b>2.</b></p><br><p>Se a URL não contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/</tt>), então o %1$s te perguntará se pode conectar-se ao serviço de mapas.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de GET</b> ao serviço de mapas e extrairá as coordenadas da resposta HTML. Você pode imaginá-lo como um <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Se você não permitir, então o %1$s criará um link geo: com o termo de pesquisa do lugar (por exemplo <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Se a URL do serviço de mapas é um link curto (por exemplo <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), então o %1$s te perguntará se pode conectar-se ao serviço de mapas.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de HEAD</b> ao link curto e lê o link completo dos cabeçalhos da resposta. Você pode imaginá-lo como um <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. E então o %1$s continua com o cenário 1 ou 2, dependendo se o link completo tem coordenadas geográficas ou não. No caso do cenário 2, outra conexão ao serviço de mapas será feita, mas dessa vez sem perguntar.</p><br><p>Se você não permitir a conexão com o serviço de mapas, então o %1$s cancela a criação do link geo:.</p><br><br><p>Para sempre permitir ou negar a conexão ao serviço de mapas, em vez de sempre perguntar (padrão), visite as Preferências do app.</p>]]></string>
-    <string name="conversion_failed_parse_html_connection_error">Erro de conexão ao buscar a página web do serviço de mapas</string>
+    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>O %1$s converte links de mapa em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</p><br><p>Porém, nem todas as URLs de mapa contêm coordenadas. Nestes casos, O %1$s te <b>pedirá permissão para conectar ao mapa (Google Maps, Apple Maps, etc.)</b> e obter as coordenadas dos cabeçalhos HTTP ou do documento HTML do link.</p><br><p>Mais precisamente, há três cenários de como o %1$s pode converter uma URL de mapa em uma URI geo: :</p><br><p><b>1.</b></p><br><p>Se a URL já contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), então elas são extraídas e nenhuma conexão é feita com os servidores do mapa.</p><br><p><b>2.</b></p><br><p>Se a URL não contém coordenadas geográficas (por exemplo <tt>https://www.google.com/maps/place/Central+Park/</tt>), então o %1$s te perguntará se pode conectar ao mapa.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de GET</b> ao mapa e extrairá as coordenadas da resposta HTML. Você pode imaginá-lo como um <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Se você não permitir, então o %1$s criará um link geo: com o termo de pesquisa do lugar (por exemplo <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Se a URL do mapa é um link curto (por exemplo <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), então o %1$s te perguntará se pode conectar ao mapa.</p><br><p>Se você permitir, então o %1$s irá fazer uma <b>solicitação HTTP de HEAD</b> ao link curto e lê o link completo dos cabeçalhos da resposta. Você pode imaginá-lo como um <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. E então o %1$s continua com o cenário 1 ou 2, dependendo se o link completo tem coordenadas geográficas ou não. No caso do cenário 2, outra conexão ao mapa será feita, mas dessa vez sem perguntar.</p><br><p>Se você não permitir a conexão com o mapa, então o %1$s cancela a criação do link geo:.</p><br><br><p>Para sempre permitir ou negar a conexão ao mapa, em vez de sempre perguntar (padrão), visite as Preferências do app.</p>]]></string>
+    <string name="conversion_failed_parse_html_connection_error">Erro de conexão ao buscar a página web do mapa</string>
     <string name="conversion_failed_unshorten_connection_error">Erro de conexão ao traduzir link curto</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Escolha como abrir links da Web para este app</string>
-    <string name="conversion_failed_unsupported_service">Serviço de mapa sem suporte</string>
+    <string name="conversion_failed_unsupported_service">Mapa sem suporte</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Compartilhando com</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Alfinete inserido</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mensagens</string>
@@ -77,8 +77,8 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">No app</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Cancelar</string>
-    <string name="converter_google_maps_loading_indicator_title">Conectando-se ao Google…</string>
-    <string name="converter_apple_maps_loading_indicator_title">Conectando-se à Apple…</string>
+    <string name="converter_google_maps_loading_indicator_title">Conectando ao Google…</string>
+    <string name="converter_apple_maps_loading_indicator_title">Conectando à Apple…</string>
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
     <string name="conversion_failed_cancelled">Cancelado</string>
     <string name="conversion_succeeded_skip">Copiar link original</string>
@@ -86,11 +86,11 @@
     <string name="conversion_succeeded_title">Coordenadas</string>
     <string name="conversion_error_title">Erro</string>
     <string name="converter_yandex_maps_permission_title">Conectar ao Yandex?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Conectando-se ao Yandex…</string>
-    <string name="faq_supported_inputs_headline">Serviços de mapa suportados</string>
+    <string name="converter_yandex_maps_loading_indicator_title">Conectando ao Yandex…</string>
+    <string name="faq_supported_inputs_headline">Mapas suportados</string>
     <string name="faq_supported_inputs_text"><![CDATA[<p>Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Wave <br />Yandex Maps<br />coordenadas (por exemplo, 41°24′12.2″N 2°10′26.5″E)<br />URIs geo:</p>]]></string>
     <string name="converter_waze_permission_title">Conectar ao Wave?</string>
-    <string name="converter_waze_loading_indicator_title">Conectando-se ao Waze…</string>
+    <string name="converter_waze_loading_indicator_title">Conectando ao Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">Copiar Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Salvar GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Resultado do %1$s %2$s.gpx</string>
@@ -98,5 +98,7 @@
     <string name="conversion_succeeded_share">Compartilhar</string>
     <string name="conversion_error_retry">Tentar novamente</string>
     <string name="converter_mapy_com_permission_title">Conectar ao Mapy.com?</string>
-    <string name="converter_mapy_com_loading_indicator_title">Conectando-se ao Mapy.com…</string>
+    <string name="converter_mapy_com_loading_indicator_title">Conectando ao Mapy.com…</string>
+    <string name="converter_open_street_map_permission_title">Conectar ao OpenStreetMap?</string>
+    <string name="converter_open_street_map_loading_indicator_title">Conectando ao OpenStreetMap…</string>
 </resources>
