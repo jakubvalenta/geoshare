@@ -100,4 +100,6 @@
     <string name="conversion_error_retry">Спробуйте ще раз</string>
     <string name="converter_mapy_com_permission_title">Підключитися до Mapy.com?</string>
     <string name="converter_mapy_com_loading_indicator_title">Підключення до Mapy.com…</string>
+    <string name="converter_open_street_map_permission_title">Підключитися до OpenStreetMap?</string>
+    <string name="converter_open_street_map_loading_indicator_title">Підключення до OpenStreetMap…</string>
 </resources>
