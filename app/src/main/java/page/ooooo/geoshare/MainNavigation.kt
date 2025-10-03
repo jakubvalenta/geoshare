@@ -8,10 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
+import page.ooooo.geoshare.ui.ChangelogScreen
 
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
     val navController = rememberNavController()
+    val changelogShown by viewModel.changelogShown.collectAsState()
     val introShown by viewModel.introShown.collectAsState()
 
     LaunchedEffect(introShown) {
@@ -25,6 +27,12 @@ fun MainNavigation(viewModel: ConversionViewModel) {
     NavHost(navController = navController, startDestination = "main") {
         composable("about") {
             AboutScreen(
+                onNavigateToMainScreen = { navController.navigate("main") },
+            )
+        }
+        composable("changelog") {
+            viewModel.setChangelogShown()
+            ChangelogScreen(
                 onNavigateToMainScreen = { navController.navigate("main") },
             )
         }
@@ -51,8 +59,9 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         }
         composable("main") {
             MainScreen(
+                changelogShown = changelogShown,
                 onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToConversionScreen = { navController.navigate("conversion") },
+                onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
@@ -61,8 +70,13 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         }
         composable("conversion") {
             ConversionScreen(
+                changelogShown = changelogShown,
                 onBack = { navController.navigate("main") },
+                onNavigateToAboutScreen = { navController.navigate("about") },
+                onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
+                onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
         }

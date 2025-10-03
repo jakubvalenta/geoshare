@@ -74,7 +74,14 @@ private fun DefaultPreview() {
         val appName = stringResource(R.string.app_name)
         val uriString =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        ConfirmationScaffold {
+        ConfirmationScaffold(
+            changelogShown = true,
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToChangelogScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        ) {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -104,7 +111,14 @@ private fun DarkPreview() {
         val appName = stringResource(R.string.app_name)
         val uriString =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        ConfirmationScaffold {
+        ConfirmationScaffold(
+            changelogShown = true,
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToChangelogScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        ) {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -133,7 +147,15 @@ private fun ParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
         val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        ConfirmationScaffold {
+        ConfirmationScaffold(
+
+            changelogShown = true,
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToChangelogScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        ) {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -165,7 +187,15 @@ private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
         val appName = stringResource(R.string.app_name)
         val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        ConfirmationScaffold {
+        ConfirmationScaffold(
+
+            changelogShown = true,
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToChangelogScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        ) {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),

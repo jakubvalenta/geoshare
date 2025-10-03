@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import page.ooooo.geoshare.FaqItemId
+import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,6 +22,12 @@ fun ConfirmationScaffold(
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
+    changelogShown: Boolean,
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToChangelogScreen: () -> Unit,
+    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     content: (@Composable (ColumnScope.() -> Unit))? = null,
 ) {
     Scaffold(
@@ -33,12 +41,12 @@ fun ConfirmationScaffold(
                 },
                 actions = {
                     MainMenu(
-                        whatIsNewBadged = true, // TODO Set whatIsNewBadged
-                        // TODO Pass navigation callbacks
-                        onNavigateToUserPreferencesScreen = {},
-                        onNavigateToFaqScreen = {},
-                        onNavigateToIntroScreen = {},
-                        onNavigateToAboutScreen = {},
+                        changelogShown = changelogShown,
+                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                        onNavigateToChangelogScreen = onNavigateToChangelogScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 },
                 navigationIcon = navigationIcon,

@@ -130,7 +130,18 @@ val lastRunVersionCode = NullableIntUserPreference(
     default = 0,
 )
 
+val changelogShownForVersionCode = NullableIntUserPreference(
+    title = @Composable {
+        stringResource(R.string.user_preferences_changelog_shown_for_version_code_title)
+    },
+    description = null,
+    key = stringPreferencesKey("changelog_shown_for_version_code"),
+    loading = null,
+    default = 0,
+)
+
 data class UserPreferencesValues(
+    var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = lastRunVersionCode.loading,
 )

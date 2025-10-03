@@ -14,16 +14,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainScreen(
+    changelogShown: Boolean,
     onNavigateToAboutScreen: () -> Unit = {},
+    onNavigateToChangelogScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit = {},
     onNavigateToFaqScreen: (FaqItemId?) -> Unit = {},
     onNavigateToIntroScreen: () -> Unit = {},
@@ -32,13 +35,15 @@ fun MainScreen(
 ) {
     MainScreen(
         inputUriString = viewModel.inputUriString,
+        changelogShown = changelogShown,
         onUpdateInput = { viewModel.updateInput(it) },
         onStart = { viewModel.start() },
+        onNavigateToAboutScreen = onNavigateToAboutScreen,
+        onNavigateToChangelogScreen = onNavigateToChangelogScreen,
         onNavigateToConversionScreen = onNavigateToConversionScreen,
-        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
-        onNavigateToAboutScreen = onNavigateToAboutScreen,
+        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
     )
 }
 
@@ -46,29 +51,32 @@ fun MainScreen(
 @Composable
 fun MainScreen(
     inputUriString: String,
+    changelogShown: Boolean,
     onUpdateInput: (String) -> Unit,
     onStart: () -> Unit,
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToChangelogScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     var errorMessageResId by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(appName) },
                 actions = {
                     MainMenu(
-                        whatIsNewBadged = false, // TODO Set whatIsNewBadged
-                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        changelogShown = changelogShown,
                         onNavigateToAboutScreen = onNavigateToAboutScreen,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                        onNavigateToChangelogScreen = onNavigateToChangelogScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 },
             )
@@ -152,13 +160,15 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            changelogShown = true,
             onUpdateInput = {},
             onStart = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToChangelogScreen = {},
             onNavigateToConversionScreen = {},
-            onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToAboutScreen = {},
+            onNavigateToUserPreferencesScreen = {},
         )
     }
 }
@@ -169,13 +179,53 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            changelogShown = true,
             onUpdateInput = {},
             onStart = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToChangelogScreen = {},
             onNavigateToConversionScreen = {},
-            onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DefaultChangelogBadgedPreview() {
+    AppTheme {
+        MainScreen(
+            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            changelogShown = false,
+            onUpdateInput = {},
+            onStart = {},
             onNavigateToAboutScreen = {},
+            onNavigateToChangelogScreen = {},
+            onNavigateToConversionScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkChangelogBadgedPreview() {
+    AppTheme {
+        MainScreen(
+            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            changelogShown = false,
+            onUpdateInput = {},
+            onStart = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToChangelogScreen = {},
+            onNavigateToConversionScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUserPreferencesScreen = {},
         )
     }
 }

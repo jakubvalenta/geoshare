@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
@@ -115,6 +116,15 @@ class ConversionViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             UserPreferencesValues(),
         )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val changelogShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
+        it.changelogShownForVersionCodeValue != changelogShownForVersionCode.default
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        userPreferencesValues.value.changelogShownForVersionCodeValue != changelogShownForVersionCode.default,
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
@@ -253,6 +263,10 @@ class ConversionViewModel @Inject constructor(
             stateContext.currentState = Initial()
             transition()
         }
+    }
+
+    fun setChangelogShown() {
+        setUserPreferenceValue(changelogShownForVersionCode, BuildConfig.VERSION_CODE)
     }
 
     fun setIntroShown() {

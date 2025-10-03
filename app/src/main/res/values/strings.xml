@@ -72,7 +72,9 @@
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>
-    <string name="what_is_new_title">What’s new</string>
+    <string name="changelog_title">What’s new</string>
+    <string name="changelog_23_title" translatable="false">v5.3.0</string>
+    <string name="changelog_23_text" translatable="false"><![CDATA[<ul><li>Added Mapy.com support.</li><li>Added OpenStreetMap nodes, relations and ways support.</li><li>Replaced the "Open original link" button with "Copy original link" and added it to the error screen too.</li><li>Fixed certain Yandex Maps organization links.</li></ul>]]></string>
     <string name="about_title">About</string>
     <string name="about_app_icon_content_description">Application icon</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -91,7 +93,8 @@
     <string name="user_preferences_connection_option_always">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="user_preferences_connection_option_never">No</string>
-    <string name="user_preferences_last_run_version_code_title">Which version of the app was last run?</string>
+    <string name="user_preferences_last_run_version_code_title" translatable="false">Which version of the app was last run?</string>
+    <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
     <string name="conversion_failed_unshorten_error">Failed to resolve short link</string>
     <string name="conversion_failed_unshorten_connection_error">Connection error when resolving short link</string>

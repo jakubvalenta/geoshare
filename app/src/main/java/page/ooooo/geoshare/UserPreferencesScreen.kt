@@ -16,12 +16,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
+import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -70,6 +71,11 @@ fun UserPreferencesScreen(
                     viewModel,
                     lastRunVersionCode,
                     userPreferencesValues.introShownForVersionCodeValue,
+                )
+                UserPreferencesItem(
+                    viewModel,
+                    changelogShownForVersionCode,
+                    userPreferencesValues.changelogShownForVersionCodeValue,
                 )
             }
         }

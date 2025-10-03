@@ -1,11 +1,10 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
@@ -25,14 +24,14 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainMenu(
-    initialExpanded: Boolean = false,
-    whatIsNewBadged: Boolean = false,
-    onNavigateToUserPreferencesScreen: () -> Unit,
+    changelogShown: Boolean = true,
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToChangelogScreen: () -> Unit,
     onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
-    var menuExpanded by remember { mutableStateOf(initialExpanded) }
+    var menuExpanded by remember { mutableStateOf(false) }
 
     Box {
         IconButton(
@@ -43,7 +42,7 @@ fun MainMenu(
         ) {
             BadgedBox(
                 badge = {
-                    if (whatIsNewBadged) {
+                    if (!changelogShown) {
                         Badge()
                     }
                 },
@@ -88,16 +87,16 @@ fun MainMenu(
             )
             DropdownMenuItem(
                 text = {
-                    Text(stringResource(R.string.what_is_new_title))
+                    Text(stringResource(R.string.changelog_title))
                 },
                 onClick = {
                     menuExpanded = false
-                    // TODO Navigate to What is new
+                    onNavigateToChangelogScreen()
                 },
                 leadingIcon = {
                     BadgedBox(
                         badge = {
-                            if (whatIsNewBadged) {
+                            if (!changelogShown) {
                                 Badge()
                             }
                         },
@@ -126,12 +125,12 @@ private fun DefaultPreview() {
     AppTheme {
         Surface(Modifier.size(200.dp, 400.dp)) {
             MainMenu(
-                initialExpanded = true,
-                whatIsNewBadged = true,
+                changelogShown = false,
                 onNavigateToUserPreferencesScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
                 onNavigateToAboutScreen = {},
+                onNavigateToChangelogScreen = {},
             )
         }
     }
@@ -143,12 +142,12 @@ private fun DarkPreview() {
     AppTheme {
         Surface(Modifier.size(200.dp, 400.dp)) {
             MainMenu(
-                initialExpanded = true,
-                whatIsNewBadged = true,
+                changelogShown = false,
                 onNavigateToUserPreferencesScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
                 onNavigateToAboutScreen = {},
+                onNavigateToChangelogScreen = {},
             )
         }
     }
