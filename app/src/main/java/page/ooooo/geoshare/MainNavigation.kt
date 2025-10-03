@@ -64,8 +64,10 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToChangelogScreen = { navController.navigate("changelog") },
+                onNavigateToConversionScreen = { navController.navigate("conversion") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToSupportedUrisScreen = { navController.navigate("supported_uris") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )

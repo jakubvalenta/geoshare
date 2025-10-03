@@ -121,4 +121,5 @@
     <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
     <string name="supported_uris_enabled">Opens by default in %1$s</string>
     <string name="supported_uris_disabled">Does not open by default in %1$s</string>
+    <string name="supported_uris_settings_button">Open Android settings</string>
 </resources>

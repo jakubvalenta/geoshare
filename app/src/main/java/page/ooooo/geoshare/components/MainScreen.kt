@@ -25,13 +25,13 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @Composable
 fun MainScreen(
     changelogShown: Boolean,
-    onNavigateToAboutScreen: () -> Unit = {},
+    onNavigateToAboutScreen: () -> Unit,
     onNavigateToChangelogScreen: () -> Unit,
-    onNavigateToConversionScreen: () -> Unit = {},
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit = {},
-    onNavigateToIntroScreen: () -> Unit = {},
-    onNavigateToSupportedUrisScreen: () -> Unit = {},
-    onNavigateToUserPreferencesScreen: () -> Unit = {},
+    onNavigateToConversionScreen: () -> Unit,
+    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSupportedUrisScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     MainScreen(
