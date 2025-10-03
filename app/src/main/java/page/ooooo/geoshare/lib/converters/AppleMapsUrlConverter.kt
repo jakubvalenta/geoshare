@@ -20,7 +20,14 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
         override val points = listOf("0" to "0")
     }
 
+    @StringRes
+    override val nameResId = R.string.converter_apple_maps_name
+
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
+    override val supportedUriStrings = listOf(
+        "https://maps.apple",
+        "https://maps.apple.com",
+    )
 
     override val conversionUriPattern = uriPattern {
         all {

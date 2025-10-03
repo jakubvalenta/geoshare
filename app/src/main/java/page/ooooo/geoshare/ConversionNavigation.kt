@@ -34,6 +34,7 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToSupportedUrisScreen = { navController.navigate("supported_uris") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 onFinish = onFinish,
                 viewModel = viewModel,

@@ -16,8 +16,17 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
         const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
     }
 
+    @StringRes
+    override val nameResId = R.string.converter_mapy_com_name
+
     override val uriPattern: Pattern =
         Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
+    override val supportedUriStrings = listOf(
+        "https://mapy.com",
+        "https://mapy.cz",
+        "https://www.mapy.com",
+        "https://www.mapy.cz",
+    )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = ShortUriMethod.GET
 

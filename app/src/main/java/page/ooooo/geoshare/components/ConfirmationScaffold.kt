@@ -27,11 +27,12 @@ fun ConfirmationScaffold(
     onNavigateToChangelogScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSupportedUrisScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     content: (@Composable (ColumnScope.() -> Unit))? = null,
 ) {
     Scaffold(
-        Modifier.semantics { testTagsAsResourceId = true },
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             TopAppBar(
                 title = {
@@ -46,6 +47,7 @@ fun ConfirmationScaffold(
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToChangelogScreen = onNavigateToChangelogScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToSupportedUrisScreen = onNavigateToSupportedUrisScreen,
                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 },

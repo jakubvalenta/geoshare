@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -31,19 +32,9 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.CoordinatesUrlConverter
-import page.ooooo.geoshare.lib.converters.GeoUrlConverter
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
-import page.ooooo.geoshare.lib.converters.MapyComUrlConverter
-import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
-import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
-import page.ooooo.geoshare.lib.converters.WazeUrlConverter
-import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.*
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,20 +45,24 @@ class ConversionViewModel @Inject constructor(
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
+    data class SupportedUri(val uriString: String, val defaultHandlerEnabled: Boolean)
+
+    private val urlConverters = listOf(
+        GeoUrlConverter(),
+        GoogleMapsUrlConverter(),
+        AppleMapsUrlConverter(),
+        HereWeGoUrlConverter(),
+        MagicEarthUrlConverter(),
+        MapyComUrlConverter(),
+        OpenStreetMapUrlConverter(),
+        OsmAndUrlConverter(),
+        WazeUrlConverter(),
+        YandexMapsUrlConverter(),
+        CoordinatesUrlConverter(),
+    )
+
     val stateContext = ConversionStateContext(
-        urlConverters = listOf(
-            GeoUrlConverter(),
-            GoogleMapsUrlConverter(),
-            AppleMapsUrlConverter(),
-            HereWeGoUrlConverter(),
-            MagicEarthUrlConverter(),
-            MapyComUrlConverter(),
-            OpenStreetMapUrlConverter(),
-            OsmAndUrlConverter(),
-            WazeUrlConverter(),
-            YandexMapsUrlConverter(),
-            CoordinatesUrlConverter(),
-        ),
+        urlConverters = urlConverters,
         intentTools = IntentTools(),
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
@@ -161,6 +156,34 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun getSupportedUris(packageManager: PackageManager): List<Pair<Int, List<SupportedUri>>> =
+        urlConverters.map { urlConverter ->
+            val key = urlConverter.nameResId
+            val value = urlConverter.supportedUriStrings.map { uriString ->
+                SupportedUri(uriString, isDefaultHandlerEnabled(packageManager, uriString))
+            }
+            key to value
+        }
+
+    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
+        val resolveInfo = try {
+            packageManager.resolveActivity(
+                Intent(Intent.ACTION_VIEW, uriString.toUri()),
+                PackageManager.MATCH_DEFAULT_ONLY,
+            )
+        } catch (e: Exception) {
+            Log.e(null, "Error when querying which app is the default handler for a URI", e)
+            return false
+        }
+        val packageName = try {
+            resolveInfo?.activityInfo?.packageName
+        } catch (e: Exception) {
+            Log.e(null, "Error when loading info about an app that is the default handler for URI", e)
+            null
+        }
+        return packageName == BuildConfig.APPLICATION_ID
+    }
+
     fun queryGeoUriApps(packageManager: PackageManager): List<App> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
@@ -241,6 +264,38 @@ class ConversionViewModel @Inject constructor(
                 }
                 writer.close()
             }
+        }
+    }
+
+    fun showOpenByDefaultSettings(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    ) {
+        showOpenByDefaultSettingsForPackage(context, launcher, BuildConfig.APPLICATION_ID)
+    }
+
+    fun showOpenByDefaultSettingsForPackage(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        packageName: String,
+    ) {
+        try {
+            val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                // Samsung supposedly doesn't allow going to the "Open by default" settings page.
+                Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
+            ) {
+                Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+            } else {
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            }
+            val intent = Intent(action, "package:$packageName".toUri())
+            launcher.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(
+                context,
+                R.string.intro_settings_activity_not_found,
+                Toast.LENGTH_LONG,
+            ).show()
         }
     }
 

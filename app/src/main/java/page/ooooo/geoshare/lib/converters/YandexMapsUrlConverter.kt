@@ -15,7 +15,33 @@ class YandexMapsUrlConverter() :
     UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
 
+    @StringRes
+    override val nameResId = R.string.converter_yandex_maps_name
+
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
+    override val supportedUriStrings = listOf(
+        "https://ya.ru/maps",
+        "https://yandex.az/maps",
+        "https://yandex.by/maps",
+        "https://yandex.co.il/maps",
+        "https://yandex.com/maps",
+        "https://yandex.com.am/maps",
+        "https://yandex.com.ge/maps",
+        "https://yandex.com.tr/maps",
+        "https://yandex.ee/maps",
+        "https://yandex.eu/maps",
+        "https://yandex.fr/maps",
+        "https://yandex.kg/maps",
+        "https://yandex.kz/maps",
+        "https://yandex.lt/maps",
+        "https://yandex.lv/maps",
+        "https://yandex.md/maps",
+        "https://yandex.ru/maps",
+        "https://yandex.tj/maps",
+        "https://yandex.tm/maps",
+        "https://yandex.ua/maps",
+        "https://yandex.uz/maps",
+    )
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
 

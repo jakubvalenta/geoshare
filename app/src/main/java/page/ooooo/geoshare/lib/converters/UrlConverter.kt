@@ -7,7 +7,9 @@ import java.net.URL
 enum class ShortUriMethod { GET, HEAD }
 
 sealed interface UrlConverter {
+    val nameResId: Int
     val uriPattern: Pattern
+    val supportedUriStrings: List<String>
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern

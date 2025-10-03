@@ -29,6 +29,7 @@ fun MainMenu(
     onNavigateToChangelogScreen: () -> Unit,
     onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSupportedUrisScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -68,6 +69,14 @@ fun MainMenu(
                 leadingIcon = {
                     Icon(imageVector = Icons.Default.Settings, contentDescription = null)
                 },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.supported_uris_title)) },
+                onClick = {
+                    menuExpanded = false
+                    onNavigateToSupportedUrisScreen()
+                },
+                leadingIcon = {},
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.faq_title)) },
@@ -126,11 +135,12 @@ private fun DefaultPreview() {
         Surface(Modifier.size(200.dp, 400.dp)) {
             MainMenu(
                 changelogShown = false,
-                onNavigateToUserPreferencesScreen = {},
-                onNavigateToFaqScreen = {},
-                onNavigateToIntroScreen = {},
                 onNavigateToAboutScreen = {},
                 onNavigateToChangelogScreen = {},
+                onNavigateToFaqScreen = {},
+                onNavigateToIntroScreen = {},
+                onNavigateToSupportedUrisScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }
@@ -143,11 +153,12 @@ private fun DarkPreview() {
         Surface(Modifier.size(200.dp, 400.dp)) {
             MainMenu(
                 changelogShown = false,
-                onNavigateToUserPreferencesScreen = {},
-                onNavigateToFaqScreen = {},
-                onNavigateToIntroScreen = {},
                 onNavigateToAboutScreen = {},
                 onNavigateToChangelogScreen = {},
+                onNavigateToFaqScreen = {},
+                onNavigateToIntroScreen = {},
+                onNavigateToSupportedUrisScreen = {},
+                onNavigateToUserPreferencesScreen = {},
             )
         }
     }

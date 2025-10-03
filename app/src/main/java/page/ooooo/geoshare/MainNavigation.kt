@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
 import page.ooooo.geoshare.ui.ChangelogScreen
+import page.ooooo.geoshare.ui.SupportedUrisScreen
 
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
@@ -55,6 +56,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                     viewModel.setIntroShown()
                     navController.navigate("main")
                 },
+                viewModel = viewModel,
             )
         }
         composable("main") {
@@ -76,7 +78,14 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToSupportedUrisScreen = { navController.navigate("supported_uris") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("supported_uris") {
+            SupportedUrisScreen(
+                onNavigateToMainScreen = { navController.navigate("main") },
                 viewModel = viewModel,
             )
         }

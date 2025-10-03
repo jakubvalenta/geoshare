@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,6 +45,7 @@ fun ConversionScreen(
     onNavigateToChangelogScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSupportedUrisScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onFinish: () -> Unit = {},
     viewModel: ConversionViewModel,
@@ -63,12 +63,13 @@ fun ConversionScreen(
         currentState = currentState,
         changelogShown = changelogShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
-        queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context.packageManager) },
+        queryGeoUriApps = { viewModel.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToChangelogScreen = onNavigateToChangelogScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onNavigateToSupportedUrisScreen = onNavigateToSupportedUrisScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
@@ -104,12 +105,13 @@ fun ConversionScreen(
     currentState: State,
     changelogShown: Boolean,
     @StringRes loadingIndicatorTitleResId: Int?,
-    queryGeoUriApps: (context: Context) -> List<ConversionViewModel.App>,
+    queryGeoUriApps: () -> List<ConversionViewModel.App>,
     onBack: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToChangelogScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSupportedUrisScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
@@ -121,7 +123,6 @@ fun ConversionScreen(
     onCancel: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var retryLoadingIndicatorVisible by remember { mutableStateOf(false) }
 
@@ -192,6 +193,7 @@ fun ConversionScreen(
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToChangelogScreen = onNavigateToChangelogScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onNavigateToSupportedUrisScreen = onNavigateToSupportedUrisScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
     ) {
         when {
@@ -272,7 +274,7 @@ fun ConversionScreen(
 
             currentState is HasResult -> {
                 ResultSuccessCard(
-                    queryGeoUriApps(context),
+                    queryGeoUriApps(),
                     currentState.position,
                     onCopy = onCopy,
                     onOpenApp = { packageName ->
@@ -303,6 +305,7 @@ private fun DefaultPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -333,6 +336,7 @@ private fun DarkPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -370,6 +374,7 @@ private fun PermissionPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -407,6 +412,7 @@ private fun DarkPermissionPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -437,6 +443,7 @@ private fun ErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -467,6 +474,7 @@ private fun DarkErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -494,6 +502,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -521,6 +530,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -548,6 +558,7 @@ private fun InitialPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
@@ -575,6 +586,7 @@ private fun DarkInitialPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},

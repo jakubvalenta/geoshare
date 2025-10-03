@@ -1,11 +1,6 @@
 package page.ooooo.geoshare
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
-import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
@@ -26,18 +21,42 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp.Companion.Hairline
-import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
-import java.util.*
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun IntroScreen(
+    onCloseIntro: () -> Unit,
+    viewModel: ConversionViewModel,
+) {
+    val context = LocalContext.current
+    val settingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { _ ->
+        // Do nothing.
+    }
+
+    IntroScreen(
+        onCloseIntro = onCloseIntro,
+        onShowOpenByDefaultSettings = {
+            viewModel.showOpenByDefaultSettings(context, settingsLauncher)
+        },
+        onShowOpenByDefaultSettingsForPackage = { packageName ->
+            viewModel.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun IntroScreen(
     initialPage: Int = 0,
-    onCloseIntro: () -> Unit = {},
+    onCloseIntro: () -> Unit,
+    onShowOpenByDefaultSettings: () -> Unit,
+    onShowOpenByDefaultSettingsForPackage: (packageName: String) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val pageCount = 2
@@ -47,36 +66,8 @@ fun IntroScreen(
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "progressAnimation",
     )
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-    val settingsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-    ) { _ ->
-        // Do nothing.
-    }
-
-    fun showOpenByDefaultSettings(packageName: String) {
-        try {
-            val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                // Samsung supposedly doesn't allow going to the "Open by
-                // default" settings page.
-                Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
-            ) {
-                Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
-            } else {
-                Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            }
-            val intent = Intent(action, "package:$packageName".toUri())
-            settingsLauncher.launch(intent)
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(
-                context,
-                R.string.intro_settings_activity_not_found,
-                Toast.LENGTH_LONG,
-            ).show()
-        }
-    }
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -128,7 +119,7 @@ fun IntroScreen(
                         ) {
                             ScreenshotOpenByDefaultMapApp()
                             IntroOutlinedButton({
-                                showOpenByDefaultSettings("com.google.android.apps.maps")
+                                onShowOpenByDefaultSettingsForPackage("com.google.android.apps.maps")
                             }) {
                                 Text(stringResource(R.string.intro_open_by_default_google_maps_button))
                             }
@@ -138,7 +129,7 @@ fun IntroScreen(
                         ) {
                             ScreenshotOpenByDefault()
                             IntroOutlinedButton({
-                                showOpenByDefaultSettings(context.packageName)
+                                onShowOpenByDefaultSettings()
                             }) {
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
@@ -246,7 +237,11 @@ fun IntroOutlinedButton(
 @Composable
 private fun PageOnePreview() {
     AppTheme {
-        IntroScreen()
+        IntroScreen(
+            onCloseIntro = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
     }
 }
 
@@ -254,7 +249,11 @@ private fun PageOnePreview() {
 @Composable
 private fun DarkPageOnePreview() {
     AppTheme {
-        IntroScreen()
+        IntroScreen(
+            onCloseIntro = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
     }
 }
 
@@ -262,7 +261,12 @@ private fun DarkPageOnePreview() {
 @Composable
 private fun PageTwoPreview() {
     AppTheme {
-        IntroScreen(initialPage = 1)
+        IntroScreen(
+            initialPage = 1,
+            onCloseIntro = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
     }
 }
 
@@ -270,7 +274,12 @@ private fun PageTwoPreview() {
 @Composable
 private fun DarkPageTwoPreview() {
     AppTheme {
-        IntroScreen(initialPage = 1)
+        IntroScreen(
+            initialPage = 1,
+            onCloseIntro = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
     }
 }
 
@@ -278,6 +287,10 @@ private fun DarkPageTwoPreview() {
 @Composable
 private fun TabletPageOnePreview() {
     AppTheme {
-        IntroScreen()
+        IntroScreen(
+            onCloseIntro = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
     }
 }

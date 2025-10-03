@@ -18,6 +18,9 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
         const val BASE32 = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
     }
 
+    @StringRes
+    override val nameResId = R.string.converter_waze_name
+
     class GeoHashRegex(regex: String) : PositionRegex(regex) {
         override val points: List<Point>?
             get() = groupOrNull("hash")?.let { hash ->
@@ -28,6 +31,13 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
+    override val supportedUriStrings = listOf(
+        "https://waze.com/live-map",
+        "https://waze.com/ul",
+        "https://www.waze.com/live-map",
+        "https://www.waze.com/ul",
+        "https://ul.waze.com/ul",
+    )
 
     override val conversionUriPattern = uriPattern {
         all {

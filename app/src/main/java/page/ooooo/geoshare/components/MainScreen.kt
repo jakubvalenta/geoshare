@@ -30,6 +30,7 @@ fun MainScreen(
     onNavigateToConversionScreen: () -> Unit = {},
     onNavigateToFaqScreen: (FaqItemId?) -> Unit = {},
     onNavigateToIntroScreen: () -> Unit = {},
+    onNavigateToSupportedUrisScreen: () -> Unit = {},
     onNavigateToUserPreferencesScreen: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
@@ -43,6 +44,7 @@ fun MainScreen(
         onNavigateToConversionScreen = onNavigateToConversionScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onNavigateToSupportedUrisScreen = onNavigateToSupportedUrisScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
     )
 }
@@ -59,13 +61,14 @@ fun MainScreen(
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSupportedUrisScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     var errorMessageResId by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
-        Modifier.semantics { testTagsAsResourceId = true },
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(appName) },
@@ -76,6 +79,7 @@ fun MainScreen(
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToChangelogScreen = onNavigateToChangelogScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToSupportedUrisScreen = onNavigateToSupportedUrisScreen,
                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 },
@@ -168,6 +172,7 @@ private fun DefaultPreview() {
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -187,6 +192,7 @@ private fun DarkPreview() {
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -206,6 +212,7 @@ private fun DefaultChangelogBadgedPreview() {
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -225,6 +232,7 @@ private fun DarkChangelogBadgedPreview() {
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
