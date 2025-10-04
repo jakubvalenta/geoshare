@@ -19,8 +19,8 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?magicearth.com/\?\S+""")
-    override val supportedUriStrings = listOf(
-        "https://magicearth.com/",
+    override val supportedInputs = listOf(
+        SupportedInput.Url("https://magicearth.com/", 20),
     )
 
     override val conversionUriPattern = uriPattern {

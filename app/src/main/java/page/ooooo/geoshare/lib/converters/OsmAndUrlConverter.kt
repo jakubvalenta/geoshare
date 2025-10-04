@@ -15,8 +15,8 @@ class OsmAndUrlConverter : UrlConverter.WithUriPattern {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
-    override val supportedUriStrings = listOf(
-        "https://osmand.net/map",
+    override val supportedInputs = listOf(
+        SupportedInput.Url("https://osmand.net/map", 20),
     )
 
     override val conversionUriPattern = uriPattern {

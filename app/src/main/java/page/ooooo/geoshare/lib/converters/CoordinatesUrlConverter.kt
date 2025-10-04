@@ -28,7 +28,9 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
-    override val supportedUriStrings = emptyList<String>()
+    override val supportedInputs = listOf(
+        SupportedInput.Text(R.string.converter_coordinates_input_description, 20)
+    )
 
     override val conversionUriPattern = uriPattern {
         // Decimal, e.g. `N 41.40338, E 2.17403`

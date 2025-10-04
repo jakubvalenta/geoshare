@@ -23,11 +23,11 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
     override val nameResId = R.string.converter_here_wego_name
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
-    override val supportedUriStrings = listOf(
-        "https://share.here.com/l/",
-        "https://share.here.com/p/",
-        "https://wego.here.com/",
-        "https://wego.here.com/p/",
+    override val supportedInputs = listOf(
+        SupportedInput.Url("https://share.here.com/l/", 20),
+        SupportedInput.Url("https://share.here.com/p/", 20),
+        SupportedInput.Url("https://wego.here.com/", 20),
+        SupportedInput.Url("https://wego.here.com/p/", 20),
     )
 
     @OptIn(ExperimentalEncodingApi::class)

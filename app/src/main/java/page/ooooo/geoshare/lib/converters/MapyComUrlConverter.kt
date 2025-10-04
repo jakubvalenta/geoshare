@@ -21,11 +21,11 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
 
     override val uriPattern: Pattern =
         Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
-    override val supportedUriStrings = listOf(
-        "https://mapy.com",
-        "https://mapy.cz",
-        "https://www.mapy.com",
-        "https://www.mapy.cz",
+    override val supportedInputs = listOf(
+        SupportedInput.Url("https://mapy.com", 23),
+        SupportedInput.Url("https://mapy.cz", 23),
+        SupportedInput.Url("https://www.mapy.com", 23),
+        SupportedInput.Url("https://www.mapy.cz", 23),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = ShortUriMethod.GET

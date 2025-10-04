@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
 import page.ooooo.geoshare.ui.ChangelogScreen
-import page.ooooo.geoshare.ui.SupportedUrisScreen
+import page.ooooo.geoshare.ui.MapServicesScreen
 
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
@@ -86,7 +86,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
             )
         }
         composable("supported_uris") {
-            SupportedUrisScreen(
+            MapServicesScreen(
                 onNavigateToMainScreen = { navController.navigate("main") },
                 viewModel = viewModel,
             )

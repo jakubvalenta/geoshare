@@ -15,8 +15,8 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val nameResId = R.string.converter_geo_name
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
-    override val supportedUriStrings = listOf(
-        "geo:",
+    override val supportedInputs = listOf(
+        SupportedInput.Uri("geo:", 3), // TODO Replace Uri with Text
     )
     override val conversionUriPattern = uriPattern {
         all {

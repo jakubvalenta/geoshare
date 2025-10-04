@@ -18,11 +18,11 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     override val nameResId = R.string.converter_open_street_map_name
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?openstreetmap\.org/\S+""")
-    override val supportedUriStrings = listOf(
-        "https://www.openstreetmap.org/",
-        "https://www.openstreetmap.org/node",
-        "https://www.openstreetmap.org/relation",
-        "https://www.openstreetmap.org/way",
+    override val supportedInputs = listOf(
+        SupportedInput.Url("https://www.openstreetmap.org/", 20),
+        SupportedInput.Url("https://www.openstreetmap.org/node", 23),
+        SupportedInput.Url("https://www.openstreetmap.org/relation", 23),
+        SupportedInput.Url("https://www.openstreetmap.org/way", 23),
     )
 
     override val conversionUriPattern = uriPattern {

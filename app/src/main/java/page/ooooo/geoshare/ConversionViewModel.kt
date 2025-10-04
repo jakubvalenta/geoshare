@@ -45,9 +45,25 @@ class ConversionViewModel @Inject constructor(
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
-    data class SupportedUri(val uriString: String, val defaultHandlerEnabled: Boolean)
+    sealed class MapServiceFilter(val titleResId: Int) {
+        class All : MapServiceFilter(R.string.supported_uris_filter_all)
+        class Recent : MapServiceFilter(R.string.supported_uris_filter_recent)
+        class Enabled : MapServiceFilter(R.string.supported_uris_default_handler_enabled)
+        class Disabled : MapServiceFilter(R.string.supported_uris_default_handler_disabled)
+    }
 
-    private val urlConverters = listOf(
+    data class MapServiceInput(
+        // TODO Create MapServiceInput.Text and MapServiceInput.Url
+        val supportedInput: SupportedInput,
+        val defaultHandlerEnabled: Boolean?,
+    )
+
+    data class MapService(
+        val urlConverter: UrlConverter,
+        val inputs: List<MapServiceInput>,
+    )
+
+    val urlConverters = listOf(
         GeoUrlConverter(),
         GoogleMapsUrlConverter(),
         AppleMapsUrlConverter(),
@@ -59,6 +75,13 @@ class ConversionViewModel @Inject constructor(
         WazeUrlConverter(),
         YandexMapsUrlConverter(),
         CoordinatesUrlConverter(),
+    )
+
+    val mapServiceFilters = listOf(
+        MapServiceFilter.All(),
+        MapServiceFilter.Recent(),
+        MapServiceFilter.Enabled(),
+        MapServiceFilter.Disabled(),
     )
 
     val stateContext = ConversionStateContext(
@@ -156,12 +179,35 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun getUrlConvertersAndSupportedUris(packageManager: PackageManager): List<Pair<UrlConverter, List<SupportedUri>>> =
-        urlConverters.map { urlConverter ->
-            val supportedUris = urlConverter.supportedUriStrings.map { uriString ->
-                SupportedUri(uriString, isDefaultHandlerEnabled(packageManager, uriString))
+    fun getMapServices(packageManager: PackageManager, filter: MapServiceFilter): List<MapService> =
+        urlConverters.mapNotNull { urlConverter ->
+            urlConverter.supportedInputs.mapNotNull { supportedInput ->
+                if (filter is MapServiceFilter.Recent && supportedInput.addedInVersionCode <= 10) {
+                    return@mapNotNull null
+                }
+                val defaultHandlerEnabled = when (supportedInput) {
+                    is SupportedInput.Url -> isDefaultHandlerEnabled(packageManager, supportedInput.urlString)
+                    else -> null
+                }
+                when (filter) {
+                    is MapServiceFilter.Enabled -> {
+                        if (defaultHandlerEnabled == false) {
+                            return@mapNotNull null
+                        }
+                    }
+
+                    is MapServiceFilter.Disabled -> {
+                        if (defaultHandlerEnabled != false) {
+                            return@mapNotNull null
+                        }
+                    }
+
+                    else -> Unit
+                }
+                MapServiceInput(supportedInput, defaultHandlerEnabled)
+            }.takeIf { it.isNotEmpty() }?.let { mapServiceInputs ->
+                MapService(urlConverter, mapServiceInputs)
             }
-            urlConverter to supportedUris
         }
 
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {

@@ -24,9 +24,9 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
     override val nameResId = R.string.converter_apple_maps_name
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
-    override val supportedUriStrings = listOf(
-        "https://maps.apple",
-        "https://maps.apple.com",
+    override val supportedInputs = listOf(
+        SupportedInput.Url("https://maps.apple", 18),
+        SupportedInput.Url("https://maps.apple.com", 18),
     )
 
     override val conversionUriPattern = uriPattern {
