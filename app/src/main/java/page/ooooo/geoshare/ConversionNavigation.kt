@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import page.ooooo.geoshare.ui.ChangelogScreen
 import page.ooooo.geoshare.ui.UrlConvertersScreen
 
 @Composable
@@ -17,12 +16,6 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     NavHost(navController = navController, startDestination = "conversion") {
         composable("about") {
             AboutScreen(
-                onNavigateToMainScreen = { navController.navigate("conversion") },
-            )
-        }
-        composable("changelog") {
-            viewModel.setChangelogShown()
-            ChangelogScreen(
                 onNavigateToMainScreen = { navController.navigate("conversion") },
             )
         }
@@ -53,16 +46,16 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 changelogShown = changelogShown,
                 onBack = onFinish,
                 onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToSupportedUrisScreen = { navController.navigate("url_converters") },
+                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 onFinish = onFinish,
                 viewModel = viewModel,
             )
         }
         composable("url_converters") {
+            // TODO Set changelog shown
             UrlConvertersScreen(
                 onNavigateToMainScreen = { navController.navigate("conversion") },
                 viewModel = viewModel,

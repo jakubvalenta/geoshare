@@ -78,7 +78,6 @@ private fun DefaultPreview() {
             changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
-            onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
@@ -116,7 +115,6 @@ private fun DarkPreview() {
             changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
-            onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
@@ -150,11 +148,9 @@ private fun ParseHtmlPermissionPreview() {
         val appName = stringResource(R.string.app_name)
         val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         ConfirmationScaffold(
-
             changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
-            onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},
@@ -191,11 +187,9 @@ private fun DarkParseHtmlPermissionPreview() {
         val appName = stringResource(R.string.app_name)
         val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         ConfirmationScaffold(
-
             changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
-            onNavigateToChangelogScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToSupportedUrisScreen = {},
             onNavigateToUserPreferencesScreen = {},

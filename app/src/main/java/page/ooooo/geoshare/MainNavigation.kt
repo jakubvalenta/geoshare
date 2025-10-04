@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
-import page.ooooo.geoshare.ui.ChangelogScreen
 import page.ooooo.geoshare.ui.UrlConvertersScreen
 
 @Composable
@@ -28,12 +27,6 @@ fun MainNavigation(viewModel: ConversionViewModel) {
     NavHost(navController = navController, startDestination = "main") {
         composable("about") {
             AboutScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
-            )
-        }
-        composable("changelog") {
-            viewModel.setChangelogShown()
-            ChangelogScreen(
                 onNavigateToMainScreen = { navController.navigate("main") },
             )
         }
@@ -63,11 +56,10 @@ fun MainNavigation(viewModel: ConversionViewModel) {
             MainScreen(
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToConversionScreen = { navController.navigate("conversion") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToSupportedUrisScreen = { navController.navigate("url_converters") },
+                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
@@ -77,15 +69,15 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 changelogShown = changelogShown,
                 onBack = { navController.navigate("main") },
                 onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToSupportedUrisScreen = { navController.navigate("url_converters") },
+                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
         }
         composable("url_converters") {
+            // TODO Set changelog shown
             UrlConvertersScreen(
                 onNavigateToMainScreen = { navController.navigate("main") },
                 viewModel = viewModel,

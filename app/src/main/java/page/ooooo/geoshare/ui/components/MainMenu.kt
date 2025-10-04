@@ -26,7 +26,6 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun MainMenu(
     changelogShown: Boolean = true,
     onNavigateToAboutScreen: () -> Unit,
-    onNavigateToChangelogScreen: () -> Unit,
     onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToSupportedUrisScreen: () -> Unit,
@@ -76,7 +75,17 @@ fun MainMenu(
                     menuExpanded = false
                     onNavigateToSupportedUrisScreen()
                 },
-                leadingIcon = {},
+                leadingIcon = {
+                    BadgedBox(
+                        badge = {
+                            if (!changelogShown) {
+                                Badge()
+                            }
+                        },
+                    ) {
+                        Icon(imageVector = Icons.Default.Star, contentDescription = null)
+                    }
+                },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.faq_title)) },
@@ -93,26 +102,6 @@ fun MainMenu(
                     onNavigateToIntroScreen()
                 },
                 leadingIcon = {},
-            )
-            DropdownMenuItem(
-                text = {
-                    Text(stringResource(R.string.changelog_title))
-                },
-                onClick = {
-                    menuExpanded = false
-                    onNavigateToChangelogScreen()
-                },
-                leadingIcon = {
-                    BadgedBox(
-                        badge = {
-                            if (!changelogShown) {
-                                Badge()
-                            }
-                        },
-                    ) {
-                        Icon(imageVector = Icons.Default.Star, contentDescription = null)
-                    }
-                },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.about_title)) },
@@ -136,7 +125,6 @@ private fun DefaultPreview() {
             MainMenu(
                 changelogShown = false,
                 onNavigateToAboutScreen = {},
-                onNavigateToChangelogScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
                 onNavigateToSupportedUrisScreen = {},
@@ -154,7 +142,6 @@ private fun DarkPreview() {
             MainMenu(
                 changelogShown = false,
                 onNavigateToAboutScreen = {},
-                onNavigateToChangelogScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
                 onNavigateToSupportedUrisScreen = {},

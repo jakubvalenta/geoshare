@@ -85,9 +85,6 @@
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>
-    <string name="changelog_title">What’s new</string>
-    <string name="changelog_23_title" translatable="false">v5.3.0</string>
-    <string name="changelog_23_text" translatable="false"><![CDATA[<ul><li>Added Mapy.com support.</li><li>Added OpenStreetMap nodes, relations and ways support.</li><li>Replaced the "Open original link" button with "Copy original link" and added it to the error screen too.</li><li>Fixed certain Yandex Maps organization links.</li></ul>]]></string>
     <string name="about_title">About</string>
     <string name="about_app_icon_content_description">Application icon</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
