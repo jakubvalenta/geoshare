@@ -49,7 +49,6 @@
     <string name="user_preferences_connection_option_always">نعم</string>
     <string name="user_preferences_connection_option_ask">اسأل قبل الاتصال</string>
     <string name="user_preferences_connection_option_never">لا</string>
-    <string name="user_preferences_last_run_version_code_title">ما هو إصدار التطبيق الذي تم تشغيله آخر مرة؟</string>
     <string name="conversion_failed_missing_url">رابط مفقود</string>
     <string name="conversion_failed_unshorten_connection_error">فشل في حل الرابط القصير</string>
     <string name="conversion_failed_parse_url_error">فشل في معالجة رابط الخريطة</string>

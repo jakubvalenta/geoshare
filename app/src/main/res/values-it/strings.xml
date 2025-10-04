@@ -27,7 +27,6 @@
     <string name="user_preferences_connection_title">Consenti la connessione a Google?</string>
     <string name="user_preferences_connection_option_always">Si</string>
     <string name="user_preferences_connection_option_never">No</string>
-    <string name="user_preferences_last_run_version_code_title">Quale versione dell’applicazione è stata eseguita l’ultima volta?</string>
     <string name="conversion_failed_missing_url">URL mancante</string>
     <string name="conversion_failed_parse_url_error">Errore nella creazione del link geo:</string>
     <string name="conversion_failed_unshorten_error">Impossibile risolvere il collegamento abbreviato</string>

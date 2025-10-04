@@ -49,7 +49,6 @@
     <string name="user_preferences_connection_option_always">Ano</string>
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
     <string name="user_preferences_connection_option_never">Ne</string>
-    <string name="user_preferences_last_run_version_code_title">Jaká verze aplikace byla naposledy spuštěná?</string>
     <string name="conversion_failed_missing_url">Chybí URL</string>
     <string name="conversion_failed_unshorten_error">Nepodařilo se analyzovat krátký odkaz</string>
     <string name="conversion_failed_parse_url_error">Nepodařilo se zpracovat odkaz na mapu</string>

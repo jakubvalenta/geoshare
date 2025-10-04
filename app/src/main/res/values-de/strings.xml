@@ -79,7 +79,6 @@
     <string name="user_preferences_connection_option_always">Ja</string>
     <string name="user_preferences_connection_option_ask">Vor dem Verbinden fragen</string>
     <string name="user_preferences_connection_option_never">Nein</string>
-    <string name="user_preferences_last_run_version_code_title">Welche Version der App wurde zuletzt gestartet?</string>
     <string name="conversion_failed_missing_url">Fehlende URL</string>
     <string name="conversion_failed_unshorten_error">Kurzlink konnte nicht aufgelöst werden</string>
     <string name="conversion_failed_unshorten_connection_error">Verbindungsfehler beim Auflösen eines Kurzlinks</string>
