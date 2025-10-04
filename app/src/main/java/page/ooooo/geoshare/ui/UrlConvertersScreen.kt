@@ -30,7 +30,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun UrlConvertersScreen(
-    onNavigateToMainScreen: () -> Unit = {},
+    onBack: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
@@ -54,7 +54,7 @@ fun UrlConvertersScreen(
     UrlConvertersScreen(
         selectedFilter = selectedFilter,
         urlConverterDocumentations = urlConverterDocumentations,
-        onNavigateToMainScreen = onNavigateToMainScreen,
+        onBack = onBack,
         onSelectFilter = { selectedFilter = it },
         onShowOpenByDefaultSettings = { viewModel.showOpenByDefaultSettings(context, settingsLauncher) },
     )
@@ -65,7 +65,7 @@ fun UrlConvertersScreen(
 fun UrlConvertersScreen(
     selectedFilter: UrlConverterDocumentationFilter,
     urlConverterDocumentations: UrlConverterDocumentations,
-    onNavigateToMainScreen: () -> Unit,
+    onBack: () -> Unit,
     onSelectFilter: (filter: UrlConverterDocumentationFilter) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
@@ -77,7 +77,7 @@ fun UrlConvertersScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.url_converters_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateToMainScreen) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description)
@@ -228,7 +228,7 @@ private fun DefaultPreview() {
                     "https://maps.apple.com" to false,
                 ),
             ),
-            onNavigateToMainScreen = {},
+            onBack = {},
             onSelectFilter = {},
             onShowOpenByDefaultSettings = {},
         )
@@ -252,7 +252,7 @@ private fun DarkPreview() {
                     "https://maps.apple.com" to false,
                 ),
             ),
-            onNavigateToMainScreen = {},
+            onBack = {},
             onSelectFilter = {},
             onShowOpenByDefaultSettings = {},
         )

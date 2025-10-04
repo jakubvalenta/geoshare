@@ -27,7 +27,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
     NavHost(navController = navController, startDestination = "main") {
         composable("about") {
             AboutScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
+                onBack = { navController.navigate("main") },
             )
         }
         composable("faq") {
@@ -71,13 +71,13 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("url_converters") {
             // TODO Set changelog shown
             UrlConvertersScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
+                onBack = { navController.navigate("main") },
                 viewModel = viewModel,
             )
         }
         composable("user_preferences") {
             UserPreferencesScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
+                onBack = { navController.navigate("main") },
                 viewModel = viewModel,
             )
         }

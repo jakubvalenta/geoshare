@@ -61,7 +61,7 @@ fun ResultErrorCard(
                     uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
                 ResultCardChip(
-                    stringResource(R.string.faq_supported_inputs_headline),
+                    stringResource(R.string.url_converters_title),
                     modifier = Modifier.padding(end = Spacing.small),
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 ) {

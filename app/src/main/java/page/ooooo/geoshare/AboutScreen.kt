@@ -24,14 +24,14 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun AboutScreen(
-    onNavigateToMainScreen: () -> Unit = {},
+    onBack: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.about_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateToMainScreen) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description)

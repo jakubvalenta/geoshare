@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.Spacing
 

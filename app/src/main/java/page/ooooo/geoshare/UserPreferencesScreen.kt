@@ -31,7 +31,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun UserPreferencesScreen(
-    onNavigateToMainScreen: () -> Unit = {},
+    onBack: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
@@ -41,7 +41,7 @@ fun UserPreferencesScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.user_preferences_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateToMainScreen) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description),

@@ -16,7 +16,7 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     NavHost(navController = navController, startDestination = "conversion") {
         composable("about") {
             AboutScreen(
-                onNavigateToMainScreen = { navController.navigate("conversion") },
+                onBack = { navController.navigate("conversion") },
             )
         }
         composable("faq") {
@@ -49,13 +49,13 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
         composable("url_converters") {
             // TODO Set changelog shown
             UrlConvertersScreen(
-                onNavigateToMainScreen = { navController.navigate("conversion") },
+                onBack = { navController.navigate("conversion") },
                 viewModel = viewModel,
             )
         }
         composable("user_preferences") {
             UserPreferencesScreen(
-                onNavigateToMainScreen = { navController.navigate("conversion") },
+                onBack = { navController.navigate("conversion") },
                 viewModel = viewModel,
             )
         }

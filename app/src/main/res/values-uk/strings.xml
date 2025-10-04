@@ -88,8 +88,11 @@
     <string name="conversion_error_title">Помилка</string>
     <string name="converter_yandex_maps_permission_title">Підключитися до Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Підключення до Yandex…</string>
-    <string name="faq_supported_inputs_headline">Підтримувані картографічні сервіси</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br / >Waze<br />Yandex Maps<br />координати (наприклад, 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
+    <string name="url_converters_title">Підтримувані картографічні сервіси</string>
+    <string name="url_converters_text">Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток.</string>
+    <string name="converter_coordinates_name">координати</string>
+    <string name="converter_coordinates_example">наприклад, 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="converter_geo_name">geo: URIs</string>
     <string name="converter_waze_permission_title">Підключитися до Waze?</string>
     <string name="converter_waze_loading_indicator_title">Підключення до Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">Копіювати Карти Google</string>
