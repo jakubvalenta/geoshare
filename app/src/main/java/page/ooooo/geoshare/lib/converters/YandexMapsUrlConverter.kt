@@ -15,32 +15,32 @@ class YandexMapsUrlConverter() :
     UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
 
-    @StringRes
-    override val nameResId = R.string.converter_yandex_maps_name
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
-    override val supportedInputs = listOf(
-        SupportedInput.Url("https://ya.ru/maps", 20),
-        SupportedInput.Url("https://yandex.az/maps", 22),
-        SupportedInput.Url("https://yandex.by/maps", 22),
-        SupportedInput.Url("https://yandex.co.il/maps", 22),
-        SupportedInput.Url("https://yandex.com/maps", 20),
-        SupportedInput.Url("https://yandex.com.am/maps", 22),
-        SupportedInput.Url("https://yandex.com.ge/maps", 22),
-        SupportedInput.Url("https://yandex.com.tr/maps", 22),
-        SupportedInput.Url("https://yandex.ee/maps", 22),
-        SupportedInput.Url("https://yandex.eu/maps", 22),
-        SupportedInput.Url("https://yandex.fr/maps", 22),
-        SupportedInput.Url("https://yandex.kg/maps", 22),
-        SupportedInput.Url("https://yandex.kz/maps", 22),
-        SupportedInput.Url("https://yandex.lt/maps", 22),
-        SupportedInput.Url("https://yandex.lv/maps", 22),
-        SupportedInput.Url("https://yandex.md/maps", 22),
-        SupportedInput.Url("https://yandex.ru/maps", 22),
-        SupportedInput.Url("https://yandex.tj/maps", 22),
-        SupportedInput.Url("https://yandex.tm/maps", 22),
-        SupportedInput.Url("https://yandex.ua/maps", 22),
-        SupportedInput.Url("https://yandex.uz/maps", 22),
+    override val documentation = UrlConverterDocumentation(
+        nameResId = R.string.converter_yandex_maps_name,
+        inputs = listOf(
+            UrlConverterDocumentationInput.Url("https://ya.ru/maps", 20),
+            UrlConverterDocumentationInput.Url("https://yandex.az/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.by/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.co.il/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.com/maps", 20),
+            UrlConverterDocumentationInput.Url("https://yandex.com.am/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.com.ge/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.com.tr/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.ee/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.eu/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.fr/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.kg/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.kz/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.lt/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.lv/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.md/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.ru/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.tj/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.tm/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.ua/maps", 22),
+            UrlConverterDocumentationInput.Url("https://yandex.uz/maps", 22),
+        ),
     )
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")

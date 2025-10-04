@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import page.ooooo.geoshare.ui.ChangelogScreen
+import page.ooooo.geoshare.ui.UrlConvertersScreen
 
 @Composable
 fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
@@ -13,6 +15,17 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     val changelogShown by viewModel.changelogShown.collectAsState()
 
     NavHost(navController = navController, startDestination = "conversion") {
+        composable("about") {
+            AboutScreen(
+                onNavigateToMainScreen = { navController.navigate("conversion") },
+            )
+        }
+        composable("changelog") {
+            viewModel.setChangelogShown()
+            ChangelogScreen(
+                onNavigateToMainScreen = { navController.navigate("conversion") },
+            )
+        }
         composable("faq/{itemId}") { backStackEntry ->
             val initialExpandedItemId = backStackEntry.arguments?.getString("itemId")?.let {
                 try {
@@ -26,6 +39,15 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onBack = { navController.navigate("conversion") },
             )
         }
+        composable("intro") {
+            IntroScreen(
+                onCloseIntro = {
+                    viewModel.setIntroShown()
+                    navController.navigate("conversion")
+                },
+                viewModel = viewModel,
+            )
+        }
         composable("conversion") {
             ConversionScreen(
                 changelogShown = changelogShown,
@@ -34,9 +56,21 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToSupportedUrisScreen = { navController.navigate("supported_uris") },
+                onNavigateToSupportedUrisScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 onFinish = onFinish,
+                viewModel = viewModel,
+            )
+        }
+        composable("url_converters") {
+            UrlConvertersScreen(
+                onNavigateToMainScreen = { navController.navigate("conversion") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences") {
+            UserPreferencesScreen(
+                onNavigateToMainScreen = { navController.navigate("conversion") },
                 viewModel = viewModel,
             )
         }

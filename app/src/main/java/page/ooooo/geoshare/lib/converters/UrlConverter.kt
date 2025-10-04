@@ -6,16 +6,9 @@ import java.net.URL
 
 enum class ShortUriMethod { GET, HEAD }
 
-sealed class SupportedInput(val addedInVersionCode: Int) {
-    class Uri(val uriString: String, addedInVersionCode: Int) : SupportedInput(addedInVersionCode)
-    class Url(val urlString: String, addedInVersionCode: Int) : SupportedInput(addedInVersionCode)
-    class Text(val descriptionResId: Int, addedInVersionCode: Int) : SupportedInput(addedInVersionCode)
-}
-
 sealed interface UrlConverter {
-    val nameResId: Int
     val uriPattern: Pattern
-    val supportedInputs: List<SupportedInput>
+    val documentation: UrlConverterDocumentation
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern

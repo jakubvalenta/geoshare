@@ -55,8 +55,9 @@
     <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_coordinates_name">coordinates</string>
-    <string name="converter_coordinates_input_description">e.g. 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="converter_coordinates_example">e.g. 41°24′12.2″N 2°10′26.5″E</string>
     <string name="converter_geo_name">geo: URI</string>
+    <string name="converter_geo_example">e.g. geo:50.123456,-11.123456</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name" translatable="false">Google Maps</string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
@@ -123,7 +124,7 @@
     <string name="supported_uris_text">You can share the following map links with %1$s or paste them in the app.</string>
     <string name="supported_uris_filter_all">All map services</string>
     <string name="supported_uris_default_handler_enabled">Opens by default in %1$s</string>
-    <string name="supported_uris_default_handler_disabled">Does not open by default in %1$s</string>
+    <string name="supported_uris_default_handler_disabled">Doesn’t open by default in %1$s</string>
     <string name="supported_uris_item_settings_button">Configure open by default</string>
     <string name="supported_uris_filter_recent">Recently added</string>
 </resources>

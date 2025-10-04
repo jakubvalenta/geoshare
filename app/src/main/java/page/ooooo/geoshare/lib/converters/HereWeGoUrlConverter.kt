@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.converters
 
-import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
@@ -19,15 +18,16 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
         val DECODED_LON_PATTERN: Pattern = Pattern.compile("""(lon=|"longitude":)$LON""")
     }
 
-    @StringRes
-    override val nameResId = R.string.converter_here_wego_name
-
+    @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
-    override val supportedInputs = listOf(
-        SupportedInput.Url("https://share.here.com/l/", 20),
-        SupportedInput.Url("https://share.here.com/p/", 20),
-        SupportedInput.Url("https://wego.here.com/", 20),
-        SupportedInput.Url("https://wego.here.com/p/", 20),
+    override val documentation = UrlConverterDocumentation(
+        nameResId = R.string.converter_here_wego_name,
+        inputs = listOf(
+            UrlConverterDocumentationInput.Url("https://share.here.com/l/", 20),
+            UrlConverterDocumentationInput.Url("https://share.here.com/p/", 20),
+            UrlConverterDocumentationInput.Url("https://wego.here.com/", 20),
+            UrlConverterDocumentationInput.Url("https://wego.here.com/p/", 20),
+        ),
     )
 
     @OptIn(ExperimentalEncodingApi::class)

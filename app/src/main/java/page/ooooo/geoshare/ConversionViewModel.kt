@@ -45,24 +45,6 @@ class ConversionViewModel @Inject constructor(
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
-    sealed class MapServiceFilter(val titleResId: Int) {
-        class All : MapServiceFilter(R.string.supported_uris_filter_all)
-        class Recent : MapServiceFilter(R.string.supported_uris_filter_recent)
-        class Enabled : MapServiceFilter(R.string.supported_uris_default_handler_enabled)
-        class Disabled : MapServiceFilter(R.string.supported_uris_default_handler_disabled)
-    }
-
-    data class MapServiceInput(
-        // TODO Create MapServiceInput.Text and MapServiceInput.Url
-        val supportedInput: SupportedInput,
-        val defaultHandlerEnabled: Boolean?,
-    )
-
-    data class MapService(
-        val urlConverter: UrlConverter,
-        val inputs: List<MapServiceInput>,
-    )
-
     val urlConverters = listOf(
         GeoUrlConverter(),
         GoogleMapsUrlConverter(),
@@ -75,13 +57,6 @@ class ConversionViewModel @Inject constructor(
         WazeUrlConverter(),
         YandexMapsUrlConverter(),
         CoordinatesUrlConverter(),
-    )
-
-    val mapServiceFilters = listOf(
-        MapServiceFilter.All(),
-        MapServiceFilter.Recent(),
-        MapServiceFilter.Enabled(),
-        MapServiceFilter.Disabled(),
     )
 
     val stateContext = ConversionStateContext(
@@ -177,56 +152,6 @@ class ConversionViewModel @Inject constructor(
             stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
             transition()
         }
-    }
-
-    fun getMapServices(packageManager: PackageManager, filter: MapServiceFilter): List<MapService> =
-        urlConverters.mapNotNull { urlConverter ->
-            urlConverter.supportedInputs.mapNotNull { supportedInput ->
-                if (filter is MapServiceFilter.Recent && supportedInput.addedInVersionCode <= 10) {
-                    return@mapNotNull null
-                }
-                val defaultHandlerEnabled = when (supportedInput) {
-                    is SupportedInput.Url -> isDefaultHandlerEnabled(packageManager, supportedInput.urlString)
-                    else -> null
-                }
-                when (filter) {
-                    is MapServiceFilter.Enabled -> {
-                        if (defaultHandlerEnabled == false) {
-                            return@mapNotNull null
-                        }
-                    }
-
-                    is MapServiceFilter.Disabled -> {
-                        if (defaultHandlerEnabled != false) {
-                            return@mapNotNull null
-                        }
-                    }
-
-                    else -> Unit
-                }
-                MapServiceInput(supportedInput, defaultHandlerEnabled)
-            }.takeIf { it.isNotEmpty() }?.let { mapServiceInputs ->
-                MapService(urlConverter, mapServiceInputs)
-            }
-        }
-
-    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
-        val resolveInfo = try {
-            packageManager.resolveActivity(
-                Intent(Intent.ACTION_VIEW, uriString.toUri()),
-                PackageManager.MATCH_DEFAULT_ONLY,
-            )
-        } catch (e: Exception) {
-            Log.e(null, "Error when querying which app is the default handler for a URI", e)
-            return false
-        }
-        val packageName = try {
-            resolveInfo?.activityInfo?.packageName
-        } catch (e: Exception) {
-            Log.e(null, "Error when loading info about an app that is the default handler for URI", e)
-            null
-        }
-        return packageName == BuildConfig.APPLICATION_ID
     }
 
     fun queryGeoUriApps(packageManager: PackageManager): List<App> {

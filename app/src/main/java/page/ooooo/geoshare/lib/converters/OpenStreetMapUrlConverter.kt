@@ -14,15 +14,15 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
     }
 
-    @StringRes
-    override val nameResId = R.string.converter_open_street_map_name
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?openstreetmap\.org/\S+""")
-    override val supportedInputs = listOf(
-        SupportedInput.Url("https://www.openstreetmap.org/", 20),
-        SupportedInput.Url("https://www.openstreetmap.org/node", 23),
-        SupportedInput.Url("https://www.openstreetmap.org/relation", 23),
-        SupportedInput.Url("https://www.openstreetmap.org/way", 23),
+    override val documentation = UrlConverterDocumentation(
+        nameResId = R.string.converter_open_street_map_name,
+        inputs = listOf(
+            UrlConverterDocumentationInput.Url("https://www.openstreetmap.org/", 20),
+            UrlConverterDocumentationInput.Url("https://www.openstreetmap.org/node", 23),
+            UrlConverterDocumentationInput.Url("https://www.openstreetmap.org/relation", 23),
+            UrlConverterDocumentationInput.Url("https://www.openstreetmap.org/way", 23),
+        ),
     )
 
     override val conversionUriPattern = uriPattern {

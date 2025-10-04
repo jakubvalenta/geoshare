@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
 import page.ooooo.geoshare.ui.ChangelogScreen
-import page.ooooo.geoshare.ui.MapServicesScreen
+import page.ooooo.geoshare.ui.UrlConvertersScreen
 
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
@@ -67,7 +67,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToConversionScreen = { navController.navigate("conversion") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToSupportedUrisScreen = { navController.navigate("supported_uris") },
+                onNavigateToSupportedUrisScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
@@ -80,13 +80,13 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToChangelogScreen = { navController.navigate("changelog") },
                 onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToSupportedUrisScreen = { navController.navigate("supported_uris") },
+                onNavigateToSupportedUrisScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
         }
-        composable("supported_uris") {
-            MapServicesScreen(
+        composable("url_converters") {
+            UrlConvertersScreen(
                 onNavigateToMainScreen = { navController.navigate("main") },
                 viewModel = viewModel,
             )

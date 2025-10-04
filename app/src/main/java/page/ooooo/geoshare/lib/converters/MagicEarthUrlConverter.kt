@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.converters
 
-import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.PositionRegex
@@ -14,13 +13,13 @@ import page.ooooo.geoshare.lib.uriPattern
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
-    @StringRes
-    override val nameResId = R.string.converter_magic_earth_name
-
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?magicearth.com/\?\S+""")
-    override val supportedInputs = listOf(
-        SupportedInput.Url("https://magicearth.com/", 20),
+    override val documentation = UrlConverterDocumentation(
+        nameResId = R.string.converter_magic_earth_name,
+        inputs = listOf(
+            UrlConverterDocumentationInput.Url("https://magicearth.com/", 20),
+        ),
     )
 
     override val conversionUriPattern = uriPattern {

@@ -1,12 +1,11 @@
 package page.ooooo.geoshare.lib.converters
 
-import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.lib.uriPattern
-import page.ooooo.geoshare.R
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     companion object {
@@ -23,13 +22,13 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
     }
 
-    @StringRes
-    override val nameResId = R.string.converter_coordinates_name
-
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
-    override val supportedInputs = listOf(
-        SupportedInput.Text(R.string.converter_coordinates_input_description, 20)
+    override val documentation = UrlConverterDocumentation(
+        nameResId = R.string.converter_coordinates_name,
+        inputs = listOf(
+            UrlConverterDocumentationInput.Text(R.string.converter_coordinates_example, 20),
+        ),
     )
 
     override val conversionUriPattern = uriPattern {

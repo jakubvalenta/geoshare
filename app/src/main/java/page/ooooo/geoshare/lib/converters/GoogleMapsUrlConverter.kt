@@ -26,9 +26,6 @@ class GoogleMapsUrlConverter() :
         )
     }
 
-    @StringRes
-    override val nameResId = R.string.converter_google_maps_name
-
     /**
      * Repeatedly searches for LAT and LON in DATA to get points
      */
@@ -53,14 +50,17 @@ class GoogleMapsUrlConverter() :
 
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?((www|maps)\.)?(google(\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
-    override val supportedInputs = listOf(
-        SupportedInput.Url("https://maps.app.goo.gl", 5),
-        SupportedInput.Url("https://app.goo.gl/maps", 5),
-        SupportedInput.Url("https://maps.google.com", 5),
-        SupportedInput.Url("https://goo.gl/maps", 5),
-        SupportedInput.Url("https://google.com/maps", 5),
-        SupportedInput.Url("https://www.google.com/maps", 5),
-        SupportedInput.Url("https://g.co/kgs", 10),
+    override val documentation = UrlConverterDocumentation(
+        nameResId = R.string.converter_google_maps_name,
+        inputs = listOf(
+            UrlConverterDocumentationInput.Url("https://maps.app.goo.gl", 5),
+            UrlConverterDocumentationInput.Url("https://app.goo.gl/maps", 5),
+            UrlConverterDocumentationInput.Url("https://maps.google.com", 5),
+            UrlConverterDocumentationInput.Url("https://goo.gl/maps", 5),
+            UrlConverterDocumentationInput.Url("https://google.com/maps", 5),
+            UrlConverterDocumentationInput.Url("https://www.google.com/maps", 5),
+            UrlConverterDocumentationInput.Url("https://g.co/kgs", 10),
+        ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
 
