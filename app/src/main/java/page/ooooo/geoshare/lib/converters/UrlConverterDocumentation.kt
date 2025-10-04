@@ -20,10 +20,10 @@ data class UrlConverterDocumentations(
 )
 
 sealed class UrlConverterDocumentationFilter(val titleResId: Int) {
-    class All : UrlConverterDocumentationFilter(R.string.supported_uris_filter_all)
-    class Recent : UrlConverterDocumentationFilter(R.string.supported_uris_filter_recent)
-    class Enabled : UrlConverterDocumentationFilter(R.string.supported_uris_default_handler_enabled)
-    class Disabled : UrlConverterDocumentationFilter(R.string.supported_uris_default_handler_disabled)
+    class All : UrlConverterDocumentationFilter(R.string.url_converters_filter_all)
+    class Recent : UrlConverterDocumentationFilter(R.string.url_converters_filter_recent)
+    class Enabled : UrlConverterDocumentationFilter(R.string.url_converters_default_handler_enabled)
+    class Disabled : UrlConverterDocumentationFilter(R.string.url_converters_default_handler_disabled)
 }
 
 val urlConverterDocumentationFilters = listOf(

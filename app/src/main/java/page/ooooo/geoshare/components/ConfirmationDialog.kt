@@ -55,7 +55,7 @@ private fun DefaultPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToSupportedUrisScreen = {},
+            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         ) {
             ConfirmationDialog(
@@ -80,7 +80,7 @@ private fun DarkPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToSupportedUrisScreen = {},
+            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         ) {
             ConfirmationDialog(

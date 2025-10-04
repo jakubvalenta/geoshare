@@ -28,7 +28,7 @@ fun MainMenu(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: (FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToSupportedUrisScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -70,10 +70,10 @@ fun MainMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.supported_uris_title)) },
+                text = { Text(stringResource(R.string.url_converters_title)) },
                 onClick = {
                     menuExpanded = false
-                    onNavigateToSupportedUrisScreen()
+                    onNavigateToUrlConvertersScreen()
                 },
                 leadingIcon = {
                     BadgedBox(
@@ -127,7 +127,7 @@ private fun DefaultPreview() {
                 onNavigateToAboutScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
-                onNavigateToSupportedUrisScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -144,7 +144,7 @@ private fun DarkPreview() {
                 onNavigateToAboutScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
-                onNavigateToSupportedUrisScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }

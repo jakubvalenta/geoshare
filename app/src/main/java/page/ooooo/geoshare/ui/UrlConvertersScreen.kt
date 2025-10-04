@@ -75,7 +75,7 @@ fun UrlConvertersScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.supported_uris_title)) },
+                title = { Text(stringResource(R.string.url_converters_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateToMainScreen) {
                         Icon(
@@ -95,7 +95,7 @@ fun UrlConvertersScreen(
                 .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.small)
         ) {
             Text(
-                stringResource(R.string.supported_uris_text, appName),
+                stringResource(R.string.url_converters_text, appName),
                 Modifier.padding(top = Spacing.tiny),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     lineBreak = LineBreak.Paragraph,
@@ -159,7 +159,7 @@ fun UrlConvertersScreen(
                                             )
                                             Text(
                                                 stringResource(
-                                                    R.string.supported_uris_default_handler_enabled,
+                                                    R.string.url_converters_default_handler_enabled,
                                                     appName,
                                                 ),
                                                 Modifier.padding(vertical = Spacing.tiny),
@@ -175,7 +175,7 @@ fun UrlConvertersScreen(
                                                 )
                                                 Text(
                                                     stringResource(
-                                                        R.string.supported_uris_default_handler_disabled,
+                                                        R.string.url_converters_default_handler_disabled,
                                                         appName,
                                                     ),
                                                     Modifier.padding(vertical = Spacing.tiny),
@@ -188,7 +188,10 @@ fun UrlConvertersScreen(
                                                     .padding(end = 12.dp)
                                             )
                                             IconButton({ onShowOpenByDefaultSettings() }) {
-                                                Icon(Icons.Default.Settings, null)
+                                                Icon(
+                                                    Icons.Default.Settings,
+                                                    stringResource(R.string.url_converters_settings_button_content_description),
+                                                )
                                             }
                                         }
                                     }

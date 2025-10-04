@@ -117,11 +117,11 @@
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="conversion_succeeded_point_number">point %1$d</string>
-    <string name="supported_uris_title">Supported map services</string>
-    <string name="supported_uris_text">You can share the following map links with %1$s or paste them in the app.</string>
-    <string name="supported_uris_filter_all">All map services</string>
-    <string name="supported_uris_default_handler_enabled">Opens by default in %1$s</string>
-    <string name="supported_uris_default_handler_disabled">Doesn’t open by default in %1$s</string>
-    <string name="supported_uris_item_settings_button">Configure open by default</string>
-    <string name="supported_uris_filter_recent">Recently added</string>
+    <string name="url_converters_title">Supported map services</string>
+    <string name="url_converters_text">You can share the following map links with %1$s or paste them in the app.</string>
+    <string name="url_converters_filter_all">All map services</string>
+    <string name="url_converters_filter_recent">Recently added</string>
+    <string name="url_converters_default_handler_enabled">Opens by default in %1$s</string>
+    <string name="url_converters_default_handler_disabled">Doesn’t open by default in %1$s</string>
+    <string name="url_converters_settings_button_content_description">Open Android settings</string>
 </resources>

@@ -26,7 +26,7 @@ fun ConfirmationScaffold(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToSupportedUrisScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     content: (@Composable (ColumnScope.() -> Unit))? = null,
 ) {
@@ -45,7 +45,7 @@ fun ConfirmationScaffold(
                         onNavigateToAboutScreen = onNavigateToAboutScreen,
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
-                        onNavigateToSupportedUrisScreen = onNavigateToSupportedUrisScreen,
+                        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 },

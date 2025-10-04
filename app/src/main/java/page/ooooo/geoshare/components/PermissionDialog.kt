@@ -79,7 +79,7 @@ private fun DefaultPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToSupportedUrisScreen = {},
+            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         ) {
             PermissionDialog(
@@ -116,7 +116,7 @@ private fun DarkPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToSupportedUrisScreen = {},
+            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         ) {
             PermissionDialog(
@@ -152,7 +152,7 @@ private fun ParseHtmlPermissionPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToSupportedUrisScreen = {},
+            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         ) {
             PermissionDialog(
@@ -191,7 +191,7 @@ private fun DarkParseHtmlPermissionPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToSupportedUrisScreen = {},
+            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         ) {
             PermissionDialog(
