@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
@@ -30,7 +29,7 @@ fun ResultErrorCard(
     @StringRes errorMessageResId: Int,
     inputUriString: String,
     retryLoadingIndicatorVisible: Boolean,
-    onNavigateToFaqScreen: (FaqItemId) -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -66,7 +65,7 @@ fun ResultErrorCard(
                     modifier = Modifier.padding(end = Spacing.small),
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 ) {
-                    onNavigateToFaqScreen(FaqItemId.SUPPORTED)
+                    onNavigateToUrlConvertersScreen()
                 }
             },
         ) {
@@ -109,7 +108,7 @@ private fun DefaultPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 retryLoadingIndicatorVisible = false,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -125,7 +124,7 @@ private fun DarkPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 retryLoadingIndicatorVisible = false,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -141,7 +140,7 @@ private fun CoordinatesPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
                 retryLoadingIndicatorVisible = false,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -157,7 +156,7 @@ private fun DarkCoordinatesPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
                 retryLoadingIndicatorVisible = false,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -173,7 +172,7 @@ private fun EmptyPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = false,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -189,7 +188,7 @@ private fun DarkEmptyPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = false,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -205,7 +204,7 @@ private fun LoadingIndicatorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = true,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }
@@ -221,7 +220,7 @@ private fun DarkLoadingIndicatorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = true,
-                onNavigateToFaqScreen = {},
+                onNavigateToUrlConvertersScreen = {},
                 onRetry = {},
             )
         }

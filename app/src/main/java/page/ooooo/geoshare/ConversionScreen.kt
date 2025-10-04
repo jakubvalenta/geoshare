@@ -42,7 +42,7 @@ fun ConversionScreen(
     changelogShown: Boolean,
     onBack: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
-    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
@@ -106,7 +106,7 @@ fun ConversionScreen(
     queryGeoUriApps: () -> List<ConversionViewModel.App>,
     onBack: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
-    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
@@ -255,7 +255,7 @@ fun ConversionScreen(
                     currentState.errorMessageResId,
                     currentState.inputUriString,
                     retryLoadingIndicatorVisible,
-                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                    onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
                     onRetry = {
                         coroutineScope.launch {
                             // Show a loading indicator for a while to indicate that conversion is being retried.

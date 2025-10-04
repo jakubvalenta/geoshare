@@ -24,7 +24,7 @@ fun ConfirmationScaffold(
     endButton: (@Composable () -> Unit)? = null,
     changelogShown: Boolean,
     onNavigateToAboutScreen: () -> Unit,
-    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,

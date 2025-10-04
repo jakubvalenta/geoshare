@@ -22,17 +22,15 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 enum class FaqItemId {
-    SUPPORTED,
     HOW_IT_WORKS,
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun FaqScreen(
-    initialExpandedItemId: FaqItemId? = null,
     onBack: () -> Unit = {},
 ) {
-    var expandedItemId by remember { mutableStateOf(initialExpandedItemId) }
+    var expandedItemId by remember { mutableStateOf<FaqItemId?>(FaqItemId.HOW_IT_WORKS) }
 
     Scaffold(
         topBar = {
@@ -59,16 +57,6 @@ fun FaqScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
-            FaqItem(
-                itemId = FaqItemId.SUPPORTED,
-                expandedItemId = expandedItemId,
-                onSetExpandedItemId = { expandedItemId = it },
-                headline = stringResource(R.string.faq_supported_inputs_headline),
-            ) {
-                ParagraphHtml(
-                    stringResource(R.string.faq_supported_inputs_text, appName)
-                )
-            }
             FaqItem(
                 itemId = FaqItemId.HOW_IT_WORKS,
                 expandedItemId = expandedItemId,
@@ -138,37 +126,5 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         FaqScreen()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SupportedDefaultPreview() {
-    AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.SUPPORTED)
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkSupportedPreview() {
-    AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.SUPPORTED)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun HowItWorksPreview() {
-    AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkHowItWorksPreview() {
-    AppTheme {
-        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
     }
 }

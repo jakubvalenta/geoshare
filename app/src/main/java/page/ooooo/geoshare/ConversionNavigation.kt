@@ -19,16 +19,8 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onNavigateToMainScreen = { navController.navigate("conversion") },
             )
         }
-        composable("faq/{itemId}") { backStackEntry ->
-            val initialExpandedItemId = backStackEntry.arguments?.getString("itemId")?.let {
-                try {
-                    FaqItemId.valueOf(it)
-                } catch (_: IllegalArgumentException) {
-                    null
-                }
-            }
+        composable("faq") {
             FaqScreen(
-                initialExpandedItemId = initialExpandedItemId,
                 onBack = { navController.navigate("conversion") },
             )
         }
@@ -46,7 +38,7 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 changelogShown = changelogShown,
                 onBack = onFinish,
                 onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },

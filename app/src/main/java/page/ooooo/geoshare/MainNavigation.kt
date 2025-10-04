@@ -30,16 +30,8 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToMainScreen = { navController.navigate("main") },
             )
         }
-        composable("faq/{itemId}") { backStackEntry ->
-            val initialExpandedItemId = backStackEntry.arguments?.getString("itemId")?.let {
-                try {
-                    FaqItemId.valueOf(it)
-                } catch (_: IllegalArgumentException) {
-                    null
-                }
-            }
+        composable("faq") {
             FaqScreen(
-                initialExpandedItemId = initialExpandedItemId,
                 onBack = { navController.navigate("main") },
             )
         }
@@ -57,7 +49,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToConversionScreen = { navController.navigate("conversion") },
-                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
@@ -69,7 +61,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 changelogShown = changelogShown,
                 onBack = { navController.navigate("main") },
                 onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },

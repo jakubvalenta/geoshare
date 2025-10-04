@@ -16,7 +16,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -27,7 +26,7 @@ fun MainScreen(
     changelogShown: Boolean,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
@@ -56,7 +55,7 @@ fun MainScreen(
     onStart: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
