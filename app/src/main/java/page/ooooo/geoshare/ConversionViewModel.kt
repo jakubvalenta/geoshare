@@ -156,13 +156,12 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun getSupportedUris(packageManager: PackageManager): List<Pair<Int, List<SupportedUri>>> =
+    fun getUrlConvertersAndSupportedUris(packageManager: PackageManager): List<Pair<UrlConverter, List<SupportedUri>>> =
         urlConverters.map { urlConverter ->
-            val key = urlConverter.nameResId
-            val value = urlConverter.supportedUriStrings.map { uriString ->
+            val supportedUris = urlConverter.supportedUriStrings.map { uriString ->
                 SupportedUri(uriString, isDefaultHandlerEnabled(packageManager, uriString))
             }
-            key to value
+            urlConverter to supportedUris
         }
 
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {

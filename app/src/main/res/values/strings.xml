@@ -51,18 +51,29 @@
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
-    <string name="converter_google_maps_permission_title">Connect to Google?</string>
-    <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
-    <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
-    <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
+    <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
+    <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
+    <string name="converter_coordinates_name">coordinates</string>
+    <string name="converter_geo_name">geo: URI</string>
+    <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
+    <string name="converter_google_maps_name" translatable="false">Google Maps</string>
+    <string name="converter_google_maps_permission_title">Connect to Google?</string>
+    <string name="converter_here_wego_name" translatable="false">Here WeGo</string>
+    <string name="converter_magic_earth_name" translatable="false">Magic Earth</string>
     <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
-    <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
+    <string name="converter_mapy_com_name" translatable="false">Mapy.com</string>
+    <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
     <string name="converter_open_street_map_loading_indicator_title">Connecting to OpenStreetMap…</string>
-    <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
-    <string name="converter_waze_permission_title">Connect to Waze?</string>
+    <string name="converter_open_street_map_name" translatable="false">OpenStreetMap</string>
+    <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
+    <string name="converter_osm_and_name" translatable="false">OsmAnd</string>
     <string name="converter_waze_loading_indicator_title">Connecting to Waze…</string>
+    <string name="converter_waze_name" translatable="false">Waze</string>
+    <string name="converter_waze_permission_title">Connect to Waze?</string>
+    <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
+    <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
+    <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
@@ -107,19 +118,10 @@
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="conversion_succeeded_point_number">point %1$d</string>
-    <string name="supported_uris_title">Supported links</string>
-    <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
-    <string name="converter_coordinates_name">coordinates</string>
-    <string name="converter_geo_name">geo: URI</string>
-    <string name="converter_google_maps_name" translatable="false">Google Maps</string>
-    <string name="converter_here_wego_name" translatable="false">Here WeGo</string>
-    <string name="converter_magic_earth_name" translatable="false">Magic Earth</string>
-    <string name="converter_mapy_com_name" translatable="false">Mapy.com</string>
-    <string name="converter_open_street_map_name" translatable="false">OpenStreetMap</string>
-    <string name="converter_osm_and_name" translatable="false">OsmAnd</string>
-    <string name="converter_waze_name" translatable="false">Waze</string>
-    <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
-    <string name="supported_uris_enabled">Opens by default in %1$s</string>
-    <string name="supported_uris_disabled">Does not open by default in %1$s</string>
-    <string name="supported_uris_settings_button">Open Android settings</string>
+    <string name="supported_uris_title">Supported map services</string>
+    <string name="supported_uris_text">You can share the following map links with %1$s or paste them in the app.</string>
+    <string name="supported_uris_filter_all">All map services</string>
+    <string name="supported_uris_default_handler_enabled">Opens by default in %1$s</string>
+    <string name="supported_uris_default_handler_disabled">Does not open by default in %1$s</string>
+    <string name="supported_uris_item_settings_button">Configure open by default</string>
 </resources>
