@@ -1,11 +1,8 @@
 package page.ooooo.geoshare.lib.converters
 
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
-import androidx.core.net.toUri
-import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.IntentTools
 
 data class UrlConverterDocumentation(val nameResId: Int, val inputs: List<UrlConverterDocumentationInput>)
 
@@ -36,6 +33,7 @@ val urlConverterDocumentationFilters = listOf(
 fun getUrlConverterDocumentations(
     urlConverters: List<UrlConverter>,
     filter: UrlConverterDocumentationFilter,
+    intentTools: IntentTools,
     changelogShownForVersionCode: Int?,
     packageManager: PackageManager,
 ): UrlConverterDocumentations {
@@ -46,7 +44,7 @@ fun getUrlConverterDocumentations(
                 return@filter false
             }
             if (input is UrlConverterDocumentationInput.Url) {
-                val defaultHandlerEnabled = isDefaultHandlerEnabled(packageManager, input.urlString)
+                val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
                 if (filter is UrlConverterDocumentationFilter.Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
@@ -71,23 +69,4 @@ fun getUrlConverterDocumentations(
         documentations = filteredUrlConverterDocumentations,
         defaultHandlersEnabled = defaultHandlersEnabled.toMap(),
     )
-}
-
-private fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
-    val resolveInfo = try {
-        packageManager.resolveActivity(
-            Intent(Intent.ACTION_VIEW, uriString.toUri()),
-            PackageManager.MATCH_DEFAULT_ONLY,
-        )
-    } catch (e: Exception) {
-        Log.e(null, "Error when querying which app is the default handler for a URI", e)
-        return false
-    }
-    val packageName = try {
-        resolveInfo?.activityInfo?.packageName
-    } catch (e: Exception) {
-        Log.e(null, "Error when loading info about an app that is the default handler for URI", e)
-        null
-    }
-    return packageName == BuildConfig.APPLICATION_ID
 }

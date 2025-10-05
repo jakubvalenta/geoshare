@@ -42,10 +42,10 @@ fun IntroScreen(
     IntroScreen(
         onCloseIntro = onCloseIntro,
         onShowOpenByDefaultSettings = {
-            viewModel.showOpenByDefaultSettings(context, settingsLauncher)
+            viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher)
         },
         onShowOpenByDefaultSettingsForPackage = { packageName ->
-            viewModel.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+            viewModel.intentTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
         }
     )
 }

@@ -62,7 +62,7 @@ fun ConversionScreen(
         currentState = currentState,
         changelogShown = changelogShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
-        queryGeoUriApps = { viewModel.queryGeoUriApps(context.packageManager) },
+        queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
@@ -79,11 +79,11 @@ fun ConversionScreen(
             viewModel.launchSave(context, saveLauncher)
         },
         onOpenApp = { packageName, uriString ->
-            viewModel.openApp(context, packageName, uriString)
+            viewModel.intentTools.openApp(context, packageName, uriString)
             onFinish()
         },
         onOpenChooser = { uriString ->
-            viewModel.openChooser(context, uriString)
+            viewModel.intentTools.openChooser(context, uriString)
             onFinish()
         },
         onRetry = { newUriString ->
@@ -103,7 +103,7 @@ fun ConversionScreen(
     currentState: State,
     changelogShown: Boolean,
     @StringRes loadingIndicatorTitleResId: Int?,
-    queryGeoUriApps: () -> List<ConversionViewModel.App>,
+    queryGeoUriApps: () -> List<IntentTools.App>,
     onBack: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,

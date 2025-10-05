@@ -1,22 +1,16 @@
 package page.ooooo.geoshare
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.os.Build
-import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,9 +36,7 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    data class App(val packageName: String, val label: String, val icon: Drawable)
-
+    val intentTools = IntentTools()
     val urlConverters = listOf(
         GeoUrlConverter(),
         GoogleMapsUrlConverter(),
@@ -61,7 +53,7 @@ class ConversionViewModel @Inject constructor(
 
     val stateContext = ConversionStateContext(
         urlConverters = urlConverters,
-        intentTools = IntentTools(),
+        intentTools = intentTools,
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
         onStateChange = { newState ->
@@ -154,50 +146,6 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun queryGeoUriApps(packageManager: PackageManager): List<App> {
-        val resolveInfos = try {
-            packageManager.queryIntentActivities(
-                Intent(Intent.ACTION_VIEW, "geo:".toUri()),
-                PackageManager.MATCH_DEFAULT_ONLY,
-            )
-        } catch (e: Exception) {
-            Log.e(null, "Error when querying apps that support geo: URIs", e)
-            return emptyList()
-        }
-        return resolveInfos.mapNotNull {
-            try {
-                App(
-                    it.activityInfo.packageName,
-                    it.activityInfo.loadLabel(packageManager).toString(),
-                    it.activityInfo.loadIcon(packageManager),
-                )
-            } catch (e: Exception) {
-                Log.e(null, "Error when loading info about an app that supports geo: URIs", e)
-                null
-            }
-        }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
-    }
-
-    fun openApp(context: Context, packageName: String, uriString: String) {
-        try {
-            context.startActivity(
-                stateContext.intentTools.createViewIntent(packageName, uriString.toUri())
-            )
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun openChooser(context: Context, uriString: String) {
-        try {
-            context.startActivity(
-                stateContext.intentTools.createChooserIntent(uriString.toUri())
-            )
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     fun copy(context: Context, clipboard: Clipboard, text: String) {
         viewModelScope.launch {
             clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
@@ -237,38 +185,6 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun showOpenByDefaultSettings(
-        context: Context,
-        launcher: ActivityResultLauncher<Intent>,
-    ) {
-        showOpenByDefaultSettingsForPackage(context, launcher, BuildConfig.APPLICATION_ID)
-    }
-
-    fun showOpenByDefaultSettingsForPackage(
-        context: Context,
-        launcher: ActivityResultLauncher<Intent>,
-        packageName: String,
-    ) {
-        try {
-            val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                // Samsung supposedly doesn't allow going to the "Open by default" settings page.
-                Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
-            ) {
-                Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
-            } else {
-                Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            }
-            val intent = Intent(action, "package:$packageName".toUri())
-            launcher.launch(intent)
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(
-                context,
-                R.string.intro_settings_activity_not_found,
-                Toast.LENGTH_LONG,
-            ).show()
-        }
-    }
-
     private fun transition() {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
@@ -298,10 +214,7 @@ class ConversionViewModel @Inject constructor(
         setUserPreferenceValue(lastRunVersionCode, BuildConfig.VERSION_CODE)
     }
 
-    fun <T> setUserPreferenceValue(
-        userPreference: UserPreference<T>,
-        value: T,
-    ) {
+    fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {
         viewModelScope.launch {
             userPreferencesRepository.setValue(userPreference, value)
         }

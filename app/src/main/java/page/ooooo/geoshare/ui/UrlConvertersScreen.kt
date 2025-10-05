@@ -39,6 +39,7 @@ fun UrlConvertersScreen(
     var urlConverterDocumentations = getUrlConverterDocumentations(
         viewModel.urlConverters,
         selectedFilter,
+        viewModel.intentTools,
         userPreferencesValues.value.changelogShownForVersionCodeValue,
         context.packageManager
     )
@@ -46,6 +47,7 @@ fun UrlConvertersScreen(
         urlConverterDocumentations = getUrlConverterDocumentations(
             viewModel.urlConverters,
             selectedFilter,
+            viewModel.intentTools,
             userPreferencesValues.value.changelogShownForVersionCodeValue,
             context.packageManager
         )
@@ -56,7 +58,7 @@ fun UrlConvertersScreen(
         urlConverterDocumentations = urlConverterDocumentations,
         onBack = onBack,
         onSelectFilter = { selectedFilter = it },
-        onShowOpenByDefaultSettings = { viewModel.showOpenByDefaultSettings(context, settingsLauncher) },
+        onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 
