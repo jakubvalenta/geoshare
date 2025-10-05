@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,7 +22,9 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
@@ -29,51 +32,49 @@ import page.ooooo.geoshare.lib.converters.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
-data class UrlConverterDocumentations(
+data class Documentations(
     val documentations: List<Documentation>,
     val defaultHandlersEnabled: Map<String, Boolean>,
+    val newLastInputVersionCode: Int,
 )
 
-sealed class UrlConverterDocumentationFilter(val titleResId: Int) {
-    class All : UrlConverterDocumentationFilter(R.string.url_converters_filter_all)
-    class Recent : UrlConverterDocumentationFilter(R.string.url_converters_filter_recent)
-    class Enabled : UrlConverterDocumentationFilter(R.string.url_converters_default_handler_enabled)
-    class Disabled : UrlConverterDocumentationFilter(R.string.url_converters_default_handler_disabled)
+sealed class Filter(val titleResId: Int) {
+    class All : Filter(R.string.url_converters_filter_all)
+    class Recent : Filter(R.string.url_converters_filter_recent)
+    class Enabled : Filter(R.string.url_converters_default_handler_enabled)
+    class Disabled : Filter(R.string.url_converters_default_handler_disabled)
 }
 
-val urlConverterDocumentationFilters = listOf(
-    UrlConverterDocumentationFilter.All(),
-    UrlConverterDocumentationFilter.Recent(),
-    UrlConverterDocumentationFilter.Enabled(),
-    UrlConverterDocumentationFilter.Disabled(),
-)
-
-fun getUrlConverterDocumentations(
-    urlConverters: List<UrlConverter>,
-    filter: UrlConverterDocumentationFilter,
+fun getDocumentations(
+    filter: Filter,
     intentTools: IntentTools,
-    changelogShownForVersionCode: Int?,
+    lastInputVersionCode: Int?,
     packageManager: PackageManager,
-): UrlConverterDocumentations {
+    urlConverters: List<UrlConverter>,
+): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
+    var newLastInputVersionCode = 1
     val filteredUrlConverterDocumentations = urlConverters.mapNotNull { urlConverter ->
         val filteredInputs = urlConverter.documentation.inputs.filter { input ->
-            if (filter is UrlConverterDocumentationFilter.Recent && (changelogShownForVersionCode == null || input.addedInVersionCode > changelogShownForVersionCode)) {
+            if (filter is Filter.Recent && lastInputVersionCode != null && input.addedInVersionCode <= lastInputVersionCode) {
                 return@filter false
+            }
+            if (input.addedInVersionCode > newLastInputVersionCode) {
+                newLastInputVersionCode = input.addedInVersionCode
             }
             if (input is DocumentationInput.Url) {
                 val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
-                if (filter is UrlConverterDocumentationFilter.Enabled) {
+                if (filter is Filter.Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
                     }
-                } else if (filter is UrlConverterDocumentationFilter.Disabled) {
+                } else if (filter is Filter.Disabled) {
                     if (defaultHandlerEnabled) {
                         return@filter false
                     }
                 }
                 defaultHandlersEnabled[input.urlString] = defaultHandlerEnabled
-            } else if (filter is UrlConverterDocumentationFilter.Disabled) {
+            } else if (filter is Filter.Disabled) {
                 return@filter false
             }
             true
@@ -83,11 +84,25 @@ fun getUrlConverterDocumentations(
         }
         urlConverter.documentation.copy(inputs = filteredInputs)
     }
-    return UrlConverterDocumentations(
+    return Documentations(
         documentations = filteredUrlConverterDocumentations,
         defaultHandlersEnabled = defaultHandlersEnabled.toMap(),
+        newLastInputVersionCode = newLastInputVersionCode,
     )
 }
+
+fun getDocumentations(
+    context: Context,
+    filter: Filter,
+    lastInputVersionCode: Int?,
+    viewModel: ConversionViewModel,
+) = getDocumentations(
+    filter,
+    viewModel.intentTools,
+    lastInputVersionCode,
+    context.packageManager,
+    viewModel.urlConverters,
+)
 
 private val trimHttpsRegex = """^https://""".toRegex()
 
@@ -100,30 +115,43 @@ fun UrlConvertersScreen(
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
-    var selectedFilter by remember { mutableStateOf(urlConverterDocumentationFilters[0]) }
-    val userPreferencesValues = viewModel.userPreferencesValues.collectAsStateWithLifecycle()
-    var urlConverterDocumentations = getUrlConverterDocumentations(
-        viewModel.urlConverters,
-        selectedFilter,
-        viewModel.intentTools,
-        userPreferencesValues.value.changelogShownForVersionCodeValue,
-        context.packageManager
-    )
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lastInputShown by viewModel.lastInputShown.collectAsState()
+    val lastInputVersionCode by viewModel.lastInputVersionCode.collectAsState()
+    val filters = buildList {
+        if (!lastInputShown) {
+            add(Filter.Recent())
+        }
+        add(Filter.All())
+        add(Filter.Enabled())
+        add(Filter.Disabled())
+    }
+    val initialFilter = if (!lastInputShown) Filter.Recent() else Filter.All()
+    var filter by remember { mutableStateOf(initialFilter) }
+    var documentations = getDocumentations(context, filter, lastInputVersionCode, viewModel)
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-        urlConverterDocumentations = getUrlConverterDocumentations(
-            viewModel.urlConverters,
-            selectedFilter,
-            viewModel.intentTools,
-            userPreferencesValues.value.changelogShownForVersionCodeValue,
-            context.packageManager
-        )
+        // TODO Test this refresh.
+        documentations = getDocumentations(context, filter, lastInputVersionCode, viewModel)
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                viewModel.setLastInputVersionCode(documentations.newLastInputVersionCode)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     UrlConvertersScreen(
-        selectedFilter = selectedFilter,
-        urlConverterDocumentations = urlConverterDocumentations,
+        filter = filter,
+        filters = filters,
+        documentations = documentations,
         onBack = onBack,
-        onSelectFilter = { selectedFilter = it },
+        onChangeFilter = { filter = it },
         onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
@@ -131,10 +159,11 @@ fun UrlConvertersScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UrlConvertersScreen(
-    selectedFilter: UrlConverterDocumentationFilter,
-    urlConverterDocumentations: UrlConverterDocumentations,
+    filter: Filter,
+    filters: List<Filter>,
+    documentations: Documentations,
     onBack: () -> Unit,
-    onSelectFilter: (filter: UrlConverterDocumentationFilter) -> Unit,
+    onChangeFilter: (filter: Filter) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
@@ -173,28 +202,26 @@ fun UrlConvertersScreen(
                 FilterChip(
                     selected = true,
                     onClick = { filterExpanded = true },
-                    label = { Text(stringResource(selectedFilter.titleResId, appName)) },
+                    label = { Text(stringResource(filter.titleResId, appName)) },
                     trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
                 )
                 DropdownMenu(
                     expanded = filterExpanded,
                     onDismissRequest = { filterExpanded = false },
                 ) {
-                    urlConverterDocumentationFilters.forEach { filter ->
-                        if (filter != selectedFilter) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(filter.titleResId, appName)) },
-                                onClick = {
-                                    filterExpanded = false
-                                    onSelectFilter(filter)
-                                },
-                            )
-                        }
+                    filters.forEach {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(it.titleResId, appName)) },
+                            onClick = {
+                                filterExpanded = false
+                                onChangeFilter(it)
+                            },
+                        )
                     }
                 }
             }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                urlConverterDocumentations.documentations.forEach { urlConverterDocumentation ->
+                documentations.documentations.forEach { urlConverterDocumentation ->
                     item {
                         Text(
                             stringResource(urlConverterDocumentation.nameResId),
@@ -216,7 +243,7 @@ fun UrlConvertersScreen(
 
                                 is DocumentationInput.Url -> {
                                     val defaultHandlerEnabled =
-                                        urlConverterDocumentations.defaultHandlersEnabled.getOrDefault(
+                                        documentations.defaultHandlersEnabled.getOrDefault(
                                             input.urlString, false
                                         )
                                     if (defaultHandlerEnabled) {
@@ -280,8 +307,9 @@ fun UrlConvertersScreen(
 private fun DefaultPreview() {
     AppTheme {
         UrlConvertersScreen(
-            selectedFilter = urlConverterDocumentationFilters[0],
-            urlConverterDocumentations = UrlConverterDocumentations(
+            filter = Filter.Recent(),
+            filters = listOf(Filter.Recent(), Filter.All(), Filter.Enabled(), Filter.Disabled()),
+            documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
                     AppleMapsUrlConverter(),
@@ -291,9 +319,10 @@ private fun DefaultPreview() {
                     "https://maps.apple" to true,
                     "https://maps.apple.com" to false,
                 ),
+                newLastInputVersionCode = 20,
             ),
             onBack = {},
-            onSelectFilter = {},
+            onChangeFilter = {},
             onShowOpenByDefaultSettings = {},
         )
     }
@@ -304,8 +333,9 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         UrlConvertersScreen(
-            selectedFilter = urlConverterDocumentationFilters[0],
-            urlConverterDocumentations = UrlConverterDocumentations(
+            filter = Filter.Recent(),
+            filters = listOf(Filter.Recent(), Filter.All(), Filter.Enabled(), Filter.Disabled()),
+            documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
                     AppleMapsUrlConverter(),
@@ -315,9 +345,10 @@ private fun DarkPreview() {
                     "https://maps.apple" to true,
                     "https://maps.apple.com" to false,
                 ),
+                newLastInputVersionCode = 20,
             ),
             onBack = {},
-            onSelectFilter = {},
+            onChangeFilter = {},
             onShowOpenByDefaultSettings = {},
         )
     }

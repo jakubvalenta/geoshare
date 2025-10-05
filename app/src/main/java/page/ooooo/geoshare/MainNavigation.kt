@@ -13,7 +13,6 @@ import page.ooooo.geoshare.ui.UrlConvertersScreen
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
     val navController = rememberNavController()
-    val changelogShown by viewModel.changelogShown.collectAsState()
     val introShown by viewModel.introShown.collectAsState()
 
     LaunchedEffect(introShown) {
@@ -46,7 +45,6 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         }
         composable("main") {
             MainScreen(
-                changelogShown = changelogShown,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToConversionScreen = { navController.navigate("conversion") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
@@ -58,7 +56,6 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         }
         composable("conversion") {
             ConversionScreen(
-                changelogShown = changelogShown,
                 onBack = { navController.navigate("main") },
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
@@ -69,7 +66,6 @@ fun MainNavigation(viewModel: ConversionViewModel) {
             )
         }
         composable("url_converters") {
-            // TODO Set changelog shown
             UrlConvertersScreen(
                 onBack = { navController.navigate("main") },
                 viewModel = viewModel,

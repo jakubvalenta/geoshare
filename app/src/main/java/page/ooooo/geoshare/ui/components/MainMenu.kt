@@ -23,7 +23,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainMenu(
-    changelogShown: Boolean = true,
+    lastInputShown: Boolean = true,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -41,7 +41,7 @@ fun MainMenu(
         ) {
             BadgedBox(
                 badge = {
-                    if (!changelogShown) {
+                    if (!lastInputShown) {
                         Badge()
                     }
                 },
@@ -77,7 +77,7 @@ fun MainMenu(
                 leadingIcon = {
                     BadgedBox(
                         badge = {
-                            if (!changelogShown) {
+                            if (!lastInputShown) {
                                 Badge()
                             }
                         },
@@ -122,7 +122,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface(Modifier.size(200.dp, 400.dp)) {
             MainMenu(
-                changelogShown = false,
+                lastInputShown = false,
                 onNavigateToAboutScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},
@@ -139,7 +139,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface(Modifier.size(200.dp, 400.dp)) {
             MainMenu(
-                changelogShown = false,
+                lastInputShown = false,
                 onNavigateToAboutScreen = {},
                 onNavigateToFaqScreen = {},
                 onNavigateToIntroScreen = {},

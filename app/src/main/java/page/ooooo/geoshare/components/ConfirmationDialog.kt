@@ -51,7 +51,7 @@ fun ConfirmationDialog(
 private fun DefaultPreview() {
     AppTheme {
         ConfirmationScaffold(
-            changelogShown = true,
+            lastInputShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
@@ -76,7 +76,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         ConfirmationScaffold(
-            changelogShown = true,
+            lastInputShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},

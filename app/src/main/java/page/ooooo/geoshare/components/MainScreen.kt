@@ -23,7 +23,6 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainScreen(
-    changelogShown: Boolean,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -32,9 +31,11 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
+    val recentInputsShown by viewModel.lastInputShown.collectAsState()
+
     MainScreen(
         inputUriString = viewModel.inputUriString,
-        changelogShown = changelogShown,
+        lastInputShown = recentInputsShown,
         onUpdateInput = { viewModel.updateInput(it) },
         onStart = { viewModel.start() },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
@@ -50,7 +51,7 @@ fun MainScreen(
 @Composable
 fun MainScreen(
     inputUriString: String,
-    changelogShown: Boolean,
+    lastInputShown: Boolean,
     onUpdateInput: (String) -> Unit,
     onStart: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -70,7 +71,7 @@ fun MainScreen(
                 title = { Text(appName) },
                 actions = {
                     MainMenu(
-                        changelogShown = changelogShown,
+                        lastInputShown = lastInputShown,
                         onNavigateToAboutScreen = onNavigateToAboutScreen,
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
@@ -159,7 +160,7 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            changelogShown = true,
+            lastInputShown = true,
             onUpdateInput = {},
             onStart = {},
             onNavigateToAboutScreen = {},
@@ -178,7 +179,7 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            changelogShown = true,
+            lastInputShown = true,
             onUpdateInput = {},
             onStart = {},
             onNavigateToAboutScreen = {},
@@ -197,7 +198,7 @@ private fun DefaultChangelogBadgedPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            changelogShown = false,
+            lastInputShown = false,
             onUpdateInput = {},
             onStart = {},
             onNavigateToAboutScreen = {},
@@ -216,7 +217,7 @@ private fun DarkChangelogBadgedPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            changelogShown = false,
+            lastInputShown = false,
             onUpdateInput = {},
             onStart = {},
             onNavigateToAboutScreen = {},

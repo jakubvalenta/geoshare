@@ -130,7 +130,7 @@ val lastRunVersionCode = NullableIntUserPreference(
     default = 0,
 )
 
-val changelogShownForVersionCode = NullableIntUserPreference(
+val lastInputVersionCode = NullableIntUserPreference(
     title = @Composable {
         stringResource(R.string.user_preferences_changelog_shown_for_version_code_title)
     },
@@ -141,7 +141,7 @@ val changelogShownForVersionCode = NullableIntUserPreference(
 )
 
 data class UserPreferencesValues(
-    var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
+    var lastInputVersionCode: Int? = page.ooooo.geoshare.data.local.preferences.lastInputVersionCode.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = lastRunVersionCode.loading,
 )

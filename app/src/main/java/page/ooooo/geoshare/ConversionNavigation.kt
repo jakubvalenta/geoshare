@@ -1,8 +1,6 @@
 package page.ooooo.geoshare
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,7 +9,6 @@ import page.ooooo.geoshare.ui.UrlConvertersScreen
 @Composable
 fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     val navController = rememberNavController()
-    val changelogShown by viewModel.changelogShown.collectAsState()
 
     NavHost(navController = navController, startDestination = "conversion") {
         composable("about") {
@@ -35,7 +32,6 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
         }
         composable("conversion") {
             ConversionScreen(
-                changelogShown = changelogShown,
                 onBack = onFinish,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
@@ -47,7 +43,6 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
             )
         }
         composable("url_converters") {
-            // TODO Set changelog shown
             UrlConvertersScreen(
                 onBack = { navController.navigate("conversion") },
                 viewModel = viewModel,

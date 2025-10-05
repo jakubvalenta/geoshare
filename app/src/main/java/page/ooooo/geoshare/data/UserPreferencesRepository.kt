@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode
+import page.ooooo.geoshare.data.local.preferences.lastInputVersionCode
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import java.io.IOException
@@ -36,7 +36,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
-                changelogShownForVersionCodeValue = changelogShownForVersionCode.getValue(it),
+                lastInputVersionCode = lastInputVersionCode.getValue(it),
                 connectionPermissionValue = connectionPermission.getValue(it),
                 introShownForVersionCodeValue = lastRunVersionCode.getValue(it),
             )
