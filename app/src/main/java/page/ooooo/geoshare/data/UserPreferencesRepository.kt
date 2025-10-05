@@ -36,7 +36,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
-                lastInputVersionCode = lastInputVersionCode.getValue(it),
+                lastInputVersionCodeValue = lastInputVersionCode.getValue(it),
                 connectionPermissionValue = connectionPermission.getValue(it),
                 introShownForVersionCodeValue = lastRunVersionCode.getValue(it),
             )

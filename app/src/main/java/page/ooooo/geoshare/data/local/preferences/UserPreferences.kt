@@ -141,7 +141,7 @@ val lastInputVersionCode = NullableIntUserPreference(
 )
 
 data class UserPreferencesValues(
-    var lastInputVersionCode: Int? = page.ooooo.geoshare.data.local.preferences.lastInputVersionCode.loading,
+    var lastInputVersionCodeValue: Int? = lastInputVersionCode.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = lastRunVersionCode.loading,
 )

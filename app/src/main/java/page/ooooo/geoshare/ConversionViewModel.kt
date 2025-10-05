@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log.e
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -102,7 +103,7 @@ class ConversionViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val lastInputShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.lastInputVersionCode?.let { lastInputVersionCode ->
+        it.lastInputVersionCodeValue?.let { lastInputVersionCode ->
             urlConverters.all { urlConverter ->
                 urlConverter.documentation.inputs.all { input ->
                     input.addedInVersionCode <= lastInputVersionCode
@@ -117,7 +118,8 @@ class ConversionViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val lastInputVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
-        it.lastInputVersionCode
+        stateContext.log.e(null, "lastInputVersionCodeValue=${it.lastInputVersionCodeValue}")
+        it.lastInputVersionCodeValue
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),

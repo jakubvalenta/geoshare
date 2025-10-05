@@ -69,6 +69,22 @@ fun MainMenu(
                 },
             )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.faq_title)) },
+                onClick = {
+                    menuExpanded = false
+                    onNavigateToFaqScreen()
+                },
+                leadingIcon = {},
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.intro_title)) },
+                onClick = {
+                    menuExpanded = false
+                    onNavigateToIntroScreen()
+                },
+                leadingIcon = {},
+            )
+            DropdownMenuItem(
                 text = { Text(stringResource(R.string.url_converters_title)) },
                 onClick = {
                     menuExpanded = false
@@ -85,22 +101,6 @@ fun MainMenu(
                         Icon(imageVector = Icons.Default.Star, contentDescription = null)
                     }
                 },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.faq_title)) },
-                onClick = {
-                    menuExpanded = false
-                    onNavigateToFaqScreen()
-                },
-                leadingIcon = {},
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.intro_title)) },
-                onClick = {
-                    menuExpanded = false
-                    onNavigateToIntroScreen()
-                },
-                leadingIcon = {},
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.about_title)) },

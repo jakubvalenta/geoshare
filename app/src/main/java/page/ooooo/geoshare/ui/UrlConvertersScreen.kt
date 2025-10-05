@@ -3,14 +3,16 @@ package page.ooooo.geoshare.ui
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,14 +23,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.components.ResultCard
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.converters.*
+import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -52,11 +53,12 @@ fun getDocumentations(
     packageManager: PackageManager,
     urlConverters: List<UrlConverter>,
 ): Documentations {
+    Log.e(null, "getDocumentations lastInputVersionCode=$lastInputVersionCode")
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
     var newLastInputVersionCode = 1
     val filteredUrlConverterDocumentations = urlConverters.mapNotNull { urlConverter ->
         val filteredInputs = urlConverter.documentation.inputs.filter { input ->
-            if (filter is Filter.Recent && lastInputVersionCode != null && input.addedInVersionCode <= lastInputVersionCode) {
+            if (filter is Recent && lastInputVersionCode != null && input.addedInVersionCode <= lastInputVersionCode) {
                 return@filter false
             }
             if (input.addedInVersionCode > newLastInputVersionCode) {
@@ -64,17 +66,17 @@ fun getDocumentations(
             }
             if (input is DocumentationInput.Url) {
                 val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
-                if (filter is Filter.Enabled) {
+                if (filter is Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
                     }
-                } else if (filter is Filter.Disabled) {
+                } else if (filter is Disabled) {
                     if (defaultHandlerEnabled) {
                         return@filter false
                     }
                 }
                 defaultHandlersEnabled[input.urlString] = defaultHandlerEnabled
-            } else if (filter is Filter.Disabled) {
+            } else if (filter is Disabled) {
                 return@filter false
             }
             true
@@ -115,43 +117,31 @@ fun UrlConvertersScreen(
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val lastInputShown by viewModel.lastInputShown.collectAsState()
     val lastInputVersionCode by viewModel.lastInputVersionCode.collectAsState()
     val filters = buildList {
+        add(All())
         if (!lastInputShown) {
-            add(Filter.Recent())
+            add(Recent())
         }
-        add(Filter.All())
-        add(Filter.Enabled())
-        add(Filter.Disabled())
+        add(Enabled())
+        add(Disabled())
     }
-    val initialFilter = if (!lastInputShown) Filter.Recent() else Filter.All()
-    var filter by remember { mutableStateOf(initialFilter) }
-    var documentations = getDocumentations(context, filter, lastInputVersionCode, viewModel)
-    val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-        // TODO Test this refresh.
+    var filter by remember { mutableStateOf(if (!lastInputShown) Recent() else All()) }
+    var documentations by remember(filter, lastInputVersionCode) {
+        mutableStateOf(getDocumentations(context, filter, lastInputVersionCode, viewModel))
+    }
+    val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         documentations = getDocumentations(context, filter, lastInputVersionCode, viewModel)
     }
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                viewModel.setLastInputVersionCode(documentations.newLastInputVersionCode)
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
     UrlConvertersScreen(
+        documentations = documentations,
         filter = filter,
         filters = filters,
-        documentations = documentations,
         onBack = onBack,
         onChangeFilter = { filter = it },
+        onSetLastInputVersionCode = { viewModel.setLastInputVersionCode(it) },
         onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
@@ -159,15 +149,21 @@ fun UrlConvertersScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UrlConvertersScreen(
+    documentations: Documentations,
     filter: Filter,
     filters: List<Filter>,
-    documentations: Documentations,
     onBack: () -> Unit,
     onChangeFilter: (filter: Filter) -> Unit,
+    onSetLastInputVersionCode: (newLastInputVersionCode: Int) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
+    Log.e(null, "Recompose")
     val appName = stringResource(R.string.app_name)
     var filterExpanded by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    // onSetLastInputVersionCode(documentations.newLastInputVersionCode)
 
     Scaffold(
         topBar = {
@@ -181,6 +177,17 @@ fun UrlConvertersScreen(
                         )
                     }
                 },
+                actions = {
+                    IconButton(
+                        { onShowOpenByDefaultSettings() },
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            stringResource(R.string.url_converters_settings_button_content_description),
+                        )
+                    }
+                }
             )
         },
     ) { innerPadding ->
@@ -199,11 +206,15 @@ fun UrlConvertersScreen(
                 ),
             )
             Box {
-                FilterChip(
-                    selected = true,
+                ElevatedFilterChip(
+                    selected = false,
                     onClick = { filterExpanded = true },
                     label = { Text(stringResource(filter.titleResId, appName)) },
                     trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
+                    colors = FilterChipDefaults.elevatedFilterChipColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        labelColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 )
                 DropdownMenu(
                     expanded = filterExpanded,
@@ -215,19 +226,48 @@ fun UrlConvertersScreen(
                             onClick = {
                                 filterExpanded = false
                                 onChangeFilter(it)
+                                scope.launch {
+                                    listState.scrollToItem(0)
+                                }
                             },
                         )
                     }
                 }
             }
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            if (filter is Recent) {
+                ElevatedCard(
+                    shape = OutlinedTextFieldDefaults.shape,
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    ),
+                ) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(Spacing.small),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        BadgedBox(badge = { Badge() }) {
+                            Icon(Icons.Default.Notifications, null)
+                        }
+                        Text(
+                            stringResource(R.string.url_converters_recent_info, appName),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            ) {
                 documentations.documentations.forEach { urlConverterDocumentation ->
                     item {
                         Text(
                             stringResource(urlConverterDocumentation.nameResId),
-                            Modifier
-                                .fillMaxWidth()
-                                .background(color = MaterialTheme.colorScheme.surface),
+                            Modifier.padding(top = Spacing.tiny),
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     }
@@ -242,53 +282,27 @@ fun UrlConvertersScreen(
                                 }
 
                                 is DocumentationInput.Url -> {
-                                    val defaultHandlerEnabled =
-                                        documentations.defaultHandlersEnabled.getOrDefault(
-                                            input.urlString, false
+                                    val defaultHandlerEnabled = documentations.defaultHandlersEnabled.getOrDefault(
+                                        input.urlString, false
+                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            trimHttps(input.urlString),
+                                            Modifier.weight(1f),
+                                            style = MaterialTheme.typography.bodyMedium,
                                         )
-                                    if (defaultHandlerEnabled) {
-                                        Column {
-                                            Text(
-                                                trimHttps(input.urlString),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                            )
-                                            Text(
-                                                stringResource(
-                                                    R.string.url_converters_default_handler_enabled,
-                                                    appName,
-                                                ),
-                                                Modifier.padding(vertical = Spacing.tiny),
-                                                style = MaterialTheme.typography.bodySmall,
-                                            )
-                                        }
-                                    } else {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Column(Modifier.weight(1f)) {
-                                                Text(
-                                                    trimHttps(input.urlString),
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                )
-                                                Text(
-                                                    stringResource(
-                                                        R.string.url_converters_default_handler_disabled,
-                                                        appName,
-                                                    ),
-                                                    Modifier.padding(vertical = Spacing.tiny),
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                )
-                                            }
-                                            VerticalDivider(
-                                                Modifier
-                                                    .height(26.dp)
-                                                    .padding(end = 12.dp)
-                                            )
-                                            IconButton({ onShowOpenByDefaultSettings() }) {
-                                                Icon(
-                                                    Icons.Default.Settings,
-                                                    stringResource(R.string.url_converters_settings_button_content_description),
-                                                )
-                                            }
-                                        }
+                                        Text(
+                                            stringResource(
+                                                if (defaultHandlerEnabled) {
+                                                    R.string.url_converters_default_handler_enabled
+                                                } else {
+                                                    R.string.url_converters_default_handler_disabled
+                                                },
+                                                appName,
+                                            ),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                        )
                                     }
                                 }
                             }
@@ -307,8 +321,8 @@ fun UrlConvertersScreen(
 private fun DefaultPreview() {
     AppTheme {
         UrlConvertersScreen(
-            filter = Filter.Recent(),
-            filters = listOf(Filter.Recent(), Filter.All(), Filter.Enabled(), Filter.Disabled()),
+            filter = Recent(),
+            filters = listOf(Recent(), All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
@@ -323,6 +337,7 @@ private fun DefaultPreview() {
             ),
             onBack = {},
             onChangeFilter = {},
+            onSetLastInputVersionCode = {},
             onShowOpenByDefaultSettings = {},
         )
     }
@@ -333,8 +348,8 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         UrlConvertersScreen(
-            filter = Filter.Recent(),
-            filters = listOf(Filter.Recent(), Filter.All(), Filter.Enabled(), Filter.Disabled()),
+            filter = Recent(),
+            filters = listOf(Recent(), All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
@@ -349,6 +364,61 @@ private fun DarkPreview() {
             ),
             onBack = {},
             onChangeFilter = {},
+            onSetLastInputVersionCode = {},
+            onShowOpenByDefaultSettings = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AllPreview() {
+    AppTheme {
+        UrlConvertersScreen(
+            filter = All(),
+            filters = listOf(All(), Enabled(), Disabled()),
+            documentations = Documentations(
+                documentations = listOf(
+                    GeoUrlConverter(),
+                    AppleMapsUrlConverter(),
+                    CoordinatesUrlConverter(),
+                ).map { it.documentation },
+                defaultHandlersEnabled = mapOf(
+                    "https://maps.apple" to true,
+                    "https://maps.apple.com" to false,
+                ),
+                newLastInputVersionCode = 20,
+            ),
+            onBack = {},
+            onChangeFilter = {},
+            onSetLastInputVersionCode = {},
+            onShowOpenByDefaultSettings = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkAllPreview() {
+    AppTheme {
+        UrlConvertersScreen(
+            filter = All(),
+            filters = listOf(All(), Enabled(), Disabled()),
+            documentations = Documentations(
+                documentations = listOf(
+                    GeoUrlConverter(),
+                    AppleMapsUrlConverter(),
+                    CoordinatesUrlConverter(),
+                ).map { it.documentation },
+                defaultHandlersEnabled = mapOf(
+                    "https://maps.apple" to true,
+                    "https://maps.apple.com" to false,
+                ),
+                newLastInputVersionCode = 20,
+            ),
+            onBack = {},
+            onChangeFilter = {},
+            onSetLastInputVersionCode = {},
             onShowOpenByDefaultSettings = {},
         )
     }

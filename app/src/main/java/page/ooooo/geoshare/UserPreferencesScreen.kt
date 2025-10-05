@@ -75,7 +75,7 @@ fun UserPreferencesScreen(
                 UserPreferencesItem(
                     viewModel,
                     lastInputVersionCode,
-                    userPreferencesValues.lastInputVersionCode,
+                    userPreferencesValues.lastInputVersionCodeValue,
                 )
             }
         }
