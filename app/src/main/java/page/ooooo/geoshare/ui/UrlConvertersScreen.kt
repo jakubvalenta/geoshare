@@ -3,11 +3,11 @@ package page.ooooo.geoshare.ui
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
@@ -53,7 +54,6 @@ private fun getDocumentations(
     packageManager: PackageManager,
     urlConverters: List<UrlConverter>,
 ): Documentations {
-    Log.e(null, "getDocumentations lastInputVersionCode=$lastInputVersionCode")
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
     var newLastInputVersionCode = 1
     val filteredUrlConverterDocumentations = urlConverters.mapNotNull { urlConverter ->
@@ -169,28 +169,24 @@ private fun UrlConvertersScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.url_converters_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.nav_back_content_description)
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        { onShowOpenByDefaultSettings() },
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                    ) {
-                        Icon(
-                            Icons.Default.Settings,
-                            stringResource(R.string.url_converters_settings_button_content_description),
-                        )
-                    }
+            TopAppBar(title = { Text(stringResource(R.string.url_converters_title)) }, navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.nav_back_content_description)
+                    )
                 }
-            )
+            }, actions = {
+                IconButton(
+                    { onShowOpenByDefaultSettings() },
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                ) {
+                    Icon(
+                        Icons.Default.Settings,
+                        stringResource(R.string.url_converters_settings_button_content_description),
+                    )
+                }
+            })
         },
     ) { innerPadding ->
         Column(
@@ -198,7 +194,7 @@ private fun UrlConvertersScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = Spacing.windowPadding)
-                .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.small)
+                .fillMaxWidth(),
         ) {
             Text(
                 stringResource(R.string.url_converters_text, appName),
@@ -212,6 +208,7 @@ private fun UrlConvertersScreen(
                     selected = false,
                     onClick = { filterExpanded = true },
                     label = { Text(stringResource(filter.titleResId, appName)) },
+                    modifier = Modifier.padding(vertical = Spacing.medium - 7.dp),
                     trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
                     colors = FilterChipDefaults.elevatedFilterChipColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -238,6 +235,7 @@ private fun UrlConvertersScreen(
             }
             if (filter is Recent) {
                 ElevatedCard(
+                    Modifier.padding(bottom = Spacing.medium),
                     shape = OutlinedTextFieldDefaults.shape,
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -261,50 +259,58 @@ private fun UrlConvertersScreen(
                     }
                 }
             }
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(Spacing.small),
-            ) {
+            LazyColumn(state = listState) {
                 documentations.documentations.forEach { urlConverterDocumentation ->
                     item {
                         Text(
                             stringResource(urlConverterDocumentation.nameResId),
-                            Modifier.padding(top = Spacing.tiny),
-                            style = MaterialTheme.typography.headlineSmall,
+                            Modifier.padding(bottom = Spacing.small),
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
-                    urlConverterDocumentation.inputs.forEach { input ->
-                        item {
-                            when (input) {
-                                is DocumentationInput.Text -> {
-                                    Text(
-                                        stringResource(input.descriptionResId),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                }
+                    item {
+                        Column(
+                            Modifier.padding(bottom = Spacing.medium),
+                            verticalArrangement = Arrangement.spacedBy(1.dp),
+                        ) {
+                            urlConverterDocumentation.inputs.forEach { input ->
+                                when (input) {
+                                    is DocumentationInput.Text -> {
+                                        Text(
+                                            stringResource(input.descriptionResId),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                        )
+                                    }
 
-                                is DocumentationInput.Url -> {
-                                    val defaultHandlerEnabled = documentations.defaultHandlersEnabled.getOrDefault(
-                                        input.urlString, false
-                                    )
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            trimHttps(input.urlString),
-                                            Modifier.weight(1f),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                        )
-                                        Text(
-                                            stringResource(
-                                                if (defaultHandlerEnabled) {
-                                                    R.string.url_converters_default_handler_enabled
-                                                } else {
-                                                    R.string.url_converters_default_handler_disabled
-                                                },
-                                                appName,
-                                            ),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                        )
+                                    is DocumentationInput.Url -> {
+                                        FlowRow(
+                                            Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalArrangement = Arrangement.spacedBy(1.dp),
+                                            itemVerticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Text(
+                                                trimHttps(input.urlString),
+                                                Modifier.padding(end = Spacing.tiny),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                            )
+                                            Text(
+                                                stringResource(
+                                                    if (
+                                                        documentations.defaultHandlersEnabled.getOrDefault(
+                                                            input.urlString, false
+                                                        )
+                                                    ) {
+                                                        R.string.url_converters_default_handler_enabled
+                                                    } else {
+                                                        R.string.url_converters_default_handler_disabled
+                                                    },
+                                                    appName,
+                                                ),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                style = MaterialTheme.typography.bodySmall,
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -328,7 +334,8 @@ private fun DefaultPreview() {
             documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
-                    AppleMapsUrlConverter(),
+                    GoogleMapsUrlConverter(),
+                    OpenStreetMapUrlConverter(),
                     CoordinatesUrlConverter(),
                 ).map { it.documentation },
                 defaultHandlersEnabled = mapOf(
@@ -354,7 +361,8 @@ private fun DarkPreview() {
             documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
-                    AppleMapsUrlConverter(),
+                    GoogleMapsUrlConverter(),
+                    OpenStreetMapUrlConverter(),
                     CoordinatesUrlConverter(),
                 ).map { it.documentation },
                 defaultHandlersEnabled = mapOf(
@@ -380,7 +388,8 @@ private fun AllPreview() {
             documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
-                    AppleMapsUrlConverter(),
+                    GoogleMapsUrlConverter(),
+                    OpenStreetMapUrlConverter(),
                     CoordinatesUrlConverter(),
                 ).map { it.documentation },
                 defaultHandlersEnabled = mapOf(
@@ -406,7 +415,8 @@ private fun DarkAllPreview() {
             documentations = Documentations(
                 documentations = listOf(
                     GeoUrlConverter(),
-                    AppleMapsUrlConverter(),
+                    GoogleMapsUrlConverter(),
+                    OpenStreetMapUrlConverter(),
                     CoordinatesUrlConverter(),
                 ).map { it.documentation },
                 defaultHandlersEnabled = mapOf(

@@ -117,7 +117,6 @@ class ConversionViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val lastInputVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
-        stateContext.log.e(null, "lastInputVersionCodeValue=${it.lastInputVersionCodeValue}")
         it.lastInputVersionCodeValue
     }.stateIn(
         viewModelScope,
