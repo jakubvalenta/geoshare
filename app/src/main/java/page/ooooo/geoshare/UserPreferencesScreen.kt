@@ -55,6 +55,7 @@ fun UserPreferencesScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
+                .imePadding()
                 .padding(horizontal = Spacing.windowPadding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
