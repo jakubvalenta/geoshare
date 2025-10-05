@@ -1,0 +1,32 @@
+分享地圖連結給 Geo Share，該應用程式會自動在你已安裝的其他地圖 App 中開啟它。
+
+<b>支援的地圖連結<b>
+
+- Google 地圖
+- Apple 地圖（測試中）
+- HERE WeGo（測試中）
+- Magic Earth（測試中）
+- Mapy.com（測試中）
+- OpenStreetMap（測試中）
+- OsmAnd（測試中）
+- Waze（測試中）
+- Yandex 地圖（測試中）
+- 座標連結
+
+<b>使用範例<b>
+
+當有人傳給你 Google 地圖的連結，但你更喜歡用 OpenStreetMap，就能快速用 OsmAnd 或 Organic Maps 開啟相同位置。
+
+如果你習慣用 Google 地圖找地點，但導航時想用別的 App，也能輕鬆從 Google 地圖切換到你最喜歡的導航應用程式。
+
+<b>其他功能<b>
+
+- 顯示地圖連結的地理座標，並可將其複製成 geo: 連結格式。
+- 可直接在應用程式內貼上地圖連結，而不必透過分享功能傳入。
+
+<b>運作方式與隱私說明<b>
+
+Geo Share 會將地圖連結（例如 https://maps.app.goo.gl/...）轉換為可供其他地圖 App 開啟的 geo: 連結。
+為了建立 geo: 連結，必須先取得地理座標，因此 Geo Share 會從原始地圖 URL 中擷取座標。
+
+不過，部分地圖連結並不包含座標。這種情況下，Geo Share 會請你授權連結至對應的地圖服務（如 Google 地圖、Apple 地圖等），並從 HTTP 標頭或該連結的 HTML 文件中擷取座標。若想了解更詳細的資訊，可查看應用程式內的常見問題（FAQ）頁面。
