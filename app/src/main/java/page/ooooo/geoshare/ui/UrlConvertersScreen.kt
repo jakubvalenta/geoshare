@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -26,27 +27,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.components.ResultCard
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.converters.*
 import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
-data class Documentations(
+private data class Documentations(
     val documentations: List<Documentation>,
     val defaultHandlersEnabled: Map<String, Boolean>,
     val newLastInputVersionCode: Int,
 )
 
-sealed class Filter(val titleResId: Int) {
+private sealed class Filter(val titleResId: Int) {
     class All : Filter(R.string.url_converters_filter_all)
     class Recent : Filter(R.string.url_converters_filter_recent)
     class Enabled : Filter(R.string.url_converters_default_handler_enabled)
     class Disabled : Filter(R.string.url_converters_default_handler_disabled)
 }
 
-fun getDocumentations(
+private fun getDocumentations(
     filter: Filter,
     intentTools: IntentTools,
     lastInputVersionCode: Int?,
@@ -93,7 +93,7 @@ fun getDocumentations(
     )
 }
 
-fun getDocumentations(
+private fun getDocumentations(
     context: Context,
     filter: Filter,
     lastInputVersionCode: Int?,
@@ -108,7 +108,7 @@ fun getDocumentations(
 
 private val trimHttpsRegex = """^https://""".toRegex()
 
-fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
+private fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
@@ -139,31 +139,33 @@ fun UrlConvertersScreen(
         documentations = documentations,
         filter = filter,
         filters = filters,
-        onBack = onBack,
+        onBack = {
+            viewModel.setLastInputVersionCode(documentations.newLastInputVersionCode)
+            onBack()
+        },
         onChangeFilter = { filter = it },
-        onSetLastInputVersionCode = { viewModel.setLastInputVersionCode(it) },
         onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UrlConvertersScreen(
+private fun UrlConvertersScreen(
     documentations: Documentations,
     filter: Filter,
     filters: List<Filter>,
     onBack: () -> Unit,
     onChangeFilter: (filter: Filter) -> Unit,
-    onSetLastInputVersionCode: (newLastInputVersionCode: Int) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
-    Log.e(null, "Recompose")
     val appName = stringResource(R.string.app_name)
     var filterExpanded by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    // onSetLastInputVersionCode(documentations.newLastInputVersionCode)
+    BackHandler {
+        onBack()
+    }
 
     Scaffold(
         topBar = {
@@ -337,7 +339,6 @@ private fun DefaultPreview() {
             ),
             onBack = {},
             onChangeFilter = {},
-            onSetLastInputVersionCode = {},
             onShowOpenByDefaultSettings = {},
         )
     }
@@ -364,7 +365,6 @@ private fun DarkPreview() {
             ),
             onBack = {},
             onChangeFilter = {},
-            onSetLastInputVersionCode = {},
             onShowOpenByDefaultSettings = {},
         )
     }
@@ -391,7 +391,6 @@ private fun AllPreview() {
             ),
             onBack = {},
             onChangeFilter = {},
-            onSetLastInputVersionCode = {},
             onShowOpenByDefaultSettings = {},
         )
     }
@@ -418,7 +417,6 @@ private fun DarkAllPreview() {
             ),
             onBack = {},
             onChangeFilter = {},
-            onSetLastInputVersionCode = {},
             onShowOpenByDefaultSettings = {},
         )
     }
