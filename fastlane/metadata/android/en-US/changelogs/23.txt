@@ -2,3 +2,4 @@
 - Added OpenStreetMap nodes, relations and ways support.
 - Replaced the "Open original link" button with "Copy original link" and added it to the error screen too.
 - Fixed certain Yandex Maps organization links.
+- Added Traditional Chinese translation.

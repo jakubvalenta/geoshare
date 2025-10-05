@@ -48,6 +48,7 @@ android {
                 "ru",
                 "uk",
                 "zh-rCN",
+                "zh-rTW",
             )
         }
     }
