@@ -15,10 +15,10 @@ import page.ooooo.geoshare.lib.uriPattern
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?magicearth.com/\?\S+""")
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_magic_earth_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Url("https://magicearth.com/", 20),
+            DocumentationInput.Url("https://magicearth.com/", 20),
         ),
     )
 

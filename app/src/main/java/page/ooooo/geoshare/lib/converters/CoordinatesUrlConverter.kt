@@ -24,10 +24,10 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_coordinates_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Text(R.string.converter_coordinates_example, 20),
+            DocumentationInput.Text(R.string.converter_coordinates_example, 20),
         ),
     )
 

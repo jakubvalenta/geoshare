@@ -11,10 +11,10 @@ import page.ooooo.geoshare.lib.uriPattern
 class OsmAndUrlConverter : UrlConverter.WithUriPattern {
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_osm_and_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Url("https://osmand.net/map", 20),
+            DocumentationInput.Url("https://osmand.net/map", 20),
         ),
     )
 

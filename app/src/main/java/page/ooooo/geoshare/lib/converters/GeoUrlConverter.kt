@@ -11,10 +11,10 @@ import page.ooooo.geoshare.lib.uriPattern
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_geo_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Text(R.string.converter_geo_example, 3),
+            DocumentationInput.Text(R.string.converter_geo_example, 3),
         )
     )
     override val conversionUriPattern = uriPattern {

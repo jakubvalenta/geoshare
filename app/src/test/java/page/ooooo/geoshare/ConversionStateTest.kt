@@ -16,7 +16,7 @@ import page.ooooo.geoshare.lib.converters.GeoUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
-import page.ooooo.geoshare.lib.converters.UrlConverterDocumentation
+import page.ooooo.geoshare.lib.converters.Documentation
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.coroutines.cancellation.CancellationException
@@ -210,7 +210,7 @@ class ConversionStateTest {
 
         class MockUrlConverter : UrlConverter.WithUriPattern {
             override val uriPattern: Pattern = Pattern.compile(".")
-            override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+            override val documentation = Documentation(nameResId = -1, inputs = emptyList())
             override val conversionUriPattern: ConversionUriPattern<PositionRegex> = uriPattern {}
         }
 
@@ -578,7 +578,7 @@ class ConversionStateTest {
 
         class MockUrlConverter : UrlConverter.WithShortUriPattern {
             override val uriPattern: Pattern = Pattern.compile(".")
-            override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+            override val documentation = Documentation(nameResId = -1, inputs = emptyList())
             override val shortUriPattern: Pattern = Pattern.compile(".")
             override val shortUriMethod = ShortUriMethod.GET
             override val permissionTitleResId = -1
@@ -828,7 +828,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithShortUriPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val shortUriPattern: Pattern = Pattern.compile(".")
                 override val shortUriMethod = ShortUriMethod.HEAD
                 override val permissionTitleResId = -1
@@ -957,7 +957,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
             }
@@ -1082,7 +1082,7 @@ class ConversionStateTest {
 
         class MockUrlConverter : UrlConverter.WithHtmlPattern {
             override val uriPattern: Pattern = Pattern.compile(".")
-            override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+            override val documentation = Documentation(nameResId = -1, inputs = emptyList())
             override val conversionHtmlPattern = mockHtmlPattern
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
@@ -1124,7 +1124,7 @@ class ConversionStateTest {
 
         class MockUrlConverter : UrlConverter.WithHtmlPattern {
             override val uriPattern: Pattern = Pattern.compile(".")
-            override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+            override val documentation = Documentation(nameResId = -1, inputs = emptyList())
             override val conversionHtmlPattern = mockHtmlPattern
             override fun getHtmlUrl(uri: Uri): URL = htmlUrl
             override val permissionTitleResId = -1
@@ -1168,7 +1168,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val conversionHtmlPattern = mockHtmlPattern
                 override fun getHtmlUrl(uri: Uri) = null
                 override val permissionTitleResId = -1
@@ -1216,7 +1216,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val conversionHtmlPattern = mockHtmlPattern
                 override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
                 override val permissionTitleResId = -1
@@ -1264,7 +1264,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val conversionHtmlPattern = mockHtmlPattern
                 override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
                 override val permissionTitleResId = -1
@@ -1310,7 +1310,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val conversionHtmlPattern = mockHtmlPattern
                 override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
                 override val permissionTitleResId = -1
@@ -1353,7 +1353,7 @@ class ConversionStateTest {
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
                 override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = UrlConverterDocumentation(nameResId = -1, inputs = emptyList())
+                override val documentation = Documentation(nameResId = -1, inputs = emptyList())
                 override val conversionHtmlPattern = mockHtmlPattern
                 override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
                 override val permissionTitleResId = -1

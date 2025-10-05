@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui
 
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,9 +24,74 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.converters.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
+
+data class UrlConverterDocumentations(
+    val documentations: List<Documentation>,
+    val defaultHandlersEnabled: Map<String, Boolean>,
+)
+
+sealed class UrlConverterDocumentationFilter(val titleResId: Int) {
+    class All : UrlConverterDocumentationFilter(R.string.url_converters_filter_all)
+    class Recent : UrlConverterDocumentationFilter(R.string.url_converters_filter_recent)
+    class Enabled : UrlConverterDocumentationFilter(R.string.url_converters_default_handler_enabled)
+    class Disabled : UrlConverterDocumentationFilter(R.string.url_converters_default_handler_disabled)
+}
+
+val urlConverterDocumentationFilters = listOf(
+    UrlConverterDocumentationFilter.All(),
+    UrlConverterDocumentationFilter.Recent(),
+    UrlConverterDocumentationFilter.Enabled(),
+    UrlConverterDocumentationFilter.Disabled(),
+)
+
+fun getUrlConverterDocumentations(
+    urlConverters: List<UrlConverter>,
+    filter: UrlConverterDocumentationFilter,
+    intentTools: IntentTools,
+    changelogShownForVersionCode: Int?,
+    packageManager: PackageManager,
+): UrlConverterDocumentations {
+    val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
+    val filteredUrlConverterDocumentations = urlConverters.mapNotNull { urlConverter ->
+        val filteredInputs = urlConverter.documentation.inputs.filter { input ->
+            if (filter is UrlConverterDocumentationFilter.Recent && (changelogShownForVersionCode == null || input.addedInVersionCode > changelogShownForVersionCode)) {
+                return@filter false
+            }
+            if (input is DocumentationInput.Url) {
+                val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
+                if (filter is UrlConverterDocumentationFilter.Enabled) {
+                    if (!defaultHandlerEnabled) {
+                        return@filter false
+                    }
+                } else if (filter is UrlConverterDocumentationFilter.Disabled) {
+                    if (defaultHandlerEnabled) {
+                        return@filter false
+                    }
+                }
+                defaultHandlersEnabled[input.urlString] = defaultHandlerEnabled
+            } else if (filter is UrlConverterDocumentationFilter.Disabled) {
+                return@filter false
+            }
+            true
+        }
+        if (filteredInputs.isEmpty()) {
+            return@mapNotNull null
+        }
+        urlConverter.documentation.copy(inputs = filteredInputs)
+    }
+    return UrlConverterDocumentations(
+        documentations = filteredUrlConverterDocumentations,
+        defaultHandlersEnabled = defaultHandlersEnabled.toMap(),
+    )
+}
+
+private val trimHttpsRegex = """^https://""".toRegex()
+
+fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
@@ -141,14 +207,14 @@ fun UrlConvertersScreen(
                     urlConverterDocumentation.inputs.forEach { input ->
                         item {
                             when (input) {
-                                is UrlConverterDocumentationInput.Text -> {
+                                is DocumentationInput.Text -> {
                                     Text(
                                         stringResource(input.descriptionResId),
                                         style = MaterialTheme.typography.bodyMedium,
                                     )
                                 }
 
-                                is UrlConverterDocumentationInput.Url -> {
+                                is DocumentationInput.Url -> {
                                     val defaultHandlerEnabled =
                                         urlConverterDocumentations.defaultHandlersEnabled.getOrDefault(
                                             input.urlString, false
@@ -206,10 +272,6 @@ fun UrlConvertersScreen(
         }
     }
 }
-
-private val trimHttpsRegex = """^https://""".toRegex()
-
-fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
 
 // Previews
 

@@ -22,11 +22,11 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
 
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_apple_maps_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Url("https://maps.apple", 18),
-            UrlConverterDocumentationInput.Url("https://maps.apple.com", 18),
+            DocumentationInput.Url("https://maps.apple", 18),
+            DocumentationInput.Url("https://maps.apple.com", 18),
         ),
     )
 

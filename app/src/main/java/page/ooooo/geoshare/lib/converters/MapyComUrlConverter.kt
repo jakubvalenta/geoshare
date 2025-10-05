@@ -18,13 +18,13 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
 
     override val uriPattern: Pattern =
         Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_mapy_com_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Url("https://mapy.com", 23),
-            UrlConverterDocumentationInput.Url("https://mapy.cz", 23),
-            UrlConverterDocumentationInput.Url("https://www.mapy.com", 23),
-            UrlConverterDocumentationInput.Url("https://www.mapy.cz", 23),
+            DocumentationInput.Url("https://mapy.com", 23),
+            DocumentationInput.Url("https://mapy.cz", 23),
+            DocumentationInput.Url("https://www.mapy.com", 23),
+            DocumentationInput.Url("https://www.mapy.cz", 23),
         ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")

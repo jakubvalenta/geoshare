@@ -20,13 +20,13 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
-    override val documentation = UrlConverterDocumentation(
+    override val documentation = Documentation(
         nameResId = R.string.converter_here_wego_name,
         inputs = listOf(
-            UrlConverterDocumentationInput.Url("https://share.here.com/l/", 20),
-            UrlConverterDocumentationInput.Url("https://share.here.com/p/", 20),
-            UrlConverterDocumentationInput.Url("https://wego.here.com/", 20),
-            UrlConverterDocumentationInput.Url("https://wego.here.com/p/", 20),
+            DocumentationInput.Url("https://share.here.com/l/", 20),
+            DocumentationInput.Url("https://share.here.com/p/", 20),
+            DocumentationInput.Url("https://wego.here.com/", 20),
+            DocumentationInput.Url("https://wego.here.com/p/", 20),
         ),
     )
 
