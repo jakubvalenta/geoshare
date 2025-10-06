@@ -13,21 +13,7 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     NavHost(navController = navController, startDestination = "conversion") {
         composable("about") {
             AboutScreen(
-                onBack = { navController.navigate("conversion") },
-            )
-        }
-        composable("faq") {
-            FaqScreen(
-                onBack = { navController.navigate("conversion") },
-            )
-        }
-        composable("intro") {
-            IntroScreen(
-                onCloseIntro = {
-                    viewModel.setIntroShown()
-                    navController.navigate("conversion")
-                },
-                viewModel = viewModel,
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
             )
         }
         composable("conversion") {
@@ -42,15 +28,26 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 viewModel = viewModel,
             )
         }
+        composable("faq") {
+            FaqScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+            )
+        }
+        composable("intro") {
+            IntroScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                viewModel = viewModel,
+            )
+        }
         composable("url_converters") {
             UrlConvertersScreen(
-                onBack = { navController.navigate("conversion") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
                 viewModel = viewModel,
             )
         }
         composable("user_preferences") {
             UserPreferencesScreen(
-                onBack = { navController.navigate("conversion") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
                 viewModel = viewModel,
             )
         }

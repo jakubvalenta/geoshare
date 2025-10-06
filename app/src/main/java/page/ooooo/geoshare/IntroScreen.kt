@@ -1,6 +1,7 @@
 package page.ooooo.geoshare
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
@@ -29,7 +30,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun IntroScreen(
-    onCloseIntro: () -> Unit,
+    onBack: () -> Unit,
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
@@ -40,7 +41,10 @@ fun IntroScreen(
     }
 
     IntroScreen(
-        onCloseIntro = onCloseIntro,
+        onBack = {
+            viewModel.setIntroShown()
+            onBack()
+        },
         onShowOpenByDefaultSettings = {
             viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher)
         },
@@ -52,9 +56,9 @@ fun IntroScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun IntroScreen(
+private fun IntroScreen(
     initialPage: Int = 0,
-    onCloseIntro: () -> Unit,
+    onBack: () -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
     onShowOpenByDefaultSettingsForPackage: (packageName: String) -> Unit,
 ) {
@@ -68,6 +72,17 @@ fun IntroScreen(
     )
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+
+    BackHandler {
+        if (page != 0) {
+            coroutineScope.launch {
+                scrollState.scrollTo(0)
+                page--
+            }
+        } else {
+            onBack()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -148,7 +163,7 @@ fun IntroScreen(
             ) {
                 if (page != pageCount - 1) {
                     TextButton(
-                        { onCloseIntro() },
+                        { onBack() },
                         Modifier.testTag("geoShareIntroScreenCloseButton"),
                     ) {
                         Text(stringResource(R.string.intro_nav_close))
@@ -163,7 +178,7 @@ fun IntroScreen(
                                 page++
                             }
                         } else {
-                            onCloseIntro()
+                            onBack()
                         }
                     },
                     Modifier.testTag("geoShareIntroScreenNextButton"),
@@ -184,7 +199,7 @@ fun IntroScreen(
 }
 
 @Composable
-fun IntroPage(
+private fun IntroPage(
     headline: String,
     page: Int,
     content: @Composable () -> Unit = {},
@@ -207,7 +222,7 @@ fun IntroPage(
 }
 
 @Composable
-fun IntroFigure(
+private fun IntroFigure(
     captionHtml: String,
     content: @Composable () -> Unit = {},
 ) {
@@ -222,7 +237,7 @@ fun IntroFigure(
 }
 
 @Composable
-fun IntroOutlinedButton(
+private fun IntroOutlinedButton(
     onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -238,7 +253,7 @@ fun IntroOutlinedButton(
 private fun PageOnePreview() {
     AppTheme {
         IntroScreen(
-            onCloseIntro = {},
+            onBack = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -250,7 +265,7 @@ private fun PageOnePreview() {
 private fun DarkPageOnePreview() {
     AppTheme {
         IntroScreen(
-            onCloseIntro = {},
+            onBack = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -263,7 +278,7 @@ private fun PageTwoPreview() {
     AppTheme {
         IntroScreen(
             initialPage = 1,
-            onCloseIntro = {},
+            onBack = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -276,7 +291,7 @@ private fun DarkPageTwoPreview() {
     AppTheme {
         IntroScreen(
             initialPage = 1,
-            onCloseIntro = {},
+            onBack = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -288,7 +303,7 @@ private fun DarkPageTwoPreview() {
 private fun TabletPageOnePreview() {
     AppTheme {
         IntroScreen(
-            onCloseIntro = {},
+            onBack = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )

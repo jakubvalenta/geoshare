@@ -26,20 +26,28 @@ fun MainNavigation(viewModel: ConversionViewModel) {
     NavHost(navController = navController, startDestination = "main") {
         composable("about") {
             AboutScreen(
-                onBack = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
+            )
+        }
+        composable("conversion") {
+            ConversionScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
+                onNavigateToAboutScreen = { navController.navigate("about") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
+                onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
+                onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                viewModel = viewModel,
             )
         }
         composable("faq") {
             FaqScreen(
-                onBack = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
             )
         }
         composable("intro") {
             IntroScreen(
-                onCloseIntro = {
-                    viewModel.setIntroShown()
-                    navController.navigate("main")
-                },
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
                 viewModel = viewModel,
             )
         }
@@ -54,26 +62,15 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 viewModel = viewModel,
             )
         }
-        composable("conversion") {
-            ConversionScreen(
-                onBack = { navController.navigate("main") },
-                onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToFaqScreen = { navController.navigate("faq") },
-                onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
-                onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
-                viewModel = viewModel,
-            )
-        }
         composable("url_converters") {
             UrlConvertersScreen(
-                onBack = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
                 viewModel = viewModel,
             )
         }
         composable("user_preferences") {
             UserPreferencesScreen(
-                onBack = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
                 viewModel = viewModel,
             )
         }
