@@ -69,7 +69,7 @@
     <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
     <string name="url_converters_title">Unterstützte Kartendienste</string>
-    <string name="url_converters_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen:</string>
+    <string name="url_converters_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
     <string name="converter_coordinates_name">Koordinaten</string>
     <string name="converter_coordinates_example">z.B. 41°24′12.2″N 2°10′26.5″E</string>
     <string name="converter_geo_name">geo: URIs</string>
