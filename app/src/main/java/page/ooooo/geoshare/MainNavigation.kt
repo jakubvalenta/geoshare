@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
+import page.ooooo.geoshare.ui.UrlConvertersScreen
 
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel) {
@@ -25,50 +26,51 @@ fun MainNavigation(viewModel: ConversionViewModel) {
     NavHost(navController = navController, startDestination = "main") {
         composable("about") {
             AboutScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
             )
         }
-        composable("faq/{itemId}") { backStackEntry ->
-            val initialExpandedItemId = backStackEntry.arguments?.getString("itemId")?.let {
-                try {
-                    FaqItemId.valueOf(it)
-                } catch (_: IllegalArgumentException) {
-                    null
-                }
-            }
+        composable("conversion") {
+            ConversionScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
+                onNavigateToAboutScreen = { navController.navigate("about") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
+                onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
+                onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("faq") {
             FaqScreen(
-                initialExpandedItemId = initialExpandedItemId,
-                onBack = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
             )
         }
         composable("intro") {
             IntroScreen(
-                onCloseIntro = {
-                    viewModel.setIntroShown()
-                    navController.navigate("main")
-                },
+                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                viewModel = viewModel,
             )
         }
         composable("main") {
             MainScreen(
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToConversionScreen = { navController.navigate("conversion") },
-                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
+                onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
+                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
         }
-        composable("conversion") {
-            ConversionScreen(
-                onBack = { navController.navigate("main") },
-                onNavigateToFaqScreen = { itemId -> navController.navigate("faq/$itemId") },
+        composable("url_converters") {
+            UrlConvertersScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
                 viewModel = viewModel,
             )
         }
         composable("user_preferences") {
             UserPreferencesScreen(
-                onNavigateToMainScreen = { navController.navigate("main") },
+                onBack = { if (!navController.popBackStack()) navController.navigate("main") },
                 viewModel = viewModel,
             )
         }

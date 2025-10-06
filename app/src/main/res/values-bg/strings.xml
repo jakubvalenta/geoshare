@@ -37,7 +37,6 @@
     <string name="user_preferences_connection_option_always">Да</string>
     <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>
     <string name="user_preferences_connection_option_never">Не</string>
-    <string name="user_preferences_last_run_version_code_title">Коя версия на приложението е стартирана последно?</string>
     <string name="conversion_failed_missing_url">Липсващ URL адрес</string>
     <string name="conversion_failed_unshorten_error">Неуспешно разрешаване на кратка връзка</string>
     <string name="conversion_succeeded_apps_not_found">Не е инсталирано приложение за карти</string>
@@ -86,8 +85,11 @@
     <string name="conversion_error_title">Грешка</string>
     <string name="converter_yandex_maps_permission_title">Свържете се с Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Свързване с Yandex…</string>
-    <string name="faq_supported_inputs_headline">Поддържани картографски услуги</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />координати (напр. 41°24′12.2″N 2°10′26.5″E)<br />geo: URI</p>]]></string>
+    <string name="url_converters_title">Поддържани картографски услуги</string>
+    <string name="url_converters_text">Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението.</string>
+    <string name="converter_coordinates_name">координати</string>
+    <string name="converter_coordinates_example">напр. 41°24′12.2″N 2°10′26.5″</string>
+    <string name="converter_geo_name">geo: URI</string>
     <string name="converter_waze_permission_title">Свързване с Waze?</string>
     <string name="converter_waze_loading_indicator_title">Свързване с Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">Копиране на Google Карти</string>

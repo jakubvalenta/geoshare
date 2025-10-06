@@ -16,12 +16,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
+import page.ooooo.geoshare.data.local.preferences.lastInputVersionCode
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -30,7 +31,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun UserPreferencesScreen(
-    onNavigateToMainScreen: () -> Unit = {},
+    onBack: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
@@ -40,7 +41,7 @@ fun UserPreferencesScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.user_preferences_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateToMainScreen) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description),
@@ -54,6 +55,7 @@ fun UserPreferencesScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
+                .imePadding()
                 .padding(horizontal = Spacing.windowPadding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
@@ -70,6 +72,11 @@ fun UserPreferencesScreen(
                     viewModel,
                     lastRunVersionCode,
                     userPreferencesValues.introShownForVersionCodeValue,
+                )
+                UserPreferencesItem(
+                    viewModel,
+                    lastInputVersionCode,
+                    userPreferencesValues.lastInputVersionCodeValue,
                 )
             }
         }

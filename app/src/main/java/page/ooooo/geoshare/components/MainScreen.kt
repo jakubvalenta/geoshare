@@ -6,7 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,31 +14,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.FaqItemId
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainScreen(
-    onNavigateToAboutScreen: () -> Unit = {},
-    onNavigateToConversionScreen: () -> Unit = {},
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit = {},
-    onNavigateToIntroScreen: () -> Unit = {},
-    onNavigateToUserPreferencesScreen: () -> Unit = {},
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToConversionScreen: () -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
+    val recentInputsShown by viewModel.lastInputShown.collectAsState()
+
     MainScreen(
         inputUriString = viewModel.inputUriString,
+        lastInputShown = recentInputsShown,
         onUpdateInput = { viewModel.updateInput(it) },
         onStart = { viewModel.start() },
+        onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToConversionScreen = onNavigateToConversionScreen,
-        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
-        onNavigateToAboutScreen = onNavigateToAboutScreen,
+        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
     )
 }
 
@@ -47,17 +51,18 @@ fun MainScreen(
 @Composable
 fun MainScreen(
     inputUriString: String,
+    lastInputShown: Boolean,
     onUpdateInput: (String) -> Unit,
     onStart: () -> Unit,
-    onNavigateToConversionScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
-    onNavigateToIntroScreen: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
+    onNavigateToConversionScreen: () -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     var errorMessageResId by remember { mutableStateOf<Int?>(null) }
-    var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -65,54 +70,14 @@ fun MainScreen(
             CenterAlignedTopAppBar(
                 title = { Text(appName) },
                 actions = {
-                    Box {
-                        IconButton(
-                            { menuExpanded = true },
-                            Modifier
-                                .padding(end = Spacing.windowPadding - Spacing.builtInTopBarPaddingEnd)
-                                .testTag("geoShareMainMenuButton"),
-                        ) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.nav_menu_content_description),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false },
-                            modifier = Modifier.semantics { testTagsAsResourceId = true },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.user_preferences_title)) },
-                                modifier = Modifier.testTag("geoShareMainMenuUserPreferences"),
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToUserPreferencesScreen()
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.faq_title)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToFaqScreen(null)
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.intro_title)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToIntroScreen()
-                                },
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.about_title)) },
-                                onClick = {
-                                    menuExpanded = false
-                                    onNavigateToAboutScreen()
-                                },
-                            )
-                        }
-                    }
+                    MainMenu(
+                        lastInputShown = lastInputShown,
+                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                    )
                 },
             )
         },
@@ -195,13 +160,15 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            lastInputShown = true,
             onUpdateInput = {},
             onStart = {},
+            onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
-            onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToAboutScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
         )
     }
 }
@@ -212,13 +179,53 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            lastInputShown = true,
             onUpdateInput = {},
             onStart = {},
+            onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
-            onNavigateToUserPreferencesScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DefaultChangelogBadgedPreview() {
+    AppTheme {
+        MainScreen(
+            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            lastInputShown = false,
+            onUpdateInput = {},
+            onStart = {},
             onNavigateToAboutScreen = {},
+            onNavigateToConversionScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkChangelogBadgedPreview() {
+    AppTheme {
+        MainScreen(
+            inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            lastInputShown = false,
+            onUpdateInput = {},
+            onStart = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToConversionScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
         )
     }
 }

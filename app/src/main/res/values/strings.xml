@@ -51,18 +51,31 @@
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
-    <string name="converter_google_maps_permission_title">Connect to Google?</string>
-    <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
-    <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
-    <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
+    <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
+    <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
+    <string name="converter_coordinates_name">coordinates</string>
+    <string name="converter_coordinates_example">e.g. 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="converter_geo_name">geo: URI</string>
+    <string name="converter_geo_example">e.g. geo:50.123456,-11.123456</string>
+    <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
+    <string name="converter_google_maps_name" translatable="false">Google Maps</string>
+    <string name="converter_google_maps_permission_title">Connect to Google?</string>
+    <string name="converter_here_wego_name" translatable="false">HERE WeGo</string>
+    <string name="converter_magic_earth_name" translatable="false">Magic Earth</string>
     <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
-    <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
+    <string name="converter_mapy_com_name" translatable="false">Mapy.com</string>
+    <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
     <string name="converter_open_street_map_loading_indicator_title">Connecting to OpenStreetMap…</string>
-    <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
-    <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
-    <string name="converter_waze_permission_title">Connect to Waze?</string>
+    <string name="converter_open_street_map_name" translatable="false">OpenStreetMap</string>
+    <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
+    <string name="converter_osm_and_name" translatable="false">OsmAnd</string>
     <string name="converter_waze_loading_indicator_title">Connecting to Waze…</string>
+    <string name="converter_waze_name" translatable="false">Waze</string>
+    <string name="converter_waze_permission_title">Connect to Waze?</string>
+    <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
+    <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
+    <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
@@ -80,8 +93,6 @@
     <string name="faq_title">FAQ</string>
     <string name="faq_how_it_works_headline">How it works and privacy considerations</string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</p><br><p>However, not all map URLs include coordinates. In such cases, %1$s will <b>prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.)</b> and retrieve the coordinates from either HTTP headers or the HTML document of the link.</p><br><p>More precisely, there are three scenarios how %1$s converts a map URL into a geo: URI:</p><br><p><b>1.</b></p><br><p>If the map URL already contains geographic coordinates (for example <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), then it’s parsed and no request to the map service’s servers is made.</p><br><p><b>2.</b></p><br><p>If the map URL doesn’t contain geographic coordinates (for example <tt>https://www.google.com/maps/place/Central+Park/</tt>), then %1$s asks you if it can connect to the map service.</p><br><p>If you allow connecting to the map service, then %1$s makes an <b>HTTP GET request</b> to Google Maps (or Apple Maps etc.) and parses the coordinates from the HTML response. You can imagine it as <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>If you don’t allow connecting to the map service, then %1$s creates a geo: link with a place search term (for example <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>If the map URL is a short link (for example <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), then %1$s asks you if it can connect to the map service.</p><br><p>If you allow connecting to the map service, then %1$s makes an <b>HTTP HEAD request</b> to the short link and reads the full link from the response headers. You can imagine it as <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. Then %1$s continues with scenario 1 or 2, depending on whether the full link contains coordinates or not. In case of scenario 2, another connection to the map service will be made, but this time without asking.</p><br><p>If you don’t allow connecting to the map service, then %1$s cancels the creation of the geo: link.</p><br><br><p>To permanently allow or deny connecting to the map service instead of always asking (the default), go to the app’s Preferences.</p>]]></string>
-    <string name="faq_supported_inputs_headline">Supported map services</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>You can share the following map links with %1$s or paste them in the app:</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />coordinates (e.g. 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
@@ -90,7 +101,8 @@
     <string name="user_preferences_connection_option_always">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="user_preferences_connection_option_never">No</string>
-    <string name="user_preferences_last_run_version_code_title">Which version of the app was last run?</string>
+    <string name="user_preferences_last_run_version_code_title" translatable="false">Which version of the app was last run?</string>
+    <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
     <string name="conversion_failed_unshorten_error">Failed to resolve short link</string>
     <string name="conversion_failed_unshorten_connection_error">Connection error when resolving short link</string>
@@ -103,4 +115,12 @@
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
     <string name="conversion_succeeded_point_number">point %1$d</string>
+    <string name="url_converters_title">Supported map services</string>
+    <string name="url_converters_text">You can share the following map links with %1$s or paste them in the app.</string>
+    <string name="url_converters_filter_all">All map services</string>
+    <string name="url_converters_filter_recent">Recently added</string>
+    <string name="url_converters_default_handler_enabled">Opens by default in %1$s</string>
+    <string name="url_converters_default_handler_disabled">Doesn’t open by default in %1$s</string>
+    <string name="url_converters_recent_info">%1$s recently got support for new map services.</string>
+    <string name="url_converters_settings_button_content_description">Open Android settings</string>
 </resources>

@@ -2,10 +2,9 @@ package page.ooooo.geoshare.converters
 
 import androidx.test.filters.RequiresDevice
 import org.junit.Test
-import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
-class GoogleMapsUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Launch app and set connection permission to Always

@@ -32,6 +32,17 @@
 
                 <data android:mimeType="text/plain"/>
             </intent-filter>
+            <!-- Apple Maps -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="maps.apple.com"
+                        android:scheme="https"/>
+            </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -42,6 +53,16 @@
                         android:host="maps.apple"
                         android:scheme="https"/>
             </intent-filter>
+            <!-- Geo -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="geo"/>
+            </intent-filter>
+            <!-- Google Maps -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -117,26 +138,7 @@
                         android:pathPrefix="/kgs"
                         android:scheme="https"/>
             </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="maps.apple.com"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="maps.apple"
-                        android:scheme="https"/>
-            </intent-filter>
+            <!-- Here WeGo -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -181,6 +183,117 @@
                         android:pathPrefix="/p/"
                         android:scheme="https"/>
             </intent-filter>
+            <!-- Magic Earth -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="magicearth.com"
+                        android:path="/"
+                        android:scheme="https"/>
+            </intent-filter>
+            <!-- Mapy.com -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="mapy.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="mapy.cz"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.mapy.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.mapy.cz"
+                        android:scheme="https"/>
+            </intent-filter>
+            <!-- OpenStreetMap -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.openstreetmap.org"
+                        android:path="/"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.openstreetmap.org"
+                        android:pathPrefix="/node"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.openstreetmap.org"
+                        android:pathPrefix="/relation"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="www.openstreetmap.org"
+                        android:pathPrefix="/way"
+                        android:scheme="https"/>
+            </intent-filter>
+            <!-- OsmAnd -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="osmand.net"
+                        android:path="/map"
+                        android:scheme="https"/>
+            </intent-filter>
+            <!-- Waze -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -222,7 +335,7 @@
 
                 <data
                         android:host="www.waze.com"
-                        android:pathPrefix="/ul*"
+                        android:pathPrefix="/ul"
                         android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
@@ -236,6 +349,7 @@
                         android:pathPrefix="/ul"
                         android:scheme="https"/>
             </intent-filter>
+            <!-- Yandex -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -465,120 +579,6 @@
                 <data
                         android:host="yandex.uz"
                         android:pathPrefix="/maps"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data android:scheme="geo"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="magicearth.com"
-                        android:path="/"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="mapy.com"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="mapy.cz"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.mapy.com"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.mapy.cz"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="osmand.net"
-                        android:path="/map"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.openstreetmap.org"
-                        android:path="/"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.openstreetmap.org"
-                        android:pathPrefix="/node"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.openstreetmap.org"
-                        android:pathPrefix="/relation"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="www.openstreetmap.org"
-                        android:pathPrefix="/way"
                         android:scheme="https"/>
             </intent-filter>
         </activity>

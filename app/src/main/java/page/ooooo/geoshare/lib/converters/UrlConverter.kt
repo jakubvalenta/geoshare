@@ -4,10 +4,18 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.*
 import java.net.URL
 
+data class Documentation(val nameResId: Int, val inputs: List<DocumentationInput>)
+
+sealed class DocumentationInput(val addedInVersionCode: Int) {
+    class Text(val descriptionResId: Int, addedInVersionCode: Int) : DocumentationInput(addedInVersionCode)
+    class Url(val urlString: String, addedInVersionCode: Int) : DocumentationInput(addedInVersionCode)
+}
+
 enum class ShortUriMethod { GET, HEAD }
 
 sealed interface UrlConverter {
     val uriPattern: Pattern
+    val documentation: Documentation
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern

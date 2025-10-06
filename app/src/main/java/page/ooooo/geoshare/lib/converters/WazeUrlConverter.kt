@@ -28,6 +28,16 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
+    override val documentation = Documentation(
+        nameResId = R.string.converter_waze_name,
+        inputs = listOf(
+            DocumentationInput.Url("https://waze.com/live-map", 21),
+            DocumentationInput.Url("https://waze.com/ul", 21),
+            DocumentationInput.Url("https://www.waze.com/live-map", 21),
+            DocumentationInput.Url("https://www.waze.com/ul", 21),
+            DocumentationInput.Url("https://ul.waze.com/ul", 21),
+        ),
+    )
 
     override val conversionUriPattern = uriPattern {
         all {

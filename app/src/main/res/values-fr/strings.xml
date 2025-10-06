@@ -44,7 +44,6 @@
     <string name="user_preferences_connection_option_always">Oui</string>
     <string name="user_preferences_connection_option_ask">Demandez avant de vous connecter</string>
     <string name="user_preferences_connection_option_never">Non</string>
-    <string name="user_preferences_last_run_version_code_title">Quelle version de l’application a été exécutée en dernier ?</string>
     <string name="conversion_failed_missing_url">URL manquante</string>
     <string name="conversion_failed_unshorten_error">Impossible de résoudre le lien court</string>
     <string name="conversion_failed_unshorten_connection_error">Erreur de connexion lors de la résolution du lien court</string>
@@ -88,8 +87,11 @@
     <string name="conversion_error_title">Erreur</string>
     <string name="converter_yandex_maps_permission_title">Se connecter à Yandex ?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connexion à Yandex…</string>
-    <string name="faq_supported_inputs_headline">Services de cartographie pris en charge</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application :</p><p>Google Maps<br />Apple Maps<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />Yandex Maps<br />coordonnées (par exemple, 41°24′12.2″N 2°10′26.5″E)<br />geo: URIs</p>]]></string>
+    <string name="url_converters_title">Services de cartographie pris en charge</string>
+    <string name="url_converters_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
+    <string name="converter_coordinates_name">coordonnées</string>
+    <string name="converter_coordinates_example">par exemple, 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="converter_geo_name">geo: URIs</string>
     <string name="conversion_succeeded_copy_google_maps">Copier Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Enregistrer GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s résultat %2$s.gpx</string>

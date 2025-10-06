@@ -19,15 +19,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun ResultSuccessCard(
-    geoUriApps: List<ConversionViewModel.App>,
+    geoUriApps: List<IntentTools.App>,
     position: Position,
     onCopy: (String) -> Unit,
     onOpenApp: (String) -> Unit,
@@ -181,7 +181,7 @@ private fun DefaultPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = List(4) { index ->
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map ${index + 1}",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -205,7 +205,7 @@ private fun DarkPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = List(4) { index ->
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map ${index + 1}",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -229,7 +229,7 @@ private fun OneAppPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = listOf(
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -253,7 +253,7 @@ private fun DarkOneAppPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = listOf(
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -277,7 +277,7 @@ private fun ParamsPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = listOf(
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -301,7 +301,7 @@ private fun DarkParamsPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = listOf(
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -325,7 +325,7 @@ private fun PointsPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = listOf(
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -355,7 +355,7 @@ private fun DarkPointsPreview() {
             val context = LocalContext.current
             ResultSuccessCard(
                 geoUriApps = listOf(
-                    ConversionViewModel.App(
+                    IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,

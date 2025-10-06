@@ -49,7 +49,6 @@
     <string name="user_preferences_connection_option_always">نعم</string>
     <string name="user_preferences_connection_option_ask">اسأل قبل الاتصال</string>
     <string name="user_preferences_connection_option_never">لا</string>
-    <string name="user_preferences_last_run_version_code_title">ما هو إصدار التطبيق الذي تم تشغيله آخر مرة؟</string>
     <string name="conversion_failed_missing_url">رابط مفقود</string>
     <string name="conversion_failed_unshorten_connection_error">فشل في حل الرابط القصير</string>
     <string name="conversion_failed_parse_url_error">فشل في معالجة رابط الخريطة</string>
@@ -90,8 +89,11 @@
     <string name="conversion_error_title">خطأ</string>
     <string name="converter_yandex_maps_permission_title">اتصل ب Yandex؟</string>
     <string name="converter_yandex_maps_loading_indicator_title">يتصل ب Yandex…</string>
-    <string name="faq_supported_inputs_headline">خدمات الخرائط المدعومة</string>
-    <string name="faq_supported_inputs_text"><![CDATA[<p>يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق:</p><p>خرائط جوجل<br />خرائط أبل<br />HERE WeGo<br />Magic Earth<br />Mapy.com<br />OpenStreetMap<br />OsmAnd<br />Waze<br />خرائط Yandex<br />الإحداثيات (مثال: 41°24′12.2″N 2°10′26.5″E)<br />معرفات الموارد الموحدة (URIs) الجغرافية</p>]]></string>
+    <string name="url_converters_title">خدمات الخرائط المدعومة</string>
+    <string name="url_converters_text">يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق:</string>
+    <string name="converter_coordinates_name">الإحداثيات</string>
+    <string name="converter_coordinates_example">مثال: 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="converter_geo_name">معرفات الموارد الموحدة (URIs) الجغرافية</string>
     <string name="converter_waze_permission_title">الاتصال ب Waze؟</string>
     <string name="converter_waze_loading_indicator_title">جارِ الاتصال ب Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">انسخ خرائط جوجل</string>

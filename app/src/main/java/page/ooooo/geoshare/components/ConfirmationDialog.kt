@@ -50,7 +50,14 @@ fun ConfirmationDialog(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        ConfirmationScaffold {
+        ConfirmationScaffold(
+            lastInputShown = true,
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        ) {
             ConfirmationDialog(
                 title = "My title",
                 confirmText = "Confirm",
@@ -68,7 +75,14 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        ConfirmationScaffold {
+        ConfirmationScaffold(
+            lastInputShown = true,
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+        ) {
             ConfirmationDialog(
                 title = "My title",
                 confirmText = "Confirm",

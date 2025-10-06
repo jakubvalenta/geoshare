@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.toScale
@@ -23,6 +24,12 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
+    override val documentation = Documentation(
+        nameResId = R.string.converter_coordinates_name,
+        inputs = listOf(
+            DocumentationInput.Text(R.string.converter_coordinates_example, 20),
+        ),
+    )
 
     override val conversionUriPattern = uriPattern {
         // Decimal, e.g. `N 41.40338, E 2.17403`

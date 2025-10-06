@@ -1,21 +1,16 @@
 package page.ooooo.geoshare
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,21 +23,10 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.CoordinatesUrlConverter
-import page.ooooo.geoshare.lib.converters.GeoUrlConverter
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.HereWeGoUrlConverter
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
-import page.ooooo.geoshare.lib.converters.MapyComUrlConverter
-import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
-import page.ooooo.geoshare.lib.converters.OsmAndUrlConverter
-import page.ooooo.geoshare.lib.converters.WazeUrlConverter
-import page.ooooo.geoshare.lib.converters.YandexMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.*
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,24 +34,24 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    data class App(val packageName: String, val label: String, val icon: Drawable)
+    val intentTools = IntentTools()
+    val urlConverters = listOf(
+        GeoUrlConverter(),
+        GoogleMapsUrlConverter(),
+        AppleMapsUrlConverter(),
+        HereWeGoUrlConverter(),
+        MagicEarthUrlConverter(),
+        MapyComUrlConverter(),
+        OpenStreetMapUrlConverter(),
+        OsmAndUrlConverter(),
+        WazeUrlConverter(),
+        YandexMapsUrlConverter(),
+        CoordinatesUrlConverter(),
+    )
 
     val stateContext = ConversionStateContext(
-        urlConverters = listOf(
-            GeoUrlConverter(),
-            GoogleMapsUrlConverter(),
-            AppleMapsUrlConverter(),
-            HereWeGoUrlConverter(),
-            MagicEarthUrlConverter(),
-            MapyComUrlConverter(),
-            OpenStreetMapUrlConverter(),
-            OsmAndUrlConverter(),
-            WazeUrlConverter(),
-            YandexMapsUrlConverter(),
-            CoordinatesUrlConverter(),
-        ),
-        intentTools = IntentTools(),
+        urlConverters = urlConverters,
+        intentTools = intentTools,
         networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
         onStateChange = { newState ->
@@ -117,12 +101,36 @@ class ConversionViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.introShownForVersionCodeValue != lastRunVersionCode.default
+    val lastInputShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
+        it.lastInputVersionCodeValue?.let { lastInputVersionCode ->
+            urlConverters.all { urlConverter ->
+                urlConverter.documentation.inputs.all { input ->
+                    input.addedInVersionCode <= lastInputVersionCode
+                }
+            }
+        } ?: true
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        userPreferencesValues.value.introShownForVersionCodeValue != lastRunVersionCode.default,
+        true,
+    )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val lastInputVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
+        it.lastInputVersionCodeValue
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        page.ooooo.geoshare.data.local.preferences.lastInputVersionCode.default,
+    )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
+        it.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.lastRunVersionCode.default
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        userPreferencesValues.value.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.lastRunVersionCode.default,
     )
 
     fun start() {
@@ -148,50 +156,6 @@ class ConversionViewModel @Inject constructor(
         viewModelScope.launch {
             stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
             transition()
-        }
-    }
-
-    fun queryGeoUriApps(packageManager: PackageManager): List<App> {
-        val resolveInfos = try {
-            packageManager.queryIntentActivities(
-                Intent(Intent.ACTION_VIEW, "geo:".toUri()),
-                PackageManager.MATCH_DEFAULT_ONLY,
-            )
-        } catch (e: Exception) {
-            Log.e(null, "Error when querying apps that support geo: URIs", e)
-            return emptyList()
-        }
-        return resolveInfos.mapNotNull {
-            try {
-                App(
-                    it.activityInfo.packageName,
-                    it.activityInfo.loadLabel(packageManager).toString(),
-                    it.activityInfo.loadIcon(packageManager),
-                )
-            } catch (e: Exception) {
-                Log.e(null, "Error when loading info about an app that supports geo: URIs", e)
-                null
-            }
-        }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
-    }
-
-    fun openApp(context: Context, packageName: String, uriString: String) {
-        try {
-            context.startActivity(
-                stateContext.intentTools.createViewIntent(packageName, uriString.toUri())
-            )
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun openChooser(context: Context, uriString: String) {
-        try {
-            context.startActivity(
-                stateContext.intentTools.createChooserIntent(uriString.toUri())
-            )
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -255,14 +219,18 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun setIntroShown() {
-        setUserPreferenceValue(lastRunVersionCode, BuildConfig.VERSION_CODE)
+    fun setLastInputVersionCode(newLastInputVersionCode: Int) {
+        setUserPreferenceValue(
+            page.ooooo.geoshare.data.local.preferences.lastInputVersionCode,
+            newLastInputVersionCode,
+        )
     }
 
-    fun <T> setUserPreferenceValue(
-        userPreference: UserPreference<T>,
-        value: T,
-    ) {
+    fun setIntroShown() {
+        setUserPreferenceValue(page.ooooo.geoshare.data.local.preferences.lastRunVersionCode, BuildConfig.VERSION_CODE)
+    }
+
+    fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {
         viewModelScope.launch {
             userPreferencesRepository.setValue(userPreference, value)
         }

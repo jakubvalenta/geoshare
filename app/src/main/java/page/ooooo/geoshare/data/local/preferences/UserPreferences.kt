@@ -34,6 +34,7 @@ class NullableIntUserPreference(
     override val key: Preferences.Key<String>,
     override val default: Int?,
     override val loading: Int?,
+    val modifier: Modifier = Modifier,
 ) : UserPreference<Int?> {
     override fun getValue(preferences: Preferences) =
         fromString(preferences[key])
@@ -52,7 +53,7 @@ class NullableIntUserPreference(
                 inputValue = it
                 onValueChange(fromString(it))
             },
-            modifier = Modifier.padding(top = Spacing.tiny),
+            modifier = modifier.padding(top = Spacing.tiny),
         )
     }
 
@@ -79,10 +80,7 @@ class PermissionUserPreference(
     }
 
     @Composable
-    override fun Component(
-        value: Permission,
-        onValueChange: (Permission) -> Unit,
-    ) {
+    override fun Component(value: Permission, onValueChange: (Permission) -> Unit) {
         RadioButtonGroup(
             options = options,
             selectedValue = value,
@@ -130,7 +128,19 @@ val lastRunVersionCode = NullableIntUserPreference(
     default = 0,
 )
 
+val lastInputVersionCode = NullableIntUserPreference(
+    title = @Composable {
+        stringResource(R.string.user_preferences_changelog_shown_for_version_code_title)
+    },
+    description = null,
+    key = stringPreferencesKey("changelog_shown_for_version_code"),
+    loading = null,
+    default = 22,
+    modifier = Modifier.testTag("geoShareUserPreferenceLastInputVersionCode"),
+)
+
 data class UserPreferencesValues(
+    var lastInputVersionCodeValue: Int? = lastInputVersionCode.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = lastRunVersionCode.loading,
 )

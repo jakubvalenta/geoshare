@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,16 +21,32 @@ fun ConfirmationScaffold(
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
+    lastInputShown: Boolean,
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     content: (@Composable (ColumnScope.() -> Unit))? = null,
 ) {
     Scaffold(
-        Modifier.semantics { testTagsAsResourceId = true },
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             TopAppBar(
                 title = {
                     if (title != null) {
                         Text(title)
                     }
+                },
+                actions = {
+                    MainMenu(
+                        lastInputShown = lastInputShown,
+                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                    )
                 },
                 navigationIcon = navigationIcon,
             )

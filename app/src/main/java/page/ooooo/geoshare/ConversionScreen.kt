@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,7 +40,11 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @Composable
 fun ConversionScreen(
     onBack: () -> Unit,
-    onNavigateToFaqScreen: (FaqItemId?) -> Unit,
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     onFinish: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
@@ -49,6 +52,7 @@ fun ConversionScreen(
     val context = LocalContext.current
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
+    val lastInputShown by viewModel.lastInputShown.collectAsState()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.save(context, it)
         onFinish()
@@ -56,10 +60,15 @@ fun ConversionScreen(
 
     ConversionScreen(
         currentState = currentState,
+        lastInputShown = lastInputShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
-        queryGeoUriApps = { context -> viewModel.queryGeoUriApps(context.packageManager) },
+        queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
+        onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
+        onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onCopy = { text ->
@@ -70,11 +79,11 @@ fun ConversionScreen(
             viewModel.launchSave(context, saveLauncher)
         },
         onOpenApp = { packageName, uriString ->
-            viewModel.openApp(context, packageName, uriString)
+            viewModel.intentTools.openApp(context, packageName, uriString)
             onFinish()
         },
         onOpenChooser = { uriString ->
-            viewModel.openChooser(context, uriString)
+            viewModel.intentTools.openChooser(context, uriString)
             onFinish()
         },
         onRetry = { newUriString ->
@@ -92,10 +101,15 @@ fun ConversionScreen(
 @Composable
 fun ConversionScreen(
     currentState: State,
+    lastInputShown: Boolean,
     @StringRes loadingIndicatorTitleResId: Int?,
-    queryGeoUriApps: (context: Context) -> List<ConversionViewModel.App>,
+    queryGeoUriApps: () -> List<IntentTools.App>,
     onBack: () -> Unit,
-    onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
+    onNavigateToAboutScreen: () -> Unit,
+    onNavigateToFaqScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUrlConvertersScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
     onOpenApp: (packageName: String, uriString: String) -> Unit,
@@ -106,7 +120,6 @@ fun ConversionScreen(
     onCancel: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var retryLoadingIndicatorVisible by remember { mutableStateOf(false) }
 
@@ -171,7 +184,13 @@ fun ConversionScreen(
             }
 
             else -> null
-        }
+        },
+        lastInputShown = lastInputShown,
+        onNavigateToAboutScreen = onNavigateToAboutScreen,
+        onNavigateToFaqScreen = onNavigateToFaqScreen,
+        onNavigateToIntroScreen = onNavigateToIntroScreen,
+        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
     ) {
         when {
             (loadingIndicatorTitleResId != null) -> {
@@ -236,7 +255,7 @@ fun ConversionScreen(
                     currentState.errorMessageResId,
                     currentState.inputUriString,
                     retryLoadingIndicatorVisible,
-                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                    onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
                     onRetry = {
                         coroutineScope.launch {
                             // Show a loading indicator for a while to indicate that conversion is being retried.
@@ -251,7 +270,7 @@ fun ConversionScreen(
 
             currentState is HasResult -> {
                 ResultSuccessCard(
-                    queryGeoUriApps(context),
+                    queryGeoUriApps(),
                     currentState.position,
                     onCopy = onCopy,
                     onOpenApp = { packageName ->
@@ -274,10 +293,15 @@ private fun DefaultPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
             ),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -299,10 +323,15 @@ private fun DarkPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
             ),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -331,10 +360,15 @@ private fun PermissionPreview() {
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -363,10 +397,15 @@ private fun DarkPermissionPreview() {
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -388,10 +427,15 @@ private fun ErrorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -413,10 +457,15 @@ private fun DarkErrorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -435,10 +484,15 @@ private fun LoadingIndicatorPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
+            lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -457,10 +511,15 @@ private fun DarkLoadingIndicatorPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
+            lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -479,10 +538,15 @@ private fun InitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
@@ -501,10 +565,15 @@ private fun DarkInitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
+            lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToUrlConvertersScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onGrant = {},
             onDeny = {},
             onOpenApp = { _, _ -> },
