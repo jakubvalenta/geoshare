@@ -211,12 +211,11 @@ private fun UrlConvertersScreen(
                     lineBreak = LineBreak.Paragraph,
                 ),
             )
-            Box {
+            Box(Modifier.padding(vertical = Spacing.medium - 7.dp)) {
                 ElevatedFilterChip(
                     selected = false,
                     onClick = { filterExpanded = true },
                     label = { Text(stringResource(filter.titleResId, appName)) },
-                    modifier = Modifier.padding(vertical = Spacing.medium - 7.dp),
                     trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
                     colors = FilterChipDefaults.elevatedFilterChipColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
