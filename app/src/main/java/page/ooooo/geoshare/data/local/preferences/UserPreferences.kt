@@ -135,7 +135,7 @@ val lastInputVersionCode = NullableIntUserPreference(
     description = null,
     key = stringPreferencesKey("changelog_shown_for_version_code"),
     loading = null,
-    default = 0,
+    default = 22,
     modifier = Modifier.testTag("geoShareUserPreferenceLastInputVersionCode"),
 )
 

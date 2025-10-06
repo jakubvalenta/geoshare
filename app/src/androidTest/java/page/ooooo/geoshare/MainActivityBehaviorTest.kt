@@ -41,11 +41,31 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun urlConvertersScreen_whenFirstOpen_doesNotShowRecentInputAndSavesNewVersionCode() = uiAutomator {
+    fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch app
         launchApplication()
 
         // Close intro
+        pressBack()
+
+        // Shows main menu badge
+        onElement { viewIdResourceName == "geoShareMainMenuBadge" }
+
+        // Go to the url converters screen
+        goToUrlConvertersScreen()
+
+        // Shows url converter that has been added in version 23
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
+
+        // Does not show url converter that has been added in version 20
+        waitForStableInActiveWindow()
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "OsmAnd" })
+
+        // Does not show url converter that has been added in version 5
+        waitForStableInActiveWindow()
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
+
+        // Go to main screen
         pressBack()
 
         // Does not show main menu badge
@@ -55,27 +75,19 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows url converter that has been supporter for a long time
+        // Shows url converter that has been added in version 23
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
+
+        // Shows url converter that has been added in version 20
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "OsmAnd" }
+
+        // Shows url converter that has been added in version 5
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" }
 
-        // Does not show url converter that has recently been added
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" })
-    }
-
-    @Test
-    fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
-        // Launch app
-        launchApplication()
-
-        // Close intro
+        // Go to main screen
         pressBack()
 
-        // Does not show main menu badge
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
-
-        // Set user preference lastInputVersionCode to an old version code
+        // Set user preference lastInputVersionCode to version 19
         goToUserPreferencesScreen()
         onElement { viewIdResourceName == "geoShareUserPreferenceLastInputVersionCode" }.setText("19")
 
@@ -88,18 +100,14 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows url converter that has recently been added
+        // Shows url converter that has been added in version 23
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
 
-        // Does not show url converter that has been supporter for a long time
+        // Shows url converter that has been added in version 20
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "OsmAnd" }
+
+        // Shows url converter that has been added in version 5
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
-
-        // Go to main screen
-        pressBack()
-
-        // Does not show main menu badge
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
     }
 }

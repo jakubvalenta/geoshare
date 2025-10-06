@@ -103,12 +103,11 @@ class ConversionViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val lastInputShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
         it.lastInputVersionCodeValue?.let { lastInputVersionCode ->
-            lastInputVersionCode == page.ooooo.geoshare.data.local.preferences.lastInputVersionCode.default ||
-                    urlConverters.all { urlConverter ->
-                        urlConverter.documentation.inputs.all { input ->
-                            input.addedInVersionCode <= lastInputVersionCode
-                        }
-                    }
+            urlConverters.all { urlConverter ->
+                urlConverter.documentation.inputs.all { input ->
+                    input.addedInVersionCode <= lastInputVersionCode
+                }
+            }
         } ?: true
     }.stateIn(
         viewModelScope,
