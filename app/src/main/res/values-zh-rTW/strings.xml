@@ -52,7 +52,7 @@
     <string name="intro_how_to_share_app_content_description">螢幕截圖關於%1$s的分享畫面</string>
     <string name="conversion_succeeded_apps_headline">用...開啟</string>
     <string name="intro_open_by_default_headline">設定安卓可以在Google地圖或替代的地圖中開啟連結（ 可選擇的）</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>在預設中開啟</i> 然後關閉「在此應用程式中開啟連結」的功能。]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，前往設定&#8594; Apps &#8594; Maps &#8594; <i>在預設中開啟</i> 然後關閉「在此應用程式中開啟連結」的功能。]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Google地圖中預設開啟設定畫面的螢幕截圖</string>
     <string name="intro_open_by_default_google_maps_button">開啟Google地圖設定</string>
     <string name="conversion_failed_cancelled">取消</string>
