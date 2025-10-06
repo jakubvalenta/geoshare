@@ -1,10 +1,9 @@
 package page.ooooo.geoshare.converters
 
 import org.junit.Test
-import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
-class OpenStreetMapUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class OpenStreetMapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Launch app and set connection permission to Always

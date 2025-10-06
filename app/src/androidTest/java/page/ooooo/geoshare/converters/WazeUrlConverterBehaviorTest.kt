@@ -1,10 +1,9 @@
 package page.ooooo.geoshare.converters
 
 import org.junit.Test
-import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
-class WazeUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Launch app and set connection permission to Always

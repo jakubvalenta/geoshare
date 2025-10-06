@@ -1,10 +1,9 @@
 package page.ooooo.geoshare.converters
 
 import org.junit.Test
-import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
-class CoordinatesUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class CoordinatesUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Decimal

@@ -1,11 +1,10 @@
 package page.ooooo.geoshare.converters
 
 import org.junit.Test
-import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
 @Suppress("SpellCheckingInspection")
-class MapyComUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class MapyComUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Launch app and set connection permission to Always

@@ -4,7 +4,7 @@ import org.junit.Test
 import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.Position
 
-class GeoUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
+class GeoUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Coordinates, query and zoom

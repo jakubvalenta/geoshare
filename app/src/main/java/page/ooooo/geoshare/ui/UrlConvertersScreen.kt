@@ -20,7 +20,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
@@ -116,7 +119,6 @@ fun UrlConvertersScreen(
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
-    // TODO Add instrumented test.
     val context = LocalContext.current
     val lastInputShown by viewModel.lastInputShown.collectAsState()
     val lastInputVersionCode by viewModel.lastInputVersionCode.collectAsState()
@@ -169,25 +171,30 @@ private fun UrlConvertersScreen(
     }
 
     Scaffold(
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.url_converters_title)) }, navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            }, actions = {
-                IconButton(
-                    { onShowOpenByDefaultSettings() },
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                ) {
-                    Icon(
-                        Icons.Default.Settings,
-                        stringResource(R.string.url_converters_settings_button_content_description),
-                    )
-                }
-            })
+            TopAppBar(
+                title = { Text(stringResource(R.string.url_converters_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.nav_back_content_description)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        { onShowOpenByDefaultSettings() },
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            stringResource(R.string.url_converters_settings_button_content_description),
+                        )
+                    }
+                },
+            )
         },
     ) { innerPadding ->
         Column(
@@ -236,7 +243,9 @@ private fun UrlConvertersScreen(
             }
             if (filter is Recent) {
                 ElevatedCard(
-                    Modifier.padding(bottom = Spacing.medium),
+                    Modifier
+                        .testTag("geoShareUrlConvertersRecentCard")
+                        .padding(bottom = Spacing.medium),
                     shape = OutlinedTextFieldDefaults.shape,
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -265,7 +274,9 @@ private fun UrlConvertersScreen(
                     item {
                         Text(
                             stringResource(urlConverterDocumentation.nameResId),
-                            Modifier.padding(bottom = Spacing.small),
+                            Modifier
+                                .testTag("geoShareUrlConvertersHeadline")
+                                .padding(bottom = Spacing.small),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
