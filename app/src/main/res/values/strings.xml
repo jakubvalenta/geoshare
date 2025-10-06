@@ -61,7 +61,7 @@
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name" translatable="false">Google Maps</string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
-    <string name="converter_here_wego_name" translatable="false">Here WeGo</string>
+    <string name="converter_here_wego_name" translatable="false">HERE WeGo</string>
     <string name="converter_magic_earth_name" translatable="false">Magic Earth</string>
     <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
     <string name="converter_mapy_com_name" translatable="false">Mapy.com</string>
