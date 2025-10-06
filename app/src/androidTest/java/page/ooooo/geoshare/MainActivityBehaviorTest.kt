@@ -54,14 +54,10 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows url converter that has been added in version 23
+        // Shows only url converter added since version 22
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
-
-        // Does not show url converter that has been added in version 20
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "OsmAnd" })
-
-        // Does not show url converter that has been added in version 5
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" })
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
 
@@ -75,13 +71,9 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows url converter that has been added in version 23
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
-
-        // Shows url converter that has been added in version 20
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "OsmAnd" }
-
-        // Shows url converter that has been added in version 5
+        // Shows all url converters
+        // Don't test Mapy.com, because it's behind the fold
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" }
 
         // Go to main screen
@@ -100,13 +92,9 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows url converter that has been added in version 23
+        // Shows only url converters added since version 19
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
-
-        // Shows url converter that has been added in version 20
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "OsmAnd" }
-
-        // Shows url converter that has been added in version 5
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
     }
