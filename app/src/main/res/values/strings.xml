@@ -121,6 +121,6 @@
     <string name="url_converters_filter_recent">Recently added</string>
     <string name="url_converters_default_handler_enabled">Opens by default in %1$s</string>
     <string name="url_converters_default_handler_disabled">Doesn’t open by default in %1$s</string>
-    <string name="url_converters_recent_info">%1$s supports new map services.</string>
+    <string name="url_converters_recent_info">We’ve recently added support for new map services to %1$s.</string>
     <string name="url_converters_settings_button_content_description">Open Android settings</string>
 </resources>
