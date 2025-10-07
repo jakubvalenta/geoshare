@@ -15,16 +15,12 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         @Suppress("SpellCheckingInspection")
-        const val BASE32 = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
-    }
+        const val BASE32_REGEX = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
 
-    class GeoHashRegex(regex: String) : PositionRegex(regex) {
-        override val points: List<Point>?
-            get() = groupOrNull("hash")?.let { hash ->
-                decodeGeoHash(hash).let { (lat, lon) ->
-                    listOf(lat.toString() to lon.toString())
-                }
-            }
+        @Suppress("SpellCheckingInspection")
+        const val BASE32_CHARS = "0123456789bcdefghjkmnpqrstuvwxyz"
+        const val BASE32_BIT_COUNT = 5
+        val base32Map = BASE32_CHARS.mapIndexed { i, char -> char to i }.toMap()
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
@@ -45,8 +41,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
                 query("z", PositionRegex(Z))
             }
             first {
-                path(GeoHashRegex("""/ul/h$BASE32"""))
-                query("h", GeoHashRegex(BASE32))
+                path(GeoHashPositionRegex("""/ul/h$BASE32_REGEX""", base32Map, BASE32_BIT_COUNT))
+                query("h", GeoHashPositionRegex(BASE32_REGEX, base32Map, BASE32_BIT_COUNT))
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
                 @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))

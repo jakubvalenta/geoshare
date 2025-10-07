@@ -12,9 +12,16 @@ import java.net.URL
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
+        const val MODIFIED_BASE64_REGEX = """(?P<hash>[A-Za-z0-9_~]+)(?P<relativeZoom>-*)"""
+
+        @Suppress("SpellCheckingInspection")
+        const val MODIFIED_BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~"
+        const val MODIFIED_BASE64_BIT_COUNT = 6
+        const val MODIFIED_BASE64_ZOOM_CHAR = '-'
+        val modifiedBase64Map = MODIFIED_BASE64_CHARS.mapIndexed { i, char -> char to i }.toMap()
     }
 
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?openstreetmap\.org/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_open_street_map_name,
         inputs = listOf(
@@ -22,10 +29,20 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
             DocumentationInput.Url("https://www.openstreetmap.org/node", 23),
             DocumentationInput.Url("https://www.openstreetmap.org/relation", 23),
             DocumentationInput.Url("https://www.openstreetmap.org/way", 23),
+            DocumentationInput.Url("https://osm.org/", 23),
+            DocumentationInput.Url("https://osm.org/go/", 23),
         ),
     )
 
     override val conversionUriPattern = uriPattern {
+        path(
+            GeoHashPositionRegex(
+                """/go/$MODIFIED_BASE64_REGEX""",
+                modifiedBase64Map,
+                MODIFIED_BASE64_BIT_COUNT,
+                MODIFIED_BASE64_ZOOM_CHAR,
+            )
+        )
         path(PositionRegex(ELEMENT_PATH))
         fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
     }

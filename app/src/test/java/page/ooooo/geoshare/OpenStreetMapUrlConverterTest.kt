@@ -18,6 +18,7 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/node/6284640534"))
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/relation/910699"))
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/way/596674456"))
+        assertTrue(doesUriPatternMatch("https://osm.org/#map=16/51.49/-0.13"))
     }
 
     @Test
@@ -59,6 +60,26 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position(),
             parseUrl("https://www.openstreetmap.org/way/596674456"),
+        )
+    }
+
+    @Test
+    fun isShortUrl_shortLink() {
+        assertEquals(
+            Position("51.510772705078125", "0.054931640625", z = "9"),
+            parseUrl("https://osm.org/go/0EEQjE--")
+        )
+        assertEquals(
+            Position("51.510772705078125", "0.054931640625", z = "9"),
+            parseUrl("https://openstreetmap.org/go/0EEQjE--")
+        )
+    }
+
+    @Test
+    fun isShortUrl_shortLinkNegative() {
+        assertEquals(
+            Position("-16.23152732849121", "-49.08348083496094", z = "11"),
+            parseUrl("https://osm.org/go/NuJWxJh-")
         )
     }
 
