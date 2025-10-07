@@ -1,5 +1,5 @@
 - Added Mapy.com support.
-- Added OpenStreetMap nodes, relations, ways and osm.org support.
+- Added OpenStreetMap nodes, relations, ways, osm.org and short links support.
 - Added screen with a list of supported map services and information about the recently added ones.
 - Replaced the "Open original link" button with "Copy original link" and added it to the error screen too.
 - Removed the automatic closing of the Coordinates screen to allow the copying of multiple coordinate formats.
