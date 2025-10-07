@@ -40,12 +40,12 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @Composable
 fun ConversionScreen(
     onBack: () -> Unit,
+    onCancel: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
-    onFinish: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
     val clipboard = LocalClipboard.current
@@ -55,7 +55,6 @@ fun ConversionScreen(
     val lastInputShown by viewModel.lastInputShown.collectAsState()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.save(context, it)
-        onFinish()
     }
 
     ConversionScreen(
@@ -64,36 +63,25 @@ fun ConversionScreen(
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
         queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
+        onCancel = {
+            viewModel.cancel()
+            onCancel()
+        },
+        onCopy = { text -> viewModel.copy(context, clipboard, text) },
+        onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
+        onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
         onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-        onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
-        onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
-        onCopy = { text ->
-            viewModel.copy(context, clipboard, text)
-            onFinish()
-        },
-        onSave = {
-            viewModel.launchSave(context, saveLauncher)
-        },
-        onOpenApp = { packageName, uriString ->
-            viewModel.intentTools.openApp(context, packageName, uriString)
-            onFinish()
-        },
-        onOpenChooser = { uriString ->
-            viewModel.intentTools.openChooser(context, uriString)
-            onFinish()
-        },
+        onOpenApp = { packageName, uriString -> viewModel.intentTools.openApp(context, packageName, uriString) },
+        onOpenChooser = { uriString -> viewModel.intentTools.openChooser(context, uriString) },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
             viewModel.start()
         },
-        onCancel = {
-            viewModel.cancel()
-            onFinish()
-        },
+        onSave = { viewModel.launchSave(context, saveLauncher) },
     )
 }
 
@@ -105,23 +93,23 @@ fun ConversionScreen(
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: () -> List<IntentTools.App>,
     onBack: () -> Unit,
+    onCancel: () -> Unit,
+    onCopy: (text: String) -> Unit,
+    onDeny: (doNotAsk: Boolean) -> Unit,
+    onGrant: (doNotAsk: Boolean) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
-    onGrant: (doNotAsk: Boolean) -> Unit,
-    onDeny: (doNotAsk: Boolean) -> Unit,
     onOpenApp: (packageName: String, uriString: String) -> Unit,
     onOpenChooser: (uriString: String) -> Unit,
-    onCopy: (text: String) -> Unit,
-    onSave: () -> Unit,
     onRetry: (newUriString: String) -> Unit,
-    onCancel: () -> Unit,
+    onSave: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
-    var retryLoadingIndicatorVisible by remember { mutableStateOf(false) }
+    val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
 
     ConfirmationScaffold(
         title = when {
@@ -259,9 +247,9 @@ fun ConversionScreen(
                     onRetry = {
                         coroutineScope.launch {
                             // Show a loading indicator for a while to indicate that conversion is being retried.
-                            retryLoadingIndicatorVisible = true
+                            setRetryLoadingIndicator(true)
                             delay(1000)
-                            retryLoadingIndicatorVisible = false
+                            setRetryLoadingIndicator(false)
                             onRetry(currentState.inputUriString)
                         }
                     },
@@ -297,19 +285,19 @@ private fun DefaultPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -327,19 +315,19 @@ private fun DarkPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -364,19 +352,19 @@ private fun PermissionPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -401,19 +389,19 @@ private fun DarkPermissionPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -431,19 +419,19 @@ private fun ErrorPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -461,19 +449,19 @@ private fun DarkErrorPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -488,19 +476,19 @@ private fun LoadingIndicatorPreview() {
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -515,19 +503,19 @@ private fun DarkLoadingIndicatorPreview() {
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -542,19 +530,19 @@ private fun InitialPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }
@@ -569,19 +557,19 @@ private fun DarkInitialPreview() {
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
             onBack = {},
+            onCancel = {},
+            onCopy = {},
+            onDeny = {},
+            onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
-            onGrant = {},
-            onDeny = {},
             onOpenApp = { _, _ -> },
             onOpenChooser = {},
-            onCopy = {},
-            onSave = {},
             onRetry = {},
-            onCancel = {},
+            onSave = {},
         )
     }
 }

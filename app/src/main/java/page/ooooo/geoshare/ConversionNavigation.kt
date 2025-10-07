@@ -19,12 +19,12 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
         composable("conversion") {
             ConversionScreen(
                 onBack = onFinish,
+                onCancel = onFinish,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
-                onFinish = onFinish,
                 viewModel = viewModel,
             )
         }

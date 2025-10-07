@@ -32,6 +32,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("conversion") {
             ConversionScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("main") },
+                onCancel = {},
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
