@@ -102,4 +102,11 @@
     <string name="converter_mapy_com_loading_indicator_title">Verbindung mit Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Mit OpenStreetMap Verbinden?</string>
     <string name="converter_open_street_map_loading_indicator_title">Verbindung mit OpenStreetMap…</string>
+    <string name="converter_geo_example">z.B. geo:50.123456,-11.123456</string>
+    <string name="url_converters_filter_all">Alle Kartendienste</string>
+    <string name="url_converters_filter_recent">Kürzlich hinzugefügt</string>
+    <string name="url_converters_default_handler_enabled">Öffnet standardmäßig in %1$s</string>
+    <string name="url_converters_default_handler_disabled">Öffnet standardmäßig nicht in %1$s</string>
+    <string name="url_converters_recent_info">%1$s hat kürzlich Unterstützung für neue Kartendienste erhalten.</string>
+    <string name="url_converters_settings_button_content_description">Android-Einstellungen öffnen</string>
 </resources>
