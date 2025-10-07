@@ -9,4 +9,6 @@ fun Int.forEachBinaryDigit(bitCount: Int, action: Int.(bit: Int) -> Unit) {
     }
 }
 
+fun Int.isOdd(): Boolean = this and 1 == 0
+
 fun Double.toScale(scale: Int) = this.toBigDecimal().setScale(scale, RoundingMode.HALF_UP).toDouble()

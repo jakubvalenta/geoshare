@@ -91,7 +91,7 @@ class OpenStreetMapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Short URI
         testUri(
-            Position("-16.2315", "-49.0835"),
+            Position("-16.23152732849121", "-49.08348083496094"),
             "https://osm.org/go/NuJWxJh-",
         )
     }

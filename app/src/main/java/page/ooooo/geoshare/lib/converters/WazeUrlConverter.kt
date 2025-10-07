@@ -3,11 +3,14 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.GeoHashPositionRegex
+import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.uriPattern
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -15,12 +18,7 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         @Suppress("SpellCheckingInspection")
-        const val BASE32_REGEX = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
-
-        @Suppress("SpellCheckingInspection")
-        const val BASE32_CHARS = "0123456789bcdefghjkmnpqrstuvwxyz"
-        const val BASE32_BIT_COUNT = 5
-        val base32Map = BASE32_CHARS.mapIndexed { i, char -> char to i }.toMap()
+        const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
@@ -41,8 +39,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
                 query("z", PositionRegex(Z))
             }
             first {
-                path(GeoHashPositionRegex("""/ul/h$BASE32_REGEX""", base32Map, BASE32_BIT_COUNT))
-                query("h", GeoHashPositionRegex(BASE32_REGEX, base32Map, BASE32_BIT_COUNT))
+                path(GeoHashPositionRegex("""/ul/h$HASH"""))
+                query("h", GeoHashPositionRegex(HASH))
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
                 @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))
