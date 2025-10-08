@@ -85,9 +85,9 @@
     <string name="converter_yandex_maps_permission_title">连接到 Yandex？</string>
     <string name="converter_yandex_maps_loading_indicator_title">正在连接到 Yandex…</string>
     <string name="url_converters_title">支持的地图服务</string>
-    <string name="url_converters_text">你可以用 %1$s 分享下列地图链接或在应用中粘贴它们。</string>
+    <string name="url_converters_text">您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中。</string>
     <string name="converter_coordinates_name">坐标</string>
-    <string name="converter_coordinates_example">例如 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="converter_coordinates_example">例如：41°24′12.2″N 2°10′26.5″E</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="conversion_succeeded_copy_google_maps">复制 Google 地图</string>
     <string name="conversion_succeeded_save_gpx">保存 GPX</string>
@@ -101,4 +101,11 @@
     <string name="converter_mapy_com_loading_indicator_title">正在连接到 Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">连接到 OpenStreetMap？</string>
     <string name="converter_open_street_map_loading_indicator_title">正在连接到 OpenStreetMap…</string>
+    <string name="converter_geo_example">例如：geo:50.123456,-11.123456</string>
+    <string name="url_converters_filter_all">所有地图服务</string>
+    <string name="url_converters_filter_recent">最近添加的</string>
+    <string name="url_converters_default_handler_enabled">在 %1$s 中默认打开</string>
+    <string name="url_converters_default_handler_disabled">在 %1$s 中不默认打开</string>
+    <string name="url_converters_recent_info">%1$s 最近支持了新的地图服务。</string>
+    <string name="url_converters_settings_button_content_description">打开 Android 设置</string>
 </resources>
