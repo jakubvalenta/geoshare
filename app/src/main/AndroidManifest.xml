@@ -300,7 +300,7 @@
 
                 <data
                         android:host="osm.org"
-                        android:pathPrefix="/go"
+                        android:pathPrefix="/go/"
                         android:scheme="https"/>
             </intent-filter>
             <!-- OsmAnd -->
