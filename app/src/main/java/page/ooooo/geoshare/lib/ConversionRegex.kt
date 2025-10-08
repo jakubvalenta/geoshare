@@ -76,7 +76,7 @@ class PointsPositionRegex(regex: String) : PositionRegex(regex) {
         }
 }
 
-abstract class HashPositionRegex(regex: String) : PositionRegex(regex) {
+abstract class GeoHashPositionRegex(regex: String) : PositionRegex(regex) {
     abstract fun decode(hash: String): Triple<Double, Double, Int>
 
     private var latLonZCache: Triple<Double, Double, Int>? = null
@@ -88,14 +88,6 @@ abstract class HashPositionRegex(regex: String) : PositionRegex(regex) {
 
     override val points: List<Point>? get() = latLonZ?.let { (lat, lon) -> listOf(lat.toString() to lon.toString()) }
     override val z: String? get() = latLonZ?.third?.toString()
-}
-
-class GeoHashPositionRegex(regex: String) : HashPositionRegex(regex) {
-    override fun decode(hash: String) = decodeGeoHash(hash)
-}
-
-class QuadTilePositionRegex(regex: String) : HashPositionRegex(regex) {
-    override fun decode(hash: String) = decodeQuadTile(hash)
 }
 
 /**

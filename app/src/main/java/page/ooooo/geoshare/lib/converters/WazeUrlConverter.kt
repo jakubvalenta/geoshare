@@ -3,14 +3,11 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.GeoHashPositionRegex
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.htmlPattern
-import page.ooooo.geoshare.lib.uriPattern
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -19,6 +16,13 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     companion object {
         @Suppress("SpellCheckingInspection")
         const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
+    }
+
+    class Base32GeoHashPositionRegex(regex: String) : GeoHashPositionRegex(regex) {
+        override fun decode(hash: String) =
+            decodeBase32GeoHash(hash).let { (lat, lon, z) ->
+                Triple(lat.toScale(6), lon.toScale(6), z)
+            }
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
@@ -39,8 +43,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
                 query("z", PositionRegex(Z))
             }
             first {
-                path(GeoHashPositionRegex("""/ul/h$HASH"""))
-                query("h", GeoHashPositionRegex(HASH))
+                path(Base32GeoHashPositionRegex("""/ul/h$HASH"""))
+                query("h", Base32GeoHashPositionRegex(HASH))
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
                 @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))

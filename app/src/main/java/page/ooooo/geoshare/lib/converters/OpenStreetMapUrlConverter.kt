@@ -15,6 +15,10 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
     }
 
+    class ModifiedBase64GeoHashPositionRegex(regex: String) : GeoHashPositionRegex(regex) {
+        override fun decode(hash: String) = decodeModifiedBase64GeoHash(hash)
+    }
+
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_open_street_map_name,
@@ -29,7 +33,7 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     )
 
     override val conversionUriPattern = uriPattern {
-        path(QuadTilePositionRegex("""/go/$HASH"""))
+        path(ModifiedBase64GeoHashPositionRegex("""/go/$HASH"""))
         path(PositionRegex(ELEMENT_PATH))
         fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
     }
