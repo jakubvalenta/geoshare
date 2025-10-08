@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +20,8 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 data class RadioButtonOption<T>(
     val value: T,
+    val text: String,
     val modifier: Modifier = Modifier,
-    val text: @Composable () -> String,
 )
 
 @Composable
@@ -51,7 +52,7 @@ fun <T> RadioButtonGroup(
                     onClick = null
                 )
                 Text(
-                    text = option.text(),
+                    text = option.text,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = Spacing.small)
                 )
@@ -70,11 +71,32 @@ private fun DefaultPreview() {
             options = listOf(
                 RadioButtonOption(
                     value = 1,
-                    text = { "Foo bar" },
+                    text = "Foo bar",
                 ),
                 RadioButtonOption(
                     value = 2,
-                    text = { "Kotlin is a modern but already mature programming language designed to make developers happier." },
+                    text = "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                ),
+            ),
+            selectedValue = 2,
+            onSelect = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPreview() {
+    AppTheme {
+        RadioButtonGroup(
+            options = listOf(
+                RadioButtonOption(
+                    value = 1,
+                    text = "Foo bar",
+                ),
+                RadioButtonOption(
+                    value = 2,
+                    text = "Kotlin is a modern but already mature programming language designed to make developers happier.",
                 ),
             ),
             selectedValue = 2,

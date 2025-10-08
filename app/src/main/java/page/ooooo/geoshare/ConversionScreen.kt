@@ -32,6 +32,8 @@ import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.components.ResultErrorCard
 import page.ooooo.geoshare.components.ResultSuccessCard
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.AutomaticAction
+import page.ooooo.geoshare.data.local.preferences.AutomaticActionType
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
@@ -51,6 +53,7 @@ fun ConversionScreen(
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+    val automaticAction by viewModel.automaticAction.collectAsState()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val lastInputShown by viewModel.lastInputShown.collectAsState()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -59,6 +62,7 @@ fun ConversionScreen(
 
     ConversionScreen(
         currentState = currentState,
+        automaticAction = automaticAction,
         lastInputShown = lastInputShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
         queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
@@ -89,6 +93,7 @@ fun ConversionScreen(
 @Composable
 fun ConversionScreen(
     currentState: State,
+    automaticAction: AutomaticAction,
     lastInputShown: Boolean,
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: () -> List<IntentTools.App>,
@@ -267,6 +272,31 @@ fun ConversionScreen(
             }
 
             currentState is HasResult -> {
+                when (automaticAction.type) {
+                    AutomaticActionType.NONE -> Unit
+                    AutomaticActionType.COPY_APPLE_MAPS_URI -> onCopy(currentState.position.toAppleMapsUriString())
+                    AutomaticActionType.COPY_COORDS_DEC -> onCopy(currentState.position.toCoordsDecString())
+                    AutomaticActionType.COPY_COORDS_NSWE_DEC -> onCopy(currentState.position.toNorthSouthWestEastDecCoordsString())
+                    AutomaticActionType.COPY_GEO_URI -> onCopy(currentState.position.toGeoUriString())
+                    AutomaticActionType.COPY_GOOGLE_MAPS_URI -> onCopy(currentState.position.toGoogleMapsUriString())
+                    AutomaticActionType.COPY_MAGIC_EARTH_URI -> onCopy(currentState.position.toMagicEarthUriString())
+                    AutomaticActionType.OPEN_APP -> automaticAction.packageName?.takeIf { it.isNotEmpty() }
+                        ?.let { onOpenApp(it, currentState.position.toGeoUriString()) }
+
+                    AutomaticActionType.SAVE_GPX -> onSave()
+                    AutomaticActionType.SHARE -> onOpenChooser(currentState.position.toGeoUriString())
+                }
+
+                // TODO Don't run automatic action after changing preferences and going back to this screen
+
+                // TODO Notify the user that automatic action ran
+
+                // TODO Allow cancelling automatic action
+
+                // TODO Add automatic actions configuration button that goes directly to user preferences dialog
+
+                // TODO Add instrumented test
+
                 ResultSuccessCard(
                     queryGeoUriApps(),
                     currentState.position,
@@ -291,6 +321,7 @@ private fun DefaultPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -321,6 +352,7 @@ private fun DarkPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -358,6 +390,7 @@ private fun PermissionPreview() {
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -395,6 +428,7 @@ private fun DarkPermissionPreview() {
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -425,6 +459,7 @@ private fun ErrorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -455,6 +490,7 @@ private fun DarkErrorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -496,6 +532,7 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
@@ -537,6 +574,7 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
@@ -564,6 +602,7 @@ private fun InitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -591,6 +630,7 @@ private fun DarkInitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
+            automaticAction = AutomaticAction(AutomaticActionType.NONE),
             lastInputShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
