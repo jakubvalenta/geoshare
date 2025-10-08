@@ -85,7 +85,7 @@
     <string name="converter_yandex_maps_permission_title">连接到 Yandex？</string>
     <string name="converter_yandex_maps_loading_indicator_title">正在连接到 Yandex…</string>
     <string name="url_converters_title">支持的地图服务</string>
-    <string name="url_converters_text">您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中：</string>
+    <string name="url_converters_text">你可以用 %1$s 分享下列地图链接或在应用中粘贴它们。</string>
     <string name="converter_coordinates_name">坐标</string>
     <string name="converter_coordinates_example">例如 41°24′12.2″N 2°10′26.5″E</string>
     <string name="converter_geo_name">geo: URI</string>
