@@ -38,7 +38,7 @@ class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Short URI
         testUri(
-            Position("19.402564", "-99.165666"),
+            Position("19.402564", "-99.165666", z = "16"),
             "https://waze.com/ul/h9g3qrkju0",
         )
 

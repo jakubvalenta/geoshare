@@ -88,5 +88,11 @@ class OpenStreetMapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
             ),
             "https://www.openstreetmap.org/way/596674456",
         )
+
+        // Short URI
+        testUri(
+            Position("-16.23152732849121", "-49.08348083496094", z = "11"),
+            "https://osm.org/go/NuJWxJh-",
+        )
     }
 }

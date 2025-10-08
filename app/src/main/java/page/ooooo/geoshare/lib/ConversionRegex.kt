@@ -76,6 +76,20 @@ class PointsPositionRegex(regex: String) : PositionRegex(regex) {
         }
 }
 
+abstract class GeoHashPositionRegex(regex: String) : PositionRegex(regex) {
+    abstract fun decode(hash: String): Triple<Double, Double, Int>
+
+    private var latLonZCache: Triple<Double, Double, Int>? = null
+
+    val latLonZ: Triple<Double, Double, Int>?
+        get() = latLonZCache ?: groupOrNull("hash")?.let { hash ->
+            decode(hash).also { latLonZCache = it }
+        }
+
+    override val points: List<Point>? get() = latLonZ?.let { (lat, lon) -> listOf(lat.toString() to lon.toString()) }
+    override val z: String? get() = latLonZ?.third?.toString()
+}
+
 /**
  * Create a position from a list of regexes.
  *

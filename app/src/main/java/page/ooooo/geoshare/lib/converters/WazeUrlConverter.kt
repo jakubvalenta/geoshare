@@ -15,15 +15,13 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         @Suppress("SpellCheckingInspection")
-        const val BASE32 = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
+        const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
     }
 
-    class GeoHashRegex(regex: String) : PositionRegex(regex) {
-        override val points: List<Point>?
-            get() = groupOrNull("hash")?.let { hash ->
-                decodeGeoHash(hash).let { (lat, lon) ->
-                    listOf(lat.toString() to lon.toString())
-                }
+    class Base32GeoHashPositionRegex(regex: String) : GeoHashPositionRegex(regex) {
+        override fun decode(hash: String) =
+            decodeBase32GeoHash(hash).let { (lat, lon, z) ->
+                Triple(lat.toScale(6), lon.toScale(6), z)
             }
     }
 
@@ -45,8 +43,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
                 query("z", PositionRegex(Z))
             }
             first {
-                path(GeoHashRegex("""/ul/h$BASE32"""))
-                query("h", GeoHashRegex(BASE32))
+                path(Base32GeoHashPositionRegex("""/ul/h$HASH"""))
+                query("h", Base32GeoHashPositionRegex(HASH))
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
                 @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))
