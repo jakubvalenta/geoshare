@@ -97,11 +97,13 @@
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
-    <string name="user_preferences_connection_title">Allow connecting to map service (Google, Apple etc.)?</string>
     <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
     <string name="user_preferences_connection_option_always">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="user_preferences_connection_option_never">No</string>
+    <string name="user_preferences_automatic_action_title">Automatic action</string>
+    <string name="user_preferences_automatic_action_description">Do something automatically after processing a map link.</string>
+    <string name="user_preferences_connection_title">Allow connecting to map service (Google, Apple etc.)?</string>
     <string name="user_preferences_last_run_version_code_title" translatable="false">Which version of the app was last run?</string>
     <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="conversion_failed_missing_url">Missing URL</string>

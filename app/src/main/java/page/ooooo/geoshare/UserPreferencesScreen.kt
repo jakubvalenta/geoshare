@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
+import page.ooooo.geoshare.data.local.preferences.automaticAction
 import page.ooooo.geoshare.data.local.preferences.lastInputVersionCode
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
@@ -61,11 +62,17 @@ fun UserPreferencesScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
+            // TODO Put the setting of user preferences in full screen dialogs
             UserPreferencesItem(
                 viewModel,
                 connectionPermission,
                 userPreferencesValues.connectionPermissionValue,
                 Modifier.padding(top = Spacing.tiny),
+            )
+            UserPreferencesItem(
+                viewModel,
+                automaticAction,
+                userPreferencesValues.automaticActionValue,
             )
             if (BuildConfig.DEBUG) {
                 UserPreferencesItem(
@@ -84,7 +91,7 @@ fun UserPreferencesScreen(
 }
 
 @Composable
-fun <T> UserPreferencesItem(
+private fun <T> UserPreferencesItem(
     viewModel: ConversionViewModel,
     userPreference: UserPreference<T>,
     value: T,
