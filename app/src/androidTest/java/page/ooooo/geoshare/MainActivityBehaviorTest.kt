@@ -79,9 +79,9 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to main screen
         pressBack()
 
-        // Set user preference lastInputVersionCode to version 19
+        // Set user preference changelogShowForVersionCode to version 19
         goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferenceLastInputVersionCode" }.setText("19")
+        onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }.setText("19")
 
         // Go to main screen
         pressBack()

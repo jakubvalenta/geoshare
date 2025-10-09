@@ -21,7 +21,7 @@ fun ConfirmationScaffold(
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
     endButton: (@Composable () -> Unit)? = null,
-    lastInputShown: Boolean,
+    changelogShown: Boolean,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -40,7 +40,7 @@ fun ConfirmationScaffold(
                 },
                 actions = {
                     MainMenu(
-                        lastInputShown = lastInputShown,
+                        changelogShown = changelogShown,
                         onNavigateToAboutScreen = onNavigateToAboutScreen,
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
