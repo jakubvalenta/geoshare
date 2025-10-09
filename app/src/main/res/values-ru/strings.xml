@@ -82,7 +82,6 @@
     <string name="conversion_loading_indicator_cancel">Отмена</string>
     <string name="conversion_failed_cancelled">Отменено</string>
     <string name="conversion_succeeded_skip">Копировать изначальную ссылку</string>
-    <string name="conversion_done">Готово</string>
     <string name="conversion_succeeded_title">Координаты</string>
     <string name="conversion_error_title">Ошибка</string>
     <string name="conversion_succeeded_copy_google_maps">Копировать ссылку на Карты Google</string>

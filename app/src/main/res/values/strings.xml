@@ -76,7 +76,6 @@
     <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
     <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
-    <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_error_report">Report issue</string>

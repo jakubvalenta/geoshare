@@ -82,7 +82,6 @@
     <string name="conversion_loading_indicator_cancel">Скасувати</string>
     <string name="conversion_failed_cancelled">Скасовано</string>
     <string name="conversion_succeeded_skip">Скопіювати оригінальне посилання</string>
-    <string name="conversion_done">Готово</string>
     <string name="conversion_succeeded_title">Координати</string>
     <string name="conversion_error_title">Помилка</string>
     <string name="converter_yandex_maps_permission_title">Підключитися до Yandex?</string>

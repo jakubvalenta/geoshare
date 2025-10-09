@@ -49,7 +49,6 @@
     <string name="conversion_loading_indicator_cancel">Abbrechen</string>
     <string name="conversion_failed_cancelled">Abgebrochen</string>
     <string name="conversion_succeeded_skip">Original-Link kopieren</string>
-    <string name="conversion_done">Erledigt</string>
     <string name="conversion_succeeded_title">Koordinaten</string>
     <string name="conversion_error_title">Fehler</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Link wird geteilt</string>
