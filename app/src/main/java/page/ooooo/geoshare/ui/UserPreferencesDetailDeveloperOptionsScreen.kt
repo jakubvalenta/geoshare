@@ -2,14 +2,8 @@ package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,6 +18,7 @@ import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.introShowForVersionCode
+import page.ooooo.geoshare.ui.components.UserPreferencesScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -50,36 +45,21 @@ private fun UserPreferencesDetailDeveloperOptionsScreen(
     onChangelogShownForVersionCodeValueChange: (value: Int?) -> Unit,
     onIntroShownForVersionCodeValueChange: (value: Int?) -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.user_preferences_developer_options_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.nav_back_content_description)
-                        )
-                    }
-                },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .padding(horizontal = Spacing.windowPadding)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-        ) {
-            changelogShownForVersionCode.description()?.let { ParagraphHtml(it) }
+    UserPreferencesScaffold(
+        title = stringResource(R.string.user_preferences_developer_options_title),
+        onBack = onBack,
+    ) {
+        Column(Modifier.padding(horizontal = Spacing.windowPadding)) {
+            ParagraphHtml(changelogShownForVersionCode.title(), Modifier.padding(bottom = Spacing.tiny))
             changelogShownForVersionCode.Component(
                 userPreferencesValues.changelogShownForVersionCodeValue,
                 onChangelogShownForVersionCodeValueChange,
             )
 
-            introShowForVersionCode.description()?.let { ParagraphHtml(it) }
+            ParagraphHtml(
+                introShowForVersionCode.title(),
+                Modifier.padding(top = Spacing.medium, bottom = Spacing.tiny)
+            )
             introShowForVersionCode.Component(
                 userPreferencesValues.introShownForVersionCodeValue,
                 onIntroShownForVersionCodeValueChange,
