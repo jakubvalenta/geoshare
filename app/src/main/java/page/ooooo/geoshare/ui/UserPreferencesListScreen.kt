@@ -56,7 +56,6 @@ private fun UserPreferencesListScreen(
 ) {
     UserPreferencesScaffold(
         title = stringResource(R.string.user_preferences_title),
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
         onBack = onBack,
     ) {
         ListItem(

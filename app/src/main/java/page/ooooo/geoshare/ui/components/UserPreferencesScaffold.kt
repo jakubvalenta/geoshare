@@ -12,6 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -19,12 +21,11 @@ import page.ooooo.geoshare.ui.theme.Spacing
 @Composable
 fun UserPreferencesScaffold(
     title: String,
-    modifier: Modifier = Modifier,
     onBack: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             TopAppBar(
                 title = {},
