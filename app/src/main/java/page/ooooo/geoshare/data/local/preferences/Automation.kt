@@ -1,6 +1,6 @@
 package page.ooooo.geoshare.data.local.preferences
 
-data class AutomaticAction(
+data class Automation(
     val type: Type,
     val packageName: String? = null,
 ) {

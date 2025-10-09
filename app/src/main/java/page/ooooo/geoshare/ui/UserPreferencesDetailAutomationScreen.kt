@@ -8,21 +8,21 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.automaticAction
+import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun UserPreferencesDetailAutomaticActionScreen(
+fun UserPreferencesDetailAutomationScreen(
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
 
     UserPreferencesDetailScreen(
-        userPreference = automaticAction,
-        value = userPreferencesValues.automaticActionValue,
+        userPreference = automation,
+        value = userPreferencesValues.automationValue,
         onBack = onBack,
-        onValueChange = { viewModel.setUserPreferenceValue(automaticAction, it) }
+        onValueChange = { viewModel.setUserPreferenceValue(automation, it) }
     )
 }
 
@@ -33,8 +33,8 @@ fun UserPreferencesDetailAutomaticActionScreen(
 private fun DefaultPreview() {
     AppTheme {
         UserPreferencesDetailScreen(
-            userPreference = automaticAction,
-            value = defaultFakeUserPreferences.automaticActionValue,
+            userPreference = automation,
+            value = defaultFakeUserPreferences.automationValue,
             onBack = {},
             onValueChange = {},
         )
@@ -46,8 +46,8 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         UserPreferencesDetailScreen(
-            userPreference = automaticAction,
-            value = defaultFakeUserPreferences.automaticActionValue,
+            userPreference = automation,
+            value = defaultFakeUserPreferences.automationValue,
             onBack = {},
             onValueChange = {},
         )

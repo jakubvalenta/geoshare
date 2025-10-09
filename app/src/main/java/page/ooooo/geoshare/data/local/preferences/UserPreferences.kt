@@ -151,60 +151,60 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-val automaticAction = object : OptionsUserPreference<AutomaticAction>(
-    default = AutomaticAction(AutomaticAction.Type.NOTHING),
+val automation = object : OptionsUserPreference<Automation>(
+    default = Automation(Automation.Type.NOTHING),
     options = {
         val context = LocalContext.current
         val intentTools = IntentTools()
         buildList {
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.NOTHING)) {
-                    Text(stringResource(R.string.user_preferences_automatic_action_nothing))
+                UserPreferenceOption(Automation(Automation.Type.NOTHING)) {
+                    Text(stringResource(R.string.user_preferences_automation_nothing))
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_COORDS_DEC)) {
+                UserPreferenceOption(Automation(Automation.Type.COPY_COORDS_DEC)) {
                     Text(
                         stringResource(
-                            R.string.user_preferences_automatic_action_copy_coords,
+                            R.string.user_preferences_automation_copy_coords,
                             examplePosition.toCoordsDecString()
                         )
                     )
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_COORDS_NSWE_DEC)) {
+                UserPreferenceOption(Automation(Automation.Type.COPY_COORDS_NSWE_DEC)) {
                     Text(
                         stringResource(
-                            R.string.user_preferences_automatic_action_copy_coords,
+                            R.string.user_preferences_automation_copy_coords,
                             examplePosition.toNorthSouthWestEastDecCoordsString(),
                         )
                     )
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_GEO_URI)) {
+                UserPreferenceOption(Automation(Automation.Type.COPY_GEO_URI)) {
                     Text(stringResource(R.string.conversion_succeeded_copy_geo))
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_GOOGLE_MAPS_URI)) {
-                    Text(stringResource(R.string.user_preferences_automatic_action_copy_google_maps_link))
+                UserPreferenceOption(Automation(Automation.Type.COPY_GOOGLE_MAPS_URI)) {
+                    Text(stringResource(R.string.user_preferences_automation_copy_google_maps_link))
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_APPLE_MAPS_URI)) {
-                    Text(stringResource(R.string.user_preferences_automatic_action_copy_apple_maps_link))
+                UserPreferenceOption(Automation(Automation.Type.COPY_APPLE_MAPS_URI)) {
+                    Text(stringResource(R.string.user_preferences_automation_copy_apple_maps_link))
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_MAGIC_EARTH_URI)) {
-                    Text(stringResource(R.string.user_preferences_automatic_action_copy_magic_earth_link))
+                UserPreferenceOption(Automation(Automation.Type.COPY_MAGIC_EARTH_URI)) {
+                    Text(stringResource(R.string.user_preferences_automation_copy_magic_earth_link))
                 }
             )
             for (app in intentTools.queryGeoUriApps(context.packageManager)) {
                 add(
-                    UserPreferenceOption(AutomaticAction(AutomaticAction.Type.OPEN_APP, app.packageName)) {
+                    UserPreferenceOption(Automation(Automation.Type.OPEN_APP, app.packageName)) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(Spacing.tiny),
                             verticalAlignment = Alignment.CenterVertically,
@@ -214,42 +214,42 @@ val automaticAction = object : OptionsUserPreference<AutomaticAction>(
                                 app.label,
                                 Modifier.widthIn(max = 24.dp),
                             )
-                            Text(stringResource(R.string.user_preferences_automatic_action_open_app, app.label))
+                            Text(stringResource(R.string.user_preferences_automation_open_app, app.label))
                         }
                     }
                 )
             }
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.SAVE_GPX)) {
+                UserPreferenceOption(Automation(Automation.Type.SAVE_GPX)) {
                     Text(stringResource(R.string.conversion_succeeded_save_gpx))
                 }
             )
             add(
-                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.SHARE)) {
+                UserPreferenceOption(Automation(Automation.Type.SHARE)) {
                     Text(stringResource(R.string.conversion_succeeded_share))
                 }
             )
         }
     }
 ) {
-    private val typeKey = stringPreferencesKey("automatic_action")
-    private val packageNameKey = stringPreferencesKey("automatic_action_package_name")
+    private val typeKey = stringPreferencesKey("automation")
+    private val packageNameKey = stringPreferencesKey("automation_package_name")
 
-    override fun getValue(preferences: Preferences): AutomaticAction = AutomaticAction(
-        type = preferences[typeKey]?.let(AutomaticAction.Type::valueOf) ?: default.type,
+    override fun getValue(preferences: Preferences): Automation = Automation(
+        type = preferences[typeKey]?.let(Automation.Type::valueOf) ?: default.type,
         packageName = preferences[packageNameKey]?.takeIf { it.isNotEmpty() } ?: default.packageName,
     )
 
-    override fun setValue(preferences: MutablePreferences, value: AutomaticAction) {
+    override fun setValue(preferences: MutablePreferences, value: Automation) {
         preferences[typeKey] = value.type.name
         preferences[packageNameKey] = value.packageName ?: ""
     }
 
     @Composable
-    override fun title() = stringResource(R.string.user_preferences_automatic_action_title)
+    override fun title() = stringResource(R.string.user_preferences_automation_title)
 
     @Composable
-    override fun description() = stringResource(R.string.user_preferences_automatic_action_description)
+    override fun description() = stringResource(R.string.user_preferences_automation_description)
 }
 
 val introShowForVersionCode = object : NullableIntUserPreference(
@@ -276,7 +276,7 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    var automaticActionValue: AutomaticAction = automaticAction.loading,
+    var automationValue: Automation = automation.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
     var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
