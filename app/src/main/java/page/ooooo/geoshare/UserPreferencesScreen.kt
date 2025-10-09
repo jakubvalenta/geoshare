@@ -1,6 +1,5 @@
 package page.ooooo.geoshare
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,25 +16,42 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.components.ParagraphHtml
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.UserPreference
-import page.ooooo.geoshare.data.local.preferences.automaticAction
-import page.ooooo.geoshare.data.local.preferences.lastInputVersionCode
-import page.ooooo.geoshare.data.local.preferences.connectionPermission
-import page.ooooo.geoshare.data.local.preferences.lastRunVersionCode
+import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.local.preferences.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+private interface ValueChangeCallback {
+    fun <T> invoke(userPreference: UserPreference<T>, value: T)
+}
+
 @Composable
 fun UserPreferencesScreen(
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
+
+    UserPreferencesScreen(
+        userPreferencesValues = userPreferencesValues,
+        onBack = onBack,
+        onValueChange = object : ValueChangeCallback {
+            override fun <T> invoke(userPreference: UserPreference<T>, value: T) {
+                viewModel.setUserPreferenceValue(userPreference, value)
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@Composable
+private fun UserPreferencesScreen(
+    userPreferencesValues: UserPreferencesValues,
+    onBack: () -> Unit,
+    onValueChange: ValueChangeCallback,
+) {
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
@@ -64,26 +80,26 @@ fun UserPreferencesScreen(
         ) {
             // TODO Put the setting of user preferences in full screen dialogs
             UserPreferencesItem(
-                viewModel,
                 connectionPermission,
                 userPreferencesValues.connectionPermissionValue,
+                { value -> onValueChange.invoke(connectionPermission, value) },
                 Modifier.padding(top = Spacing.tiny),
             )
             UserPreferencesItem(
-                viewModel,
                 automaticAction,
                 userPreferencesValues.automaticActionValue,
+                { value -> onValueChange.invoke(automaticAction, value) }
             )
             if (BuildConfig.DEBUG) {
                 UserPreferencesItem(
-                    viewModel,
                     lastRunVersionCode,
                     userPreferencesValues.introShownForVersionCodeValue,
+                    { value -> onValueChange.invoke(lastRunVersionCode, value) }
                 )
                 UserPreferencesItem(
-                    viewModel,
                     lastInputVersionCode,
                     userPreferencesValues.lastInputVersionCodeValue,
+                    { value -> onValueChange.invoke(lastInputVersionCode, value) }
                 )
             }
         }
@@ -92,9 +108,9 @@ fun UserPreferencesScreen(
 
 @Composable
 private fun <T> UserPreferencesItem(
-    viewModel: ConversionViewModel,
     userPreference: UserPreference<T>,
     value: T,
+    onValueChange: (value: T) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
@@ -104,38 +120,40 @@ private fun <T> UserPreferencesItem(
             style = MaterialTheme.typography.bodyLarge,
         )
         userPreference.description?.let { ParagraphHtml(it()) }
-        userPreference.Component(value) {
-            viewModel.setUserPreferenceValue(userPreference, it)
-        }
+        userPreference.Component(value, onValueChange)
     }
 }
 
 // Previews
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     AppTheme {
         UserPreferencesScreen(
-            viewModel = ConversionViewModel(
-                FakeUserPreferencesRepository(),
-                SavedStateHandle(),
-            )
+            userPreferencesValues = defaultFakeUserPreferences,
+            onBack = {},
+            onValueChange = object : ValueChangeCallback {
+                override fun <T> invoke(userPreference: UserPreference<T>, value: T) {
+                    throw NotImplementedError()
+                }
+            },
         )
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
     AppTheme {
         UserPreferencesScreen(
-            viewModel = ConversionViewModel(
-                FakeUserPreferencesRepository(),
-                SavedStateHandle(),
-            )
+            userPreferencesValues = defaultFakeUserPreferences,
+            onBack = {},
+            onValueChange = object : ValueChangeCallback {
+                override fun <T> invoke(userPreference: UserPreference<T>, value: T) {
+                    throw NotImplementedError()
+                }
+            },
         )
     }
 }
