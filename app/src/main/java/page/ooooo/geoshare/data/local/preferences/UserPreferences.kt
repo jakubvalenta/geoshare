@@ -1,15 +1,23 @@
 package page.ooooo.geoshare.data.local.preferences
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.components.RadioButtonGroup
 import page.ooooo.geoshare.components.RadioButtonOption
@@ -32,7 +40,7 @@ interface UserPreference<T> {
     fun description(): String?
 
     @Composable
-    fun valueLabel(value: T): String
+    fun ValueLabel(value: T)
 
     @Composable
     fun Component(value: T, onValueChange: (T) -> Unit)
@@ -52,7 +60,9 @@ abstract class NullableIntUserPreference(
     }
 
     @Composable
-    override fun valueLabel(value: Int?) = (value ?: default).toString()
+    override fun ValueLabel(value: Int?) {
+        Text((value ?: default).toString())
+    }
 
     @Composable
     override fun Component(value: Int?, onValueChange: (Int?) -> Unit) {
@@ -77,8 +87,8 @@ abstract class NullableIntUserPreference(
 
 data class UserPreferenceOption<T>(
     val value: T,
-    val label: String,
     val modifier: Modifier = Modifier,
+    val label: @Composable () -> Unit,
 )
 
 abstract class OptionsUserPreference<T>(
@@ -88,8 +98,11 @@ abstract class OptionsUserPreference<T>(
     override val loading = default
 
     @Composable
-    override fun valueLabel(value: T) =
-        (options().find { it.value == value } ?: options().find { it.value == default })?.label ?: value.toString()
+    override fun ValueLabel(value: T) {
+        (options().find { it.value == value } ?: options().find { it.value == default })?.also { option ->
+            option.label()
+        } ?: Text(value.toString())
+    }
 
     @Composable
     override fun Component(value: T, onValueChange: (T) -> Unit) {
@@ -98,7 +111,7 @@ abstract class OptionsUserPreference<T>(
             onSelect = { onValueChange(it) },
             modifier = Modifier.padding(top = Spacing.tiny),
         ) {
-            options().map { option -> RadioButtonOption(option.value, option.label, option.modifier) }
+            options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
         }
     }
 }
@@ -109,11 +122,16 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         listOf(
             UserPreferenceOption(
                 Permission.ALWAYS,
-                stringResource(R.string.user_preferences_connection_option_always),
                 Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
-            ),
-            UserPreferenceOption(Permission.ASK, stringResource(R.string.user_preferences_connection_option_ask)),
-            UserPreferenceOption(Permission.NEVER, stringResource(R.string.user_preferences_connection_option_never)),
+            ) {
+                Text(stringResource(R.string.user_preferences_connection_option_always))
+            },
+            UserPreferenceOption(Permission.ASK) {
+                Text(stringResource(R.string.user_preferences_connection_option_ask))
+            },
+            UserPreferenceOption(Permission.NEVER) {
+                Text(stringResource(R.string.user_preferences_connection_option_never))
+            },
         )
     },
 ) {
@@ -140,73 +158,76 @@ val automaticAction = object : OptionsUserPreference<AutomaticAction>(
         val intentTools = IntentTools()
         buildList {
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.NOTHING),
-                    stringResource(R.string.user_preferences_automatic_action_nothing),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.NOTHING)) {
+                    Text(stringResource(R.string.user_preferences_automatic_action_nothing))
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.COPY_COORDS_DEC),
-                    stringResource(
-                        R.string.user_preferences_automatic_action_copy_coords,
-                        examplePosition.toCoordsDecString(),
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_COORDS_DEC)) {
+                    Text(
+                        stringResource(
+                            R.string.user_preferences_automatic_action_copy_coords,
+                            examplePosition.toCoordsDecString()
+                        )
                     )
-                )
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.COPY_COORDS_NSWE_DEC),
-                    stringResource(
-                        R.string.user_preferences_automatic_action_copy_coords,
-                        examplePosition.toNorthSouthWestEastDecCoordsString(),
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_COORDS_NSWE_DEC)) {
+                    Text(
+                        stringResource(
+                            R.string.user_preferences_automatic_action_copy_coords,
+                            examplePosition.toNorthSouthWestEastDecCoordsString(),
+                        )
                     )
-                )
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.COPY_GEO_URI),
-                    stringResource(R.string.conversion_succeeded_copy_geo),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_GEO_URI)) {
+                    Text(stringResource(R.string.conversion_succeeded_copy_geo))
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.COPY_GOOGLE_MAPS_URI),
-                    stringResource(R.string.user_preferences_automatic_action_copy_google_maps_link),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_GOOGLE_MAPS_URI)) {
+                    Text(stringResource(R.string.user_preferences_automatic_action_copy_google_maps_link))
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.COPY_APPLE_MAPS_URI),
-                    stringResource(R.string.user_preferences_automatic_action_copy_apple_maps_link),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_APPLE_MAPS_URI)) {
+                    Text(stringResource(R.string.user_preferences_automatic_action_copy_apple_maps_link))
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.COPY_MAGIC_EARTH_URI),
-                    stringResource(R.string.user_preferences_automatic_action_copy_magic_earth_link),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.COPY_MAGIC_EARTH_URI)) {
+                    Text(stringResource(R.string.user_preferences_automatic_action_copy_magic_earth_link))
+                }
             )
             for (app in intentTools.queryGeoUriApps(context.packageManager)) {
                 add(
-                    UserPreferenceOption(
-                        AutomaticAction(AutomaticAction.Type.OPEN_APP, app.packageName),
-                        // TODO Show app icon
-                        stringResource(R.string.user_preferences_automatic_action_open_app, app.label)
-                    )
+                    UserPreferenceOption(AutomaticAction(AutomaticAction.Type.OPEN_APP, app.packageName)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.tiny),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                rememberDrawablePainter(app.icon),
+                                app.label,
+                                Modifier.widthIn(max = 24.dp),
+                            )
+                            Text(stringResource(R.string.user_preferences_automatic_action_open_app, app.label))
+                        }
+                    }
                 )
             }
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.SAVE_GPX),
-                    stringResource(R.string.conversion_succeeded_save_gpx),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.SAVE_GPX)) {
+                    Text(stringResource(R.string.conversion_succeeded_save_gpx))
+                }
             )
             add(
-                UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.SHARE),
-                    stringResource(R.string.conversion_succeeded_share),
-                )
+                UserPreferenceOption(AutomaticAction(AutomaticAction.Type.SHARE)) {
+                    Text(stringResource(R.string.conversion_succeeded_share))
+                }
             )
         }
     }

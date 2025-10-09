@@ -4,9 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -67,10 +69,9 @@ private fun UserPreferencesListScreen(
                 .clickable(onClick = onNavigateToUserPreferencesConnectionPermissionScreen)
                 .testTag("geoShareUserPreferencesConnectionPermissionItem"),
             supportingContent = {
-                Text(
-                    connectionPermission.valueLabel(userPreferencesValues.connectionPermissionValue),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                    connectionPermission.ValueLabel(userPreferencesValues.connectionPermissionValue)
+                }
             }
         )
         ListItem(
@@ -84,10 +85,9 @@ private fun UserPreferencesListScreen(
                 .clickable(onClick = onNavigateToUserPreferencesAutomaticActionScreen)
                 .testTag("geoShareUserPreferencesAutomaticActionItem"),
             supportingContent = {
-                Text(
-                    automaticAction.valueLabel(userPreferencesValues.automaticActionValue),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                    automaticAction.ValueLabel(userPreferencesValues.automaticActionValue)
+                }
             }
         )
         if (BuildConfig.DEBUG) {

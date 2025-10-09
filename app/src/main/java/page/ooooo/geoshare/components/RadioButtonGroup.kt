@@ -1,16 +1,15 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -20,8 +19,8 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 data class RadioButtonOption<T>(
     val value: T,
-    val label: String,
     val modifier: Modifier = Modifier,
+    val label: @Composable () -> Unit,
 )
 
 @Composable
@@ -43,6 +42,7 @@ fun <T> RadioButtonGroup(
                         onClick = { onSelect(option.value) },
                         role = Role.RadioButton
                     ),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
@@ -50,11 +50,9 @@ fun <T> RadioButtonGroup(
                     // Null recommended for accessibility with screen readers
                     onClick = null
                 )
-                Text(
-                    text = option.label,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = Spacing.small)
-                )
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                    option.label()
+                }
             }
         }
     }
@@ -71,14 +69,12 @@ private fun DefaultPreview() {
             onSelect = {}
         ) {
             listOf(
-                RadioButtonOption(
-                    value = 1,
-                    label = "Foo bar",
-                ),
-                RadioButtonOption(
-                    value = 2,
-                    label = "Kotlin is a modern but already mature programming language designed to make developers happier.",
-                ),
+                RadioButtonOption(value = 1) {
+                    Text("Foo bar")
+                },
+                RadioButtonOption(value = 2) {
+                    Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                },
             )
         }
     }
@@ -93,14 +89,12 @@ private fun DarkPreview() {
             onSelect = {}
         ) {
             listOf(
-                RadioButtonOption(
-                    value = 1,
-                    label = "Foo bar",
-                ),
-                RadioButtonOption(
-                    value = 2,
-                    label = "Kotlin is a modern but already mature programming language designed to make developers happier.",
-                ),
+                RadioButtonOption(value = 1) {
+                    Text("Foo bar")
+                },
+                RadioButtonOption(value = 2) {
+                    Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                },
             )
         }
     }
