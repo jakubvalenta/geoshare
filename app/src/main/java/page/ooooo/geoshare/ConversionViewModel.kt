@@ -192,7 +192,7 @@ class ConversionViewModel @Inject constructor(
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "text/xml"
                 putExtra(Intent.EXTRA_TITLE, filename)
-            },
+            }
         )
     }
 

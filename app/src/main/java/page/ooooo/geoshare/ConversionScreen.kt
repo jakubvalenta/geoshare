@@ -109,8 +109,8 @@ fun ConversionScreen(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onOpenApp: (packageName: String, uriString: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Unit,
+    onOpenApp: (packageName: String, uriString: String) -> Boolean,
+    onOpenChooser: (uriString: String) -> Boolean,
     onRetry: (newUriString: String) -> Unit,
     onSave: () -> Unit,
 ) {
@@ -263,32 +263,10 @@ fun ConversionScreen(
             }
 
             currentState is HasResult -> {
-                when (automation.type) {
-                    Automation.Type.NOTHING -> Unit
-                    Automation.Type.COPY_APPLE_MAPS_URI -> onCopy(currentState.position.toAppleMapsUriString())
-                    Automation.Type.COPY_COORDS_DEC -> onCopy(currentState.position.toCoordsDecString())
-                    Automation.Type.COPY_COORDS_NSWE_DEC -> onCopy(currentState.position.toNorthSouthWestEastDecCoordsString())
-                    Automation.Type.COPY_GEO_URI -> onCopy(currentState.position.toGeoUriString())
-                    Automation.Type.COPY_GOOGLE_MAPS_URI -> onCopy(currentState.position.toGoogleMapsUriString())
-                    Automation.Type.COPY_MAGIC_EARTH_URI -> onCopy(currentState.position.toMagicEarthUriString())
-                    Automation.Type.OPEN_APP -> automation.packageName?.takeIf { it.isNotEmpty() }
-                        ?.let { onOpenApp(it, currentState.position.toGeoUriString()) }
-
-                    Automation.Type.SAVE_GPX -> onSave()
-                    Automation.Type.SHARE -> onOpenChooser(currentState.position.toGeoUriString())
-                }
-
-                // TODO Don't run automatic action after changing preferences and going back to this screen
-
-                // TODO Notify the user that automatic action ran
-
-                // TODO Allow cancelling automatic action
-
-                // TODO Add instrumented test
-
                 ResultSuccessCard(
-                    queryGeoUriApps(),
-                    currentState.position,
+                    automation = automation,
+                    apps = queryGeoUriApps(),
+                    position = currentState.position,
                     onCopy = onCopy,
                     onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                     onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
@@ -299,6 +277,8 @@ fun ConversionScreen(
         }
     }
 }
+
+// Previews
 
 @Preview(showBackground = true)
 @Composable
@@ -324,8 +304,8 @@ private fun DefaultPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -356,8 +336,8 @@ private fun DarkPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -395,8 +375,8 @@ private fun PermissionPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -434,8 +414,8 @@ private fun DarkPermissionPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -466,8 +446,8 @@ private fun ErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -498,8 +478,8 @@ private fun DarkErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -541,8 +521,8 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -584,8 +564,8 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -613,8 +593,8 @@ private fun InitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )
@@ -642,8 +622,8 @@ private fun DarkInitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
+            onOpenApp = { _, _ -> true },
+            onOpenChooser = { true },
             onRetry = {},
             onSave = {},
         )

@@ -77,6 +77,13 @@
     <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="conversion_succeeded_title">Coordinates</string>
+    <string name="conversion_automation_copy_succeeded">Automatically copied coordinates</string>
+    <string name="conversion_automation_open_app_failed">Failed to automatically open an app</string>
+    <string name="conversion_automation_open_app_succeeded">Automatically opened an app</string>
+    <string name="conversion_automation_open_app_running">Automatically opening an app in %1$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">Automatically saved a GPX</string>
+    <string name="conversion_automation_share_succeeded">Automatically shared coordinates</string>
+    <string name="conversion_automation_share_failed">Failed to automatically share coordinates</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_error_report">Report issue</string>
     <string name="conversion_error_retry">Try again</string>
