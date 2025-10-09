@@ -124,6 +124,6 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun goToUserPreferencesDetailDeveloperOptionsScreen() = uiAutomator {
         goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "UserPreferencesDetailDeveloperOptionsScreen" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesDeveloperOptionsItem" }.click()
     }
 }

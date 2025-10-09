@@ -32,8 +32,12 @@ fun UserPreferencesDetailDeveloperOptionsScreen(
     UserPreferencesDetailDeveloperOptionsScreen(
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
-        onChangelogShownForVersionCodeValueChange = { viewModel.setUserPreferenceValue(introShowForVersionCode, it) },
-        onIntroShownForVersionCodeValueChange = { viewModel.setUserPreferenceValue(changelogShownForVersionCode, it) },
+        onChangelogShownForVersionCodeValueChange = {
+            viewModel.setUserPreferenceValue(changelogShownForVersionCode, it)
+        },
+        onIntroShownForVersionCodeValueChange = {
+            viewModel.setUserPreferenceValue(introShowForVersionCode, it)
+        },
     )
 }
 
@@ -57,8 +61,7 @@ private fun UserPreferencesDetailDeveloperOptionsScreen(
             )
 
             ParagraphHtml(
-                introShowForVersionCode.title(),
-                Modifier.padding(top = Spacing.medium, bottom = Spacing.tiny)
+                introShowForVersionCode.title(), Modifier.padding(top = Spacing.medium, bottom = Spacing.tiny)
             )
             introShowForVersionCode.Component(
                 userPreferencesValues.introShownForVersionCodeValue,
