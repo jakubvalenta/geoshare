@@ -2,20 +2,20 @@ package page.ooooo.geoshare.lib
 
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
-import android.provider.Settings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import java.util.Locale
+import java.util.*
 
 class IntentTools {
 
@@ -88,21 +88,18 @@ class IntentTools {
         }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
     }
 
-    fun openApp(context: Context, packageName: String, uriString: String) {
-        try {
-            context.startActivity(createViewIntent(packageName, uriString.toUri()))
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
-        }
+    fun startActivity(context: Context, intent: Intent): Boolean = try {
+        context.startActivity(intent)
+        true
+    } catch (_: ActivityNotFoundException) {
+        false
     }
 
-    fun openChooser(context: Context, uriString: String) {
-        try {
-            context.startActivity(createChooserIntent(uriString.toUri()))
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
-        }
-    }
+    fun openApp(context: Context, packageName: String, uriString: String): Boolean =
+        startActivity(context, createViewIntent(packageName, uriString.toUri()))
+
+    fun openChooser(context: Context, uriString: String): Boolean =
+        startActivity(context, createChooserIntent(uriString.toUri()))
 
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
         val resolveInfo = try {

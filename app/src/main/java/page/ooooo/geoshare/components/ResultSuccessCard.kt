@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,26 +19,131 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.ui.components.AutomationState
+import page.ooooo.geoshare.ui.components.ResultAutomationRow
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessCard(
-    geoUriApps: List<IntentTools.App>,
+    apps: List<IntentTools.App>,
+    automation: Automation,
     position: Position,
-    onCopy: (String) -> Unit,
+    onCopy: (text: String) -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onOpenApp: (String) -> Unit,
-    onShare: () -> Unit,
+    onOpenApp: (packageName: String) -> Boolean,
+    onShare: () -> Boolean,
     onSave: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val openAppCoroutineScope = rememberCoroutineScope()
     val columnCount = 4
+    val automationDelaySec = 5
+
+    var automationState by remember { mutableStateOf<AutomationState>(AutomationState.Nothing()) }
+    var automationCounterSec by remember { mutableIntStateOf(0) }
     var menuExpanded by remember { mutableStateOf(false) }
+
+    // TODO Don't run automatic action after changing preferences and going back to this screen
+
+    // TODO Add instrumented test
+
+    LaunchedEffect(automation) {
+        when (automation.type) {
+            Automation.Type.NOTHING -> Unit
+            Automation.Type.COPY_APPLE_MAPS_URI -> {
+                onCopy(position.toAppleMapsUriString())
+                automationState = AutomationState.Succeeded(R.string.conversion_automation_copy_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.COPY_COORDS_DEC -> {
+                onCopy(position.toCoordsDecString())
+                automationState = AutomationState.Succeeded(R.string.conversion_automation_copy_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.COPY_COORDS_NSWE_DEC -> {
+                onCopy(position.toNorthSouthWestEastDecCoordsString())
+                automationState = AutomationState.Succeeded(R.string.conversion_automation_copy_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.COPY_GEO_URI -> {
+                onCopy(position.toGeoUriString())
+                automationState = AutomationState.Succeeded(R.string.conversion_automation_copy_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.COPY_GOOGLE_MAPS_URI -> {
+                onCopy(position.toGoogleMapsUriString())
+                automationState = AutomationState.Succeeded(R.string.conversion_automation_copy_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.COPY_MAGIC_EARTH_URI -> {
+                onCopy(position.toMagicEarthUriString())
+                automationState = AutomationState.Succeeded(R.string.conversion_automation_copy_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.OPEN_APP -> automation.packageName?.takeIf { it.isNotEmpty() }?.let { packageName ->
+                automationState = AutomationState.Running(R.string.conversion_automation_open_app_running)
+                openAppCoroutineScope.launch {
+                    try {
+                        automationCounterSec = automationDelaySec
+                        while (automationCounterSec > 0) {
+                            delay(1000L)
+                            automationCounterSec--
+                        }
+                        automationState = if (onOpenApp(packageName)) {
+                            AutomationState.Succeeded(R.string.conversion_automation_open_app_succeeded)
+                        } else {
+                            AutomationState.Failed(R.string.conversion_automation_open_app_failed)
+                        }
+                        delay(automationDelaySec * 1000L)
+                    } catch (_: CancellationException) {
+                        // Do nothing
+                    } finally {
+                        automationState = AutomationState.Nothing()
+                    }
+                }
+            }
+
+            Automation.Type.SAVE_GPX -> {
+                onSave()
+                AutomationState.Succeeded(R.string.conversion_automation_save_gpx_succeeded)
+                delay(automationDelaySec * 1000L)
+                automationState = AutomationState.Nothing()
+            }
+
+            Automation.Type.SHARE -> {
+                if (onShare()) {
+                    automationState = AutomationState.Succeeded(R.string.conversion_automation_share_succeeded)
+                    delay(automationDelaySec * 1000L)
+                    automationState = AutomationState.Nothing()
+                } else {
+                    automationState = AutomationState.Succeeded(R.string.conversion_automation_share_failed)
+                }
+            }
+        }
+    }
 
     Column {
         ResultCard(
@@ -84,7 +190,9 @@ fun ResultSuccessCard(
                         )
                     }
                     DropdownMenu(
-                        expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false },
+                    ) {
                         listOf(
                             position.toCoordsDecString(),
                             position.toNorthSouthWestEastDecCoordsString(),
@@ -137,51 +245,50 @@ fun ResultSuccessCard(
                 .padding(horizontal = Spacing.tiny),
             verticalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
-            for (geoUriAppsChunk in geoUriApps.chunked(columnCount)) {
+            apps.chunked(columnCount).forEach { appsChunk ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                    for (geoUriApp in geoUriAppsChunk) {
+                    appsChunk.forEach { app ->
                         Column(
                             Modifier
-                                .clickable { onOpenApp(geoUriApp.packageName) }
+                                .clickable {
+                                    if (!onOpenApp(app.packageName)) {
+                                        Toast.makeText(
+                                            context,
+                                            R.string.conversion_automation_open_app_failed,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
                                 .weight(1f)
-                                .testTag("geoShareResultCardApp_${geoUriApp.packageName}"),
+                                .testTag("geoShareResultCardApp_${app.packageName}"),
                             verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
                             Image(
-                                rememberDrawablePainter(geoUriApp.icon),
-                                geoUriApp.label,
+                                rememberDrawablePainter(app.icon),
+                                app.label,
                                 Modifier
                                     .align(Alignment.CenterHorizontally)
                                     .widthIn(max = 46.dp),
                             )
                             Text(
-                                geoUriApp.label,
+                                app.label,
                                 Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
                     }
-                    repeat(columnCount - geoUriAppsChunk.size) {
+                    repeat(columnCount - apps.size) {
                         Box(Modifier.weight(1f))
                     }
                 }
             }
-            Row(
-                Modifier.padding(horizontal = Spacing.tiny),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.tiny / 2),
-            ) {
-                Button({ onShare() }) {
-                    Text(stringResource(R.string.conversion_succeeded_share))
-                }
-                Button({ onNavigateToUserPreferencesAutomationScreen() }) {
-                    Icon(
-                        painterResource(R.drawable.automation_24px),
-                        null,
-                        Modifier.padding(end = Spacing.tiny),
-                    )
-                    Text(stringResource(R.string.user_preferences_automation_title))
-                }
-            }
+            ResultAutomationRow(
+                automationState = automationState,
+                automationCounterSec = automationCounterSec,
+                onCancel = { openAppCoroutineScope.cancel() },
+                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                onShare = onShare,
+            )
         }
     }
 }
@@ -195,18 +302,19 @@ private fun DefaultPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = List(4) { index ->
+                apps = List(4) { index ->
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map ${index + 1}",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     )
                 },
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -220,18 +328,19 @@ private fun DarkPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = List(4) { index ->
+                apps = List(4) { index ->
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map ${index + 1}",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     )
                 },
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -245,18 +354,19 @@ private fun OneAppPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = listOf(
+                apps = listOf(
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -270,18 +380,19 @@ private fun DarkOneAppPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = listOf(
+                apps = listOf(
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -295,18 +406,19 @@ private fun ParamsPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = listOf(
+                apps = listOf(
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -320,18 +432,19 @@ private fun DarkParamsPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = listOf(
+                apps = listOf(
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -345,13 +458,14 @@ private fun PointsPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = listOf(
+                apps = listOf(
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position(
                     points = listOf(
                         "59.1293656" to "11.4585672",
@@ -361,8 +475,8 @@ private fun PointsPreview() {
                 ),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -376,13 +490,14 @@ private fun DarkPointsPreview() {
         Surface {
             val context = LocalContext.current
             ResultSuccessCard(
-                geoUriApps = listOf(
+                apps = listOf(
                     IntentTools.App(
                         BuildConfig.APPLICATION_ID,
                         "My Map App",
                         icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                     ),
                 ),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position(
                     points = listOf(
                         "59.1293656" to "11.4585672",
@@ -392,8 +507,8 @@ private fun DarkPointsPreview() {
                 ),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -406,12 +521,13 @@ private fun NoAppsPreview() {
     AppTheme {
         Surface {
             ResultSuccessCard(
-                geoUriApps = listOf(),
+                apps = listOf(),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
@@ -424,12 +540,13 @@ private fun DarkNoAppsPreview() {
     AppTheme {
         Surface {
             ResultSuccessCard(
-                geoUriApps = listOf(),
+                apps = listOf(),
+                automation = Automation(Automation.Type.NOTHING),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
-                onOpenApp = {},
-                onShare = {},
+                onOpenApp = { true },
+                onShare = { true },
                 onSave = {},
             )
         }
