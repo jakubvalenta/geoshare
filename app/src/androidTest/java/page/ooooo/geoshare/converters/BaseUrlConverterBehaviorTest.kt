@@ -11,7 +11,7 @@ abstract class BaseUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     protected fun setUserPreferenceConnectionPermissionToAlways() = uiAutomator {
-        goToUserPreferencesScreen()
+        goToUserPreferencesDetailConnectionPermissionScreen()
         onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermissionAlways" }.click()
     }
 

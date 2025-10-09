@@ -108,7 +108,22 @@ abstract class BaseActivityBehaviorTest {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuUrlConverters" }
     }
 
-    protected fun goToUserPreferencesScreen() {
+    private fun goToUserPreferencesScreen() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuUserPreferences" }
+    }
+
+    protected fun goToUserPreferencesDetailAutomaticActionScreen() = uiAutomator {
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferencesAutomaticActionItem" }.click()
+    }
+
+    protected fun goToUserPreferencesDetailConnectionPermissionScreen() = uiAutomator {
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferencesConnectionPermissionItem" }.click()
+    }
+
+    protected fun goToUserPreferencesDetailDeveloperOptionsScreen() = uiAutomator {
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "UserPreferencesDetailDeveloperOptionsScreen" }.click()
     }
 }
