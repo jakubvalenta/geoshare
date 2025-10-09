@@ -32,7 +32,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
-                automaticActionValue = automaticAction.getValue(it),
+                automationValue = automation.getValue(it),
                 connectionPermissionValue = connectionPermission.getValue(it),
                 introShownForVersionCodeValue = introShowForVersionCode.getValue(it),
                 changelogShownForVersionCodeValue = changelogShownForVersionCode.getValue(it),

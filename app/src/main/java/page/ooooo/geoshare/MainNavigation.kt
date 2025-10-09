@@ -9,9 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.components.MainScreen
 import page.ooooo.geoshare.ui.UrlConvertersScreen
-import page.ooooo.geoshare.ui.UserPreferencesDetailDeveloperOptionsScreen
+import page.ooooo.geoshare.ui.UserPreferencesDetailDeveloperScreen
 import page.ooooo.geoshare.ui.UserPreferencesListScreen
-import page.ooooo.geoshare.ui.UserPreferencesDetailAutomaticActionScreen
+import page.ooooo.geoshare.ui.UserPreferencesDetailAutomationScreen
 import page.ooooo.geoshare.ui.UserPreferencesDetailConnectionPermissionScreen
 
 @Composable
@@ -42,7 +42,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
-                onNavigateToUserPreferencesAutomaticActionScreen = { navController.navigate("user_preferences/automatic_action") },
+                onNavigateToUserPreferencesAutomationScreen = { navController.navigate("user_preferences/automation") },
                 viewModel = viewModel,
             )
         }
@@ -77,14 +77,14 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("user_preferences") {
             UserPreferencesListScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("main") },
-                onNavigateToUserPreferencesAutomaticActionScreen = { navController.navigate("user_preferences/automatic_action") },
+                onNavigateToUserPreferencesAutomationScreen = { navController.navigate("user_preferences/automation") },
                 onNavigateToUserPreferencesConnectionPermissionScreen = { navController.navigate("user_preferences/connection_permission") },
-                onNavigateToUserPreferencesDeveloperOptionsScreen = { navController.navigate("user_preferences/developer_options") },
+                onNavigateToUserPreferencesDeveloperScreen = { navController.navigate("user_preferences/developer") },
                 viewModel = viewModel,
             )
         }
-        composable("user_preferences/automatic_action") {
-            UserPreferencesDetailAutomaticActionScreen(
+        composable("user_preferences/automation") {
+            UserPreferencesDetailAutomationScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
@@ -95,8 +95,8 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 viewModel = viewModel,
             )
         }
-        composable("user_preferences/developer_options") {
-            UserPreferencesDetailDeveloperOptionsScreen(
+        composable("user_preferences/developer") {
+            UserPreferencesDetailDeveloperScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )

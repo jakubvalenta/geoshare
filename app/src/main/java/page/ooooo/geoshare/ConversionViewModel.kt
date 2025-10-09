@@ -21,7 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomaticAction
+import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
@@ -102,12 +102,12 @@ class ConversionViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val automaticAction: StateFlow<AutomaticAction> = userPreferencesValues.mapLatest {
-        it.automaticActionValue
+    val automation: StateFlow<Automation> = userPreferencesValues.mapLatest {
+        it.automationValue
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        page.ooooo.geoshare.data.local.preferences.automaticAction.default,
+        page.ooooo.geoshare.data.local.preferences.automation.default,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)

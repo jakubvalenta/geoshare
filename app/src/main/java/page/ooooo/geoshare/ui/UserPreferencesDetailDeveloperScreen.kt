@@ -23,13 +23,13 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
-fun UserPreferencesDetailDeveloperOptionsScreen(
+fun UserPreferencesDetailDeveloperScreen(
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
 
-    UserPreferencesDetailDeveloperOptionsScreen(
+    UserPreferencesDetailDeveloperScreen(
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onChangelogShownForVersionCodeValueChange = {
@@ -43,14 +43,14 @@ fun UserPreferencesDetailDeveloperOptionsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun UserPreferencesDetailDeveloperOptionsScreen(
+private fun UserPreferencesDetailDeveloperScreen(
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onChangelogShownForVersionCodeValueChange: (value: Int?) -> Unit,
     onIntroShownForVersionCodeValueChange: (value: Int?) -> Unit,
 ) {
     UserPreferencesScaffold(
-        title = stringResource(R.string.user_preferences_developer_options_title),
+        title = stringResource(R.string.user_preferences_developer_title),
         onBack = onBack,
     ) {
         Column(Modifier.padding(horizontal = Spacing.windowPadding)) {
@@ -77,7 +77,7 @@ private fun UserPreferencesDetailDeveloperOptionsScreen(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        UserPreferencesDetailDeveloperOptionsScreen(
+        UserPreferencesDetailDeveloperScreen(
             userPreferencesValues = defaultFakeUserPreferences,
             onBack = {},
             onChangelogShownForVersionCodeValueChange = {},
@@ -90,7 +90,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        UserPreferencesDetailDeveloperOptionsScreen(
+        UserPreferencesDetailDeveloperScreen(
             userPreferencesValues = defaultFakeUserPreferences,
             onBack = {},
             onChangelogShownForVersionCodeValueChange = {},

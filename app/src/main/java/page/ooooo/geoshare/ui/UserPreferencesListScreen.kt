@@ -21,7 +21,7 @@ import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.local.preferences.automaticAction
+import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.ui.components.UserPreferencesScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -29,9 +29,9 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @Composable
 fun UserPreferencesListScreen(
     onBack: () -> Unit,
-    onNavigateToUserPreferencesAutomaticActionScreen: () -> Unit,
+    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onNavigateToUserPreferencesConnectionPermissionScreen: () -> Unit,
-    onNavigateToUserPreferencesDeveloperOptionsScreen: () -> Unit,
+    onNavigateToUserPreferencesDeveloperScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
@@ -39,9 +39,9 @@ fun UserPreferencesListScreen(
     UserPreferencesListScreen(
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
-        onNavigateToUserPreferencesAutomaticActionScreen = onNavigateToUserPreferencesAutomaticActionScreen,
+        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
         onNavigateToUserPreferencesConnectionPermissionScreen = onNavigateToUserPreferencesConnectionPermissionScreen,
-        onNavigateToUserPreferencesDeveloperOptionsScreen = onNavigateToUserPreferencesDeveloperOptionsScreen,
+        onNavigateToUserPreferencesDeveloperScreen = onNavigateToUserPreferencesDeveloperScreen,
     )
 }
 
@@ -50,9 +50,9 @@ fun UserPreferencesListScreen(
 private fun UserPreferencesListScreen(
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
-    onNavigateToUserPreferencesAutomaticActionScreen: () -> Unit,
+    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onNavigateToUserPreferencesConnectionPermissionScreen: () -> Unit,
-    onNavigateToUserPreferencesDeveloperOptionsScreen: () -> Unit,
+    onNavigateToUserPreferencesDeveloperScreen: () -> Unit,
 ) {
     UserPreferencesScaffold(
         title = stringResource(R.string.user_preferences_title),
@@ -77,16 +77,16 @@ private fun UserPreferencesListScreen(
         ListItem(
             headlineContent = {
                 Text(
-                    automaticAction.title(),
+                    automation.title(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },
             modifier = Modifier
-                .clickable(onClick = onNavigateToUserPreferencesAutomaticActionScreen)
-                .testTag("geoShareUserPreferencesAutomaticActionItem"),
+                .clickable(onClick = onNavigateToUserPreferencesAutomationScreen)
+                .testTag("geoShareUserPreferencesAutomationItem"),
             supportingContent = {
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                    automaticAction.ValueLabel(userPreferencesValues.automaticActionValue)
+                    automation.ValueLabel(userPreferencesValues.automationValue)
                 }
             }
         )
@@ -94,12 +94,12 @@ private fun UserPreferencesListScreen(
             ListItem(
                 headlineContent = {
                     Text(
-                        stringResource(R.string.user_preferences_developer_options_title),
-                        Modifier.testTag("geoShareUserPreferencesDeveloperOptionsItem"),
+                        stringResource(R.string.user_preferences_developer_title),
+                        Modifier.testTag("geoShareUserPreferencesDeveloperItem"),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 },
-                modifier = Modifier.clickable(onClick = onNavigateToUserPreferencesDeveloperOptionsScreen),
+                modifier = Modifier.clickable(onClick = onNavigateToUserPreferencesDeveloperScreen),
             )
         }
     }
@@ -114,9 +114,9 @@ private fun DefaultPreview() {
         UserPreferencesListScreen(
             userPreferencesValues = defaultFakeUserPreferences,
             onBack = {},
-            onNavigateToUserPreferencesAutomaticActionScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesConnectionPermissionScreen = {},
-            onNavigateToUserPreferencesDeveloperOptionsScreen = {},
+            onNavigateToUserPreferencesDeveloperScreen = {},
         )
     }
 }
@@ -128,9 +128,9 @@ private fun DarkPreview() {
         UserPreferencesListScreen(
             userPreferencesValues = defaultFakeUserPreferences,
             onBack = {},
-            onNavigateToUserPreferencesAutomaticActionScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
             onNavigateToUserPreferencesConnectionPermissionScreen = {},
-            onNavigateToUserPreferencesDeveloperOptionsScreen = {},
+            onNavigateToUserPreferencesDeveloperScreen = {},
         )
     }
 }
