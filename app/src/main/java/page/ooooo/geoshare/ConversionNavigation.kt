@@ -5,6 +5,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import page.ooooo.geoshare.ui.UrlConvertersScreen
+import page.ooooo.geoshare.ui.UserPreferencesDetailDeveloperOptionsScreen
+import page.ooooo.geoshare.ui.UserPreferencesListScreen
+import page.ooooo.geoshare.ui.UserPreferencesDetailAutomaticActionScreen
+import page.ooooo.geoshare.ui.UserPreferencesDetailConnectionPermissionScreen
 
 @Composable
 fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
@@ -46,8 +50,29 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
             )
         }
         composable("user_preferences") {
-            UserPreferencesScreen(
+            UserPreferencesListScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                onNavigateToUserPreferencesDetailAutomaticActionScreen = { navController.navigate("user_preferences/automatic_action") },
+                onNavigateToUserPreferencesDetailConnectionPermissionScreen = { navController.navigate("user_preferences/connection_permission") },
+                onNavigateToUserPreferencesDetailDeveloperOptionsScreen = { navController.navigate("user_preferences/developer_options") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences/automatic_action") {
+            UserPreferencesDetailAutomaticActionScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences/connection_permission") {
+            UserPreferencesDetailConnectionPermissionScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences/developer_options") {
+            UserPreferencesDetailDeveloperOptionsScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
         }

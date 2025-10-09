@@ -111,11 +111,11 @@ class ConversionViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val lastInputShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.lastInputVersionCodeValue?.let { lastInputVersionCode ->
+    val changelogShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
+        it.changelogShownForVersionCodeValue?.let { changelogShownForVersionCodeValue ->
             urlConverters.all { urlConverter ->
                 urlConverter.documentation.inputs.all { input ->
-                    input.addedInVersionCode <= lastInputVersionCode
+                    input.addedInVersionCode <= changelogShownForVersionCodeValue
                 }
             }
         } ?: true
@@ -126,21 +126,21 @@ class ConversionViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val lastInputVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
-        it.lastInputVersionCodeValue
+    val changelogShownForVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
+        it.changelogShownForVersionCodeValue
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        page.ooooo.geoshare.data.local.preferences.lastInputVersionCode.default,
+        page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode.default,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.lastRunVersionCode.default
+        it.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.introShowForVersionCode.default
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        userPreferencesValues.value.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.lastRunVersionCode.default,
+        userPreferencesValues.value.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.introShowForVersionCode.default,
     )
 
     fun start() {
@@ -227,9 +227,9 @@ class ConversionViewModel @Inject constructor(
         transitionJob?.cancel()
     }
 
-    fun updateInput(newUriString: String) {
+    fun updateInput(value: String) {
         withMutableSnapshot {
-            inputUriString = newUriString
+            inputUriString = value
         }
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
@@ -237,15 +237,18 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun setLastInputVersionCode(newLastInputVersionCode: Int) {
+    fun setChangelogShownForVersionCode(value: Int) {
         setUserPreferenceValue(
-            page.ooooo.geoshare.data.local.preferences.lastInputVersionCode,
-            newLastInputVersionCode,
+            page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode,
+            value,
         )
     }
 
     fun setIntroShown() {
-        setUserPreferenceValue(page.ooooo.geoshare.data.local.preferences.lastRunVersionCode, BuildConfig.VERSION_CODE)
+        setUserPreferenceValue(
+            page.ooooo.geoshare.data.local.preferences.introShowForVersionCode,
+            BuildConfig.VERSION_CODE,
+        )
     }
 
     fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {

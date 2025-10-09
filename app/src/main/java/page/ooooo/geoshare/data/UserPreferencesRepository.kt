@@ -34,8 +34,8 @@ class DefaultUserPreferencesRepository @Inject constructor(
             UserPreferencesValues(
                 automaticActionValue = automaticAction.getValue(it),
                 connectionPermissionValue = connectionPermission.getValue(it),
-                introShownForVersionCodeValue = lastRunVersionCode.getValue(it),
-                lastInputVersionCodeValue = lastInputVersionCode.getValue(it),
+                introShownForVersionCodeValue = introShowForVersionCode.getValue(it),
+                changelogShownForVersionCodeValue = changelogShownForVersionCode.getValue(it),
             )
         }
 

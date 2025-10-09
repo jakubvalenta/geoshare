@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,7 +39,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 private data class Documentations(
     val documentations: List<Documentation>,
     val defaultHandlersEnabled: Map<String, Boolean>,
-    val newLastInputVersionCode: Int,
+    val newChangelogShownForVersionCode: Int,
 )
 
 private sealed class Filter(val titleResId: Int) {
@@ -53,19 +52,19 @@ private sealed class Filter(val titleResId: Int) {
 private fun getDocumentations(
     filter: Filter,
     intentTools: IntentTools,
-    lastInputVersionCode: Int?,
+    changelogShownForVersionCode: Int?,
     packageManager: PackageManager,
     urlConverters: List<UrlConverter>,
 ): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
-    var newLastInputVersionCode = 1
+    var newChangelogShownForVersionCode = 1
     val filteredUrlConverterDocumentations = urlConverters.mapNotNull { urlConverter ->
         val filteredInputs = urlConverter.documentation.inputs.filter { input ->
-            if (filter is Recent && lastInputVersionCode != null && input.addedInVersionCode <= lastInputVersionCode) {
+            if (filter is Recent && changelogShownForVersionCode != null && input.addedInVersionCode <= changelogShownForVersionCode) {
                 return@filter false
             }
-            if (input.addedInVersionCode > newLastInputVersionCode) {
-                newLastInputVersionCode = input.addedInVersionCode
+            if (input.addedInVersionCode > newChangelogShownForVersionCode) {
+                newChangelogShownForVersionCode = input.addedInVersionCode
             }
             if (input is DocumentationInput.Url) {
                 val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
@@ -92,19 +91,19 @@ private fun getDocumentations(
     return Documentations(
         documentations = filteredUrlConverterDocumentations,
         defaultHandlersEnabled = defaultHandlersEnabled.toMap(),
-        newLastInputVersionCode = newLastInputVersionCode,
+        newChangelogShownForVersionCode = newChangelogShownForVersionCode,
     )
 }
 
 private fun getDocumentations(
     context: Context,
     filter: Filter,
-    lastInputVersionCode: Int?,
+    changelogShownForVersionCode: Int?,
     viewModel: ConversionViewModel,
 ) = getDocumentations(
     filter,
     viewModel.intentTools,
-    lastInputVersionCode,
+    changelogShownForVersionCode,
     context.packageManager,
     viewModel.urlConverters,
 )
@@ -113,29 +112,29 @@ private val trimHttpsRegex = """^https://""".toRegex()
 
 private fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UrlConvertersScreen(
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
-    val lastInputShown by viewModel.lastInputShown.collectAsState()
-    val lastInputVersionCode by viewModel.lastInputVersionCode.collectAsState()
+    val changelogShown by viewModel.changelogShown.collectAsState()
+    val changelogShownForVersionCode by viewModel.changelogShownForVersionCode.collectAsState()
     val filters = buildList {
         add(All())
-        if (!lastInputShown) {
+        if (!changelogShown) {
             add(Recent())
         }
         add(Enabled())
         add(Disabled())
     }
-    var filter by remember { mutableStateOf(if (!lastInputShown) Recent() else All()) }
-    var documentations by remember(filter, lastInputVersionCode) {
-        mutableStateOf(getDocumentations(context, filter, lastInputVersionCode, viewModel))
+    var filter by remember { mutableStateOf(if (!changelogShown) Recent() else All()) }
+    var documentations by remember(filter, changelogShownForVersionCode) {
+        mutableStateOf(getDocumentations(context, filter, changelogShownForVersionCode, viewModel))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        documentations = getDocumentations(context, filter, lastInputVersionCode, viewModel)
+        documentations = getDocumentations(context, filter, changelogShownForVersionCode, viewModel)
     }
 
     UrlConvertersScreen(
@@ -143,7 +142,7 @@ fun UrlConvertersScreen(
         filter = filter,
         filters = filters,
         onBack = {
-            viewModel.setLastInputVersionCode(documentations.newLastInputVersionCode)
+            viewModel.setChangelogShownForVersionCode(documentations.newChangelogShownForVersionCode)
             onBack()
         },
         onChangeFilter = { filter = it },
@@ -353,7 +352,7 @@ private fun DefaultPreview() {
                     "https://maps.apple" to true,
                     "https://maps.apple.com" to false,
                 ),
-                newLastInputVersionCode = 20,
+                newChangelogShownForVersionCode = 20,
             ),
             onBack = {},
             onChangeFilter = {},
@@ -380,7 +379,7 @@ private fun DarkPreview() {
                     "https://maps.apple" to true,
                     "https://maps.apple.com" to false,
                 ),
-                newLastInputVersionCode = 20,
+                newChangelogShownForVersionCode = 20,
             ),
             onBack = {},
             onChangeFilter = {},
@@ -407,7 +406,7 @@ private fun AllPreview() {
                     "https://maps.apple" to true,
                     "https://maps.apple.com" to false,
                 ),
-                newLastInputVersionCode = 20,
+                newChangelogShownForVersionCode = 20,
             ),
             onBack = {},
             onChangeFilter = {},
@@ -434,7 +433,7 @@ private fun DarkAllPreview() {
                     "https://maps.apple" to true,
                     "https://maps.apple.com" to false,
                 ),
-                newLastInputVersionCode = 20,
+                newChangelogShownForVersionCode = 20,
             ),
             onBack = {},
             onChangeFilter = {},

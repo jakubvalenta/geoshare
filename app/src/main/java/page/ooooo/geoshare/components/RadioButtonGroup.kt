@@ -20,21 +20,20 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 data class RadioButtonOption<T>(
     val value: T,
-    val text: String,
+    val label: String,
     val modifier: Modifier = Modifier,
 )
 
 @Composable
 fun <T> RadioButtonGroup(
-    options: List<RadioButtonOption<T>>,
     selectedValue: T,
     onSelect: (value: T) -> Unit,
     modifier: Modifier = Modifier,
+    options: @Composable () -> List<RadioButtonOption<T>>,
 ) {
-    // Note that Modifier.selectableGroup() is essential to ensure correct
-    // accessibility behavior
+    // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
     Column(modifier.selectableGroup()) {
-        options.forEach { option ->
+        options().forEach { option ->
             Row(
                 option.modifier
                     .fillMaxWidth()
@@ -52,7 +51,7 @@ fun <T> RadioButtonGroup(
                     onClick = null
                 )
                 Text(
-                    text = option.text,
+                    text = option.label,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = Spacing.small)
                 )
@@ -68,19 +67,20 @@ fun <T> RadioButtonGroup(
 private fun DefaultPreview() {
     AppTheme {
         RadioButtonGroup(
-            options = listOf(
+            selectedValue = 2,
+            onSelect = {}
+        ) {
+            listOf(
                 RadioButtonOption(
                     value = 1,
-                    text = "Foo bar",
+                    label = "Foo bar",
                 ),
                 RadioButtonOption(
                     value = 2,
-                    text = "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                    label = "Kotlin is a modern but already mature programming language designed to make developers happier.",
                 ),
-            ),
-            selectedValue = 2,
-            onSelect = {}
-        )
+            )
+        }
     }
 }
 
@@ -89,18 +89,19 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         RadioButtonGroup(
-            options = listOf(
+            selectedValue = 2,
+            onSelect = {}
+        ) {
+            listOf(
                 RadioButtonOption(
                     value = 1,
-                    text = "Foo bar",
+                    label = "Foo bar",
                 ),
                 RadioButtonOption(
                     value = 2,
-                    text = "Kotlin is a modern but already mature programming language designed to make developers happier.",
+                    label = "Kotlin is a modern but already mature programming language designed to make developers happier.",
                 ),
-            ),
-            selectedValue = 2,
-            onSelect = {}
-        )
+            )
+        }
     }
 }
