@@ -11,8 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,9 +27,9 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @Composable
 fun UserPreferencesListScreen(
     onBack: () -> Unit,
-    onNavigateToUserPreferencesDetailAutomaticActionScreen: () -> Unit,
-    onNavigateToUserPreferencesDetailConnectionPermissionScreen: () -> Unit,
-    onNavigateToUserPreferencesDetailDeveloperOptionsScreen: () -> Unit,
+    onNavigateToUserPreferencesAutomaticActionScreen: () -> Unit,
+    onNavigateToUserPreferencesConnectionPermissionScreen: () -> Unit,
+    onNavigateToUserPreferencesDeveloperOptionsScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
@@ -39,9 +37,9 @@ fun UserPreferencesListScreen(
     UserPreferencesListScreen(
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
-        onNavigateToUserPreferencesDetailAutomaticActionScreen = onNavigateToUserPreferencesDetailAutomaticActionScreen,
-        onNavigateToUserPreferencesDetailConnectionPermissionScreen = onNavigateToUserPreferencesDetailConnectionPermissionScreen,
-        onNavigateToUserPreferencesDetailDeveloperOptionsScreen = onNavigateToUserPreferencesDetailDeveloperOptionsScreen,
+        onNavigateToUserPreferencesAutomaticActionScreen = onNavigateToUserPreferencesAutomaticActionScreen,
+        onNavigateToUserPreferencesConnectionPermissionScreen = onNavigateToUserPreferencesConnectionPermissionScreen,
+        onNavigateToUserPreferencesDeveloperOptionsScreen = onNavigateToUserPreferencesDeveloperOptionsScreen,
     )
 }
 
@@ -50,9 +48,9 @@ fun UserPreferencesListScreen(
 private fun UserPreferencesListScreen(
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
-    onNavigateToUserPreferencesDetailAutomaticActionScreen: () -> Unit,
-    onNavigateToUserPreferencesDetailConnectionPermissionScreen: () -> Unit,
-    onNavigateToUserPreferencesDetailDeveloperOptionsScreen: () -> Unit,
+    onNavigateToUserPreferencesAutomaticActionScreen: () -> Unit,
+    onNavigateToUserPreferencesConnectionPermissionScreen: () -> Unit,
+    onNavigateToUserPreferencesDeveloperOptionsScreen: () -> Unit,
 ) {
     UserPreferencesScaffold(
         title = stringResource(R.string.user_preferences_title),
@@ -66,7 +64,7 @@ private fun UserPreferencesListScreen(
                 )
             },
             modifier = Modifier
-                .clickable(onClick = onNavigateToUserPreferencesDetailConnectionPermissionScreen)
+                .clickable(onClick = onNavigateToUserPreferencesConnectionPermissionScreen)
                 .testTag("geoShareUserPreferencesConnectionPermissionItem"),
             supportingContent = {
                 Text(
@@ -83,7 +81,7 @@ private fun UserPreferencesListScreen(
                 )
             },
             modifier = Modifier
-                .clickable(onClick = onNavigateToUserPreferencesDetailAutomaticActionScreen)
+                .clickable(onClick = onNavigateToUserPreferencesAutomaticActionScreen)
                 .testTag("geoShareUserPreferencesAutomaticActionItem"),
             supportingContent = {
                 Text(
@@ -101,7 +99,7 @@ private fun UserPreferencesListScreen(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 },
-                modifier = Modifier.clickable(onClick = onNavigateToUserPreferencesDetailDeveloperOptionsScreen),
+                modifier = Modifier.clickable(onClick = onNavigateToUserPreferencesDeveloperOptionsScreen),
             )
         }
     }
@@ -116,9 +114,9 @@ private fun DefaultPreview() {
         UserPreferencesListScreen(
             userPreferencesValues = defaultFakeUserPreferences,
             onBack = {},
-            onNavigateToUserPreferencesDetailAutomaticActionScreen = {},
-            onNavigateToUserPreferencesDetailConnectionPermissionScreen = {},
-            onNavigateToUserPreferencesDetailDeveloperOptionsScreen = {},
+            onNavigateToUserPreferencesAutomaticActionScreen = {},
+            onNavigateToUserPreferencesConnectionPermissionScreen = {},
+            onNavigateToUserPreferencesDeveloperOptionsScreen = {},
         )
     }
 }
@@ -130,9 +128,9 @@ private fun DarkPreview() {
         UserPreferencesListScreen(
             userPreferencesValues = defaultFakeUserPreferences,
             onBack = {},
-            onNavigateToUserPreferencesDetailAutomaticActionScreen = {},
-            onNavigateToUserPreferencesDetailConnectionPermissionScreen = {},
-            onNavigateToUserPreferencesDetailDeveloperOptionsScreen = {},
+            onNavigateToUserPreferencesAutomaticActionScreen = {},
+            onNavigateToUserPreferencesConnectionPermissionScreen = {},
+            onNavigateToUserPreferencesDeveloperOptionsScreen = {},
         )
     }
 }

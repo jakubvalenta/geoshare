@@ -134,15 +134,15 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
 }
 
 val automaticAction = object : OptionsUserPreference<AutomaticAction>(
-    default = AutomaticAction(AutomaticAction.Type.NONE),
+    default = AutomaticAction(AutomaticAction.Type.NOTHING),
     options = {
         val context = LocalContext.current
         val intentTools = IntentTools()
         buildList {
             add(
                 UserPreferenceOption(
-                    AutomaticAction(AutomaticAction.Type.NONE),
-                    stringResource(R.string.user_preferences_automatic_action_none),
+                    AutomaticAction(AutomaticAction.Type.NOTHING),
+                    stringResource(R.string.user_preferences_automatic_action_nothing),
                 )
             )
             add(
@@ -191,7 +191,8 @@ val automaticAction = object : OptionsUserPreference<AutomaticAction>(
                 add(
                     UserPreferenceOption(
                         AutomaticAction(AutomaticAction.Type.OPEN_APP, app.packageName),
-                        stringResource(R.string.user_preferences_automatic_action_open_app, app.packageName)
+                        // TODO Show app icon
+                        stringResource(R.string.user_preferences_automatic_action_open_app, app.label)
                     )
                 )
             }

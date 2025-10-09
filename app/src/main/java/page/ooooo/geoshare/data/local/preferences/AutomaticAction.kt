@@ -11,7 +11,7 @@ data class AutomaticAction(
         COPY_GEO_URI,
         COPY_GOOGLE_MAPS_URI,
         COPY_MAGIC_EARTH_URI,
-        NONE,
+        NOTHING,
         OPEN_APP,
         SAVE_GPX,
         SHARE,

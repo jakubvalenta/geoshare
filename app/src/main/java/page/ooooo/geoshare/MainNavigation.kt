@@ -42,6 +42,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                onNavigateToUserPreferencesAutomaticActionScreen = { navController.navigate("user_preferences/automatic_action") },
                 viewModel = viewModel,
             )
         }
@@ -76,9 +77,9 @@ fun MainNavigation(viewModel: ConversionViewModel) {
         composable("user_preferences") {
             UserPreferencesListScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("main") },
-                onNavigateToUserPreferencesDetailAutomaticActionScreen = { navController.navigate("user_preferences/automatic_action") },
-                onNavigateToUserPreferencesDetailConnectionPermissionScreen = { navController.navigate("user_preferences/connection_permission") },
-                onNavigateToUserPreferencesDetailDeveloperOptionsScreen = { navController.navigate("user_preferences/developer_options") },
+                onNavigateToUserPreferencesAutomaticActionScreen = { navController.navigate("user_preferences/automatic_action") },
+                onNavigateToUserPreferencesConnectionPermissionScreen = { navController.navigate("user_preferences/connection_permission") },
+                onNavigateToUserPreferencesDeveloperOptionsScreen = { navController.navigate("user_preferences/developer_options") },
                 viewModel = viewModel,
             )
         }

@@ -45,7 +45,7 @@ class FakeUserPreferencesRepository @Inject constructor() :
 }
 
 val defaultFakeUserPreferences = UserPreferencesValues(
-    automaticActionValue = AutomaticAction(AutomaticAction.Type.NONE),
+    automaticActionValue = AutomaticAction(AutomaticAction.Type.NOTHING),
     changelogShownForVersionCodeValue = 22,
     connectionPermissionValue = Permission.ALWAYS,
     introShownForVersionCodeValue = 0,
