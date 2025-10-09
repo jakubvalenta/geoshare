@@ -295,8 +295,6 @@ fun ConversionScreen(
 
                 // TODO Allow cancelling automatic action
 
-                // TODO Add automatic actions configuration button that goes directly to user preferences dialog
-
                 // TODO Add instrumented test
 
                 ResultSuccessCard(
