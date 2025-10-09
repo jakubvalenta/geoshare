@@ -97,12 +97,12 @@
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
-    <string name="user_preferences_automatic_action_copy_apple_maps_link">Copy Google Maps link</string>
+    <string name="user_preferences_automatic_action_copy_apple_maps_link">Copy Apple Maps link</string>
     <string name="user_preferences_automatic_action_copy_coords">Copy coordinates in format %1$s</string>
     <string name="user_preferences_automatic_action_copy_google_maps_link">Copy Google Maps link</string>
     <string name="user_preferences_automatic_action_copy_magic_earth_link">Copy Magic Earth link</string>
-    <string name="user_preferences_automatic_action_description">Do something automatically after processing a map link.</string>
-    <string name="user_preferences_automatic_action_none">Do nothing</string>
+    <string name="user_preferences_automatic_action_description">Do something automatically every time a map link is converted to coordinates.</string>
+    <string name="user_preferences_automatic_action_nothing">Nothing</string>
     <string name="user_preferences_automatic_action_open_app">Open %1$s</string>
     <string name="user_preferences_automatic_action_title">Automatic action</string>
     <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>

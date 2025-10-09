@@ -4,7 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,11 +28,13 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessCard(
     geoUriApps: List<IntentTools.App>,
     position: Position,
     onCopy: (String) -> Unit,
+    onNavigateToUserPreferencesAutomaticActionScreen: () -> Unit,
     onOpenApp: (String) -> Unit,
     onShare: () -> Unit,
     onSave: () -> Unit,
@@ -82,8 +87,7 @@ fun ResultSuccessCard(
                         )
                     }
                     DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }) {
+                        expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         listOf(
                             position.toCoordsDecString(),
                             position.toNorthSouthWestEastDecCoordsString(),
@@ -116,7 +120,7 @@ fun ResultSuccessCard(
                 ) {
                     onSave()
                 }
-            }
+            },
         )
 
         Text(
@@ -165,8 +169,16 @@ fun ResultSuccessCard(
                     }
                 }
             }
-            Button({ onShare() }, Modifier.padding(horizontal = Spacing.tiny)) {
-                Text(stringResource(R.string.conversion_succeeded_share))
+            Row(Modifier.padding(horizontal = Spacing.tiny)) {
+                Button({ onShare() }) {
+                    Text(stringResource(R.string.conversion_succeeded_share))
+                }
+                FilledIconButton({ onNavigateToUserPreferencesAutomaticActionScreen() }) {
+                    Icon(
+                        Icons.Default.Settings,
+                        stringResource(R.string.user_preferences_automatic_action_title)
+                    )
+                }
             }
         }
     }
@@ -190,6 +202,7 @@ private fun DefaultPreview() {
                 },
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -214,6 +227,7 @@ private fun DarkPreview() {
                 },
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -238,6 +252,7 @@ private fun OneAppPreview() {
                 ),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -262,6 +277,7 @@ private fun DarkOneAppPreview() {
                 ),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -286,6 +302,7 @@ private fun ParamsPreview() {
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -310,6 +327,7 @@ private fun DarkParamsPreview() {
                 ),
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -340,6 +358,7 @@ private fun PointsPreview() {
                     ),
                 ),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -370,6 +389,7 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -387,6 +407,7 @@ private fun NoAppsPreview() {
                 geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
@@ -404,6 +425,7 @@ private fun DarkNoAppsPreview() {
                 geoUriApps = listOf(),
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onNavigateToUserPreferencesAutomaticActionScreen = {},
                 onOpenApp = {},
                 onShare = {},
                 onSave = {},
