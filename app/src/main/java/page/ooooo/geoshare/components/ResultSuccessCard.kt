@@ -277,7 +277,7 @@ fun ResultSuccessCard(
                             )
                         }
                     }
-                    repeat(columnCount - apps.size) {
+                    repeat(columnCount - appsChunk.size) {
                         Box(Modifier.weight(1f))
                     }
                 }
