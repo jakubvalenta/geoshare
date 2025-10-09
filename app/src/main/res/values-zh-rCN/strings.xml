@@ -79,7 +79,6 @@
     <string name="conversion_loading_indicator_cancel">取消</string>
     <string name="conversion_failed_cancelled">已取消</string>
     <string name="conversion_succeeded_skip">复制原始链接</string>
-    <string name="conversion_done">完成</string>
     <string name="conversion_succeeded_title">坐标</string>
     <string name="conversion_error_title">错误</string>
     <string name="converter_yandex_maps_permission_title">连接到 Yandex？</string>

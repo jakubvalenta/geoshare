@@ -82,7 +82,6 @@
     <string name="conversion_loading_indicator_cancel">Zrušit</string>
     <string name="conversion_failed_cancelled">Zrušeno</string>
     <string name="conversion_succeeded_skip">Kopírovat původní odkaz</string>
-    <string name="conversion_done">Hotovo</string>
     <string name="conversion_succeeded_title">Souřadnice</string>
     <string name="conversion_error_title">Chyba</string>
     <string name="converter_yandex_maps_permission_title">Spojit se s Yandexem?</string>

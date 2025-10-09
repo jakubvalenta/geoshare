@@ -81,7 +81,6 @@
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
     <string name="conversion_failed_cancelled">Cancelado</string>
     <string name="conversion_succeeded_skip">Copiar link original</string>
-    <string name="conversion_done">Pronto</string>
     <string name="conversion_succeeded_title">Coordenadas</string>
     <string name="conversion_error_title">Erro</string>
     <string name="converter_yandex_maps_permission_title">Conectar ao Yandex?</string>

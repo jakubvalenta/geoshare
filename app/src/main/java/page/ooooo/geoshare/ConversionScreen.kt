@@ -135,7 +135,7 @@ fun ConversionScreen(
             else -> null
         },
         navigationIcon = {
-            IconButton(onClick = { onBack() }) {
+            IconButton({ onBack() }, Modifier.testTag("geoShareConversionBackButton")) {
                 Icon(
                     Icons.AutoMirrored.Default.ArrowBack,
                     stringResource(R.string.nav_back_content_description)
@@ -145,7 +145,7 @@ fun ConversionScreen(
         startButton = when {
             loadingIndicatorTitleResId != null -> {
                 {
-                    OutlinedButton(onCancel) {
+                    TextButton(onCancel) {
                         Text(stringResource(R.string.conversion_loading_indicator_cancel))
                     }
                 }
@@ -163,17 +163,6 @@ fun ConversionScreen(
                 {
                     TextButton({ onCopy(currentState.inputUriString) }) {
                         Text(stringResource(R.string.conversion_succeeded_skip))
-                    }
-                }
-            }
-
-            else -> null
-        },
-        endButton = when (currentState) {
-            is HasError, is HasResult -> {
-                {
-                    OutlinedButton(onBack, Modifier.testTag("geoShareConversionDoneButton")) {
-                        Text(stringResource(R.string.conversion_done))
                     }
                 }
             }

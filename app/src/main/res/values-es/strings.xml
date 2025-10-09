@@ -78,7 +78,6 @@
     <string name="converter_google_maps_loading_indicator_title">Conectándose a Google…</string>
     <string name="converter_apple_maps_permission_title">¿Conectarse a Apple?</string>
     <string name="converter_apple_maps_loading_indicator_title">Conectándose a Apple…</string>
-    <string name="conversion_done">Finalizado</string>
     <string name="conversion_succeeded_title">Coordenadas</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
