@@ -159,18 +159,18 @@ val automation = object : OptionsUserPreference<AutomationImplementation>(
     options = {
         val context = LocalContext.current
         listOf(
+            AutomationImplementation.Noop(),
             AutomationImplementation.CopyCoordsDec(),
             AutomationImplementation.CopyCoordsNorthSouthWestEastDec(),
             AutomationImplementation.CopyGeoUri(),
             AutomationImplementation.CopyGoogleMapsUri(),
-            AutomationImplementation.CopyMagicEarthUri(),
-            AutomationImplementation.Noop(),
             AutomationImplementation.CopyAppleMapsUri(),
+            AutomationImplementation.CopyMagicEarthUri(),
+            AutomationImplementation.SaveGpx(),
+            AutomationImplementation.Share(),
             *IntentTools().queryGeoUriApps(context.packageManager)
                 .map { app -> AutomationImplementation.OpenApp(app.packageName) }
                 .toTypedArray(),
-            AutomationImplementation.SaveGpx(),
-            AutomationImplementation.Share(),
         ).map { automation -> UserPreferenceOption(automation) { automation.Label() } }
     }
 ) {
