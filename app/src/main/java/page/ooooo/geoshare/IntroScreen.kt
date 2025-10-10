@@ -132,9 +132,15 @@ private fun IntroScreen(
                             stringResource(R.string.intro_open_by_default_google_maps_caption),
                         ) {
                             ScreenshotOpenByDefaultMapApp()
-                            FilledTonalButton({
-                                onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
-                            }) {
+                            Button(
+                                {
+                                    onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                ),
+                            ) {
                                 Text(stringResource(R.string.intro_open_by_default_google_maps_button))
                             }
                         }
@@ -142,9 +148,15 @@ private fun IntroScreen(
                             stringResource(R.string.intro_open_by_default_app_caption, appName),
                         ) {
                             ScreenshotOpenByDefault()
-                            FilledTonalButton({
-                                onShowOpenByDefaultSettings()
-                            }) {
+                            FilledTonalButton(
+                                {
+                                    onShowOpenByDefaultSettings()
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                ),
+                            ) {
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
                             ParagraphHtml(
