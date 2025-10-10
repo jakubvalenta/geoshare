@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,6 +11,8 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -17,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
@@ -31,13 +36,18 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val clipboard = LocalClipboard.current
+    val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.saveGpx(context, it)
+    }
     val recentInputsShown by viewModel.changelogShown.collectAsState()
 
     MainScreen(
         inputUriString = viewModel.inputUriString,
         changelogShown = recentInputsShown,
         onUpdateInput = { viewModel.updateInput(it) },
-        onStart = { viewModel.start() },
+        onStart = { viewModel.start(ConversionRunContext(context, clipboard, saveGpxLauncher)) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToConversionScreen = onNavigateToConversionScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,

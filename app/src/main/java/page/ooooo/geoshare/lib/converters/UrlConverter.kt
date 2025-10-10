@@ -19,7 +19,7 @@ sealed interface UrlConverter {
 
     interface WithShortUriPattern : UrlConverter {
         val shortUriPattern: Pattern
-        val shortUriMethod: ShortUriMethod get() = ShortUriMethod.HEAD
+        val shortUriMethod: ShortUriMethod
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }
@@ -29,8 +29,8 @@ sealed interface UrlConverter {
     }
 
     interface WithHtmlPattern : UrlConverter {
-        val conversionHtmlPattern: ConversionHtmlPattern<PositionRegex>? get() = null
-        val conversionHtmlRedirectPattern: ConversionHtmlPattern<RedirectRegex>? get() = null
+        val conversionHtmlPattern: ConversionHtmlPattern<PositionRegex>?
+        val conversionHtmlRedirectPattern: ConversionHtmlPattern<RedirectRegex>?
         fun getHtmlUrl(uri: Uri): URL? = uri.toUrl()
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.converters.*
 import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -49,7 +51,8 @@ private sealed class Filter(val titleResId: Int) {
 private fun getDocumentations(
     filter: Filter,
     changelogShownForVersionCode: Int?,
-    isDefaultHandlerEnabled: (uriString: String) -> Boolean,
+    intentTools: IntentTools,
+    packageManager: PackageManager,
     urlConverters: List<UrlConverter>,
 ): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
@@ -63,7 +66,7 @@ private fun getDocumentations(
                 newChangelogShownForVersionCode = input.addedInVersionCode
             }
             if (input is DocumentationInput.Url) {
-                val defaultHandlerEnabled = isDefaultHandlerEnabled(input.urlString)
+                val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
                 if (filter is Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
@@ -99,7 +102,8 @@ private fun getDocumentations(
 ) = getDocumentations(
     filter,
     changelogShownForVersionCode,
-    isDefaultHandlerEnabled = { viewModel.isDefaultHandlerEnabled(context.packageManager, it) },
+    intentTools = viewModel.intentTools,
+    packageManager = context.packageManager,
     viewModel.urlConverters,
 )
 
@@ -141,7 +145,7 @@ fun UrlConvertersScreen(
             onBack()
         },
         onChangeFilter = { filter = it },
-        onShowOpenByDefaultSettings = { viewModel.showOpenByDefaultSettings(context, settingsLauncher) },
+        onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 

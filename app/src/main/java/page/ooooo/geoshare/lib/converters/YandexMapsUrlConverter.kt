@@ -3,10 +3,12 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ConversionHtmlPattern
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.RedirectRegex
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
@@ -44,6 +46,7 @@ class YandexMapsUrlConverter() :
     )
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val shortUriMethod: ShortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {
@@ -65,6 +68,8 @@ class YandexMapsUrlConverter() :
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex("""data-coordinates="$LON,$LAT""""))
     }
+
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

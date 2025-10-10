@@ -60,6 +60,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
         content(PositionRegex(""""latLng":{"lat":$LAT,"lng":$LON}"""))
     }
 
+    override val conversionHtmlRedirectPattern = null
+
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title
 
