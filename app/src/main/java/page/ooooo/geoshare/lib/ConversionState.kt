@@ -410,10 +410,14 @@ data class AutomationWaiting(
     override val automation: Automation.HasDelay,
 ) : ConversionState(), HasResult, HasAutomation {
     override suspend fun transition(): State {
-        if (automation.delaySec > 0) {
-            delay(automation.delaySec * 1000L)
+        try {
+            if (automation.delaySec > 0) {
+                delay(automation.delaySec * 1000L)
+            }
+            return AutomationReady(stateContext, runContext, inputUriString, position, automation)
+        } catch (_: CancellationException) {
+            return AutomationFinished(inputUriString, position, automation)
         }
-        return AutomationReady(stateContext, runContext, inputUriString, position, automation)
     }
 }
 
