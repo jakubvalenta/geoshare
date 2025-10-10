@@ -4,11 +4,9 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
@@ -27,8 +25,6 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,8 +45,10 @@ class ConversionViewModel @Inject constructor(
         YandexMapsUrlConverter(),
         CoordinatesUrlConverter(),
     )
+    val intentTools = IntentTools()
     val stateContext = ConversionStateContext(
         urlConverters = urlConverters,
+        intentTools = intentTools,
         userPreferencesRepository = userPreferencesRepository,
     ) { newState ->
         _currentState.value = newState
@@ -140,13 +138,13 @@ class ConversionViewModel @Inject constructor(
         userPreferencesValues.value.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.introShowForVersionCode.default,
     )
 
-    fun start() {
-        stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
+    fun start(runContext: ConversionRunContext) {
+        stateContext.currentState = ReceivedUriString(stateContext, runContext, inputUriString)
         transition()
     }
 
-    fun start(intent: Intent) {
-        stateContext.currentState = ReceivedIntent(stateContext, intent)
+    fun start(runContext: ConversionRunContext, intent: Intent) {
+        stateContext.currentState = ReceivedIntent(stateContext, runContext, intent)
         transition()
     }
 
@@ -166,19 +164,6 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun runAutomation(context: Context, clipboard: Clipboard, saveLauncher: ActivityResultLauncher<Intent>) {
-        assert(stateContext.currentState is AutomationReady)
-        viewModelScope.launch {
-            stateContext.currentState = (stateContext.currentState as AutomationReady).run(
-                onCopy = { text -> copy(context, clipboard, text) },
-                onOpenApp = { packageName, uriString -> openApp(context, packageName, uriString) },
-                onOpenChooser = { uriString -> openChooser(context, uriString) },
-                onSave = { launchSave(context, saveLauncher) },
-            )
-            transition()
-        }
-    }
-
     fun copy(context: Context, clipboard: Clipboard, text: String) {
         viewModelScope.launch {
             clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
@@ -189,48 +174,7 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun openApp(context: Context, packageName: String, uriString: String): Boolean =
-        stateContext.intentTools.openApp(context, packageName, uriString)
-
-    fun openChooser(context: Context, uriString: String): Boolean =
-        stateContext.intentTools.openChooser(context, uriString)
-
-    fun queryGeoUriApps(packageManager: PackageManager): List<IntentTools.App> =
-        stateContext.intentTools.queryGeoUriApps(packageManager)
-
-    fun showOpenByDefaultSettings(context: Context, settingsLauncher: ActivityResultLauncher<Intent>) {
-        stateContext.intentTools.showOpenByDefaultSettings(context, settingsLauncher)
-    }
-
-    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean =
-        stateContext.intentTools.isDefaultHandlerEnabled(packageManager, uriString)
-
-    fun showOpenByDefaultSettingsForPackage(
-        context: Context,
-        settingsLauncher: ActivityResultLauncher<Intent>,
-        packageName: String,
-    ) {
-        stateContext.intentTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
-    }
-
-    fun launchSave(context: Context, saveLauncher: ActivityResultLauncher<Intent>) {
-        @Suppress("SpellCheckingInspection") val timestamp =
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
-        val filename = context.resources.getString(
-            R.string.conversion_succeeded_save_gpx_filename,
-            context.resources.getString(R.string.app_name),
-            timestamp,
-        )
-        saveLauncher.launch(
-            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/xml"
-                putExtra(Intent.EXTRA_TITLE, filename)
-            }
-        )
-    }
-
-    fun save(context: Context, result: ActivityResult) {
+    fun saveGpx(context: Context, result: ActivityResult) {
         result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.writer()

@@ -42,6 +42,8 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         content(PointsPositionRegex(""""lat":$LAT,"lon":$LON"""))
     }
 
+    override val conversionHtmlRedirectPattern = null
+
     override fun getHtmlUrl(uri: Uri): URL? {
         val m = Pattern.compile(ELEMENT_PATH).matcher(uri.path)
         if (!m.matches()) {

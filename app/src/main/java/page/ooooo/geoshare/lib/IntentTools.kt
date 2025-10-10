@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -12,9 +13,12 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
 import androidx.core.net.toUri
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import java.text.SimpleDateFormat
 import java.util.*
 
 class IntentTools {
@@ -123,6 +127,23 @@ class IntentTools {
     fun openChooser(context: Context, uriString: String): Boolean =
         startActivity(context, createChooserIntent(uriString.toUri()))
 
+    fun launchSaveGpx(context: Context, saveGpxLauncher: ActivityResultLauncher<Intent>) {
+        @Suppress("SpellCheckingInspection")
+        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
+        val filename = context.resources.getString(
+            R.string.conversion_succeeded_save_gpx_filename,
+            context.resources.getString(R.string.app_name),
+            timestamp,
+        )
+        saveGpxLauncher.launch(
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "text/xml"
+                putExtra(Intent.EXTRA_TITLE, filename)
+            }
+        )
+    }
+
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
         val resolveInfo = try {
             packageManager.resolveActivity(
@@ -171,6 +192,14 @@ class IntentTools {
                 R.string.intro_settings_activity_not_found,
                 Toast.LENGTH_LONG,
             ).show()
+        }
+    }
+
+    suspend fun copyToClipboard(context: Context, clipboard: Clipboard, text: String) {
+        clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
+        val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        if (!systemHasClipboardEditor) {
+            Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
         }
     }
 }

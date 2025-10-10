@@ -4,11 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import page.ooooo.geoshare.ui.UrlConvertersScreen
-import page.ooooo.geoshare.ui.UserPreferencesDetailDeveloperScreen
-import page.ooooo.geoshare.ui.UserPreferencesListScreen
-import page.ooooo.geoshare.ui.UserPreferencesDetailAutomationScreen
-import page.ooooo.geoshare.ui.UserPreferencesDetailConnectionPermissionScreen
+import page.ooooo.geoshare.ui.*
 
 @Composable
 fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {

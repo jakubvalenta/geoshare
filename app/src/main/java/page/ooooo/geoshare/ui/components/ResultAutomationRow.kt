@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,11 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.AutomationImplementation
 import page.ooooo.geoshare.lib.*
@@ -67,8 +72,8 @@ fun ResultAutomationRow(
             }
         }
         ResultAutomationNotification(currentState is AutomationWaiting) {
-            currentState.automation.takeIf { it is Automation.CanWait }?.let { automation ->
-                (automation as Automation.CanWait).waitingText(automationCounterSec)
+            currentState.automation.takeIf { it is Automation.HasDelay }?.let { automation ->
+                (automation as Automation.HasDelay).waitingText(automationCounterSec)
             } ?: ""
         }
         ResultAutomationNotification(currentState is AutomationSucceeded) {
@@ -81,8 +86,8 @@ fun ResultAutomationRow(
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
-            currentState.automation.takeIf { it is Automation.CanFail }?.let { automation ->
-                (automation as Automation.CanFail).errorText()
+            currentState.automation.takeIf { it is Automation.HasErrorMessage }?.let { automation ->
+                (automation as Automation.HasErrorMessage).errorText()
             } ?: ""
         }
         AnimatedVisibility(currentState is AutomationWaiting) {
@@ -177,8 +182,14 @@ private fun WaitingPreview() {
     AppTheme {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val context = LocalContext.current
+                val clipboard = LocalClipboard.current
+                val saveGpxLauncher =
+                    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
                 ResultAutomationRow(
                     currentState = AutomationWaiting(
+                        ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                        ConversionRunContext(context, clipboard, saveGpxLauncher),
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
                         AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
@@ -197,8 +208,14 @@ private fun DarkWaitingPreview() {
     AppTheme {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val context = LocalContext.current
+                val clipboard = LocalClipboard.current
+                val saveGpxLauncher =
+                    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
                 ResultAutomationRow(
                     currentState = AutomationWaiting(
+                        ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                        ConversionRunContext(context, clipboard, saveGpxLauncher),
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
                         AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
