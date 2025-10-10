@@ -39,11 +39,11 @@ class ConversionStateTest {
         } doThrow NotImplementedError()
     }
 
-    fun mockStateContext(
-        intentTools: IntentTools = mockIntentTools,
-        userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
+    private fun mockStateContext(
         urlConverters: List<UrlConverter> = listOf(geoUrlConverter, googleMapsUrlConverter),
+        intentTools: IntentTools = mockIntentTools,
         networkTools: NetworkTools = mockNetworkTools,
+        userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
         log: ILog = fakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
@@ -810,7 +810,7 @@ class ConversionStateTest {
         )
         val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, uri, null)
         assertEquals(
-            ConversionSucceeded(inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, position),
             state.transition(),
         )
     }
@@ -884,7 +884,7 @@ class ConversionStateTest {
             val stateContext = mockStateContext(urlConverters = listOf(mockGoogleMapsUrlConverter))
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, uri, Permission.NEVER)
             assertEquals(
-                ParseHtmlFailed(inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
                 state.transition(),
             )
         }
@@ -975,7 +975,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsUrlConverter, uri, null)
             assertEquals(
-                ParseHtmlFailed(inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
                 state.transition(),
             )
         }
@@ -999,7 +999,7 @@ class ConversionStateTest {
             val stateContext = mockStateContext(urlConverters = listOf(mockUrlConverter))
             val state = UnshortenedUrl(stateContext, inputUriString, mockUrlConverter, uri, Permission.ALWAYS)
             assertEquals(
-                ParseHtmlFailed(inputUriString, null),
+                ParseHtmlFailed(stateContext, inputUriString, null),
                 state.transition(),
             )
         }
@@ -1071,7 +1071,7 @@ class ConversionStateTest {
         val state =
             RequestedParseHtmlPermission(stateContext, inputUriString, googleMapsUrlConverter, uri, positionFromUri)
         assertEquals(
-            ParseHtmlFailed(inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
             state.deny(false),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
@@ -1092,7 +1092,7 @@ class ConversionStateTest {
         val state =
             RequestedParseHtmlPermission(stateContext, inputUriString, googleMapsUrlConverter, uri, positionFromUri)
         assertEquals(
-            ParseHtmlFailed(inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -1137,7 +1137,7 @@ class ConversionStateTest {
             )
             val state = GrantedParseHtmlPermission(stateContext, inputUriString, mockUrlConverter, uri, positionFromUri)
             assertEquals(
-                ParseHtmlFailed(inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
                 state.transition(),
             )
         }
@@ -1393,7 +1393,7 @@ class ConversionStateTest {
         )
         val state = GrantedParseHtmlPermission(stateContext, inputUriString, mockUrlConverter, uri, positionFromUri)
         assertEquals(
-            ConversionSucceeded(inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, position),
             state.transition(),
         )
     }
@@ -1442,7 +1442,7 @@ class ConversionStateTest {
         )
         val state = GrantedParseHtmlPermission(stateContext, inputUriString, mockUrlConverter, uri, positionFromUri)
         assertEquals(
-            ConversionSucceeded(inputUriString, positionFromHtml),
+            ConversionSucceeded(stateContext, inputUriString, positionFromHtml),
             state.transition(),
         )
     }
@@ -1662,7 +1662,7 @@ class ConversionStateTest {
                 stateContext, inputUriString, mockUrlConverter, uri, positionFromUri
             )
             assertEquals(
-                ParseHtmlFailed(inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
                 state.transition(),
             )
         }
@@ -1713,7 +1713,7 @@ class ConversionStateTest {
                 stateContext, inputUriString, mockUrlConverter, uri, positionFromUri
             )
             assertEquals(
-                ParseHtmlFailed(inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
                 state.transition(),
             )
         }
@@ -1722,9 +1722,10 @@ class ConversionStateTest {
     fun parseHtmlFailed_positionFromUriHasPoint_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val positionFromUri = Position(lat = "1", lon = "2")
-        val state = ParseHtmlFailed(inputUriString, positionFromUri)
+        val stateContext = mockStateContext()
+        val state = ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
         assertEquals(
-            ConversionSucceeded(inputUriString, positionFromUri),
+            ConversionSucceeded(stateContext, inputUriString, positionFromUri),
             state.transition(),
         )
     }
@@ -1733,9 +1734,10 @@ class ConversionStateTest {
     fun parseHtmlFailed_positionFromUriHasQuery_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val positionFromUri = Position(q = "foo")
-        val state = ParseHtmlFailed(inputUriString, positionFromUri)
+        val stateContext = mockStateContext()
+        val state = ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
         assertEquals(
-            ConversionSucceeded(inputUriString, positionFromUri),
+            ConversionSucceeded(stateContext, inputUriString, positionFromUri),
             state.transition(),
         )
     }
@@ -1744,7 +1746,8 @@ class ConversionStateTest {
     fun parseHtmlFailed_positionFromUriIsEmpty_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val positionFromUri = Position()
-        val state = ParseHtmlFailed(inputUriString, positionFromUri)
+        val stateContext = mockStateContext()
+        val state = ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),
@@ -1754,7 +1757,8 @@ class ConversionStateTest {
     @Test
     fun parseHtmlFailed_positionFromUriIsNull_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val state = ParseHtmlFailed(inputUriString, null)
+        val stateContext = mockStateContext()
+        val state = ParseHtmlFailed(stateContext, inputUriString, null)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),
@@ -1764,7 +1768,8 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_returnsNull() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val state = ConversionSucceeded(inputUriString, Position("1", "2"))
+        val stateContext = mockStateContext()
+        val state = ConversionSucceeded(stateContext, inputUriString, Position("1", "2"))
         assertNull(state.transition())
     }
 

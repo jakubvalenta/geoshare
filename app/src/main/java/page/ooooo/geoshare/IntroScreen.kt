@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -44,10 +45,10 @@ fun IntroScreen(
             onBack()
         },
         onShowOpenByDefaultSettings = {
-            viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher)
+            viewModel.showOpenByDefaultSettings(context, settingsLauncher)
         },
         onShowOpenByDefaultSettingsForPackage = { packageName ->
-            viewModel.intentTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+            viewModel.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
         }
     )
 }
@@ -132,7 +133,7 @@ private fun IntroScreen(
                         ) {
                             ScreenshotOpenByDefaultMapApp()
                             FilledTonalButton({
-                                onShowOpenByDefaultSettingsForPackage("com.google.android.apps.maps")
+                                onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
                             }) {
                                 Text(stringResource(R.string.intro_open_by_default_google_maps_button))
                             }

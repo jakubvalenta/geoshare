@@ -1,13 +1,11 @@
 package page.ooooo.geoshare.ui
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -30,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.converters.*
 import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -51,9 +48,8 @@ private sealed class Filter(val titleResId: Int) {
 
 private fun getDocumentations(
     filter: Filter,
-    intentTools: IntentTools,
     changelogShownForVersionCode: Int?,
-    packageManager: PackageManager,
+    isDefaultHandlerEnabled: (uriString: String) -> Boolean,
     urlConverters: List<UrlConverter>,
 ): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
@@ -67,7 +63,7 @@ private fun getDocumentations(
                 newChangelogShownForVersionCode = input.addedInVersionCode
             }
             if (input is DocumentationInput.Url) {
-                val defaultHandlerEnabled = intentTools.isDefaultHandlerEnabled(packageManager, input.urlString)
+                val defaultHandlerEnabled = isDefaultHandlerEnabled(input.urlString)
                 if (filter is Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
@@ -102,9 +98,8 @@ private fun getDocumentations(
     viewModel: ConversionViewModel,
 ) = getDocumentations(
     filter,
-    viewModel.intentTools,
     changelogShownForVersionCode,
-    context.packageManager,
+    isDefaultHandlerEnabled = { viewModel.isDefaultHandlerEnabled(context.packageManager, it) },
     viewModel.urlConverters,
 )
 
@@ -146,7 +141,7 @@ fun UrlConvertersScreen(
             onBack()
         },
         onChangeFilter = { filter = it },
-        onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
+        onShowOpenByDefaultSettings = { viewModel.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -35,7 +36,6 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    val intentTools = IntentTools()
     val urlConverters = listOf(
         GeoUrlConverter(),
         GoogleMapsUrlConverter(),
@@ -49,34 +49,31 @@ class ConversionViewModel @Inject constructor(
         YandexMapsUrlConverter(),
         CoordinatesUrlConverter(),
     )
-
     val stateContext = ConversionStateContext(
         urlConverters = urlConverters,
-        intentTools = intentTools,
-        networkTools = NetworkTools(),
         userPreferencesRepository = userPreferencesRepository,
-        onStateChange = { newState ->
-            _currentState.value = newState
-            when (newState) {
-                is HasLoadingIndicator -> {
-                    loadingIndicatorJob?.cancel()
-                    loadingIndicatorJob = viewModelScope.launch {
-                        // Show loading indicator only if the state lasts longer than 200ms.
-                        delay(200L)
-                        _loadingIndicatorTitleResId.value = newState.loadingIndicatorTitleResId
-                    }
-                }
-
-                else -> {
-                    loadingIndicatorJob?.cancel()
-                    loadingIndicatorJob = viewModelScope.launch {
-                        // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
-                        delay(200L)
-                        _loadingIndicatorTitleResId.value = null
-                    }
+    ) { newState ->
+        _currentState.value = newState
+        when (newState) {
+            is HasLoadingIndicator -> {
+                loadingIndicatorJob?.cancel()
+                loadingIndicatorJob = viewModelScope.launch {
+                    // Show loading indicator only if the state lasts longer than 200ms.
+                    delay(200L)
+                    _loadingIndicatorTitleResId.value = newState.loadingIndicatorTitleResId
                 }
             }
-        })
+
+            else -> {
+                loadingIndicatorJob?.cancel()
+                loadingIndicatorJob = viewModelScope.launch {
+                    // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
+                    delay(200L)
+                    _loadingIndicatorTitleResId.value = null
+                }
+            }
+        }
+    }
 
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
@@ -169,6 +166,19 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun runAutomation(context: Context, clipboard: Clipboard, saveLauncher: ActivityResultLauncher<Intent>) {
+        assert(stateContext.currentState is AutomationReady)
+        viewModelScope.launch {
+            stateContext.currentState = (stateContext.currentState as AutomationReady).run(
+                onCopy = { text -> copy(context, clipboard, text) },
+                onOpenApp = { packageName, uriString -> openApp(context, packageName, uriString) },
+                onOpenChooser = { uriString -> openChooser(context, uriString) },
+                onSave = { launchSave(context, saveLauncher) },
+            )
+            transition()
+        }
+    }
+
     fun copy(context: Context, clipboard: Clipboard, text: String) {
         viewModelScope.launch {
             clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
@@ -179,7 +189,31 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun launchSave(context: Context, launcher: ActivityResultLauncher<Intent>) {
+    fun openApp(context: Context, packageName: String, uriString: String): Boolean =
+        stateContext.intentTools.openApp(context, packageName, uriString)
+
+    fun openChooser(context: Context, uriString: String): Boolean =
+        stateContext.intentTools.openChooser(context, uriString)
+
+    fun queryGeoUriApps(packageManager: PackageManager): List<IntentTools.App> =
+        stateContext.intentTools.queryGeoUriApps(packageManager)
+
+    fun showOpenByDefaultSettings(context: Context, settingsLauncher: ActivityResultLauncher<Intent>) {
+        stateContext.intentTools.showOpenByDefaultSettings(context, settingsLauncher)
+    }
+
+    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean =
+        stateContext.intentTools.isDefaultHandlerEnabled(packageManager, uriString)
+
+    fun showOpenByDefaultSettingsForPackage(
+        context: Context,
+        settingsLauncher: ActivityResultLauncher<Intent>,
+        packageName: String,
+    ) {
+        stateContext.intentTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+    }
+
+    fun launchSave(context: Context, saveLauncher: ActivityResultLauncher<Intent>) {
         @Suppress("SpellCheckingInspection") val timestamp =
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
         val filename = context.resources.getString(
@@ -187,7 +221,7 @@ class ConversionViewModel @Inject constructor(
             context.resources.getString(R.string.app_name),
             timestamp,
         )
-        launcher.launch(
+        saveLauncher.launch(
             Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "text/xml"

@@ -18,6 +18,9 @@ import page.ooooo.geoshare.R
 import java.util.*
 
 class IntentTools {
+    companion object {
+        const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
+    }
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
@@ -61,6 +64,25 @@ class IntentTools {
                 Log.w(null, "Unsupported intent action $intentAction")
                 return null
             }
+        }
+    }
+
+    fun queryApp(packageManager: PackageManager, packageName: String): App? {
+        val applicationInfo = try {
+            packageManager.getApplicationInfo(packageName, 0)
+        } catch (e: Exception) {
+            Log.e(null, "Error when querying an app", e)
+            return null
+        }
+        return try {
+            App(
+                applicationInfo.packageName,
+                applicationInfo.loadLabel(packageManager).toString(),
+                applicationInfo.loadIcon(packageManager),
+            )
+        } catch (e: Exception) {
+            Log.e(null, "Error when loading info about an app", e)
+            null
         }
     }
 

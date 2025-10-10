@@ -1,107 +1,91 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.AutomationImplementation
+import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultAutomationRow(
-    automationState: AutomationState,
-    automationCounterSec: Int,
+    currentState: HasAutomation,
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onShare: () -> Boolean,
 ) {
-    val context = LocalContext.current
+    var automationCounterSec by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(currentState) {
+        if (currentState is AutomationWaiting) {
+            automationCounterSec = currentState.automation.delaySec
+            while (automationCounterSec > 0) {
+                delay(1000L)
+                automationCounterSec--
+            }
+        }
+    }
 
     Row(
         Modifier
+            .padding(top = Spacing.large)
             .fillMaxWidth()
             .height(40.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        AnimatedVisibility(automationState is AutomationState.Nothing) {
-            Button(
-                {
-                    if (!onShare()) {
-                        Toast.makeText(
-                            context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                },
-                Modifier.padding(start = Spacing.tiny, end = Spacing.tiny / 2),
-            ) {
-                Text(stringResource(R.string.conversion_succeeded_share))
-            }
+        AnimatedVisibility(currentState is AutomationFinished, Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.conversion_succeeded_apps_headline),
+                Modifier.padding(horizontal = Spacing.small),
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
-        AnimatedVisibility(automationState is AutomationState.Nothing) {
-            Button(onNavigateToUserPreferencesAutomationScreen) {
-                Icon(
-                    painterResource(R.drawable.automation_24px),
-                    null,
-                    Modifier.padding(end = Spacing.tiny),
+        AnimatedVisibility(currentState is AutomationFinished) {
+            Button(
+                onNavigateToUserPreferencesAutomationScreen,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
                 )
+            ) {
                 Text(stringResource(R.string.user_preferences_automation_title))
             }
         }
-        AnimatedVisibility(automationState !is AutomationState.Nothing, Modifier.weight(1f)) {
-            Card(
-                shape = MaterialTheme.shapes.extraSmall,
-                colors = CardDefaults.cardColors(
-                    containerColor = if (automationState is AutomationState.Failed) {
-                        MaterialTheme.colorScheme.errorContainer
-                    } else {
-                        MaterialTheme.colorScheme.tertiaryContainer
-                    },
-                    contentColor = if (automationState is AutomationState.Failed) {
-                        MaterialTheme.colorScheme.onErrorContainer
-                    } else {
-                        MaterialTheme.colorScheme.onTertiaryContainer
-                    },
-                ),
-            ) {
-                Row(
-                    Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = Spacing.small),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        when (automationState) {
-                            is AutomationState.Nothing -> stringResource(R.string.user_preferences_automation_title)
-                            is AutomationState.Running -> stringResource(
-                                automationState.messageResId, automationCounterSec
-                            )
-
-                            is AutomationState.Failed -> stringResource(automationState.messageResId)
-                            is AutomationState.Succeeded -> stringResource(automationState.messageResId)
-                        },
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
+        ResultAutomationNotification(currentState is AutomationWaiting) {
+            currentState.automation.takeIf { it is Automation.CanWait }?.let { automation ->
+                (automation as Automation.CanWait).waitingText(automationCounterSec)
+            } ?: ""
         }
-        AnimatedVisibility(automationState is AutomationState.Running) {
+        ResultAutomationNotification(currentState is AutomationSucceeded) {
+            currentState.automation.takeIf { it is Automation.HasSuccessMessage }?.let { automation ->
+                (automation as Automation.HasSuccessMessage).successText()
+            } ?: ""
+        }
+        ResultAutomationNotification(
+            currentState is AutomationFailed,
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
+            currentState.automation.takeIf { it is Automation.CanFail }?.let { automation ->
+                (automation as Automation.CanFail).errorText()
+            } ?: ""
+        }
+        AnimatedVisibility(currentState is AutomationWaiting) {
             FilledIconButton(
                 onCancel,
                 colors = IconButtonDefaults.filledIconButtonColors(
@@ -118,6 +102,33 @@ fun ResultAutomationRow(
     }
 }
 
+@Composable
+private fun RowScope.ResultAutomationNotification(
+    visible: Boolean,
+    containerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
+    text: @Composable () -> String,
+) {
+    AnimatedVisibility(visible, Modifier.weight(1f)) {
+        Card(
+            shape = MaterialTheme.shapes.extraSmall,
+            colors = CardDefaults.cardColors(containerColor = containerColor, contentColor = contentColor),
+        ) {
+            Row(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = Spacing.small),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text(),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+    }
+}
+
 // Previews
 
 @Preview(showBackground = true)
@@ -127,11 +138,13 @@ private fun DefaultPreview() {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Nothing(),
-                    automationCounterSec = 0,
+                    currentState = AutomationFinished(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -145,11 +158,13 @@ private fun DarkPreview() {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Nothing(),
-                    automationCounterSec = 0,
+                    currentState = AutomationFinished(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -158,16 +173,18 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun RunningPreview() {
+private fun WaitingPreview() {
     AppTheme {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Running(R.string.conversion_automation_open_app_running),
-                    automationCounterSec = 3,
+                    currentState = AutomationWaiting(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -176,16 +193,18 @@ private fun RunningPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkRunningPreview() {
+private fun DarkWaitingPreview() {
     AppTheme {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Running(R.string.conversion_automation_open_app_running),
-                    automationCounterSec = 3,
+                    currentState = AutomationWaiting(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -199,11 +218,13 @@ private fun SucceededPreview() {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Succeeded(R.string.conversion_automation_open_app_succeeded),
-                    automationCounterSec = 0,
+                    currentState = AutomationSucceeded(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -217,11 +238,13 @@ private fun DarSucceededPreview() {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Succeeded(R.string.conversion_automation_open_app_succeeded),
-                    automationCounterSec = 0,
+                    currentState = AutomationSucceeded(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -235,11 +258,13 @@ private fun FailedPreview() {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Failed(R.string.conversion_automation_open_app_failed),
-                    automationCounterSec = 0,
+                    currentState = AutomationFailed(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
@@ -253,11 +278,13 @@ private fun DarkFailedPreview() {
         Surface {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ResultAutomationRow(
-                    automationState = AutomationState.Failed(R.string.conversion_automation_open_app_failed),
-                    automationCounterSec = 0,
+                    currentState = AutomationFailed(
+                        "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        Position("50.123456", "11.123456"),
+                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
-                    onShare = { true },
                 )
             }
         }
