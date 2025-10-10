@@ -28,7 +28,6 @@ import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultAutomationRow(
     currentState: HasAutomation,
@@ -64,9 +63,9 @@ fun ResultAutomationRow(
         AnimatedVisibility(currentState is AutomationFinished) {
             Button(
                 onNavigateToUserPreferencesAutomationScreen,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                 )
             ) {
                 Text(stringResource(R.string.user_preferences_automation_title))
