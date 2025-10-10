@@ -5,8 +5,12 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.AutomationImplementation
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
@@ -31,6 +35,10 @@ interface HasResult {
 interface HasError {
     val errorMessageResId: Int
     val inputUriString: String
+}
+
+interface HasAutomation {
+    val automation: Automation
 }
 
 class Initial : ConversionState()
@@ -191,7 +199,7 @@ data class UnshortenedUrl(
             val positionFromUrl = conversionMatchers.toPosition()
             stateContext.log.i(null, "URI Pattern: Converted $uri to $positionFromUrl")
             if (positionFromUrl.points?.isNotEmpty() == true) {
-                return ConversionSucceeded(inputUriString, positionFromUrl)
+                return ConversionSucceeded(stateContext, inputUriString, positionFromUrl)
             }
             positionFromUrl
         } else {
@@ -207,10 +215,10 @@ data class UnshortenedUrl(
                     stateContext, inputUriString, urlConverter, uri, positionFromUri
                 )
 
-                Permission.NEVER -> ParseHtmlFailed(inputUriString, positionFromUri)
+                Permission.NEVER -> ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
             }
         }
-        return ParseHtmlFailed(inputUriString, positionFromUri)
+        return ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
     }
 }
 
@@ -234,7 +242,7 @@ data class RequestedParseHtmlPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
         }
-        return ParseHtmlFailed(inputUriString, positionFromUri)
+        return ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
     }
 }
 
@@ -277,7 +285,7 @@ data class GrantedParseHtmlPermission(
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
             stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
-            return ConversionSucceeded(inputUriString, position)
+            return ConversionSucceeded(stateContext, inputUriString, position)
         }
         urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUriString ->
             stateContext.log.i(
@@ -288,7 +296,7 @@ data class GrantedParseHtmlPermission(
             return ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
         }
         stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
-        return ParseHtmlFailed(inputUriString, positionFromUri)
+        return ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
     }
 
     @Composable
@@ -303,23 +311,112 @@ data class GrantedParseHtmlPermission(
 }
 
 data class ParseHtmlFailed(
+    val stateContext: ConversionStateContext,
     val inputUriString: String,
     val positionFromUri: Position?,
 ) : ConversionState() {
     override suspend fun transition() =
         if (positionFromUri != null && (!positionFromUri.points.isNullOrEmpty() || !positionFromUri.q.isNullOrEmpty())) {
-            ConversionSucceeded(inputUriString, positionFromUri)
+            ConversionSucceeded(stateContext, inputUriString, positionFromUri)
         } else {
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
 }
 
 data class ConversionSucceeded(
+    val stateContext: ConversionStateContext,
     override val inputUriString: String,
     override val position: Position,
-) : ConversionState(), HasResult
+) : ConversionState(), HasResult {
+    override suspend fun transition(): State =
+        stateContext.userPreferencesRepository.getValue(automation).let { automation ->
+            when (automation) {
+                is Automation.CanWait -> AutomationWaiting(inputUriString, position, automation)
+                else -> AutomationReady(inputUriString, position, automation)
+            }
+        }
+}
 
 data class ConversionFailed(
     @param:StringRes override val errorMessageResId: Int,
     override val inputUriString: String,
 ) : ConversionState(), HasError
+
+data class AutomationWaiting(
+    override val inputUriString: String,
+    override val position: Position,
+    override val automation: Automation.CanWait,
+) : ConversionState(), HasResult, HasAutomation {
+    override suspend fun transition(): State {
+        if (automation.delaySec > 0) {
+            delay(automation.delaySec * 1000L)
+        }
+        return AutomationReady(inputUriString, position, automation)
+    }
+}
+
+data class AutomationReady(
+    override val inputUriString: String,
+    override val position: Position,
+    override val automation: Automation,
+) : ConversionState(), HasResult, HasAutomation {
+    fun run(
+        onCopy: (text: String) -> Unit,
+        onOpenApp: (packageName: String, uriString: String) -> Boolean,
+        onOpenChooser: (uriString: String) -> Boolean,
+        onSave: () -> Unit,
+    ): State =
+        when (automation) {
+            is Automation.AlwaysSucceeds -> {
+                automation.run(
+                    position,
+                    onCopy = onCopy,
+                    onOpenApp = onOpenApp,
+                    onOpenChooser = onOpenChooser,
+                    onSave = onSave,
+                )
+                when (automation) {
+                    is Automation.HasSuccessMessage -> AutomationSucceeded(inputUriString, position, automation)
+                    else -> AutomationFinished(inputUriString, position, automation)
+                }
+            }
+
+            is Automation.CanFail -> {
+                val success = automation.run(
+                    position,
+                    onCopy = onCopy,
+                    onOpenApp = onOpenApp,
+                    onOpenChooser = onOpenChooser,
+                    onSave = onSave,
+                )
+                if (success) {
+                    when (automation) {
+                        is Automation.HasSuccessMessage -> AutomationSucceeded(inputUriString, position, automation)
+                        else -> AutomationFinished(inputUriString, position, automation)
+                    }
+                } else {
+                    AutomationFailed(inputUriString, position, automation)
+                }
+            }
+
+            else -> AutomationFinished(inputUriString, position, AutomationImplementation.Noop())
+        }
+}
+
+data class AutomationSucceeded(
+    override val inputUriString: String,
+    override val position: Position,
+    override val automation: Automation.HasSuccessMessage,
+) : ConversionState(), HasResult, HasAutomation
+
+data class AutomationFinished(
+    override val inputUriString: String,
+    override val position: Position,
+    override val automation: Automation,
+) : ConversionState(), HasResult, HasAutomation
+
+data class AutomationFailed(
+    override val inputUriString: String,
+    override val position: Position,
+    override val automation: Automation.CanFail,
+) : ConversionState(), HasResult, HasAutomation

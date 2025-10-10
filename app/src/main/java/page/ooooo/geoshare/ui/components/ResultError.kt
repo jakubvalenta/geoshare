@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
@@ -25,7 +25,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ResultErrorCard(
+fun ResultError(
     @StringRes errorMessageResId: Int,
     inputUriString: String,
     retryLoadingIndicatorVisible: Boolean,
@@ -105,7 +105,7 @@ fun ResultErrorCard(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 retryLoadingIndicatorVisible = false,
@@ -121,7 +121,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 retryLoadingIndicatorVisible = false,
@@ -137,7 +137,7 @@ private fun DarkPreview() {
 private fun CoordinatesPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
                 retryLoadingIndicatorVisible = false,
@@ -153,7 +153,7 @@ private fun CoordinatesPreview() {
 private fun DarkCoordinatesPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
                 retryLoadingIndicatorVisible = false,
@@ -169,7 +169,7 @@ private fun DarkCoordinatesPreview() {
 private fun EmptyPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = false,
@@ -185,7 +185,7 @@ private fun EmptyPreview() {
 private fun DarkEmptyPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = false,
@@ -201,7 +201,7 @@ private fun DarkEmptyPreview() {
 private fun LoadingIndicatorPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = true,
@@ -217,7 +217,7 @@ private fun LoadingIndicatorPreview() {
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
         Surface {
-            ResultErrorCard(
+            ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
                 retryLoadingIndicatorVisible = true,

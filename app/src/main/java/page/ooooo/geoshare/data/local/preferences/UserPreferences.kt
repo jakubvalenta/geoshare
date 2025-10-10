@@ -1,31 +1,21 @@
 package page.ooooo.geoshare.data.local.preferences
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.components.RadioButtonGroup
 import page.ooooo.geoshare.components.RadioButtonOption
 import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.ui.theme.Spacing
-
-private val examplePosition = Position("50.123456", "-11.123456")
 
 interface UserPreference<T> {
     val loading: T
@@ -151,98 +141,76 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-val automation = object : OptionsUserPreference<Automation>(
-    default = Automation(Automation.Type.NOTHING),
+private enum class AutomationType {
+    COPY_APPLE_MAPS_URI,
+    COPY_COORDS_DEC,
+    COPY_COORDS_NSWE_DEC,
+    COPY_GEO_URI,
+    COPY_GOOGLE_MAPS_URI,
+    COPY_MAGIC_EARTH_URI,
+    NOOP,
+    OPEN_APP,
+    SAVE_GPX,
+    SHARE,
+}
+
+val automation = object : OptionsUserPreference<AutomationImplementation>(
+    default = AutomationImplementation.Noop(),
     options = {
         val context = LocalContext.current
-        val intentTools = IntentTools()
-        buildList {
-            add(
-                UserPreferenceOption(Automation(Automation.Type.NOTHING)) {
-                    Text(stringResource(R.string.user_preferences_automation_nothing))
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.COPY_COORDS_DEC)) {
-                    Text(
-                        stringResource(
-                            R.string.user_preferences_automation_copy_coords,
-                            examplePosition.toCoordsDecString()
-                        )
-                    )
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.COPY_COORDS_NSWE_DEC)) {
-                    Text(
-                        stringResource(
-                            R.string.user_preferences_automation_copy_coords,
-                            examplePosition.toNorthSouthWestEastDecCoordsString(),
-                        )
-                    )
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.COPY_GEO_URI)) {
-                    Text(stringResource(R.string.conversion_succeeded_copy_geo))
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.COPY_GOOGLE_MAPS_URI)) {
-                    Text(stringResource(R.string.user_preferences_automation_copy_google_maps_link))
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.COPY_APPLE_MAPS_URI)) {
-                    Text(stringResource(R.string.user_preferences_automation_copy_apple_maps_link))
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.COPY_MAGIC_EARTH_URI)) {
-                    Text(stringResource(R.string.user_preferences_automation_copy_magic_earth_link))
-                }
-            )
-            for (app in intentTools.queryGeoUriApps(context.packageManager)) {
-                add(
-                    UserPreferenceOption(Automation(Automation.Type.OPEN_APP, app.packageName)) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(Spacing.tiny),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Image(
-                                rememberDrawablePainter(app.icon),
-                                app.label,
-                                Modifier.widthIn(max = 24.dp),
-                            )
-                            Text(stringResource(R.string.user_preferences_automation_open_app, app.label))
-                        }
-                    }
-                )
-            }
-            add(
-                UserPreferenceOption(Automation(Automation.Type.SAVE_GPX)) {
-                    Text(stringResource(R.string.conversion_succeeded_save_gpx))
-                }
-            )
-            add(
-                UserPreferenceOption(Automation(Automation.Type.SHARE)) {
-                    Text(stringResource(R.string.conversion_succeeded_share))
-                }
-            )
-        }
+        listOf(
+            AutomationImplementation.CopyCoordsDec(),
+            AutomationImplementation.CopyCoordsNorthSouthWestEastDec(),
+            AutomationImplementation.CopyGeoUri(),
+            AutomationImplementation.CopyGoogleMapsUri(),
+            AutomationImplementation.CopyMagicEarthUri(),
+            AutomationImplementation.Noop(),
+            AutomationImplementation.CopyAppleMapsUri(),
+            *IntentTools().queryGeoUriApps(context.packageManager)
+                .map { app -> AutomationImplementation.OpenApp(app.packageName) }
+                .toTypedArray(),
+            AutomationImplementation.SaveGpx(),
+            AutomationImplementation.Share(),
+        ).map { automation -> UserPreferenceOption(automation) { automation.Label() } }
     }
 ) {
     private val typeKey = stringPreferencesKey("automation")
     private val packageNameKey = stringPreferencesKey("automation_package_name")
 
-    override fun getValue(preferences: Preferences): Automation = Automation(
-        type = preferences[typeKey]?.let(Automation.Type::valueOf) ?: default.type,
-        packageName = preferences[packageNameKey]?.takeIf { it.isNotEmpty() } ?: default.packageName,
-    )
+    override fun getValue(preferences: Preferences): AutomationImplementation {
+        val type = preferences[typeKey]?.let(AutomationType::valueOf) ?: return default
+        return when (type) {
+            AutomationType.COPY_APPLE_MAPS_URI -> AutomationImplementation.CopyAppleMapsUri()
+            AutomationType.COPY_COORDS_DEC -> AutomationImplementation.CopyCoordsDec()
+            AutomationType.COPY_COORDS_NSWE_DEC -> AutomationImplementation.CopyCoordsNorthSouthWestEastDec()
+            AutomationType.COPY_GEO_URI -> AutomationImplementation.CopyGeoUri()
+            AutomationType.COPY_GOOGLE_MAPS_URI -> AutomationImplementation.CopyGoogleMapsUri()
+            AutomationType.COPY_MAGIC_EARTH_URI -> AutomationImplementation.CopyMagicEarthUri()
+            AutomationType.NOOP -> AutomationImplementation.Noop()
+            AutomationType.OPEN_APP -> preferences[packageNameKey]?.takeIf { it.isNotEmpty() }?.let { packageName ->
+                AutomationImplementation.OpenApp(packageName)
+            } ?: AutomationImplementation.Noop()
 
-    override fun setValue(preferences: MutablePreferences, value: Automation) {
-        preferences[typeKey] = value.type.name
-        preferences[packageNameKey] = value.packageName ?: ""
+            AutomationType.SAVE_GPX -> AutomationImplementation.SaveGpx()
+            AutomationType.SHARE -> AutomationImplementation.Share()
+        }
+    }
+
+    override fun setValue(preferences: MutablePreferences, value: AutomationImplementation) {
+        val (type, packageName) = when (value) {
+            is AutomationImplementation.CopyAppleMapsUri -> AutomationType.COPY_APPLE_MAPS_URI to ""
+            is AutomationImplementation.CopyCoordsDec -> AutomationType.COPY_COORDS_DEC to ""
+            is AutomationImplementation.CopyCoordsNorthSouthWestEastDec -> AutomationType.COPY_COORDS_NSWE_DEC to ""
+            is AutomationImplementation.CopyGeoUri -> AutomationType.COPY_GEO_URI to ""
+            is AutomationImplementation.CopyGoogleMapsUri -> AutomationType.COPY_GOOGLE_MAPS_URI to ""
+            is AutomationImplementation.CopyMagicEarthUri -> AutomationType.COPY_MAGIC_EARTH_URI to ""
+            is AutomationImplementation.Noop -> AutomationType.NOOP to ""
+            is AutomationImplementation.OpenApp -> AutomationType.OPEN_APP to value.packageName
+            is AutomationImplementation.SaveGpx -> AutomationType.SAVE_GPX to ""
+            is AutomationImplementation.Share -> AutomationType.SHARE to ""
+        }
+        preferences[typeKey] = type.name
+        preferences[packageNameKey] = packageName
     }
 
     @Composable
@@ -276,7 +244,7 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    var automationValue: Automation = automation.loading,
+    var automationValue: AutomationImplementation = automation.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
     var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,

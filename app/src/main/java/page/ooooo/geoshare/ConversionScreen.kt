@@ -29,13 +29,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ConfirmationScaffold
 import page.ooooo.geoshare.components.PermissionDialog
-import page.ooooo.geoshare.components.ResultErrorCard
-import page.ooooo.geoshare.components.ResultSuccessCard
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.AutomationImplementation
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.ui.components.ResultAutomationRow
+import page.ooooo.geoshare.ui.components.ResultError
+import page.ooooo.geoshare.ui.components.ResultSuccessApps
+import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -53,7 +54,6 @@ fun ConversionScreen(
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-    val automation by viewModel.automation.collectAsState()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
     val saveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -62,10 +62,9 @@ fun ConversionScreen(
 
     ConversionScreen(
         currentState = currentState,
-        automation = automation,
         changelogShown = changelogShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
-        queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
+        queryGeoUriApps = { viewModel.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
         onCancel = {
             viewModel.cancel()
@@ -80,12 +79,13 @@ fun ConversionScreen(
         onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
         onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-        onOpenApp = { packageName, uriString -> viewModel.intentTools.openApp(context, packageName, uriString) },
-        onOpenChooser = { uriString -> viewModel.intentTools.openChooser(context, uriString) },
+        onOpenApp = { packageName, uriString -> viewModel.openApp(context, packageName, uriString) },
+        onOpenChooser = { uriString -> viewModel.openChooser(context, uriString) },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
             viewModel.start()
         },
+        onRunAutomation = { viewModel.runAutomation(context, clipboard, saveLauncher) },
         onSave = { viewModel.launchSave(context, saveLauncher) },
     )
 }
@@ -94,7 +94,6 @@ fun ConversionScreen(
 @Composable
 fun ConversionScreen(
     currentState: State,
-    automation: Automation,
     changelogShown: Boolean,
     @StringRes loadingIndicatorTitleResId: Int?,
     queryGeoUriApps: () -> List<IntentTools.App>,
@@ -112,6 +111,7 @@ fun ConversionScreen(
     onOpenApp: (packageName: String, uriString: String) -> Boolean,
     onOpenChooser: (uriString: String) -> Boolean,
     onRetry: (newUriString: String) -> Unit,
+    onRunAutomation: () -> Unit, // TODO
     onSave: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
@@ -245,7 +245,7 @@ fun ConversionScreen(
             }
 
             currentState is HasError -> {
-                ResultErrorCard(
+                ResultError(
                     currentState.errorMessageResId,
                     currentState.inputUriString,
                     retryLoadingIndicatorVisible,
@@ -263,15 +263,27 @@ fun ConversionScreen(
             }
 
             currentState is HasResult -> {
-                ResultSuccessCard(
-                    automation = automation,
-                    apps = queryGeoUriApps(),
+
+                // TODO Don't run automatic action after changing preferences and going back to this screen
+
+                // TODO Add instrumented test
+
+                ResultSuccessCoordinates(
                     position = currentState.position,
                     onCopy = onCopy,
-                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                    onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
-                    onShare = { onOpenChooser(currentState.position.toGeoUriString()) },
                     onSave = onSave,
+                )
+                if (currentState is HasAutomation) {
+                    ResultAutomationRow(
+                        currentState,
+                        onCancel = onCancel,
+                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                    )
+                }
+                ResultSuccessApps(
+                    apps = queryGeoUriApps(),
+                    onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
+                    onOpenChooser = { onOpenChooser(currentState.position.toGeoUriString()) },
                 )
             }
         }
@@ -284,15 +296,24 @@ fun ConversionScreen(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
+        val context = LocalContext.current
         ConversionScreen(
-            currentState = ConversionSucceeded(
+            currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
+                AutomationImplementation.Noop(),
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
-            queryGeoUriApps = { listOf() },
+            queryGeoUriApps = {
+                listOf(
+                    IntentTools.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    ),
+                )
+            },
             onBack = {},
             onCancel = {},
             onCopy = {},
@@ -307,6 +328,7 @@ private fun DefaultPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -316,15 +338,24 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
+        val context = LocalContext.current
         ConversionScreen(
-            currentState = ConversionSucceeded(
+            currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
+                AutomationImplementation.Noop(),
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
-            queryGeoUriApps = { listOf() },
+            queryGeoUriApps = {
+                listOf(
+                    IntentTools.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    ),
+                )
+            },
             onBack = {},
             onCancel = {},
             onCopy = {},
@@ -339,6 +370,7 @@ private fun DarkPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -346,24 +378,26 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun PermissionPreview() {
+private fun AutomationPreview() {
     AppTheme {
+        val context = LocalContext.current
         ConversionScreen(
-            currentState = RequestedUnshortenPermission(
-                ConversionStateContext(
-                    listOf(),
-                    IntentTools(),
-                    NetworkTools(),
-                    FakeUserPreferencesRepository(),
-                ),
+            currentState = AutomationWaiting(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsUrlConverter(),
-                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                Position("50.123456", "11.123456"),
+                AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
-            queryGeoUriApps = { listOf() },
+            queryGeoUriApps = {
+                listOf(
+                    IntentTools.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    ),
+                )
+            },
             onBack = {},
             onCancel = {},
             onCopy = {},
@@ -378,6 +412,7 @@ private fun PermissionPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -385,24 +420,26 @@ private fun PermissionPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkPermissionPreview() {
+private fun DarkAutomationPreview() {
     AppTheme {
+        val context = LocalContext.current
         ConversionScreen(
-            currentState = RequestedUnshortenPermission(
-                ConversionStateContext(
-                    listOf(),
-                    IntentTools(),
-                    NetworkTools(),
-                    FakeUserPreferencesRepository(),
-                ),
+            currentState = AutomationWaiting(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsUrlConverter(),
-                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                Position("50.123456", "11.123456"),
+                AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
-            queryGeoUriApps = { listOf() },
+            queryGeoUriApps = {
+                listOf(
+                    IntentTools.App(
+                        BuildConfig.APPLICATION_ID,
+                        "My Map App",
+                        icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    ),
+                )
+            },
             onBack = {},
             onCancel = {},
             onCopy = {},
@@ -417,6 +454,7 @@ private fun DarkPermissionPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -431,7 +469,6 @@ private fun ErrorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -449,6 +486,7 @@ private fun ErrorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -463,7 +501,6 @@ private fun DarkErrorPreview() {
                 R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -481,6 +518,7 @@ private fun DarkErrorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -506,7 +544,6 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
@@ -524,6 +561,7 @@ private fun LoadingIndicatorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -549,7 +587,6 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
@@ -567,6 +604,7 @@ private fun DarkLoadingIndicatorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -578,7 +616,6 @@ private fun InitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -596,6 +633,7 @@ private fun InitialPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
@@ -607,7 +645,6 @@ private fun DarkInitialPreview() {
     AppTheme {
         ConversionScreen(
             currentState = Initial(),
-            automation = Automation(Automation.Type.NOTHING),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
             queryGeoUriApps = { listOf() },
@@ -625,6 +662,7 @@ private fun DarkInitialPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
+            onRunAutomation = {},
             onSave = {},
         )
     }
