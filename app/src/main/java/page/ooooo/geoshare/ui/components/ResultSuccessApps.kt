@@ -24,6 +24,12 @@ import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
+private sealed class GridItem {
+    class App(val app: IntentTools.App) : GridItem()
+    class ShareButton : GridItem()
+    class Empty : GridItem()
+}
+
 @Composable
 fun ResultSuccessApps(
     apps: List<IntentTools.App>,
@@ -31,8 +37,11 @@ fun ResultSuccessApps(
     onOpenChooser: () -> Boolean,
 ) {
     val context = LocalContext.current
-    val appsColumnCount = 4
-    val appsIconSize = 46.dp
+    val columnCount = 4
+    val iconSize = 46.dp
+    val gridItems = apps.map { GridItem.App(it) } +
+            listOf(GridItem.ShareButton()) +
+            List(columnCount - (apps.size + 1) % columnCount) { GridItem.Empty() }
 
     Column(
         Modifier
@@ -40,55 +49,66 @@ fun ResultSuccessApps(
             .padding(start = Spacing.tiny, top = Spacing.medium, end = Spacing.tiny),
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
-        apps.chunked(appsColumnCount).forEach { appsChunk ->
+        gridItems.chunked(columnCount).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                appsChunk.forEach { app ->
-                    Column(
-                        Modifier
-                            .clickable {
-                                if (!onOpenApp(app.packageName)) {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.conversion_automation_open_app_failed,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                row.forEach { gridItem ->
+                    when (gridItem) {
+                        is GridItem.App ->
+                            Column(
+                                Modifier
+                                    .clickable {
+                                        if (!onOpenApp(gridItem.app.packageName)) {
+                                            Toast.makeText(
+                                                context,
+                                                R.string.conversion_automation_open_app_failed,
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                    .weight(1f)
+                                    .testTag("geoShareResultCardApp_${gridItem.app.packageName}"),
+                                verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                                Image(
+                                    rememberDrawablePainter(gridItem.app.icon),
+                                    gridItem.app.label,
+                                    Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .widthIn(max = iconSize),
+                                )
+                                Text(
+                                    gridItem.app.label,
+                                    Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+
+                        is GridItem.ShareButton ->
+                            Column(Modifier.weight(1f)) {
+                                FilledIconButton(
+                                    {
+                                        if (!onOpenChooser()) {
+                                            Toast.makeText(
+                                                context,
+                                                R.string.conversion_succeeded_apps_not_found,
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                        }
+                                    },
+                                    Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .size(iconSize),
+                                ) {
+                                    Icon(
+                                        Icons.Default.Share,
+                                        stringResource(R.string.conversion_succeeded_share),
+                                    )
                                 }
                             }
-                            .weight(1f)
-                            .testTag("geoShareResultCardApp_${app.packageName}"),
-                        verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
-                        Image(
-                            rememberDrawablePainter(app.icon),
-                            app.label,
-                            Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .widthIn(max = appsIconSize),
-                        )
-                        Text(
-                            app.label,
-                            Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
+
+                        is GridItem.Empty ->
+                            Box(Modifier.weight(1f))
                     }
-                }
-                FilledIconButton(
-                    {
-                        if (!onOpenChooser()) {
-                            Toast.makeText(
-                                context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    Modifier.size(appsIconSize),
-                ) {
-                    Icon(
-                        Icons.Default.Share,
-                        stringResource(R.string.conversion_succeeded_share),
-                    )
-                }
-                repeat(appsColumnCount - appsChunk.size - 1) {
-                    Box(Modifier.weight(1f))
                 }
             }
         }
