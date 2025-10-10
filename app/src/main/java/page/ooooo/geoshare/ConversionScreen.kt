@@ -255,8 +255,6 @@ fun ConversionScreen(
 
             currentState is HasResult -> {
 
-                // TODO Don't run automatic action after changing preferences and going back to this screen
-
                 // TODO Add instrumented test
 
                 ResultSuccessCoordinates(

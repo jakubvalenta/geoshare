@@ -52,6 +52,9 @@ sealed interface Automation {
 }
 
 sealed class AutomationImplementation : Automation {
+    override fun equals(other: Any?) = other != null && this::class == other::class
+    override fun hashCode() = javaClass.hashCode()
+
     class Noop : AutomationImplementation() {
         override fun run(position: Position) = AutomationAction.Noop()
 
@@ -144,7 +147,7 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    class OpenApp(val packageName: String) : Automation.HasSuccessMessage, Automation.HasErrorMessage,
+    data class OpenApp(val packageName: String) : Automation.HasSuccessMessage, Automation.HasErrorMessage,
         Automation.HasDelay, AutomationImplementation() {
         override val delaySec = 5
         override fun run(position: Position) = AutomationAction.OpenApp(packageName, position.toGeoUriString())
