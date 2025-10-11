@@ -454,6 +454,15 @@ class UriTest {
     }
 
     @Test
+    fun toString_doesNotEncodeExclamationPointAndAtSignInPath() {
+        val uriString = "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
     fun toUrl_addsHttpsSchemeIfNecessary() {
         assertEquals("https://foo/bar", Uri.parse("https://foo/bar", uriQuote).toUrl().toString())
         assertEquals("https://foo", Uri.parse("https://foo", uriQuote).toUrl().toString())
