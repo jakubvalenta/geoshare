@@ -14,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
+import kotlin.math.pow
+import kotlin.math.roundToLong
 
 class UnexpectedResponseCodeException : IOException("Unexpected response code")
 
@@ -73,11 +75,31 @@ class NetworkTools(
         httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
-        requestTimeoutMillisParam: Long = 45_000L,
+        maxRetries: Int = 5,
+        requestTimeoutMillisParam: Long = 30_000L,
+        connectTimeoutMillisParam: Long = 15_000L,
+        socketTimeoutMillisParam: Long = 15_000L,
         block: suspend (response: HttpResponse) -> T,
     ): T {
         HttpClient(engine) {
             followRedirects = followRedirectsParam
+            install(HttpTimeout) {
+                requestTimeoutMillis = requestTimeoutMillisParam
+                connectTimeoutMillis = connectTimeoutMillisParam
+                socketTimeoutMillis = socketTimeoutMillisParam
+            }
+            install(HttpRequestRetry) {
+                retryOnExceptionOrServerErrors(maxRetries)
+                exponentialDelay()
+                modifyRequest { request ->
+                    request.timeout {
+                        val factor = 1.5.pow(retryCount - 1)
+                        requestTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
+                        connectTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
+                        socketTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
+                    }
+                }
+            }
             // Set custom User-Agent, so that we don't receive Google Lite HTML,
             // which doesn't contain coordinates in case of Google Maps or maps link
             // in case of Google Search.
@@ -86,9 +108,6 @@ class NetworkTools(
             try {
                 val response = client.request(url) {
                     method = httpMethod
-                    timeout {
-                        requestTimeoutMillis = requestTimeoutMillisParam
-                    }
                 }
                 if (expectedStatusCodes.contains(response.status)) {
                     return block(response)
