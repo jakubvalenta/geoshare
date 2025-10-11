@@ -1977,12 +1977,18 @@ class ConversionStateTest {
     }
 
     @Test
-    fun conversionSucceeded_returnsNull() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ConversionSucceeded(stateContext, runContext, inputUriString, Position("1", "2"))
-        assertNull(state.transition())
+    fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsAutomationReady() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun conversionSucceeded_userPreferenceAutomationIsCopyCoords_returnsAutomationReady() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun conversionSucceeded_userPreferenceAutomationIsOpenApp_returnsAutomationWaiting() = runTest {
+        TODO()
     }
 
     @Test
@@ -1990,5 +1996,80 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val state = ConversionFailed(R.string.conversion_failed_missing_url, inputUriString)
         assertNull(state.transition())
+    }
+
+    @Test
+    fun automationWaiting_automationIsNoop_returnsAutomationFinished() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationWaiting_automationIsCopyCoords_returnsAutomationFinished() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationWaiting_automationIsOpenApp_waitsAndReturnsAutomationReady() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationWaiting_automationIsOpenAppAndDelayThrowsCancellationException_returnsAutomationFinished() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsNoop_returnsAutomationFinished() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsCopyCoords_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsOpenApp_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsOpenAppAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsShare_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsShareAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationReady_automationIsSaveGpx_returnsAutomationSucceeded() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationSucceeded_waitsAndReturnsAutomationFinished() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationSucceeded_delayThrowsCancellationException_returnsAutomationFinished() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationFinished_returnsNull() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationFailed_returnsNull() = runTest {
+        TODO()
     }
 }
