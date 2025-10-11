@@ -37,11 +37,12 @@ abstract class ConversionRegex(regex: String) {
 
 open class PositionRegex(regex: String) : ConversionRegex(regex) {
     companion object {
-        const val LAT_NUM = """-?\d{1,2}(\.\d{1,16})?"""
-        const val LON_NUM = """-?\d{1,3}(\.\d{1,16})?"""
+        const val MAX_COORD_PRECISION = 17
+        const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
+        const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?"""
         const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
         const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
-        const val Z = """(?P<z>\d{1,2}(\.\d{1,16})?)"""
+        const val Z = """(?P<z>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
         const val Q_PARAM = """(?P<q>.+)"""
         const val Q_PATH = """(?P<q>[^/]+)"""
     }

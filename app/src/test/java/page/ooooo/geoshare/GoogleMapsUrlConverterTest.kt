@@ -217,6 +217,14 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_placeListInData() {
+        assertEquals(
+            Position(),
+            parseUrl("https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts")
+        )
+    }
+
+    @Test
     fun parseUrl_searchCoordinates() {
         assertEquals(
             Position("48.8584", "2.2945"),
@@ -529,6 +537,20 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 <body></body>
 </html>
 """
+            ),
+        )
+    }
+
+    @Test
+    fun parseHtml_placeListHighPrecision() {
+        assertEquals(
+            Position(
+                points = listOf(
+                    "5.5592846" to "-0.19743059999999998",
+                )
+            ),
+            parseHtml(
+                """ll,"Ghana",null,"",[null,null,5.5592846,-0.19743059999999998],["1143791729983858547","-469"""
             ),
         )
     }
