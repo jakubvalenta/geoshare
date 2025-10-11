@@ -373,7 +373,6 @@ data class ParseHtmlFailed(
         }
 }
 
-// TODO Test ConversionSucceeded
 data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
@@ -401,7 +400,6 @@ data class ConversionFailed(
     override val inputUriString: String,
 ) : ConversionState(), HasError
 
-// TODO Test AutomationWaiting
 data class AutomationWaiting(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
@@ -421,7 +419,6 @@ data class AutomationWaiting(
     }
 }
 
-// TODO Test AutomationReady
 data class AutomationReady(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
@@ -466,26 +463,27 @@ data class AutomationReady(
     }
 }
 
-// TODO Test AutomationSucceeded
 data class AutomationSucceeded(
     override val inputUriString: String,
     override val position: Position,
     override val automation: Automation.HasSuccessMessage,
 ) : ConversionState(), HasResult, HasAutomation {
     override suspend fun transition(): State {
-        delay(5000L)
+        try {
+            delay(1000L)
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
         return AutomationFinished(inputUriString, position, automation)
     }
 }
 
-// TODO Test AutomationFinished
 data class AutomationFinished(
     override val inputUriString: String,
     override val position: Position,
     override val automation: Automation,
 ) : ConversionState(), HasResult, HasAutomation
 
-// TODO Test AutomationFailed
 data class AutomationFailed(
     override val inputUriString: String,
     override val position: Position,
