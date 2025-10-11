@@ -75,30 +75,33 @@ class NetworkTools(
         httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
-        maxRetries: Int = 5,
-        requestTimeoutMillisParam: Long = 30_000L,
-        connectTimeoutMillisParam: Long = 15_000L,
-        socketTimeoutMillisParam: Long = 15_000L,
+        maxRetriesParam: Int = 4,
+        requestTimeoutMillisParam: Long = 32_000L,
+        connectTimeoutMillisParam: Long = 16_000L,
+        socketTimeoutMillisParam: Long = 16_000L,
         block: suspend (response: HttpResponse) -> T,
     ): T {
         HttpClient(engine) {
             followRedirects = followRedirectsParam
-            install(HttpTimeout) {
-                requestTimeoutMillis = requestTimeoutMillisParam
-                connectTimeoutMillis = connectTimeoutMillisParam
-                socketTimeoutMillis = socketTimeoutMillisParam
-            }
             install(HttpRequestRetry) {
-                retryOnExceptionOrServerErrors(maxRetries)
-                exponentialDelay()
+                maxRetries = maxRetriesParam
+                constantDelay()
+                retryOnServerErrors()
+                retryOnException(retryOnTimeout = true)
                 modifyRequest { request ->
+                    log.i(null, "Retrying request ${retryCount + 1} / ${maxRetries + 1} for ${request.url}")
                     request.timeout {
-                        val factor = 1.5.pow(retryCount - 1)
+                        val factor = 2.0.pow(retryCount)
                         requestTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
                         connectTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
                         socketTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
                     }
                 }
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = requestTimeoutMillisParam
+                connectTimeoutMillis = connectTimeoutMillisParam
+                socketTimeoutMillis = socketTimeoutMillisParam
             }
             // Set custom User-Agent, so that we don't receive Google Lite HTML,
             // which doesn't contain coordinates in case of Google Maps or maps link
