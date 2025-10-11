@@ -14,8 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
-import kotlin.math.pow
-import kotlin.math.roundToLong
 
 class UnexpectedResponseCodeException : IOException("Unexpected response code")
 
@@ -23,6 +21,14 @@ class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog(),
 ) {
+    companion object {
+        const val MAX_RETRIES = 4
+        const val CONSTANT_DELAY = 1_000L
+        const val REQUEST_TIMEOUT = 256_000L
+        const val CONNECT_TIMEOUT = 128_000L
+        const val SOCKET_TIMEOUT = 128_000L
+    }
+
     @Throws(
         ConnectTimeoutException::class,
         HttpRequestTimeoutException::class,
@@ -75,33 +81,23 @@ class NetworkTools(
         httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
-        maxRetriesParam: Int = 4,
-        requestTimeoutMillisParam: Long = 32_000L,
-        connectTimeoutMillisParam: Long = 16_000L,
-        socketTimeoutMillisParam: Long = 16_000L,
         block: suspend (response: HttpResponse) -> T,
     ): T {
         HttpClient(engine) {
             followRedirects = followRedirectsParam
             install(HttpRequestRetry) {
-                maxRetries = maxRetriesParam
-                constantDelay()
+                maxRetries = MAX_RETRIES
+                constantDelay(CONSTANT_DELAY)
                 retryOnServerErrors()
                 retryOnException(retryOnTimeout = true)
-                modifyRequest { request ->
+                modifyRequest {
                     log.i(null, "Retrying request ${retryCount + 1} / ${maxRetries + 1} for ${request.url}")
-                    request.timeout {
-                        val factor = 2.0.pow(retryCount)
-                        requestTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
-                        connectTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
-                        socketTimeoutMillis = (factor * requestTimeoutMillisParam).roundToLong()
-                    }
                 }
             }
             install(HttpTimeout) {
-                requestTimeoutMillis = requestTimeoutMillisParam
-                connectTimeoutMillis = connectTimeoutMillisParam
-                socketTimeoutMillis = socketTimeoutMillisParam
+                requestTimeoutMillis = REQUEST_TIMEOUT
+                connectTimeoutMillis = CONNECT_TIMEOUT
+                socketTimeoutMillis = SOCKET_TIMEOUT
             }
             // Set custom User-Agent, so that we don't receive Google Lite HTML,
             // which doesn't contain coordinates in case of Google Maps or maps link
