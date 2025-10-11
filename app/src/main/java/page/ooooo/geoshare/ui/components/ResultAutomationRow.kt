@@ -60,17 +60,6 @@ fun ResultAutomationRow(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
-        AnimatedVisibility(currentState is AutomationFinished) {
-            Button(
-                onNavigateToUserPreferencesAutomationScreen,
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                )
-            ) {
-                Text(stringResource(R.string.user_preferences_automation_title))
-            }
-        }
         ResultAutomationNotification(currentState is AutomationWaiting) {
             currentState.automation.takeIf { it is Automation.HasDelay }?.let { automation ->
                 (automation as Automation.HasDelay).waitingText(automationCounterSec)
@@ -102,6 +91,17 @@ fun ResultAutomationRow(
                     Icons.Default.Close,
                     stringResource(R.string.conversion_loading_indicator_cancel),
                 )
+            }
+        }
+        AnimatedVisibility(currentState is AutomationFinished) {
+            Button(
+                onNavigateToUserPreferencesAutomationScreen,
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                )
+            ) {
+                Text(stringResource(R.string.user_preferences_automation_title))
             }
         }
     }
