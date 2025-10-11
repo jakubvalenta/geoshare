@@ -90,7 +90,7 @@ class NetworkTools(
                 constantDelay(CONSTANT_DELAY)
                 retryOnServerErrors()
                 retryOnException(retryOnTimeout = true)
-                modifyRequest {
+                modifyRequest { request ->
                     log.i(null, "Retrying request ${retryCount + 1} / ${maxRetries + 1} for ${request.url}")
                 }
             }
