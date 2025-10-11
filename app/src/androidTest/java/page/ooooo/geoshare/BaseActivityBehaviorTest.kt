@@ -7,11 +7,14 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Until
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import page.ooooo.geoshare.lib.Position
 import java.lang.Thread.sleep
 import java.util.regex.Pattern
+import kotlin.math.pow
+import kotlin.math.roundToLong
 
 abstract class BaseActivityBehaviorTest {
     companion object {
@@ -19,6 +22,9 @@ abstract class BaseActivityBehaviorTest {
         const val LAUNCH_TIMEOUT = 10_000L
         const val TIMEOUT = 10_000L
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
+        val networkTimeout: Long = (1..5).fold(0) { acc, curr ->
+            (acc + 2.0.pow(curr - 1) * 32_000 + 1000).roundToLong()
+        }
     }
 
     @Before
@@ -71,8 +77,12 @@ abstract class BaseActivityBehaviorTest {
     }
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
+        val resultText = onElement(networkTimeout) {
+            viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" ||
+                    viewIdResourceName == "geoShareConversionErrorMessage"
+        }
         val expectedCoordinatesText = expectedPosition.toNorthSouthWestEastDecCoordsString()
-        onElement { textAsString() == expectedCoordinatesText }
+        assertEquals(resultText.text, expectedCoordinatesText)
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
             val expectedParamsText = expectedPosition.toParamsString()
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedParamsText }
