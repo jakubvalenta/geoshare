@@ -1992,6 +1992,16 @@ class ConversionStateTest {
     }
 
     @Test
+    fun conversionSucceeded_userPreferenceAutomationIsSaveGpx_returnsAutomationWaiting() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun conversionSucceeded_userPreferenceAutomationIsShare_returnsAutomationReady() = runTest {
+        TODO()
+    }
+
+    @Test
     fun conversionFailed_returnsNull() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val state = ConversionFailed(R.string.conversion_failed_missing_url, inputUriString)
@@ -2010,6 +2020,16 @@ class ConversionStateTest {
 
     @Test
     fun automationWaiting_automationIsOpenApp_waitsAndReturnsAutomationReady() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationWaiting_automationIsSaveGpx_waitsAndReturnsAutomationReady() = runTest {
+        TODO()
+    }
+
+    @Test
+    fun automationWaiting_automationIsShare_returnsAutomationReady() = runTest {
         TODO()
     }
 
@@ -2039,17 +2059,17 @@ class ConversionStateTest {
     }
 
     @Test
+    fun automationReady_automationIsSaveGpx_returnsAutomationSucceeded() = runTest {
+        TODO()
+    }
+
+    @Test
     fun automationReady_automationIsShare_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
         TODO()
     }
 
     @Test
     fun automationReady_automationIsShareAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
-        TODO()
-    }
-
-    @Test
-    fun automationReady_automationIsSaveGpx_returnsAutomationSucceeded() = runTest {
         TODO()
     }
 
