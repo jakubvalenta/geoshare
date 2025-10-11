@@ -4,6 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionRegex.Companion.MAX_COORD_PRECISION
 import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.lib.uriPattern
 
@@ -13,13 +14,13 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         const val CHARS = """[\p{Zs},°'′"″NSWE]"""
         const val SPACE = """\p{Zs}*"""
         const val LAT_SIG = """(?P<latSig>-?)"""
-        const val LAT_DEG = """(?P<latDeg>\d{1,2}(\.\d{1,16})?)"""
-        const val LAT_MIN = """(?P<latMin>\d{1,2}(\.\d{1,16})?)"""
-        const val LAT_SEC = """(?P<latSec>\d{1,2}(\.\d{1,16})?)"""
+        const val LAT_DEG = """(?P<latDeg>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+        const val LAT_MIN = """(?P<latMin>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+        const val LAT_SEC = """(?P<latSec>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
         const val LON_SIG = """(?P<lonSig>-?)"""
-        const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,16})?)"""
-        const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,16})?)"""
-        const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,16})?)"""
+        const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+        const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+        const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
     }
 
     @Suppress("SpellCheckingInspection")

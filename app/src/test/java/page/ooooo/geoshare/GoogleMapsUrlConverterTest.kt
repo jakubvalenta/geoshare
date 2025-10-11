@@ -534,6 +534,20 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseHtml_placeListHighPrecision() {
+        assertEquals(
+            Position(
+                points = listOf(
+                    "5.5592846" to "-0.19743059999999998",
+                )
+            ),
+            parseHtml(
+                """ll,"Ghana",null,"",[null,null,5.5592846,-0.19743059999999998],["1143791729983858547","-469"""
+            ),
+        )
+    }
+
+    @Test
     fun parseHtml_myMaps() {
         assertEquals(
             Position(
