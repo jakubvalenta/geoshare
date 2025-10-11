@@ -198,7 +198,8 @@ sealed class AutomationImplementation : Automation {
             appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
     }
 
-    class SaveGpx : Automation.HasSuccessMessage, AutomationImplementation() {
+    class SaveGpx : Automation.HasSuccessMessage, Automation.HasDelay, AutomationImplementation() {
+        override val delaySec = 5
         override fun run(position: Position) = AutomationAction.SaveGpx()
 
         @Composable
@@ -208,6 +209,10 @@ sealed class AutomationImplementation : Automation {
 
         @Composable
         override fun successText() = stringResource(R.string.conversion_automation_save_gpx_succeeded)
+
+        @Composable
+        override fun waitingText(counterSec: Int) =
+            stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
     class Share : Automation.HasErrorMessage, Automation.HasSuccessMessage, AutomationImplementation() {
