@@ -93,6 +93,7 @@ class GoogleMapsUrlConverter() :
                 path(PositionRegex("""/maps/place/$Q_PATH.*"""))
                 path(PositionRegex("""/maps/place//.*"""))
                 path(PositionRegex("""/maps/placelists/list/.*"""))
+                path(PositionRegex("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3"""))
                 path(PositionRegex("""/maps/search/$LAT,$LON.*"""))
                 path(PositionRegex("""/maps/search/$Q_PATH.*"""))
                 path(PositionRegex("""/maps/search/"""))

@@ -217,6 +217,14 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseUrl_placeListInData() {
+        assertEquals(
+            Position(),
+            parseUrl("https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts")
+        )
+    }
+
+    @Test
     fun parseUrl_searchCoordinates() {
         assertEquals(
             Position("48.8584", "2.2945"),
