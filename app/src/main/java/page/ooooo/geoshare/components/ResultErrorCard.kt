@@ -72,6 +72,7 @@ fun ResultErrorCard(
             SelectionContainer {
                 Text(
                     stringResource(errorMessageResId),
+                    Modifier.testTag("geoShareConversionErrorMessage"),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
