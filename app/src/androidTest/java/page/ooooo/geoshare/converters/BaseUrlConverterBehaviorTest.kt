@@ -15,7 +15,10 @@ abstract class BaseUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermissionAlways" }.click()
     }
 
-    protected fun testUri(expectedPosition: Position, unsafeUriString: String) {
+    protected fun testUri(expectedPosition: Position, unsafeUriString: String) = uiAutomator {
+        // Make sure we leave the result screen, if we're there, so that we don't accidentally test the old result.
+        pressBack()
+
         shareUri(unsafeUriString)
         waitAndAssertPositionIsVisible(expectedPosition)
     }

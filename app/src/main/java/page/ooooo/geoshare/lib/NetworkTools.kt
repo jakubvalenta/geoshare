@@ -21,6 +21,14 @@ class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog(),
 ) {
+    companion object {
+        const val MAX_RETRIES = 4
+        const val CONSTANT_DELAY = 1_000L
+        const val REQUEST_TIMEOUT = 256_000L
+        const val CONNECT_TIMEOUT = 128_000L
+        const val SOCKET_TIMEOUT = 128_000L
+    }
+
     @Throws(
         ConnectTimeoutException::class,
         HttpRequestTimeoutException::class,
@@ -73,11 +81,24 @@ class NetworkTools(
         httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
-        requestTimeoutMillisParam: Long = 45_000L,
         block: suspend (response: HttpResponse) -> T,
     ): T {
         HttpClient(engine) {
             followRedirects = followRedirectsParam
+            install(HttpRequestRetry) {
+                maxRetries = MAX_RETRIES
+                constantDelay(CONSTANT_DELAY)
+                retryOnServerErrors()
+                retryOnException(retryOnTimeout = true)
+                modifyRequest { request ->
+                    log.i(null, "Retrying request ${retryCount + 1} / ${maxRetries + 1} for ${request.url}")
+                }
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = REQUEST_TIMEOUT
+                connectTimeoutMillis = CONNECT_TIMEOUT
+                socketTimeoutMillis = SOCKET_TIMEOUT
+            }
             // Set custom User-Agent, so that we don't receive Google Lite HTML,
             // which doesn't contain coordinates in case of Google Maps or maps link
             // in case of Google Search.
@@ -86,9 +107,6 @@ class NetworkTools(
             try {
                 val response = client.request(url) {
                     method = httpMethod
-                    timeout {
-                        requestTimeoutMillis = requestTimeoutMillisParam
-                    }
                 }
                 if (expectedStatusCodes.contains(response.status)) {
                     return block(response)

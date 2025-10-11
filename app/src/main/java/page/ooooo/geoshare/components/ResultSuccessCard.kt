@@ -43,6 +43,7 @@ fun ResultSuccessCard(
                 SelectionContainer {
                     Text(
                         position.toNorthSouthWestEastDecCoordsString(),
+                        Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
