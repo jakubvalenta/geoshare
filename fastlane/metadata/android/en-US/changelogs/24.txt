@@ -1,0 +1,1 @@
+- Added support for private Google Maps place lists.
