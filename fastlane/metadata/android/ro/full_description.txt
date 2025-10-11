@@ -1,0 +1,33 @@
+Împărtășește un link de hartă prin Geo Share și aplicația îl va deschide în altă aplicație de hartă instalată.
+
+<b>linkuri de hărți implementate<b>
+
+- Google Maps
+- Apple Maps (beta)
+- HERE WeGo (beta)
+- Magic Earth (beta)
+- Mapy.com (beta)
+- OpenStreetMap (beta)
+- OsmAnd (beta)
+- Waze (beta)
+- Yandex Maps (beta)
+- coordonate
+
+<b>Exemple de utilizare<b>
+
+Când cineva îți trimite un link Google Maps, dar tu preferi să folosești OpenStreetMap, poți să deschizi rapid aceeași locație in OsmAnd sau Organic Maps.
+
+Când îți place Google Maps pentru a găsi diverse locuri, dar preferi o altă aplicație pentru navigare, poți să te muți cu ușurința din Google Maps către aplicația ta favorită de navigație.
+
+<b>Alte caracteristici</b>
+
+- Arată coordonatele geografice ale unui link de hartă și copiază-le în clipboard drept link de tip geo:.
+- Inserează linkuri de hartă direct în aplicație, în loc de a le împartăși.
+
+<b>Cum funcționează și considerații despre confidențialitate</b>
+
+Geo Share transformă linkuri de hartă (ex. https://maps.app.goo.gl/...) în linkuri de tip geo: care pot fi deschise de către alte aplicații de hărți. Pentru a crea un link geo:, sunt necesare coordonate geografice. Geo Share extrage aceste coordonate din URL-ul de hartă inițial.
+
+However, not all map URLs include coordinates. In such cases, Geo Share will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app's FAQ screen.
+
+Totuși, nu toate URL-urile de hartă includ coordonate. În aceste cazuri, Geo Share îți va cere permisiunea pentru a se conecta la serviciul de hartă (Google Maps, Apple Maps etc.) și să primească coordonatele din headere HTTP ori din documentul HTML indicat de link. Pentru informații mai detaliate, verifică secțiunea de FAQ din aplicație.
