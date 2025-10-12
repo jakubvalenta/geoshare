@@ -3,12 +3,10 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionHtmlPattern
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.RedirectRegex
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
