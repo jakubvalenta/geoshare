@@ -1,6 +1,7 @@
 package page.ooooo.geoshare
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -35,9 +36,9 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.ui.components.ResultAutomationRow
 import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSuccessApps
+import page.ooooo.geoshare.ui.components.ResultSuccessAutomation
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -112,11 +113,16 @@ fun ConversionScreen(
     onOpenApp: (packageName: String, uriString: String) -> Boolean,
     onOpenChooser: (uriString: String) -> Boolean,
     onRetry: (newUriString: String) -> Unit,
-    onSave: () -> Unit,
+    onSave: () -> Boolean,
 ) {
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
+
+    BackHandler {
+        onCancel()
+        onBack()
+    }
 
     ConfirmationScaffold(
         title = when {
@@ -126,7 +132,13 @@ fun ConversionScreen(
             else -> null
         },
         navigationIcon = {
-            IconButton({ onBack() }, Modifier.testTag("geoShareConversionBackButton")) {
+            IconButton(
+                {
+                    onCancel()
+                    onBack()
+                },
+                Modifier.testTag("geoShareConversionBackButton"),
+            ) {
                 Icon(
                     Icons.AutoMirrored.Default.ArrowBack,
                     stringResource(R.string.nav_back_content_description)
@@ -259,13 +271,11 @@ fun ConversionScreen(
                     onCopy = onCopy,
                     onSave = onSave,
                 )
-                if (currentState is HasAutomation) {
-                    ResultAutomationRow(
-                        currentState,
-                        onCancel = onCancel,
-                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                    )
-                }
+                ResultSuccessAutomation(
+                    currentState,
+                    onCancel = onCancel,
+                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                )
                 ResultSuccessApps(
                     apps = queryGeoUriApps(),
                     onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
@@ -314,7 +324,7 @@ private fun DefaultPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -355,7 +365,7 @@ private fun DarkPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -400,7 +410,7 @@ private fun AutomationPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -445,7 +455,7 @@ private fun DarkAutomationPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -476,7 +486,7 @@ private fun ErrorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -507,7 +517,7 @@ private fun DarkErrorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -553,7 +563,7 @@ private fun LoadingIndicatorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -599,7 +609,7 @@ private fun DarkLoadingIndicatorPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -627,7 +637,7 @@ private fun InitialPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }
@@ -655,7 +665,7 @@ private fun DarkInitialPreview() {
             onOpenApp = { _, _ -> true },
             onOpenChooser = { true },
             onRetry = {},
-            onSave = {},
+            onSave = { true },
         )
     }
 }

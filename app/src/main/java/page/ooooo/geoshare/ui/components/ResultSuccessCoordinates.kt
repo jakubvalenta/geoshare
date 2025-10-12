@@ -24,7 +24,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 fun ResultSuccessCoordinates(
     position: Position,
     onCopy: (text: String) -> Unit,
-    onSave: () -> Unit,
+    onSave: () -> Boolean,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -121,7 +121,7 @@ private fun DefaultPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -135,7 +135,7 @@ private fun DarkPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -149,7 +149,7 @@ private fun OneAppPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -163,7 +163,7 @@ private fun DarkOneAppPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -177,7 +177,7 @@ private fun ParamsPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -191,7 +191,7 @@ private fun DarkParamsPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -211,7 +211,7 @@ private fun PointsPreview() {
                     ),
                 ),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }
@@ -231,7 +231,7 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 onCopy = {},
-                onSave = {},
+                onSave = { true },
             )
         }
     }

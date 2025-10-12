@@ -127,7 +127,7 @@ class IntentTools {
     fun openChooser(context: Context, uriString: String): Boolean =
         startActivity(context, createChooserIntent(uriString.toUri()))
 
-    fun launchSaveGpx(context: Context, saveGpxLauncher: ActivityResultLauncher<Intent>) {
+    fun launchSaveGpx(context: Context, saveGpxLauncher: ActivityResultLauncher<Intent>): Boolean {
         @Suppress("SpellCheckingInspection")
         val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
         val filename = context.resources.getString(
@@ -135,13 +135,19 @@ class IntentTools {
             context.resources.getString(R.string.app_name),
             timestamp,
         )
-        saveGpxLauncher.launch(
-            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/xml"
-                putExtra(Intent.EXTRA_TITLE, filename)
-            }
-        )
+        return try {
+            saveGpxLauncher.launch(
+                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/xml"
+                    putExtra(Intent.EXTRA_TITLE, filename)
+                }
+            )
+            true
+        } catch (_: IllegalStateException) {
+            // TODO Fix launchSaveGpx crash
+            false
+        }
     }
 
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {

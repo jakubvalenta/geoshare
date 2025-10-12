@@ -449,7 +449,7 @@ data class AutomationReady(
             is AutomationAction.SaveGpx -> stateContext.intentTools.launchSaveGpx(
                 runContext.context,
                 runContext.saveGpxLauncher,
-            ).let { true }
+            )
         }
         return when (success) {
             true if automation is Automation.HasSuccessMessage ->
@@ -478,14 +478,23 @@ data class AutomationSucceeded(
     }
 }
 
-data class AutomationFinished(
-    override val inputUriString: String,
-    override val position: Position,
-    override val automation: Automation,
-) : ConversionState(), HasResult, HasAutomation
-
 data class AutomationFailed(
     override val inputUriString: String,
     override val position: Position,
     override val automation: Automation.HasErrorMessage,
+) : ConversionState(), HasResult, HasAutomation {
+    override suspend fun transition(): State {
+        try {
+            delay(3.seconds)
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        return AutomationFinished(inputUriString, position, automation)
+    }
+}
+
+data class AutomationFinished(
+    override val inputUriString: String,
+    override val position: Position,
+    override val automation: Automation,
 ) : ConversionState(), HasResult, HasAutomation
