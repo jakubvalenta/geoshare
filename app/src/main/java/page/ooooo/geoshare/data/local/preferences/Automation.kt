@@ -14,10 +14,14 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.ui.theme.Spacing
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-private val examplePosition = Position("50.123456", "-11.123456")
+private val examplePosition = Position("49.26", "-123.11")
 
 sealed class AutomationAction {
     class Noop : AutomationAction()
@@ -28,13 +32,13 @@ sealed class AutomationAction {
 }
 
 sealed interface Automation {
+    fun run(position: Position, uriQuote: UriQuote = DefaultUriQuote()): AutomationAction
+
     @Composable
     fun Label()
 
-    fun run(position: Position): AutomationAction
-
     interface HasDelay : Automation {
-        val delaySec: Int
+        val delay: Duration
 
         @Composable
         fun waitingText(counterSec: Int): String
@@ -51,12 +55,12 @@ sealed interface Automation {
     }
 }
 
-sealed class AutomationImplementation : Automation {
+sealed class AutomationImpl : Automation {
     override fun equals(other: Any?) = other != null && this::class == other::class
     override fun hashCode() = javaClass.hashCode()
 
-    class Noop : AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Noop()
+    class Noop : AutomationImpl() {
+        override fun run(position: Position, uriQuote: UriQuote) = AutomationAction.Noop()
 
         @Composable
         override fun Label() {
@@ -64,8 +68,11 @@ sealed class AutomationImplementation : Automation {
         }
     }
 
-    class CopyCoordsDec : Automation.HasSuccessMessage, AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Copy(position.toCoordsDecString())
+    class CopyCoordsDec :
+        AutomationImpl(),
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) = AutomationAction.Copy(position.toCoordsDecString())
 
         @Composable
         override fun Label() {
@@ -81,9 +88,12 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    class CopyCoordsNorthSouthWestEastDec : Automation.HasSuccessMessage,
-        AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Copy(position.toNorthSouthWestEastDecCoordsString())
+    class CopyCoordsNorthSouthWestEastDec :
+        AutomationImpl(),
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.Copy(position.toNorthSouthWestEastDecCoordsString())
 
         @Composable
         override fun Label() {
@@ -99,8 +109,12 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    class CopyGeoUri : Automation.HasSuccessMessage, AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Copy(position.toGeoUriString())
+    class CopyGeoUri :
+        AutomationImpl(),
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.Copy(position.toGeoUriString(uriQuote))
 
         @Composable
         override fun Label() {
@@ -111,8 +125,12 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    class CopyGoogleMapsUri : Automation.HasSuccessMessage, AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Copy(position.toGoogleMapsUriString())
+    class CopyGoogleMapsUri :
+        AutomationImpl(),
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.Copy(position.toGoogleMapsUriString())
 
         @Composable
         override fun Label() {
@@ -123,8 +141,12 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    class CopyAppleMapsUri : Automation.HasSuccessMessage, AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Copy(position.toAppleMapsUriString())
+    class CopyAppleMapsUri :
+        AutomationImpl(),
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.Copy(position.toAppleMapsUriString())
 
         @Composable
         override fun Label() {
@@ -135,8 +157,12 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    class CopyMagicEarthUri : Automation.HasSuccessMessage, AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.Copy(position.toMagicEarthUriString())
+    class CopyMagicEarthUri :
+        AutomationImpl(),
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.Copy(position.toMagicEarthUriString())
 
         @Composable
         override fun Label() {
@@ -147,10 +173,16 @@ sealed class AutomationImplementation : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    data class OpenApp(val packageName: String) : Automation.HasSuccessMessage, Automation.HasErrorMessage,
-        Automation.HasDelay, AutomationImplementation() {
-        override val delaySec = 5
-        override fun run(position: Position) = AutomationAction.OpenApp(packageName, position.toGeoUriString())
+    data class OpenApp(val packageName: String) :
+        AutomationImpl(),
+        Automation.HasSuccessMessage,
+        Automation.HasErrorMessage,
+        Automation.HasDelay {
+
+        override val delay = 5.seconds
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.OpenApp(packageName, position.toGeoUriString(uriQuote))
 
         @Composable
         override fun Label() {
@@ -198,9 +230,14 @@ sealed class AutomationImplementation : Automation {
             appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
     }
 
-    class SaveGpx : Automation.HasSuccessMessage, Automation.HasDelay, AutomationImplementation() {
-        override val delaySec = 5
-        override fun run(position: Position) = AutomationAction.SaveGpx()
+    class SaveGpx :
+        AutomationImpl(),
+        Automation.HasSuccessMessage,
+        Automation.HasDelay {
+
+        override val delay = 5.seconds
+
+        override fun run(position: Position, uriQuote: UriQuote) = AutomationAction.SaveGpx()
 
         @Composable
         override fun Label() {
@@ -215,8 +252,13 @@ sealed class AutomationImplementation : Automation {
             stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
-    class Share : Automation.HasErrorMessage, Automation.HasSuccessMessage, AutomationImplementation() {
-        override fun run(position: Position) = AutomationAction.OpenChooser(position.toGeoUriString())
+    class Share :
+        AutomationImpl(),
+        Automation.HasErrorMessage,
+        Automation.HasSuccessMessage {
+
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.OpenChooser(position.toGeoUriString(uriQuote))
 
         @Composable
         override fun Label() {

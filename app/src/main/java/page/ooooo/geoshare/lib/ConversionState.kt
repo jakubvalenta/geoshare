@@ -14,6 +14,7 @@ import page.ooooo.geoshare.data.local.preferences.*
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
+import kotlin.time.Duration.Companion.seconds
 
 open class ConversionState : State {
     override suspend fun transition(): State? = null
@@ -407,16 +408,15 @@ data class AutomationWaiting(
     override val position: Position,
     override val automation: Automation.HasDelay,
 ) : ConversionState(), HasResult, HasAutomation {
-    override suspend fun transition(): State {
+    override suspend fun transition(): State =
         try {
-            if (automation.delaySec > 0) {
-                delay(automation.delaySec * 1000L)
+            if (automation.delay.isPositive()) {
+                delay(automation.delay)
             }
-            return AutomationReady(stateContext, runContext, inputUriString, position, automation)
+            AutomationReady(stateContext, runContext, inputUriString, position, automation)
         } catch (_: CancellationException) {
-            return AutomationFinished(inputUriString, position, automation)
+            AutomationFinished(inputUriString, position, automation)
         }
-    }
 }
 
 data class AutomationReady(
@@ -427,7 +427,7 @@ data class AutomationReady(
     override val automation: Automation,
 ) : ConversionState(), HasResult, HasAutomation {
     override suspend fun transition(): State {
-        val success: Boolean? = when (val automationAction = automation.run(position)) {
+        val success: Boolean? = when (val automationAction = automation.run(position, stateContext.uriQuote)) {
             is AutomationAction.Noop -> null
             is AutomationAction.Copy -> stateContext.intentTools.copyToClipboard(
                 runContext.context,
@@ -470,7 +470,7 @@ data class AutomationSucceeded(
 ) : ConversionState(), HasResult, HasAutomation {
     override suspend fun transition(): State {
         try {
-            delay(1000L)
+            delay(3.seconds)
         } catch (_: CancellationException) {
             // Do nothing
         }
