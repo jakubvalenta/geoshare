@@ -1,9 +1,12 @@
 [versions]
 accompanistDrawablePainter = "0.37.3"
-agp = "8.12.3"
+# Pin AGP to 8.11.1, because that's the latest version F-Droid buildserver supports
+# https://gitlab.com/fdroid/admin/-/issues/593
+#noinspection AndroidGradlePluginVersion
+agp = "8.11.1"
 androidxActivityCompose = "1.11.0"
-androidxComposeBom = "2025.09.01"
-androidxComposeMaterial3 = "1.5.0-alpha04"
+androidxComposeBom = "2025.10.00"
+androidxComposeMaterial3 = "1.5.0-alpha06"
 androidxCore = "1.17.0"
 androidxDatastorePreferences = "1.1.7"
 androidxHiltNavigationCompose = "1.3.0"
