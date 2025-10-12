@@ -3,6 +3,7 @@
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
+    <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>

@@ -67,6 +67,30 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
+    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_showsPositionAndCopiesCoords() =
+        uiAutomator {
+            // Launch application and close intro
+            launchApplication()
+            pressBack()
+
+            // Configure automation
+            goToUserPreferencesDetailAutomationScreen()
+            onElement { viewIdResourceName == "geoShareUserPreferenceAutomationCopyCoordsDec" }.click()
+
+            // Share a Google Maps coordinates link with the app
+            shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+            // Shows precise location
+            waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
+
+            // Shows automation success message
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
+
+            // Shows automation preferences button
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
+        }
+
+    @Test
     fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_showsPositionAndOpensTheInstalledAppAutomatically() =
         uiAutomator {
             // Launch application and close intro
@@ -83,10 +107,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
 
-            // Shows countdown
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCountdown" }
+            // Shows automation counter
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
 
-            // Google Maps doesn't open while the countdown is running
+            // Google Maps doesn't open while the counter is running
             assertNull(onElementOrNull(4_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME })
 
             // Google Maps opens
@@ -94,12 +118,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Go back to Geo Share
             launchApplication()
-
-            // Shows automation success message
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
-
-            // Automation preferences button doesn't show up while the success message is shown
-            assertNull(onElementOrNull(2_000L) { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" })
 
             // Shows automation preferences button
             onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }

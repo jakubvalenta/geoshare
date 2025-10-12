@@ -160,7 +160,7 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
         val context = LocalContext.current
         listOf(
             AutomationImpl.Noop() to Modifier,
-            AutomationImpl.CopyCoordsDec() to Modifier,
+            AutomationImpl.CopyCoordsDec() to Modifier.testTag("geoShareUserPreferenceAutomationCopyCoordsDec"),
             AutomationImpl.CopyCoordsNorthSouthWestEastDec() to Modifier,
             AutomationImpl.CopyGeoUri() to Modifier,
             AutomationImpl.CopyGoogleMapsUri() to Modifier,

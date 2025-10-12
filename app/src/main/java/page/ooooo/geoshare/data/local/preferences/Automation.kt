@@ -233,6 +233,7 @@ sealed class AutomationImpl : Automation {
     class SaveGpx :
         AutomationImpl(),
         Automation.HasSuccessMessage,
+        Automation.HasErrorMessage,
         Automation.HasDelay {
 
         override val delay = 5.seconds
@@ -246,6 +247,9 @@ sealed class AutomationImpl : Automation {
 
         @Composable
         override fun successText() = stringResource(R.string.conversion_automation_save_gpx_succeeded)
+
+        @Composable
+        override fun errorText() = stringResource(R.string.conversion_succeeded_save_gpx_failed)
 
         @Composable
         override fun waitingText(counterSec: Int) =
