@@ -42,10 +42,8 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
-        // Launch app
+        // Launch application and close intro
         launchApplication()
-
-        // Close intro
         pressBack()
 
         // Shows main menu badge

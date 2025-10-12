@@ -159,19 +159,24 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
     options = {
         val context = LocalContext.current
         listOf(
-            AutomationImpl.Noop(),
-            AutomationImpl.CopyCoordsDec(),
-            AutomationImpl.CopyCoordsNorthSouthWestEastDec(),
-            AutomationImpl.CopyGeoUri(),
-            AutomationImpl.CopyGoogleMapsUri(),
-            AutomationImpl.CopyAppleMapsUri(),
-            AutomationImpl.CopyMagicEarthUri(),
-            AutomationImpl.SaveGpx(),
-            AutomationImpl.Share(),
+            AutomationImpl.Noop() to Modifier,
+            AutomationImpl.CopyCoordsDec() to Modifier,
+            AutomationImpl.CopyCoordsNorthSouthWestEastDec() to Modifier,
+            AutomationImpl.CopyGeoUri() to Modifier,
+            AutomationImpl.CopyGoogleMapsUri() to Modifier,
+            AutomationImpl.CopyAppleMapsUri() to Modifier,
+            AutomationImpl.CopyMagicEarthUri() to Modifier,
+            AutomationImpl.SaveGpx() to Modifier,
+            AutomationImpl.Share() to Modifier,
             *IntentTools().queryGeoUriApps(context.packageManager)
-                .map { app -> AutomationImpl.OpenApp(app.packageName) }
+                .map { app ->
+                    AutomationImpl.OpenApp(app.packageName) to
+                            Modifier.testTag("geoShareUserPreferenceAutomationOpenApp_${app.packageName}")
+                }
                 .toTypedArray(),
-        ).map { automation -> UserPreferenceOption(automation) { automation.Label() } }
+        ).map { (automation, modifier) ->
+            UserPreferenceOption(automation, modifier) { automation.Label() }
+        }
     }
 ) {
     private val typeKey = stringPreferencesKey("automation")
