@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ConfirmationScaffold
 import page.ooooo.geoshare.components.PermissionDialog
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationImplementation
+import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
@@ -290,7 +290,7 @@ private fun DefaultPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
-                AutomationImplementation.Noop(),
+                AutomationImpl.Noop(),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -331,7 +331,7 @@ private fun DarkPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
-                AutomationImplementation.Noop(),
+                AutomationImpl.Noop(),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -376,7 +376,7 @@ private fun AutomationPreview() {
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
-                AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+                AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -421,7 +421,7 @@ private fun DarkAutomationPreview() {
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position("50.123456", "11.123456"),
-                AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+                AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,

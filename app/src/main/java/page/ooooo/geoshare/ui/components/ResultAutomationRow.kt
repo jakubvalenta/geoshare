@@ -22,11 +22,13 @@ import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Automation
-import page.ooooo.geoshare.data.local.preferences.AutomationImplementation
+import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Composable
 fun ResultAutomationRow(
@@ -38,9 +40,9 @@ fun ResultAutomationRow(
 
     LaunchedEffect(currentState) {
         if (currentState is AutomationWaiting) {
-            automationCounterSec = currentState.automation.delaySec
+            automationCounterSec = currentState.automation.delay.toInt(DurationUnit.SECONDS)
             while (automationCounterSec > 0) {
-                delay(1000L)
+                delay(1.seconds)
                 automationCounterSec--
             }
         }
@@ -148,7 +150,7 @@ private fun DefaultPreview() {
                     currentState = AutomationFinished(
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -168,7 +170,7 @@ private fun DarkPreview() {
                     currentState = AutomationFinished(
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -194,7 +196,7 @@ private fun WaitingPreview() {
                         ConversionRunContext(context, clipboard, saveGpxLauncher),
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -220,7 +222,7 @@ private fun DarkWaitingPreview() {
                         ConversionRunContext(context, clipboard, saveGpxLauncher),
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -240,7 +242,7 @@ private fun SucceededPreview() {
                     currentState = AutomationSucceeded(
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -260,7 +262,7 @@ private fun DarSucceededPreview() {
                     currentState = AutomationSucceeded(
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -280,7 +282,7 @@ private fun FailedPreview() {
                     currentState = AutomationFailed(
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -300,7 +302,7 @@ private fun DarkFailedPreview() {
                     currentState = AutomationFailed(
                         "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         Position("50.123456", "11.123456"),
-                        AutomationImplementation.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                        AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                     ),
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},

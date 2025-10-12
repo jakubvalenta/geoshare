@@ -2,20 +2,26 @@ package page.ooooo.geoshare
 
 import android.content.Intent
 import com.google.re2j.Pattern
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.*
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.converters.*
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTime
 
 class ConversionStateTest {
     private val fakeLog = FakeLog()
@@ -528,7 +534,7 @@ class ConversionStateTest {
                 GrantedUnshortenPermission(stateContext, runContext, inputUriString, googleMapsUrlConverter, uri)
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, inputUriString, googleMapsUrlConverter, uri, NetworkTools.Retry(1, tr),
+                    stateContext, runContext, inputUriString, googleMapsUrlConverter, uri, NetworkTools.Retry(1, tr),
                 ),
                 state.transition(),
             )
@@ -859,7 +865,7 @@ class ConversionStateTest {
     fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsAPoint_returnsSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val position = Position(lat = "1", lon = "2")
+        val position = Position("1", "2")
         val mockUriPattern: ConversionFirstUriPattern<PositionRegex> = mock {
             on { matches(any()) } doReturn listOf(object : PositionRegex("mock") {
                 override fun matches(input: String) = false
@@ -1417,6 +1423,7 @@ class ConversionStateTest {
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
+                    runContext,
                     inputUriString,
                     googleMapsUrlConverter,
                     uri,
@@ -1928,7 +1935,7 @@ class ConversionStateTest {
     @Test
     fun parseHtmlFailed_positionFromUriHasPoint_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val positionFromUri = Position(lat = "1", lon = "2")
+        val positionFromUri = Position("1", "2")
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
         val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
@@ -1978,118 +1985,348 @@ class ConversionStateTest {
 
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsAutomationReady() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.Noop()
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(automation) } doReturn automationValue
+        }
+        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val runContext = mockRunContext()
+        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        assertEquals(
+            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsCopyCoords_returnsAutomationReady() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.CopyCoordsDec()
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(automation) } doReturn automationValue
+        }
+        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val runContext = mockRunContext()
+        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        assertEquals(
+            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsOpenApp_returnsAutomationWaiting() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(automation) } doReturn automationValue
+        }
+        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val runContext = mockRunContext()
+        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        assertEquals(
+            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsSaveGpx_returnsAutomationWaiting() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.SaveGpx()
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(automation) } doReturn automationValue
+        }
+        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val runContext = mockRunContext()
+        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        assertEquals(
+            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsShare_returnsAutomationReady() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.Share()
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(automation) } doReturn automationValue
+        }
+        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val runContext = mockRunContext()
+        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        assertEquals(
+            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun conversionFailed_returnsNull() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
+        val inputUriString = "https://maps.google.com/foo"
         val state = ConversionFailed(R.string.conversion_failed_missing_url, inputUriString)
         assertNull(state.transition())
     }
 
     @Test
-    fun automationWaiting_automationIsNoop_returnsAutomationFinished() = runTest {
-        TODO()
+    fun automationWaiting_executionIsNotCancelled_waitsAndReturnsAutomationReady() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.SaveGpx()
+        val stateContext = mockStateContext()
+        val runContext = mockRunContext()
+        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue)
+        val workDuration = testScheduler.timeSource.measureTime {
+            assertEquals(
+                AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+                state.transition(),
+            )
+        }
+        assertTrue(automationValue.delay.isPositive())
+        assertEquals(automationValue.delay, workDuration)
     }
 
     @Test
-    fun automationWaiting_automationIsCopyCoords_returnsAutomationFinished() = runTest {
-        TODO()
-    }
-
-    @Test
-    fun automationWaiting_automationIsOpenApp_waitsAndReturnsAutomationReady() = runTest {
-        TODO()
-    }
-
-    @Test
-    fun automationWaiting_automationIsSaveGpx_waitsAndReturnsAutomationReady() = runTest {
-        TODO()
-    }
-
-    @Test
-    fun automationWaiting_automationIsShare_returnsAutomationReady() = runTest {
-        TODO()
-    }
-
-    @Test
-    fun automationWaiting_automationIsOpenAppAndDelayThrowsCancellationException_returnsAutomationFinished() = runTest {
-        TODO()
+    fun automationWaiting_executionIsCancelled_returnsAutomationFinished() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.SaveGpx()
+        val stateContext = mockStateContext()
+        val runContext = mockRunContext()
+        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue)
+        var res: State? = null
+        val job = launch {
+            res = state.transition()
+        }
+        testScheduler.runCurrent()
+        testScheduler.advanceTimeBy(1.seconds)
+        try {
+            job.cancelAndJoin()
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        assertEquals(
+            res,
+            AutomationFinished(inputUriString, position, automationValue),
+        )
     }
 
     @Test
     fun automationReady_automationIsNoop_returnsAutomationFinished() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.Noop()
+        val stateContext = mockStateContext()
+        val runContext = mockRunContext()
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationFinished(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun automationReady_automationIsCopyCoords_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.CopyCoordsDec()
+        val runContext = mockRunContext()
+        val mockIntentTools: IntentTools = mock {
+            onBlocking { copyToClipboard(any(), any(), any()) } doThrow NotImplementedError()
+            onBlocking {
+                copyToClipboard(
+                    eq(runContext.context),
+                    eq(runContext.clipboard),
+                    argThat { toString() == position.toCoordsDecString() },
+                )
+            } doReturn Unit
+        }
+        val stateContext = mockStateContext(intentTools = mockIntentTools)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationSucceeded(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun automationReady_automationIsOpenApp_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+        val runContext = mockRunContext()
+        val mockIntentTools: IntentTools = mock {
+            on { openApp(any(), any(), any()) } doThrow NotImplementedError()
+            on {
+                openApp(
+                    eq(runContext.context),
+                    eq(automationValue.packageName),
+                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                )
+            } doReturn true
+        }
+        val stateContext = mockStateContext(intentTools = mockIntentTools)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationSucceeded(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun automationReady_automationIsOpenAppAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+        val runContext = mockRunContext()
+        val mockIntentTools: IntentTools = mock {
+            on { openApp(any(), any(), any()) } doThrow NotImplementedError()
+            on {
+                openApp(
+                    eq(runContext.context),
+                    eq(automationValue.packageName),
+                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                )
+            } doReturn false
+        }
+        val stateContext = mockStateContext(intentTools = mockIntentTools)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationFailed(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
-    fun automationReady_automationIsSaveGpx_returnsAutomationSucceeded() = runTest {
-        TODO()
+    fun automationReady_automationIsSaveGpx_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.SaveGpx()
+        val runContext = mockRunContext()
+        val mockIntentTools: IntentTools = mock {
+            doThrow(NotImplementedError::class).whenever(mockIntentTools).launchSaveGpx(
+                any(),
+                any(),
+            )
+            doNothing().whenever(mockIntentTools).launchSaveGpx(
+                eq(runContext.context),
+                eq(runContext.saveGpxLauncher),
+            )
+        }
+        val stateContext = mockStateContext(intentTools = mockIntentTools)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationSucceeded(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun automationReady_automationIsShare_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.Share()
+        val runContext = mockRunContext()
+        val mockIntentTools: IntentTools = mock {
+            on { openChooser(any(), any()) } doThrow NotImplementedError()
+            on {
+                openChooser(
+                    eq(runContext.context),
+                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                )
+            } doReturn true
+        }
+        val stateContext = mockStateContext(intentTools = mockIntentTools)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationSucceeded(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
     fun automationReady_automationIsShareAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.Share()
+        val runContext = mockRunContext()
+        val mockIntentTools: IntentTools = mock {
+            on { openChooser(any(), any()) } doThrow NotImplementedError()
+            on {
+                openChooser(
+                    eq(runContext.context),
+                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                )
+            } doReturn false
+        }
+        val stateContext = mockStateContext(intentTools = mockIntentTools)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        assertEquals(
+            AutomationFailed(inputUriString, position, automationValue),
+            state.transition(),
+        )
     }
 
     @Test
-    fun automationSucceeded_waitsAndReturnsAutomationFinished() = runTest {
-        TODO()
+    fun automationSucceeded_executionIsNotCancelled_waitsAndReturnsAutomationFinished() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+        val state = AutomationSucceeded(inputUriString, position, automationValue)
+        val workDuration = testScheduler.timeSource.measureTime {
+            assertEquals(
+                AutomationFinished(inputUriString, position, automationValue),
+                state.transition(),
+            )
+        }
+        assertEquals(3.seconds, workDuration)
     }
 
     @Test
-    fun automationSucceeded_delayThrowsCancellationException_returnsAutomationFinished() = runTest {
-        TODO()
+    fun automationSucceeded_executionIsCancelled_returnsAutomationFinished() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+        val state = AutomationSucceeded(inputUriString, position, automationValue)
+        var res: State? = null
+        val job = launch {
+            res = state.transition()
+        }
+        testScheduler.runCurrent()
+        testScheduler.advanceTimeBy(1.seconds)
+        try {
+            job.cancelAndJoin()
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        assertEquals(
+            res,
+            AutomationFinished(inputUriString, position, automationValue),
+        )
     }
 
     @Test
     fun automationFinished_returnsNull() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+        val state = AutomationFinished(inputUriString, position, automationValue)
+        assertNull(state.transition())
     }
 
     @Test
     fun automationFailed_returnsNull() = runTest {
-        TODO()
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val automationValue = AutomationImpl.Share()
+        val state = AutomationFailed(inputUriString, position, automationValue)
+        assertNull(state.transition())
     }
 }

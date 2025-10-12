@@ -154,22 +154,22 @@ private enum class AutomationType {
     SHARE,
 }
 
-val automation = object : OptionsUserPreference<AutomationImplementation>(
-    default = AutomationImplementation.Noop(),
+val automation = object : OptionsUserPreference<AutomationImpl>(
+    default = AutomationImpl.Noop(),
     options = {
         val context = LocalContext.current
         listOf(
-            AutomationImplementation.Noop(),
-            AutomationImplementation.CopyCoordsDec(),
-            AutomationImplementation.CopyCoordsNorthSouthWestEastDec(),
-            AutomationImplementation.CopyGeoUri(),
-            AutomationImplementation.CopyGoogleMapsUri(),
-            AutomationImplementation.CopyAppleMapsUri(),
-            AutomationImplementation.CopyMagicEarthUri(),
-            AutomationImplementation.SaveGpx(),
-            AutomationImplementation.Share(),
+            AutomationImpl.Noop(),
+            AutomationImpl.CopyCoordsDec(),
+            AutomationImpl.CopyCoordsNorthSouthWestEastDec(),
+            AutomationImpl.CopyGeoUri(),
+            AutomationImpl.CopyGoogleMapsUri(),
+            AutomationImpl.CopyAppleMapsUri(),
+            AutomationImpl.CopyMagicEarthUri(),
+            AutomationImpl.SaveGpx(),
+            AutomationImpl.Share(),
             *IntentTools().queryGeoUriApps(context.packageManager)
-                .map { app -> AutomationImplementation.OpenApp(app.packageName) }
+                .map { app -> AutomationImpl.OpenApp(app.packageName) }
                 .toTypedArray(),
         ).map { automation -> UserPreferenceOption(automation) { automation.Label() } }
     }
@@ -177,37 +177,37 @@ val automation = object : OptionsUserPreference<AutomationImplementation>(
     private val typeKey = stringPreferencesKey("automation")
     private val packageNameKey = stringPreferencesKey("automation_package_name")
 
-    override fun getValue(preferences: Preferences): AutomationImplementation {
+    override fun getValue(preferences: Preferences): AutomationImpl {
         val type = preferences[typeKey]?.let(AutomationType::valueOf) ?: return default
         return when (type) {
-            AutomationType.COPY_APPLE_MAPS_URI -> AutomationImplementation.CopyAppleMapsUri()
-            AutomationType.COPY_COORDS_DEC -> AutomationImplementation.CopyCoordsDec()
-            AutomationType.COPY_COORDS_NSWE_DEC -> AutomationImplementation.CopyCoordsNorthSouthWestEastDec()
-            AutomationType.COPY_GEO_URI -> AutomationImplementation.CopyGeoUri()
-            AutomationType.COPY_GOOGLE_MAPS_URI -> AutomationImplementation.CopyGoogleMapsUri()
-            AutomationType.COPY_MAGIC_EARTH_URI -> AutomationImplementation.CopyMagicEarthUri()
-            AutomationType.NOOP -> AutomationImplementation.Noop()
+            AutomationType.COPY_APPLE_MAPS_URI -> AutomationImpl.CopyAppleMapsUri()
+            AutomationType.COPY_COORDS_DEC -> AutomationImpl.CopyCoordsDec()
+            AutomationType.COPY_COORDS_NSWE_DEC -> AutomationImpl.CopyCoordsNorthSouthWestEastDec()
+            AutomationType.COPY_GEO_URI -> AutomationImpl.CopyGeoUri()
+            AutomationType.COPY_GOOGLE_MAPS_URI -> AutomationImpl.CopyGoogleMapsUri()
+            AutomationType.COPY_MAGIC_EARTH_URI -> AutomationImpl.CopyMagicEarthUri()
+            AutomationType.NOOP -> AutomationImpl.Noop()
             AutomationType.OPEN_APP -> preferences[packageNameKey]?.takeIf { it.isNotEmpty() }?.let { packageName ->
-                AutomationImplementation.OpenApp(packageName)
-            } ?: AutomationImplementation.Noop()
+                AutomationImpl.OpenApp(packageName)
+            } ?: AutomationImpl.Noop()
 
-            AutomationType.SAVE_GPX -> AutomationImplementation.SaveGpx()
-            AutomationType.SHARE -> AutomationImplementation.Share()
+            AutomationType.SAVE_GPX -> AutomationImpl.SaveGpx()
+            AutomationType.SHARE -> AutomationImpl.Share()
         }
     }
 
-    override fun setValue(preferences: MutablePreferences, value: AutomationImplementation) {
+    override fun setValue(preferences: MutablePreferences, value: AutomationImpl) {
         val (type, packageName) = when (value) {
-            is AutomationImplementation.CopyAppleMapsUri -> AutomationType.COPY_APPLE_MAPS_URI to ""
-            is AutomationImplementation.CopyCoordsDec -> AutomationType.COPY_COORDS_DEC to ""
-            is AutomationImplementation.CopyCoordsNorthSouthWestEastDec -> AutomationType.COPY_COORDS_NSWE_DEC to ""
-            is AutomationImplementation.CopyGeoUri -> AutomationType.COPY_GEO_URI to ""
-            is AutomationImplementation.CopyGoogleMapsUri -> AutomationType.COPY_GOOGLE_MAPS_URI to ""
-            is AutomationImplementation.CopyMagicEarthUri -> AutomationType.COPY_MAGIC_EARTH_URI to ""
-            is AutomationImplementation.Noop -> AutomationType.NOOP to ""
-            is AutomationImplementation.OpenApp -> AutomationType.OPEN_APP to value.packageName
-            is AutomationImplementation.SaveGpx -> AutomationType.SAVE_GPX to ""
-            is AutomationImplementation.Share -> AutomationType.SHARE to ""
+            is AutomationImpl.CopyAppleMapsUri -> AutomationType.COPY_APPLE_MAPS_URI to ""
+            is AutomationImpl.CopyCoordsDec -> AutomationType.COPY_COORDS_DEC to ""
+            is AutomationImpl.CopyCoordsNorthSouthWestEastDec -> AutomationType.COPY_COORDS_NSWE_DEC to ""
+            is AutomationImpl.CopyGeoUri -> AutomationType.COPY_GEO_URI to ""
+            is AutomationImpl.CopyGoogleMapsUri -> AutomationType.COPY_GOOGLE_MAPS_URI to ""
+            is AutomationImpl.CopyMagicEarthUri -> AutomationType.COPY_MAGIC_EARTH_URI to ""
+            is AutomationImpl.Noop -> AutomationType.NOOP to ""
+            is AutomationImpl.OpenApp -> AutomationType.OPEN_APP to value.packageName
+            is AutomationImpl.SaveGpx -> AutomationType.SAVE_GPX to ""
+            is AutomationImpl.Share -> AutomationType.SHARE to ""
         }
         preferences[typeKey] = type.name
         preferences[packageNameKey] = packageName
@@ -244,8 +244,8 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    var automationValue: AutomationImplementation = automation.loading,
+    var automationValue: AutomationImpl = automation.loading,
+    var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
     var connectionPermissionValue: Permission = connectionPermission.loading,
     var introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
-    var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
 )
