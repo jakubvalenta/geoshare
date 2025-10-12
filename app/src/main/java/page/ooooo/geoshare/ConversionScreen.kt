@@ -254,9 +254,6 @@ fun ConversionScreen(
             }
 
             currentState is HasResult -> {
-
-                // TODO Add instrumented test
-
                 ResultSuccessCoordinates(
                     position = currentState.position,
                     onCopy = onCopy,

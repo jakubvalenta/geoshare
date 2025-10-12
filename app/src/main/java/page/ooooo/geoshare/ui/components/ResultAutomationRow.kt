@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,7 +68,10 @@ fun ResultAutomationRow(
                 (automation as Automation.HasDelay).waitingText(automationCounterSec)
             } ?: ""
         }
-        ResultAutomationNotification(currentState is AutomationSucceeded) {
+        ResultAutomationNotification(
+            currentState is AutomationSucceeded,
+            modifier = Modifier.testTag("geoShareConversionSuccessAutomationSuccess"),
+        ) {
             currentState.automation.takeIf { it is Automation.HasSuccessMessage }?.let { automation ->
                 (automation as Automation.HasSuccessMessage).successText()
             } ?: ""
@@ -81,7 +85,10 @@ fun ResultAutomationRow(
                 (automation as Automation.HasErrorMessage).errorText()
             } ?: ""
         }
-        AnimatedVisibility(currentState is AutomationWaiting) {
+        AnimatedVisibility(
+            currentState is AutomationWaiting,
+            modifier = Modifier.testTag("geoShareConversionSuccessAutomationCountdown"),
+        ) {
             FilledIconButton(
                 onCancel,
                 colors = IconButtonDefaults.filledIconButtonColors(
@@ -95,7 +102,10 @@ fun ResultAutomationRow(
                 )
             }
         }
-        AnimatedVisibility(currentState is AutomationFinished) {
+        AnimatedVisibility(
+            currentState is AutomationFinished,
+            Modifier.testTag("geoShareConversionSuccessAutomationPreferencesButton")
+        ) {
             Button(
                 onNavigateToUserPreferencesAutomationScreen,
                 colors = ButtonDefaults.elevatedButtonColors(
@@ -112,12 +122,14 @@ fun ResultAutomationRow(
 @Composable
 private fun RowScope.ResultAutomationNotification(
     visible: Boolean,
+    modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
     text: @Composable () -> String,
 ) {
     AnimatedVisibility(visible, Modifier.weight(1f)) {
         Card(
+            modifier = modifier,
             shape = MaterialTheme.shapes.extraSmall,
             colors = CardDefaults.cardColors(containerColor = containerColor, contentColor = contentColor),
         ) {

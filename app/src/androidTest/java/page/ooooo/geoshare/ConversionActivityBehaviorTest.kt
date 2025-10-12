@@ -44,7 +44,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun conversionScreen_whenFullUriIsShared_showsPositionAndOpensGoogleMaps() = uiAutomator {
+    fun conversionScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
@@ -54,6 +54,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Open the coordinates with Google Maps
         onElement { viewIdResourceName == "geoShareResultCardApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
 
+        // Wait for Google Maps
+        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Make it your map" }?.also {
             onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() == "skip" }.click()
@@ -62,6 +65,45 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Verify Google Maps content
         onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Westend" }
     }
+
+    @Test
+    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_showsPositionAndOpensTheInstalledAppAutomatically() =
+        uiAutomator {
+            // Launch application and close intro
+            launchApplication()
+            pressBack()
+
+            // Configure automation
+            goToUserPreferencesDetailAutomationScreen()
+            onElement { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
+
+            // Share a Google Maps coordinates link with the app
+            shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+            // Shows precise location
+            waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
+
+            // Shows countdown
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCountdown" }
+
+            // Google Maps doesn't open while the countdown is running
+            assertNull(onElementOrNull(4_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME })
+
+            // Google Maps opens
+            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+
+            // Go back to Geo Share
+            launchApplication()
+
+            // Shows automation success message
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
+
+            // Automation preferences button doesn't show up while the success message is shown
+            assertNull(onElementOrNull(2_000L) { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" })
+
+            // Shows automation preferences button
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
+        }
 
     @Test
     fun conversionScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
