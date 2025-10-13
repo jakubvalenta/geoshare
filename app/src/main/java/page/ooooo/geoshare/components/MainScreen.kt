@@ -1,19 +1,24 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
+import android.view.KeyEvent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
@@ -46,10 +51,12 @@ fun MainScreen(
                 block(viewModel.intentTools.pasteFromClipboard(runContext.clipboard))
             }
         },
-        onSubmit = { viewModel.start(runContext) },
+        onSubmit = {
+            viewModel.start(runContext)
+            onNavigateToConversionScreen()
+        },
         onUpdateInput = { viewModel.updateInput(it) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
-        onNavigateToConversionScreen = onNavigateToConversionScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
         onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
@@ -66,7 +73,6 @@ fun MainScreen(
     onSubmit: () -> Unit,
     onUpdateInput: (String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
-    onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUrlConvertersScreen: () -> Unit,
@@ -110,6 +116,14 @@ fun MainScreen(
                 },
                 modifier = Modifier
                     .testTag("geoShareMainInputUriStringTextField")
+                    .onPreviewKeyEvent { keyEvent ->
+                        if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                            onSubmit()
+                            true
+                        } else {
+                            false
+                        }
+                    }
                     .fillMaxWidth()
                     .padding(top = Spacing.small),
                 label = {
@@ -144,6 +158,12 @@ fun MainScreen(
                     Text(stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text))
                 },
                 isError = errorMessageResId != null,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { onSubmit() },
+                ),
             )
             Button(
                 {
@@ -154,7 +174,6 @@ fun MainScreen(
                         errorMessageResId = R.string.conversion_failed_missing_url
                     } else {
                         onSubmit()
-                        onNavigateToConversionScreen()
                     }
                 },
                 Modifier
@@ -183,10 +202,10 @@ private fun DefaultPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = true,
+            onPaste = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
-            onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
@@ -202,10 +221,10 @@ private fun DarkPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = true,
+            onPaste = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
-            onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
@@ -221,10 +240,10 @@ private fun DefaultChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
+            onPaste = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
-            onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
@@ -240,10 +259,10 @@ private fun DarkChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
+            onPaste = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
-            onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToUrlConvertersScreen = {},
