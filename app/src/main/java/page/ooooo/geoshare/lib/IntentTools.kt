@@ -208,4 +208,7 @@ class IntentTools {
             Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
         }
     }
+
+    suspend fun pasteFromClipboard(clipboard: Clipboard): String =
+        clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
 }

@@ -55,8 +55,6 @@ fun ConversionScreen(
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
 ) {
-    val context = LocalContext.current
-    val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
@@ -66,7 +64,7 @@ fun ConversionScreen(
         currentState = currentState,
         changelogShown = changelogShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
-        queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
+        queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(runContext.context.packageManager) },
         onBack = {
             viewModel.cancel()
             onBack()
@@ -75,7 +73,7 @@ fun ConversionScreen(
         onCopy = { text ->
             viewModel.cancel()
             coroutineScope.launch {
-                viewModel.intentTools.copyToClipboard(context, clipboard, text)
+                viewModel.intentTools.copyToClipboard(runContext.context, runContext.clipboard, text)
             }
         },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
@@ -107,11 +105,11 @@ fun ConversionScreen(
         },
         onOpenApp = { packageName, uriString ->
             viewModel.cancel()
-            viewModel.intentTools.openApp(context, packageName, uriString)
+            viewModel.intentTools.openApp(runContext.context, packageName, uriString)
         },
         onOpenChooser = { uriString ->
             viewModel.cancel()
-            viewModel.intentTools.openChooser(context, uriString)
+            viewModel.intentTools.openChooser(runContext.context, uriString)
         },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
@@ -119,7 +117,7 @@ fun ConversionScreen(
         },
         onSave = {
             viewModel.cancel()
-            viewModel.intentTools.launchSaveGpx(context, runContext.saveGpxLauncher)
+            viewModel.intentTools.launchSaveGpx(runContext.context, runContext.saveGpxLauncher)
         },
     )
 }

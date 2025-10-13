@@ -10,11 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ConversionRunContext
@@ -33,11 +35,17 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val recentInputsShown by viewModel.changelogShown.collectAsState()
 
     MainScreen(
         inputUriString = viewModel.inputUriString,
         changelogShown = recentInputsShown,
+        onPaste = { block ->
+            coroutineScope.launch {
+                block(viewModel.intentTools.pasteFromClipboard(runContext.clipboard))
+            }
+        },
         onSubmit = { viewModel.start(runContext) },
         onUpdateInput = { viewModel.updateInput(it) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
@@ -54,6 +62,7 @@ fun MainScreen(
 fun MainScreen(
     inputUriString: String,
     changelogShown: Boolean,
+    onPaste: (block: (String) -> Unit) -> Unit,
     onSubmit: () -> Unit,
     onUpdateInput: (String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -106,20 +115,30 @@ fun MainScreen(
                 label = {
                     Text(stringResource(R.string.main_input_uri_label))
                 },
-                trailingIcon = if (inputUriString.isNotEmpty()) {
-                    {
+                trailingIcon = {
+                    if (inputUriString.isNotEmpty()) {
                         IconButton({
                             onUpdateInput("")
                             errorMessageResId = null
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = stringResource(R.string.main_input_uri_clear_content_description),
+                                Icons.Default.Clear,
+                                stringResource(R.string.main_input_uri_clear_content_description),
+                            )
+                        }
+                    } else {
+                        IconButton({
+                            onPaste { text ->
+                                onUpdateInput(text)
+                                errorMessageResId = null
+                            }
+                        }) {
+                            Icon(
+                                painterResource(R.drawable.content_paste_24px),
+                                stringResource(R.string.main_input_uri_paste_content_description),
                             )
                         }
                     }
-                } else {
-                    null
                 },
                 supportingText = {
                     Text(stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text))

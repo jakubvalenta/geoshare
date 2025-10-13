@@ -48,6 +48,7 @@
     <string name="intro_settings_activity_not_found">Failed to open settings</string>
     <string name="main_input_uri_label">Paste a map link here</string>
     <string name="main_input_uri_clear_content_description">Clear</string>
+    <string name="main_input_uri_paste_content_description">Paste</string>
     <string name="main_input_uri_supporting_text">e.g. https://maps.app.goo.gl/&#8230; or maps.apple.com/&#8230;</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="main_create_geo_uri">Show coordinates</string>
