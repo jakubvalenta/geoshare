@@ -44,6 +44,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
 fun ConversionScreen(
+    runContext: ConversionRunContext,
     onBack: () -> Unit,
     onCancel: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -56,9 +57,7 @@ fun ConversionScreen(
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
-    val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        viewModel.saveGpx(context, it)
-    }
+    val coroutineScope = rememberCoroutineScope()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
@@ -73,7 +72,11 @@ fun ConversionScreen(
             viewModel.cancel()
             onCancel()
         },
-        onCopy = { text -> viewModel.copy(context, clipboard, text) },
+        onCopy = { text ->
+            coroutineScope.launch {
+                viewModel.intentTools.copyToClipboard(context, clipboard, text)
+            }
+        },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
@@ -86,9 +89,9 @@ fun ConversionScreen(
         onOpenChooser = { uriString -> viewModel.intentTools.openChooser(context, uriString) },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
-            viewModel.start(ConversionRunContext(context, clipboard, saveGpxLauncher))
+            viewModel.start(runContext)
         },
-        onSave = { viewModel.intentTools.launchSaveGpx(context, saveGpxLauncher) },
+        onSave = { viewModel.intentTools.launchSaveGpx(context, runContext.saveGpxLauncher) },
     )
 }
 

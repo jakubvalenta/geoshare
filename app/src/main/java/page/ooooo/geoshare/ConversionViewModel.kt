@@ -1,15 +1,12 @@
 package page.ooooo.geoshare
 
 import android.app.Activity
-import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.Clipboard
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -161,16 +158,6 @@ class ConversionViewModel @Inject constructor(
         viewModelScope.launch {
             stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
             transition()
-        }
-    }
-
-    fun copy(context: Context, clipboard: Clipboard, text: String) {
-        viewModelScope.launch {
-            clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
-            val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            if (!systemHasClipboardEditor) {
-                Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.components
 
 import android.content.res.Configuration
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,8 +9,6 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -28,6 +24,7 @@ import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainScreen(
+    runContext: ConversionRunContext,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -36,18 +33,13 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
-    val clipboard = LocalClipboard.current
-    val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        viewModel.saveGpx(context, it)
-    }
     val recentInputsShown by viewModel.changelogShown.collectAsState()
 
     MainScreen(
         inputUriString = viewModel.inputUriString,
         changelogShown = recentInputsShown,
+        onSubmit = { viewModel.start(runContext) },
         onUpdateInput = { viewModel.updateInput(it) },
-        onStart = { viewModel.start(ConversionRunContext(context, clipboard, saveGpxLauncher)) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToConversionScreen = onNavigateToConversionScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
@@ -62,8 +54,8 @@ fun MainScreen(
 fun MainScreen(
     inputUriString: String,
     changelogShown: Boolean,
+    onSubmit: () -> Unit,
     onUpdateInput: (String) -> Unit,
-    onStart: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -142,7 +134,7 @@ fun MainScreen(
                         // screen.
                         errorMessageResId = R.string.conversion_failed_missing_url
                     } else {
-                        onStart()
+                        onSubmit()
                         onNavigateToConversionScreen()
                     }
                 },
@@ -171,8 +163,8 @@ private fun DefaultPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = true,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
@@ -190,8 +182,8 @@ private fun DarkPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = true,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
@@ -209,8 +201,8 @@ private fun DefaultChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
@@ -228,8 +220,8 @@ private fun DarkChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
