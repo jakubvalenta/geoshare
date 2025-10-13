@@ -7,10 +7,9 @@ import page.ooooo.geoshare.lib.Position
 class MapyComUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
-        // Launch app and set connection permission to Always
+        // Launch app and close intro
         launchApplication()
-        clickIntroCloseButton()
-        setUserPreferenceConnectionPermissionToAlways()
+        closeIntroIfItIsVisible()
 
         // Coordinates
         testUri(
@@ -39,11 +38,10 @@ class MapyComUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
         )
 
         // Text
-        // TODO Test this when we figure out how to pass extra text with spaces.
-        // testTextUri(
-        //     Position("41.9966006", "-6.1223825"),
-        //     @Suppress("SpellCheckingInspection")
-        //     "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha",
-        // )
+        testTextUri(
+            Position("41.9966006", "-6.1223825"),
+            @Suppress("SpellCheckingInspection")
+            "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha",
+        )
     }
 }

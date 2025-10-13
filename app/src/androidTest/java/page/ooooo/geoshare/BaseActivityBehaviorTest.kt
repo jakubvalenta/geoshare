@@ -49,9 +49,9 @@ abstract class BaseActivityBehaviorTest {
         device.pressRecentApps()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // On newer Android, swipe up to close the most recent app
-            sleep(1000) // Crude way to make sure recent apps finished loading
+            waitForStableInActiveWindow()
             device.swipe(
-                device.displayWidth / 2, device.displayHeight / 2, device.displayWidth / 2, 0, 5
+                device.displayWidth / 2, device.displayHeight / 2, device.displayWidth / 2, 0, 10
             )
         } else {
             // On older Android, swipe right to close the most recent app
@@ -78,6 +78,10 @@ abstract class BaseActivityBehaviorTest {
     protected fun executeShellCommand(cmd: String) = uiAutomator {
         val output = device.executeShellCommand(cmd)
         Log.i(null, "Executed shell command `$cmd`: $output")
+    }
+
+    protected fun closeIntroIfItIsVisible() = uiAutomator {
+        onElementOrNull(1000) { viewIdResourceName == "geoShareIntroScreenCloseButton" }?.click()
     }
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {

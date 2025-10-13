@@ -7,10 +7,9 @@ import page.ooooo.geoshare.lib.Position
 class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
-        // Launch app and set connection permission to Always
+        // Launch app and close intro
         launchApplication()
-        clickIntroCloseButton()
-        setUserPreferenceConnectionPermissionToAlways()
+        closeIntroIfItIsVisible()
 
         // Coordinates in data
         testUri(
@@ -74,7 +73,7 @@ class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun testSearch() {
         // Launch app and set connection permission to Always
         launchApplication()
-        clickIntroCloseButton()
+        closeIntroIfItIsVisible()
         setUserPreferenceConnectionPermissionToAlways()
 
         // Google Search

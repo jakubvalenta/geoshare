@@ -139,6 +139,7 @@ fun MainScreen(
                     }
                 },
                 Modifier
+                    .testTag("geoShareMainSubmitButton")
                     .fillMaxWidth()
                     .padding(top = Spacing.small),
             ) {

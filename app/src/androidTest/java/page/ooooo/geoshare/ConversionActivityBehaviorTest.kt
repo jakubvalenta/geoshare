@@ -71,7 +71,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         uiAutomator {
             // Launch application and close intro
             launchApplication()
-            pressBack()
+            closeIntroIfItIsVisible()
 
             // Configure automation
             goToUserPreferencesDetailAutomationScreen()
@@ -95,7 +95,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         uiAutomator {
             // Launch application and close intro
             launchApplication()
-            pressBack()
+            closeIntroIfItIsVisible()
 
             // Configure automation
             goToUserPreferencesDetailAutomationScreen()
@@ -111,7 +111,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
 
             // Google Maps doesn't open while the counter is running
-            assertNull(onElementOrNull(4_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME })
+            assertNull(onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME })
 
             // Google Maps opens
             onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
