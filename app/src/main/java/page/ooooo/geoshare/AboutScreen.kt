@@ -54,7 +54,7 @@ fun AboutScreen(
                 modifier = Modifier
                     .size(144.dp)
                     .align(Alignment.CenterHorizontally),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                colorFilter = ColorFilter.tint(LocalContentColor.current)
             )
             val appName = stringResource(R.string.app_name)
             Text(

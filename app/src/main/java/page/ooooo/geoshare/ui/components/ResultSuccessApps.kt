@@ -46,7 +46,7 @@ fun ResultSuccessApps(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(start = Spacing.tiny, top = Spacing.medium, end = Spacing.tiny),
+            .padding(top = Spacing.large),
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
         gridItems.chunked(columnCount).forEach { row ->
