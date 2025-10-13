@@ -142,7 +142,7 @@ val LocalSpacing = staticCompositionLocalOf {
 private fun isSmallWindow(): Boolean {
     val windowInfo = LocalWindowInfo.current
     val windowHeight = with(LocalDensity.current) { windowInfo.containerSize.height.toDp() }
-    return windowHeight < 1200.dp
+    return windowHeight < 800.dp
 }
 
 @Composable
