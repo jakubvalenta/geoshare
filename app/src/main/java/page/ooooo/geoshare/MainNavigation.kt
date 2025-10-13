@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import page.ooooo.geoshare.components.MainScreen
+import page.ooooo.geoshare.ui.MainScreen
 import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.ui.*
 

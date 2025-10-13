@@ -5,7 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -28,8 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.components.ConfirmationScaffold
-import page.ooooo.geoshare.components.PermissionDialog
+import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
@@ -40,7 +41,9 @@ import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSuccessApps
 import page.ooooo.geoshare.ui.components.ResultSuccessAutomation
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
+import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun ConversionScreen(
@@ -149,168 +152,213 @@ fun ConversionScreen(
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
+    val containerColor = when (currentState) {
+        is HasError -> MaterialTheme.colorScheme.errorContainer
+        is HasResult -> MaterialTheme.colorScheme.secondaryContainer
+        else -> MaterialTheme.colorScheme.background
+    }
+    val contentColor = when (currentState) {
+        is HasError -> MaterialTheme.colorScheme.onErrorContainer
+        is HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+        else -> MaterialTheme.colorScheme.onBackground
+    }
 
     BackHandler {
         onBack()
     }
 
-    ConfirmationScaffold(
-        title = when {
-            loadingIndicatorTitleResId != null -> stringResource(loadingIndicatorTitleResId)
-            currentState is HasError -> stringResource(R.string.conversion_error_title)
-            currentState is HasResult -> stringResource(R.string.conversion_succeeded_title)
-            else -> null
-        },
-        navigationIcon = {
-            IconButton(
-                onBack,
-                Modifier.testTag("geoShareConversionBackButton"),
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Default.ArrowBack,
-                    stringResource(R.string.nav_back_content_description)
-                )
-            }
-        },
-        startButton = when {
-            loadingIndicatorTitleResId != null -> {
-                {
-                    TextButton({
-                        onCancel()
-                        onFinish()
-                    }) {
-                        Text(stringResource(R.string.conversion_loading_indicator_cancel))
-                    }
-                }
-            }
-
-            currentState is HasError -> {
-                {
-                    TextButton({ onCopy(currentState.inputUriString) }) {
-                        Text(stringResource(R.string.conversion_succeeded_skip))
-                    }
-                }
-            }
-
-            currentState is HasResult -> {
-                {
-                    TextButton({ onCopy(currentState.inputUriString) }) {
-                        Text(stringResource(R.string.conversion_succeeded_skip))
-                    }
-                }
-            }
-
-            else -> null
-        },
-        changelogShown = changelogShown,
-        onNavigateToAboutScreen = onNavigateToAboutScreen,
-        onNavigateToFaqScreen = onNavigateToFaqScreen,
-        onNavigateToIntroScreen = onNavigateToIntroScreen,
-        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
-        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-    ) {
-        when {
-            (loadingIndicatorTitleResId != null) -> {
-                LoadingIndicator(
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .size(64.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                if (currentState is HasLoadingIndicator) {
-                    currentState.loadingIndicatorDescription()?.let { text ->
-                        Text(
-                            text,
-                            Modifier.align(Alignment.CenterHorizontally),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodySmall,
+    Scaffold(
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(
+                        onBack,
+                        Modifier.testTag("geoShareConversionBackButton"),
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.nav_back_content_description)
                         )
                     }
-                }
-            }
-
-            currentState is RequestedUnshortenPermission -> {
-                PermissionDialog(
-                    title = stringResource(currentState.permissionTitleResId),
-                    confirmText = stringResource(R.string.conversion_permission_common_grant),
-                    dismissText = stringResource(R.string.conversion_permission_common_deny),
-                    onConfirmation = onGrant,
-                    onDismissRequest = onDeny,
-                    modifier = Modifier
-                        .semantics { testTagsAsResourceId = true }
-                        .testTag("geoShareUnshortenPermissionDialog"),
-                ) {
-                    Text(
-                        AnnotatedString.fromHtml(
-                            stringResource(
-                                R.string.conversion_permission_common_text,
-                                truncateMiddle(currentState.uri.toString()),
-                                appName,
-                            )
-                        ),
-                        style = TextStyle(lineBreak = LineBreak.Paragraph),
+                },
+                actions = {
+                    MainMenu(
+                        changelogShown = changelogShown,
+                        onNavigateToAboutScreen = onNavigateToAboutScreen,
+                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+                        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
-                }
-            }
-
-            currentState is RequestedParseHtmlPermission -> {
-                PermissionDialog(
-                    title = stringResource(currentState.permissionTitleResId),
-                    confirmText = stringResource(R.string.conversion_permission_common_grant),
-                    dismissText = stringResource(R.string.conversion_permission_common_deny),
-                    onConfirmation = onGrant,
-                    onDismissRequest = onDeny,
-                    modifier = Modifier
-                        .semantics { testTagsAsResourceId = true }
-                        .testTag("geoShareParseHtmlPermissionDialog"),
-                ) {
-                    Text(
-                        AnnotatedString.fromHtml(
-                            stringResource(
-                                R.string.conversion_permission_common_text,
-                                truncateMiddle(currentState.uri.toString()),
-                                appName,
-                            )
-                        ),
-                        style = TextStyle(lineBreak = LineBreak.Paragraph),
-                    )
-                }
-            }
-
-            currentState is HasError -> {
-                ResultError(
-                    currentState.errorMessageResId,
-                    currentState.inputUriString,
-                    retryLoadingIndicatorVisible,
-                    onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
-                    onRetry = {
-                        coroutineScope.launch {
-                            // Show a loading indicator for a while to indicate that conversion is being retried.
-                            setRetryLoadingIndicator(true)
-                            delay(1000)
-                            setRetryLoadingIndicator(false)
-                            onRetry(currentState.inputUriString)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = containerColor,
+                    navigationIconContentColor = contentColor,
+                    actionIconContentColor = contentColor,
+                ),
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f, true)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                when {
+                    (loadingIndicatorTitleResId != null) -> {
+                        SmallHeadline(stringResource(loadingIndicatorTitleResId))
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = Spacing.small),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(Spacing.small)
+                        ) {
+                            LoadingIndicator(Modifier.size(96.dp), color = MaterialTheme.colorScheme.tertiary)
+                            if (currentState is HasLoadingIndicator) {
+                                currentState.loadingIndicatorDescription()?.let { text ->
+                                    Text(
+                                        text,
+                                        Modifier.align(Alignment.CenterHorizontally),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
+                            Button(
+                                {
+                                    onCancel()
+                                    onFinish()
+                                },
+                                colors = ButtonDefaults.elevatedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    contentColor = MaterialTheme.colorScheme.onSurface,
+                                ),
+                            ) {
+                                Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                            }
                         }
-                    },
-                )
-            }
+                    }
 
-            currentState is HasResult -> {
-                ResultSuccessCoordinates(
-                    position = currentState.position,
-                    onCopy = onCopy,
-                    onSave = onSave,
-                )
-                ResultSuccessAutomation(
-                    currentState,
-                    onCancel = onCancel,
-                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                )
-                ResultSuccessApps(
-                    apps = queryGeoUriApps(),
-                    onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
-                    onOpenChooser = { onOpenChooser(currentState.position.toGeoUriString()) },
-                )
+                    currentState is RequestedUnshortenPermission -> {
+                        PermissionDialog(
+                            title = stringResource(currentState.permissionTitleResId),
+                            confirmText = stringResource(R.string.conversion_permission_common_grant),
+                            dismissText = stringResource(R.string.conversion_permission_common_deny),
+                            onConfirmation = onGrant,
+                            onDismissRequest = onDeny,
+                            modifier = Modifier
+                                .semantics { testTagsAsResourceId = true }
+                                .testTag("geoShareUnshortenPermissionDialog"),
+                        ) {
+                            Text(
+                                AnnotatedString.fromHtml(
+                                    stringResource(
+                                        R.string.conversion_permission_common_text,
+                                        truncateMiddle(currentState.uri.toString()),
+                                        appName,
+                                    )
+                                ),
+                                style = TextStyle(lineBreak = LineBreak.Paragraph),
+                            )
+                        }
+                    }
+
+                    currentState is RequestedParseHtmlPermission -> {
+                        PermissionDialog(
+                            title = stringResource(currentState.permissionTitleResId),
+                            confirmText = stringResource(R.string.conversion_permission_common_grant),
+                            dismissText = stringResource(R.string.conversion_permission_common_deny),
+                            onConfirmation = onGrant,
+                            onDismissRequest = onDeny,
+                            modifier = Modifier
+                                .semantics { testTagsAsResourceId = true }
+                                .testTag("geoShareParseHtmlPermissionDialog"),
+                        ) {
+                            Text(
+                                AnnotatedString.fromHtml(
+                                    stringResource(
+                                        R.string.conversion_permission_common_text,
+                                        truncateMiddle(currentState.uri.toString()),
+                                        appName,
+                                    )
+                                ),
+                                style = TextStyle(lineBreak = LineBreak.Paragraph),
+                            )
+                        }
+                    }
+
+                    currentState is HasError -> {
+                        SmallHeadline(
+                            stringResource(R.string.conversion_error_title),
+                            containerColor = containerColor,
+                            contentColor = contentColor,
+                        )
+                        ResultError(
+                            currentState.errorMessageResId,
+                            currentState.inputUriString,
+                            retryLoadingIndicatorVisible,
+                            onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+                            onRetry = {
+                                coroutineScope.launch {
+                                    // Show a loading indicator for a while to indicate that conversion is being retried.
+                                    setRetryLoadingIndicator(true)
+                                    delay(1000)
+                                    setRetryLoadingIndicator(false)
+                                    onRetry(currentState.inputUriString)
+                                }
+                            },
+                        )
+                    }
+
+                    currentState is HasResult -> {
+                        SmallHeadline(
+                            stringResource(R.string.conversion_succeeded_title),
+                            containerColor = containerColor,
+                            contentColor = contentColor,
+                        )
+                        ResultSuccessCoordinates(
+                            position = currentState.position,
+                            onCopy = onCopy,
+                            onSave = onSave,
+                        )
+                        Column(Modifier.padding(horizontal = Spacing.windowPadding)) {
+                            ResultSuccessAutomation(
+                                currentState,
+                                onCancel = onCancel,
+                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                            )
+                            ResultSuccessApps(
+                                apps = queryGeoUriApps(),
+                                onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
+                                onOpenChooser = { onOpenChooser(currentState.position.toGeoUriString()) },
+                            )
+                        }
+                    }
+                }
+            }
+            when (currentState) {
+                is HasError -> TextButton({ onCopy(currentState.inputUriString) }) {
+                    Text(
+                        stringResource(R.string.conversion_succeeded_skip),
+                        Modifier.padding(start = Spacing.windowPadding, top = Spacing.tiny, bottom = Spacing.small)
+                    )
+                }
+
+                is HasResult -> TextButton({ onCopy(currentState.inputUriString) }) {
+                    Text(
+                        stringResource(R.string.conversion_succeeded_skip),
+                        Modifier.padding(start = Spacing.windowPadding, top = Spacing.tiny, bottom = Spacing.small)
+                    )
+                }
             }
         }
     }

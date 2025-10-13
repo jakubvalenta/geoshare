@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
 import android.view.KeyEvent

@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,11 +46,7 @@ fun UserPreferencesScaffold(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                title,
-                Modifier.padding(horizontal = Spacing.windowPadding, vertical = Spacing.medium),
-                style = MaterialTheme.typography.headlineSmall,
-            )
+            SmallHeadline(title)
             content()
         }
     }

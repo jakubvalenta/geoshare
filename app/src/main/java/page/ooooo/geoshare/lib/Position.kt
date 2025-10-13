@@ -35,7 +35,7 @@ data class Position(
 
     fun toCoordsDecString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) -> "$lat, $lon" }
 
-    fun toParamsString(): String = mutableListOf<String>().apply {
+    fun toParamsString(separator: String): String = mutableListOf<String>().apply {
         q.takeUnless { it.isNullOrEmpty() }?.let { q ->
             (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
                 val coords = "$lat,$lon"
@@ -47,7 +47,7 @@ data class Position(
         z.takeUnless { it.isNullOrEmpty() }?.let { z ->
             add("z$z")
         }
-    }.joinToString(" \u2022 ")
+    }.joinToString(separator)
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String =
         (mainPoint ?: ("0" to "0")).let { (lat, lon) -> "$lat,$lon" }.let { coords ->

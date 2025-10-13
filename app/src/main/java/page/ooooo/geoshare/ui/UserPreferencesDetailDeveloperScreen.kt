@@ -13,7 +13,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.components.ParagraphHtml
+import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode

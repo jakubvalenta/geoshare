@@ -61,7 +61,7 @@ fun ScreenshotColumn(
             .let { if (width != null) it.width(with(density) { (width - 2 * x).toDp() * scale }) else it },
         verticalArrangement = Arrangement.spacedBy(with(density) { verticalSpacing.toDp() * scale }),
         horizontalAlignment = horizontalAlignment,
-        content = content
+        content = content,
     )
 }
 

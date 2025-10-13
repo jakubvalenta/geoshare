@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -32,6 +34,8 @@ fun ResultError(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
+    val containerColor = MaterialTheme.colorScheme.errorContainer
+    val contentColor = MaterialTheme.colorScheme.onErrorContainer
     val uriHandler = LocalUriHandler.current
 
     if (retryLoadingIndicatorVisible) {
@@ -45,25 +49,28 @@ fun ResultError(
         }
     } else {
         ResultCard(
+            containerColor = containerColor,
+            contentColor = contentColor,
             modifier = Modifier.testTag("geoShareConversionError"),
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-            chips = {
+            chips = { lastPaddingEnd ->
                 ResultCardChip(
                     stringResource(R.string.conversion_error_retry),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    icon = {
+                        Icon(Icons.Default.Refresh, null)
+                    },
                     onClick = onRetry,
                 )
                 ResultCardChip(
                     stringResource(R.string.conversion_error_report),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 ) {
                     uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
                 ResultCardChip(
                     stringResource(R.string.url_converters_title),
-                    modifier = Modifier.padding(end = Spacing.small),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    icon = {
+                        Icon(Icons.Outlined.Info, null)
+                    },
+                    modifier = Modifier.padding(end = lastPaddingEnd),
                 ) {
                     onNavigateToUrlConvertersScreen()
                 }

@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*

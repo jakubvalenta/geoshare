@@ -12,8 +12,8 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.components.RadioButtonGroup
-import page.ooooo.geoshare.components.RadioButtonOption
+import page.ooooo.geoshare.ui.components.RadioButtonGroup
+import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.ui.theme.Spacing
 

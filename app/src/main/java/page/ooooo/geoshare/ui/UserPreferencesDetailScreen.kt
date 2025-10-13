@@ -7,7 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import page.ooooo.geoshare.components.ParagraphHtml
+import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.connectionPermission

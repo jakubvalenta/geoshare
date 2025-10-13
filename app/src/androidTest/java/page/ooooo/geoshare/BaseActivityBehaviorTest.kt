@@ -89,7 +89,7 @@ abstract class BaseActivityBehaviorTest {
         val expectedCoordinatesText = expectedPosition.toNorthSouthWestEastDecCoordsString()
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedCoordinatesText }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
-            val expectedParamsText = expectedPosition.toParamsString()
+            val expectedParamsText = expectedPosition.toParamsString("\t\t")
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedParamsText }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })

@@ -1,9 +1,8 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
@@ -20,7 +19,6 @@ import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -29,40 +27,45 @@ fun ResultSuccessCoordinates(
     onCopy: (text: String) -> Unit,
     onSave: () -> Boolean,
 ) {
+    val containerColor = MaterialTheme.colorScheme.secondaryContainer
+    val contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+    val separator = "\t\t"
     var menuExpanded by remember { mutableStateOf(false) }
 
     ResultCard(
+        containerColor = containerColor,
+        contentColor = contentColor,
         main = {
             SelectionContainer {
                 Text(
                     position.toNorthSouthWestEastDecCoordsString(),
-                    Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
+                    Modifier
+                        .testTag("geoShareConversionSuccessPositionCoordinates")
+                        .fillMaxWidth(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            position.toParamsString().takeIf { it.isNotEmpty() }?.let {
+            position.toParamsString(separator).takeIf { it.isNotEmpty() }?.let {
                 SelectionContainer {
                     Text(
                         it,
-                        Modifier.testTag("geoShareConversionSuccessPositionParams"),
+                        Modifier
+                            .testTag("geoShareConversionSuccessPositionParams")
+                            .fillMaxWidth(),
                         fontStyle = FontStyle.Italic,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
-            position.points?.takeIf { it.size > 1 }?.mapIndexed { i, (lat, lon) ->
-                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+            position.points?.takeIf { it.size > 1 }?.let { points ->
+                SelectionContainer {
                     Text(
-                        stringResource(R.string.conversion_succeeded_point_number, i + 1),
-                        fontStyle = FontStyle.Italic,
+                        points.mapIndexed { i, (lat, lon) ->
+                            stringResource(R.string.conversion_succeeded_point_number, i + 1) + separator +
+                                    Position(lat, lon).toCoordsDecString()
+                        }.joinToString("\n"),
                         style = MaterialTheme.typography.bodySmall,
                     )
-                    SelectionContainer {
-                        Text(
-                            Position(lat, lon).toCoordsDecString(),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
                 }
             }
         },
@@ -97,7 +100,7 @@ fun ResultSuccessCoordinates(
                 }
             }
         },
-        chips = {
+        chips = { lastPaddingEnd ->
             ResultCardChip(stringResource(R.string.conversion_succeeded_copy_geo)) {
                 onCopy(position.toGeoUriString())
             }
@@ -106,7 +109,7 @@ fun ResultSuccessCoordinates(
             }
             ResultCardChip(
                 stringResource(R.string.conversion_succeeded_save_gpx),
-                Modifier.padding(end = Spacing.small),
+                Modifier.padding(end = lastPaddingEnd),
             ) {
                 onSave()
             }

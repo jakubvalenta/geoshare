@@ -20,7 +20,7 @@ class PositionTest {
                     "59.4154007" to "11.659710599999999",
                     "59.147731699999994" to "11.550661199999999",
                 ),
-            ).toParamsString(),
+            ).toParamsString(" \u2022 "),
         )
     }
 

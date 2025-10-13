@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui.components
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text

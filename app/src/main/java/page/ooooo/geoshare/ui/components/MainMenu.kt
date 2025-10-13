@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -99,7 +99,7 @@ fun MainMenu(
                             }
                         },
                     ) {
-                        Icon(imageVector = Icons.Default.Star, contentDescription = null)
+                        Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
                     }
                 },
             )

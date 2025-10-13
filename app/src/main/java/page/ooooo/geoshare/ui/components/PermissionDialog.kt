@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -71,17 +72,7 @@ fun PermissionDialog(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        val appName = stringResource(R.string.app_name)
-        val uriString =
-            "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        ConfirmationScaffold(
-            changelogShown = true,
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-        ) {
+        Scaffold {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -89,6 +80,9 @@ private fun DefaultPreview() {
                 onConfirmation = {},
                 onDismissRequest = {},
             ) {
+                val appName = stringResource(R.string.app_name)
+                val uriString =
+                    "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
@@ -108,17 +102,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        val appName = stringResource(R.string.app_name)
-        val uriString =
-            "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
-        ConfirmationScaffold(
-            changelogShown = true,
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-        ) {
+        Scaffold {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -126,6 +110,9 @@ private fun DarkPreview() {
                 onConfirmation = {},
                 onDismissRequest = {},
             ) {
+                val appName = stringResource(R.string.app_name)
+                val uriString =
+                    "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
@@ -145,16 +132,7 @@ private fun DarkPreview() {
 @Composable
 private fun ParseHtmlPermissionPreview() {
     AppTheme {
-        val appName = stringResource(R.string.app_name)
-        val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        ConfirmationScaffold(
-            changelogShown = true,
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-        ) {
+        Scaffold {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -165,6 +143,8 @@ private fun ParseHtmlPermissionPreview() {
                     .semantics { testTagsAsResourceId = true }
                     .testTag("geoShareParseHtmlPermissionDialog"),
             ) {
+                val appName = stringResource(R.string.app_name)
+                val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
@@ -184,16 +164,7 @@ private fun ParseHtmlPermissionPreview() {
 @Composable
 private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
-        val appName = stringResource(R.string.app_name)
-        val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        ConfirmationScaffold(
-            changelogShown = true,
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-        ) {
+        Scaffold {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -204,6 +175,8 @@ private fun DarkParseHtmlPermissionPreview() {
                     .semantics { testTagsAsResourceId = true }
                     .testTag("geoShareParseHtmlPermissionDialog"),
             ) {
+                val appName = stringResource(R.string.app_name)
+                val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(

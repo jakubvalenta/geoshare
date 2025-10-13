@@ -134,8 +134,7 @@ fun ResultSuccessAutomation(
                 ResultAutomationRow {
                     Text(
                         stringResource(R.string.conversion_succeeded_apps_headline),
-                        Modifier.padding(horizontal = Spacing.small),
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                     Button(
                         onNavigateToUserPreferencesAutomationScreen,
