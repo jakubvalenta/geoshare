@@ -38,21 +38,14 @@ fun ResultError(
     val contentColor = MaterialTheme.colorScheme.onErrorContainer
     val uriHandler = LocalUriHandler.current
 
-    if (retryLoadingIndicatorVisible) {
-        Column(Modifier.fillMaxWidth()) {
-            LoadingIndicator(
-                Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(64.dp),
-                color = MaterialTheme.colorScheme.errorContainer,
-            )
-        }
-    } else {
-        ResultCard(
-            containerColor = containerColor,
-            contentColor = contentColor,
-            modifier = Modifier.testTag("geoShareConversionError"),
-            chips = { lastPaddingEnd ->
+    ResultCard(
+        containerColor = containerColor,
+        contentColor = contentColor,
+        modifier = Modifier
+            .testTag("geoShareConversionError")
+            .fillMaxWidth(),
+        chips = { lastPaddingEnd ->
+            if (!retryLoadingIndicatorVisible) {
                 ResultCardChip(
                     stringResource(R.string.conversion_error_retry),
                     icon = {
@@ -74,8 +67,10 @@ fun ResultError(
                 ) {
                     onNavigateToUrlConvertersScreen()
                 }
-            },
-        ) {
+            }
+        },
+    ) {
+        if (!retryLoadingIndicatorVisible) {
             SelectionContainer {
                 Text(
                     stringResource(errorMessageResId),
@@ -100,6 +95,10 @@ fun ResultError(
                         )
                     }
                 }
+            }
+        } else {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoadingIndicator(Modifier.size(96.dp), color = contentColor)
             }
         }
     }
