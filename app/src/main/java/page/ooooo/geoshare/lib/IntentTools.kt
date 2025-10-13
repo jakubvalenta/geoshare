@@ -144,8 +144,8 @@ class IntentTools {
                 }
             )
             true
-        } catch (_: IllegalStateException) {
-            // TODO Fix launchSaveGpx crash
+        } catch (e: Exception) {
+            Log.e(null, "Error when saving GPX file", e)
             false
         }
     }

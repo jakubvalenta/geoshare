@@ -29,10 +29,11 @@ class ConversionActivity : ComponentActivity() {
                     rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                         viewModel.saveGpx(context, it)
                     }
+                val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
                 LaunchedEffect(intent) {
-                    viewModel.start(ConversionRunContext(context, clipboard, saveGpxLauncher), intent)
+                    viewModel.start(runContext, intent)
                 }
-                ConversionNavigation(viewModel, onFinish = { finish() })
+                ConversionNavigation(runContext, viewModel, onFinish = { finish() })
             }
         }
     }

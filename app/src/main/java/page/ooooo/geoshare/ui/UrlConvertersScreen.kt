@@ -160,9 +160,9 @@ private fun UrlConvertersScreen(
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
+    val coroutineScope = rememberCoroutineScope()
     var filterExpanded by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
     BackHandler {
         onBack()
@@ -230,7 +230,7 @@ private fun UrlConvertersScreen(
                             onClick = {
                                 filterExpanded = false
                                 onChangeFilter(it)
-                                scope.launch {
+                                coroutineScope.launch {
                                     listState.scrollToItem(0)
                                 }
                             },
