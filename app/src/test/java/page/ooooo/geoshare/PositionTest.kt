@@ -27,18 +27,50 @@ class PositionTest {
     }
 
     @Test
-    fun toNorthSouthWestEastDecCoordsString_returnsSouthWestForNegativeCoordinates() {
+    fun toDegMinSecCoordsString_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
-            "17.2165721° S, 149.9470294° W",
-            Position("-17.2165721", "-149.9470294").toNorthSouthWestEastDecCoordsString(),
+            "17° 12′ 59.65956″ S, 149° 56′ 49.30584″ W",
+            Position("-17.2165721", "-149.9470294").toDegMinSecCoordsString(),
         )
     }
 
     @Test
-    fun toNorthSouthWestEastDecCoordsString_returnsNorthEastForPositiveCoordinates() {
+    fun toDegMinSecCoordsString_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
-            "52.5067296° N, 13.2599309° E",
-            Position("52.5067296", "13.2599309").toNorthSouthWestEastDecCoordsString(),
+            "52° 30′ 24.22656″ N, 13° 15′ 35.75124″ E",
+            Position("52.5067296", "13.2599309").toDegMinSecCoordsString(),
+        )
+    }
+
+    @Test
+    fun toDegMinSecCoordsString_returnsZerosForZeroCoordinates() {
+        assertEquals(
+            "0° 0′ 0.0″ N, 0° 0′ 0.0″ E",
+            Position("0", "0").toDegMinSecCoordsString(),
+        )
+    }
+
+    @Test
+    fun toDegMinSecCoordsString_returnsZeroDegForZeroDegCoordinates() {
+        assertEquals(
+            "0° 30′ 0.0″ N, 0° 30′ 0.0″ E",
+            Position("0.5", "0.5").toDegMinSecCoordsString(),
+        )
+    }
+
+    @Test
+    fun toDegMinSecCoordsString_returnsZeroMinForZeroMinCoordinates() {
+        assertEquals(
+            "10° 0′ 0.0″ S, 20° 0′ 0.0″ W",
+            Position("-10", "-20").toDegMinSecCoordsString(),
+        )
+    }
+
+    @Test
+    fun toDegMinSecCoordsString_returnsZerosSecForZeroSecCoordinates() {
+        assertEquals(
+            "10° 30′ 0.0″ S, 20° 30′ 0.0″ W",
+            Position("-10.5", "-20.5").toDegMinSecCoordsString(),
         )
     }
 

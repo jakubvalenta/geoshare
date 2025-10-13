@@ -96,7 +96,7 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val expectedCoordinatesText = expectedPosition.toNorthSouthWestEastDecCoordsString()
+        val expectedCoordinatesText = expectedPosition.toDegMinSecCoordsString()
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedCoordinatesText }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
             val expectedParamsText = expectedPosition.toParamsString("\t\t")

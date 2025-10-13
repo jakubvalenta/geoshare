@@ -37,7 +37,7 @@ fun ScreenshotOpen() {
             y = 100,
         ) {
             ScreenshotText(
-                Position("42.5784957", "1.8955661").toNorthSouthWestEastDecCoordsString(),
+                Position("42.5784957", "1.8955661").toDegMinSecCoordsString(),
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,

@@ -36,7 +36,7 @@ fun ResultSuccessCoordinates(
         main = {
             SelectionContainer {
                 Text(
-                    position.toNorthSouthWestEastDecCoordsString(),
+                    position.toDegMinSecCoordsString(),
                     Modifier
                         .testTag("geoShareConversionSuccessPositionCoordinates")
                         .fillMaxWidth(),
@@ -81,7 +81,7 @@ fun ResultSuccessCoordinates(
                 ) {
                     listOf(
                         position.toCoordsDecString(),
-                        position.toNorthSouthWestEastDecCoordsString(),
+                        position.toDegMinSecCoordsString(),
                         position.toGeoUriString(),
                         GoogleMapsUrlConverter.formatUriString(position),
                         AppleMapsUrlConverter.formatUriString(position),
