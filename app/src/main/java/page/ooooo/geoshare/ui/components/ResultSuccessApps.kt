@@ -47,7 +47,7 @@ fun ResultSuccessApps(
         Modifier
             .fillMaxWidth()
             .padding(top = Spacing.large),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(Spacing.large),
     ) {
         gridItems.chunked(columnCount).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
@@ -125,7 +125,7 @@ private fun DefaultPreview() {
             Column {
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    apps = List(4) { index ->
+                    apps = List(8) { index ->
                         IntentTools.App(
                             BuildConfig.APPLICATION_ID,
                             "My Map ${index + 1}",
@@ -148,7 +148,7 @@ private fun DarkPreview() {
             Column {
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    apps = List(4) { index ->
+                    apps = List(8) { index ->
                         IntentTools.App(
                             BuildConfig.APPLICATION_ID,
                             "My Map ${index + 1}",

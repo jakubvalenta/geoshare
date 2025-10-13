@@ -53,6 +53,7 @@
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
+    <string name="main_random">Random link</string>
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
     <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>

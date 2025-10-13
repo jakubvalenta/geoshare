@@ -31,9 +31,12 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
+import kotlin.random.Random
 
 @Composable
 fun MainScreen(
@@ -236,6 +239,23 @@ fun MainScreen(
                             Modifier.padding(end = Spacing.tiny),
                         )
                         Text(stringResource(R.string.main_navigate_to_intro))
+                    }
+                    TextButton({
+                        onUpdateInput(
+                            Position(
+                                Random.nextDouble(-50.0, 80.0).toScale(6).toString(),
+                                Random.nextDouble(-180.0, 180.0).toScale(6).toString(),
+                                z = "8",
+                            ).toGoogleMapsUriString()
+                        )
+                        errorMessageResId = null
+                    }) {
+                        Icon(
+                            painterResource(R.drawable.ifl_24px),
+                            null,
+                            Modifier.padding(end = Spacing.tiny),
+                        )
+                        Text(stringResource(R.string.main_random))
                     }
                 }
             }

@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -65,7 +66,7 @@ fun MainMenu(
                     onNavigateToUserPreferencesScreen()
                 },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    Icon(Icons.Default.Settings, null)
                 },
             )
             DropdownMenuItem(
@@ -82,7 +83,9 @@ fun MainMenu(
                     menuExpanded = false
                     onNavigateToIntroScreen()
                 },
-                leadingIcon = {},
+                leadingIcon = {
+                    Icon(painterResource(R.drawable.rocket_launch_24px), contentDescription = null)
+                },
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.url_converters_title)) },
@@ -99,7 +102,7 @@ fun MainMenu(
                             }
                         },
                     ) {
-                        Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
+                        Icon(Icons.Outlined.Info, null)
                     }
                 },
             )
