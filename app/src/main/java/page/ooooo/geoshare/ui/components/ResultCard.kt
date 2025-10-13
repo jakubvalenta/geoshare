@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultCard(
@@ -29,7 +29,8 @@ fun ResultCard(
     chips: @Composable (lastPaddingEnd: Dp) -> Unit,
     main: @Composable ColumnScope.() -> Unit,
 ) {
-    val verticalSpace = Spacing.small
+    val spacing = LocalSpacing.current
+    val verticalSpace = spacing.small
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -40,8 +41,8 @@ fun ResultCard(
         Column(verticalArrangement = Arrangement.spacedBy(verticalSpace)) {
             Row(
                 Modifier.padding(
-                    start = Spacing.windowPadding,
-                    end = (if (after != null) 4.dp else Spacing.windowPadding),
+                    start = spacing.windowPadding,
+                    end = (if (after != null) 4.dp else spacing.windowPadding),
                 ),
             ) {
                 Row(
@@ -55,11 +56,11 @@ fun ResultCard(
             }
             Row(
                 Modifier
-                    .padding(start = Spacing.windowPadding, bottom = Spacing.small)
+                    .padding(start = spacing.windowPadding, bottom = spacing.small)
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
             ) {
-                chips(Spacing.windowPadding)
+                chips(spacing.windowPadding)
             }
         }
     }

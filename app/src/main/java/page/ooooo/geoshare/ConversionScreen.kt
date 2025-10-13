@@ -43,7 +43,7 @@ import page.ooooo.geoshare.ui.components.ResultSuccessAutomation
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ConversionScreen(
@@ -151,6 +151,7 @@ fun ConversionScreen(
 ) {
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
+    val spacing = LocalSpacing.current
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
     val containerColor = when (currentState) {
         is HasError -> MaterialTheme.colorScheme.errorContainer
@@ -214,13 +215,13 @@ fun ConversionScreen(
             ) {
                 when {
                     (loadingIndicatorTitleResId != null) -> {
-                        SmallHeadline(stringResource(loadingIndicatorTitleResId))
+                        Headline(stringResource(loadingIndicatorTitleResId))
                         Column(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(top = Spacing.small),
+                                .padding(top = spacing.small),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(Spacing.small)
+                            verticalArrangement = Arrangement.spacedBy(spacing.small)
                         ) {
                             LoadingIndicator(Modifier.size(96.dp), color = MaterialTheme.colorScheme.tertiary)
                             if (currentState is HasLoadingIndicator) {
@@ -297,7 +298,7 @@ fun ConversionScreen(
                     }
 
                     currentState is HasError -> {
-                        SmallHeadline(
+                        Headline(
                             stringResource(R.string.conversion_error_title),
                             containerColor = containerColor,
                             contentColor = contentColor,
@@ -320,7 +321,7 @@ fun ConversionScreen(
                     }
 
                     currentState is HasResult -> {
-                        SmallHeadline(
+                        Headline(
                             stringResource(R.string.conversion_succeeded_title),
                             containerColor = containerColor,
                             contentColor = contentColor,
@@ -330,7 +331,7 @@ fun ConversionScreen(
                             onCopy = onCopy,
                             onSave = onSave,
                         )
-                        Column(Modifier.padding(horizontal = Spacing.windowPadding)) {
+                        Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                             ResultSuccessAutomation(
                                 currentState,
                                 onCancel = onCancel,
@@ -349,14 +350,14 @@ fun ConversionScreen(
                 is HasError -> TextButton({ onCopy(currentState.inputUriString) }) {
                     Text(
                         stringResource(R.string.conversion_succeeded_skip),
-                        Modifier.padding(start = Spacing.windowPadding, top = Spacing.tiny, bottom = Spacing.small)
+                        Modifier.padding(start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small)
                     )
                 }
 
                 is HasResult -> TextButton({ onCopy(currentState.inputUriString) }) {
                     Text(
                         stringResource(R.string.conversion_succeeded_skip),
-                        Modifier.padding(start = Spacing.windowPadding, top = Spacing.tiny, bottom = Spacing.small)
+                        Modifier.padding(start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small)
                     )
                 }
             }

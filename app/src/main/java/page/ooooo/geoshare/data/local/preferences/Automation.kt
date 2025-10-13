@@ -20,7 +20,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -187,9 +187,10 @@ sealed class AutomationImpl : Automation {
 
         @Composable
         override fun Label() {
+            val spacing = LocalSpacing.current
             queryApp()?.let { app ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.tiny),
+                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Image(

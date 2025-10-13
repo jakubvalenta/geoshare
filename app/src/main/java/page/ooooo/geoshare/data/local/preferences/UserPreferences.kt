@@ -15,7 +15,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 interface UserPreference<T> {
     val loading: T
@@ -56,6 +56,7 @@ abstract class NullableIntUserPreference(
 
     @Composable
     override fun Component(value: Int?, onValueChange: (Int?) -> Unit) {
+        val spacing = LocalSpacing.current
         var inputValue by remember { mutableStateOf(value.toString()) }
         OutlinedTextField(
             value = inputValue,
@@ -64,7 +65,7 @@ abstract class NullableIntUserPreference(
                 inputValue = it
                 onValueChange(fromString(it))
             },
-            modifier = modifier.padding(top = Spacing.tiny),
+            modifier = modifier.padding(top = spacing.tiny),
         )
     }
 
@@ -96,10 +97,11 @@ abstract class OptionsUserPreference<T>(
 
     @Composable
     override fun Component(value: T, onValueChange: (T) -> Unit) {
+        val spacing = LocalSpacing.current
         RadioButtonGroup(
             selectedValue = value,
             onSelect = { onValueChange(it) },
-            modifier = Modifier.padding(top = Spacing.tiny),
+            modifier = Modifier.padding(top = spacing.tiny),
         ) {
             options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
         }

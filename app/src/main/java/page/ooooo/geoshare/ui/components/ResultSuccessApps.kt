@@ -22,7 +22,7 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed class GridItem {
     class App(val app: IntentTools.App) : GridItem()
@@ -37,6 +37,7 @@ fun ResultSuccessApps(
     onOpenChooser: () -> Boolean,
 ) {
     val context = LocalContext.current
+    val spacing = LocalSpacing.current
     val columnCount = 4
     val iconSize = 46.dp
     val gridItems = apps.map { GridItem.App(it) } +
@@ -46,11 +47,11 @@ fun ResultSuccessApps(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(top = Spacing.large),
-        verticalArrangement = Arrangement.spacedBy(Spacing.large),
+            .padding(top = spacing.large),
+        verticalArrangement = Arrangement.spacedBy(spacing.large),
     ) {
         gridItems.chunked(columnCount).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
                         is GridItem.App ->
@@ -67,7 +68,7 @@ fun ResultSuccessApps(
                                     }
                                     .weight(1f)
                                     .testTag("geoShareResultCardApp_${gridItem.app.packageName}"),
-                                verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                                verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                                 Image(
                                     rememberDrawablePainter(gridItem.app.icon),
                                     gridItem.app.label,

@@ -13,7 +13,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.ui.components.UserPreferencesScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,12 +23,13 @@ fun <T> UserPreferencesDetailScreen(
     onBack: () -> Unit,
     onValueChange: (value: T) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     UserPreferencesScaffold(
         title = userPreference.title(),
         onBack = onBack,
     ) {
-        Column(Modifier.padding(horizontal = Spacing.windowPadding)) {
-            userPreference.description()?.let { ParagraphHtml(it, Modifier.padding(bottom = Spacing.tiny)) }
+        Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+            userPreference.description()?.let { ParagraphHtml(it, Modifier.padding(bottom = spacing.tiny)) }
             userPreference.Component(value, onValueChange)
         }
     }

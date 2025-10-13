@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 enum class FaqItemId {
     HOW_IT_WORKS,
@@ -29,6 +29,7 @@ enum class FaqItemId {
 fun FaqScreen(
     onBack: () -> Unit = {},
 ) {
+    val spacing = LocalSpacing.current
     var expandedItemId by remember { mutableStateOf<FaqItemId?>(FaqItemId.HOW_IT_WORKS) }
 
     Scaffold(
@@ -51,10 +52,10 @@ fun FaqScreen(
             Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(horizontal = Spacing.windowPadding)
+                .padding(horizontal = spacing.windowPadding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
             FaqItem(
                 itemId = FaqItemId.HOW_IT_WORKS,
@@ -78,12 +79,13 @@ fun FaqItem(
     headline: String,
     content: @Composable () -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     val expanded = itemId == expandedItemId
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+    Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(top = Spacing.tiny)
+                .padding(top = spacing.tiny)
                 .clickable(
                     onClickLabel = stringResource(if (expanded) R.string.faq_item_collapse else R.string.faq_item_expand),
                     onClick = { onSetExpandedItemId(if (expanded) null else itemId) },
@@ -103,7 +105,7 @@ fun FaqItem(
             )
         }
         AnimatedVisibility(expanded) {
-            Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
                 content()
             }
         }

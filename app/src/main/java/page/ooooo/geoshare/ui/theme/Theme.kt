@@ -9,7 +9,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -131,13 +134,26 @@ object ScreenshotTheme {
         get() = LocalScreenshotTypography.current
 }
 
+val LocalSpacing = staticCompositionLocalOf {
+    Spacing()
+}
+
+@Composable
+private fun isSmallWindow(): Boolean {
+    val windowInfo = LocalWindowInfo.current
+    val windowHeight = with(LocalDensity.current) { windowInfo.containerSize.height.toDp() }
+    return windowHeight < 1200.dp
+}
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
+    smallWindow: Boolean = isSmallWindow(),
     content: @Composable () -> Unit,
 ) {
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -150,14 +166,17 @@ fun AppTheme(
         else -> lightScheme
     }
     val screenshotColors = if (darkTheme) darkScreenshotColors else lightScreenshotColors
+    val typography = if (smallWindow) smallWindowTypography else defaultTypography
+    val spacing = if (smallWindow) smallWindowSpacing else defaultSpacing
 
     CompositionLocalProvider(
         LocalScreenshotColors provides screenshotColors,
         LocalScreenshotTypography provides screenshotTypography,
+        LocalSpacing provides spacing,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = AppTypography,
+            typography = typography,
             content = content,
         )
     }

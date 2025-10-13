@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainMenu(
@@ -31,13 +31,14 @@ fun MainMenu(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     var menuExpanded by remember { mutableStateOf(false) }
 
     Box {
         IconButton(
             { menuExpanded = true },
             Modifier
-                .padding(end = Spacing.windowPadding - Spacing.builtInTopBarPaddingEnd)
+                .padding(end = spacing.windowPadding - spacing.builtInTopBarPaddingEnd)
                 .testTag("geoShareMainMenuButton"),
         ) {
             BadgedBox(

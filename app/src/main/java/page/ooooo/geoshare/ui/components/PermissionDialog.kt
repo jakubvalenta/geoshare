@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun PermissionDialog(
@@ -35,6 +35,7 @@ fun PermissionDialog(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     var doNotAsk by remember { mutableStateOf(false) }
 
     ConfirmationDialog(
@@ -45,7 +46,7 @@ fun PermissionDialog(
         onDismissRequest = { onDismissRequest(doNotAsk) },
         modifier = modifier,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
             content()
             Row(
                 Modifier.fillMaxWidth(),
@@ -72,7 +73,7 @@ fun PermissionDialog(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Scaffold {
+        Surface {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -102,7 +103,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Scaffold {
+        Surface {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -132,7 +133,7 @@ private fun DarkPreview() {
 @Composable
 private fun ParseHtmlPermissionPreview() {
     AppTheme {
-        Scaffold {
+        Surface {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -164,7 +165,7 @@ private fun ParseHtmlPermissionPreview() {
 @Composable
 private fun DarkParseHtmlPermissionPreview() {
     AppTheme {
-        Scaffold {
+        Surface {
             PermissionDialog(
                 title = stringResource(R.string.converter_google_maps_permission_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),

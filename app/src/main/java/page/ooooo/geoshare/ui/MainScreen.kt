@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,7 +26,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
@@ -35,7 +35,7 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.random.Random
 
 @Composable
@@ -87,6 +87,8 @@ fun MainScreen(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
+    val density = LocalDensity.current
+    val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
     var errorMessageResId by remember { mutableStateOf<Int?>(null) }
 
@@ -117,28 +119,27 @@ fun MainScreen(
                 .verticalScroll(rememberScrollState()),
         ) {
             Row(
-                Modifier.padding(
-                    start = 13.dp,
-                    top = Spacing.large,
-                    end = Spacing.windowPadding,
-                    bottom = Spacing.large,
-                ),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.tiny),
+                Modifier
+                    .padding(vertical = spacing.large)
+                    .padding(start = 13.dp, end = spacing.windowPadding),
+                horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = stringResource(R.string.about_app_icon_content_description),
-                    modifier = Modifier.size(72.dp),
+                    modifier = Modifier.size(
+                        with(density) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2.25f }
+                    ),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                 )
                 Text(appName, style = MaterialTheme.typography.headlineLarge)
             }
             Column(
-                Modifier.padding(horizontal = Spacing.windowPadding),
-                verticalArrangement = Arrangement.spacedBy(Spacing.large),
+                Modifier.padding(horizontal = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(spacing.large),
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.medium)) {
                     OutlinedTextField(
                         value = inputUriString,
                         onValueChange = {
@@ -187,7 +188,7 @@ fun MainScreen(
                         supportingText = {
                             Text(
                                 stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text),
-                                Modifier.padding(top = Spacing.tiny),
+                                Modifier.padding(top = spacing.tiny),
                             )
                         },
                         isError = errorMessageResId != null,
@@ -214,11 +215,11 @@ fun MainScreen(
                                 .testTag("geoShareMainSubmitButton")
                                 .align(Alignment.CenterHorizontally)
                                 .width(400.dp)
-                                .height(50.dp),
                         ) {
                             Text(
                                 stringResource(R.string.main_create_geo_uri),
-                                fontSize = 16.sp,
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.5,
                             )
                         }
                     }
@@ -228,7 +229,7 @@ fun MainScreen(
                         Icon(
                             Icons.Outlined.Info,
                             null,
-                            Modifier.padding(end = Spacing.tiny),
+                            Modifier.padding(end = spacing.tiny),
                         )
                         Text(stringResource(R.string.url_converters_title))
                     }
@@ -236,7 +237,7 @@ fun MainScreen(
                         Icon(
                             painterResource(R.drawable.rocket_launch_24px),
                             null,
-                            Modifier.padding(end = Spacing.tiny),
+                            Modifier.padding(end = spacing.tiny),
                         )
                         Text(stringResource(R.string.main_navigate_to_intro))
                     }
@@ -253,7 +254,7 @@ fun MainScreen(
                         Icon(
                             painterResource(R.drawable.ifl_24px),
                             null,
-                            Modifier.padding(end = Spacing.tiny),
+                            Modifier.padding(end = spacing.tiny),
                         )
                         Text(stringResource(R.string.main_random))
                     }

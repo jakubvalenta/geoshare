@@ -15,7 +15,6 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DEL
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
-import java.lang.Thread.sleep
 import java.util.regex.Pattern
 import kotlin.math.pow
 import kotlin.math.roundToLong

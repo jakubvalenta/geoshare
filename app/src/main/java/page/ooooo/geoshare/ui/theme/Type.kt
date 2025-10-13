@@ -5,7 +5,14 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 
-val AppTypography = Typography()
+val defaultTypography = Typography()
+
+val smallWindowTypography = defaultTypography.run {
+    copy(
+        headlineLarge = headlineMedium,
+        headlineMedium = headlineSmall,
+    )
+}
 
 @Immutable
 data class ScreenshotTypography(

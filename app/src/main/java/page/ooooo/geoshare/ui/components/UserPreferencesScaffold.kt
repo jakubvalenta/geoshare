@@ -46,7 +46,7 @@ fun UserPreferencesScaffold(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            SmallHeadline(title)
+            Headline(title)
             content()
         }
     }

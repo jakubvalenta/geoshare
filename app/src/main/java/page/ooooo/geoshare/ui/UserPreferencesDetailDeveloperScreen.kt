@@ -20,7 +20,7 @@ import page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.introShowForVersionCode
 import page.ooooo.geoshare.ui.components.UserPreferencesScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun UserPreferencesDetailDeveloperScreen(
@@ -49,19 +49,20 @@ private fun UserPreferencesDetailDeveloperScreen(
     onChangelogShownForVersionCodeValueChange: (value: Int?) -> Unit,
     onIntroShownForVersionCodeValueChange: (value: Int?) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     UserPreferencesScaffold(
         title = stringResource(R.string.user_preferences_developer_title),
         onBack = onBack,
     ) {
-        Column(Modifier.padding(horizontal = Spacing.windowPadding)) {
-            ParagraphHtml(changelogShownForVersionCode.title(), Modifier.padding(bottom = Spacing.tiny))
+        Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+            ParagraphHtml(changelogShownForVersionCode.title(), Modifier.padding(bottom = spacing.tiny))
             changelogShownForVersionCode.Component(
                 userPreferencesValues.changelogShownForVersionCodeValue,
                 onChangelogShownForVersionCodeValueChange,
             )
 
             ParagraphHtml(
-                introShowForVersionCode.title(), Modifier.padding(top = Spacing.medium, bottom = Spacing.tiny)
+                introShowForVersionCode.title(), Modifier.padding(top = spacing.medium, bottom = spacing.tiny)
             )
             introShowForVersionCode.Component(
                 userPreferencesValues.introShownForVersionCodeValue,

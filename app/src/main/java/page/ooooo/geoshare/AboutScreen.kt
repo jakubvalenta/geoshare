@@ -18,13 +18,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
     onBack: () -> Unit = {},
 ) {
+    val spacing = LocalSpacing.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -44,7 +46,7 @@ fun AboutScreen(
             Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(horizontal = Spacing.windowPadding)
+                .padding(horizontal = spacing.windowPadding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
@@ -63,7 +65,7 @@ fun AboutScreen(
                     appName,
                     BuildConfig.VERSION_NAME
                 ),
-                Modifier.padding(bottom = Spacing.medium),
+                Modifier.padding(bottom = spacing.medium),
                 style = MaterialTheme.typography.headlineSmall,
             )
             ParagraphHtml(stringResource(R.string.about_text, appName))

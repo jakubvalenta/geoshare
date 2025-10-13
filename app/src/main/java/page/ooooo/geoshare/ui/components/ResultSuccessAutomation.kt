@@ -33,7 +33,7 @@ import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -44,6 +44,7 @@ fun ResultSuccessAutomation(
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     var counterSec by remember { mutableIntStateOf(0) }
     var targetState by remember {
         mutableStateOf(
@@ -69,7 +70,7 @@ fun ResultSuccessAutomation(
     AnimatedContent(
         targetState,
         modifier = Modifier
-            .padding(top = Spacing.large)
+            .padding(top = spacing.large)
             .fillMaxWidth()
             .height(40.dp),
         transitionSpec = {
@@ -168,12 +169,13 @@ private fun RowScope.ResultAutomationMessage(
     contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
     text: @Composable () -> String,
 ) {
+    val spacing = LocalSpacing.current
     Row(
         modifier
             .weight(1f)
             .background(containerColor, MaterialTheme.shapes.extraSmall)
             .fillMaxHeight()
-            .padding(horizontal = Spacing.small),
+            .padding(horizontal = spacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(

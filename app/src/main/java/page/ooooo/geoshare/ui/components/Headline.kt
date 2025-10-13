@@ -12,25 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun SmallHeadline(
+fun Headline(
     text: String,
     containerColor: Color = Color.Unspecified,
     contentColor: Color = Color.Unspecified,
 ) {
+    val spacing = LocalSpacing.current
     Text(
         text,
         Modifier
             .background(containerColor)
             .fillMaxWidth()
-            .padding(
-                start = Spacing.windowPadding,
-                top = Spacing.large,
-                end = Spacing.windowPadding,
-                bottom = Spacing.medium,
-            ),
+            .padding(horizontal = spacing.windowPadding)
+            .padding(top = spacing.large, bottom = spacing.medium),
         color = contentColor,
         style = MaterialTheme.typography.headlineMedium,
     )
@@ -43,7 +40,7 @@ fun SmallHeadline(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            SmallHeadline("My heading")
+            Headline("My heading")
         }
     }
 }
@@ -53,7 +50,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            SmallHeadline("My heading")
+            Headline("My heading")
         }
     }
 }
@@ -65,7 +62,7 @@ private fun DarkPreview() {
 private fun BackgroundPreview() {
     AppTheme {
         Surface {
-            SmallHeadline(
+            Headline(
                 "My heading",
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -79,7 +76,7 @@ private fun BackgroundPreview() {
 private fun DarkBackgroundPreview() {
     AppTheme {
         Surface {
-            SmallHeadline(
+            Headline(
                 "My heading",
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
