@@ -11,7 +11,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.NetworkTools
-import page.ooooo.geoshare.lib.UnexpectedResponseCodeException
 import java.net.SocketTimeoutException
 import java.net.URL
 
@@ -33,7 +32,7 @@ class NetworkToolsTest {
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
-            "https://maps.apple.com/place?address=Thomash%C3%B6he%2C+12053+Berlin%2C+Germany&coordinate=52.4737758%2C13.4373898",
+            NetworkTools.Result.Success("https://maps.apple.com/place?address=Thomash%C3%B6he%2C+12053+Berlin%2C+Germany&coordinate=52.4737758%2C13.4373898"),
             mockNetworkTools.requestLocationHeader(url)
         )
         val lastRequest = mockEngine.requestHistory.last()
@@ -57,7 +56,7 @@ class NetworkToolsTest {
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
-            "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd",
+            NetworkTools.Result.Success("https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd"),
             mockNetworkTools.requestLocationHeader(url)
         )
         val lastRequest = mockEngine.requestHistory.last()
@@ -76,7 +75,10 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        assertNull(mockNetworkTools.requestLocationHeader(url))
+        assertEquals(
+            NetworkTools.Result.Success(null),
+            mockNetworkTools.requestLocationHeader(url),
+        )
     }
 
     @Test
@@ -93,13 +95,9 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.requestLocationHeader(url)
-        } catch (_: UnexpectedResponseCodeException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.requestLocationHeader(url)
+        assertTrue((res as NetworkTools.Result.UnrecoverableError).tr is ResponseException)
+        assertFalse(res.tr is ServerResponseException)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Head)
@@ -120,13 +118,9 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.requestLocationHeader(url)
-        } catch (_: UnexpectedResponseCodeException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.requestLocationHeader(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is ServerResponseException)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Head)
@@ -140,13 +134,9 @@ class NetworkToolsTest {
             throw HttpRequestTimeoutException(request)
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.requestLocationHeader(url)
-        } catch (_: HttpRequestTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.requestLocationHeader(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is HttpRequestTimeoutException)
     }
 
     @Test
@@ -156,13 +146,9 @@ class NetworkToolsTest {
             throw ConnectTimeoutException("Connect timeout")
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.requestLocationHeader(url)
-        } catch (_: ConnectTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.requestLocationHeader(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is ConnectTimeoutException)
     }
 
     @Test
@@ -172,13 +158,9 @@ class NetworkToolsTest {
             throw SocketTimeoutException()
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.requestLocationHeader(url)
-        } catch (_: SocketTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.requestLocationHeader(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is SocketTimeoutException)
     }
 
     @Test
@@ -192,9 +174,33 @@ class NetworkToolsTest {
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
-            "https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17",
+            NetworkTools.Result.Success("https://mapy.com/en/turisticka?source=base&id=1723771&x=14.4549515&y=50.0831498&z=17"),
             mockNetworkTools.getRedirectUrlString(url)
         )
+        val lastRequest = mockEngine.requestHistory.last()
+        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+        assertEquals(lastRequest.method, HttpMethod.Get)
+        assertTrue(clientConfig.followRedirects)
+    }
+
+    @Test
+    fun getRedirectUrlString_404Response() = runTest {
+        val url = URL("https://example.com/")
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = "",
+                status = HttpStatusCode.NotFound,
+                headers = headersOf(
+                    HttpHeaders.Location,
+                    "https://mapy.com/s/jakuhelasu"
+                ),
+            )
+        }
+        val mockNetworkTools = NetworkTools(mockEngine, log)
+        val res = mockNetworkTools.getRedirectUrlString(url)
+        assertTrue(res is NetworkTools.Result.UnrecoverableError)
+        assertTrue((res as NetworkTools.Result.UnrecoverableError).tr is ResponseException)
+        assertFalse(res.tr is ServerResponseException)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)
@@ -215,13 +221,9 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getRedirectUrlString(url)
-        } catch (_: UnexpectedResponseCodeException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getRedirectUrlString(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is ServerResponseException)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)
@@ -235,13 +237,9 @@ class NetworkToolsTest {
             throw HttpRequestTimeoutException(request)
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getRedirectUrlString(url)
-        } catch (_: HttpRequestTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getRedirectUrlString(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is HttpRequestTimeoutException)
     }
 
     @Test
@@ -251,13 +249,9 @@ class NetworkToolsTest {
             throw ConnectTimeoutException("Connect timeout")
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getRedirectUrlString(url)
-        } catch (_: ConnectTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getRedirectUrlString(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is ConnectTimeoutException)
     }
 
     @Test
@@ -267,13 +261,9 @@ class NetworkToolsTest {
             throw SocketTimeoutException()
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getRedirectUrlString(url)
-        } catch (_: SocketTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getRedirectUrlString(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is SocketTimeoutException)
     }
 
     @Test
@@ -287,9 +277,29 @@ class NetworkToolsTest {
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         assertEquals(
-            "test content",
+            NetworkTools.Result.Success("test content"),
             mockNetworkTools.getText(url),
         )
+        val lastRequest = mockEngine.requestHistory.last()
+        val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
+        assertEquals(lastRequest.method, HttpMethod.Get)
+        assertTrue(clientConfig.followRedirects)
+    }
+
+    @Test
+    fun getText_404Response() = runTest {
+        val url = URL("https://example.com/")
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = "test content",
+                status = HttpStatusCode.NotFound,
+            )
+        }
+        val mockNetworkTools = NetworkTools(mockEngine, log)
+        val res = mockNetworkTools.getText(url)
+        assertTrue(res is NetworkTools.Result.UnrecoverableError)
+        assertTrue((res as NetworkTools.Result.UnrecoverableError).tr is ResponseException)
+        assertFalse(res.tr is ServerResponseException)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)
@@ -306,13 +316,9 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getText(url)
-        } catch (_: UnexpectedResponseCodeException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getText(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is ServerResponseException)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)
@@ -326,13 +332,9 @@ class NetworkToolsTest {
             throw HttpRequestTimeoutException(request)
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getText(url)
-        } catch (_: HttpRequestTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getText(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is HttpRequestTimeoutException)
     }
 
     @Test
@@ -342,13 +344,9 @@ class NetworkToolsTest {
             throw ConnectTimeoutException("Connect timeout")
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getText(url)
-        } catch (_: ConnectTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getText(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is ConnectTimeoutException)
     }
 
     @Test
@@ -358,12 +356,8 @@ class NetworkToolsTest {
             throw SocketTimeoutException()
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        var threw = false
-        try {
-            mockNetworkTools.getText(url)
-        } catch (_: SocketTimeoutException) {
-            threw = true
-        }
-        assertTrue(threw)
+        val res = mockNetworkTools.getText(url)
+        assertTrue(res is NetworkTools.Result.RecoverableError)
+        assertTrue((res as NetworkTools.Result.RecoverableError).tr is SocketTimeoutException)
     }
 }

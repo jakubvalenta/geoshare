@@ -82,6 +82,7 @@
     <string name="conversion_error_report">Report issue</string>
     <string name="conversion_error_retry">Try again</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
+    <string name="conversion_loading_indicator_description">Attempt %1$d of %2$d due to %3$s</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>

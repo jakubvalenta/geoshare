@@ -11,87 +11,94 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.net.URL
-
-class UnexpectedResponseCodeException : IOException("Unexpected response code")
+import kotlin.math.pow
 
 class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog(),
 ) {
     companion object {
-        const val MAX_RETRIES = 4
-        const val CONSTANT_DELAY = 1_000L
+        const val MAX_RETRIES = 9
+        const val EXPONENTIAL_DELAY = 1_000L
         const val REQUEST_TIMEOUT = 256_000L
         const val CONNECT_TIMEOUT = 128_000L
         const val SOCKET_TIMEOUT = 128_000L
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        SocketTimeoutException::class,
-        UnexpectedResponseCodeException::class,
-    )
-    suspend fun requestLocationHeader(url: URL): String? = withContext(Dispatchers.IO) {
+    sealed class Result<T> {
+        data class Success<U>(val value: U) : Result<U>()
+        class RecoverableError<U>(val tr: Throwable) : Result<U>()
+        class UnrecoverableError<U>(val tr: Throwable) : Result<U>()
+    }
+
+    data class Retry(val count: Int, val tr: Throwable)
+
+    suspend fun requestLocationHeader(
+        url: URL,
+        retry: Retry? = null,
+    ): Result<String?> = withContext(Dispatchers.IO) {
         connect(
             engine,
             url,
             httpMethod = HttpMethod.Head,
-            followRedirectsParam = false,
             expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
+            followRedirectsParam = false,
+            retry = retry,
         ) { response ->
             response.headers["Location"]
         }
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        SocketTimeoutException::class,
-        UnexpectedResponseCodeException::class,
-    )
-    suspend fun getText(url: URL): String = withContext(Dispatchers.IO) {
-        connect(engine, url) { response ->
-            val text: String = response.body()
-            text
+    suspend fun getText(url: URL, retry: Retry? = null): Result<String> = withContext(Dispatchers.IO) {
+        connect(engine, url, retry = retry) { response ->
+            response.body<String>()
         }
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        SocketTimeoutException::class,
-        UnexpectedResponseCodeException::class,
-    )
-    suspend fun getRedirectUrlString(url: URL): String = withContext(Dispatchers.IO) {
-        connect(
-            engine,
-            url,
-        ) { response ->
+    suspend fun getRedirectUrlString(url: URL, retry: Retry? = null): Result<String> = withContext(Dispatchers.IO) {
+        connect(engine, url, retry = retry) { response ->
             response.request.url.toString()
         }
     }
 
+    @Throws(
+        ConnectTimeoutException::class,
+        HttpRequestTimeoutException::class,
+        ResponseException::class,
+        SocketTimeoutException::class,
+    )
     private suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
         httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
+        retry: Retry? = null,
         block: suspend (response: HttpResponse) -> T,
-    ): T {
+    ): Result<T> {
+        if (retry != null && retry.count > 0) {
+            if (retry.count > MAX_RETRIES) {
+                log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
+                return Result.UnrecoverableError(retry.tr)
+            }
+            val timeMillis = (2.0.pow(retry.count - 1) * EXPONENTIAL_DELAY).toLong()
+            log.i(null, "Waiting ${timeMillis}ms before retry $retry.count of $MAX_RETRIES for $url")
+            delay(timeMillis)
+        }
         HttpClient(engine) {
             followRedirects = followRedirectsParam
-            install(HttpRequestRetry) {
-                maxRetries = MAX_RETRIES
-                constantDelay(CONSTANT_DELAY)
-                retryOnServerErrors()
-                retryOnException(retryOnTimeout = true)
-                modifyRequest { request ->
-                    log.i(null, "Retrying request ${retryCount + 1} / ${maxRetries + 1} for ${request.url}")
+            this.expectSuccess
+            HttpResponseValidator {
+                validateResponse { response ->
+                    if (response.status.value >= 500) {
+                        throw ServerResponseException(response, "<not implemented>")
+                    }
+                    if (response.status !in expectedStatusCodes) {
+                        throw ResponseException(response, "<not implemented>")
+                    }
                 }
             }
             install(HttpTimeout) {
@@ -104,25 +111,30 @@ class NetworkTools(
             // in case of Google Search.
             BrowserUserAgent()
         }.use { client ->
-            try {
-                val response = client.request(url) {
+            val response = try {
+                client.request(url) {
                     method = httpMethod
                 }
-                if (expectedStatusCodes.contains(response.status)) {
-                    return block(response)
-                }
-                log.w(null, "Received HTTP code ${response.status} for $url")
-                throw UnexpectedResponseCodeException()
-            } catch (e: HttpRequestTimeoutException) {
-                log.w(null, "HTTP request timeout for $url")
-                throw e
-            } catch (e: SocketTimeoutException) {
-                log.w(null, "Socket timeout for $url")
-                throw e
-            } catch (e: ConnectTimeoutException) {
-                log.w(null, "Connect timeout for $url")
-                throw e
+            } catch (tr: HttpRequestTimeoutException) {
+                log.w(null, "Request timeout for $url", tr)
+                return Result.RecoverableError(tr)
+            } catch (tr: SocketTimeoutException) {
+                log.w(null, "Socket timeout for $url", tr)
+                return Result.RecoverableError(tr)
+            } catch (tr: ConnectTimeoutException) {
+                log.w(null, "Connect timeout for $url", tr)
+                return Result.RecoverableError(tr)
+            } catch (tr: ServerResponseException) {
+                log.w(null, "Server error ${tr.response.status} for $url", tr)
+                return Result.RecoverableError(tr)
+            } catch (tr: ResponseException) {
+                log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
+                return Result.UnrecoverableError(tr)
+            } catch (tr: Exception) {
+                log.e(null, "Unknown network exception for $url", tr)
+                return Result.UnrecoverableError(tr)
             }
+            return Result.Success(block(response))
         }
     }
 }

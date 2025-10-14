@@ -10,12 +10,14 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Before
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.NetworkTools.Companion.CONSTANT_DELAY
+import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
 import java.lang.Thread.sleep
 import java.util.regex.Pattern
+import kotlin.math.pow
+import kotlin.math.roundToLong
 
 abstract class BaseActivityBehaviorTest {
     companion object {
@@ -23,7 +25,9 @@ abstract class BaseActivityBehaviorTest {
         const val LAUNCH_TIMEOUT = 10_000L
         const val TIMEOUT = 10_000L
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
-        const val NETWORK_TIMEOUT = (CONNECT_TIMEOUT + REQUEST_TIMEOUT + CONSTANT_DELAY) * (MAX_RETRIES + 1)
+        val NETWORK_TIMEOUT = (1..MAX_RETRIES).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
+            acc + (2.0.pow(curr - 1) * EXPONENTIAL_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
+        }
     }
 
     @Before

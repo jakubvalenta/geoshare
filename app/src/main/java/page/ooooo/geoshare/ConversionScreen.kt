@@ -188,6 +188,16 @@ fun ConversionScreen(
                         .size(64.dp),
                     color = MaterialTheme.colorScheme.primary,
                 )
+                if (currentState is HasLoadingIndicator) {
+                    currentState.loadingIndicatorDescription()?.let { text ->
+                        Text(
+                            text,
+                            Modifier.align(Alignment.CenterHorizontally),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
             }
 
             currentState is RequestedUnshortenPermission -> {
@@ -471,7 +481,18 @@ private fun DarkErrorPreview() {
 private fun LoadingIndicatorPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = Initial(),
+            currentState = GrantedUnshortenPermission(
+                ConversionStateContext(
+                    listOf(),
+                    IntentTools(),
+                    NetworkTools(),
+                    FakeUserPreferencesRepository(),
+                ),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                GoogleMapsUrlConverter(),
+                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                retry = NetworkTools.Retry(2, Exception("Connection timeout"))
+            ),
             lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
@@ -498,7 +519,18 @@ private fun LoadingIndicatorPreview() {
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = Initial(),
+            currentState = GrantedUnshortenPermission(
+                ConversionStateContext(
+                    listOf(),
+                    IntentTools(),
+                    NetworkTools(),
+                    FakeUserPreferencesRepository(),
+                ),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                GoogleMapsUrlConverter(),
+                Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                retry = NetworkTools.Retry(2, Exception("Connection timeout"))
+            ),
             lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
             queryGeoUriApps = { listOf() },
