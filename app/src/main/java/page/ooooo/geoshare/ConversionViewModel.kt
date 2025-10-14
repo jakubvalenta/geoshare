@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log.e
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -201,7 +202,15 @@ class ConversionViewModel @Inject constructor(
     private fun transition() {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
-            stateContext.transition()
+            try {
+                stateContext.transition()
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while transitioning state", tr)
+                stateContext.currentState = ConversionFailed(
+                    R.string.conversion_failed_parse_url_error,
+                    inputUriString,
+                )
+            }
         }
     }
 

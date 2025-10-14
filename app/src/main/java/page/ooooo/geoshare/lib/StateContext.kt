@@ -12,7 +12,7 @@ abstract class StateContext {
             i++
         }
         if (i >= maxIterations) {
-            throw Exception("Exceeded max state iterations")
+            throw IllegalStateException("Exceeded max state iterations")
         }
     }
 }
