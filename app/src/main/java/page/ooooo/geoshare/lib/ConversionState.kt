@@ -166,7 +166,7 @@ data class GrantedUnshortenPermission(
             R.string.conversion_loading_indicator_description,
             retry.count + 1,
             NetworkTools.MAX_RETRIES + 1,
-            retry.tr.localizedMessage,
+            retry.tr.message ?: "Unknown exception",
         )
     }
 }
@@ -308,7 +308,7 @@ data class GrantedParseHtmlPermission(
             R.string.conversion_loading_indicator_description,
             retry.count + 1,
             NetworkTools.MAX_RETRIES + 1,
-            retry.tr.localizedMessage,
+            retry.tr.message ?: "Unknown exception",
         )
     }
 }
