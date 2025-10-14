@@ -10,6 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
+import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -115,6 +116,10 @@ class NetworkTools(
                 client.request(url) {
                     method = httpMethod
                 }
+            } catch (tr: UnresolvedAddressException) {
+                // TODO Test
+                log.w(null, "Unresolved address for $url", tr)
+                return Result.RecoverableError(tr)
             } catch (tr: HttpRequestTimeoutException) {
                 log.w(null, "Request timeout for $url", tr)
                 return Result.RecoverableError(tr)
