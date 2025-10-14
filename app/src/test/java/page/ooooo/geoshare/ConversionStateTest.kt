@@ -24,8 +24,8 @@ class ConversionStateTest {
     private val geoUrlConverter = GeoUrlConverter()
     private val googleMapsUrlConverter = GoogleMapsUrlConverter()
     private val mockIntentTools: IntentTools = mock {
-        on { getIntentUriString(anyOrNull()) } doThrow NotImplementedError()
-        on { createChooserIntent(anyOrNull()) } doThrow NotImplementedError()
+        on { getIntentUriString(any()) } doThrow NotImplementedError()
+        on { createChooserIntent(any()) } doThrow NotImplementedError()
     }
     private val mockNetworkTools: NetworkTools = mock {
         onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
@@ -473,7 +473,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedUnshortenPermission_requestLocationHeaderThrowsUnexpectedResponseCodeException_returnsConversionFailedWithConnectionErrorMessage() =
+    fun grantedUnshortenPermission_requestLocationHeaderThrowsUnexpectedResponseCodeException_returnsConversionFailedWithGeneralErrorMessage() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -493,7 +493,7 @@ class ConversionStateTest {
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
             assertEquals(
-                ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString),
+                ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString),
                 state.transition(),
             )
         }
@@ -1080,7 +1080,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_getTextThrowsUnexpectedResponseCodeException_returnsConversionFailedWithConnectionErrorMessage() =
+    fun grantedParseHtmlPermission_getTextThrowsUnexpectedResponseCodeException_returnsConversionFailedWithGeneralErrorMessage() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1100,7 +1100,7 @@ class ConversionStateTest {
             val state =
                 GrantedParseHtmlPermission(stateContext, inputUriString, googleMapsUrlConverter, uri, positionFromUri)
             assertEquals(
-                ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString),
+                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
                 state.transition(),
             )
         }

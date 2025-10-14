@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib
 
-import android.net.Network
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -82,9 +81,11 @@ class NetworkTools(
     ): T {
         if (retry != null && retry.count > 0) {
             if (retry.count > MAX_RETRIES) {
+                // TODO Test
                 log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
                 throw UnrecoverableException(retry.tr.messageResId, retry.tr.cause)
             }
+            // TODO Test
             val timeMillis = (2.0.pow(retry.count - 1) * EXPONENTIAL_DELAY).toLong()
             log.i(null, "Waiting ${timeMillis}ms before retry $retry.count of $MAX_RETRIES for $url")
             delay(timeMillis)
@@ -135,6 +136,7 @@ class NetworkTools(
                 log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
                 throw UnrecoverableException(R.string.network_exception_response_error, tr)
             } catch (tr: Exception) {
+                // TODO Test
                 log.e(null, "Unknown network exception for $url", tr)
                 throw UnrecoverableException(R.string.network_exception_unknown, tr)
             }
