@@ -48,7 +48,7 @@
     <string name="conversion_succeeded_copy_google_maps">複製Google地圖</string>
     <string name="intro_title">簡介</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">放置圖釘</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> 之後，應用程式將會讓您在其他安裝的地圖應用程式中打開相同的地點。]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[選擇 <i>%1$s</i> 之後，應用程式將會讓您在其他安裝的地圖應用程式中打開相同的地點。]]></string>
     <string name="intro_how_to_share_app_content_description">螢幕截圖關於%1$s的分享畫面</string>
     <string name="conversion_succeeded_apps_headline">用…開啟</string>
     <string name="intro_open_by_default_headline">設定安卓可以在Google地圖或替代的地圖中開啟連結（ 可選擇的）</string>
@@ -72,7 +72,7 @@
     <string name="conversion_failed_missing_url">找不到URL</string>
     <string name="conversion_failed_unshorten_error">無法解析縮短連結</string>
     <string name="conversion_failed_parse_html_error">無法從地圖服務擷取網頁內容</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Then go to Settings &#8594; Apps &#8594; %1$s &#8594; <i>預設開啟</i>，開啟「在此應用程式中開啟連結」功能，並點選，然後按 <i>新增連結</i>.]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[然後去設定 &#8594; Apps &#8594; %1$s &#8594; <i>預設開啟</i>，開啟「在此應用程式中開啟連結」功能，並點選，然後按 <i>新增連結</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">%1$s 的「預設開啟」設定頁面螢幕截圖</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Select at least <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。若有部分連結呈現灰色無法選取，表示其他 Google 應用程式已設定為預設開啟這些連結。您可以像先前對 Google 地圖那樣，找到那些應用程式並關閉它們的「開啟連結」功能。]]></string>
     <string name="intro_open_by_default_app_screenshot_title">使用預設開啟方式</string>
@@ -101,4 +101,11 @@
     <string name="conversion_failed_parse_html_connection_error">從地圖服務擷取網頁時發生連線錯誤</string>
     <string name="conversion_failed_unsupported_service">不支援的地圖服務</string>
     <string name="conversion_succeeded_point_number">%1$d項</string>
+    <string name="converter_geo_example">例如：geo:50.123456,-11.123456</string>
+    <string name="url_converters_filter_all">所有的地圖服務</string>
+    <string name="url_converters_filter_recent">最近添加</string>
+    <string name="url_converters_default_handler_enabled">預設用%1$s打開</string>
+    <string name="url_converters_default_handler_disabled">不要打開預設%1$s</string>
+    <string name="url_converters_recent_info">%1$s最近支援了新的地圖服務。</string>
+    <string name="url_converters_settings_button_content_description">開啟安卓設定</string>
 </resources>
