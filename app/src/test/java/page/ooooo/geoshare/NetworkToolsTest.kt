@@ -6,6 +6,7 @@ import io.ktor.client.network.sockets.*
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import io.ktor.util.*
+import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
@@ -132,6 +133,23 @@ class NetworkToolsTest {
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Head)
         assertFalse(clientConfig.followRedirects)
+    }
+
+    @Test
+    fun requestLocationHeader_unresolvedAddressException() = runTest {
+        val url = URL("https://example.com/")
+        val mockEngine = MockEngine {
+            throw UnresolvedAddressException()
+        }
+        val mockNetworkTools = NetworkTools(mockEngine, log)
+        var threw: NetworkTools.NetworkException? = null
+        try {
+            mockNetworkTools.requestLocationHeader(url)
+        } catch (tr: NetworkTools.RecoverableException) {
+            threw = tr
+        }
+        assertNotNull(threw)
+        assertTrue(threw?.cause is UnresolvedAddressException)
     }
 
     @Test
@@ -263,6 +281,23 @@ class NetworkToolsTest {
     }
 
     @Test
+    fun getRedirectUrlString_unresolvedAddressException() = runTest {
+        val url = URL("https://example.com/")
+        val mockEngine = MockEngine {
+            throw UnresolvedAddressException()
+        }
+        val mockNetworkTools = NetworkTools(mockEngine, log)
+        var threw: NetworkTools.NetworkException? = null
+        try {
+            mockNetworkTools.getRedirectUrlString(url)
+        } catch (tr: NetworkTools.RecoverableException) {
+            threw = tr
+        }
+        assertNotNull(threw)
+        assertTrue(threw?.cause is UnresolvedAddressException)
+    }
+
+    @Test
     fun getRedirectUrlString_httpRequestTimeoutException() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { request ->
@@ -380,6 +415,23 @@ class NetworkToolsTest {
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)
         assertTrue(clientConfig.followRedirects)
+    }
+
+    @Test
+    fun getText_unresolvedAddressException() = runTest {
+        val url = URL("https://example.com/")
+        val mockEngine = MockEngine {
+            throw UnresolvedAddressException()
+        }
+        val mockNetworkTools = NetworkTools(mockEngine, log)
+        var threw: NetworkTools.NetworkException? = null
+        try {
+            mockNetworkTools.getText(url)
+        } catch (tr: NetworkTools.RecoverableException) {
+            threw = tr
+        }
+        assertNotNull(threw)
+        assertTrue(threw?.cause is UnresolvedAddressException)
     }
 
     @Test

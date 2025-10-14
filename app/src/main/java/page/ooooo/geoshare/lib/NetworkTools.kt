@@ -117,7 +117,6 @@ class NetworkTools(
                     method = httpMethod
                 }
             } catch (tr: UnresolvedAddressException) {
-                // TODO Test
                 log.w(null, "Unresolved address for $url", tr)
                 throw RecoverableException(R.string.network_exception_unresolved_address, tr)
             } catch (tr: HttpRequestTimeoutException) {
