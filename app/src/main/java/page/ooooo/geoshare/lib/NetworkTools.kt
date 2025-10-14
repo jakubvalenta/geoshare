@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib
 
+import android.net.Network
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -10,10 +11,11 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
-import io.ktor.util.network.UnresolvedAddressException
+import io.ktor.util.network.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.math.pow
 
@@ -29,18 +31,19 @@ class NetworkTools(
         const val SOCKET_TIMEOUT = 128_000L
     }
 
-    sealed class Result<T> {
-        data class Success<U>(val value: U) : Result<U>()
-        class RecoverableError<U>(val tr: Throwable) : Result<U>()
-        class UnrecoverableError<U>(val tr: Throwable) : Result<U>()
-    }
+    abstract class NetworkException(val messageResId: Int, override val cause: Throwable) : Exception(cause)
 
-    data class Retry(val count: Int, val tr: Throwable)
+    class RecoverableException(messageResId: Int, cause: Throwable) : NetworkException(messageResId, cause)
 
+    class UnrecoverableException(messageResId: Int, cause: Throwable) : NetworkException(messageResId, cause)
+
+    data class Retry(val count: Int, val tr: NetworkException)
+
+    @Throws(NetworkException::class)
     suspend fun requestLocationHeader(
         url: URL,
         retry: Retry? = null,
-    ): Result<String?> = withContext(Dispatchers.IO) {
+    ): String? = withContext(Dispatchers.IO) {
         connect(
             engine,
             url,
@@ -53,24 +56,21 @@ class NetworkTools(
         }
     }
 
-    suspend fun getText(url: URL, retry: Retry? = null): Result<String> = withContext(Dispatchers.IO) {
+    @Throws(NetworkException::class)
+    suspend fun getText(url: URL, retry: Retry? = null): String = withContext(Dispatchers.IO) {
         connect(engine, url, retry = retry) { response ->
             response.body<String>()
         }
     }
 
-    suspend fun getRedirectUrlString(url: URL, retry: Retry? = null): Result<String> = withContext(Dispatchers.IO) {
+    @Throws(NetworkException::class)
+    suspend fun getRedirectUrlString(url: URL, retry: Retry? = null): String = withContext(Dispatchers.IO) {
         connect(engine, url, retry = retry) { response ->
             response.request.url.toString()
         }
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        ResponseException::class,
-        SocketTimeoutException::class,
-    )
+    @Throws(NetworkException::class)
     private suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
@@ -79,11 +79,11 @@ class NetworkTools(
         followRedirectsParam: Boolean = true,
         retry: Retry? = null,
         block: suspend (response: HttpResponse) -> T,
-    ): Result<T> {
+    ): T {
         if (retry != null && retry.count > 0) {
             if (retry.count > MAX_RETRIES) {
                 log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
-                return Result.UnrecoverableError(retry.tr)
+                throw UnrecoverableException(retry.tr.messageResId, retry.tr.cause)
             }
             val timeMillis = (2.0.pow(retry.count - 1) * EXPONENTIAL_DELAY).toLong()
             log.i(null, "Waiting ${timeMillis}ms before retry $retry.count of $MAX_RETRIES for $url")
@@ -119,27 +119,27 @@ class NetworkTools(
             } catch (tr: UnresolvedAddressException) {
                 // TODO Test
                 log.w(null, "Unresolved address for $url", tr)
-                return Result.RecoverableError(tr)
+                throw RecoverableException(R.string.network_exception_unresolved_address, tr)
             } catch (tr: HttpRequestTimeoutException) {
                 log.w(null, "Request timeout for $url", tr)
-                return Result.RecoverableError(tr)
+                throw RecoverableException(R.string.network_exception_request_timeout, tr)
             } catch (tr: SocketTimeoutException) {
                 log.w(null, "Socket timeout for $url", tr)
-                return Result.RecoverableError(tr)
+                throw RecoverableException(R.string.network_exception_socket_timeout, tr)
             } catch (tr: ConnectTimeoutException) {
                 log.w(null, "Connect timeout for $url", tr)
-                return Result.RecoverableError(tr)
+                throw RecoverableException(R.string.network_exception_connect_timeout, tr)
             } catch (tr: ServerResponseException) {
                 log.w(null, "Server error ${tr.response.status} for $url", tr)
-                return Result.RecoverableError(tr)
+                throw RecoverableException(R.string.network_exception_server_response_error, tr)
             } catch (tr: ResponseException) {
                 log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
-                return Result.UnrecoverableError(tr)
+                throw UnrecoverableException(R.string.network_exception_response_error, tr)
             } catch (tr: Exception) {
                 log.e(null, "Unknown network exception for $url", tr)
-                return Result.UnrecoverableError(tr)
+                throw UnrecoverableException(R.string.network_exception_unknown, tr)
             }
-            return Result.Success(block(response))
+            return block(response)
         }
     }
 }

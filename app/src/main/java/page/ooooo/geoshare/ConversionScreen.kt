@@ -491,7 +491,10 @@ private fun LoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(2, Exception("Connection timeout"))
+                retry = NetworkTools.Retry(
+                    2,
+                    NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
+                )
             ),
             lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
@@ -529,7 +532,10 @@ private fun DarkLoadingIndicatorPreview() {
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsUrlConverter(),
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                retry = NetworkTools.Retry(2, Exception("Connection timeout"))
+                retry = NetworkTools.Retry(
+                    2,
+                    NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
+                )
             ),
             lastInputShown = true,
             loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
