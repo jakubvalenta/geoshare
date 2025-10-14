@@ -24,13 +24,13 @@ class ConversionStateTest {
     private val geoUrlConverter = GeoUrlConverter()
     private val googleMapsUrlConverter = GoogleMapsUrlConverter()
     private val mockIntentTools: IntentTools = mock {
-        on { getIntentUriString(any()) } doThrow NotImplementedError()
-        on { createChooserIntent(any()) } doThrow NotImplementedError()
+        on { getIntentUriString(anyOrNull()) } doThrow NotImplementedError()
+        on { createChooserIntent(anyOrNull()) } doThrow NotImplementedError()
     }
     private val mockNetworkTools: NetworkTools = mock {
-        onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-        onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-        onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+        onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+        onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+        onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
     }
 
     fun mockStateContext(
@@ -331,7 +331,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(connectionPermission), anyOrNull()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val state = RequestedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -351,7 +351,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(connectionPermission), anyOrNull()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val state = RequestedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -371,7 +371,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(connectionPermission), anyOrNull()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val state = RequestedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -390,7 +390,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+            onBlocking { setValue(eq(connectionPermission), anyOrNull()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val state = RequestedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -411,9 +411,9 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val redirectUriString = "https://maps.google.com/foo-redirect"
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doReturn redirectUriString
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doReturn redirectUriString
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -429,14 +429,14 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
                 onBlocking {
                     requestLocationHeader(
-                        argThat { toString() == inputUriString }, any()
+                        argThat { toString() == inputUriString }, anyOrNull()
                     )
                 } doThrow CancellationException()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -447,26 +447,27 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedUnshortenPermission_requestLocationHeaderThrowsSocketTimeoutException_returnsConversionFailedWithConnectionErrorMessage() =
+    fun grantedUnshortenPermission_requestLocationHeaderThrowsSocketTimeoutException_returnsGrantedUnshortenPermissionWithRetry() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
+            val tr = NetworkTools.RecoverableException(
+                R.string.network_exception_socket_timeout, SocketTimeoutException()
+            )
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
                 onBlocking {
-                    requestLocationHeader(
-                        argThat { toString() == inputUriString }, any()
-                    )
-                } doThrow NetworkTools.RecoverableException(
-                    R.string.network_exception_socket_timeout, SocketTimeoutException()
-                )
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                    requestLocationHeader(argThat { toString() == inputUriString }, anyOrNull())
+                } doThrow tr
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
             assertEquals(
-                ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString),
+                GrantedUnshortenPermission(
+                    stateContext, inputUriString, googleMapsUrlConverter, uri, NetworkTools.Retry(1, tr),
+                ),
                 state.transition(),
             )
         }
@@ -477,17 +478,17 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
                 onBlocking {
                     requestLocationHeader(
-                        argThat { toString() == inputUriString }, any()
+                        argThat { toString() == inputUriString }, anyOrNull()
                     )
                 } doThrow NetworkTools.UnrecoverableException(
                     R.string.network_exception_server_response_error,
                     Exception(),
                 )
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -503,10 +504,14 @@ class ConversionStateTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { requestLocationHeader(argThat { toString() == inputUriString }, any()) } doReturn null
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking {
+                    requestLocationHeader(
+                        argThat { toString() == inputUriString }, anyOrNull()
+                    )
+                } doReturn null
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -524,13 +529,13 @@ class ConversionStateTest {
             val redirectUriString = "https://maps.google.com/foo-redirect"
             val redirectUri = Uri.parse(redirectUriString, uriQuote)
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
                 onBlocking {
-                    requestLocationHeader(argThat { toString() == "https://$inputUriString" }, any())
+                    requestLocationHeader(argThat { toString() == "https://$inputUriString" }, anyOrNull())
                 } doReturn redirectUriString
 
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -547,15 +552,12 @@ class ConversionStateTest {
         val redirectUriString = "https://maps.google.com/foo-redirect"
         val redirectUri = Uri.parse(redirectUriString, uriQuote)
         val mockNetworkTools: NetworkTools = mock {
-            onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
+            onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
             onBlocking {
-                requestLocationHeader(
-                    argThat { toString() == inputUriString },
-                    any()
-                )
+                requestLocationHeader(argThat { toString() == inputUriString }, anyOrNull())
             } doReturn redirectUriString
-            onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+            onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
         }
         val stateContext = mockStateContext(networkTools = mockNetworkTools)
         val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -572,15 +574,12 @@ class ConversionStateTest {
         val redirectUriString = "foo-redirect"
         val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
         val mockNetworkTools: NetworkTools = mock {
-            onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
+            onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
             onBlocking {
-                requestLocationHeader(
-                    argThat { toString() == inputUriString },
-                    any()
-                )
+                requestLocationHeader(argThat { toString() == inputUriString }, anyOrNull())
             } doReturn redirectUriString
-            onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+            onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
         }
         val stateContext = mockStateContext(networkTools = mockNetworkTools)
         val state = GrantedUnshortenPermission(stateContext, inputUriString, googleMapsUrlConverter, uri)
@@ -597,13 +596,10 @@ class ConversionStateTest {
         val redirectUriString = "https://maps.google.com/foo-redirect"
         val redirectUri = Uri.parse(redirectUriString, uriQuote)
         val mockNetworkTools: NetworkTools = mock {
-            onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getText(any(), any()) } doThrow NotImplementedError()
+            onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
             onBlocking {
-                getRedirectUrlString(
-                    argThat { toString() == inputUriString },
-                    any()
-                )
+                getRedirectUrlString(argThat { toString() == inputUriString }, anyOrNull())
             } doReturn redirectUriString
         }
 
@@ -980,10 +976,10 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val html = "<html></html>"
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1013,10 +1009,10 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val html = "<html></html>"
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state =
@@ -1034,10 +1030,14 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val positionFromUri = Position(q = "bar")
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doThrow CancellationException()
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking {
+                    getText(
+                        argThat { toString() == inputUriString }, anyOrNull()
+                    )
+                } doThrow CancellationException()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state =
@@ -1049,27 +1049,32 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_getTextThrowsSocketTimeoutException_returnsConversionFailedWithConnectionErrorMessage() =
+    fun grantedParseHtmlPermission_getTextThrowsSocketTimeoutException_returnsGrantedParseHtmlPermissionWithRetry() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val positionFromUri = Position(q = "bar")
+            val tr = NetworkTools.RecoverableException(
+                R.string.network_exception_socket_timeout, SocketTimeoutException(),
+            )
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking {
-                    getText(argThat { toString() == inputUriString }, any())
-                } doThrow NetworkTools.RecoverableException(
-                    R.string.network_exception_socket_timeout,
-                    SocketTimeoutException(),
-                )
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doThrow tr
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state =
                 GrantedParseHtmlPermission(stateContext, inputUriString, googleMapsUrlConverter, uri, positionFromUri)
             assertEquals(
-                ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString),
+                GrantedParseHtmlPermission(
+                    stateContext,
+                    inputUriString,
+                    googleMapsUrlConverter,
+                    uri,
+                    positionFromUri,
+                    NetworkTools.Retry(1, tr),
+                ),
                 state.transition(),
             )
         }
@@ -1081,15 +1086,15 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val positionFromUri = Position(q = "bar")
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
                 onBlocking {
-                    getText(argThat { toString() == inputUriString }, any())
+                    getText(argThat { toString() == inputUriString }, anyOrNull())
                 } doThrow NetworkTools.UnrecoverableException(
                     R.string.network_exception_server_response_error,
                     Exception(),
                 )
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
             val stateContext = mockStateContext(networkTools = mockNetworkTools)
             val state =
@@ -1108,17 +1113,17 @@ class ConversionStateTest {
         val html = "<html></html>"
         val position = Position("1", "2", q = "fromHtml")
         val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-            on { find(any()) } doReturn listOf(object : PositionRegex("mock") {
+            on { find(anyOrNull()) } doReturn listOf(object : PositionRegex("mock") {
                 override fun matches(input: String) = true
                 override val points = position.points
                 override val q = position.q
             })
         }
         val mockNetworkTools: NetworkTools = mock {
-            onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getText(argThat { toString() == "https://$inputUriString" }, any()) } doReturn html
-            onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+            onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getText(argThat { toString() == "https://$inputUriString" }, anyOrNull()) } doReturn html
+            onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
         }
 
         class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1150,17 +1155,17 @@ class ConversionStateTest {
         val html = "<html></html>"
         val positionFromHtml = Position("1", "2", q = "fromHtml")
         val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-            on { find(any()) } doReturn listOf(object : PositionRegex("mock") {
+            on { find(anyOrNull()) } doReturn listOf(object : PositionRegex("mock") {
                 override fun matches(input: String) = true
                 override val points = positionFromHtml.points
                 override val q = positionFromHtml.q
             })
         }
         val mockNetworkTools: NetworkTools = mock {
-            onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-            onBlocking { getText(argThat { toString() == htmlUrl.toString() }, any()) } doReturn html
-            onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+            onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+            onBlocking { getText(argThat { toString() == htmlUrl.toString() }, anyOrNull()) } doReturn html
+            onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
         }
 
         class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1194,17 +1199,17 @@ class ConversionStateTest {
             val html = "<html></html>"
             val positionFromHtml = Position("1", "2", q = "fromHtml")
             val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-                on { find(any()) } doReturn listOf(object : PositionRegex("mock") {
+                on { find(anyOrNull()) } doReturn listOf(object : PositionRegex("mock") {
                     override fun matches(input: String) = true
                     override val points = positionFromHtml.points
                     override val q = positionFromHtml.q
                 })
             }
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == htmlUrl.toString() }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == htmlUrl.toString() }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1240,19 +1245,19 @@ class ConversionStateTest {
             val redirectUri = Uri.parse(redirectUriString, uriQuote)
             val html = "<html></html>"
             val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-                on { find(any()) } doReturn null
+                on { find(anyOrNull()) } doReturn null
             }
             val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
-                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                on { find(anyOrNull()) } doReturn listOf(object : RedirectRegex("mock") {
                     override fun matches(input: String) = true
                     override val url = redirectUriString
                 })
             }
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1288,19 +1293,19 @@ class ConversionStateTest {
             val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
             val html = "<html></html>"
             val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-                on { find(any()) } doReturn null
+                on { find(anyOrNull()) } doReturn null
             }
             val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
-                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                on { find(anyOrNull()) } doReturn listOf(object : RedirectRegex("mock") {
                     override fun matches(input: String) = true
                     override val url = redirectUriString
                 })
             }
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1334,19 +1339,19 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val html = "<html></html>"
             val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-                on { find(any()) } doReturn null
+                on { find(anyOrNull()) } doReturn null
             }
             val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
-                on { find(any()) } doReturn listOf(object : RedirectRegex("mock") {
+                on { find(anyOrNull()) } doReturn listOf(object : RedirectRegex("mock") {
                     override fun matches(input: String) = true
                     override val url = null
                 })
             }
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
@@ -1380,16 +1385,16 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val html = "<html></html>"
             val mockHtmlPattern: ConversionFirstHtmlPattern<PositionRegex> = mock {
-                on { find(any()) } doReturn null
+                on { find(anyOrNull()) } doReturn null
             }
             val mockHtmlRedirectPattern: ConversionFirstHtmlPattern<RedirectRegex> = mock {
-                on { find(any()) } doReturn null
+                on { find(anyOrNull()) } doReturn null
             }
             val mockNetworkTools: NetworkTools = mock {
-                onBlocking { requestLocationHeader(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(any(), any()) } doThrow NotImplementedError()
-                onBlocking { getText(argThat { toString() == inputUriString }, any()) } doReturn html
-                onBlocking { getRedirectUrlString(any(), any()) } doThrow NotImplementedError()
+                onBlocking { requestLocationHeader(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(any(), anyOrNull()) } doThrow NotImplementedError()
+                onBlocking { getText(argThat { toString() == inputUriString }, anyOrNull()) } doReturn html
+                onBlocking { getRedirectUrlString(any(), anyOrNull()) } doThrow NotImplementedError()
             }
 
             class MockUrlConverter : UrlConverter.WithHtmlPattern {
