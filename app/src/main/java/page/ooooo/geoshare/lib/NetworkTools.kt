@@ -10,88 +10,106 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
+import io.ktor.util.network.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import java.io.IOException
+import page.ooooo.geoshare.R
 import java.net.URL
+import kotlin.math.pow
+import kotlin.math.roundToLong
 
-class UnexpectedResponseCodeException : IOException("Unexpected response code")
-
-class NetworkTools(
+open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog(),
 ) {
     companion object {
-        const val MAX_RETRIES = 4
-        const val CONSTANT_DELAY = 1_000L
+        const val MAX_RETRIES = 9
+        const val EXPONENTIAL_DELAY_BASE = 2.0
+        const val EXPONENTIAL_DELAY_BASE_DELAY = 1_000L
         const val REQUEST_TIMEOUT = 256_000L
         const val CONNECT_TIMEOUT = 128_000L
         const val SOCKET_TIMEOUT = 128_000L
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        SocketTimeoutException::class,
-        UnexpectedResponseCodeException::class,
-    )
-    suspend fun requestLocationHeader(url: URL): String? = withContext(Dispatchers.IO) {
+    abstract class NetworkException(val messageResId: Int, override val cause: Throwable) : Exception(cause)
+
+    class RecoverableException(messageResId: Int, cause: Throwable) : NetworkException(messageResId, cause)
+
+    class UnrecoverableException(messageResId: Int, cause: Throwable) : NetworkException(messageResId, cause)
+
+    data class Retry(val count: Int, val tr: NetworkException)
+
+    @Throws(NetworkException::class)
+    suspend fun requestLocationHeader(
+        url: URL,
+        retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String? = withContext(dispatcher) {
         connect(
             engine,
             url,
             httpMethod = HttpMethod.Head,
-            followRedirectsParam = false,
             expectedStatusCodes = listOf(HttpStatusCode.MovedPermanently, HttpStatusCode.Found),
+            followRedirectsParam = false,
+            retry = retry,
         ) { response ->
-            response.headers["Location"]
+            response.headers[HttpHeaders.Location]
         }
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        SocketTimeoutException::class,
-        UnexpectedResponseCodeException::class,
-    )
-    suspend fun getText(url: URL): String = withContext(Dispatchers.IO) {
-        connect(engine, url) { response ->
-            val text: String = response.body()
-            text
+    @Throws(NetworkException::class)
+    suspend fun getText(
+        url: URL,
+        retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String = withContext(dispatcher) {
+        connect(engine, url, retry = retry) { response ->
+            response.body<String>()
         }
     }
 
-    @Throws(
-        ConnectTimeoutException::class,
-        HttpRequestTimeoutException::class,
-        SocketTimeoutException::class,
-        UnexpectedResponseCodeException::class,
-    )
-    suspend fun getRedirectUrlString(url: URL): String = withContext(Dispatchers.IO) {
-        connect(
-            engine,
-            url,
-        ) { response ->
+    @Throws(NetworkException::class)
+    suspend fun getRedirectUrlString(
+        url: URL,
+        retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String = withContext(dispatcher) {
+        connect(engine, url, retry = retry) { response ->
             response.request.url.toString()
         }
     }
 
-    private suspend fun <T> connect(
+    @Throws(NetworkException::class)
+    open suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
         httpMethod: HttpMethod = HttpMethod.Get,
         expectedStatusCodes: List<HttpStatusCode> = listOf(HttpStatusCode.OK),
         followRedirectsParam: Boolean = true,
+        retry: Retry? = null,
         block: suspend (response: HttpResponse) -> T,
     ): T {
+        if (retry != null && retry.count > 0) {
+            if (retry.count > MAX_RETRIES) {
+                log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
+                throw UnrecoverableException(retry.tr.messageResId, retry.tr.cause)
+            }
+            val timeMillis = (EXPONENTIAL_DELAY_BASE.pow(retry.count - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong()
+            log.i(null, "Waiting ${timeMillis}ms before retry ${retry.count} of $MAX_RETRIES for $url")
+            delay(timeMillis)
+        }
         HttpClient(engine) {
             followRedirects = followRedirectsParam
-            install(HttpRequestRetry) {
-                maxRetries = MAX_RETRIES
-                constantDelay(CONSTANT_DELAY)
-                retryOnServerErrors()
-                retryOnException(retryOnTimeout = true)
-                modifyRequest { request ->
-                    log.i(null, "Retrying request ${retryCount + 1} / ${maxRetries + 1} for ${request.url}")
+            HttpResponseValidator {
+                validateResponse { response ->
+                    if (response.status !in expectedStatusCodes) {
+                        if (response.status.value in 500..599) {
+                            throw ServerResponseException(response, "<not implemented>")
+                        }
+                        throw ResponseException(response, "<not implemented>")
+                    }
                 }
             }
             install(HttpTimeout) {
@@ -104,25 +122,33 @@ class NetworkTools(
             // in case of Google Search.
             BrowserUserAgent()
         }.use { client ->
-            try {
-                val response = client.request(url) {
+            val response = try {
+                client.request(url) {
                     method = httpMethod
                 }
-                if (expectedStatusCodes.contains(response.status)) {
-                    return block(response)
-                }
-                log.w(null, "Received HTTP code ${response.status} for $url")
-                throw UnexpectedResponseCodeException()
-            } catch (e: HttpRequestTimeoutException) {
-                log.w(null, "HTTP request timeout for $url")
-                throw e
-            } catch (e: SocketTimeoutException) {
-                log.w(null, "Socket timeout for $url")
-                throw e
-            } catch (e: ConnectTimeoutException) {
-                log.w(null, "Connect timeout for $url")
-                throw e
+            } catch (tr: UnresolvedAddressException) {
+                log.w(null, "Unresolved address for $url", tr)
+                throw RecoverableException(R.string.network_exception_unresolved_address, tr)
+            } catch (tr: HttpRequestTimeoutException) {
+                log.w(null, "Request timeout for $url", tr)
+                throw RecoverableException(R.string.network_exception_request_timeout, tr)
+            } catch (tr: SocketTimeoutException) {
+                log.w(null, "Socket timeout for $url", tr)
+                throw RecoverableException(R.string.network_exception_socket_timeout, tr)
+            } catch (tr: ConnectTimeoutException) {
+                log.w(null, "Connect timeout for $url", tr)
+                throw RecoverableException(R.string.network_exception_connect_timeout, tr)
+            } catch (tr: ServerResponseException) {
+                log.w(null, "Server error ${tr.response.status} for $url", tr)
+                throw RecoverableException(R.string.network_exception_server_response_error, tr)
+            } catch (tr: ResponseException) {
+                log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
+                throw UnrecoverableException(R.string.network_exception_response_error, tr)
+            } catch (tr: Exception) {
+                log.e(null, "Unknown network exception for $url", tr)
+                throw UnrecoverableException(R.string.network_exception_unknown, tr)
             }
+            return block(response)
         }
     }
 }

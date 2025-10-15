@@ -1,18 +1,20 @@
 package page.ooooo.geoshare.lib
 
 abstract class StateContext {
-    private val maxIterations = 10
+    companion object {
+        const val MAX_ITERATIONS = 30
+    }
 
     abstract var currentState: State
 
     suspend fun transition() {
         var i = 0
-        while (i < maxIterations) {
+        while (i < MAX_ITERATIONS) {
             currentState = currentState.transition() ?: break
             i++
         }
-        if (i >= maxIterations) {
-            throw Exception("Exceeded max state iterations")
+        if (i >= MAX_ITERATIONS) {
+            throw IllegalStateException("Exceeded max state iterations")
         }
     }
 }

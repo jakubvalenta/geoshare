@@ -2,6 +2,8 @@ package page.ooooo.geoshare.lib
 
 import android.content.Intent
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -16,6 +18,9 @@ open class ConversionState : State {
 
 interface HasLoadingIndicator {
     val loadingIndicatorTitleResId: Int
+
+    @Composable
+    fun loadingIndicatorDescription(): String?
 }
 
 interface HasResult {
@@ -108,35 +113,55 @@ data class GrantedUnshortenPermission(
     val inputUriString: String,
     val urlConverter: UrlConverter.WithShortUriPattern,
     val uri: Uri,
+    val retry: NetworkTools.Retry? = null,
 ) : ConversionState(), HasLoadingIndicator {
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
         val url = uri.toUrl()
         if (url == null) {
-            stateContext.log.e(null, "HTML Pattern: Failed to get URL for $uri")
+            stateContext.log.e(null, "Unshorten: Failed to get URL for $uri")
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         val locationHeader = try {
             when (urlConverter.shortUriMethod) {
-                ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url)
-                ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url)
+                ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
+                ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
             }
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
-        } catch (_: IOException) {
-            // Catches SocketTimeoutException and UnexpectedResponseCodeException too.
-            return ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString)
-        } catch (_: Exception) {
-            return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
+        } catch (tr: NetworkTools.RecoverableException) {
+            return GrantedUnshortenPermission(
+                stateContext,
+                inputUriString,
+                urlConverter,
+                uri,
+                retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
+            )
+        } catch (tr: NetworkTools.UnrecoverableException) {
+            return if (tr.cause is IOException) {
+                ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString)
+            } else {
+                ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
+            }
         }
         if (locationHeader == null) {
-            stateContext.log.w(null, "Unshorten: Missing location header")
+            stateContext.log.w(null, "Unshorten: Missing location header for $url")
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
         stateContext.log.i(null, "Unshorten: Resolved short URI $uri to $unshortenedUri")
         return UnshortenedUrl(stateContext, inputUriString, urlConverter, unshortenedUri, Permission.ALWAYS)
+    }
+
+    @Composable
+    override fun loadingIndicatorDescription(): String? = retry?.let { retry ->
+        stringResource(
+            R.string.conversion_loading_indicator_description,
+            retry.count + 1,
+            NetworkTools.MAX_RETRIES + 1,
+            stringResource(retry.tr.messageResId),
+        )
     }
 }
 
@@ -219,6 +244,7 @@ data class GrantedParseHtmlPermission(
     val urlConverter: UrlConverter.WithHtmlPattern,
     val uri: Uri,
     val positionFromUri: Position?,
+    val retry: NetworkTools.Retry? = null,
 ) : ConversionState(), HasLoadingIndicator {
     override val loadingIndicatorTitleResId: Int = urlConverter.loadingIndicatorTitleResId
 
@@ -230,26 +256,49 @@ data class GrantedParseHtmlPermission(
         }
         val html = try {
             stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
-            stateContext.networkTools.getText(htmlUrl)
+            stateContext.networkTools.getText(htmlUrl, retry)
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
-        } catch (_: IOException) {
-            // Catches SocketTimeoutException and UnexpectedResponseCodeException too.
-            return ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
-        } catch (_: Exception) {
-            return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+        } catch (tr: NetworkTools.RecoverableException) {
+            return GrantedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                urlConverter,
+                uri,
+                positionFromUri,
+                retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
+            )
+        } catch (tr: NetworkTools.UnrecoverableException) {
+            return if (tr.cause is IOException) {
+                ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
+            } else {
+                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+            }
         }
         urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
             stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
-            return@transition ConversionSucceeded(inputUriString, position)
+            return ConversionSucceeded(inputUriString, position)
         }
         urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUriString ->
-            stateContext.log.i(null, "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString")
+            stateContext.log.i(
+                null,
+                "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"
+            )
             val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
-            return@transition ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
+            return ReceivedUri(stateContext, inputUriString, urlConverter, redirectUri, Permission.ALWAYS)
         }
         stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
         return ParseHtmlFailed(inputUriString, positionFromUri)
+    }
+
+    @Composable
+    override fun loadingIndicatorDescription(): String? = retry?.let { retry ->
+        stringResource(
+            R.string.conversion_loading_indicator_description,
+            retry.count + 1,
+            NetworkTools.MAX_RETRIES + 1,
+            stringResource(retry.tr.messageResId),
+        )
     }
 }
 

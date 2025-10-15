@@ -82,6 +82,7 @@
     <string name="conversion_error_report">Report issue</string>
     <string name="conversion_error_retry">Try again</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
+    <string name="conversion_loading_indicator_description">Attempt %1$d out of %2$d due to %3$s.</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>
@@ -123,4 +124,11 @@
     <string name="url_converters_default_handler_disabled">Doesn’t open by default in %1$s</string>
     <string name="url_converters_recent_info">%1$s recently got support for new map services.</string>
     <string name="url_converters_settings_button_content_description">Open Android settings</string>
+    <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
+    <string name="network_exception_request_timeout" translatable="false">request timeout</string>
+    <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
+    <string name="network_exception_connect_timeout" translatable="false">connect timeout</string>
+    <string name="network_exception_server_response_error" translatable="false">server response error</string>
+    <string name="network_exception_response_error" translatable="false">response error</string>
+    <string name="network_exception_unknown" translatable="false">unknown error</string>
 </resources>

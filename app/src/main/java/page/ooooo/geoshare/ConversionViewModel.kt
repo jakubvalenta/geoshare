@@ -201,7 +201,15 @@ class ConversionViewModel @Inject constructor(
     private fun transition() {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
-            stateContext.transition()
+            try {
+                stateContext.transition()
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while transitioning state", tr)
+                stateContext.currentState = ConversionFailed(
+                    R.string.conversion_failed_parse_url_error,
+                    inputUriString,
+                )
+            }
         }
     }
 
