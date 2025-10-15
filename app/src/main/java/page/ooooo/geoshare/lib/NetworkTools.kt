@@ -19,7 +19,7 @@ import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.math.pow
 
-class NetworkTools(
+open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
     private val log: ILog = DefaultLog(),
 ) {
@@ -53,7 +53,7 @@ class NetworkTools(
             followRedirectsParam = false,
             retry = retry,
         ) { response ->
-            response.headers["Location"]
+            response.headers[HttpHeaders.Location]
         }
     }
 
@@ -80,7 +80,7 @@ class NetworkTools(
     }
 
     @Throws(NetworkException::class)
-    private suspend fun <T> connect(
+    open suspend fun <T> connect(
         engine: HttpClientEngine,
         url: URL,
         httpMethod: HttpMethod = HttpMethod.Get,
@@ -89,7 +89,6 @@ class NetworkTools(
         retry: Retry? = null,
         block: suspend (response: HttpResponse) -> T,
     ): T {
-        // TODO Mock in tests
         if (retry != null && retry.count > 0) {
             if (retry.count > MAX_RETRIES) {
                 log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
@@ -101,13 +100,12 @@ class NetworkTools(
         }
         HttpClient(engine) {
             followRedirects = followRedirectsParam
-            this.expectSuccess
             HttpResponseValidator {
                 validateResponse { response ->
-                    if (response.status.value in 500..599) {
-                        throw ServerResponseException(response, "<not implemented>")
-                    }
                     if (response.status !in expectedStatusCodes) {
+                        if (response.status.value in 500..599) {
+                            throw ServerResponseException(response, "<not implemented>")
+                        }
                         throw ResponseException(response, "<not implemented>")
                     }
                 }
@@ -145,7 +143,6 @@ class NetworkTools(
                 log.w(null, "Unexpected response code ${tr.response.status} for $url", tr)
                 throw UnrecoverableException(R.string.network_exception_response_error, tr)
             } catch (tr: Exception) {
-                // TODO Test
                 log.e(null, "Unknown network exception for $url", tr)
                 throw UnrecoverableException(R.string.network_exception_unknown, tr)
             }
