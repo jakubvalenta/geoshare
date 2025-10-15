@@ -136,11 +136,10 @@ data class GrantedUnshortenPermission(
                 inputUriString,
                 urlConverter,
                 uri,
-                retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr), // TODO Test increasing retry count
+                retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
             )
         } catch (tr: NetworkTools.UnrecoverableException) {
             return if (tr.cause is IOException) {
-                // TODO Test
                 ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString)
             } else {
                 ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
@@ -271,7 +270,6 @@ data class GrantedParseHtmlPermission(
             )
         } catch (tr: NetworkTools.UnrecoverableException) {
             return if (tr.cause is IOException) {
-                // TODO Test
                 ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString)
             } else {
                 ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
