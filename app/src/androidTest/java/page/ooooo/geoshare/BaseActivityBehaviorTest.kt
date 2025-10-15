@@ -10,7 +10,8 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Before
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY
+import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
+import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
@@ -26,7 +27,7 @@ abstract class BaseActivityBehaviorTest {
         const val TIMEOUT = 10_000L
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
         val NETWORK_TIMEOUT = (1..MAX_RETRIES).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
-            acc + (2.0.pow(curr - 1) * EXPONENTIAL_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
+            acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
         }
     }
 

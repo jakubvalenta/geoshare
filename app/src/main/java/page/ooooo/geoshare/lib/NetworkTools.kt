@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.math.pow
+import kotlin.math.roundToLong
 
 open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
@@ -25,7 +26,8 @@ open class NetworkTools(
 ) {
     companion object {
         const val MAX_RETRIES = 9
-        const val EXPONENTIAL_DELAY = 1_000L
+        const val EXPONENTIAL_DELAY_BASE = 2.0
+        const val EXPONENTIAL_DELAY_BASE_DELAY = 1_000L
         const val REQUEST_TIMEOUT = 256_000L
         const val CONNECT_TIMEOUT = 128_000L
         const val SOCKET_TIMEOUT = 128_000L
@@ -94,8 +96,8 @@ open class NetworkTools(
                 log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
                 throw UnrecoverableException(retry.tr.messageResId, retry.tr.cause)
             }
-            val timeMillis = (2.0.pow(retry.count - 1) * EXPONENTIAL_DELAY).toLong()
-            log.i(null, "Waiting ${timeMillis}ms before retry $retry.count of $MAX_RETRIES for $url")
+            val timeMillis = (EXPONENTIAL_DELAY_BASE.pow(retry.count - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong()
+            log.i(null, "Waiting ${timeMillis}ms before retry ${retry.count} of $MAX_RETRIES for $url")
             delay(timeMillis)
         }
         HttpClient(engine) {
