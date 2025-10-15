@@ -11,6 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -42,7 +43,8 @@ class NetworkTools(
     suspend fun requestLocationHeader(
         url: URL,
         retry: Retry? = null,
-    ): String? = withContext(Dispatchers.IO) {
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String? = withContext(dispatcher) {
         connect(
             engine,
             url,
@@ -56,14 +58,22 @@ class NetworkTools(
     }
 
     @Throws(NetworkException::class)
-    suspend fun getText(url: URL, retry: Retry? = null): String = withContext(Dispatchers.IO) {
+    suspend fun getText(
+        url: URL,
+        retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             response.body<String>()
         }
     }
 
     @Throws(NetworkException::class)
-    suspend fun getRedirectUrlString(url: URL, retry: Retry? = null): String = withContext(Dispatchers.IO) {
+    suspend fun getRedirectUrlString(
+        url: URL,
+        retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             response.request.url.toString()
         }
@@ -79,13 +89,12 @@ class NetworkTools(
         retry: Retry? = null,
         block: suspend (response: HttpResponse) -> T,
     ): T {
+        // TODO Mock in tests
         if (retry != null && retry.count > 0) {
             if (retry.count > MAX_RETRIES) {
-                // TODO Test
                 log.w(null, "Maximum number of $MAX_RETRIES retries reached for $url")
                 throw UnrecoverableException(retry.tr.messageResId, retry.tr.cause)
             }
-            // TODO Test
             val timeMillis = (2.0.pow(retry.count - 1) * EXPONENTIAL_DELAY).toLong()
             log.i(null, "Waiting ${timeMillis}ms before retry $retry.count of $MAX_RETRIES for $url")
             delay(timeMillis)
@@ -95,7 +104,7 @@ class NetworkTools(
             this.expectSuccess
             HttpResponseValidator {
                 validateResponse { response ->
-                    if (response.status.value >= 500) {
+                    if (response.status.value in 500..599) {
                         throw ServerResponseException(response, "<not implemented>")
                     }
                     if (response.status !in expectedStatusCodes) {
