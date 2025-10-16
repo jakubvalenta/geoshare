@@ -7,6 +7,10 @@ data class Position(
     val q: String? = null,
     val z: String? = null,
 ) {
+    companion object {
+        val example = Position("49.26", "-123.11")
+    }
+
     constructor(
         lat: String,
         lon: String,

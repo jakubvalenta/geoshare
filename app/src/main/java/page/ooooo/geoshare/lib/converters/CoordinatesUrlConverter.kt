@@ -1,8 +1,10 @@
 package page.ooooo.geoshare.lib.converters
 
+import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.MAX_COORD_PRECISION
 import page.ooooo.geoshare.lib.toScale
@@ -28,7 +30,9 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_coordinates_name,
         inputs = listOf(
-            DocumentationInput.Text(R.string.converter_coordinates_example, 20),
+            DocumentationInput.Text(20) {
+                stringResource(R.string.example, Position.example.toNorthSouthWestEastDecCoordsString())
+            },
         ),
     )
 

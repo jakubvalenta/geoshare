@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.lib.converters
 
+import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
@@ -14,7 +16,9 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_geo_name,
         inputs = listOf(
-            DocumentationInput.Text(R.string.converter_geo_example, 3),
+            DocumentationInput.Text(3) {
+                stringResource(R.string.example, Position.example.toGeoUriString())
+            },
         )
     )
     override val conversionUriPattern = uriPattern {

@@ -286,7 +286,7 @@ private fun UrlConvertersScreen(
                                 when (input) {
                                     is DocumentationInput.Text -> {
                                         Text(
-                                            stringResource(input.descriptionResId),
+                                            input.text(),
                                             style = MaterialTheme.typography.bodyMedium,
                                         )
                                     }

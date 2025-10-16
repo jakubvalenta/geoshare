@@ -25,8 +25,8 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
     override val documentation = Documentation(
         nameResId = R.string.converter_apple_maps_name,
         inputs = listOf(
-            DocumentationInput.Url("https://maps.apple", 18),
-            DocumentationInput.Url("https://maps.apple.com", 18),
+            DocumentationInput.Url(18, "https://maps.apple"),
+            DocumentationInput.Url(18, "https://maps.apple.com"),
         ),
     )
 

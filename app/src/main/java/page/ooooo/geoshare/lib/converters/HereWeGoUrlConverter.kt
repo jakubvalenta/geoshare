@@ -23,10 +23,10 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_here_wego_name,
         inputs = listOf(
-            DocumentationInput.Url("https://share.here.com/l/", 20),
-            DocumentationInput.Url("https://share.here.com/p/", 20),
-            DocumentationInput.Url("https://wego.here.com/", 20),
-            DocumentationInput.Url("https://wego.here.com/p/", 20),
+            DocumentationInput.Url(20, "https://share.here.com/l/"),
+            DocumentationInput.Url(20, "https://share.here.com/p/"),
+            DocumentationInput.Url(20, "https://wego.here.com/"),
+            DocumentationInput.Url(20, "https://wego.here.com/p/"),
         ),
     )
 

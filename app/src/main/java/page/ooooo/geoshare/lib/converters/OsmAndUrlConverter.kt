@@ -14,7 +14,7 @@ class OsmAndUrlConverter : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_osm_and_name,
         inputs = listOf(
-            DocumentationInput.Url("https://osmand.net/map", 20),
+            DocumentationInput.Url(20, "https://osmand.net/map"),
         ),
     )
 
