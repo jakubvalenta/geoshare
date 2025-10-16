@@ -37,10 +37,6 @@ interface HasError {
     val inputUriString: String
 }
 
-interface HasAutomation {
-    val automation: Automation
-}
-
 data class ConversionRunContext(
     val context: Context,
     val clipboard: Clipboard,
@@ -406,8 +402,8 @@ data class AutomationWaiting(
     val runContext: ConversionRunContext,
     override val inputUriString: String,
     override val position: Position,
-    override val automation: Automation.HasDelay,
-) : ConversionState(), HasResult, HasAutomation {
+    val automation: Automation.HasDelay,
+) : ConversionState(), HasResult {
     override suspend fun transition(): State =
         try {
             if (automation.delay.isPositive()) {
@@ -424,8 +420,8 @@ data class AutomationReady(
     val runContext: ConversionRunContext,
     override val inputUriString: String,
     override val position: Position,
-    override val automation: Automation,
-) : ConversionState(), HasResult, HasAutomation {
+    val automation: Automation,
+) : ConversionState(), HasResult {
     override suspend fun transition(): State {
         val success: Boolean? = when (val automationAction = automation.run(position, stateContext.uriQuote)) {
             is AutomationAction.Noop -> null
@@ -466,8 +462,8 @@ data class AutomationReady(
 data class AutomationSucceeded(
     override val inputUriString: String,
     override val position: Position,
-    override val automation: Automation.HasSuccessMessage,
-) : ConversionState(), HasResult, HasAutomation {
+    val automation: Automation.HasSuccessMessage,
+) : ConversionState(), HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
@@ -481,8 +477,8 @@ data class AutomationSucceeded(
 data class AutomationFailed(
     override val inputUriString: String,
     override val position: Position,
-    override val automation: Automation.HasErrorMessage,
-) : ConversionState(), HasResult, HasAutomation {
+    val automation: Automation.HasErrorMessage,
+) : ConversionState(), HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
@@ -496,5 +492,5 @@ data class AutomationFailed(
 data class AutomationFinished(
     override val inputUriString: String,
     override val position: Position,
-    override val automation: Automation,
-) : ConversionState(), HasResult, HasAutomation
+    val automation: Automation,
+) : ConversionState(), HasResult

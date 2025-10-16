@@ -3,8 +3,6 @@ package page.ooooo.geoshare
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
