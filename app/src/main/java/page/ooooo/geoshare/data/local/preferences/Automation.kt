@@ -21,8 +21,6 @@ import page.ooooo.geoshare.ui.theme.Spacing
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-private val examplePosition = Position("49.26", "-123.11")
-
 sealed class AutomationAction {
     class Noop : AutomationAction()
     class Copy(val text: String) : AutomationAction()
@@ -79,7 +77,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    examplePosition.toCoordsDecString()
+                    Position.example.toCoordsDecString()
                 )
             )
         }
@@ -100,7 +98,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    examplePosition.toNorthSouthWestEastDecCoordsString(),
+                    Position.example.toNorthSouthWestEastDecCoordsString(),
                 )
             )
         }

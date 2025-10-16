@@ -53,13 +53,13 @@ class GoogleMapsUrlConverter() :
     override val documentation = Documentation(
         nameResId = R.string.converter_google_maps_name,
         inputs = listOf(
-            DocumentationInput.Url("https://maps.app.goo.gl", 5),
-            DocumentationInput.Url("https://app.goo.gl/maps", 5),
-            DocumentationInput.Url("https://maps.google.com", 5),
-            DocumentationInput.Url("https://goo.gl/maps", 5),
-            DocumentationInput.Url("https://google.com/maps", 5),
-            DocumentationInput.Url("https://www.google.com/maps", 5),
-            DocumentationInput.Url("https://g.co/kgs", 10),
+            DocumentationInput.Url(5, "https://maps.app.goo.gl"),
+            DocumentationInput.Url(5, "https://app.goo.gl/maps"),
+            DocumentationInput.Url(5, "https://maps.google.com"),
+            DocumentationInput.Url(5, "https://goo.gl/maps"),
+            DocumentationInput.Url(5, "https://google.com/maps"),
+            DocumentationInput.Url(5, "https://www.google.com/maps"),
+            DocumentationInput.Url(10, "https://g.co/kgs"),
         ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")

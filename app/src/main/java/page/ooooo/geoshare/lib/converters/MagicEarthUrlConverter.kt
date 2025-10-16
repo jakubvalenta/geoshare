@@ -18,7 +18,7 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_magic_earth_name,
         inputs = listOf(
-            DocumentationInput.Url("https://magicearth.com/", 20),
+            DocumentationInput.Url(20, "https://magicearth.com/"),
         ),
     )
 

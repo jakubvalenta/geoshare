@@ -23,12 +23,12 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     override val documentation = Documentation(
         nameResId = R.string.converter_open_street_map_name,
         inputs = listOf(
-            DocumentationInput.Url("https://www.openstreetmap.org/", 20),
-            DocumentationInput.Url("https://www.openstreetmap.org/node", 23),
-            DocumentationInput.Url("https://www.openstreetmap.org/relation", 23),
-            DocumentationInput.Url("https://www.openstreetmap.org/way", 23),
-            DocumentationInput.Url("https://osm.org/", 23),
-            DocumentationInput.Url("https://osm.org/go/", 23),
+            DocumentationInput.Url(20, "https://www.openstreetmap.org/"),
+            DocumentationInput.Url(23, "https://www.openstreetmap.org/node"),
+            DocumentationInput.Url(23, "https://www.openstreetmap.org/relation"),
+            DocumentationInput.Url(23, "https://www.openstreetmap.org/way"),
+            DocumentationInput.Url(23, "https://osm.org/"),
+            DocumentationInput.Url(23, "https://osm.org/go/"),
         ),
     )
 
