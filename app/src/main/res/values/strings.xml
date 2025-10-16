@@ -77,14 +77,14 @@
     <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="conversion_succeeded_title">Coordinates</string>
-    <string name="conversion_automation_copy_link_succeeded">Copied link to clipboard</string>
+    <string name="conversion_automation_copy_link_succeeded">Automatically copied link</string>
     <string name="conversion_automation_copy_succeeded">Automatically copied coordinates</string>
     <string name="conversion_automation_open_app_failed">Failed to automatically open %1$s</string>
     <string name="conversion_automation_open_app_succeeded">Automatically opened %1$s</string>
     <string name="conversion_automation_open_app_waiting">Automatically opening %1$s in %2$ds</string>
-    <string name="conversion_automation_save_gpx_succeeded">Automatically saved a GPX</string>
-    <string name="conversion_automation_save_gpx_waiting">Saving GPX in %1$ds</string>
-    <string name="conversion_automation_share_failed">Failed to automatically share coordinates</string>
+    <string name="conversion_automation_save_gpx_succeeded">Automatically saved GPX</string>
+    <string name="conversion_automation_save_gpx_waiting">Automatically saving GPX in %1$ds</string>
+    <string name="conversion_automation_share_failed">Failed to automatically share link</string>
     <string name="conversion_automation_share_succeeded">Automatically shared coordinates</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_error_report">Report issue</string>
@@ -118,7 +118,7 @@
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="user_preferences_connection_option_never">No</string>
     <string name="user_preferences_connection_title">Allow connecting to map service (Google, Apple etc.)?</string>
-    <string name="user_preferences_developer_title">Developer options</string>
+    <string name="user_preferences_developer_title" translatable="false">Developer options</string>
     <string name="user_preferences_last_run_version_code_title" translatable="false">Which version of the app was last run?</string>
     <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="conversion_failed_missing_url">Missing URL</string>
