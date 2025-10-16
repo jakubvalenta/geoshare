@@ -85,7 +85,7 @@
     <string name="conversion_automation_save_gpx_succeeded">Automatically saved GPX</string>
     <string name="conversion_automation_save_gpx_waiting">Automatically saving GPX in %1$ds</string>
     <string name="conversion_automation_share_failed">Failed to automatically share link</string>
-    <string name="conversion_automation_share_succeeded">Automatically shared coordinates</string>
+    <string name="conversion_automation_share_succeeded">Automatically shared link</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_error_report">Report issue</string>
     <string name="conversion_error_retry">Try again</string>
