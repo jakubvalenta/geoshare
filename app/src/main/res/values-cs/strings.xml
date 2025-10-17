@@ -84,7 +84,6 @@
     <string name="conversion_failed_cancelled">Zrušeno</string>
     <string name="conversion_succeeded_skip">Kopírovat původní odkaz</string>
     <string name="conversion_succeeded_title">Souřadnice</string>
-    <string name="conversion_automation_share_succeeded">Odkaz byl automaticky sdílen</string>
     <string name="conversion_error_title">Chyba</string>
     <string name="converter_yandex_maps_permission_title">Spojit se s Yandexem?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Spojování s Yandexem…</string>
@@ -122,6 +121,8 @@
     <string name="conversion_automation_save_gpx_succeeded">Soubor GPX byl automaticky uložen</string>
     <string name="conversion_automation_save_gpx_waiting">Soubor GPX se automaticky uloží za %1$d</string>
     <string name="conversion_automation_share_failed">Nepodařilo se automaticky sdílet odkaz</string>
+    <string name="conversion_automation_share_succeeded">Odkaz byl automaticky nasdílen</string>
+    <string name="conversion_automation_share_waiting">Odkaz bude automaticky nasdílen za %1$d</string>
     <string name="user_preferences_automation_copy_link">Kopírovat odkaz na %1$s</string>
     <string name="user_preferences_automation_copy_coords">Kopírovat souřadnice ve formátu %1$s</string>
     <string name="user_preferences_automation_description">Vyberte akci, která se má automaticky provést po převedení odkazu na mapu na souřadnice.</string>
