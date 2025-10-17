@@ -21,7 +21,7 @@ fun ConversionNavigation(runContext: ConversionRunContext, viewModel: Conversion
             ConversionScreen(
                 runContext = runContext,
                 onBack = onFinish,
-                onCancel = onFinish,
+                onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
