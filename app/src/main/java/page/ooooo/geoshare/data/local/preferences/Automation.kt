@@ -260,7 +260,10 @@ sealed class AutomationImpl : Automation {
     class Share :
         AutomationImpl(),
         Automation.HasErrorMessage,
-        Automation.HasSuccessMessage {
+        Automation.HasSuccessMessage,
+        Automation.HasDelay {
+
+        override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
             AutomationAction.OpenChooser(position.toGeoUriString(uriQuote))
@@ -275,5 +278,9 @@ sealed class AutomationImpl : Automation {
 
         @Composable
         override fun errorText() = stringResource(R.string.conversion_automation_share_failed)
+
+        @Composable
+        override fun waitingText(counterSec: Int) =
+            stringResource(R.string.conversion_automation_share_waiting, counterSec)
     }
 }
