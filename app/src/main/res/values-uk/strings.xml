@@ -111,4 +111,5 @@
     <string name="url_converters_default_handler_disabled">Не відкривається за замовчуванням у %1$s</string>
     <string name="url_converters_recent_info">%1$s нещодавно отримав підтримку нових картографічних сервісів.</string>
     <string name="url_converters_settings_button_content_description">Відкрийте налаштування Android</string>
+    <string name="conversion_loading_indicator_description">Спроба %1$d з %2$d через %3$s.</string>
 </resources>
