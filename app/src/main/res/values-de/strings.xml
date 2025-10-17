@@ -70,7 +70,7 @@
     <string name="url_converters_title">Unterstützte Kartendienste</string>
     <string name="url_converters_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
     <string name="converter_coordinates_name">Koordinaten</string>
-    <string name="converter_coordinates_example">z.B. 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">z.B. %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
     <string name="faq_item_collapse">Abschnitt zuklappen</string>
     <string name="faq_item_expand">Abschnitt ausklappen</string>
@@ -101,7 +101,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Verbindung mit Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Mit OpenStreetMap Verbinden?</string>
     <string name="converter_open_street_map_loading_indicator_title">Verbindung mit OpenStreetMap…</string>
-    <string name="converter_geo_example">z.B. geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">Alle Kartendienste</string>
     <string name="url_converters_filter_recent">Kürzlich hinzugefügt</string>
     <string name="url_converters_default_handler_enabled">Öffnet standardmäßig in %1$s</string>

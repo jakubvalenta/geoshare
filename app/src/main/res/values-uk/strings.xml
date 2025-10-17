@@ -89,7 +89,7 @@
     <string name="url_converters_title">Підтримувані картографічні сервіси</string>
     <string name="url_converters_text">Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток.</string>
     <string name="converter_coordinates_name">координати</string>
-    <string name="converter_coordinates_example">наприклад, 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">наприклад, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
     <string name="converter_waze_permission_title">Підключитися до Waze?</string>
     <string name="converter_waze_loading_indicator_title">Підключення до Waze…</string>
@@ -103,7 +103,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Підключення до Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Підключитися до OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Підключення до OpenStreetMap…</string>
-    <string name="converter_geo_example">наприклад geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">Усі картографічні сервіси</string>
     <string name="url_converters_filter_recent">Нещодавно додано</string>
     <string name="url_converters_default_handler_enabled">Відкривається за замовчуванням у %1$s</string>
