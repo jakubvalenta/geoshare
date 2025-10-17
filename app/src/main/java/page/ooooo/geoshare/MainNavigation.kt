@@ -34,7 +34,7 @@ fun MainNavigation(runContext: ConversionRunContext, viewModel: ConversionViewMo
             ConversionScreen(
                 runContext = runContext,
                 onBack = { if (!navController.popBackStack()) navController.navigate("main") },
-                onCancel = {},
+                onFinish = {},
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },

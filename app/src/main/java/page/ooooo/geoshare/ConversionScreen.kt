@@ -46,7 +46,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun ConversionScreen(
     runContext: ConversionRunContext,
     onBack: () -> Unit,
-    onCancel: () -> Unit,
+    onFinish: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -68,16 +68,14 @@ fun ConversionScreen(
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
         queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
         onBack = onBack,
-        onCancel = {
-            viewModel.cancel()
-            onCancel()
-        },
+        onCancel = { viewModel.cancel() },
         onCopy = { text ->
             coroutineScope.launch {
                 viewModel.intentTools.copyToClipboard(context, clipboard, text)
             }
         },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
+        onFinish = onFinish,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
@@ -106,6 +104,7 @@ fun ConversionScreen(
     onCancel: () -> Unit,
     onCopy: (text: String) -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
+    onFinish: () -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -151,7 +150,10 @@ fun ConversionScreen(
         startButton = when {
             loadingIndicatorTitleResId != null -> {
                 {
-                    TextButton(onCancel) {
+                    TextButton({
+                        onCancel()
+                        onFinish()
+                    }) {
                         Text(stringResource(R.string.conversion_loading_indicator_cancel))
                     }
                 }
@@ -317,6 +319,7 @@ private fun DefaultPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -358,6 +361,7 @@ private fun DarkPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -403,6 +407,7 @@ private fun AutomationPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -448,6 +453,7 @@ private fun DarkAutomationPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -479,6 +485,7 @@ private fun ErrorPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -510,6 +517,7 @@ private fun DarkErrorPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -556,6 +564,7 @@ private fun LoadingIndicatorPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -602,6 +611,7 @@ private fun DarkLoadingIndicatorPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -630,6 +640,7 @@ private fun InitialPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -658,6 +669,7 @@ private fun DarkInitialPreview() {
             onCancel = {},
             onCopy = {},
             onDeny = {},
+            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
