@@ -107,7 +107,7 @@
     <string name="user_preferences_title">Preferences</string>
     <string name="user_preferences_automation_copy_coords">Copy coordinates in format %1$s</string>
     <string name="user_preferences_automation_copy_link">Copy %1$s link</string>
-    <string name="user_preferences_automation_description">Do something automatically every time a map link is converted to coordinates.</string>
+    <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>
     <string name="user_preferences_automation_open_app">Open %1$s</string>
     <string name="user_preferences_automation_title">Automation</string>
