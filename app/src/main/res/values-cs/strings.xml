@@ -124,7 +124,7 @@
     <string name="conversion_automation_share_failed">Nepodařilo se automaticky sdílet odkaz</string>
     <string name="user_preferences_automation_copy_link">Kopírovat odkaz na %1$s</string>
     <string name="user_preferences_automation_copy_coords">Kopírovat souřadnice ve formátu %1$s</string>
-    <string name="user_preferences_automation_description">Udělat něco automaticky pokaždé, když je odkaz na mapy převeden na souřadnice.</string>
+    <string name="user_preferences_automation_description">Vyberte akci, která se má automaticky provést po převedení odkazu na mapu na souřadnice.</string>
     <string name="user_preferences_automation_nothing">Nic</string>
     <string name="user_preferences_automation_open_app">Otevřít %1$s</string>
 </resources>
