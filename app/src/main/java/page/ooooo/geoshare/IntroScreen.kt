@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,9 +20,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp.Companion.Hairline
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.components.ParagraphHtml
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -133,9 +132,15 @@ private fun IntroScreen(
                             stringResource(R.string.intro_open_by_default_google_maps_caption),
                         ) {
                             ScreenshotOpenByDefaultMapApp()
-                            IntroOutlinedButton({
-                                onShowOpenByDefaultSettingsForPackage("com.google.android.apps.maps")
-                            }) {
+                            Button(
+                                {
+                                    onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                ),
+                            ) {
                                 Text(stringResource(R.string.intro_open_by_default_google_maps_button))
                             }
                         }
@@ -143,9 +148,15 @@ private fun IntroScreen(
                             stringResource(R.string.intro_open_by_default_app_caption, appName),
                         ) {
                             ScreenshotOpenByDefault()
-                            IntroOutlinedButton({
-                                onShowOpenByDefaultSettings()
-                            }) {
+                            FilledTonalButton(
+                                {
+                                    onShowOpenByDefaultSettings()
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                ),
+                            ) {
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
                             ParagraphHtml(
@@ -232,16 +243,6 @@ private fun IntroFigure(
         verticalArrangement = Arrangement.spacedBy(Spacing.tiny),
     ) {
         ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
-        content()
-    }
-}
-
-@Composable
-private fun IntroOutlinedButton(
-    onClick: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    OutlinedButton(onClick, border = BorderStroke(width = Hairline, color = MaterialTheme.colorScheme.outline)) {
         content()
     }
 }

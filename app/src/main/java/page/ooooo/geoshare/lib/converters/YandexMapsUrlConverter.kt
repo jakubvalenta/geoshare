@@ -19,31 +19,32 @@ class YandexMapsUrlConverter() :
     override val documentation = Documentation(
         nameResId = R.string.converter_yandex_maps_name,
         inputs = listOf(
-            DocumentationInput.Url("https://ya.ru/maps", 20),
-            DocumentationInput.Url("https://yandex.az/maps", 22),
-            DocumentationInput.Url("https://yandex.by/maps", 22),
-            DocumentationInput.Url("https://yandex.co.il/maps", 22),
-            DocumentationInput.Url("https://yandex.com/maps", 20),
-            DocumentationInput.Url("https://yandex.com.am/maps", 22),
-            DocumentationInput.Url("https://yandex.com.ge/maps", 22),
-            DocumentationInput.Url("https://yandex.com.tr/maps", 22),
-            DocumentationInput.Url("https://yandex.ee/maps", 22),
-            DocumentationInput.Url("https://yandex.eu/maps", 22),
-            DocumentationInput.Url("https://yandex.fr/maps", 22),
-            DocumentationInput.Url("https://yandex.kg/maps", 22),
-            DocumentationInput.Url("https://yandex.kz/maps", 22),
-            DocumentationInput.Url("https://yandex.lt/maps", 22),
-            DocumentationInput.Url("https://yandex.lv/maps", 22),
-            DocumentationInput.Url("https://yandex.md/maps", 22),
-            DocumentationInput.Url("https://yandex.ru/maps", 22),
-            DocumentationInput.Url("https://yandex.tj/maps", 22),
-            DocumentationInput.Url("https://yandex.tm/maps", 22),
-            DocumentationInput.Url("https://yandex.ua/maps", 22),
-            DocumentationInput.Url("https://yandex.uz/maps", 22),
+            DocumentationInput.Url(20, "https://ya.ru/maps"),
+            DocumentationInput.Url(22, "https://yandex.az/maps"),
+            DocumentationInput.Url(22, "https://yandex.by/maps"),
+            DocumentationInput.Url(22, "https://yandex.co.il/maps"),
+            DocumentationInput.Url(20, "https://yandex.com/maps"),
+            DocumentationInput.Url(22, "https://yandex.com.am/maps"),
+            DocumentationInput.Url(22, "https://yandex.com.ge/maps"),
+            DocumentationInput.Url(22, "https://yandex.com.tr/maps"),
+            DocumentationInput.Url(22, "https://yandex.ee/maps"),
+            DocumentationInput.Url(22, "https://yandex.eu/maps"),
+            DocumentationInput.Url(22, "https://yandex.fr/maps"),
+            DocumentationInput.Url(22, "https://yandex.kg/maps"),
+            DocumentationInput.Url(22, "https://yandex.kz/maps"),
+            DocumentationInput.Url(22, "https://yandex.lt/maps"),
+            DocumentationInput.Url(22, "https://yandex.lv/maps"),
+            DocumentationInput.Url(22, "https://yandex.md/maps"),
+            DocumentationInput.Url(22, "https://yandex.ru/maps"),
+            DocumentationInput.Url(22, "https://yandex.tj/maps"),
+            DocumentationInput.Url(22, "https://yandex.tm/maps"),
+            DocumentationInput.Url(22, "https://yandex.ua/maps"),
+            DocumentationInput.Url(22, "https://yandex.uz/maps"),
         ),
     )
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val shortUriMethod: ShortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {
@@ -65,6 +66,8 @@ class YandexMapsUrlConverter() :
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex("""data-coordinates="$LON,$LAT""""))
     }
+
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

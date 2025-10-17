@@ -3,15 +3,44 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
+    companion object {
+        const val NAME = "Apple Maps"
+
+        /**
+         * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
+         */
+        fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+            scheme = "https",
+            host = "maps.apple.com",
+            path = "/",
+            queryParams = buildMap {
+                position.apply {
+                    mainPoint?.let { (lat, lon) ->
+                        set("ll", "$lat,$lon")
+                    } ?: q?.let { q ->
+                        set("q", q)
+                    }
+                    z?.let { z ->
+                        set("z", z)
+                    }
+                }
+            },
+            uriQuote = uriQuote,
+        ).toString()
+    }
 
     /**
      * Sets points to zero, so that we avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
@@ -25,8 +54,8 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
     override val documentation = Documentation(
         nameResId = R.string.converter_apple_maps_name,
         inputs = listOf(
-            DocumentationInput.Url("https://maps.apple", 18),
-            DocumentationInput.Url("https://maps.apple.com", 18),
+            DocumentationInput.Url(18, "https://maps.apple"),
+            DocumentationInput.Url(18, "https://maps.apple.com"),
         ),
     )
 
@@ -65,6 +94,8 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
             content(PositionRegex("""<meta property="place:location:longitude" content="$LON""""))
         }
     }
+
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title

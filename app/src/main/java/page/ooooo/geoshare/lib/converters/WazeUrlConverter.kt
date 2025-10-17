@@ -29,11 +29,11 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     override val documentation = Documentation(
         nameResId = R.string.converter_waze_name,
         inputs = listOf(
-            DocumentationInput.Url("https://waze.com/live-map", 21),
-            DocumentationInput.Url("https://waze.com/ul", 21),
-            DocumentationInput.Url("https://www.waze.com/live-map", 21),
-            DocumentationInput.Url("https://www.waze.com/ul", 21),
-            DocumentationInput.Url("https://ul.waze.com/ul", 21),
+            DocumentationInput.Url(21, "https://waze.com/live-map"),
+            DocumentationInput.Url(21, "https://waze.com/ul"),
+            DocumentationInput.Url(21, "https://www.waze.com/live-map"),
+            DocumentationInput.Url(21, "https://www.waze.com/ul"),
+            DocumentationInput.Url(21, "https://ul.waze.com/ul"),
         ),
     )
 
@@ -59,6 +59,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     override val conversionHtmlPattern = htmlPattern {
         content(PositionRegex(""""latLng":{"lat":$LAT,"lng":$LON}"""))
     }
+
+    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title

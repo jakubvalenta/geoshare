@@ -42,10 +42,8 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
-        // Launch app
+        // Launch application and close intro
         launchApplication()
-
-        // Close intro
         pressBack()
 
         // Shows main menu badge
@@ -79,9 +77,12 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to main screen
         pressBack()
 
-        // Set user preference lastInputVersionCode to version 19
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferenceLastInputVersionCode" }.setText("19")
+        // Set user preference changelogShowForVersionCode to version 19
+        goToUserPreferencesDetailDeveloperScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }.setText("19")
+
+        // Go to user preferences screen
+        pressBack()
 
         // Go to main screen
         pressBack()

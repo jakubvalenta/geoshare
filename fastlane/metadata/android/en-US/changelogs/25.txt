@@ -1,2 +1,3 @@
+- Added Automation feature, which allows opening an app or copying coordinates automatically every time a link is converted to coordinates.
 - Improved network connection retrying.
 - Fixed Apple Maps place links.

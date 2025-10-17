@@ -18,12 +18,35 @@ class GoogleMapsUrlConverter() :
     UrlConverter.WithHtmlPattern {
 
     companion object {
+        const val NAME = "Google Maps"
         const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
         const val DATA = """data=(?P<data>.*(!3d$LAT_NUM!4d$LON_NUM|!1d$LON_NUM!2d$LAT_NUM).*)"""
         val DATA_PATTERNS = listOf<Pattern>(
             Pattern.compile("""!3d$LAT!4d$LON"""),
             Pattern.compile("""!1d$LON!2d$LAT"""),
         )
+
+        /**
+         * See https://developers.google.com/maps/documentation/urls/get-started
+         */
+        fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+            scheme = "https",
+            host = "www.google.com",
+            path = "/maps",
+            queryParams = buildMap {
+                position.apply {
+                    mainPoint?.let { (lat, lon) ->
+                        set("q", "$lat,$lon")
+                    } ?: q?.let { q ->
+                        set("q", q)
+                    }
+                    z?.let { z ->
+                        set("z", z)
+                    }
+                }
+            },
+            uriQuote = uriQuote,
+        ).toString()
     }
 
     /**
@@ -53,16 +76,17 @@ class GoogleMapsUrlConverter() :
     override val documentation = Documentation(
         nameResId = R.string.converter_google_maps_name,
         inputs = listOf(
-            DocumentationInput.Url("https://maps.app.goo.gl", 5),
-            DocumentationInput.Url("https://app.goo.gl/maps", 5),
-            DocumentationInput.Url("https://maps.google.com", 5),
-            DocumentationInput.Url("https://goo.gl/maps", 5),
-            DocumentationInput.Url("https://google.com/maps", 5),
-            DocumentationInput.Url("https://www.google.com/maps", 5),
-            DocumentationInput.Url("https://g.co/kgs", 10),
+            DocumentationInput.Url(5, "https://maps.app.goo.gl"),
+            DocumentationInput.Url(5, "https://app.goo.gl/maps"),
+            DocumentationInput.Url(5, "https://maps.google.com"),
+            DocumentationInput.Url(5, "https://goo.gl/maps"),
+            DocumentationInput.Url(5, "https://google.com/maps"),
+            DocumentationInput.Url(5, "https://www.google.com/maps"),
+            DocumentationInput.Url(10, "https://g.co/kgs"),
         ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
+    override val shortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = uriPattern {

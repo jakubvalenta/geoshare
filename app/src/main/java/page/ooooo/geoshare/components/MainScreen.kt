@@ -17,12 +17,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun MainScreen(
+    runContext: ConversionRunContext,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -31,13 +33,13 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val recentInputsShown by viewModel.lastInputShown.collectAsState()
+    val recentInputsShown by viewModel.changelogShown.collectAsState()
 
     MainScreen(
         inputUriString = viewModel.inputUriString,
-        lastInputShown = recentInputsShown,
+        changelogShown = recentInputsShown,
+        onSubmit = { viewModel.start(runContext) },
         onUpdateInput = { viewModel.updateInput(it) },
-        onStart = { viewModel.start() },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToConversionScreen = onNavigateToConversionScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
@@ -51,9 +53,9 @@ fun MainScreen(
 @Composable
 fun MainScreen(
     inputUriString: String,
-    lastInputShown: Boolean,
+    changelogShown: Boolean,
+    onSubmit: () -> Unit,
     onUpdateInput: (String) -> Unit,
-    onStart: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -71,7 +73,7 @@ fun MainScreen(
                 title = { Text(appName) },
                 actions = {
                     MainMenu(
-                        lastInputShown = lastInputShown,
+                        changelogShown = changelogShown,
                         onNavigateToAboutScreen = onNavigateToAboutScreen,
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
@@ -132,7 +134,7 @@ fun MainScreen(
                         // screen.
                         errorMessageResId = R.string.conversion_failed_missing_url
                     } else {
-                        onStart()
+                        onSubmit()
                         onNavigateToConversionScreen()
                     }
                 },
@@ -160,9 +162,9 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            lastInputShown = true,
+            changelogShown = true,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
@@ -179,9 +181,9 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            lastInputShown = true,
+            changelogShown = true,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
@@ -198,9 +200,9 @@ private fun DefaultChangelogBadgedPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            lastInputShown = false,
+            changelogShown = false,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},
@@ -217,9 +219,9 @@ private fun DarkChangelogBadgedPreview() {
     AppTheme {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-            lastInputShown = false,
+            changelogShown = false,
+            onSubmit = {},
             onUpdateInput = {},
-            onStart = {},
             onNavigateToAboutScreen = {},
             onNavigateToConversionScreen = {},
             onNavigateToFaqScreen = {},

@@ -1,23 +1,30 @@
 package page.ooooo.geoshare.lib
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
 import android.content.ComponentName
-import android.provider.Settings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
 import androidx.core.net.toUri
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import java.util.Locale
+import java.text.SimpleDateFormat
+import java.util.*
 
 class IntentTools {
+    companion object {
+        const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
+    }
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
@@ -64,6 +71,25 @@ class IntentTools {
         }
     }
 
+    fun queryApp(packageManager: PackageManager, packageName: String): App? {
+        val applicationInfo = try {
+            packageManager.getApplicationInfo(packageName, 0)
+        } catch (e: Exception) {
+            Log.e(null, "Error when querying an app", e)
+            return null
+        }
+        return try {
+            App(
+                applicationInfo.packageName,
+                applicationInfo.loadLabel(packageManager).toString(),
+                applicationInfo.loadIcon(packageManager),
+            )
+        } catch (e: Exception) {
+            Log.e(null, "Error when loading info about an app", e)
+            null
+        }
+    }
+
     fun queryGeoUriApps(packageManager: PackageManager): List<App> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
@@ -88,19 +114,39 @@ class IntentTools {
         }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
     }
 
-    fun openApp(context: Context, packageName: String, uriString: String) {
-        try {
-            context.startActivity(createViewIntent(packageName, uriString.toUri()))
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
-        }
+    fun startActivity(context: Context, intent: Intent): Boolean = try {
+        context.startActivity(intent)
+        true
+    } catch (_: ActivityNotFoundException) {
+        false
     }
 
-    fun openChooser(context: Context, uriString: String) {
-        try {
-            context.startActivity(createChooserIntent(uriString.toUri()))
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.conversion_succeeded_apps_not_found, Toast.LENGTH_SHORT).show()
+    fun openApp(context: Context, packageName: String, uriString: String): Boolean =
+        startActivity(context, createViewIntent(packageName, uriString.toUri()))
+
+    fun openChooser(context: Context, uriString: String): Boolean =
+        startActivity(context, createChooserIntent(uriString.toUri()))
+
+    fun launchSaveGpx(context: Context, saveGpxLauncher: ActivityResultLauncher<Intent>): Boolean {
+        @Suppress("SpellCheckingInspection")
+        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
+        val filename = context.resources.getString(
+            R.string.conversion_succeeded_save_gpx_filename,
+            context.resources.getString(R.string.app_name),
+            timestamp,
+        )
+        return try {
+            saveGpxLauncher.launch(
+                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/xml"
+                    putExtra(Intent.EXTRA_TITLE, filename)
+                }
+            )
+            true
+        } catch (e: Exception) {
+            Log.e(null, "Error when saving GPX file", e)
+            false
         }
     }
 
@@ -152,6 +198,14 @@ class IntentTools {
                 R.string.intro_settings_activity_not_found,
                 Toast.LENGTH_LONG,
             ).show()
+        }
+    }
+
+    suspend fun copyToClipboard(context: Context, clipboard: Clipboard, text: String) {
+        clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
+        val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        if (!systemHasClipboardEditor) {
+            Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
         }
     }
 }
