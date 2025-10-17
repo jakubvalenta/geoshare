@@ -1,1 +1,2 @@
 - Improved network connection retrying.
+- Fixed Apple Maps place links.

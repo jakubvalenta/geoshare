@@ -117,10 +117,13 @@ open class NetworkTools(
                 connectTimeoutMillis = CONNECT_TIMEOUT
                 socketTimeoutMillis = SOCKET_TIMEOUT
             }
-            // Set custom User-Agent, so that we don't receive Google Lite HTML,
-            // which doesn't contain coordinates in case of Google Maps or maps link
-            // in case of Google Search.
-            BrowserUserAgent()
+            // Set custom User-Agent, so that we don't receive Google Lite HTML, which doesn't contain coordinates in
+            // case of Google Maps or maps link in case of Google Search.
+            install(UserAgent) {
+                // Use custom user agent, because BrowserUserAgent() shows unsupported browser error in Apple Maps.
+                agent =
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+            }
         }.use { client ->
             val response = try {
                 client.request(url) {
