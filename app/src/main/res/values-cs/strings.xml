@@ -90,7 +90,6 @@
     <string name="url_converters_title">Podporované mapové služby</string>
     <string name="url_converters_text">S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit.</string>
     <string name="converter_coordinates_name">souřadnice</string>
-    <string name="converter_coordinates_example">např. 41°24′12.2″N 2°10′26.5″E</string>
     <string name="example">např. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="conversion_succeeded_copy_google_maps">Kopírovat odkaz na Google Mapy</string>
@@ -105,7 +104,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Spojování s Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Spojit se s OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Spojování s OpenStreetMap…</string>
-    <string name="converter_geo_example">např. geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">Všechny mapové služby</string>
     <string name="url_converters_filter_recent">Nedávno přidané</string>
     <string name="url_converters_default_handler_enabled">Otevírá se v %1$s</string>

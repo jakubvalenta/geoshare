@@ -89,7 +89,7 @@
     <string name="url_converters_title">Services de cartographie pris en charge</string>
     <string name="url_converters_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
     <string name="converter_coordinates_name">coordonnées</string>
-    <string name="converter_coordinates_example">par exemple, 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">par exemple, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
     <string name="conversion_succeeded_copy_google_maps">Copier Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Enregistrer GPX</string>
@@ -102,7 +102,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Connexion à Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Se connecter à OpenStreetMap ?</string>
     <string name="converter_open_street_map_loading_indicator_title">Connexion à OpenStreetMap…</string>
-    <string name="converter_geo_example">par exemple, geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">Tous les services de cartographie</string>
     <string name="url_converters_filter_recent">Récemment ajoutés</string>
     <string name="url_converters_default_handler_enabled">S’ouvre par défaut dans %1$s</string>

@@ -87,7 +87,7 @@
     <string name="url_converters_title">Поддържани картографски услуги</string>
     <string name="url_converters_text">Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението.</string>
     <string name="converter_coordinates_name">координати</string>
-    <string name="converter_coordinates_example">напр. 41°24′12.2″N 2°10′26.5″</string>
+    <string name="example">напр. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_waze_permission_title">Свързване с Waze?</string>
     <string name="converter_waze_loading_indicator_title">Свързване с Waze…</string>
@@ -101,7 +101,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Свързване с Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Свързване с OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Свързване с OpenStreetMap…</string>
-    <string name="converter_geo_example">напр. geo:50.123456,-1</string>
     <string name="url_converters_filter_all">Всички картографски услуги</string>
     <string name="url_converters_filter_recent">Наскоро добавени</string>
     <string name="url_converters_default_handler_enabled">Отваря се по подразбиране в %1$s</string>
