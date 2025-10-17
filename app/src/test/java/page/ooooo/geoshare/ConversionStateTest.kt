@@ -2071,7 +2071,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun conversionSucceeded_userPreferenceAutomationIsShare_returnsAutomationReady() = runTest {
+    fun conversionSucceeded_userPreferenceAutomationIsShare_returnsAutomationWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
         val automationValue = AutomationImpl.Share()
@@ -2082,7 +2082,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
         assertEquals(
-            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
             state.transition(),
         )
     }
