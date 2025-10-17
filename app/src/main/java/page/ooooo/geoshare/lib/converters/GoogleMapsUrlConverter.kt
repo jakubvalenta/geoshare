@@ -18,12 +18,35 @@ class GoogleMapsUrlConverter() :
     UrlConverter.WithHtmlPattern {
 
     companion object {
+        const val NAME = "Google Maps"
         const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
         const val DATA = """data=(?P<data>.*(!3d$LAT_NUM!4d$LON_NUM|!1d$LON_NUM!2d$LAT_NUM).*)"""
         val DATA_PATTERNS = listOf<Pattern>(
             Pattern.compile("""!3d$LAT!4d$LON"""),
             Pattern.compile("""!1d$LON!2d$LAT"""),
         )
+
+        /**
+         * See https://developers.google.com/maps/documentation/urls/get-started
+         */
+        fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+            scheme = "https",
+            host = "www.google.com",
+            path = "/maps",
+            queryParams = buildMap {
+                position.apply {
+                    mainPoint?.let { (lat, lon) ->
+                        set("q", "$lat,$lon")
+                    } ?: q?.let { q ->
+                        set("q", q)
+                    }
+                    z?.let { z ->
+                        set("z", z)
+                    }
+                }
+            },
+            uriQuote = uriQuote,
+        ).toString()
     }
 
     /**

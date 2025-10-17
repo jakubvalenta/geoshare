@@ -198,4 +198,30 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_failure() {
         assertNull(parseHtml("spam"))
     }
+
+    @Test
+    fun formatUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
+        assertEquals(
+            "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
+            AppleMapsUrlConverter.formatUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
+        assertEquals(
+            "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
+            AppleMapsUrlConverter.formatUriString(
+                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
+            ),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
+        assertEquals(
+            "https://maps.apple.com/?q=foo%20bar&z=3.4",
+            AppleMapsUrlConverter.formatUriString(Position(q = "foo bar", z = "3.4"), uriQuote),
+        )
+    }
 }

@@ -17,6 +17,9 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 import page.ooooo.geoshare.ui.theme.Spacing
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -128,11 +131,11 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(position.toGoogleMapsUriString())
+            AutomationAction.Copy(GoogleMapsUrlConverter.formatUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_copy_google_maps_link))
+            Text(stringResource(R.string.user_preferences_automation_copy_link, GoogleMapsUrlConverter.NAME))
         }
 
         @Composable
@@ -144,11 +147,11 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(position.toAppleMapsUriString())
+            AutomationAction.Copy(AppleMapsUrlConverter.formatUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_copy_apple_maps_link))
+            Text(stringResource(R.string.user_preferences_automation_copy_link, AppleMapsUrlConverter.NAME))
         }
 
         @Composable
@@ -160,11 +163,11 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(position.toMagicEarthUriString())
+            AutomationAction.Copy(MagicEarthUrlConverter.formatUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_copy_magic_earth_link))
+            Text(stringResource(R.string.user_preferences_automation_copy_link, MagicEarthUrlConverter.NAME))
         }
 
         @Composable

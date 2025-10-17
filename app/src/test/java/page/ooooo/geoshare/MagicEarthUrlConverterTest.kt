@@ -88,4 +88,24 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
             parseUrl("https://magicearth.com/?name=Reuterplatz&q=Central%20Park")
         )
     }
+
+    @Test
+    fun formatUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            "magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4",
+            MagicEarthUrlConverter.formatUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
+        )
+    }
+
+    @Test
+    fun formatUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndQueryAndZoom() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
+            MagicEarthUrlConverter.formatUriString(
+                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
+            ),
+        )
+    }
 }
