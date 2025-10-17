@@ -12,10 +12,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
@@ -80,7 +80,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    Position.example.toCoordsDecString()
+                    Position.example.toCoordsDecString().replace(' ', ' ')
                 )
             )
         }
@@ -101,7 +101,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    Position.example.toNorthSouthWestEastDecCoordsString(),
+                    Position.example.toNorthSouthWestEastDecCoordsString().replace(' ', ' '),
                 )
             )
         }
