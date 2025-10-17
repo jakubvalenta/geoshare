@@ -110,4 +110,5 @@
     <string name="url_converters_default_handler_disabled">Ne s’ouvre pas par défaut dans %1$s</string>
     <string name="url_converters_recent_info">La prise en charge de nouveaux services de cartographie a récemment été ajoutée à %1$s.</string>
     <string name="url_converters_settings_button_content_description">Ouvrir les paramètres Android</string>
+    <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
 </resources>
