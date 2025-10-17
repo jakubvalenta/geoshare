@@ -16,6 +16,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.Spacing
 
@@ -79,9 +82,9 @@ fun ResultSuccessCoordinates(
                         position.toCoordsDecString(),
                         position.toNorthSouthWestEastDecCoordsString(),
                         position.toGeoUriString(),
-                        position.toGoogleMapsUriString(),
-                        position.toAppleMapsUriString(),
-                        position.toMagicEarthUriString()
+                        GoogleMapsUrlConverter.formatUriString(position),
+                        AppleMapsUrlConverter.formatUriString(position),
+                        MagicEarthUrlConverter.formatUriString(position),
                     ).map { text ->
                         DropdownMenuItem(
                             text = { Text(text) },
@@ -99,7 +102,7 @@ fun ResultSuccessCoordinates(
                 onCopy(position.toGeoUriString())
             }
             ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
-                onCopy(position.toGoogleMapsUriString())
+                onCopy(GoogleMapsUrlConverter.formatUriString(position))
             }
             ResultCardChip(
                 stringResource(R.string.conversion_succeeded_save_gpx),

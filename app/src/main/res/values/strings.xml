@@ -105,10 +105,8 @@
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
-    <string name="user_preferences_automation_copy_apple_maps_link">Copy Apple Maps link</string>
     <string name="user_preferences_automation_copy_coords">Copy coordinates in format %1$s</string>
-    <string name="user_preferences_automation_copy_google_maps_link">Copy Google Maps link</string>
-    <string name="user_preferences_automation_copy_magic_earth_link">Copy Magic Earth link</string>
+    <string name="user_preferences_automation_copy_link">Copy %1$s link</string>
     <string name="user_preferences_automation_description">Do something automatically every time a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>
     <string name="user_preferences_automation_open_app">Open %1$s</string>

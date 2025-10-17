@@ -64,68 +64,6 @@ data class Position(
             ).toString()
         }
 
-    /**
-     * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
-     */
-    fun toAppleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-        scheme = "https",
-        host = "maps.apple.com",
-        path = "/",
-        queryParams = mutableMapOf<String, String>().apply {
-            mainPoint?.let { (lat, lon) ->
-                set("ll", "$lat,$lon")
-            } ?: q?.let { q ->
-                set("q", q)
-            }
-            z?.let { z ->
-                set("z", z)
-            }
-        },
-        uriQuote = uriQuote,
-    ).toString()
-
-    /**
-     * See https://developers.google.com/maps/documentation/urls/get-started
-     */
-    fun toGoogleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-        scheme = "https",
-        host = "www.google.com",
-        path = "/maps",
-        queryParams = mutableMapOf<String, String>().apply {
-            mainPoint?.let { (lat, lon) ->
-                set("q", "$lat,$lon")
-            } ?: q?.let { q ->
-                set("q", q)
-            }
-            z?.let { z ->
-                set("z", z)
-            }
-        },
-        uriQuote = uriQuote,
-    ).toString()
-
-    /**
-     * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
-     */
-    @Suppress("SpellCheckingInspection")
-    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-        scheme = "magicearth",
-        path = "//",
-        queryParams = mutableMapOf<String, String>().apply {
-            mainPoint?.let { (lat, lon) ->
-                set("lat", lat)
-                set("lon", lon)
-            }
-            q?.let { q ->
-                set("q", q)
-            }
-            z?.let { z ->
-                set("zoom", z)
-            }
-        },
-        uriQuote = uriQuote,
-    ).toString()
-
     fun toNorthSouthWestEastDecCoordsString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
         listOf(
             coordToDeg(lat, "S", "N"),

@@ -3,15 +3,44 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.htmlPattern
 import page.ooooo.geoshare.lib.uriPattern
 
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
+    companion object {
+        const val NAME = "Apple Maps"
+
+        /**
+         * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
+         */
+        fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
+            scheme = "https",
+            host = "maps.apple.com",
+            path = "/",
+            queryParams = buildMap {
+                position.apply {
+                    mainPoint?.let { (lat, lon) ->
+                        set("ll", "$lat,$lon")
+                    } ?: q?.let { q ->
+                        set("q", q)
+                    }
+                    z?.let { z ->
+                        set("z", z)
+                    }
+                }
+            },
+            uriQuote = uriQuote,
+        ).toString()
+    }
 
     /**
      * Sets points to zero, so that we avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
