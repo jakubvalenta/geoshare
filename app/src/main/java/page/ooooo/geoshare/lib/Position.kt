@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.lib
 
+import kotlin.random.Random
+
 typealias Point = Pair<String, String>
 
 data class Position(
@@ -8,7 +10,18 @@ data class Position(
     val z: String? = null,
 ) {
     companion object {
-        val example = Position("49.26", "-123.11")
+        val example: Position = genRandomPosition(minLat = 0.0, maxLon = -100.0)
+
+        fun genRandomPosition(
+            minLat: Double = -50.0,
+            maxLat: Double = 80.0,
+            minLon: Double = -180.0,
+            maxLon: Double = 180.0,
+        ): Position = Position(
+            Random.nextDouble(minLat, maxLat).toScale(6).toString(),
+            Random.nextDouble(minLon, maxLon).toScale(6).toString(),
+            z = "8",
+        )
     }
 
     constructor(
