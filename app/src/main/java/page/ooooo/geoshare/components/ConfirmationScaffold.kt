@@ -20,8 +20,7 @@ fun ConfirmationScaffold(
     title: String? = null,
     navigationIcon: @Composable () -> Unit = {},
     startButton: (@Composable () -> Unit)? = null,
-    endButton: (@Composable () -> Unit)? = null,
-    lastInputShown: Boolean,
+    changelogShown: Boolean,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -40,7 +39,7 @@ fun ConfirmationScaffold(
                 },
                 actions = {
                     MainMenu(
-                        lastInputShown = lastInputShown,
+                        changelogShown = changelogShown,
                         onNavigateToAboutScreen = onNavigateToAboutScreen,
                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                         onNavigateToIntroScreen = onNavigateToIntroScreen,
@@ -52,7 +51,7 @@ fun ConfirmationScaffold(
             )
         },
     ) { innerPadding ->
-        if (startButton != null || endButton != null || content != null) {
+        if (startButton != null || content != null) {
             Column(
                 Modifier
                     .padding(innerPadding)
@@ -78,10 +77,6 @@ fun ConfirmationScaffold(
                 ) {
                     if (startButton != null) {
                         startButton()
-                    }
-                    if (endButton != null) {
-                        Spacer(Modifier.weight(1f))
-                        endButton()
                     }
                 }
             }

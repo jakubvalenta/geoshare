@@ -69,7 +69,6 @@
     <string name="converter_apple_maps_loading_indicator_title">Connessione a Apple…</string>
     <string name="converter_mapy_com_permission_title">Connettersi a Mapy.com?</string>
     <string name="converter_mapy_com_loading_indicator_title">Connessione a Mapy.com…</string>
-    <string name="conversion_done">Fatto</string>
     <string name="converter_waze_loading_indicator_title">Connessione a Waze…</string>
     <string name="converter_waze_permission_title">Connettersi a Waze?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connessione a Yandex…</string>

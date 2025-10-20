@@ -82,7 +82,6 @@
     <string name="conversion_loading_indicator_cancel">Отмена</string>
     <string name="conversion_failed_cancelled">Отменено</string>
     <string name="conversion_succeeded_skip">Копировать изначальную ссылку</string>
-    <string name="conversion_done">Готово</string>
     <string name="conversion_succeeded_title">Координаты</string>
     <string name="conversion_error_title">Ошибка</string>
     <string name="conversion_succeeded_copy_google_maps">Копировать ссылку на Карты Google</string>
@@ -100,7 +99,7 @@
     <string name="url_converters_title">Поддерживаемые карты</string>
     <string name="url_converters_text">Вы можете поделиться следующими ссылками на карту с %1$s или вставить их в приложение.</string>
     <string name="converter_coordinates_name">координаты</string>
-    <string name="converter_coordinates_example">например, 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">например, %1$s</string>
     <string name="converter_geo_name">geo: URI-адресы</string>
     <string name="converter_open_street_map_permission_title">Подключиться к OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Подключение к OpenStreetMap…</string>

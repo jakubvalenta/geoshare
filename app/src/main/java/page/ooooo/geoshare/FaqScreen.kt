@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.components.ParagraphHtml
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -25,7 +24,7 @@ enum class FaqItemId {
     HOW_IT_WORKS,
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(
     onBack: () -> Unit = {},

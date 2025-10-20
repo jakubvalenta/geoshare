@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import page.ooooo.geoshare.ui.UrlConvertersScreen
+import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.ui.*
 
 @Composable
-fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
+fun ConversionNavigation(runContext: ConversionRunContext, viewModel: ConversionViewModel, onFinish: () -> Unit) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "conversion") {
@@ -18,13 +19,15 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
         }
         composable("conversion") {
             ConversionScreen(
+                runContext = runContext,
                 onBack = onFinish,
-                onCancel = onFinish,
+                onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate("about") },
                 onNavigateToFaqScreen = { navController.navigate("faq") },
                 onNavigateToIntroScreen = { navController.navigate("intro") },
                 onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
                 onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
+                onNavigateToUserPreferencesAutomationScreen = { navController.navigate("user_preferences/automation") },
                 viewModel = viewModel,
             )
         }
@@ -46,8 +49,29 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
             )
         }
         composable("user_preferences") {
-            UserPreferencesScreen(
+            UserPreferencesListScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                onNavigateToUserPreferencesAutomationScreen = { navController.navigate("user_preferences/automation") },
+                onNavigateToUserPreferencesConnectionPermissionScreen = { navController.navigate("user_preferences/connection_permission") },
+                onNavigateToUserPreferencesDeveloperScreen = { navController.navigate("user_preferences/developer") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences/automation") {
+            UserPreferencesDetailAutomationScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences/connection_permission") {
+            UserPreferencesDetailConnectionPermissionScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
+                viewModel = viewModel,
+            )
+        }
+        composable("user_preferences/developer") {
+            UserPreferencesDetailDeveloperScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
                 viewModel = viewModel,
             )
         }

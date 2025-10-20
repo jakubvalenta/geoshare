@@ -84,7 +84,6 @@
     <string name="conversion_loading_indicator_cancel">ألغِ</string>
     <string name="conversion_failed_cancelled">أُلغِيَ</string>
     <string name="conversion_succeeded_skip">انسخ الرابط الأصلي</string>
-    <string name="conversion_done">تم</string>
     <string name="conversion_succeeded_title">إحداثيات</string>
     <string name="conversion_error_title">خطأ</string>
     <string name="converter_yandex_maps_permission_title">اتصل ب Yandex؟</string>
@@ -92,7 +91,7 @@
     <string name="url_converters_title">خدمات الخرائط المدعومة</string>
     <string name="url_converters_text">يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق.</string>
     <string name="converter_coordinates_name">الإحداثيات</string>
-    <string name="converter_coordinates_example">مثال: 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">مثال: %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_waze_permission_title">الاتصال ب Waze؟</string>
     <string name="converter_waze_loading_indicator_title">جارِ الاتصال ب Waze…</string>
@@ -106,7 +105,6 @@
     <string name="converter_mapy_com_loading_indicator_title">يتصل ب Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">الاتصال ب OpenStreetMap؟</string>
     <string name="converter_open_street_map_loading_indicator_title">يتصل ب OpenStreetMap…</string>
-    <string name="converter_geo_example">مثال: geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">جميع خدمات الخرائط</string>
     <string name="url_converters_filter_recent">مضافة مؤخرًا</string>
     <string name="url_converters_default_handler_enabled">يُفتح افتراضيًا في %1$s</string>

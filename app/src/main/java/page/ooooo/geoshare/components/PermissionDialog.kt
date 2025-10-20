@@ -75,7 +75,7 @@ private fun DefaultPreview() {
         val uriString =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
         ConfirmationScaffold(
-            lastInputShown = true,
+            changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
@@ -112,7 +112,7 @@ private fun DarkPreview() {
         val uriString =
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
         ConfirmationScaffold(
-            lastInputShown = true,
+            changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
@@ -148,7 +148,7 @@ private fun ParseHtmlPermissionPreview() {
         val appName = stringResource(R.string.app_name)
         val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         ConfirmationScaffold(
-            lastInputShown = true,
+            changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
@@ -187,7 +187,7 @@ private fun DarkParseHtmlPermissionPreview() {
         val appName = stringResource(R.string.app_name)
         val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         ConfirmationScaffold(
-            lastInputShown = true,
+            changelogShown = true,
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},

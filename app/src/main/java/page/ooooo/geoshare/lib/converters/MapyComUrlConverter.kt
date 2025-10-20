@@ -21,10 +21,10 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val documentation = Documentation(
         nameResId = R.string.converter_mapy_com_name,
         inputs = listOf(
-            DocumentationInput.Url("https://mapy.com", 23),
-            DocumentationInput.Url("https://mapy.cz", 23),
-            DocumentationInput.Url("https://www.mapy.com", 23),
-            DocumentationInput.Url("https://www.mapy.cz", 23),
+            DocumentationInput.Url(23, "https://mapy.com"),
+            DocumentationInput.Url(23, "https://mapy.cz"),
+            DocumentationInput.Url(23, "https://www.mapy.com"),
+            DocumentationInput.Url(23, "https://www.mapy.cz"),
         ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")

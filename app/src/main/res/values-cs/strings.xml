@@ -45,6 +45,7 @@
     <string name="faq_item_expand">Rozbalit sekci</string>
     <string name="user_preferences_title">Nastavení</string>
     <string name="user_preferences_connection_title">Povolit spojení s mapovou službou (Google, Apple atd.)?</string>
+    <string name="user_preferences_automation_title">Automatizace</string>
     <string name="user_preferences_connection_description">Pro podporu krátkých odkazů a pro získání souřadnic z webové stránky mapové služby, když odkaz souřadnice neobsahuje, se %1$s může spojit s danou mapovou službou. Více informací najdete na obrazovce Nejčastější dotazy.</string>
     <string name="user_preferences_connection_option_always">Ano</string>
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
@@ -82,7 +83,6 @@
     <string name="conversion_loading_indicator_cancel">Zrušit</string>
     <string name="conversion_failed_cancelled">Zrušeno</string>
     <string name="conversion_succeeded_skip">Kopírovat původní odkaz</string>
-    <string name="conversion_done">Hotovo</string>
     <string name="conversion_succeeded_title">Souřadnice</string>
     <string name="conversion_error_title">Chyba</string>
     <string name="converter_yandex_maps_permission_title">Spojit se s Yandexem?</string>
@@ -90,10 +90,11 @@
     <string name="url_converters_title">Podporované mapové služby</string>
     <string name="url_converters_text">S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit.</string>
     <string name="converter_coordinates_name">souřadnice</string>
-    <string name="converter_coordinates_example">např. 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">např. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="conversion_succeeded_copy_google_maps">Kopírovat odkaz na Google Mapy</string>
     <string name="conversion_succeeded_save_gpx">Uložit GPX</string>
+    <string name="conversion_succeeded_save_gpx_failed">Nepodařilo se uložit GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s výsledek %2$s.gpx</string>
     <string name="conversion_succeeded_share">Sdílet</string>
     <string name="converter_waze_permission_title">Spojit se s Wazem?</string>
@@ -103,7 +104,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Spojování s Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Spojit se s OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Spojování s OpenStreetMap…</string>
-    <string name="converter_geo_example">např. geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">Všechny mapové služby</string>
     <string name="url_converters_filter_recent">Nedávno přidané</string>
     <string name="url_converters_default_handler_enabled">Otevírá se v %1$s</string>
@@ -111,4 +111,19 @@
     <string name="url_converters_recent_info">Do %1$s byla nedávno přidaná podpora pro nové mapové služby.</string>
     <string name="url_converters_settings_button_content_description">Otevřít nastavení Androidu</string>
     <string name="conversion_loading_indicator_description">Pokus %1$d z %2$d kvůli %3$s.</string>
+    <string name="conversion_automation_copy_link_succeeded">Odkaz byl automaticky zkopírován</string>
+    <string name="conversion_automation_copy_succeeded">Souřadnice byly automaticky zkopírovány</string>
+    <string name="conversion_automation_open_app_failed">Nepodařilo se automaticky otevřít %1$s</string>
+    <string name="conversion_automation_open_app_succeeded">Aplikace %1$s byla automaticky otevřena</string>
+    <string name="conversion_automation_open_app_waiting">Aplikace %1$s se automaticky otevře za %2$d</string>
+    <string name="conversion_automation_save_gpx_succeeded">Soubor GPX byl automaticky uložen</string>
+    <string name="conversion_automation_save_gpx_waiting">Soubor GPX se automaticky uloží za %1$d</string>
+    <string name="conversion_automation_share_failed">Nepodařilo se automaticky sdílet odkaz</string>
+    <string name="conversion_automation_share_succeeded">Odkaz byl automaticky nasdílen</string>
+    <string name="conversion_automation_share_waiting">Odkaz bude automaticky nasdílen za %1$d</string>
+    <string name="user_preferences_automation_copy_link">Kopírovat odkaz na %1$s</string>
+    <string name="user_preferences_automation_copy_coords">Kopírovat souřadnice ve formátu %1$s</string>
+    <string name="user_preferences_automation_description">Vyberte akci, která se má automaticky provést po převedení odkazu na mapu na souřadnice.</string>
+    <string name="user_preferences_automation_nothing">Nic</string>
+    <string name="user_preferences_automation_open_app">Otevřít %1$s</string>
 </resources>

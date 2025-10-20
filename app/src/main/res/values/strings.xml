@@ -3,6 +3,7 @@
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
+    <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>
@@ -55,9 +56,8 @@
     <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_coordinates_name">coordinates</string>
-    <string name="converter_coordinates_example">e.g. 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">e.g. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
-    <string name="converter_geo_example">e.g. geo:50.123456,-11.123456</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name" translatable="false">Google Maps</string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
@@ -76,13 +76,22 @@
     <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
     <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
-    <string name="conversion_done">Done</string>
     <string name="conversion_succeeded_title">Coordinates</string>
+    <string name="conversion_automation_copy_link_succeeded">Automatically copied link</string>
+    <string name="conversion_automation_copy_succeeded">Automatically copied coordinates</string>
+    <string name="conversion_automation_open_app_failed">Failed to automatically open %1$s</string>
+    <string name="conversion_automation_open_app_succeeded">Automatically opened %1$s</string>
+    <string name="conversion_automation_open_app_waiting">Automatically opening %1$s in %2$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">Automatically saved GPX</string>
+    <string name="conversion_automation_save_gpx_waiting">Automatically saving GPX in %1$ds</string>
+    <string name="conversion_automation_share_failed">Failed to automatically share link</string>
+    <string name="conversion_automation_share_succeeded">Automatically shared link</string>
+    <string name="conversion_automation_share_waiting">Automatically sharing link in %1$d</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_error_report">Report issue</string>
     <string name="conversion_error_retry">Try again</string>
     <string name="conversion_loading_indicator_cancel">Cancel</string>
-    <string name="conversion_loading_indicator_description">Attempt %1$d out of %2$d due to %3$s.</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Attempt %1$d out of %2$d due to %3$s.</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>
@@ -97,11 +106,18 @@
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
-    <string name="user_preferences_connection_title">Allow connecting to map service (Google, Apple etc.)?</string>
+    <string name="user_preferences_automation_copy_coords">Copy coordinates in format %1$s</string>
+    <string name="user_preferences_automation_copy_link">Copy %1$s link</string>
+    <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
+    <string name="user_preferences_automation_nothing">Nothing</string>
+    <string name="user_preferences_automation_open_app">Open %1$s</string>
+    <string name="user_preferences_automation_title">Automation</string>
     <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
     <string name="user_preferences_connection_option_always">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="user_preferences_connection_option_never">No</string>
+    <string name="user_preferences_connection_title">Allow connecting to map service (Google, Apple etc.)?</string>
+    <string name="user_preferences_developer_title" translatable="false">Developer options</string>
     <string name="user_preferences_last_run_version_code_title" translatable="false">Which version of the app was last run?</string>
     <string name="user_preferences_changelog_shown_for_version_code_title" translatable="false">For which version of the app was changelog last shown?</string>
     <string name="conversion_failed_missing_url">Missing URL</string>

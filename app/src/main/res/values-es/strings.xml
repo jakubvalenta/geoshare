@@ -78,7 +78,6 @@
     <string name="converter_google_maps_loading_indicator_title">Conectándose a Google…</string>
     <string name="converter_apple_maps_permission_title">¿Conectarse a Apple?</string>
     <string name="converter_apple_maps_loading_indicator_title">Conectándose a Apple…</string>
-    <string name="conversion_done">Finalizado</string>
     <string name="conversion_succeeded_title">Coordenadas</string>
     <string name="conversion_error_title">Error</string>
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
@@ -89,7 +88,7 @@
     <string name="url_converters_title">Servicios de mapa soportados</string>
     <string name="url_converters_text">Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación.</string>
     <string name="converter_coordinates_name">coordenadas</string>
-    <string name="converter_coordinates_example">p.e. 41°24′12.2″N 2°10′26.5″E</string>
+    <string name="example">p.e. %1$s</string>
     <string name="converter_geo_name">URIs de geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copiar Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Guardar GPX</string>
@@ -103,7 +102,6 @@
     <string name="converter_mapy_com_loading_indicator_title">Conectándose a Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">¿Conectarse a OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Conectándose a OpenStreetMap…</string>
-    <string name="converter_geo_example">p.e. geo:50.123456,-11.123456</string>
     <string name="url_converters_filter_all">Todos los servicios de mapas</string>
     <string name="url_converters_filter_recent">Recientemente agregado</string>
     <string name="url_converters_default_handler_enabled">Abre por defecto en %1$s</string>

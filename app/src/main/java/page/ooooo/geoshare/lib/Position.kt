@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.lib
 
+import kotlin.random.Random
+
 typealias Point = Pair<String, String>
 
 data class Position(
@@ -7,6 +9,21 @@ data class Position(
     val q: String? = null,
     val z: String? = null,
 ) {
+    companion object {
+        val example: Position = genRandomPosition(minLat = 0.0, maxLon = -100.0)
+
+        fun genRandomPosition(
+            minLat: Double = -50.0,
+            maxLat: Double = 80.0,
+            minLon: Double = -180.0,
+            maxLon: Double = 180.0,
+        ): Position = Position(
+            Random.nextDouble(minLat, maxLat).toScale(6).toString(),
+            Random.nextDouble(minLon, maxLon).toScale(6).toString(),
+            z = "8",
+        )
+    }
+
     constructor(
         lat: String,
         lon: String,
@@ -46,68 +63,6 @@ data class Position(
                 uriQuote = uriQuote,
             ).toString()
         }
-
-    /**
-     * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
-     */
-    fun toAppleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-        scheme = "https",
-        host = "maps.apple.com",
-        path = "/",
-        queryParams = mutableMapOf<String, String>().apply {
-            mainPoint?.let { (lat, lon) ->
-                set("ll", "$lat,$lon")
-            } ?: q?.let { q ->
-                set("q", q)
-            }
-            z?.let { z ->
-                set("z", z)
-            }
-        },
-        uriQuote = uriQuote,
-    ).toString()
-
-    /**
-     * See https://developers.google.com/maps/documentation/urls/get-started
-     */
-    fun toGoogleMapsUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-        scheme = "https",
-        host = "www.google.com",
-        path = "/maps",
-        queryParams = mutableMapOf<String, String>().apply {
-            mainPoint?.let { (lat, lon) ->
-                set("q", "$lat,$lon")
-            } ?: q?.let { q ->
-                set("q", q)
-            }
-            z?.let { z ->
-                set("z", z)
-            }
-        },
-        uriQuote = uriQuote,
-    ).toString()
-
-    /**
-     * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
-     */
-    @Suppress("SpellCheckingInspection")
-    fun toMagicEarthUriString(uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-        scheme = "magicearth",
-        path = "//",
-        queryParams = mutableMapOf<String, String>().apply {
-            mainPoint?.let { (lat, lon) ->
-                set("lat", lat)
-                set("lon", lon)
-            }
-            q?.let { q ->
-                set("q", q)
-            }
-            z?.let { z ->
-                set("zoom", z)
-            }
-        },
-        uriQuote = uriQuote,
-    ).toString()
 
     fun toNorthSouthWestEastDecCoordsString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
         listOf(
