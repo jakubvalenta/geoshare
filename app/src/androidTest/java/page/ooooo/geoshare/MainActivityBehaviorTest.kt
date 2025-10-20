@@ -11,6 +11,7 @@ import org.junit.runner.RunWith
 open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
+    @NotXiaomi
     fun introScreen_whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app
         launchApplication()

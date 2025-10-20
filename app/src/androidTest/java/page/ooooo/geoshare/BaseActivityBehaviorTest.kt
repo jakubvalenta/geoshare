@@ -3,8 +3,6 @@ package page.ooooo.geoshare
 import android.os.Build
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.Until
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
@@ -15,7 +13,7 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DEL
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
-import java.util.regex.Pattern
+import page.ooooo.geoshare.lib.XiaomiTools
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -46,32 +44,29 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun closeApplication() = uiAutomator {
         device.pressRecentApps()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // On newer Android, swipe up to close the most recent app
-            waitForStableInActiveWindow()
+        waitForStableInActiveWindow()
+        if (XiaomiTools.isMiuiDevice()) {
+            throw Exception("We cannot close the app on Xiaomi MIUI, because it stops the tests")
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // On newer Android, swipe from the center of the screen towards the upper edge
             device.swipe(
-                device.displayWidth / 2, device.displayHeight / 2, device.displayWidth / 2, 0, 10
+                device.displayWidth / 2,
+                device.displayHeight / 2,
+                device.displayWidth / 2,
+                0,
+                10,
             )
         } else {
-            // On older Android, swipe right to close the most recent app
-            var retries = 5
-            while (--retries >= 0) {
-                // Retry swiping several times, because it sometimes fails
-                device.swipe(
-                    (device.displayWidth * 0.1).toInt(),
-                    (device.displayHeight * 0.8).toInt(),
-                    (device.displayWidth * 0.9).toInt(),
-                    (device.displayHeight * 0.8).toInt(),
-                    10
-                )
-                val success = device.wait(
-                    Until.gone(By.text("clear all".toPattern(Pattern.CASE_INSENSITIVE))), 3_000L
-                )
-                if (success) {
-                    break
-                }
-            }
+            // On older Android, swipe from the bottom left corner of the screen towards the right edge
+            device.swipe(
+                (device.displayWidth * 0.1).toInt(),
+                (device.displayHeight * 0.8).toInt(),
+                device.displayWidth,
+                (device.displayHeight * 0.8).toInt(),
+                5,
+            )
         }
+        waitForStableInActiveWindow()
     }
 
     protected fun executeShellCommand(cmd: String) = uiAutomator {

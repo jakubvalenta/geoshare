@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.converters
 
-import androidx.test.filters.RequiresDevice
 import org.junit.Test
+import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.lib.Position
 
 class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
@@ -69,7 +69,8 @@ class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     }
 
     @Test
-    @RequiresDevice
+    // Require that the device is not an emulator, because Google recognizes an emulator and returns a captcha
+    @NotEmulator
     fun testSearch() {
         // Launch app and set connection permission to Always
         launchApplication()
