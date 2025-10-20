@@ -6,10 +6,9 @@ import page.ooooo.geoshare.lib.Position
 class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
-        // Launch app and set connection permission to Always
+        // Launch app and close intro
         launchApplication()
-        clickIntroCloseButton()
-        setUserPreferenceConnectionPermissionToAlways()
+        closeIntroIfItIsVisible()
 
         // Coordinates
         testUri(
@@ -24,11 +23,10 @@ class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
         )
 
         // Place id
-        // TODO This test currently doesn't work, because the Waze HTML no longer contains coordinates.
-        // testUri(
-        //     Position("43.64265563", "-79.387202798"),
-        //     "https://ul.waze.com/ul?venue_id=183894452.1839010060.260192",
-        // )
+        testUri(
+            Position("43.64265563", "-79.387202798"),
+            "https://ul.waze.com/ul?venue_id=183894452.1839010060.260192",
+        )
 
         // Map view
         testUri(
@@ -43,11 +41,10 @@ class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
         )
 
         // Text
-        // TODO Test this when we figure out how to pass extra text with spaces.
-        // testTextUri(
-        //     Position("45.829189", "1.259372"),
-        //     @Suppress("SpellCheckingInspection")
-        //     "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
-        // )
+        testTextUri(
+            Position("45.829189", "1.259372", z = "16"),
+            @Suppress("SpellCheckingInspection")
+            "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
+        )
     }
 }

@@ -44,7 +44,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
     fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch application and close intro
         launchApplication()
-        pressBack()
+        closeIntroIfItIsVisible()
 
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }

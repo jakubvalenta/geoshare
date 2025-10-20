@@ -6,10 +6,9 @@ import page.ooooo.geoshare.lib.Position
 class YandexMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
-        // Launch app and set connection permission to Always
+        // Launch app and close intro
         launchApplication()
-        clickIntroCloseButton()
-        setUserPreferenceConnectionPermissionToAlways()
+        closeIntroIfItIsVisible()
 
         // Coordinates
         testUri(
