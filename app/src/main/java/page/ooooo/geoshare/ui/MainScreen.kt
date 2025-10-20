@@ -32,6 +32,7 @@ import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -243,11 +244,13 @@ fun MainScreen(
                     }
                     TextButton({
                         onUpdateInput(
-                            Position(
-                                Random.nextDouble(-50.0, 80.0).toScale(6).toString(),
-                                Random.nextDouble(-180.0, 180.0).toScale(6).toString(),
-                                z = "8",
-                            ).toGoogleMapsUriString()
+                            GoogleMapsUrlConverter.formatUriString(
+                                Position(
+                                    Random.nextDouble(-50.0, 80.0).toScale(6).toString(),
+                                    Random.nextDouble(-180.0, 180.0).toScale(6).toString(),
+                                    z = "8",
+                                )
+                            )
                         )
                         errorMessageResId = null
                     }) {
