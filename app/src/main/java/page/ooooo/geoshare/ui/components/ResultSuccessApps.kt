@@ -74,7 +74,7 @@ fun ResultSuccessApps(
                                     gridItem.app.label,
                                     Modifier
                                         .align(Alignment.CenterHorizontally)
-                                        .widthIn(max = iconSize),
+                                        .size(iconSize),
                                 )
                                 Text(
                                     gridItem.app.label,
