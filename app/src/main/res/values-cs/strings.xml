@@ -115,12 +115,12 @@
     <string name="conversion_automation_copy_succeeded">Souřadnice byly automaticky zkopírovány</string>
     <string name="conversion_automation_open_app_failed">Nepodařilo se automaticky otevřít %1$s</string>
     <string name="conversion_automation_open_app_succeeded">Aplikace %1$s byla automaticky otevřena</string>
-    <string name="conversion_automation_open_app_waiting">Aplikace %1$s se automaticky otevře za %2$d</string>
+    <string name="conversion_automation_open_app_waiting">Aplikace %1$s se automaticky otevře za %2$d s</string>
     <string name="conversion_automation_save_gpx_succeeded">Soubor GPX byl automaticky uložen</string>
-    <string name="conversion_automation_save_gpx_waiting">Soubor GPX se automaticky uloží za %1$d</string>
+    <string name="conversion_automation_save_gpx_waiting">Soubor GPX se automaticky uloží za %1$d s</string>
     <string name="conversion_automation_share_failed">Nepodařilo se automaticky sdílet odkaz</string>
     <string name="conversion_automation_share_succeeded">Odkaz byl automaticky nasdílen</string>
-    <string name="conversion_automation_share_waiting">Odkaz bude automaticky nasdílen za %1$d</string>
+    <string name="conversion_automation_share_waiting">Odkaz bude automaticky nasdílen za %1$d s</string>
     <string name="user_preferences_automation_copy_link">Kopírovat odkaz na %1$s</string>
     <string name="user_preferences_automation_copy_coords">Kopírovat souřadnice ve formátu %1$s</string>
     <string name="user_preferences_automation_description">Vyberte akci, která se má automaticky provést po převedení odkazu na mapu na souřadnice.</string>
