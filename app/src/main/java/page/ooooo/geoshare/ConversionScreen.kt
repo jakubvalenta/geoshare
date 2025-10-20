@@ -67,9 +67,13 @@ fun ConversionScreen(
         changelogShown = changelogShown,
         loadingIndicatorTitleResId = loadingIndicatorTitleResId,
         queryGeoUriApps = { viewModel.intentTools.queryGeoUriApps(context.packageManager) },
-        onBack = onBack,
+        onBack = {
+            viewModel.cancel()
+            onBack()
+        },
         onCancel = { viewModel.cancel() },
         onCopy = { text ->
+            viewModel.cancel()
             coroutineScope.launch {
                 viewModel.intentTools.copyToClipboard(context, clipboard, text)
             }
@@ -77,19 +81,46 @@ fun ConversionScreen(
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onFinish = onFinish,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
-        onNavigateToAboutScreen = onNavigateToAboutScreen,
-        onNavigateToFaqScreen = onNavigateToFaqScreen,
-        onNavigateToIntroScreen = onNavigateToIntroScreen,
-        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
-        onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-        onOpenApp = { packageName, uriString -> viewModel.intentTools.openApp(context, packageName, uriString) },
-        onOpenChooser = { uriString -> viewModel.intentTools.openChooser(context, uriString) },
+        onNavigateToAboutScreen = {
+            viewModel.cancel()
+            onNavigateToAboutScreen()
+        },
+        onNavigateToFaqScreen = {
+            viewModel.cancel()
+            onNavigateToFaqScreen()
+        },
+        onNavigateToIntroScreen = {
+            viewModel.cancel()
+            onNavigateToIntroScreen()
+        },
+        onNavigateToUrlConvertersScreen = {
+            viewModel.cancel()
+            onNavigateToUrlConvertersScreen()
+        },
+        onNavigateToUserPreferencesScreen = {
+            viewModel.cancel()
+            onNavigateToUserPreferencesScreen()
+        },
+        onNavigateToUserPreferencesAutomationScreen = {
+            viewModel.cancel()
+            onNavigateToUserPreferencesAutomationScreen()
+        },
+        onOpenApp = { packageName, uriString ->
+            viewModel.cancel()
+            viewModel.intentTools.openApp(context, packageName, uriString)
+        },
+        onOpenChooser = { uriString ->
+            viewModel.cancel()
+            viewModel.intentTools.openChooser(context, uriString)
+        },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
             viewModel.start(runContext)
         },
-        onSave = { viewModel.intentTools.launchSaveGpx(context, runContext.saveGpxLauncher) },
+        onSave = {
+            viewModel.cancel()
+            viewModel.intentTools.launchSaveGpx(context, runContext.saveGpxLauncher)
+        },
     )
 }
 
@@ -122,7 +153,6 @@ fun ConversionScreen(
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
 
     BackHandler {
-        onCancel()
         onBack()
     }
 
@@ -135,10 +165,7 @@ fun ConversionScreen(
         },
         navigationIcon = {
             IconButton(
-                {
-                    onCancel()
-                    onBack()
-                },
+                onBack,
                 Modifier.testTag("geoShareConversionBackButton"),
             ) {
                 Icon(
