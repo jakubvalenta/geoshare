@@ -219,32 +219,39 @@ fun ConversionScreen(
                         Column(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(top = spacing.small),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(spacing.small)
+                                .padding(top = spacing.small)
+                                .padding(horizontal = spacing.windowPadding),
                         ) {
-                            LoadingIndicator(Modifier.size(96.dp), color = MaterialTheme.colorScheme.tertiary)
-                            if (currentState is HasLoadingIndicator) {
-                                currentState.loadingIndicatorDescription()?.let { text ->
-                                    Text(
-                                        text,
-                                        Modifier.align(Alignment.CenterHorizontally),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        style = MaterialTheme.typography.bodySmall,
-                                    )
-                                }
-                            }
+                            LoadingIndicator(
+                                Modifier
+                                    .size(96.dp)
+                                    .align(Alignment.CenterHorizontally),
+                                color = MaterialTheme.colorScheme.tertiary,
+                            )
                             Button(
                                 {
                                     onCancel()
                                     onFinish()
                                 },
+                                Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = spacing.small),
                                 colors = ButtonDefaults.elevatedButtonColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                     contentColor = MaterialTheme.colorScheme.onSurface,
                                 ),
                             ) {
                                 Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                            }
+                            if (currentState is HasLoadingIndicator) {
+                                currentState.loadingIndicatorDescription()?.let { text ->
+                                    Text(
+                                        text,
+                                        Modifier.padding(top = spacing.medium),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                    )
+                                }
                             }
                         }
                     }
