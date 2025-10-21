@@ -9,8 +9,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,8 +20,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultCard(
-    containerColor: Color,
-    contentColor: Color,
     modifier: Modifier = Modifier,
     after: (@Composable () -> Unit)? = null,
     chips: @Composable (lastPaddingEnd: Dp) -> Unit,
@@ -32,36 +28,32 @@ fun ResultCard(
     val spacing = LocalSpacing.current
     val verticalSpace = spacing.small
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RectangleShape,
-        color = containerColor,
-        contentColor = contentColor
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(verticalSpace),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(verticalSpace)) {
-            Row(
-                Modifier.padding(
-                    start = spacing.windowPadding,
-                    end = (if (after != null) 4.dp else spacing.windowPadding),
-                ),
-            ) {
-                Row(
-                    Modifier
-                        .weight(1f)
-                        .padding(top = 12.dp, bottom = if (after == null) 4.dp else 0.dp),
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(verticalSpace), content = main)
-                }
-                after?.invoke()
-            }
+        Row(
+            Modifier.padding(
+                start = spacing.windowPadding,
+                end = (if (after != null) 4.dp else spacing.windowPadding),
+            ),
+        ) {
             Row(
                 Modifier
-                    .padding(start = spacing.windowPadding, bottom = spacing.small)
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                    .weight(1f)
+                    .padding(top = 12.dp, bottom = if (after == null) 4.dp else 0.dp),
             ) {
-                chips(spacing.windowPadding)
+                Column(verticalArrangement = Arrangement.spacedBy(verticalSpace), content = main)
             }
+            after?.invoke()
+        }
+        Row(
+            Modifier
+                .padding(start = spacing.windowPadding, bottom = spacing.small)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+        ) {
+            chips(spacing.windowPadding)
         }
     }
 }
@@ -96,10 +88,11 @@ fun ResultCardChip(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultCard(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 chips = { lastPaddingEnd ->
                     ResultCardChip(
                         "My first chip",
@@ -139,10 +132,11 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultCard(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 chips = { lastPaddingEnd ->
                     ResultCardChip(
                         "My first chip",
@@ -182,10 +176,11 @@ private fun DarkPreview() {
 @Composable
 private fun ErrorPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultCard(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 chips = { lastPaddingEnd ->
                     ResultCardChip(
                         "My first chip",
@@ -215,10 +210,11 @@ private fun ErrorPreview() {
 @Composable
 private fun DarkErrorPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultCard(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 chips = { lastPaddingEnd ->
                     ResultCardChip(
                         "My first chip",

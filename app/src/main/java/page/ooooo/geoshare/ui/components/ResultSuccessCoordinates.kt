@@ -27,14 +27,10 @@ fun ResultSuccessCoordinates(
     onCopy: (text: String) -> Unit,
     onSave: () -> Boolean,
 ) {
-    val containerColor = MaterialTheme.colorScheme.secondaryContainer
-    val contentColor = MaterialTheme.colorScheme.onSecondaryContainer
     val separator = "\t\t"
     var menuExpanded by remember { mutableStateOf(false) }
 
     ResultCard(
-        containerColor = containerColor,
-        contentColor = contentColor,
         main = {
             SelectionContainer {
                 Text(
@@ -123,7 +119,10 @@ fun ResultSuccessCoordinates(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
@@ -137,7 +136,10 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
@@ -151,7 +153,10 @@ private fun DarkPreview() {
 @Composable
 private fun OneAppPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
@@ -165,7 +170,10 @@ private fun OneAppPreview() {
 @Composable
 private fun DarkOneAppPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
@@ -179,7 +187,10 @@ private fun DarkOneAppPreview() {
 @Composable
 private fun ParamsPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
@@ -193,7 +204,10 @@ private fun ParamsPreview() {
 @Composable
 private fun DarkParamsPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
@@ -207,7 +221,10 @@ private fun DarkParamsPreview() {
 @Composable
 private fun PointsPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position(
                     points = listOf(
@@ -227,7 +244,10 @@ private fun PointsPreview() {
 @Composable
 private fun DarkPointsPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
             ResultSuccessCoordinates(
                 position = Position(
                     points = listOf(

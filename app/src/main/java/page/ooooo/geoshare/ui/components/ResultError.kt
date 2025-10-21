@@ -34,13 +34,9 @@ fun ResultError(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    val containerColor = MaterialTheme.colorScheme.errorContainer
-    val contentColor = MaterialTheme.colorScheme.onErrorContainer
     val uriHandler = LocalUriHandler.current
 
     ResultCard(
-        containerColor = containerColor,
-        contentColor = contentColor,
         modifier = Modifier
             .testTag("geoShareConversionError")
             .fillMaxWidth(),
@@ -98,7 +94,7 @@ fun ResultError(
             }
         } else {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                LoadingIndicator(Modifier.size(96.dp), color = contentColor)
+                LoadingIndicator(Modifier.size(96.dp), color = LocalContentColor.current)
             }
         }
     }
@@ -110,7 +106,10 @@ fun ResultError(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
@@ -126,7 +125,10 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
@@ -142,7 +144,10 @@ private fun DarkPreview() {
 @Composable
 private fun CoordinatesPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
@@ -158,7 +163,10 @@ private fun CoordinatesPreview() {
 @Composable
 private fun DarkCoordinatesPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
@@ -174,7 +182,10 @@ private fun DarkCoordinatesPreview() {
 @Composable
 private fun EmptyPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
@@ -190,7 +201,10 @@ private fun EmptyPreview() {
 @Composable
 private fun DarkEmptyPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
@@ -206,7 +220,10 @@ private fun DarkEmptyPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
@@ -222,7 +239,10 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",

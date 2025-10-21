@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +41,9 @@ fun ResultSuccessApps(
 ) {
     val context = LocalContext.current
     val spacing = LocalSpacing.current
+    val windowInfo = LocalWindowInfo.current
+    val windowWidth = with(LocalDensity.current) { windowInfo.containerSize.height.toDp() }
+    Log.d(null, "windowWidth=$windowWidth")
     val columnCount = 4
     val iconSize = 46.dp
     val gridItems = apps.map { GridItem.App(it) } +
