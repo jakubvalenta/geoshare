@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
@@ -37,7 +38,7 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
                     groupOrNull("lon")?.let { lon ->
                         val latSig = if (groupOrNull()?.contains('S') == true) "-" else ""
                         val lonSig = if (groupOrNull()?.contains('W') == true) "-" else ""
-                        listOf(latSig + lat to lonSig + lon)
+                        persistentListOf(Point(latSig + lat, lonSig + lon))
                     }
                 }
         })

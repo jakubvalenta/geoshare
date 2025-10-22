@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Position
@@ -40,7 +41,7 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
                         set("zoom", z)
                     }
                 }
-            },
+            }.toImmutableMap(),
             uriQuote = uriQuote,
         ).toString()
 

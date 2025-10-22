@@ -112,16 +112,16 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun goToUserPreferencesDetailAutomationScreen() = uiAutomator {
         goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesAutomationItem" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_AUTOMATION" }.click()
     }
 
     protected fun goToUserPreferencesDetailConnectionPermissionScreen() = uiAutomator {
         goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesConnectionPermissionItem" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_CONNECTION_PERMISSION" }.click()
     }
 
     protected fun goToUserPreferencesDetailDeveloperScreen() = uiAutomator {
         goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesDeveloperItem" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_DEVELOPER_OPTIONS" }.click()
     }
 }

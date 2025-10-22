@@ -1,8 +1,10 @@
 package page.ooooo.geoshare
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 
 class PositionTest {
@@ -15,10 +17,10 @@ class PositionTest {
             Position(
                 q = "foo bar",
                 z = "3.4",
-                points = listOf(
-                    "59.1293656" to "11.4585672",
-                    "59.4154007" to "11.659710599999999",
-                    "59.147731699999994" to "11.550661199999999",
+                points = persistentListOf(
+                    Point("59.1293656", "11.4585672"),
+                    Point("59.4154007", "11.659710599999999"),
+                    Point("59.147731699999994", "11.550661199999999"),
                 ),
             ).toParamsString(" \u2022 "),
         )
@@ -53,9 +55,9 @@ class PositionTest {
 """,
             StringBuilder().apply {
                 Position(
-                    points = listOf(
-                        "50.123456" to "-11.123456",
-                        "52.5067296" to "13.2599309",
+                    points = persistentListOf(
+                        Point("50.123456", "-11.123456"),
+                        Point("52.5067296", "13.2599309"),
                     ),
                 ).toGpx(this, uriQuote)
             }.toString()
@@ -74,8 +76,8 @@ class PositionTest {
 """,
             StringBuilder().apply {
                 Position(
-                    points = listOf(
-                        "\"" to "<",
+                    points = persistentListOf(
+                        Point("\"", "<"),
                     ),
                 ).toGpx(this, uriQuote)
             }.toString()

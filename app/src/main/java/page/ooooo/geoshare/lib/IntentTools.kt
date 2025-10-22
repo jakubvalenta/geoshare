@@ -1,10 +1,6 @@
 package page.ooooo.geoshare.lib
 
-import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri

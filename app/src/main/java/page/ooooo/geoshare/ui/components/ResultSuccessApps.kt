@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -9,17 +8,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
@@ -27,10 +26,10 @@ import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-private sealed class GridItem {
-    class App(val app: IntentTools.App) : GridItem()
-    class ShareButton : GridItem()
-    class Empty : GridItem()
+private sealed interface GridItem {
+    data class App(val app: IntentTools.App) : GridItem
+    class ShareButton : GridItem
+    class Empty : GridItem
 }
 
 @Composable
@@ -38,13 +37,15 @@ fun ResultSuccessApps(
     apps: List<IntentTools.App>,
     onOpenApp: (packageName: String) -> Boolean,
     onOpenChooser: () -> Boolean,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val context = LocalContext.current
     val spacing = LocalSpacing.current
-    val windowInfo = LocalWindowInfo.current
-    val windowWidth = with(LocalDensity.current) { windowInfo.containerSize.height.toDp() }
-    Log.d(null, "windowWidth=$windowWidth")
-    val columnCount = 4
+    val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)) {
+        5
+    } else {
+        4
+    }
     val iconSize = 46.dp
     val gridItems = apps.map { GridItem.App(it) } +
             listOf(GridItem.ShareButton()) +

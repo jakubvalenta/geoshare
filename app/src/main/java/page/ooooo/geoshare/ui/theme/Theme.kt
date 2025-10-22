@@ -3,16 +3,15 @@ package page.ooooo.geoshare.ui.theme
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -139,21 +138,13 @@ val LocalSpacing = staticCompositionLocalOf {
 }
 
 @Composable
-private fun isSmallWindow(): Boolean {
-    val windowInfo = LocalWindowInfo.current
-    val windowHeight = with(LocalDensity.current) { windowInfo.containerSize.height.toDp() }
-    return windowHeight < 800.dp
-}
-
-@Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    smallWindow: Boolean = isSmallWindow(),
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     content: @Composable () -> Unit,
 ) {
-
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -166,6 +157,7 @@ fun AppTheme(
         else -> lightScheme
     }
     val screenshotColors = if (darkTheme) darkScreenshotColors else lightScreenshotColors
+    val smallWindow = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND)
     val typography = if (smallWindow) smallWindowTypography else defaultTypography
     val spacing = if (smallWindow) smallWindowSpacing else defaultSpacing
 

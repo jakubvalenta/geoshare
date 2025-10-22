@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.PositionRegex
@@ -60,7 +61,7 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
                                 null
                             }
                         } ?: return null
-                        return listOf(lat to lon)
+                        return persistentListOf(Point(lat, lon))
                     }
             })
         }

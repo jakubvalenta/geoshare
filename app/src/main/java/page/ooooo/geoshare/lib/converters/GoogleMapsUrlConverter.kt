@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
@@ -44,7 +45,7 @@ class GoogleMapsUrlConverter() :
                         set("z", z)
                     }
                 }
-            },
+            }.toImmutableMap(),
             uriQuote = uriQuote,
         ).toString()
     }
@@ -55,12 +56,12 @@ class GoogleMapsUrlConverter() :
     class DataPointsPositionRegex(regex: String) : PositionRegex(regex) {
         override val points: List<Point>?
             get() = groupOrNull("data")?.let { data ->
-                mutableListOf<Point>().apply {
+                buildList {
                     DATA_PATTERNS.forEach { dataPattern ->
                         dataPattern.matcher(data).let { m ->
                             while (m.find()) {
                                 try {
-                                    add(m.group("lat") to m.group("lon"))
+                                    add(Point(m.group("lat"), m.group("lon")))
                                 } catch (_: IllegalArgumentException) {
                                     // Do nothing
                                 }

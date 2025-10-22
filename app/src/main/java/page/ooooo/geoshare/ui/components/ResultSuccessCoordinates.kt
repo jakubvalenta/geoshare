@@ -13,7 +13,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
@@ -227,10 +229,10 @@ private fun PointsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position(
-                    points = listOf(
-                        "59.1293656" to "11.4585672",
-                        "59.4154007" to "11.659710599999999",
-                        "59.147731699999994" to "11.550661199999999",
+                    points = persistentListOf(
+                        Point("59.1293656", "11.4585672"),
+                        Point("59.4154007", "11.659710599999999"),
+                        Point("59.147731699999994", "11.550661199999999"),
                     ),
                 ),
                 onCopy = {},
@@ -250,10 +252,10 @@ private fun DarkPointsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position(
-                    points = listOf(
-                        "59.1293656" to "11.4585672",
-                        "59.4154007" to "11.659710599999999",
-                        "59.147731699999994" to "11.550661199999999",
+                    points = persistentListOf(
+                        Point("59.1293656", "11.4585672"),
+                        Point("59.4154007", "11.659710599999999"),
+                        Point("59.147731699999994", "11.550661199999999"),
                     ),
                 ),
                 onCopy = {},
