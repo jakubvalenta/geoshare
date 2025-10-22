@@ -157,7 +157,7 @@ fun AppTheme(
         else -> lightScheme
     }
     val screenshotColors = if (darkTheme) darkScreenshotColors else lightScreenshotColors
-    val smallWindow = windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND)
+    val smallWindow = !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND)
     val typography = if (smallWindow) smallWindowTypography else defaultTypography
     val spacing = if (smallWindow) smallWindowSpacing else defaultSpacing
 
