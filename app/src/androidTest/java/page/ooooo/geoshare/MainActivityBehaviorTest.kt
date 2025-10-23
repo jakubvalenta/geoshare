@@ -82,11 +82,10 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUserPreferencesDetailDeveloperScreen()
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }.setText("19")
 
-        // Go to user preferences screen
-        pressBack()
-
-        // Go to main screen
-        pressBack()
+        // Go to main screen (two back steps on small screen, one back step on large screen)
+        onElement { viewIdResourceName == "geoShareUserPreferencesBack" }.click()
+        waitForStableInActiveWindow()
+        onElementOrNull { viewIdResourceName == "geoShareUserPreferencesBack" }?.click()
 
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }

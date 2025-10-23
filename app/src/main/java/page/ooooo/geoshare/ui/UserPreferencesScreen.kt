@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -123,15 +124,18 @@ private fun UserPreferencesScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            if (navigator.canNavigateBack()) {
-                                navigator.navigateBack()
-                            } else {
-                                onBack()
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                if (navigator.canNavigateBack()) {
+                                    navigator.navigateBack()
+                                } else {
+                                    onBack()
+                                }
                             }
-                        }
-                    }) {
+                        },
+                        Modifier.testTag("geoShareUserPreferencesBack"),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description)
