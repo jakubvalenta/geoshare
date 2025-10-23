@@ -110,4 +110,22 @@
     <string name="url_converters_recent_info">%1$s нещодавно отримав підтримку нових картографічних сервісів.</string>
     <string name="url_converters_settings_button_content_description">Відкрийте налаштування Android</string>
     <string name="conversion_loading_indicator_description">Спроба %1$d з %2$d через %3$s.</string>
+    <string name="conversion_succeeded_save_gpx_failed">Не вдалося зберегти GPX</string>
+    <string name="main_input_uri_paste_content_description">Вставити</string>
+    <string name="conversion_automation_copy_link_succeeded">Автоматично скопійоване посилання</string>
+    <string name="conversion_automation_copy_succeeded">Автоматично скопійовані координати</string>
+    <string name="conversion_automation_open_app_failed">Не вдалося автоматично відкрити %1$s</string>
+    <string name="conversion_automation_open_app_succeeded">Автоматично відкрито %1$s</string>
+    <string name="conversion_automation_open_app_waiting">Автоматичне відкриття %1$s через %2$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">Автоматично збережений GPX</string>
+    <string name="conversion_automation_save_gpx_waiting">Автоматичне збереження GPX через %1$ds</string>
+    <string name="conversion_automation_share_failed">Не вдалося автоматично поділитися посиланням</string>
+    <string name="conversion_automation_share_succeeded">Автоматично опубліковане посилання</string>
+    <string name="conversion_automation_share_waiting">Автоматичне поширення посилання через %1$ds</string>
+    <string name="user_preferences_automation_copy_coords">Копіювати координати у форматі %1$s</string>
+    <string name="user_preferences_automation_copy_link">Копіювати посилання %1$s</string>
+    <string name="user_preferences_automation_description">Виберіть дію, яка має виконуватися автоматично під час перетворення посилання на карту на координати.</string>
+    <string name="user_preferences_automation_nothing">Нічого</string>
+    <string name="user_preferences_automation_open_app">Відкрити %1$s</string>
+    <string name="user_preferences_automation_title">Автоматизація</string>
 </resources>
