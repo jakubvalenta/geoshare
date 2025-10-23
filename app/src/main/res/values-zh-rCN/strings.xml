@@ -107,4 +107,22 @@
     <string name="url_converters_recent_info">%1$s 最近支持了新的地图服务。</string>
     <string name="url_converters_settings_button_content_description">打开 Android 设置</string>
     <string name="conversion_loading_indicator_description">由于 %3$s， 第 %1$d 次尝试，共 %2$d 次。</string>
+    <string name="conversion_succeeded_save_gpx_failed">无法保存 GPX</string>
+    <string name="main_input_uri_paste_content_description">粘贴</string>
+    <string name="conversion_automation_copy_link_succeeded">已自动复制链接</string>
+    <string name="conversion_automation_copy_succeeded">已自动复制坐标</string>
+    <string name="conversion_automation_open_app_failed">无法自动打开 %1$s</string>
+    <string name="conversion_automation_open_app_succeeded">已自动打开 %1$s</string>
+    <string name="conversion_automation_open_app_waiting">将在 %2$d 秒后自动打开 %1$s</string>
+    <string name="conversion_automation_save_gpx_succeeded">已自动保存 GPX</string>
+    <string name="conversion_automation_save_gpx_waiting">将在 %1$d 秒后自动保存 GPX</string>
+    <string name="conversion_automation_share_failed">无法自动分享链接</string>
+    <string name="conversion_automation_share_succeeded">已自动分享链接</string>
+    <string name="conversion_automation_share_waiting">将在 %1$d 秒后自动分享链接</string>
+    <string name="user_preferences_automation_copy_coords">以 %1$s 格式复制坐标</string>
+    <string name="user_preferences_automation_copy_link">复制 %1$s 链接</string>
+    <string name="user_preferences_automation_description">选择当地图链接转换为坐标时要自动执行的操作。</string>
+    <string name="user_preferences_automation_nothing">无</string>
+    <string name="user_preferences_automation_open_app">打开 %1$s</string>
+    <string name="user_preferences_automation_title">自动化</string>
 </resources>
