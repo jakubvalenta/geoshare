@@ -22,7 +22,7 @@
     <string name="intro_settings_activity_not_found">Nepodařilo se otevřít nastavení</string>
     <string name="main_input_uri_label">Sem vložte odkaz na mapu</string>
     <string name="main_input_uri_clear_content_description">Vymazat</string>
-    <string name="main_input_uri_supporting_text">Např. https://maps.app.goo.gl/… nebo maps.apple.com/…</string>
+    <string name="main_input_uri_supporting_text">např. https://maps.app.goo.gl/… nebo maps.apple.com/…</string>
     <string name="conversion_succeeded_copy_content_description">Kopírovat</string>
     <string name="main_create_geo_uri">Zobrazit souřadnice</string>
     <string name="main_navigate_to_intro">Objevte další funkce aplikace</string>
@@ -126,4 +126,5 @@
     <string name="user_preferences_automation_description">Vyberte akci, která se má automaticky provést po převedení odkazu na mapu na souřadnice.</string>
     <string name="user_preferences_automation_nothing">Nic</string>
     <string name="user_preferences_automation_open_app">Otevřít %1$s</string>
+    <string name="main_input_uri_paste_content_description">Vložit</string>
 </resources>

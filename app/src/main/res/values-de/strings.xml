@@ -107,4 +107,5 @@
     <string name="url_converters_default_handler_disabled">Öffnet standardmäßig nicht in %1$s</string>
     <string name="url_converters_recent_info">%1$s hat kürzlich Unterstützung für neue Kartendienste erhalten.</string>
     <string name="url_converters_settings_button_content_description">Android-Einstellungen öffnen</string>
+    <string name="main_input_uri_paste_content_description">Einfügen</string>
 </resources>
