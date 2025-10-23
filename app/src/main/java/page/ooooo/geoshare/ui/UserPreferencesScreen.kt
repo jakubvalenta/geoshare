@@ -123,7 +123,15 @@ private fun UserPreferencesScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        scope.launch {
+                            if (navigator.canNavigateBack()) {
+                                navigator.navigateBack()
+                            } else {
+                                onBack()
+                            }
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.nav_back_content_description)
