@@ -41,7 +41,7 @@ fun ResultSuccessApps(
 ) {
     val context = LocalContext.current
     val spacing = LocalSpacing.current
-    val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)) {
+    val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
         5
     } else {
         4
