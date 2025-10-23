@@ -5,11 +5,9 @@ import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
@@ -21,8 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
@@ -111,39 +107,9 @@ private fun UserPreferencesScreen(
     )
     val scope = rememberCoroutineScope()
     val currentGroup = navigator.currentDestination?.contentKey?.let { id -> groups.find { it.id == id } }
-    val listExpanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden
-    val detailExpanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
-        topBar = {
-            TopAppBar(
-                title = {
-                    if (!listExpanded && !detailExpanded) {
-                        Text(stringResource(R.string.user_preferences_title))
-                    }
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            scope.launch {
-                                if (navigator.canNavigateBack()) {
-                                    navigator.navigateBack()
-                                } else {
-                                    onBack()
-                                }
-                            }
-                        },
-                        Modifier.testTag("geoShareUserPreferencesBack"),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.nav_back_content_description)
-                        )
-                    }
-                },
-            )
-        },
     ) { innerPadding ->
         NavigableListDetailPaneScaffold(
             navigator = navigator,
@@ -152,8 +118,17 @@ private fun UserPreferencesScreen(
                     UserPreferencesListPane(
                         currentGroup = currentGroup,
                         groups = groups,
-                        expanded = listExpanded,
+                        expanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden,
                         userPreferencesValues = userPreferencesValues,
+                        onBack = {
+                            scope.launch {
+                                if (navigator.canNavigateBack()) {
+                                    navigator.navigateBack()
+                                } else {
+                                    onBack()
+                                }
+                            }
+                        },
                         onNavigateToGroup = { id ->
                             scope.launch {
                                 navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
@@ -165,13 +140,21 @@ private fun UserPreferencesScreen(
             detailPane = {
                 AnimatedPane {
                     if (currentGroup != null) {
-                        Column(Modifier.verticalScroll(rememberScrollState())) {
-                            UserPreferencesDetailPane(
-                                currentGroup = currentGroup,
-                                userPreferencesValues = userPreferencesValues,
-                                onValueChange = onValueChange,
-                            )
-                        }
+                        UserPreferencesDetailPane(
+                            currentGroup = currentGroup,
+                            expanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden,
+                            userPreferencesValues = userPreferencesValues,
+                            onBack = {
+                                scope.launch {
+                                    if (navigator.canNavigateBack()) {
+                                        navigator.navigateBack()
+                                    } else {
+                                        onBack()
+                                    }
+                                }
+                            },
+                            onValueChange = onValueChange,
+                        )
                     }
                 }
             },
