@@ -75,7 +75,7 @@
     <string name="intro_open_by_default_app_content_description">%1$s 的「預設開啟」設定頁面螢幕截圖</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Select at least <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。若有部分連結呈現灰色無法選取，表示其他 Google 應用程式已設定為預設開啟這些連結。您可以像先前對 Google 地圖那樣，找到那些應用程式並關閉它們的「開啟連結」功能。]]></string>
     <string name="intro_open_by_default_app_screenshot_title">使用預設開啟方式</string>
-    <string name="url_converters_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中：</string>
+    <string name="url_converters_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中。</string>
     <string name="converter_coordinates_name">座標</string>
     <string name="example">例如：%1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -106,4 +106,23 @@
     <string name="url_converters_default_handler_disabled">不要打開預設%1$s</string>
     <string name="url_converters_recent_info">%1$s最近支援了新的地圖服務。</string>
     <string name="url_converters_settings_button_content_description">開啟安卓設定</string>
+    <string name="conversion_succeeded_save_gpx_failed">儲存GPX檔時發生錯誤</string>
+    <string name="main_input_uri_paste_content_description">貼上</string>
+    <string name="conversion_automation_copy_link_succeeded">自動複製連結</string>
+    <string name="conversion_automation_copy_succeeded">自動複製座標</string>
+    <string name="conversion_automation_open_app_failed">自動開啟 %1$s時失敗</string>
+    <string name="conversion_automation_open_app_succeeded">自動開啟 %1$s</string>
+    <string name="conversion_automation_open_app_waiting">在%2$d中自動開啟%1$s</string>
+    <string name="conversion_automation_save_gpx_succeeded">自動儲存GPX檔</string>
+    <string name="conversion_automation_save_gpx_waiting">自動在%1$d中儲存GPX檔</string>
+    <string name="conversion_automation_share_failed">自動分享連結時發生錯誤</string>
+    <string name="conversion_automation_share_succeeded">自動分享連結</string>
+    <string name="conversion_automation_share_waiting">自動在%1$d中分享連結</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">因為 %3$s，正在進行第 %1$d 次嘗試（共 %2$d 次）。</string>
+    <string name="user_preferences_automation_copy_coords">在%1$s格式中複製座標</string>
+    <string name="user_preferences_automation_copy_link">複製%1$s連結</string>
+    <string name="user_preferences_automation_description">選擇在地圖連結轉換為座標時要自動執行的動作。</string>
+    <string name="user_preferences_automation_nothing">什麼也沒有</string>
+    <string name="user_preferences_automation_open_app">開啟%1$s</string>
+    <string name="user_preferences_automation_title">自動地</string>
 </resources>
