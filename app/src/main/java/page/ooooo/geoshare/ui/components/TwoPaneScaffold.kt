@@ -24,6 +24,7 @@ fun TwoPaneScaffold(
     dialog: (@Composable () -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = Color.Unspecified,
+    ratio: Float = 0.5f,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val spacing = LocalSpacing.current
@@ -55,7 +56,7 @@ fun TwoPaneScaffold(
                     .consumeWindowInsets(innerPadding)
                     .imePadding(),
             ) {
-                Column(Modifier.weight(0.5f)) {
+                Column(Modifier.weight(ratio)) {
                     Column(
                         Modifier
                             .fillMaxWidth()
@@ -84,7 +85,7 @@ fun TwoPaneScaffold(
                         bottomPane()
                     }
                 }
-                Column(Modifier.weight(0.5f)) {
+                Column(Modifier.weight(1 - ratio)) {
                     if (secondPane != null) {
                         Column(
                             Modifier

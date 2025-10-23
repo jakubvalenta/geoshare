@@ -255,6 +255,7 @@ fun MainScreen(
                 }
             }
         },
+        ratio = 0.7f,
     )
 }
 
