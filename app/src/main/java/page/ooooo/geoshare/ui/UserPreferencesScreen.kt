@@ -107,6 +107,8 @@ private fun UserPreferencesScreen(
     )
     val scope = rememberCoroutineScope()
     val currentGroup = navigator.currentDestination?.contentKey?.let { id -> groups.find { it.id == id } }
+    val listExpanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden
+    val detailExpanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -118,7 +120,7 @@ private fun UserPreferencesScreen(
                     UserPreferencesListPane(
                         currentGroup = currentGroup,
                         groups = groups,
-                        expanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden,
+                        expanded = listExpanded || detailExpanded,
                         userPreferencesValues = userPreferencesValues,
                         onBack = {
                             scope.launch {
@@ -142,7 +144,7 @@ private fun UserPreferencesScreen(
                     if (currentGroup != null) {
                         UserPreferencesDetailPane(
                             currentGroup = currentGroup,
-                            expanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden,
+                            expanded = detailExpanded,
                             userPreferencesValues = userPreferencesValues,
                             onBack = {
                                 scope.launch {
