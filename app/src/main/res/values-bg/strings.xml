@@ -108,4 +108,22 @@
     <string name="url_converters_recent_info">%1$s наскоро получи поддръжка за нови картографски услуги.</string>
     <string name="url_converters_settings_button_content_description">Отворете настройките на Android</string>
     <string name="conversion_loading_indicator_description">Опит %1$d от %2$d до %3$s.</string>
+    <string name="conversion_succeeded_save_gpx_failed">Неуспешно запазване на GPX</string>
+    <string name="main_input_uri_paste_content_description">Поставяне</string>
+    <string name="conversion_automation_copy_link_succeeded">Автоматично копирана връзка</string>
+    <string name="conversion_automation_copy_succeeded">Автоматично копирани координати</string>
+    <string name="conversion_automation_open_app_failed">Неуспешно автоматично отваряне на %1$s</string>
+    <string name="conversion_automation_open_app_succeeded">Автоматично отваряне %1$s</string>
+    <string name="conversion_automation_open_app_waiting">Автоматично отваряне на %1$s в %2$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">Автоматично запазване на GPX</string>
+    <string name="conversion_automation_save_gpx_waiting">Автоматично запазване на GPX в %1$ds</string>
+    <string name="conversion_automation_share_failed">Неуспешно автоматично споделяне на връзка</string>
+    <string name="conversion_automation_share_succeeded">Автоматично споделена връзка</string>
+    <string name="conversion_automation_share_waiting">Автоматично споделяне на връзка в %1$ds</string>
+    <string name="user_preferences_automation_copy_coords">Копиране на координати във формат %1$s</string>
+    <string name="user_preferences_automation_copy_link">Копиране на връзка %1$s</string>
+    <string name="user_preferences_automation_description">Изберете действие, което да се извърши автоматично, когато връзка към карта се преобразува в координати.</string>
+    <string name="user_preferences_automation_nothing">Нищо</string>
+    <string name="user_preferences_automation_open_app">Отваряне %1$s</string>
+    <string name="user_preferences_automation_title">Автоматизация</string>
 </resources>
