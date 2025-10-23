@@ -109,4 +109,22 @@
     <string name="url_converters_recent_info">O %1$s recebeu suporte para novos mapas recentemente.</string>
     <string name="url_converters_settings_button_content_description">Abrir configurações do Android</string>
     <string name="conversion_loading_indicator_description">Tentativa %1$d de %2$d devido a %3$s.</string>
+    <string name="conversion_succeeded_save_gpx_failed">Falha ao salvar GPX</string>
+    <string name="conversion_automation_copy_link_succeeded">Link copiado automaticamente</string>
+    <string name="conversion_automation_copy_succeeded">Coordenadas copiadas automaticamente</string>
+    <string name="conversion_automation_open_app_failed">Falha ao abrir %1$s automaticamente</string>
+    <string name="conversion_automation_open_app_succeeded">%1$s aberto automaticamente</string>
+    <string name="conversion_automation_open_app_waiting">Abrindo %1$s automaticamente em %2$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">GPX salvo automaticamente</string>
+    <string name="conversion_automation_save_gpx_waiting">Salvando GPX automaticamente em %1$ds</string>
+    <string name="conversion_automation_share_failed">Falha ao compartilhar link automaticamente</string>
+    <string name="conversion_automation_share_succeeded">Link compartilhado automaticamente</string>
+    <string name="conversion_automation_share_waiting">Compartilhando link automaticamente em %1$ds</string>
+    <string name="user_preferences_automation_copy_coords">Copiar coordenadas no formato %1$s</string>
+    <string name="user_preferences_automation_copy_link">Copiar link do %1$s</string>
+    <string name="user_preferences_automation_description">Escolha uma ação para fazer automaticamente quando um link de mapa é convertido para coordenadas.</string>
+    <string name="user_preferences_automation_nothing">Nada</string>
+    <string name="user_preferences_automation_open_app">Abrir %1$s</string>
+    <string name="user_preferences_automation_title">Automatização</string>
+    <string name="main_input_uri_paste_content_description">Colar</string>
 </resources>
