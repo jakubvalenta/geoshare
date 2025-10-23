@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.theme.ScreenshotTheme
 
@@ -32,6 +33,7 @@ fun Screenshot(
     var currentSizePx by remember { mutableStateOf(IntSize.Zero) }
     Box(
         Modifier
+            .sizeIn(maxWidth = 400.dp)
             .padding(horizontal = spacing.large)
             .clip(MaterialTheme.shapes.large),
     ) {
