@@ -110,4 +110,21 @@
     <string name="url_converters_settings_button_content_description">Ouvrir les paramètres Android</string>
     <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
     <string name="main_input_uri_paste_content_description">Coller</string>
+    <string name="conversion_succeeded_save_gpx_failed">Échec de l\'enregistrement du GPX</string>
+    <string name="conversion_automation_copy_link_succeeded">Lien copié automatiquement</string>
+    <string name="conversion_automation_copy_succeeded">Coordonnées copiées automatiquement</string>
+    <string name="conversion_automation_open_app_failed">Échec de l\'ouverture automatique de %1$s</string>
+    <string name="conversion_automation_open_app_succeeded">%1$s ouvert automatiquement</string>
+    <string name="conversion_automation_open_app_waiting">Ouverture automatique de %1$s dans %2$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">GPX enregistré automatiquement</string>
+    <string name="conversion_automation_save_gpx_waiting">Sauvegarde automatique du GPX dans %1$ds</string>
+    <string name="conversion_automation_share_failed">Échec du partage automatique du lien</string>
+    <string name="conversion_automation_share_succeeded">Lien partagé automatiquement</string>
+    <string name="conversion_automation_share_waiting">Lien de partage automatique dans %1$ds</string>
+    <string name="user_preferences_automation_copy_coords">Copier les coordonnées au format %1$s</string>
+    <string name="user_preferences_automation_copy_link">Copier le lien %1$s</string>
+    <string name="user_preferences_automation_description">Choisissez une action à effectuer automatiquement lorsqu\'un lien de carte est converti en coordonnées.</string>
+    <string name="user_preferences_automation_nothing">Rien</string>
+    <string name="user_preferences_automation_open_app">Ouvrir %1$s</string>
+    <string name="user_preferences_automation_title">Automatisation</string>
 </resources>
