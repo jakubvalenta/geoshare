@@ -88,7 +88,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    Position.example.toCoordsDecString().replace(' ', ' ')
+                    Position.example.toCoordsDecString(),
                 )
             )
         }
@@ -109,7 +109,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    Position.example.toDegMinSecCoordsString().replace(' ', ' '),
+                    Position.example.toDegMinSecCoordsString(),
                 )
             )
         }

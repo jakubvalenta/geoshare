@@ -74,8 +74,8 @@ data class Position(
     fun toDegMinSecCoordsString(): String {
         val (latDegInt, latMinInt, latSec) = (mainPoint?.lat?.toDoubleOrNull() ?: 0.0).toDegMinSec()
         val (lonDegInt, lonMinInt, lonSec) = (mainPoint?.lon?.toDoubleOrNull() ?: 0.0).toDegMinSec()
-        return "${abs(latDegInt)}° $latMinInt′ ${latSec.toScale(5)}″ ${if (latDegInt < 0) "S" else "N"}, " +
-                "${abs(lonDegInt)}° $lonMinInt′ ${lonSec.toScale(5)}″ ${if (lonDegInt < 0) "W" else "E"}"
+        return "${abs(latDegInt)}°\u00a0$latMinInt′\u00a0${latSec.toScale(5)}″\u00a0${if (latDegInt < 0) "S" else "N"}, " +
+                "${abs(lonDegInt)}°\u00a0$lonMinInt′\u00a0${lonSec.toScale(5)}″\u00a0${if (lonDegInt < 0) "W" else "E"}"
     }
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {

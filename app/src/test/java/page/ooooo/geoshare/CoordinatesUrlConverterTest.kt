@@ -13,7 +13,7 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun uriPattern_supportedUrl() {
-        assertTrue(doesUriPatternMatch("50.21972° N, 0.68453° W"))
+        assertTrue(doesUriPatternMatch("50.21972°\u00a0N, 0.68453°\u00a0W"))
         assertTrue(doesUriPatternMatch("31°57′N 35°56′E"))
     }
 
@@ -40,7 +40,7 @@ class CoordinatesUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_decimalDegreeSign() {
         assertEquals(
             Position("50.21972", "-0.68453"),
-            parseUrl("50.21972° N, 0.68453° W")
+            parseUrl("50.21972°\u00a0N, 0.68453°\u00a0W")
         )
     }
 
