@@ -47,24 +47,17 @@ abstract class BaseActivityBehaviorTest {
         waitForStableInActiveWindow()
         if (XiaomiTools.isMiuiDevice()) {
             throw Exception("We cannot close the app on Xiaomi MIUI, because it stops the tests")
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+            // On Android API >= 36.1, use the dropdown menu
+            onElement { textAsString() == "Geo Share" }.click()
+            onElement { textAsString() == "Clear" }.click()
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // On newer Android, swipe from the center of the screen towards the upper edge
-            device.swipe(
-                device.displayWidth / 2,
-                device.displayHeight / 2,
-                device.displayWidth / 2,
-                0,
-                10,
-            )
+            // On Android API >= 28, swipe from the center of the screen towards the upper edge
+            device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
         } else {
-            // On older Android, swipe from the bottom left corner of the screen towards the right edge
-            device.swipe(
-                (device.displayWidth * 0.1).toInt(),
-                (device.displayHeight * 0.8).toInt(),
-                device.displayWidth,
-                (device.displayHeight * 0.8).toInt(),
-                5,
-            )
+            // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
+            device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, displayHeight, 10) }
+            onElement { textAsString() == "CLEAR ALL" }.click()
         }
         waitForStableInActiveWindow()
     }

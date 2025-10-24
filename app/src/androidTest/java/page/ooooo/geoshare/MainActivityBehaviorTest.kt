@@ -53,10 +53,10 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows only url converter added since version 22
+        // Shows only those url converters that have been added since version 22
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "geo: URI" })
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
 
@@ -71,8 +71,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUrlConvertersScreen()
 
         // Shows all url converters
-        // Don't test Mapy.com, because it's behind the fold
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "geo: URI" }
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" }
 
         // Go to main screen
