@@ -39,7 +39,7 @@ abstract class BaseUrlConverterBehaviorTest : BaseActivityBehaviorTest() {
     protected fun testTextUri(expectedPosition: Position, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the texts, so we put the text in the main screen of the app instead.
-        // executeShellCommand(
+        // device.executeShellCommand(
         //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n $PACKAGE_NAME/page.ooooo.geoshare.ConversionActivity $PACKAGE_NAME"
         // )
 

@@ -9,7 +9,7 @@ class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun test() {
         // Launch app and close intro
         launchApplication()
-        closeIntroIfItIsVisible()
+        closeIntro()
 
         // Coordinates in data
         testUri(
@@ -74,7 +74,7 @@ class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun testSearch() {
         // Launch app and set connection permission to Always
         launchApplication()
-        closeIntroIfItIsVisible()
+        closeIntro()
         setUserPreferenceConnectionPermissionToAlways()
 
         // Google Search

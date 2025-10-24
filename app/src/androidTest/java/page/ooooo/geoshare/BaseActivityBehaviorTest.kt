@@ -1,12 +1,14 @@
 package page.ooooo.geoshare
 
 import android.os.Build
-import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
@@ -36,39 +38,60 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun launchApplication() = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi.
-        executeShellCommand("monkey -p $PACKAGE_NAME 1")
+        device.executeShellCommand("monkey -p $PACKAGE_NAME 1")
 
         // Wait for the app to appear
         waitForAppToBeVisible(PACKAGE_NAME, LAUNCH_TIMEOUT)
     }
 
     protected fun closeApplication() = uiAutomator {
+        assertNotXiaomi()
         device.pressRecentApps()
         waitForStableInActiveWindow()
-        if (XiaomiTools.isMiuiDevice()) {
-            throw Exception("We cannot close the app on Xiaomi MIUI, because it stops the tests")
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
-            // On Android API >= 36.1, use the dropdown menu
-            onElement { textAsString() == "Geo Share" }.click()
-            onElement { textAsString() == "Clear" }.click()
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // On Android API >= 28, swipe from the center of the screen towards the upper edge
-            device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val menu = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Geo Share" }
+            if (menu != null) {
+                // On Android API >= 36.1, use the dropdown menu
+                menu.click()
+                onElement { textAsString() == "Clear" }.click()
+            } else {
+                // On Android API >= 28, swipe from the center of the screen towards the upper edge
+                device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
+            }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
+            if (onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "No recent items" || textAsString() == "Aucun élément récent" } != null) {
+                // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
+                device.pressRecentApps()
+                waitForStableInActiveWindow()
+                device.pressRecentApps()
+                waitForStableInActiveWindow()
+            }
             device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, displayHeight, 10) }
-            onElement { textAsString() == "CLEAR ALL" }.click()
+            // waitForStableInActiveWindow()
+            onElement { textAsString() == "CLEAR ALL" || textAsString() == "TOUT EFFACER" }.click()
         }
         waitForStableInActiveWindow()
     }
 
-    protected fun executeShellCommand(cmd: String) = uiAutomator {
-        val output = device.executeShellCommand(cmd)
-        Log.i(null, "Executed shell command `$cmd`: $output")
+    protected fun closeIntro() = uiAutomator {
+        waitForStableInActiveWindow()
+        onElement { viewIdResourceName == "geoShareIntroScreenCloseButton" }.click()
     }
 
-    protected fun closeIntroIfItIsVisible() = uiAutomator {
-        onElementOrNull(1000) { viewIdResourceName == "geoShareIntroScreenCloseButton" }?.click()
+
+    protected fun assertGoogleMapsInstalled() = uiAutomator {
+        assertTrue(
+            "This test only works when Google Maps is installed on the device",
+            device.executeShellCommand("pm path $GOOGLE_MAPS_PACKAGE_NAME").isNotEmpty(),
+        )
+    }
+
+    protected fun assertNotXiaomi() = uiAutomator {
+        assertFalse(
+            "We cannot close the app on Xiaomi MIUI, because it stops the tests",
+            XiaomiTools.isMiuiDevice(),
+        )
     }
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
@@ -83,9 +106,9 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun shareUri(unsafeUriString: String) {
+    protected fun shareUri(unsafeUriString: String) = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi
-        executeShellCommand(
+        device.executeShellCommand(
             "am start -a android.intent.action.VIEW -d $unsafeUriString -n $PACKAGE_NAME/page.ooooo.geoshare.ConversionActivity $PACKAGE_NAME"
         )
     }

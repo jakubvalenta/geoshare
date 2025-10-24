@@ -45,7 +45,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
     fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch application and close intro
         launchApplication()
-        closeIntroIfItIsVisible()
+        closeIntro()
 
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
@@ -56,7 +56,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Shows only those url converters that have been added since version 22
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "geo: URI" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") })
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
 
@@ -71,7 +71,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUrlConvertersScreen()
 
         // Shows all url converters
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "geo: URI" }
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") }
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" }
 
         // Go to main screen
@@ -93,8 +93,8 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUrlConvertersScreen()
 
         // Shows only url converters added since version 19
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Magic Earth" }
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
     }

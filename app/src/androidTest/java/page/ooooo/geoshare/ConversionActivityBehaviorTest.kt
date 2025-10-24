@@ -45,6 +45,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun conversionScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
+        assertGoogleMapsInstalled()
+
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
@@ -71,7 +73,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         uiAutomator {
             // Launch application and close intro
             launchApplication()
-            closeIntroIfItIsVisible()
+            closeIntro()
 
             // Configure automation
             goToUserPreferencesDetailAutomationScreen()
@@ -93,9 +95,11 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     @Test
     fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_showsPositionAndOpensTheInstalledAppAutomatically() =
         uiAutomator {
+            assertGoogleMapsInstalled()
+
             // Launch application and close intro
             launchApplication()
-            closeIntroIfItIsVisible()
+            closeIntro()
 
             // Configure automation
             goToUserPreferencesDetailAutomationScreen()
