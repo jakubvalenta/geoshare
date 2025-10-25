@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import kotlinx.collections.immutable.persistentMapOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -45,7 +46,7 @@ class UriTest {
     fun parse_queryOnly() {
         assertEquals(
             Uri(
-                queryParams = mapOf("baz" to ""),
+                queryParams = persistentMapOf("baz" to ""),
                 uriQuote = uriQuote,
             ),
             Uri.parse("?baz", uriQuote)
@@ -81,7 +82,7 @@ class UriTest {
             Uri(
                 host = "foo",
                 path = "/bar",
-                queryParams = mapOf("baz" to ""),
+                queryParams = persistentMapOf("baz" to ""),
                 uriQuote = uriQuote,
             ),
             Uri.parse("foo/bar?baz", uriQuote)
@@ -131,7 +132,7 @@ class UriTest {
                 scheme = "https",
                 host = "foo",
                 path = "/bar",
-                queryParams = mapOf("baz" to ""),
+                queryParams = persistentMapOf("baz" to ""),
                 uriQuote = uriQuote,
             ),
             Uri.parse("https://foo/bar?baz", uriQuote)
@@ -146,7 +147,7 @@ class UriTest {
                 scheme = "https",
                 host = "osmand.net",
                 path = "/map",
-                queryParams = mapOf("pin" to "52.51628,13.37771"),
+                queryParams = persistentMapOf("pin" to "52.51628,13.37771"),
                 fragment = "12.5/-53.347932/-13.2347",
                 uriQuote = uriQuote,
             ),
@@ -160,7 +161,7 @@ class UriTest {
             Uri(
                 scheme = "https",
                 host = "foo",
-                queryParams = mapOf("bar/baz" to ""),
+                queryParams = persistentMapOf("bar/baz" to ""),
                 uriQuote = uriQuote,
             ),
             Uri.parse("https://foo?bar/baz", uriQuote)
@@ -213,7 +214,7 @@ class UriTest {
                 scheme = "https",
                 host = "foo",
                 path = "/",
-                queryParams = mapOf("baz" to ""),
+                queryParams = persistentMapOf("baz" to ""),
                 uriQuote = uriQuote,
             ),
             Uri.parse("https://foo/?baz", uriQuote)
@@ -251,7 +252,7 @@ class UriTest {
             Uri(
                 scheme = "geo",
                 path = "foo",
-                queryParams = mapOf("baz" to ""),
+                queryParams = persistentMapOf("baz" to ""),
                 uriQuote = uriQuote,
             ),
             Uri.parse("geo:foo?baz", uriQuote)
@@ -277,7 +278,7 @@ class UriTest {
             Uri(
                 scheme = "geo",
                 path = "50.123456,-11.123456",
-                queryParams = mapOf("q" to "foo bar", "z" to "3.4"),
+                queryParams = persistentMapOf("q" to "foo bar", "z" to "3.4"),
                 uriQuote = uriQuote,
             ),
             Uri.parse("geo:50.123456,-11.123456?q=foo%20bar&z=3.4", uriQuote)
@@ -287,7 +288,7 @@ class UriTest {
     @Test
     fun parse_queryParams_missingQuery_returnsEmptyMap() {
         assertEquals(
-            Uri(queryParams = emptyMap(), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf(), uriQuote = uriQuote),
             Uri.parse("?", uriQuote)
         )
     }
@@ -295,7 +296,7 @@ class UriTest {
     @Test
     fun parse_queryParams_severalParameters_returnsMap() {
         assertEquals(
-            Uri(queryParams = mapOf("foo" to "bar", "baz" to "1"), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf("foo" to "bar", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&baz=1", uriQuote)
         )
     }
@@ -303,7 +304,7 @@ class UriTest {
     @Test
     fun parse_queryParams_urlEncodeParameter_returnsMapWithUrlDecodedValue() {
         assertEquals(
-            Uri(queryParams = mapOf("foo" to "bar baz"), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf("foo" to "bar baz"), uriQuote = uriQuote),
             Uri.parse("?foo=bar%20baz", uriQuote)
         )
     }
@@ -311,11 +312,11 @@ class UriTest {
     @Test
     fun parse_queryParams_parameterWithoutValue_returnsMapWithEmptyStringsAsTheParameterValue() {
         assertEquals(
-            Uri(queryParams = mapOf("foo" to "bar", "spam" to "", "baz" to "1"), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf("foo" to "bar", "spam" to "", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&spam&baz=1", uriQuote)
         )
         assertEquals(
-            Uri(queryParams = mapOf("foo" to "bar", "spam" to "", "baz" to "1"), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf("foo" to "bar", "spam" to "", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&spam=&baz=1", uriQuote)
         )
     }
@@ -323,11 +324,11 @@ class UriTest {
     @Test
     fun parse_queryParams_parameterWithoutNameOrValue_returnsMapWithEmptyStringsAsTheParameterNameAndValue() {
         assertEquals(
-            Uri(queryParams = mapOf("foo" to "bar", "" to "", "baz" to "1"), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf("foo" to "bar", "" to "", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&=&baz=1", uriQuote)
         )
         assertEquals(
-            Uri(queryParams = mapOf("foo" to "bar", "" to "", "baz" to "1"), uriQuote = uriQuote),
+            Uri(queryParams = persistentMapOf("foo" to "bar", "" to "", "baz" to "1"), uriQuote = uriQuote),
             Uri.parse("?foo=bar&&baz=1", uriQuote)
         )
     }

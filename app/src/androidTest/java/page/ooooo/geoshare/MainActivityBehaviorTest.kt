@@ -11,6 +11,7 @@ import org.junit.runner.RunWith
 open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
+    @NotXiaomi
     fun introScreen_whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {
         // Launch app
         launchApplication()
@@ -44,7 +45,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
     fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch application and close intro
         launchApplication()
-        closeIntroIfItIsVisible()
+        closeIntro()
 
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
@@ -52,10 +53,10 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the url converters screen
         goToUrlConvertersScreen()
 
-        // Shows only url converter added since version 22
+        // Shows only those url converters that have been added since version 22
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") })
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
 
@@ -70,8 +71,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUrlConvertersScreen()
 
         // Shows all url converters
-        // Don't test Mapy.com, because it's behind the fold
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") }
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" }
 
         // Go to main screen
@@ -81,11 +81,10 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUserPreferencesDetailDeveloperScreen()
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }.setText("19")
 
-        // Go to user preferences screen
-        pressBack()
-
-        // Go to main screen
-        pressBack()
+        // Go to main screen (two back steps on small screen, one back step on large screen)
+        onElement { viewIdResourceName == "geoShareUserPreferencesBack" }.click()
+        waitForStableInActiveWindow()
+        onElementOrNull { viewIdResourceName == "geoShareUserPreferencesBack" }?.click()
 
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
@@ -94,8 +93,8 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         goToUrlConvertersScreen()
 
         // Shows only url converters added since version 19
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
         onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
+        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Magic Earth" }
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
     }

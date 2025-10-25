@@ -1,7 +1,9 @@
 package page.ooooo.geoshare
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.*
 import org.junit.Test
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 
@@ -344,10 +346,10 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position(
                 z = "16",
-                points = listOf(
-                    "52.4858222" to "13.4236883",
-                    "52.4881038" to "13.4255518",
-                    "52.4807739" to "13.4300356",
+                points = persistentListOf(
+                    Point("52.4858222", "13.4236883"),
+                    Point("52.4881038", "13.4255518"),
+                    Point("52.4807739", "13.4300356"),
                 ),
             ),
             @Suppress("SpellCheckingInspection")
@@ -520,10 +522,10 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_placeList() {
         assertEquals(
             Position(
-                points = listOf(
-                    "59.1293656" to "11.4585672",
-                    "59.4154007" to "11.659710599999999",
-                    "59.147731699999994" to "11.550661199999999"
+                points = persistentListOf(
+                    Point("59.1293656", "11.4585672"),
+                    Point("59.4154007", "11.659710599999999"),
+                    Point("59.147731699999994", "11.550661199999999")
                 )
             ),
             @Suppress("SpellCheckingInspection")
@@ -545,8 +547,8 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_placeListHighPrecision() {
         assertEquals(
             Position(
-                points = listOf(
-                    "5.5592846" to "-0.19743059999999998",
+                points = persistentListOf(
+                    Point("5.5592846", "-0.19743059999999998"),
                 )
             ),
             parseHtml(
@@ -559,16 +561,16 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseHtml_myMaps() {
         assertEquals(
             Position(
-                points = listOf(
-                    "52.49016" to "13.434500000000071",
-                    "52.49534999999999" to "13.431890000000067",
-                    "52.4901894" to "13.433825899999988",
-                    "52.4898201" to "13.433602800000017",
-                    "52.4960741" to "13.435130399999935",
-                    "52.4961778" to "13.422070500000018",
-                    "52.49514559999999" to "13.423243800000023",
-                    "52.497884" to "13.429134",
-                    "52.4957432" to "13.43344819999993",
+                points = persistentListOf(
+                    Point("52.49016", "13.434500000000071"),
+                    Point("52.49534999999999", "13.431890000000067"),
+                    Point("52.4901894", "13.433825899999988"),
+                    Point("52.4898201", "13.433602800000017"),
+                    Point("52.4960741", "13.435130399999935"),
+                    Point("52.4961778", "13.422070500000018"),
+                    Point("52.49514559999999", "13.423243800000023"),
+                    Point("52.497884", "13.429134"),
+                    Point("52.4957432", "13.43344819999993"),
                 )
             ),
             @Suppress("SpellCheckingInspection")

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,17 +18,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-private sealed class GridItem {
-    class App(val app: IntentTools.App) : GridItem()
-    class ShareButton : GridItem()
-    class Empty : GridItem()
+private sealed interface GridItem {
+    data class App(val app: IntentTools.App) : GridItem
+    class ShareButton : GridItem
+    class Empty : GridItem
 }
 
 @Composable
@@ -35,9 +37,15 @@ fun ResultSuccessApps(
     apps: List<IntentTools.App>,
     onOpenApp: (packageName: String) -> Boolean,
     onOpenChooser: () -> Boolean,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val context = LocalContext.current
-    val columnCount = 4
+    val spacing = LocalSpacing.current
+    val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
+        5
+    } else {
+        4
+    }
     val iconSize = 46.dp
     val gridItems = apps.map { GridItem.App(it) } +
             listOf(GridItem.ShareButton()) +
@@ -46,11 +54,11 @@ fun ResultSuccessApps(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(start = Spacing.tiny, top = Spacing.medium, end = Spacing.tiny),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+            .padding(top = spacing.large),
+        verticalArrangement = Arrangement.spacedBy(spacing.large),
     ) {
         gridItems.chunked(columnCount).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
                         is GridItem.App ->
@@ -67,13 +75,13 @@ fun ResultSuccessApps(
                                     }
                                     .weight(1f)
                                     .testTag("geoShareResultCardApp_${gridItem.app.packageName}"),
-                                verticalArrangement = Arrangement.spacedBy(Spacing.tiny)) {
+                                verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                                 Image(
                                     rememberDrawablePainter(gridItem.app.icon),
                                     gridItem.app.label,
                                     Modifier
                                         .align(Alignment.CenterHorizontally)
-                                        .widthIn(max = iconSize),
+                                        .size(iconSize),
                                 )
                                 Text(
                                     gridItem.app.label,
@@ -125,7 +133,7 @@ private fun DefaultPreview() {
             Column {
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    apps = List(4) { index ->
+                    apps = List(8) { index ->
                         IntentTools.App(
                             BuildConfig.APPLICATION_ID,
                             "My Map ${index + 1}",
@@ -148,7 +156,7 @@ private fun DarkPreview() {
             Column {
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    apps = List(4) { index ->
+                    apps = List(8) { index ->
                         IntentTools.App(
                             BuildConfig.APPLICATION_ID,
                             "My Map ${index + 1}",

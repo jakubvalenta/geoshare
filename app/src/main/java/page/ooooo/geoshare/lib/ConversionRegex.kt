@@ -2,6 +2,8 @@ package page.ooooo.geoshare.lib
 
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
 
@@ -48,7 +50,7 @@ open class PositionRegex(regex: String) : ConversionRegex(regex) {
     }
 
     open val points: List<Point>?
-        get() = lat?.let { lat -> lon?.let { lon -> listOf(lat to lon) } }
+        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(lat, lon)) } }
     open val lat: String?
         get() = groupOrNull("lat")
     open val lon: String?
@@ -65,10 +67,10 @@ open class PositionRegex(regex: String) : ConversionRegex(regex) {
 class PointsPositionRegex(regex: String) : PositionRegex(regex) {
     override val points: List<Point>
         get() = pattern.matcher(input).let { m ->
-            mutableListOf<Point>().apply {
+            buildList {
                 while (m.find()) {
                     try {
-                        add(m.group("lat") to m.group("lon"))
+                        add(Point(m.group("lat"), m.group("lon")))
                     } catch (_: IllegalArgumentException) {
                         // Do nothing
                     }
@@ -87,7 +89,10 @@ abstract class GeoHashPositionRegex(regex: String) : PositionRegex(regex) {
             decode(hash).also { latLonZCache = it }
         }
 
-    override val points: List<Point>? get() = latLonZ?.let { (lat, lon) -> listOf(lat.toString() to lon.toString()) }
+    override val points: List<Point>?
+        get() = latLonZ?.let { (lat, lon) ->
+            persistentListOf(Point(lat.toString(), lon.toString()))
+        }
     override val z: String? get() = latLonZ?.third?.toString()
 }
 
@@ -99,10 +104,10 @@ abstract class GeoHashPositionRegex(regex: String) : PositionRegex(regex) {
  * them.
  */
 fun List<PositionRegex>.toPosition() = Position(
-    this.lastNotNullOrNull { it.points }
+    this.lastNotNullOrNull { it.points?.toImmutableList() }
         ?: this.lastNotNullOrNull { it.lat }?.let { lat ->
             this.lastNotNullOrNull { it.lon }?.let { lon ->
-                listOf(lat to lon)
+                persistentListOf(Point(lat, lon))
             }
         },
     this.lastNotNullOrNull { it.q },

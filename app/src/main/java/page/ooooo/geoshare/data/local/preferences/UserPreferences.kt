@@ -12,14 +12,15 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.components.RadioButtonGroup
-import page.ooooo.geoshare.components.RadioButtonOption
 import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.components.RadioButtonGroup
+import page.ooooo.geoshare.ui.components.RadioButtonOption
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 interface UserPreference<T> {
     val loading: T
 
+    fun getValue(values: UserPreferencesValues): T
     fun getValue(preferences: Preferences): T
     fun setValue(preferences: MutablePreferences, value: T)
 
@@ -30,10 +31,10 @@ interface UserPreference<T> {
     fun description(): String?
 
     @Composable
-    fun ValueLabel(value: T)
+    fun ValueLabel(values: UserPreferencesValues)
 
     @Composable
-    fun Component(value: T, onValueChange: (T) -> Unit)
+    fun Component(values: UserPreferencesValues, onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit)
 }
 
 abstract class NullableIntUserPreference(
@@ -50,21 +51,29 @@ abstract class NullableIntUserPreference(
     }
 
     @Composable
-    override fun ValueLabel(value: Int?) {
+    override fun ValueLabel(values: UserPreferencesValues) {
+        val value = getValue(values)
         Text((value ?: default).toString())
     }
 
     @Composable
-    override fun Component(value: Int?, onValueChange: (Int?) -> Unit) {
+    override fun Component(
+        values: UserPreferencesValues,
+        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+    ) {
+        val value = getValue(values)
+        val spacing = LocalSpacing.current
         var inputValue by remember { mutableStateOf(value.toString()) }
         OutlinedTextField(
             value = inputValue,
             onValueChange = {
                 @Suppress("AssignedValueIsNeverRead")
                 inputValue = it
-                onValueChange(fromString(it))
+                onValueChange { preferences ->
+                    setValue(preferences, fromString(it))
+                }
             },
-            modifier = modifier.padding(top = Spacing.tiny),
+            modifier = modifier.padding(top = spacing.tiny),
         )
     }
 
@@ -88,18 +97,28 @@ abstract class OptionsUserPreference<T>(
     override val loading = default
 
     @Composable
-    override fun ValueLabel(value: T) {
+    override fun ValueLabel(values: UserPreferencesValues) {
+        val value = getValue(values)
         (options().find { it.value == value } ?: options().find { it.value == default })?.also { option ->
             option.label()
         } ?: Text(value.toString())
     }
 
     @Composable
-    override fun Component(value: T, onValueChange: (T) -> Unit) {
+    override fun Component(
+        values: UserPreferencesValues,
+        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+    ) {
+        val value = getValue(values)
+        val spacing = LocalSpacing.current
         RadioButtonGroup(
             selectedValue = value,
-            onSelect = { onValueChange(it) },
-            modifier = Modifier.padding(top = Spacing.tiny),
+            onSelect = {
+                onValueChange { preferences ->
+                    setValue(preferences, it)
+                }
+            },
+            modifier = Modifier.padding(top = spacing.tiny),
         ) {
             options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
         }
@@ -126,6 +145,8 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
     },
 ) {
     private val key = stringPreferencesKey("connect_to_google_permission")
+
+    override fun getValue(values: UserPreferencesValues) = values.connectionPermissionValue
 
     override fun getValue(preferences: Preferences) = preferences[key]?.let(Permission::valueOf) ?: default
 
@@ -182,6 +203,8 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
     private val typeKey = stringPreferencesKey("automation")
     private val packageNameKey = stringPreferencesKey("automation_package_name")
 
+    override fun getValue(values: UserPreferencesValues) = values.automationValue
+
     override fun getValue(preferences: Preferences): AutomationImpl {
         val type = preferences[typeKey]?.let(AutomationType::valueOf) ?: return default
         return when (type) {
@@ -229,6 +252,8 @@ val introShowForVersionCode = object : NullableIntUserPreference(
     key = stringPreferencesKey("intro_shown_for_version_code"),
     default = 0,
 ) {
+    override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCodeValue
+
     @Composable
     override fun title() = stringResource(R.string.user_preferences_last_run_version_code_title)
 
@@ -241,6 +266,8 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
     default = 22,
     modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
 ) {
+    override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCodeValue
+
     @Composable
     override fun title() = stringResource(R.string.user_preferences_changelog_shown_for_version_code_title)
 
@@ -249,8 +276,8 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    var automationValue: AutomationImpl = automation.loading,
-    var changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
-    var connectionPermissionValue: Permission = connectionPermission.loading,
-    var introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
+    val automationValue: AutomationImpl = automation.loading,
+    val changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
+    val connectionPermissionValue: Permission = connectionPermission.loading,
+    val introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
 )

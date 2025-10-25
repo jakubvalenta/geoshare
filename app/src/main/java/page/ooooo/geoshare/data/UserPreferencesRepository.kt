@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.data
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -18,6 +19,8 @@ interface UserPreferencesRepository {
     suspend fun <T> getValue(userPreference: UserPreference<T>): T
 
     suspend fun <T> setValue(userPreference: UserPreference<T>, value: T)
+
+    suspend fun edit(transform: (preferences: MutablePreferences) -> Unit)
 }
 
 class DefaultUserPreferencesRepository @Inject constructor(
@@ -44,5 +47,9 @@ class DefaultUserPreferencesRepository @Inject constructor(
 
     override suspend fun <T> setValue(userPreference: UserPreference<T>, value: T) {
         dataStore.edit { userPreference.setValue(it, value) }
+    }
+
+    override suspend fun edit(transform: (preferences: MutablePreferences) -> Unit) {
+        dataStore.edit(transform)
     }
 }

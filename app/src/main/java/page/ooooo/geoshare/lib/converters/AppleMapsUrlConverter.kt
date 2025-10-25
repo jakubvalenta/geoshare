@@ -2,8 +2,11 @@ package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
@@ -37,7 +40,7 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
                         set("z", z)
                     }
                 }
-            },
+            }.toImmutableMap(),
             uriQuote = uriQuote,
         ).toString()
     }
@@ -46,7 +49,7 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
      * Sets points to zero, so that we avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
      */
     class DoNotParseHtmlPositionRegex(regex: String) : PositionRegex(regex) {
-        override val points = listOf("0" to "0")
+        override val points = persistentListOf(Point())
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")

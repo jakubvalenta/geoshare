@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.components
+package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 data class RadioButtonOption<T>(
     val value: T,
@@ -30,19 +30,21 @@ fun <T> RadioButtonGroup(
     modifier: Modifier = Modifier,
     options: @Composable () -> List<RadioButtonOption<T>>,
 ) {
+    val spacing = LocalSpacing.current
+
     // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
     Column(modifier.selectableGroup()) {
         options().forEach { option ->
             Row(
                 option.modifier
                     .fillMaxWidth()
-                    .padding(vertical = Spacing.tiny)
+                    .padding(vertical = spacing.tiny)
                     .selectable(
                         selected = (option.value == selectedValue),
                         onClick = { onSelect(option.value) },
                         role = Role.RadioButton
                     ),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(

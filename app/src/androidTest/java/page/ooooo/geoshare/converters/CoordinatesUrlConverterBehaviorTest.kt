@@ -8,7 +8,7 @@ class CoordinatesUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun test() {
         // Launch app and close intro
         launchApplication()
-        closeIntroIfItIsVisible()
+        closeIntro()
 
         // Decimal
         testTextUri(

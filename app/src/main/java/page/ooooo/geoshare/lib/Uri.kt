@@ -1,18 +1,23 @@
 package page.ooooo.geoshare.lib
 
+import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
 import java.net.MalformedURLException
 import java.net.URL
 
 /**
  * Like android.net.Uri but correctly sets path for non-hierarchical URIs, so it can be used for geo: URIs.
  */
+@Immutable
 data class Uri(
     val scheme: String = "",
     val host: String = "",
     val path: String = "",
-    val queryParams: Map<String, String> = emptyMap(),
+    val queryParams: ImmutableMap<String, String> = persistentMapOf(),
     val fragment: String = "",
-    val uriQuote: UriQuote = DefaultUriQuote(),
+    private val uriQuote: UriQuote = DefaultUriQuote(),
 ) {
     companion object {
         fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Uri {
@@ -74,9 +79,9 @@ data class Uri(
             )
         }
 
-        private fun parseQueryParams(query: String?, uriQuote: UriQuote): Map<String, String> =
+        private fun parseQueryParams(query: String?, uriQuote: UriQuote): ImmutableMap<String, String> =
             if (query.isNullOrEmpty()) {
-                emptyMap()
+                persistentMapOf()
             } else {
                 query.split('&').associate { rawParam ->
                     val paramParts = rawParam.split('=')
@@ -84,7 +89,7 @@ data class Uri(
                     val rawParamValue = paramParts.drop(1).firstOrNull() ?: ""
                     val paramValue = uriQuote.decode(rawParamValue)
                     paramName to paramValue
-                }
+                }.toImmutableMap()
             }
     }
 

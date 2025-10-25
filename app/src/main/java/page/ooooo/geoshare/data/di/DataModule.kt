@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.di
 
+import androidx.datastore.preferences.core.MutablePreferences
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -36,10 +37,11 @@ class FakeUserPreferencesRepository @Inject constructor() :
         throw NotImplementedError()
     }
 
-    override suspend fun <T> setValue(
-        userPreference: UserPreference<T>,
-        value: T,
-    ) {
+    override suspend fun <T> setValue(userPreference: UserPreference<T>, value: T) {
+        throw NotImplementedError()
+    }
+
+    override suspend fun edit(transform: (preferences: MutablePreferences) -> Unit) {
         throw NotImplementedError()
     }
 }

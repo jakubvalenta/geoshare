@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -34,41 +36,37 @@ fun ResultError(
 ) {
     val uriHandler = LocalUriHandler.current
 
-    if (retryLoadingIndicatorVisible) {
-        Column(Modifier.fillMaxWidth()) {
-            LoadingIndicator(
-                Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(64.dp),
-                color = MaterialTheme.colorScheme.errorContainer,
-            )
-        }
-    } else {
-        ResultCard(
-            modifier = Modifier.testTag("geoShareConversionError"),
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-            chips = {
+    ResultCard(
+        modifier = Modifier
+            .testTag("geoShareConversionError")
+            .fillMaxWidth(),
+        chips = { lastPaddingEnd ->
+            if (!retryLoadingIndicatorVisible) {
                 ResultCardChip(
                     stringResource(R.string.conversion_error_retry),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    icon = {
+                        Icon(Icons.Default.Refresh, null)
+                    },
                     onClick = onRetry,
                 )
                 ResultCardChip(
                     stringResource(R.string.conversion_error_report),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 ) {
                     uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
                 ResultCardChip(
                     stringResource(R.string.url_converters_title),
-                    modifier = Modifier.padding(end = Spacing.small),
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    icon = {
+                        Icon(Icons.Outlined.Info, null)
+                    },
+                    modifier = Modifier.padding(end = lastPaddingEnd),
                 ) {
                     onNavigateToUrlConvertersScreen()
                 }
-            },
-        ) {
+            }
+        },
+    ) {
+        if (!retryLoadingIndicatorVisible) {
             SelectionContainer {
                 Text(
                     stringResource(errorMessageResId),
@@ -94,6 +92,10 @@ fun ResultError(
                     }
                 }
             }
+        } else {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoadingIndicator(Modifier.size(96.dp), color = LocalContentColor.current)
+            }
         }
     }
 }
@@ -104,7 +106,10 @@ fun ResultError(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
@@ -120,7 +125,10 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
@@ -136,7 +144,10 @@ private fun DarkPreview() {
 @Composable
 private fun CoordinatesPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
@@ -152,7 +163,10 @@ private fun CoordinatesPreview() {
 @Composable
 private fun DarkCoordinatesPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
@@ -168,7 +182,10 @@ private fun DarkCoordinatesPreview() {
 @Composable
 private fun EmptyPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
@@ -184,7 +201,10 @@ private fun EmptyPreview() {
 @Composable
 private fun DarkEmptyPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
@@ -200,7 +220,10 @@ private fun DarkEmptyPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
@@ -216,7 +239,10 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        Surface {
+        Surface(
+            color = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",

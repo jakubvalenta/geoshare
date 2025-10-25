@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,15 +21,22 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 sealed class AutomationAction {
     class Noop : AutomationAction()
-    class Copy(val text: String) : AutomationAction()
-    class OpenApp(val packageName: String, val uriString: String) : AutomationAction()
-    class OpenChooser(val uriString: String) : AutomationAction()
+
+    @Immutable
+    data class Copy(val text: String) : AutomationAction()
+
+    @Immutable
+    data class OpenApp(val packageName: String, val uriString: String) : AutomationAction()
+
+    @Immutable
+    data class OpenChooser(val uriString: String) : AutomationAction()
+
     class SaveGpx() : AutomationAction()
 }
 
@@ -174,6 +182,7 @@ sealed class AutomationImpl : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
+    @Immutable
     data class OpenApp(val packageName: String) :
         AutomationImpl(),
         Automation.HasSuccessMessage,
@@ -187,9 +196,10 @@ sealed class AutomationImpl : Automation {
 
         @Composable
         override fun Label() {
+            val spacing = LocalSpacing.current
             queryApp()?.let { app ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.tiny),
+                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Image(

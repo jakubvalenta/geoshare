@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.ui.*
 
@@ -11,67 +12,50 @@ import page.ooooo.geoshare.ui.*
 fun ConversionNavigation(runContext: ConversionRunContext, viewModel: ConversionViewModel, onFinish: () -> Unit) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "conversion") {
-        composable("about") {
+    NavHost(navController = navController, startDestination = ConversionRoute) {
+        composable<AboutRoute> {
             AboutScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
             )
         }
-        composable("conversion") {
+        composable<ConversionRoute> {
             ConversionScreen(
                 runContext = runContext,
                 onBack = onFinish,
                 onFinish = onFinish,
-                onNavigateToAboutScreen = { navController.navigate("about") },
-                onNavigateToFaqScreen = { navController.navigate("faq") },
-                onNavigateToIntroScreen = { navController.navigate("intro") },
-                onNavigateToUrlConvertersScreen = { navController.navigate("url_converters") },
-                onNavigateToUserPreferencesScreen = { navController.navigate("user_preferences") },
-                onNavigateToUserPreferencesAutomationScreen = { navController.navigate("user_preferences/automation") },
+                onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
+                onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
+                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
+                onNavigateToUrlConvertersScreen = { navController.navigate(UrlConvertersRoute) },
+                onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
+                onNavigateToUserPreferencesAutomationScreen = {
+                    navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
+                },
                 viewModel = viewModel,
             )
         }
-        composable("faq") {
+        composable<FaqRoute> {
             FaqScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
             )
         }
-        composable("intro") {
+        composable<IntroRoute> {
             IntroScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )
         }
-        composable("url_converters") {
+        composable<UrlConvertersRoute> {
             UrlConvertersScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
+                onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )
         }
-        composable("user_preferences") {
-            UserPreferencesListScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("conversion") },
-                onNavigateToUserPreferencesAutomationScreen = { navController.navigate("user_preferences/automation") },
-                onNavigateToUserPreferencesConnectionPermissionScreen = { navController.navigate("user_preferences/connection_permission") },
-                onNavigateToUserPreferencesDeveloperScreen = { navController.navigate("user_preferences/developer") },
-                viewModel = viewModel,
-            )
-        }
-        composable("user_preferences/automation") {
-            UserPreferencesDetailAutomationScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
-                viewModel = viewModel,
-            )
-        }
-        composable("user_preferences/connection_permission") {
-            UserPreferencesDetailConnectionPermissionScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
-                viewModel = viewModel,
-            )
-        }
-        composable("user_preferences/developer") {
-            UserPreferencesDetailDeveloperScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate("user_preferences") },
+        composable<UserPreferencesRoute> { backStackEntry ->
+            val route: UserPreferencesRoute = backStackEntry.toRoute()
+            UserPreferencesScreen(
+                initialGroupId = route.id,
+                onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )
         }

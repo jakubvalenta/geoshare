@@ -3,6 +3,7 @@ package page.ooooo.geoshare.ui.theme
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -10,6 +11,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.window.core.layout.WindowSizeClass
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -131,11 +133,16 @@ object ScreenshotTheme {
         get() = LocalScreenshotTypography.current
 }
 
+val LocalSpacing = staticCompositionLocalOf {
+    Spacing()
+}
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
@@ -150,14 +157,18 @@ fun AppTheme(
         else -> lightScheme
     }
     val screenshotColors = if (darkTheme) darkScreenshotColors else lightScreenshotColors
+    val smallWindow = !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_EXPANDED_LOWER_BOUND)
+    val typography = if (smallWindow) smallWindowTypography else defaultTypography
+    val spacing = if (smallWindow) smallWindowSpacing else defaultSpacing
 
     CompositionLocalProvider(
         LocalScreenshotColors provides screenshotColors,
         LocalScreenshotTypography provides screenshotTypography,
+        LocalSpacing provides spacing,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = AppTypography,
+            typography = typography,
             content = content,
         )
     }

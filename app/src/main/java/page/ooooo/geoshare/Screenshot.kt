@@ -18,8 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.theme.ScreenshotTheme
-import page.ooooo.geoshare.ui.theme.Spacing
 
 @Composable
 fun Screenshot(
@@ -28,10 +29,12 @@ fun Screenshot(
     origSizePx: IntSize,
     content: @Composable (scale: Float) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     var currentSizePx by remember { mutableStateOf(IntSize.Zero) }
     Box(
         Modifier
-            .padding(horizontal = Spacing.large)
+            .sizeIn(maxWidth = 400.dp)
+            .padding(horizontal = spacing.large)
             .clip(MaterialTheme.shapes.large),
     ) {
         Image(
@@ -61,7 +64,7 @@ fun ScreenshotColumn(
             .let { if (width != null) it.width(with(density) { (width - 2 * x).toDp() * scale }) else it },
         verticalArrangement = Arrangement.spacedBy(with(density) { verticalSpacing.toDp() * scale }),
         horizontalAlignment = horizontalAlignment,
-        content = content
+        content = content,
     )
 }
 

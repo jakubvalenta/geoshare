@@ -8,9 +8,7 @@ import java.net.URL
 data class Documentation(val nameResId: Int, val inputs: List<DocumentationInput>)
 
 sealed class DocumentationInput(val addedInVersionCode: Int) {
-    class Text(addedInVersionCode: Int, val text: @Composable () -> String) :
-        DocumentationInput(addedInVersionCode)
-
+    class Text(addedInVersionCode: Int, val text: @Composable () -> String) : DocumentationInput(addedInVersionCode)
     class Url(addedInVersionCode: Int, val urlString: String) : DocumentationInput(addedInVersionCode)
 }
 

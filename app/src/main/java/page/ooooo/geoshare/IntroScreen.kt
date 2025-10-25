@@ -21,10 +21,10 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.components.ParagraphHtml
+import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -61,6 +61,7 @@ private fun IntroScreen(
     onShowOpenByDefaultSettings: () -> Unit,
     onShowOpenByDefaultSettingsForPackage: (packageName: String) -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
     val pageCount = 2
     var page by remember { mutableIntStateOf(initialPage) }
@@ -92,13 +93,13 @@ private fun IntroScreen(
             Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(horizontal = Spacing.windowPadding)
+                .padding(horizontal = spacing.windowPadding)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             LinearProgressIndicator(
                 { animatedProgress },
-                Modifier.padding(vertical = Spacing.tiny),
+                Modifier.padding(vertical = spacing.tiny),
                 trackColor = MaterialTheme.colorScheme.surface,
             )
             Column(
@@ -170,7 +171,7 @@ private fun IntroScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(vertical = Spacing.tiny),
+                    .padding(vertical = spacing.tiny),
             ) {
                 if (page != pageCount - 1) {
                     TextButton(
@@ -215,17 +216,18 @@ private fun IntroPage(
     page: Int,
     content: @Composable () -> Unit = {},
 ) {
+    val spacing = LocalSpacing.current
     Column(Modifier.fillMaxWidth()) {
         Text(
             headline,
             Modifier
                 .testTag("geoShareIntroPage${page}HeadingText")
-                .padding(vertical = Spacing.small),
+                .padding(vertical = spacing.small),
             style = MaterialTheme.typography.headlineSmall,
         )
         Column(
             Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(Spacing.small),
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
             content()
         }
@@ -237,10 +239,11 @@ private fun IntroFigure(
     captionHtml: String,
     content: @Composable () -> Unit = {},
 ) {
+    val spacing = LocalSpacing.current
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.tiny),
+        verticalArrangement = Arrangement.spacedBy(spacing.tiny),
     ) {
         ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
         content()

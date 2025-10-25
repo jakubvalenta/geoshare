@@ -1,4 +1,5 @@
 - Added Automation feature, which allows opening an app or copying coordinates automatically every time a link is converted to coordinates.
-- Added paste button to the main text field.
+- Changed app style to use more screen space and make it adaptive on tablets.
+- Added paste and random link buttons to the main screen.
 - Improved network connection retrying.
 - Fixed Apple Maps place links.

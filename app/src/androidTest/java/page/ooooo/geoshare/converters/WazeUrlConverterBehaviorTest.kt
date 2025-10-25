@@ -8,7 +8,7 @@ class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun test() {
         // Launch app and close intro
         launchApplication()
-        closeIntroIfItIsVisible()
+        closeIntro()
 
         // Coordinates
         testUri(

@@ -33,7 +33,7 @@ import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.converters.*
 import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.Spacing
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private data class Documentations(
     val documentations: List<Documentation>,
@@ -159,6 +159,7 @@ private fun UrlConvertersScreen(
     onChangeFilter: (filter: Filter) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
+    val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
     var filterExpanded by remember { mutableStateOf(false) }
@@ -199,17 +200,17 @@ private fun UrlConvertersScreen(
             Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(horizontal = Spacing.windowPadding)
+                .padding(horizontal = spacing.windowPadding)
                 .fillMaxWidth(),
         ) {
             Text(
                 stringResource(R.string.url_converters_text, appName),
-                Modifier.padding(top = Spacing.tiny),
+                Modifier.padding(top = spacing.tiny),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     lineBreak = LineBreak.Paragraph,
                 ),
             )
-            Box(Modifier.padding(vertical = Spacing.medium - 7.dp)) {
+            Box(Modifier.padding(vertical = spacing.medium - 7.dp)) {
                 ElevatedFilterChip(
                     selected = false,
                     onClick = { filterExpanded = true },
@@ -242,7 +243,7 @@ private fun UrlConvertersScreen(
                 ElevatedCard(
                     Modifier
                         .testTag("geoShareUrlConvertersRecentCard")
-                        .padding(bottom = Spacing.medium),
+                        .padding(bottom = spacing.medium),
                     shape = OutlinedTextFieldDefaults.shape,
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -252,8 +253,8 @@ private fun UrlConvertersScreen(
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .padding(Spacing.small),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                            .padding(spacing.small),
+                        horizontalArrangement = Arrangement.spacedBy(spacing.small),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         BadgedBox(badge = { Badge() }) {
@@ -273,13 +274,13 @@ private fun UrlConvertersScreen(
                             stringResource(urlConverterDocumentation.nameResId),
                             Modifier
                                 .testTag("geoShareUrlConvertersHeadline")
-                                .padding(bottom = Spacing.small),
+                                .padding(bottom = spacing.small),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                     item {
                         Column(
-                            Modifier.padding(bottom = Spacing.medium),
+                            Modifier.padding(bottom = spacing.medium),
                             verticalArrangement = Arrangement.spacedBy(1.dp),
                         ) {
                             urlConverterDocumentation.inputs.forEach { input ->
@@ -300,7 +301,7 @@ private fun UrlConvertersScreen(
                                         ) {
                                             Text(
                                                 trimHttps(input.urlString),
-                                                Modifier.padding(end = Spacing.tiny),
+                                                Modifier.padding(end = spacing.tiny),
                                                 style = MaterialTheme.typography.bodyMedium,
                                             )
                                             Text(

@@ -1,11 +1,17 @@
 package page.ooooo.geoshare.lib
 
+import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableMap
 import kotlin.random.Random
 
-typealias Point = Pair<String, String>
+@Immutable
+data class Point(val lat: String = "0", val lon: String = "0")
 
+@Immutable
 data class Position(
-    val points: List<Point>? = null,
+    val points: ImmutableList<Point>? = null,
     val q: String? = null,
     val z: String? = null,
 ) {
@@ -29,15 +35,15 @@ data class Position(
         lon: String,
         q: String? = null,
         z: String? = null,
-    ) : this(listOf(lat to lon), q, z)
+    ) : this(persistentListOf(Point(lat, lon)), q, z)
 
     val mainPoint: Point? get() = points?.lastOrNull()
 
-    fun toCoordsDecString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) -> "$lat, $lon" }
+    fun toCoordsDecString(): String = (mainPoint ?: Point()).let { (lat, lon) -> "$lat, $lon" }
 
-    fun toParamsString(): String = mutableListOf<String>().apply {
+    fun toParamsString(separator: String): String = buildList {
         q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-            (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
+            (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
                 val coords = "$lat,$lon"
                 if (q != coords) {
                     add(q.replace('+', ' '))
@@ -47,24 +53,24 @@ data class Position(
         z.takeUnless { it.isNullOrEmpty() }?.let { z ->
             add("z$z")
         }
-    }.joinToString(" \u2022 ")
+    }.joinToString(separator)
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String =
-        (mainPoint ?: ("0" to "0")).let { (lat, lon) -> "$lat,$lon" }.let { coords ->
+        (mainPoint ?: Point()).let { (lat, lon) -> "$lat,$lon" }.let { coords ->
             Uri(
                 scheme = "geo",
                 path = coords,
-                queryParams = mutableMapOf<String, String>().apply {
+                queryParams = buildMap {
                     set("q", q ?: coords)
                     z?.let { z ->
                         set("z", z)
                     }
-                },
+                }.toImmutableMap(),
                 uriQuote = uriQuote,
             ).toString()
         }
 
-    fun toNorthSouthWestEastDecCoordsString(): String = (mainPoint ?: ("0" to "0")).let { (lat, lon) ->
+    fun toNorthSouthWestEastDecCoordsString(): String = (mainPoint ?: Point()).let { (lat, lon) ->
         listOf(
             coordToDeg(lat, "S", "N"),
             coordToDeg(lon, "W", "E"),

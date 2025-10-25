@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -217,6 +218,12 @@ class ConversionViewModel @Inject constructor(
     fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {
         viewModelScope.launch {
             userPreferencesRepository.setValue(userPreference, value)
+        }
+    }
+
+    fun editUserPreferences(transform: (preferences: MutablePreferences) -> Unit) {
+        viewModelScope.launch {
+            userPreferencesRepository.edit(transform)
         }
     }
 }
