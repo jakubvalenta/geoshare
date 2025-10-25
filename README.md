@@ -17,14 +17,14 @@ map app.
 **Supported map links**
 
 - Google Maps
-- Apple Maps (beta)
-- HERE WeGo (beta)
-- Magic Earth (beta)
-- Mapy.com (beta)
-- OpenStreetMap (beta)
-- OsmAnd (beta)
-- Waze (beta)
-- Yandex Maps (beta)
+- Apple Maps
+- HERE WeGo
+- Magic Earth
+- Mapy.com
+- OpenStreetMap
+- OsmAnd
+- Waze
+- Yandex Maps
 - coordinates
 
 **Example use cases**
@@ -145,14 +145,17 @@ issue](https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-li
 alt="Screenshot of Geo Share's main screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"
-alt="Screenshot of Geo Share's share screen"
+alt="Screenshot of Geo Share's result screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"
-alt="Screenshot of Geo Share asking for permission to connect to Google"
+alt="Screenshot of Geo Share's automation configuration screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
-alt="Screenshot of Geo Share's intro screen"
+alt="Screenshot of Geo Share asking for permission to connect to Google"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"
+alt="Screenshot of Geo Share's intro screen"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png)
 
 ## Installation
 
