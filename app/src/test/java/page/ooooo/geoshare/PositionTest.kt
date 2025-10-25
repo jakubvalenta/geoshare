@@ -29,7 +29,7 @@ class PositionTest {
     @Test
     fun toDegMinSecCoordsString_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
-            "17° 12′ 59.65956″ S, 149° 56′ 49.30584″ W",
+            "17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W",
             Position("-17.2165721", "-149.9470294").toDegMinSecCoordsString(),
         )
     }
@@ -37,7 +37,7 @@ class PositionTest {
     @Test
     fun toDegMinSecCoordsString_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
-            "52° 30′ 24.22656″ N, 13° 15′ 35.75124″ E",
+            "52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E",
             Position("52.5067296", "13.2599309").toDegMinSecCoordsString(),
         )
     }
@@ -45,7 +45,7 @@ class PositionTest {
     @Test
     fun toDegMinSecCoordsString_returnsZerosForZeroCoordinates() {
         assertEquals(
-            "0° 0′ 0.0″ N, 0° 0′ 0.0″ E",
+            "0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E",
             Position("0", "0").toDegMinSecCoordsString(),
         )
     }
@@ -53,7 +53,7 @@ class PositionTest {
     @Test
     fun toDegMinSecCoordsString_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
-            "0° 30′ 0.0″ N, 0° 30′ 0.0″ E",
+            "0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E",
             Position("0.5", "0.5").toDegMinSecCoordsString(),
         )
     }
@@ -61,7 +61,7 @@ class PositionTest {
     @Test
     fun toDegMinSecCoordsString_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
-            "10° 0′ 0.0″ S, 20° 0′ 0.0″ W",
+            "10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W",
             Position("-10", "-20").toDegMinSecCoordsString(),
         )
     }
@@ -69,7 +69,7 @@ class PositionTest {
     @Test
     fun toDegMinSecCoordsString_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
-            "10° 30′ 0.0″ S, 20° 30′ 0.0″ W",
+            "10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W",
             Position("-10.5", "-20.5").toDegMinSecCoordsString(),
         )
     }
