@@ -182,7 +182,7 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
         listOf(
             AutomationImpl.Noop() to Modifier,
             AutomationImpl.CopyCoordsDec() to Modifier.testTag("geoShareUserPreferenceAutomationCopyCoordsDec"),
-            AutomationImpl.CopyCoordsNorthSouthWestEastDec() to Modifier,
+            AutomationImpl.CopyCoordsDegMinSec() to Modifier,
             AutomationImpl.CopyGeoUri() to Modifier,
             AutomationImpl.CopyGoogleMapsUri() to Modifier,
             AutomationImpl.CopyAppleMapsUri() to Modifier,
@@ -210,7 +210,7 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
         return when (type) {
             AutomationType.COPY_APPLE_MAPS_URI -> AutomationImpl.CopyAppleMapsUri()
             AutomationType.COPY_COORDS_DEC -> AutomationImpl.CopyCoordsDec()
-            AutomationType.COPY_COORDS_NSWE_DEC -> AutomationImpl.CopyCoordsNorthSouthWestEastDec()
+            AutomationType.COPY_COORDS_NSWE_DEC -> AutomationImpl.CopyCoordsDegMinSec()
             AutomationType.COPY_GEO_URI -> AutomationImpl.CopyGeoUri()
             AutomationType.COPY_GOOGLE_MAPS_URI -> AutomationImpl.CopyGoogleMapsUri()
             AutomationType.COPY_MAGIC_EARTH_URI -> AutomationImpl.CopyMagicEarthUri()
@@ -228,7 +228,7 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
         val (type, packageName) = when (value) {
             is AutomationImpl.CopyAppleMapsUri -> AutomationType.COPY_APPLE_MAPS_URI to ""
             is AutomationImpl.CopyCoordsDec -> AutomationType.COPY_COORDS_DEC to ""
-            is AutomationImpl.CopyCoordsNorthSouthWestEastDec -> AutomationType.COPY_COORDS_NSWE_DEC to ""
+            is AutomationImpl.CopyCoordsDegMinSec -> AutomationType.COPY_COORDS_NSWE_DEC to ""
             is AutomationImpl.CopyGeoUri -> AutomationType.COPY_GEO_URI to ""
             is AutomationImpl.CopyGoogleMapsUri -> AutomationType.COPY_GOOGLE_MAPS_URI to ""
             is AutomationImpl.CopyMagicEarthUri -> AutomationType.COPY_MAGIC_EARTH_URI to ""

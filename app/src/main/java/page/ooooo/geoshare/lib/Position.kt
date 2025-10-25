@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
+import kotlin.math.abs
 import kotlin.random.Random
 
 @Immutable
@@ -70,11 +71,11 @@ data class Position(
             ).toString()
         }
 
-    fun toNorthSouthWestEastDecCoordsString(): String = (mainPoint ?: Point()).let { (lat, lon) ->
-        listOf(
-            coordToDeg(lat, "S", "N"),
-            coordToDeg(lon, "W", "E"),
-        ).joinToString(", ")
+    fun toDegMinSecCoordsString(): String {
+        val (latDegInt, latMinInt, latSec) = (mainPoint?.lat?.toDoubleOrNull() ?: 0.0).toDegMinSec()
+        val (lonDegInt, lonMinInt, lonSec) = (mainPoint?.lon?.toDoubleOrNull() ?: 0.0).toDegMinSec()
+        return "${abs(latDegInt)}°\u00a0$latMinInt′\u00a0${latSec.toScale(5)}″\u00a0${if (latDegInt < 0) "S" else "N"}, " +
+                "${abs(lonDegInt)}°\u00a0$lonMinInt′\u00a0${lonSec.toScale(5)}″\u00a0${if (lonDegInt < 0) "W" else "E"}"
     }
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
@@ -86,18 +87,5 @@ data class Position(
             append("<wpt lat=\"${uriQuote.encode(lat)}\" lon=\"${uriQuote.encode(lon)}\" />\n")
         }
         append("</gpx>\n")
-    }
-
-    private fun coordToDeg(s: String, directionNegative: String, directionPositive: String): String {
-        var abs: String
-        var direction: String
-        if (s.startsWith("-")) {
-            abs = s.substring(1)
-            direction = directionNegative
-        } else {
-            abs = s
-            direction = directionPositive
-        }
-        return "$abs\u00B0\u00A0$direction"
     }
 }

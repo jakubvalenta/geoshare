@@ -32,7 +32,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         nameResId = R.string.converter_coordinates_name,
         inputs = listOf(
             DocumentationInput.Text(20) {
-                stringResource(R.string.example, Position.example.toNorthSouthWestEastDecCoordsString())
+                stringResource(R.string.example, Position.example.toDegMinSecCoordsString())
             },
         ),
     )

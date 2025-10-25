@@ -88,7 +88,7 @@ sealed class AutomationImpl : Automation {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    Position.example.toCoordsDecString().replace(' ', ' ')
+                    Position.example.toCoordsDecString(),
                 )
             )
         }
@@ -97,19 +97,19 @@ sealed class AutomationImpl : Automation {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    class CopyCoordsNorthSouthWestEastDec :
+    class CopyCoordsDegMinSec :
         AutomationImpl(),
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(position.toNorthSouthWestEastDecCoordsString())
+            AutomationAction.Copy(position.toDegMinSecCoordsString())
 
         @Composable
         override fun Label() {
             Text(
                 stringResource(
                     R.string.user_preferences_automation_copy_coords,
-                    Position.example.toNorthSouthWestEastDecCoordsString().replace(' ', ' '),
+                    Position.example.toDegMinSecCoordsString(),
                 )
             )
         }
