@@ -125,4 +125,5 @@
     <string name="user_preferences_automation_nothing">无</string>
     <string name="user_preferences_automation_open_app">打开 %1$s</string>
     <string name="user_preferences_automation_title">自动化</string>
+    <string name="main_random">随机链接</string>
 </resources>
