@@ -3,14 +3,14 @@ Partagez un lien cartographique avec Geo Share et l’application l’ouvrira da
 <b>Liens cartographiques pris en charge</b>
 
 - Google Maps
-- Apple Plans (beta)
-- HERE WeGo (beta)
-- Magic Earth (beta)
-- Mapy.com (beta)
-- OpenStreetMap (beta)
-- OsmAnd (beta)
-- Waze (beta)
-- Yandex Maps (beta)
+- Apple Plans
+- HERE WeGo
+- Magic Earth
+- Mapy.com
+- OpenStreetMap
+- OsmAnd
+- Waze
+- Yandex Maps
 - coordonnées
 
 <b>Exemples d’utilisation</b>

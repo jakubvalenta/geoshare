@@ -127,4 +127,5 @@
     <string name="user_preferences_automation_nothing">Rien</string>
     <string name="user_preferences_automation_open_app">Ouvrir %1$s</string>
     <string name="user_preferences_automation_title">Automatisation</string>
+    <string name="main_random">Lien aléatoire</string>
 </resources>
