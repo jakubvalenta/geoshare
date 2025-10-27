@@ -3,14 +3,14 @@ Compartilhe um link de mapa com o Geo Share e o app abrirá ele em outro app de 
 <b>Links de mapa suportados</b>
 
 - Google Maps
-- Apple Maps (em beta)
-- HERE WeGo (em beta)
-- Magic Earth (em beta)
-- Mapy.com (em beta)
-- OpenStreetMap (em beta)
-- OsmAnd (em beta)
-- Waze (em beta)
-- Yandex Maps (em beta)
+- Apple Maps
+- HERE WeGo
+- Magic Earth
+- Mapy.com
+- OpenStreetMap
+- OsmAnd
+- Waze
+- Yandex Maps
 - Coordenadas
 
 <b>Exemplos de como usar</b>
