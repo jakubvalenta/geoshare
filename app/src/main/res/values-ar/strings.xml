@@ -112,4 +112,23 @@
     <string name="url_converters_recent_info">حصل %1$s مؤخرًا على دعم لخدمات خرائط جديدة.</string>
     <string name="url_converters_settings_button_content_description">افتح إعدادات Android</string>
     <string name="conversion_loading_indicator_description">المحاولة %1$d من أصل %2$d بسبب %3$s.</string>
+    <string name="conversion_succeeded_save_gpx_failed">فشل حفظ GPX</string>
+    <string name="main_input_uri_paste_content_description">ألصق</string>
+    <string name="main_random">رابط عشوائي</string>
+    <string name="conversion_automation_copy_link_succeeded">نُسخ الرابط تلقائيًا</string>
+    <string name="conversion_automation_copy_succeeded">نُسخ الإحداثيات تلقائيًا</string>
+    <string name="conversion_automation_open_app_failed">فشل فتح %1$s تلقائيًا</string>
+    <string name="conversion_automation_open_app_succeeded">فُتح تلقائيًا %1$s</string>
+    <string name="conversion_automation_open_app_waiting">فتح %1$s تلقائيًا في %2$d ثوانٍ</string>
+    <string name="conversion_automation_save_gpx_succeeded">حُفظ GPX تلقائيًا</string>
+    <string name="conversion_automation_save_gpx_waiting">يحفظ GPX تلقائيًا في %1$ds</string>
+    <string name="conversion_automation_share_failed">فشل في مشاركة الرابط تلقائيًا</string>
+    <string name="conversion_automation_share_succeeded">رابط مشترك تلقائيًا</string>
+    <string name="conversion_automation_share_waiting">مشاركة الرابط تلقائيًا خلال %1$d ثانية</string>
+    <string name="user_preferences_automation_copy_coords">انسخ الإحداثيات بالصيغة %1$s</string>
+    <string name="user_preferences_automation_copy_link">انسخ رابط %1$s</string>
+    <string name="user_preferences_automation_description">اختر إجراءً ليتم تنفيذه تلقائيًا عند تحويل رابط الخريطة إلى إحداثيات.</string>
+    <string name="user_preferences_automation_nothing">لا شيء</string>
+    <string name="user_preferences_automation_open_app">افتح %1$s</string>
+    <string name="user_preferences_automation_title">أتمتة</string>
 </resources>
