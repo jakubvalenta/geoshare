@@ -1,14 +1,13 @@
 package page.ooooo.geoshare.lib.converters
 
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.uriPattern
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -17,6 +16,34 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
         const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
         val DECODED_LAT_PATTERN: Pattern = Pattern.compile("""(lat=|"latitude":)$LAT""")
         val DECODED_LON_PATTERN: Pattern = Pattern.compile("""(lon=|"longitude":)$LON""")
+    }
+
+    class EncodedPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+        override val points: List<Point>?
+            get() {
+                val encoded = matcher.groupOrNull("encoded") ?: return null
+                val decoded = Base64.decode(encoded).decodeToString()
+                val lat = DECODED_LAT_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
+                    try {
+                        m.group("lat")
+                    } catch (_: IllegalArgumentException) {
+                        null
+                    }
+                } ?: return null
+                val lon = DECODED_LON_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
+                    try {
+                        m.group("lon")
+                    } catch (_: IllegalArgumentException) {
+                        null
+                    }
+                } ?: return null
+                return persistentListOf(Point(lat, lon))
+            }
+    }
+
+    class EncodedPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { EncodedPositionMatch(it) }
+        override fun find(input: String) = pattern.matcherIfFind(input)?.let { EncodedPositionMatch(it) }
     }
 
     @Suppress("SpellCheckingInspection")
@@ -42,28 +69,7 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
             optional {
                 query("map", PositionRegex("$LAT,$LON,$Z"))
             }
-            path(object : PositionRegex("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""") {
-                override val points: List<Point>?
-                    get() {
-                        val encoded = groupOrNull("encoded") ?: return null
-                        val decoded = Base64.decode(encoded).decodeToString()
-                        val lat = DECODED_LAT_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
-                            try {
-                                m.group("lat")
-                            } catch (_: IllegalArgumentException) {
-                                null
-                            }
-                        } ?: return null
-                        val lon = DECODED_LON_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
-                            try {
-                                m.group("lon")
-                            } catch (_: IllegalArgumentException) {
-                                null
-                            }
-                        } ?: return null
-                        return persistentListOf(Point(lat, lon))
-                    }
-            })
+            path(EncodedPositionRegex("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)"""))
         }
     }
 }

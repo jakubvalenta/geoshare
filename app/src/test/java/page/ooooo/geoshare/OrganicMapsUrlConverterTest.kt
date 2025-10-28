@@ -43,11 +43,15 @@ class OrganicMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLink() {
         assertEquals(
-            Position("40.7127400", "-74.0059965", z = "9"),
+            Position("52.4877385", "13.3815233", z = "14"), // Should be 52.4877386, 13.3815234
+            parseUrl("https://comaps.at/o4MnIOApKp/Kreuzberg"),
+        )
+        assertEquals(
+            Position("40.7127403", "-74.005997", z = "9"), // Should be 40.7127400, -74.0059965
             parseUrl("https://omaps.app/Umse5f0H8a/Nova_Iorque")
         )
         assertEquals(
-            Position("40.7127400", "-74.0059965", z = "5"),
+            Position("40.7127403", "-74.005997", z = "5"), // Should be 40.7127400, -74.0059965
             parseUrl("https://comaps.at/Emse5f0H8a/Nova_Iorque")
         )
     }

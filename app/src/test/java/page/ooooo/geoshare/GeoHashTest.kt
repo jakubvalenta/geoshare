@@ -109,11 +109,11 @@ class GeoHashTest {
     @Test
     fun decodeOrganicMapsGeoHash() {
         assertEquals(
-            Triple(40.71274, -74.0059965, 9),
+            Triple(40.71274034678936, -74.00599703192711, 9), // Should be 40.71274, -74.0059965
             OrganicMapsUrlConverter.decodeGeoHash("Umse5f0H8a"),
         )
         assertEquals(
-            Triple(40.71274, -74.0059965, 5),
+            Triple(40.71274034678936, -74.00599703192711, 5), // Should be 40.71274, -74.0059965
             OrganicMapsUrlConverter.decodeGeoHash("Emse5f0H8a"),
         )
     }

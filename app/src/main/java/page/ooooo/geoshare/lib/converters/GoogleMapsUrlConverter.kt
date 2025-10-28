@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
@@ -53,9 +54,9 @@ class GoogleMapsUrlConverter() :
     /**
      * Repeatedly searches for LAT and LON in DATA to get points
      */
-    class DataPointsPositionRegex(regex: String) : PositionRegex(regex) {
+    class DataPointsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
         override val points: List<Point>?
-            get() = groupOrNull("data")?.let { data ->
+            get() = matcher.groupOrNull("data")?.let { data ->
                 buildList {
                     DATA_PATTERNS.forEach { dataPattern ->
                         dataPattern.matcher(data).let { m ->
@@ -70,6 +71,11 @@ class GoogleMapsUrlConverter() :
                     }
                 }
             }
+    }
+
+    class DataPointsPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { DataPointsPositionMatch(it) }
+        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DataPointsPositionMatch(it) }
     }
 
     override val uriPattern: Pattern =

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
@@ -16,30 +17,37 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
 
         @Suppress("SpellCheckingInspection")
-        private val HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~"
-            .mapIndexed { i, char -> char to i }.toMap()
+        private val HASH_CHAR_MAP =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~".mapIndexed { i, char -> char to i }
+                .toMap()
 
         /**
          * See https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
          */
-        fun decodeGeoHash(hash: String) =
-            decodeGeoHash(hash, HASH_CHAR_MAP, 6).let { (lat, lon, z) ->
-                // Add relative zoom, which works like this:
-                // - If the hash doesn't end with "-", add 0.
-                // - If the hash ends with "-", add -2.
-                // - If the hash ends with "--", add -1.
-                // - If the hash ends with "---", add 0.
-                // - If the hash ends with "----", add -2.
-                // - etc.
-                val relativeZoom = hash.takeLastWhile { it == '-' }.length.takeIf { it > 0 }
-                    ?.let { zoomCharCount -> (zoomCharCount + 2).mod(3) - 2 }
-                    ?: 0
-                Triple(lat, lon, max(z + relativeZoom, 0))
-            }
+        fun decodeGeoHash(hash: String) = decodeGeoHash(hash, HASH_CHAR_MAP, 6).let { (lat, lon, z) ->
+            // Add relative zoom, which works like this:
+            // - If the hash doesn't end with "-", add 0.
+            // - If the hash ends with "-", add -2.
+            // - If the hash ends with "--", add -1.
+            // - If the hash ends with "---", add 0.
+            // - If the hash ends with "----", add -2.
+            // - etc.
+            val relativeZoom = hash.takeLastWhile { it == '-' }.length.takeIf { it > 0 }
+                ?.let { zoomCharCount -> (zoomCharCount + 2).mod(3) - 2 } ?: 0
+            Triple(lat, lon, max(z + relativeZoom, 0))
+        }
     }
 
-    class GeoHashPositionRegex(regex: String) : page.ooooo.geoshare.lib.GeoHashPositionRegex(regex) {
+    class OpenStreetMapGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
         override fun decode(hash: String) = decodeGeoHash(hash)
+    }
+
+    class OpenStreetMapGeoHashPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) =
+            pattern.matcherIfMatches(input)?.let { OpenStreetMapGeoHashPositionMatch(it) }
+
+        override fun find(input: String) =
+            pattern.matcherIfFind(input)?.let { OpenStreetMapGeoHashPositionMatch(it) }
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
@@ -56,12 +64,12 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     )
 
     override val conversionUriPattern = uriPattern {
-        path(GeoHashPositionRegex("""/go/$HASH"""))
+        path(OpenStreetMapGeoHashPositionRegex("""/go/$HASH"""))
         path(PositionRegex(ELEMENT_PATH))
         fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
     }
 
-    override val conversionHtmlPattern = htmlPattern<PositionRegex> {
+    override val conversionHtmlPattern = htmlPattern {
         content(PointsPositionRegex(""""lat":$LAT,"lon":$LON"""))
     }
 

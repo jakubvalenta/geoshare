@@ -1,15 +1,12 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.compose.ui.res.stringResource
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionRegex.Companion.MAX_COORD_PRECISION
-import page.ooooo.geoshare.lib.toScale
-import page.ooooo.geoshare.lib.uriPattern
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     companion object {
@@ -24,6 +21,21 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?)"""
         const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
         const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+
+        private fun degToDec(
+            southOrWest: Boolean,
+            sig: String?,
+            deg: String?,
+            min: String? = null,
+            sec: String? = null,
+        ): String {
+            val sig = if (southOrWest && sig != "-" || !southOrWest && sig == "-") -1 else 1
+            val deg = (deg?.toDouble() ?: 0.0)
+            val min = (min?.toDouble() ?: 0.0) / 60
+            val sec = (sec?.toDouble() ?: 0.0) / 3600
+            val dec = (sig * (deg + min + sec))
+            return dec.toScale(6).toString()
+        }
     }
 
     @Suppress("SpellCheckingInspection")
@@ -37,82 +49,91 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
-        // Decimal, e.g. `N 41.40338, E 2.17403`
-        path(object : PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") {
-            override val points: List<Point>
-                get() {
-                    val lat = degToDec(
-                        groupOrNull()?.contains('S') == true,
-                        groupOrNull("latSig"),
-                        groupOrNull("latDeg"),
-                    )
-                    val lon = degToDec(
-                        groupOrNull()?.contains('W') == true,
-                        groupOrNull("lonSig"),
-                        groupOrNull("lonDeg"),
-                    )
-                    return persistentListOf(Point(lat, lon))
-                }
-        })
-
-        // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-        path(object :
-            PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") {
-            override val points: List<Point>
-                get() {
-                    val lat = degToDec(
-                        groupOrNull()?.contains('S') == true,
-                        groupOrNull("latSig"),
-                        groupOrNull("latDeg"),
-                        groupOrNull("latMin"),
-                        groupOrNull("latSec"),
-                    )
-                    val lon = degToDec(
-                        groupOrNull()?.contains('W') == true,
-                        groupOrNull("lonSig"),
-                        groupOrNull("lonDeg"),
-                        groupOrNull("lonMin"),
-                        groupOrNull("lonSec"),
-                    )
-                    return persistentListOf(Point(lat, lon))
-                }
-        })
-
-        // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-        path(object :
-            PositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") {
-            override val points: List<Point>
-                get() {
-                    val lat = degToDec(
-                        groupOrNull()?.contains('S') == true,
-                        groupOrNull("latSig"),
-                        groupOrNull("latDeg"),
-                        groupOrNull("latMin"),
-                    )
-                    val lon = degToDec(
-                        groupOrNull()?.contains('W') == true,
-                        groupOrNull("lonSig"),
-                        groupOrNull("lonDeg"),
-                        groupOrNull("lonMin"),
-                    )
-                    return persistentListOf(Point(lat, lon))
-                }
-        })
+    class DecimalCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+        override val points: List<Point>
+            get() {
+                val lat = degToDec(
+                    matcher.groupOrNull()?.contains('S') == true,
+                    matcher.groupOrNull("latSig"),
+                    matcher.groupOrNull("latDeg"),
+                )
+                val lon = degToDec(
+                    matcher.groupOrNull()?.contains('W') == true,
+                    matcher.groupOrNull("lonSig"),
+                    matcher.groupOrNull("lonDeg"),
+                )
+                return persistentListOf(Point(lat, lon))
+            }
     }
 
-    private fun degToDec(
-        southOrWest: Boolean,
-        sig: String?,
-        deg: String?,
-        min: String? = null,
-        sec: String? = null,
-    ): String {
-        val sig = if (southOrWest && sig != "-" || !southOrWest && sig == "-") -1 else 1
-        val deg = (deg?.toDouble() ?: 0.0)
-        val min = (min?.toDouble() ?: 0.0) / 60
-        val sec = (sec?.toDouble() ?: 0.0) / 3600
-        val dec = (sig * (deg + min + sec))
-        return dec.toScale(6).toString()
+    class DecimalCoordsPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { DecimalCoordsPositionMatch(it) }
+        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DecimalCoordsPositionMatch(it) }
+    }
+
+    class DegreesMinutesSecondsCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+        override val points: List<Point>
+            get() {
+                val lat = degToDec(
+                    matcher.groupOrNull()?.contains('S') == true,
+                    matcher.groupOrNull("latSig"),
+                    matcher.groupOrNull("latDeg"),
+                    matcher.groupOrNull("latMin"),
+                    matcher.groupOrNull("latSec"),
+                )
+                val lon = degToDec(
+                    matcher.groupOrNull()?.contains('W') == true,
+                    matcher.groupOrNull("lonSig"),
+                    matcher.groupOrNull("lonDeg"),
+                    matcher.groupOrNull("lonMin"),
+                    matcher.groupOrNull("lonSec"),
+                )
+                return persistentListOf(Point(lat, lon))
+            }
+    }
+
+    class DegreesMinutesSecondsCoordsPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) =
+            pattern.matcherIfMatches(input)?.let { DegreesMinutesSecondsCoordsPositionMatch(it) }
+
+        override fun find(input: String) =
+            pattern.matcherIfFind(input)?.let { DegreesMinutesSecondsCoordsPositionMatch(it) }
+    }
+
+    class DegreesMinutesCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+        override val points: List<Point>
+            get() {
+                val lat = degToDec(
+                    matcher.groupOrNull()?.contains('S') == true,
+                    matcher.groupOrNull("latSig"),
+                    matcher.groupOrNull("latDeg"),
+                    matcher.groupOrNull("latMin"),
+                )
+                val lon = degToDec(
+                    matcher.groupOrNull()?.contains('W') == true,
+                    matcher.groupOrNull("lonSig"),
+                    matcher.groupOrNull("lonDeg"),
+                    matcher.groupOrNull("lonMin"),
+                )
+                return persistentListOf(Point(lat, lon))
+            }
+    }
+
+    class DegreesMinutesCoordsPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) =
+            pattern.matcherIfMatches(input)?.let { DegreesMinutesCoordsPositionMatch(it) }
+
+        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DegreesMinutesCoordsPositionMatch(it) }
+    }
+
+    override val conversionUriPattern = uriPattern {
+        // Decimal, e.g. `N 41.40338, E 2.17403`
+        path(DecimalCoordsPositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*"""))
+
+        // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
+        path(DegreesMinutesSecondsCoordsPositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*"""))
+
+        // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
+        path(DegreesMinutesCoordsPositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*"""))
     }
 }

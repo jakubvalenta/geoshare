@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
@@ -8,6 +9,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
@@ -16,6 +18,8 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.htmlPattern
+import page.ooooo.geoshare.lib.matcherIfFind
+import page.ooooo.geoshare.lib.matcherIfMatches
 import page.ooooo.geoshare.lib.uriPattern
 
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
@@ -48,8 +52,13 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
     /**
      * Sets points to zero, so that we avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
      */
-    class DoNotParseHtmlPositionRegex(regex: String) : PositionRegex(regex) {
+    class DoNotParseHtmlPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
         override val points = persistentListOf(Point())
+    }
+
+    class DoNotParseHtmlPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { DoNotParseHtmlPositionMatch(it) }
+        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DoNotParseHtmlPositionMatch(it) }
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")

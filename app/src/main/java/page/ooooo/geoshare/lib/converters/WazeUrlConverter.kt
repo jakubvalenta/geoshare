@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
@@ -27,10 +28,15 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
             decodeGeoHash(hash, HASH_CHAR_MAP, 5, useMeanValue = true)
     }
 
-    class GeoHashPositionRegex(regex: String) : page.ooooo.geoshare.lib.GeoHashPositionRegex(regex) {
+    class WazeGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
         override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
             Triple(lat.toScale(6), lon.toScale(6), z)
         }
+    }
+
+    class WazeGeoHashPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { WazeGeoHashPositionMatch(it) }
+        override fun find(input: String) = pattern.matcherIfFind(input)?.let { WazeGeoHashPositionMatch(it) }
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
@@ -51,8 +57,8 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
                 query("z", PositionRegex(Z))
             }
             first {
-                path(GeoHashPositionRegex("""/ul/h$HASH"""))
-                query("h", GeoHashPositionRegex(HASH))
+                path(WazeGeoHashPositionRegex("""/ul/h$HASH"""))
+                query("h", WazeGeoHashPositionRegex(HASH))
                 query("to", PositionRegex("""ll\.$LAT,$LON"""))
                 query("ll", PositionRegex("$LAT,$LON"))
                 @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))

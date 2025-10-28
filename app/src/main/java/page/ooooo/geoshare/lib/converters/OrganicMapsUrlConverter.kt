@@ -1,9 +1,14 @@
 package page.ooooo.geoshare.lib.converters
 
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.GeoHashPositionMatch
 import page.ooooo.geoshare.lib.PositionRegex
 import page.ooooo.geoshare.lib.decodeGeoHash
+import page.ooooo.geoshare.lib.matcherIfFind
+import page.ooooo.geoshare.lib.matcherIfMatches
+import page.ooooo.geoshare.lib.toScale
 import page.ooooo.geoshare.lib.uriPattern
 import kotlin.math.roundToInt
 
@@ -37,8 +42,18 @@ class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
         }
     }
 
-    class GeoHashPositionRegex(regex: String) : page.ooooo.geoshare.lib.GeoHashPositionRegex(regex) {
-        override fun decode(hash: String): Triple<Double, Double, Int> = decodeGeoHash(hash)
+    class OrganicMapsGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+        override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
+            Triple(lat.toScale(7), lon.toScale(7), z)
+        }
+    }
+
+    class OrganicMapsGeoHashPositionRegex(regex: String) : PositionRegex(regex) {
+        override fun matches(input: String) =
+            pattern.matcherIfMatches(input)?.let { OrganicMapsGeoHashPositionMatch(it) }
+
+        override fun find(input: String) =
+            pattern.matcherIfFind(input)?.let { OrganicMapsGeoHashPositionMatch(it) }
     }
 
     @Suppress("SpellCheckingInspection")
@@ -51,7 +66,7 @@ class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = uriPattern<PositionRegex> {
-        path(GeoHashPositionRegex("""/$HASH\S*"""))
+    override val conversionUriPattern = uriPattern {
+        path(OrganicMapsGeoHashPositionRegex("""/$HASH\S*"""))
     }
 }

@@ -7,37 +7,28 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
 
-abstract class ConversionRegex(regex: String) {
-    protected val pattern: Pattern = Pattern.compile(regex)
-    protected var matcher: Matcher? = null
-    protected var input: String? = null
+abstract class ConversionRegex<T>(val regex: String) {
+    protected var patternCache: Pattern? = null
+    protected val pattern: Pattern get() = patternCache ?: Pattern.compile(regex).also { patternCache = it }
 
-    open fun matches(input: String): Boolean {
-        this.input = input
-        matcher = pattern.matcher(input)
-        return matcher?.matches() == true
-    }
-
-    open fun find(input: String): Boolean {
-        this.input = input
-        matcher = pattern.matcher(input)
-        return matcher?.find() == true
-    }
-
-    protected fun groupOrNull(): String? = try {
-        matcher?.group()
-    } catch (_: IllegalArgumentException) {
-        null
-    }
-
-    protected fun groupOrNull(name: String): String? = try {
-        matcher?.group(name)
-    } catch (_: IllegalArgumentException) {
-        null
-    }
+    abstract fun matches(input: String): T?
+    abstract fun find(input: String): T?
 }
 
-open class PositionRegex(regex: String) : ConversionRegex(regex) {
+open class PositionMatch(val matcher: Matcher) {
+    open val points: List<Point>?
+        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(lat, lon)) } }
+    open val lat: String?
+        get() = matcher.groupOrNull("lat")
+    open val lon: String?
+        get() = matcher.groupOrNull("lon")
+    open val q: String?
+        get() = matcher.groupOrNull("q")
+    open val z: String?
+        get() = matcher.groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
+}
+
+open class PositionRegex(regex: String) : ConversionRegex<PositionMatch>(regex) {
     companion object {
         const val MAX_COORD_PRECISION = 17
         const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
@@ -49,24 +40,16 @@ open class PositionRegex(regex: String) : ConversionRegex(regex) {
         const val Q_PATH = """(?P<q>[^/]+)"""
     }
 
-    open val points: List<Point>?
-        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(lat, lon)) } }
-    open val lat: String?
-        get() = groupOrNull("lat")
-    open val lon: String?
-        get() = groupOrNull("lon")
-    open val q: String?
-        get() = groupOrNull("q")
-    open val z: String?
-        get() = groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
+    override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { PositionMatch(it) }
+    override fun find(input: String) = pattern.matcherIfFind(input)?.let { PositionMatch(it) }
 }
 
 /**
  * Repeatedly searches for LAT and LON in the input to get points.
  */
-class PointsPositionRegex(regex: String) : PositionRegex(regex) {
+class PointsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
     override val points: List<Point>
-        get() = pattern.matcher(input).let { m ->
+        get() = matcher.reset().let { m ->
             buildList {
                 while (m.find()) {
                     try {
@@ -79,31 +62,31 @@ class PointsPositionRegex(regex: String) : PositionRegex(regex) {
         }
 }
 
-abstract class GeoHashPositionRegex(regex: String) : PositionRegex(regex) {
-    abstract fun decode(hash: String): Triple<Double, Double, Int>
+open class PointsPositionRegex(regex: String) : PositionRegex(regex) {
+    override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { PointsPositionMatch(it) }
+    override fun find(input: String) = pattern.matcherIfFind(input)?.let { PointsPositionMatch(it) }
+}
 
+abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
     private var latLonZCache: Triple<Double, Double, Int>? = null
-
     val latLonZ: Triple<Double, Double, Int>?
-        get() = latLonZCache ?: groupOrNull("hash")?.let { hash ->
-            decode(hash).also { latLonZCache = it }
-        }
-
+        get() = latLonZCache ?: matcher.groupOrNull("hash")?.let { hash -> decode(hash).also { latLonZCache = it } }
     override val points: List<Point>?
-        get() = latLonZ?.let { (lat, lon) ->
-            persistentListOf(Point(lat.toString(), lon.toString()))
-        }
-    override val z: String? get() = latLonZ?.third?.toString()
+        get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(lat.toString(), lon.toString())) }
+    override val z: String?
+        get() = latLonZ?.third?.toString()
+
+    abstract fun decode(hash: String): Triple<Double, Double, Int>
 }
 
 /**
- * Create a position from a list of regexes.
+ * Create a position from a list of matches.
  *
- * Get points from the last regex that has not null `points` property. If such a regex doesn't exist, find the last
- * regex that has not null `lat` property and the last regex that has not null `lon` property and create a point from
+ * Get points from the last match that has not null `points` property. If such a match doesn't exist, find the last
+ * match that has not null `lat` property and the last match that has not null `lon` property and create a point from
  * them.
  */
-fun List<PositionRegex>.toPosition() = Position(
+fun List<PositionMatch>.toPosition() = Position(
     this.lastNotNullOrNull { it.points?.toImmutableList() }
         ?: this.lastNotNullOrNull { it.lat }?.let { lat ->
             this.lastNotNullOrNull { it.lon }?.let { lon ->
@@ -114,8 +97,13 @@ fun List<PositionRegex>.toPosition() = Position(
     this.lastNotNullOrNull { it.z },
 )
 
-open class RedirectRegex(regex: String) : ConversionRegex(regex) {
-    open val url: String? get() = groupOrNull("url")
+open class RedirectMatch(val matcher: Matcher) {
+    open val url: String? get() = matcher.groupOrNull("url")
 }
 
-fun List<RedirectRegex>.toUrlString() = this.lastNotNullOrNull { it.url }
+open class RedirectRegex(regex: String) : ConversionRegex<RedirectMatch>(regex) {
+    override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { RedirectMatch(it) }
+    override fun find(input: String) = pattern.matcherIfFind(input)?.let { RedirectMatch(it) }
+}
+
+fun List<RedirectMatch>.toUrlString() = this.lastNotNullOrNull { it.url }
