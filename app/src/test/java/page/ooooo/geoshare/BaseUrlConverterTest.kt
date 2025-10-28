@@ -20,7 +20,7 @@ abstract class BaseUrlConverterTest() {
         throw NotImplementedError()
     }
 
-    fun isShortUrl(uriString: String): Boolean = getShortUri(uriString) != null
+    fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
     fun parseUrl(uriString: String): Position? = if (urlConverter is UrlConverter.WithUriPattern) {
         (urlConverter as UrlConverter.WithUriPattern).conversionUriPattern.matches(Uri.parse(uriString, uriQuote))

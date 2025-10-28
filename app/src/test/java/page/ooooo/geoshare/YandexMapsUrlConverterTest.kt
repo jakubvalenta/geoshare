@@ -118,20 +118,20 @@ class YandexMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun isShortUrl_correct() {
-        assertTrue(isShortUrl("https://yandex.com/maps/-/CLAvMI18"))
+    fun isShortUri_correct() {
+        assertTrue(isShortUri("https://yandex.com/maps/-/CLAvMI18"))
     }
 
     @Test
     fun isShortUri_wrongPath() {
-        assertFalse(isShortUrl("https://yandex.com/"))
-        assertFalse(isShortUrl("https://yandex.com/maps/"))
-        assertFalse(isShortUrl("https://yandex.com/maps/-/"))
-        assertFalse(isShortUrl("https://yandex.com/foo"))
+        assertFalse(isShortUri("https://yandex.com/"))
+        assertFalse(isShortUri("https://yandex.com/maps/"))
+        assertFalse(isShortUri("https://yandex.com/maps/-/"))
+        assertFalse(isShortUri("https://yandex.com/foo"))
     }
 
     @Test
     fun isShortUri_unknownDomain() {
-        assertFalse(isShortUrl("https://www.example.com/foo"))
+        assertFalse(isShortUri("https://www.example.com/foo"))
     }
 }

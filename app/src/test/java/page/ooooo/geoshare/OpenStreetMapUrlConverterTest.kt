@@ -66,7 +66,7 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun isShortUrl_shortLink() {
+    fun parseUrl_shortLink() {
         assertEquals(
             Position("51.510772705078125", "0.054931640625", z = "9"),
             parseUrl("https://osm.org/go/0EEQjE--")
@@ -78,7 +78,7 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun isShortUrl_shortLinkNegative() {
+    fun parseUrl_shortLinkNegative() {
         assertEquals(
             Position("-16.23152732849121", "-49.08348083496094", z = "11"),
             parseUrl("https://osm.org/go/NuJWxJh-")
