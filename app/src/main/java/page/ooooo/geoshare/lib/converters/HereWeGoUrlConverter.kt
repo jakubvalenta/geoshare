@@ -23,20 +23,8 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
             get() {
                 val encoded = matcher.groupOrNull("encoded") ?: return null
                 val decoded = Base64.decode(encoded).decodeToString()
-                val lat = DECODED_LAT_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
-                    try {
-                        m.group("lat")
-                    } catch (_: IllegalArgumentException) {
-                        null
-                    }
-                } ?: return null
-                val lon = DECODED_LON_PATTERN.matcher(decoded)?.takeIf { it.find() }?.let { m ->
-                    try {
-                        m.group("lon")
-                    } catch (_: IllegalArgumentException) {
-                        null
-                    }
-                } ?: return null
+                val lat = DECODED_LAT_PATTERN.matcherIfFind(decoded)?.groupOrNull("lat") ?: return null
+                val lon = DECODED_LON_PATTERN.matcherIfFind(decoded)?.groupOrNull("lon") ?: return null
                 return persistentListOf(Point(lat, lon))
             }
     }

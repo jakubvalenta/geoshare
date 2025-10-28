@@ -76,20 +76,9 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     override val conversionHtmlRedirectPattern = null
 
     override fun getHtmlUrl(uri: Uri): URL? {
-        val m = Pattern.compile(ELEMENT_PATH).matcher(uri.path)
-        if (!m.matches()) {
-            return null
-        }
-        val type = try {
-            m.group("type")
-        } catch (_: IllegalArgumentException) {
-            return null
-        }
-        val id = try {
-            m.group("id")
-        } catch (_: IllegalArgumentException) {
-            return null
-        }
+        val m = Pattern.compile(ELEMENT_PATH).matcherIfMatches(uri.path) ?: return null
+        val type = m.groupOrNull("type") ?: return null
+        val id = m.groupOrNull("id") ?: return null
         return URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")
     }
 
