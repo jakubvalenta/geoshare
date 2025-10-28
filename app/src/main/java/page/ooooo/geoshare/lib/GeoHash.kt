@@ -7,7 +7,7 @@ import kotlin.math.roundToInt
  * A Geohash decoding algorithm that works for:
  * - Waze base32 Geohashes
  * - OpenStreetMap modified base64 QuadTile hashes
- * - Organic Maps and CoMaps base64 Geohashes
+ * - Organic Maps base64 Geohashes
  *
  * See:
  * - https://en.wikipedia.org/wiki/Geohash#Algorithm_and_example
