@@ -3,14 +3,14 @@ Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen insta
 <b>Unterstützte Links</b>
 
 - Google Maps
-- Apple Maps (beta)
-- HERE WeGo (beta)
-- Magic Earth (beta)
-- Mapy.com (beta)
-- OpenStreetMap (beta)
-- OsmAnd (beta)
-- Waze (beta)
-- Yandex Maps (beta)
+- Apple Maps
+- HERE WeGo
+- Magic Earth
+- Mapy.com
+- OpenStreetMap
+- OsmAnd
+- Waze
+- Yandex Maps
 - Koordinaten
 
 <b>Beispielhafte Anwendungsfälle</b>
