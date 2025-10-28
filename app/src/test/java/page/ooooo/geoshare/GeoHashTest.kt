@@ -5,6 +5,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import page.ooooo.geoshare.lib.converters.OrganicMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.WazeUrlConverter
+import page.ooooo.geoshare.lib.toScale
 
 @Suppress("SpellCheckingInspection")
 class GeoHashTest {
@@ -103,6 +104,18 @@ class GeoHashTest {
         assertEquals(
             Triple(-16.23152732849121, -49.08348083496094, 11),
             OpenStreetMapUrlConverter.decodeGeoHash("NuJWxJh----"),
+        )
+    }
+
+    @Test
+    fun decodeOrganicMapsGeoHash() {
+        assertEquals(
+            Triple(40.71274, -74.0059965, 9),
+            OrganicMapsUrlConverter.decodeGeoHash("Umse5f0H8a"),
+        )
+        assertEquals(
+            Triple(40.71274, -74.0059965, 5),
+            OrganicMapsUrlConverter.decodeGeoHash("Emse5f0H8a"),
         )
     }
 }
