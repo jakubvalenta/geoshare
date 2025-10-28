@@ -8,15 +8,38 @@ import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
 import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
 import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
 import java.net.URL
+import kotlin.math.max
 
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
         const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
+
+        @Suppress("SpellCheckingInspection")
+        private val HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~"
+            .mapIndexed { i, char -> char to i }.toMap()
+
+        /**
+         * See https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
+         */
+        fun decodeGeoHash(hash: String) =
+            decodeGeoHash(hash, HASH_CHAR_MAP, 6).let { (lat, lon, z) ->
+                // Add relative zoom, which works like this:
+                // - If the hash doesn't end with "-", add 0.
+                // - If the hash ends with "-", add -2.
+                // - If the hash ends with "--", add -1.
+                // - If the hash ends with "---", add 0.
+                // - If the hash ends with "----", add -2.
+                // - etc.
+                val relativeZoom = hash.takeLastWhile { it == '-' }.length.takeIf { it > 0 }
+                    ?.let { zoomCharCount -> (zoomCharCount + 2).mod(3) - 2 }
+                    ?: 0
+                Triple(lat, lon, max(z + relativeZoom, 0))
+            }
     }
 
-    class ModifiedBase64GeoHashPositionRegex(regex: String) : GeoHashPositionRegex(regex) {
-        override fun decode(hash: String) = decodeModifiedBase64GeoHash(hash)
+    class GeoHashPositionRegex(regex: String) : page.ooooo.geoshare.lib.GeoHashPositionRegex(regex) {
+        override fun decode(hash: String) = decodeGeoHash(hash)
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
@@ -33,7 +56,7 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     )
 
     override val conversionUriPattern = uriPattern {
-        path(ModifiedBase64GeoHashPositionRegex("""/go/$HASH"""))
+        path(GeoHashPositionRegex("""/go/$HASH"""))
         path(PositionRegex(ELEMENT_PATH))
         fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
     }

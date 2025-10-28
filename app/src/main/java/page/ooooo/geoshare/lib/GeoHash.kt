@@ -4,19 +4,6 @@ import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-@Suppress("SpellCheckingInspection")
-private val modifiedBase64Map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~"
-    .mapIndexed { i, char -> char to i }.toMap()
-private const val modifiedBase64ZoomChar = '-'
-private const val modifiedBase64DigitBitCount = 6
-
-@Suppress("SpellCheckingInspection")
-private val base32Map = "0123456789bcdefghjkmnpqrstuvwxyz"
-    .mapIndexed { i, char -> char to i }.toMap()
-private const val base32DigitBitCount = 5
-
-private const val osmZoomAdjustment = -8
-
 /**
  * A Geohash decoding algorithm that works for:
  * - Waze base32 Geohashes
@@ -26,12 +13,12 @@ private const val osmZoomAdjustment = -8
  * - https://en.wikipedia.org/wiki/Geohash#Algorithm_and_example
  * - https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
  */
-private fun decodeGeoHash(
+fun decodeGeoHash(
     hash: String,
     charMap: Map<Char, Int>,
     digitBitCount: Int,
     useMeanValue: Boolean = false,
-    zoomChar: Char? = null,
+    zoomAdjustmentConst: Int = -8,
 ): Triple<Double, Double, Int> {
 
     // Collect odd bits of the hash into x and even bits into y.
@@ -70,32 +57,9 @@ private fun decodeGeoHash(
     // Calculate zoom based on the precision of the hash; higher precision results in higher zoom
     var z = bitCount / 2.0
 
-    // Adjust zoom by a magic constant that OpenStreetMap uses for their short links
-    var zoomAdjustment = osmZoomAdjustment
-
-    // Add relative zoom, which works like this:
-    // - If the hash doesn't end with "-", add 0.
-    // - If the hash ends with "-", add -2.
-    // - If the hash ends with "--", add -1.
-    // - If the hash ends with "---", add 0.
-    // - If the hash ends with "----", add -2.
-    // - etc.
-    if (zoomChar != null) {
-        val zoomCharCount = hash.takeLastWhile { it == zoomChar }.length
-        if (zoomCharCount > 0) {
-            val relativeZoom = (zoomCharCount + 2).mod(3) - 2
-            zoomAdjustment += relativeZoom
-        }
-    }
-
-    // Because the zoom adjustments were designed for base64 hashes, multiply them so they work for base32 hashes too
-    z += zoomAdjustment * (digitBitCount.toDouble() / modifiedBase64DigitBitCount)
+    // Adjust zoom by a magic constant that OpenStreetMap uses for their short links; the constant was designed for
+    // base64 hashes, so we need to multiply to make it work for base32 hashes too
+    z += zoomAdjustmentConst * (digitBitCount.toDouble() / 6.0)
 
     return Triple(lat, lon, max(z, 0.0).roundToInt())
 }
-
-fun decodeBase32GeoHash(hash: String): Triple<Double, Double, Int> =
-    decodeGeoHash(hash, base32Map, base32DigitBitCount, useMeanValue = true)
-
-fun decodeModifiedBase64GeoHash(hash: String): Triple<Double, Double, Int> =
-    decodeGeoHash(hash, modifiedBase64Map, modifiedBase64DigitBitCount, zoomChar = modifiedBase64ZoomChar)
