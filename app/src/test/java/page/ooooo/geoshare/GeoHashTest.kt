@@ -5,7 +5,6 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import page.ooooo.geoshare.lib.converters.OrganicMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.WazeUrlConverter
-import page.ooooo.geoshare.lib.toScale
 
 @Suppress("SpellCheckingInspection")
 class GeoHashTest {
