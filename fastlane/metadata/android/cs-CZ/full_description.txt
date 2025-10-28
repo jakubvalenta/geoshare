@@ -3,14 +3,14 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 <b>Podporované odkazy na mapy</b>
 
 - Google Mapy
-- Apple Mapy (beta)
-- HERE WeGo (beta)
-- Magic Earth (beta)
-- Mapy.com (beta)
-- OpenStreetMap (beta)
-- OsmAnd (beta)
-- Waze (beta)
-- Yandex Maps (beta)
+- Apple Mapy
+- HERE WeGo
+- Magic Earth
+- Mapy.com
+- OpenStreetMap
+- OsmAnd
+- Waze
+- Yandex Maps
 - souřadnice
 
 <b>Příklady použití</b>
