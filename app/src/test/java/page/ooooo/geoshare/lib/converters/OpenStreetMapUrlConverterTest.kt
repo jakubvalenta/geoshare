@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.*
@@ -6,7 +6,6 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.converters.OpenStreetMapUrlConverter
 import java.net.URL
 
 class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {

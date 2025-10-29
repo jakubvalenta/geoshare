@@ -1,11 +1,10 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 
 class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = GoogleMapsUrlConverter()

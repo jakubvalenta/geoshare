@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -16,8 +16,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
-import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.R
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.time.Duration.Companion.seconds

@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -6,7 +6,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.OrganicMapsUrlConverter
 
 class OrganicMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = OrganicMapsUrlConverter()

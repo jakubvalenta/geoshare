@@ -1,7 +1,6 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.UrlConverter
 
 abstract class BaseUrlConverterTest() {
     protected abstract val urlConverter: UrlConverter

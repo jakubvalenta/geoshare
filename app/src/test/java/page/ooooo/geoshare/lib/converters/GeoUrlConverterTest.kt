@@ -1,10 +1,8 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.GeoUrlConverter
-import page.ooooo.geoshare.lib.converters.UrlConverter
 
 class GeoUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter: UrlConverter = GeoUrlConverter()
