@@ -6,21 +6,11 @@ import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionRegex
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.htmlPattern
-import page.ooooo.geoshare.lib.matcherIfFind
-import page.ooooo.geoshare.lib.matcherIfMatches
-import page.ooooo.geoshare.lib.uriPattern
+import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
@@ -49,20 +39,7 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
         ).toString()
     }
 
-    /**
-     * Sets points to zero, so that we avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
-     */
-    class DoNotParseHtmlPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-        override val points = persistentListOf(Point())
-    }
-
-    class DoNotParseHtmlPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { DoNotParseHtmlPositionMatch(it) }
-        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DoNotParseHtmlPositionMatch(it) }
-    }
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
-
     override val documentation = Documentation(
         nameResId = R.string.converter_apple_maps_name,
         inputs = listOf(
@@ -71,39 +48,39 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
+    override val conversionUriPattern = conversionPattern {
         all {
             optional {
-                query("z", PositionRegex(Z))
+                query("z", Z) { PositionMatch(it) }
             }
             first {
                 all {
-                    host(PositionRegex("maps.apple"))
-                    path(PositionRegex("/p/.+"))
+                    host("maps.apple") { PositionMatch(it) }
+                    path("/p/.+") { PositionMatch(it) }
                 }
-                query("ll", PositionRegex("$LAT,$LON"))
-                query("coordinate", PositionRegex("$LAT,$LON"))
-                query("q", PositionRegex("$LAT,$LON"))
-                query("address", PositionRegex(Q_PARAM))
-                query("name", PositionRegex(Q_PARAM))
+                query("ll", "$LAT,$LON") { PositionMatch(it) }
+                query("coordinate", "$LAT,$LON") { PositionMatch(it) }
+                query("q", "$LAT,$LON") { PositionMatch(it) }
+                query("address", Q_PARAM) { PositionMatch(it) }
+                query("name", Q_PARAM) { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                query("auid", PositionRegex(".+"))
-                query("place-id", PositionRegex(".+"))
+                query("auid", ".+") { PositionMatch(it) }
+                query("place-id", ".+") { PositionMatch(it) }
                 all {
-                    query("q", PositionRegex(Q_PARAM))
-                    query("sll", PositionRegex("$LAT,$LON"))
+                    query("q", Q_PARAM) { PositionMatch(it) }
+                    query("sll", "$LAT,$LON") { PositionMatch(it) }
                 }
-                query("sll", PositionRegex("$LAT,$LON"))
-                query("center", PositionRegex("$LAT,$LON"))
-                query("q", DoNotParseHtmlPositionRegex(Q_PARAM))
+                query("sll", "$LAT,$LON") { PositionMatch(it) }
+                query("center", "$LAT,$LON") { PositionMatch(it) }
+                query("q", Q_PARAM) { DoNotParseHtmlPositionMatch(it) }
             }
         }
     }
 
-    override val conversionHtmlPattern = htmlPattern {
+    override val conversionHtmlPattern = conversionPattern {
         all {
-            content(PositionRegex("""<meta property="place:location:latitude" content="$LAT""""))
-            content(PositionRegex("""<meta property="place:location:longitude" content="$LON""""))
+            html("""<meta property="place:location:latitude" content="$LAT"""") { PositionMatch(it) }
+            html("""<meta property="place:location:longitude" content="$LON"""") { PositionMatch(it) }
         }
     }
 
@@ -114,4 +91,11 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
+
+    /**
+     * Sets points to zero, so that we avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
+     */
+    private class DoNotParseHtmlPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+        override val points = persistentListOf(Point())
+    }
 }

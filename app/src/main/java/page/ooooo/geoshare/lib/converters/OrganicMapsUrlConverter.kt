@@ -4,12 +4,10 @@ import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.GeoHashPositionMatch
-import page.ooooo.geoshare.lib.PositionRegex
+import page.ooooo.geoshare.lib.PositionMatch
+import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.decodeGeoHash
-import page.ooooo.geoshare.lib.matcherIfFind
-import page.ooooo.geoshare.lib.matcherIfMatches
 import page.ooooo.geoshare.lib.toScale
-import page.ooooo.geoshare.lib.uriPattern
 import kotlin.math.roundToInt
 
 class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
@@ -17,7 +15,7 @@ class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
         const val HASH = """(?P<hash>[A-Za-z0-9\-_]{2,})"""
 
         @Suppress("SpellCheckingInspection")
-        val HASH_CHAR_MAP =
+        private val HASH_CHAR_MAP =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".mapIndexed { i, char -> char to i }
                 .toMap()
 
@@ -30,30 +28,9 @@ class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
             } catch (_: IndexOutOfBoundsException) {
                 ""
             }
-            return decodeGeoHash(
-                hash,
-                HASH_CHAR_MAP,
-                6,
-                isLonOddBits = false,
-                useMeanValue = true,
-            ).let { (lat, lon, z) ->
-                Triple(lat, lon, zFromHash ?: z)
-            }
+            return decodeGeoHash(hash, HASH_CHAR_MAP, 6, isLonOddBits = false, useMeanValue = true)
+                .let { (lat, lon, z) -> Triple(lat, lon, zFromHash ?: z) }
         }
-    }
-
-    class OrganicMapsGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
-        override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
-            Triple(lat.toScale(7), lon.toScale(7), z)
-        }
-    }
-
-    class OrganicMapsGeoHashPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) =
-            pattern.matcherIfMatches(input)?.let { OrganicMapsGeoHashPositionMatch(it) }
-
-        override fun find(input: String) =
-            pattern.matcherIfFind(input)?.let { OrganicMapsGeoHashPositionMatch(it) }
     }
 
     @Suppress("SpellCheckingInspection")
@@ -66,7 +43,13 @@ class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
-        path(OrganicMapsGeoHashPositionRegex("""/$HASH\S*"""))
+    override val conversionUriPattern = conversionPattern<PositionMatch> {
+        path("""/$HASH\S*""") { OrganicMapsGeoHashPositionMatch(it) }
+    }
+
+    private class OrganicMapsGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+        override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
+            Triple(lat.toScale(7), lon.toScale(7), z)
+        }
     }
 }

@@ -1,34 +1,12 @@
 package page.ooooo.geoshare.lib
 
 import com.google.re2j.Matcher
-import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
 
-abstract class ConversionRegex<T>(val regex: String) {
-    protected var patternCache: Pattern? = null
-    protected val pattern: Pattern get() = patternCache ?: Pattern.compile(regex).also { patternCache = it }
-
-    abstract fun matches(input: String): T?
-    abstract fun find(input: String): T?
-}
-
 open class PositionMatch(val matcher: Matcher) {
-    open val points: List<Point>?
-        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(lat, lon)) } }
-    open val lat: String?
-        get() = matcher.groupOrNull("lat")
-    open val lon: String?
-        get() = matcher.groupOrNull("lon")
-    open val q: String?
-        get() = matcher.groupOrNull("q")
-    open val z: String?
-        get() = matcher.groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
-}
-
-open class PositionRegex(regex: String) : ConversionRegex<PositionMatch>(regex) {
     companion object {
         const val MAX_COORD_PRECISION = 17
         const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
@@ -40,8 +18,16 @@ open class PositionRegex(regex: String) : ConversionRegex<PositionMatch>(regex) 
         const val Q_PATH = """(?P<q>[^/]+)"""
     }
 
-    override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { PositionMatch(it) }
-    override fun find(input: String) = pattern.matcherIfFind(input)?.let { PositionMatch(it) }
+    open val points: List<Point>?
+        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(lat, lon)) } }
+    open val lat: String?
+        get() = matcher.groupOrNull("lat")
+    open val lon: String?
+        get() = matcher.groupOrNull("lon")
+    open val q: String?
+        get() = matcher.groupOrNull("q")
+    open val z: String?
+        get() = matcher.groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
 }
 
 /**
@@ -60,11 +46,6 @@ class PointsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
                 }
             }
         }
-}
-
-open class PointsPositionRegex(regex: String) : PositionRegex(regex) {
-    override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { PointsPositionMatch(it) }
-    override fun find(input: String) = pattern.matcherIfFind(input)?.let { PointsPositionMatch(it) }
 }
 
 abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
@@ -99,11 +80,6 @@ fun List<PositionMatch>.toPosition() = Position(
 
 open class RedirectMatch(val matcher: Matcher) {
     open val url: String? get() = matcher.groupOrNull("url")
-}
-
-open class RedirectRegex(regex: String) : ConversionRegex<RedirectMatch>(regex) {
-    override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { RedirectMatch(it) }
-    override fun find(input: String) = pattern.matcherIfFind(input)?.let { RedirectMatch(it) }
 }
 
 fun List<RedirectMatch>.toUrlString() = this.lastNotNullOrNull { it.url }

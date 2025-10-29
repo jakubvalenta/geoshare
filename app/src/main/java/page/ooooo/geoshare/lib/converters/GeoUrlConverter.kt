@@ -4,12 +4,12 @@ import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.PositionRegex
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.uriPattern
+import page.ooooo.geoshare.lib.PositionMatch
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.conversionPattern
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
@@ -21,16 +21,16 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
             },
         )
     )
-    override val conversionUriPattern = uriPattern {
+    override val conversionUriPattern = conversionPattern {
         all {
             optional {
-                path(PositionRegex("""$LAT,$LON"""))
+                path("""$LAT,$LON""") { PositionMatch(it) }
             }
             optional {
-                query("q", PositionRegex(Q_PARAM))
+                query("q", Q_PARAM) { PositionMatch(it) }
             }
             optional {
-                query("z", PositionRegex(Z))
+                query("z", Z) { PositionMatch(it) }
             }
         }
     }

@@ -5,9 +5,9 @@ import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import java.net.URL
 import kotlin.math.max
 
@@ -38,18 +38,6 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         }
     }
 
-    class OpenStreetMapGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
-        override fun decode(hash: String) = decodeGeoHash(hash)
-    }
-
-    class OpenStreetMapGeoHashPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) =
-            pattern.matcherIfMatches(input)?.let { OpenStreetMapGeoHashPositionMatch(it) }
-
-        override fun find(input: String) =
-            pattern.matcherIfFind(input)?.let { OpenStreetMapGeoHashPositionMatch(it) }
-    }
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_open_street_map_name,
@@ -63,14 +51,14 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
-        path(OpenStreetMapGeoHashPositionRegex("""/go/$HASH"""))
-        path(PositionRegex(ELEMENT_PATH))
-        fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
+    override val conversionUriPattern = conversionPattern {
+        path("""/go/$HASH""") { OpenStreetMapGeoHashPositionMatch(it) }
+        path(ELEMENT_PATH) { PositionMatch(it) }
+        fragment("""map=$Z/$LAT/$LON.*""") { PositionMatch(it) }
     }
 
-    override val conversionHtmlPattern = htmlPattern {
-        content(PointsPositionRegex(""""lat":$LAT,"lon":$LON"""))
+    override val conversionHtmlPattern = conversionPattern<PositionMatch> {
+        html(""""lat":$LAT,"lon":$LON""") { PointsPositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null
@@ -87,4 +75,8 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
+
+    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+        override fun decode(hash: String) = decodeGeoHash(hash)
+    }
 }

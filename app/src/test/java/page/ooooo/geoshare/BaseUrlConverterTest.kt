@@ -29,8 +29,8 @@ abstract class BaseUrlConverterTest() {
         throw NotImplementedError()
     }
 
-    fun parseHtml(content: String): Position? = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.find(content)?.toPosition()
+    fun parseHtml(html: String): Position? = if (urlConverter is UrlConverter.WithHtmlPattern) {
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.find(html)?.toPosition()
     } else {
         throw NotImplementedError()
     }

@@ -6,7 +6,7 @@ import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionRegex.Companion.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.PositionMatch.Companion.MAX_COORD_PRECISION
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     companion object {
@@ -49,7 +49,22 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    class DecimalCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    override val conversionUriPattern = conversionPattern {
+        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") {
+            DecimalCoordsPositionMatch(it)
+        }
+        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") {
+            DegreesMinutesSecondsCoordsPositionMatch(it)
+        }
+        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") {
+            DegreesMinutesCoordsPositionMatch(it)
+        }
+    }
+
+    /**
+     * Decimal, e.g. `N 41.40338, E 2.17403`
+     */
+    private class DecimalCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
         override val points: List<Point>
             get() {
                 val lat = degToDec(
@@ -66,12 +81,10 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             }
     }
 
-    class DecimalCoordsPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { DecimalCoordsPositionMatch(it) }
-        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DecimalCoordsPositionMatch(it) }
-    }
-
-    class DegreesMinutesSecondsCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    /**
+     * Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
+     */
+    private class DegreesMinutesSecondsCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
         override val points: List<Point>
             get() {
                 val lat = degToDec(
@@ -92,15 +105,10 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             }
     }
 
-    class DegreesMinutesSecondsCoordsPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) =
-            pattern.matcherIfMatches(input)?.let { DegreesMinutesSecondsCoordsPositionMatch(it) }
-
-        override fun find(input: String) =
-            pattern.matcherIfFind(input)?.let { DegreesMinutesSecondsCoordsPositionMatch(it) }
-    }
-
-    class DegreesMinutesCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    /**
+     * Degrees minutes, e.g. `41 24.2028, 2 10.4418`
+     */
+    private class DegreesMinutesCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
         override val points: List<Point>
             get() {
                 val lat = degToDec(
@@ -117,23 +125,5 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
                 )
                 return persistentListOf(Point(lat, lon))
             }
-    }
-
-    class DegreesMinutesCoordsPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) =
-            pattern.matcherIfMatches(input)?.let { DegreesMinutesCoordsPositionMatch(it) }
-
-        override fun find(input: String) = pattern.matcherIfFind(input)?.let { DegreesMinutesCoordsPositionMatch(it) }
-    }
-
-    override val conversionUriPattern = uriPattern {
-        // Decimal, e.g. `N 41.40338, E 2.17403`
-        path(DecimalCoordsPositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*"""))
-
-        // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-        path(DegreesMinutesSecondsCoordsPositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*"""))
-
-        // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-        path(DegreesMinutesCoordsPositionRegex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*"""))
     }
 }

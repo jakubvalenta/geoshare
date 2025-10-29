@@ -5,10 +5,10 @@ import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -19,24 +19,13 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
         const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
 
         @Suppress("SpellCheckingInspection")
-        val HASH_CHAR_MAP = "0123456789bcdefghjkmnpqrstuvwxyz".mapIndexed { i, char -> char to i }.toMap()
+        private val HASH_CHAR_MAP = "0123456789bcdefghjkmnpqrstuvwxyz".mapIndexed { i, char -> char to i }.toMap()
 
         /**
          * See https://en.wikipedia.org/wiki/Geohash#Algorithm_and_example
          */
         fun decodeGeoHash(hash: String): Triple<Double, Double, Int> =
             decodeGeoHash(hash, HASH_CHAR_MAP, 5, useMeanValue = true)
-    }
-
-    class WazeGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
-        override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
-            Triple(lat.toScale(6), lon.toScale(6), z)
-        }
-    }
-
-    class WazeGeoHashPositionRegex(regex: String) : PositionRegex(regex) {
-        override fun matches(input: String) = pattern.matcherIfMatches(input)?.let { WazeGeoHashPositionMatch(it) }
-        override fun find(input: String) = pattern.matcherIfFind(input)?.let { WazeGeoHashPositionMatch(it) }
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
@@ -51,27 +40,28 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
+    override val conversionUriPattern = conversionPattern {
         all {
             optional {
-                query("z", PositionRegex(Z))
+                query("z", Z) { PositionMatch(it) }
             }
             first {
-                path(WazeGeoHashPositionRegex("""/ul/h$HASH"""))
-                query("h", WazeGeoHashPositionRegex(HASH))
-                query("to", PositionRegex("""ll\.$LAT,$LON"""))
-                query("ll", PositionRegex("$LAT,$LON"))
-                @Suppress("SpellCheckingInspection") query("latlng", PositionRegex("$LAT,$LON"))
-                query("q", PositionRegex(Q_PARAM))
-                query("venue_id", PositionRegex(".+"))
-                query("place", PositionRegex(".+"))
-                query("to", PositionRegex("""place\..+"""))
+                path("""/ul/h$HASH""") { WazeGeoHashPositionMatch(it) }
+                query("h", HASH) { WazeGeoHashPositionMatch(it) }
+                query("to", """ll\.$LAT,$LON""") { PositionMatch(it) }
+                query("ll", "$LAT,$LON") { PositionMatch(it) }
+                @Suppress("SpellCheckingInspection")
+                query("latlng", "$LAT,$LON") { PositionMatch(it) }
+                query("q", Q_PARAM) { PositionMatch(it) }
+                query("venue_id", ".+") { PositionMatch(it) }
+                query("place", ".+") { PositionMatch(it) }
+                query("to", """place\..+""") { PositionMatch(it) }
             }
         }
     }
 
-    override val conversionHtmlPattern = htmlPattern {
-        content(PositionRegex(""""latLng":{"lat":$LAT,"lng":$LON}"""))
+    override val conversionHtmlPattern = conversionPattern {
+        html(""""latLng":{"lat":$LAT,"lng":$LON}""") { PositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null
@@ -81,4 +71,10 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
+
+    private class WazeGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+        override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
+            Triple(lat.toScale(6), lon.toScale(6), z)
+        }
+    }
 }

@@ -2,11 +2,11 @@ package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.PositionRegex
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.uriPattern
+import page.ooooo.geoshare.lib.PositionMatch
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.conversionPattern
 
 class OsmAndUrlConverter : UrlConverter.WithUriPattern {
     @Suppress("SpellCheckingInspection")
@@ -18,12 +18,12 @@ class OsmAndUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
+    override val conversionUriPattern = conversionPattern {
         all {
-            fragment(PositionRegex("""$Z/$LAT/$LON.*"""))
-            query("pin", PositionRegex("""$LAT,$LON"""))
+            fragment("""$Z/$LAT/$LON.*""") { PositionMatch(it) }
+            query("pin", """$LAT,$LON""") { PositionMatch(it) }
         }
-        fragment(PositionRegex("""$Z/$LAT/$LON.*"""))
-        query("pin", PositionRegex("""$LAT,$LON"""))
+        fragment("""$Z/$LAT/$LON.*""") { PositionMatch(it) }
+        query("pin", """$LAT,$LON""") { PositionMatch(it) }
     }
 }
