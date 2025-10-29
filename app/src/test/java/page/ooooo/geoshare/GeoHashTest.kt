@@ -109,11 +109,18 @@ class GeoHashTest {
     @Test
     fun decodeOrganicMapsGeoHash_examples() {
         assertEquals(
-            Triple(40.71274034678936, -74.00599703192711, 9), // Should be 40.71274, -74.0059965
+            // Organic Maps returns 52.4877386, 13.3815234 due to different rounding algorithm
+            Triple(52.48773850500584, 13.381523340940475, 14),
+            decodeOrganicMapsGeoHash("o4MnIOApKp"),
+        )
+        assertEquals(
+            // Organic Maps returns 40.71274, -74.0059965 due to different rounding algorithm.
+            Triple(40.71274034678936, -74.00599703192711, 9),
             decodeOrganicMapsGeoHash("Umse5f0H8a"),
         )
         assertEquals(
-            Triple(40.71274034678936, -74.00599703192711, 5), // Should be 40.71274, -74.0059965
+            // Organic Maps returns 40.71274, -74.0059965 due to different rounding algorithm.
+            Triple(40.71274034678936, -74.00599703192711, 5),
             decodeOrganicMapsGeoHash("Emse5f0H8a"),
         )
     }

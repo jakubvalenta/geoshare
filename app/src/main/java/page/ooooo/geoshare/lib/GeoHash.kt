@@ -4,15 +4,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * A Geohash decoding algorithm that works for:
- * - Waze base32 Geohashes
- * - OpenStreetMap modified base64 QuadTile hashes
- * - Organic Maps base64 Geohashes
- *
- * See:
- * - https://en.wikipedia.org/wiki/Geohash#Algorithm_and_example
- * - https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
- * - https://github.com/organicmaps/url-processor/blob/d7b873dd1ea044fc6c5b7e63b570855dfe24f259/src/ge0.ts#L120-L156
+ * A universal Geohash decoding algorithm that works for various characters sets and rounding algorithms.
  */
 private fun decodeGeoHash(
     hash: String,
@@ -93,6 +85,12 @@ fun decodeOpenStreetMapGeoHash(hash: String) =
 private val ORGANIC_MAPS_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
     .mapIndexed { i, char -> char to i }.toMap()
 
+/**
+ * An approximation of Organic Maps' Geohash algorithm. We use a different rounding algorithm, so the results are
+ * slightly different.
+ *
+ * See https://github.com/organicmaps/url-processor/blob/d7b873dd1ea044fc6c5b7e63b570855dfe24f259/src/ge0.ts#L120-L156
+ */
 fun decodeOrganicMapsGeoHash(hash: String): Triple<Double, Double, Int> {
     val zFromHash = hash.getOrNull(0)
         ?.let { ORGANIC_MAPS_HASH_CHAR_MAP[it] }
