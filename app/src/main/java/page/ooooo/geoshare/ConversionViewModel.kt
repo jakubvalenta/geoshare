@@ -36,7 +36,7 @@ class ConversionViewModel @Inject constructor(
         MagicEarthUrlConverter(),
         MapyComUrlConverter(),
         OpenStreetMapUrlConverter(),
-        OrganicMapsUrlConverter(),
+        Ge0UrlConverter(),
         OsmAndUrlConverter(),
         WazeUrlConverter(),
         YandexMapsUrlConverter(),

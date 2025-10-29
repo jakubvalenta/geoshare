@@ -1,7 +1,7 @@
+- Added Maps.me, Organic Maps and CoMaps short link support.
 - Added Automation feature, which allows opening an app or copying coordinates automatically every time a link is converted to coordinates.
 - Changed app style to use more screen space and make it adaptive on tablets.
 - Changed formatted coordinates format to degrees, minutes, seconds.
-- Added Organic Maps and CoMaps support.
 - Added paste and random link buttons to the main screen.
 - Improved network connection retrying.
 - Fixed Apple Maps place links.

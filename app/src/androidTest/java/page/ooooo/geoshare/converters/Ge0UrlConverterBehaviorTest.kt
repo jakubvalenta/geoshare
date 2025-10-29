@@ -3,14 +3,20 @@ package page.ooooo.geoshare.converters
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 
-class OrganicMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
+class Ge0UrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
         // Launch app and close intro
         launchApplication()
         closeIntro()
 
-        // OrganicMaps short URI
+        // Maps.me short URI
+        testUri(
+            Position("-18.9249433", "46.4416404", z = "4"),
+            "http://ge0.me/AbCMCNp0LO/Madagascar",
+        )
+
+        // Organic Maps short URI
         testUri(
             Position("40.7127403", "-74.005997", z = "9"),
             "https://omaps.app/Umse5f0H8a/Nova_Iorque",
@@ -20,6 +26,14 @@ class OrganicMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
         testUri(
             Position("52.4877385", "13.3815233", z = "14"),
             "https://comaps.at/o4MnIOApKp/Kreuzberg",
+        )
+
+        // Text
+        testTextUri(
+            Position("51.0000003", "-108.9999868", z = "4"),
+            "América do Norte, Lancer, Saskatchewan, Canadá\n" +
+                    "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
+                    "(51.000001, -108.999988)",
         )
 
         // Text, which will get parsed by GeoUrlConverter, because it contains a geo: URI that precedes the short URI
