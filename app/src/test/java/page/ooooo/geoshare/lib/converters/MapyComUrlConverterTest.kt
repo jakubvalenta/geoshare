@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -6,7 +6,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.MapyComUrlConverter
 
 @Suppress("SpellCheckingInspection")
 class MapyComUrlConverterTest : BaseUrlConverterTest() {
@@ -116,21 +115,21 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun isShortUrl_correct() {
-        assertTrue(isShortUrl("https://mapy.com/s/jakuhelasu"))
-        assertTrue(isShortUrl("https://www.mapy.com/s/jakuhelasu"))
-        assertTrue(isShortUrl("https://mapy.cz/s/jakuhelasu"))
+    fun isShortUri_correct() {
+        assertTrue(isShortUri("https://mapy.com/s/jakuhelasu"))
+        assertTrue(isShortUri("https://www.mapy.com/s/jakuhelasu"))
+        assertTrue(isShortUri("https://mapy.cz/s/jakuhelasu"))
     }
 
     @Test
     fun isShortUri_wrongPath() {
-        assertFalse(isShortUrl("https://mapy.com/"))
-        assertFalse(isShortUrl("https://mapy.com/s"))
-        assertFalse(isShortUrl("https://mapy.com/s/"))
+        assertFalse(isShortUri("https://mapy.com/"))
+        assertFalse(isShortUri("https://mapy.com/s"))
+        assertFalse(isShortUri("https://mapy.com/s/"))
     }
 
     @Test
     fun isShortUri_unknownDomain() {
-        assertFalse(isShortUrl("https://www.example.com/foo"))
+        assertFalse(isShortUri("https://www.example.com/foo"))
     }
 }

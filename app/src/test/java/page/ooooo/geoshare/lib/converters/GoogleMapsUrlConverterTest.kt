@@ -1,11 +1,10 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 
 class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = GoogleMapsUrlConverter()
@@ -654,51 +653,51 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun isShortUri_mapsAppGooGlCorrect() {
-        assertTrue(isShortUrl("https://maps.app.goo.gl/foo"))
+        assertTrue(isShortUri("https://maps.app.goo.gl/foo"))
     }
 
     @Test
     fun isShortUri_mapsAppGooGlWithQueryStringCorrect() {
-        assertFalse(isShortUrl("https://maps.app.goo.gl/foo?g_st=isi"))
+        assertFalse(isShortUri("https://maps.app.goo.gl/foo?g_st=isi"))
     }
 
     @Test
     fun isShortUri_mapsAppGooGlMissingPath() {
-        assertFalse(isShortUrl("https://maps.app.goo.gl/"))
+        assertFalse(isShortUri("https://maps.app.goo.gl/"))
     }
 
     @Test
     fun isShortUri_appGooGlCorrect() {
-        assertTrue(isShortUrl("https://app.goo.gl/maps/foo"))
+        assertTrue(isShortUri("https://app.goo.gl/maps/foo"))
     }
 
     @Test
     fun isShortUri_appGooGlWrongPath() {
-        assertTrue(isShortUrl("https://app.goo.gl/maps"))
-        assertTrue(isShortUrl("https://app.goo.gl/maps/"))
-        assertTrue(isShortUrl("https://app.goo.gl/foo/bar"))
+        assertTrue(isShortUri("https://app.goo.gl/maps"))
+        assertTrue(isShortUri("https://app.goo.gl/maps/"))
+        assertTrue(isShortUri("https://app.goo.gl/foo/bar"))
     }
 
     @Test
     fun isShortUri_gooGlCorrect() {
-        assertTrue(isShortUrl("https://goo.gl/maps/foo"))
+        assertTrue(isShortUri("https://goo.gl/maps/foo"))
     }
 
     @Test
     fun isShortUri_gooGlWrongPath() {
-        assertTrue(isShortUrl("https://goo.gl/maps"))
-        assertTrue(isShortUrl("https://goo.gl/maps/"))
-        assertTrue(isShortUrl("https://goo.gl/foo/bar"))
+        assertTrue(isShortUri("https://goo.gl/maps"))
+        assertTrue(isShortUri("https://goo.gl/maps/"))
+        assertTrue(isShortUri("https://goo.gl/foo/bar"))
     }
 
     @Test
     fun isShortUri_gCoCorrect() {
-        assertTrue(isShortUrl("https://g.co/kgs/foo"))
+        assertTrue(isShortUri("https://g.co/kgs/foo"))
     }
 
     @Test
     fun isShortUri_unknownDomain() {
-        assertFalse(isShortUrl("https://www.example.com/foo"))
+        assertFalse(isShortUri("https://www.example.com/foo"))
     }
 
     @Test

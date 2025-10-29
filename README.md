@@ -18,10 +18,12 @@ map app.
 
 - Google Maps
 - Apple Maps
+- CoMaps
 - HERE WeGo
 - Magic Earth
 - Mapy.com
 - OpenStreetMap
+- Organic Maps
 - OsmAnd
 - Waze
 - Yandex Maps

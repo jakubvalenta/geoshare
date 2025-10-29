@@ -1,11 +1,9 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib
 
 import kotlinx.collections.immutable.persistentMapOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Uri
 
 class UriTest {
     private val uriQuote = FakeUriQuote()

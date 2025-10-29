@@ -1,8 +1,7 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeUriQuote
 
 class UriQuoteTest {
     val uriQuote = FakeUriQuote()

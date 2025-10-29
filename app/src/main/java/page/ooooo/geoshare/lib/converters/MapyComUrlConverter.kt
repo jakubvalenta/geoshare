@@ -1,15 +1,17 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.PositionRegex
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.uriPattern
+import page.ooooo.geoshare.lib.PositionMatch
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.groupOrNull
 
 @Suppress("SpellCheckingInspection")
 class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern {
@@ -31,23 +33,14 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = ShortUriMethod.GET
 
-    override val conversionUriPattern = uriPattern {
-        path(object : PositionRegex(COORDS) {
-            override val points: List<Point>?
-                get() = groupOrNull("lat")?.let { lat ->
-                    groupOrNull("lon")?.let { lon ->
-                        val latSig = if (groupOrNull()?.contains('S') == true) "-" else ""
-                        val lonSig = if (groupOrNull()?.contains('W') == true) "-" else ""
-                        persistentListOf(Point(latSig + lat, lonSig + lon))
-                    }
-                }
-        })
+    override val conversionUriPattern = conversionPattern {
+        path(COORDS) { NorthSouthWestEastPositionMatch(it) }
         all {
             optional {
-                query("z", PositionRegex(Z))
+                query("z", Z) { PositionMatch(it) }
             }
-            query("x", PositionRegex(LON))
-            query("y", PositionRegex(LAT))
+            query("x", LON) { PositionMatch(it) }
+            query("y", LAT) { PositionMatch(it) }
         }
     }
 
@@ -56,4 +49,15 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
+
+    private class NorthSouthWestEastPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+        override val points: List<Point>?
+            get() = matcher.groupOrNull("lat")?.let { lat ->
+                matcher.groupOrNull("lon")?.let { lon ->
+                    val latSig = if (matcher.groupOrNull()?.contains('S') == true) "-" else ""
+                    val lonSig = if (matcher.groupOrNull()?.contains('W') == true) "-" else ""
+                    persistentListOf(Point(latSig + lat, lonSig + lon))
+                }
+            }
+    }
 }

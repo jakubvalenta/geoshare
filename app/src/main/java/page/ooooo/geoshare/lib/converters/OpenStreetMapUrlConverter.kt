@@ -1,22 +1,19 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import java.net.URL
 
 class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
         const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
-    }
-
-    class ModifiedBase64GeoHashPositionRegex(regex: String) : GeoHashPositionRegex(regex) {
-        override fun decode(hash: String) = decodeModifiedBase64GeoHash(hash)
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
@@ -32,33 +29,22 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
-        path(ModifiedBase64GeoHashPositionRegex("""/go/$HASH"""))
-        path(PositionRegex(ELEMENT_PATH))
-        fragment(PositionRegex("""map=$Z/$LAT/$LON.*"""))
+    override val conversionUriPattern = conversionPattern {
+        path("""/go/$HASH""") { OpenStreetMapGeoHashPositionMatch(it) }
+        path(ELEMENT_PATH) { PositionMatch(it) }
+        fragment("""map=$Z/$LAT/$LON.*""") { PositionMatch(it) }
     }
 
-    override val conversionHtmlPattern = htmlPattern<PositionRegex> {
-        content(PointsPositionRegex(""""lat":$LAT,"lon":$LON"""))
+    override val conversionHtmlPattern = conversionPattern<PositionMatch> {
+        html(""""lat":$LAT,"lon":$LON""") { PointsPositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null
 
     override fun getHtmlUrl(uri: Uri): URL? {
-        val m = Pattern.compile(ELEMENT_PATH).matcher(uri.path)
-        if (!m.matches()) {
-            return null
-        }
-        val type = try {
-            m.group("type")
-        } catch (_: IllegalArgumentException) {
-            return null
-        }
-        val id = try {
-            m.group("id")
-        } catch (_: IllegalArgumentException) {
-            return null
-        }
+        val m = Pattern.compile(ELEMENT_PATH).matcherIfMatches(uri.path) ?: return null
+        val type = m.groupOrNull("type") ?: return null
+        val id = m.groupOrNull("id") ?: return null
         return URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")
     }
 
@@ -67,4 +53,8 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
+
+    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+        override fun decode(hash: String) = decodeOpenStreetMapGeoHash(hash)
+    }
 }

@@ -1,10 +1,8 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.GeoUrlConverter
-import page.ooooo.geoshare.lib.converters.UrlConverter
 
 class GeoUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter: UrlConverter = GeoUrlConverter()
@@ -32,6 +30,17 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_unknownPath() {
         assertTrue(doesUriPatternMatch("geo:example?q=foo%20bar&z=3.4"))
+    }
+
+    @Test
+    fun uriPattern_replacement() {
+        assertEquals(
+            "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
+            getUri(
+                "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
+                        "https://omaps.app/Umse5f0H8a/Nova_Iorque"
+            )
+        )
     }
 
     @Test

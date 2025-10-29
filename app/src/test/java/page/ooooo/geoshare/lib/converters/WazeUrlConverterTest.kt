@@ -1,9 +1,8 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.lib.converters
 
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.WazeUrlConverter
 
 class WazeUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = WazeUrlConverter()
@@ -124,7 +123,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun isShortUrl_shortLink() {
+    fun parseUrl_shortLink() {
         assertEquals(
             Position("45.829189", "1.259372", z = "16"),
             parseUrl("https://waze.com/ul/hu00uswvn3")
@@ -140,7 +139,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
-    fun isShortUrl_shortLinkNegative() {
+    fun parseUrl_shortLinkNegative() {
         assertEquals(
             Position("19.402564", "-99.165666", z = "16"),
             parseUrl("https://waze.com/ul/h9g3qrkju0")

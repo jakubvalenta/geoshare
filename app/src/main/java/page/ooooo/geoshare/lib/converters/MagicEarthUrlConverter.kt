@@ -3,16 +3,11 @@ package page.ooooo.geoshare.lib.converters
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.PositionRegex
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LAT
-import page.ooooo.geoshare.lib.PositionRegex.Companion.LON
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionRegex.Companion.Z
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.uriPattern
+import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
+import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
+import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
@@ -21,9 +16,6 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     companion object {
         const val NAME = "Magic Earth"
 
-        /**
-         * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
-         */
         @Suppress("SpellCheckingInspection")
         fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
             scheme = "magicearth",
@@ -44,7 +36,6 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
             }.toImmutableMap(),
             uriQuote = uriQuote,
         ).toString()
-
     }
 
     @Suppress("SpellCheckingInspection")
@@ -56,20 +47,20 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = uriPattern {
+    override val conversionUriPattern = conversionPattern {
         all {
             optional {
-                query("z", PositionRegex(Z))
+                query("z", Z) { PositionMatch(it) }
             }
             first {
                 all {
-                    query("lat", PositionRegex(LAT))
-                    query("lon", PositionRegex(LON))
+                    query("lat", LAT) { PositionMatch(it) }
+                    query("lon", LON) { PositionMatch(it) }
                 }
-                query("name", PositionRegex(Q_PARAM))
+                query("name", Q_PARAM) { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                query("daddr", PositionRegex(Q_PARAM))
-                query("q", PositionRegex(Q_PARAM))
+                query("daddr", Q_PARAM) { PositionMatch(it) }
+                query("q", Q_PARAM) { PositionMatch(it) }
             }
         }
     }
