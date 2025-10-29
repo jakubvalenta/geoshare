@@ -59,7 +59,7 @@
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_coordinates_name">coordinates</string>
     <string name="example">e.g. %1$s</string>
-    <string name="converter_ge0_name" translatable="false">MAPS.ME, Organic Maps, CoMaps</string>
+    <string name="converter_ge0_name" translatable="false">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
     <string name="converter_google_maps_name" translatable="false">Google Maps</string>

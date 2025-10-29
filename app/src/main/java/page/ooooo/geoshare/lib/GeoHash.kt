@@ -86,8 +86,8 @@ private val ORGANIC_MAPS_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
     .mapIndexed { i, char -> char to i }.toMap()
 
 /**
- * An approximation of the Ge0 algorithm. It produces slightly different results than the MAPS.ME and Organic Maps
- * implementations, because we use the Geohash rounding algorithm.
+ * An approximation of the Ge0 algorithm. It produces slightly different results than the Maps.me, Organic Maps and
+ * CoMaps implementations, because we use the Geohash rounding algorithm.
  *
  * See https://github.com/mapsme/ge0_url_decoder/blob/c609a6503fa91d424d5169c74158424e9eaf6f06/mwm_api.php#L7-L51
  * See https://github.com/organicmaps/url-processor/blob/d7b873dd1ea044fc6c5b7e63b570855dfe24f259/src/ge0.ts#L120-L156
