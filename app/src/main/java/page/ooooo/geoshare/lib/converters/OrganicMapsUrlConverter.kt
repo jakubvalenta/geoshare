@@ -15,8 +15,8 @@ class OrganicMapsUrlConverter : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_organic_maps_name,
         inputs = listOf(
-            DocumentationInput.Url(26, "https://omaps.app/"),
-            DocumentationInput.Url(26, "https://comaps.at/"),
+            DocumentationInput.Url(25, "https://omaps.app/"),
+            DocumentationInput.Url(25, "https://comaps.at/"),
         ),
     )
 
