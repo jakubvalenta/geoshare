@@ -128,4 +128,5 @@
     <string name="user_preferences_automation_nothing">Нічого</string>
     <string name="user_preferences_automation_open_app">Відкрити %1$s</string>
     <string name="user_preferences_automation_title">Автоматизація</string>
+    <string name="main_random">Випадкове посилання</string>
 </resources>
