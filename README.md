@@ -21,6 +21,7 @@ map app.
 - CoMaps
 - HERE WeGo
 - Magic Earth
+- MAPS.ME
 - Mapy.com
 - OpenStreetMap
 - Organic Maps

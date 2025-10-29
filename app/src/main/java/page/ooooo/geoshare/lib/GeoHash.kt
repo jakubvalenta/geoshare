@@ -54,7 +54,7 @@ private fun decodeGeoHash(
     var z = bitCount / 2.0
 
     // Adjust zoom by a magic constant that OpenStreetMap uses for their short links; the constant was designed for
-    // base64 hashes, so we need to multiply to make it work for base32 hashes too
+    // base64 hashes, so we need to multiply it to make it work for base32 hashes too
     z += zoomAdjustmentConst * (digitBitCount.toDouble() / 6.0)
 
     return Triple(lat, lon, max(z, 0.0).roundToInt())
@@ -67,7 +67,7 @@ private val OPEN_STREET_MAP_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
 /**
  * See https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
  */
-fun decodeOpenStreetMapGeoHash(hash: String) =
+fun decodeOpenStreetMapQuadTileHash(hash: String) =
     decodeGeoHash(hash, OPEN_STREET_MAP_HASH_CHAR_MAP, 6).let { (lat, lon, z) ->
         // Add relative zoom, which works like this:
         // - If the hash doesn't end with "-", add 0.
@@ -86,12 +86,13 @@ private val ORGANIC_MAPS_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
     .mapIndexed { i, char -> char to i }.toMap()
 
 /**
- * An approximation of Organic Maps' Geohash algorithm. We use a different rounding algorithm, so the results are
- * slightly different.
+ * An approximation of the Ge0 algorithm. It produces slightly different results than the MAPS.ME and Organic Maps
+ * implementations, because we use the Geohash rounding algorithm.
  *
+ * See https://github.com/mapsme/ge0_url_decoder/blob/c609a6503fa91d424d5169c74158424e9eaf6f06/mwm_api.php#L7-L51
  * See https://github.com/organicmaps/url-processor/blob/d7b873dd1ea044fc6c5b7e63b570855dfe24f259/src/ge0.ts#L120-L156
  */
-fun decodeOrganicMapsGeoHash(hash: String): Triple<Double, Double, Int> {
+fun decodeGe0Hash(hash: String): Triple<Double, Double, Int> {
     val zFromHash = hash.getOrNull(0)
         ?.let { ORGANIC_MAPS_HASH_CHAR_MAP[it] }
         ?.let { (it / 4.0 + 4).roundToInt() }

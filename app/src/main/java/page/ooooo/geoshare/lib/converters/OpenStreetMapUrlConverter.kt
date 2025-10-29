@@ -55,6 +55,6 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
     private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
-        override fun decode(hash: String) = decodeOpenStreetMapGeoHash(hash)
+        override fun decode(hash: String) = decodeOpenStreetMapQuadTileHash(hash)
     }
 }
