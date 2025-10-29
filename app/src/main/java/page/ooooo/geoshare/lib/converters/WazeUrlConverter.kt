@@ -17,15 +17,6 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     companion object {
         @Suppress("SpellCheckingInspection")
         const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
-
-        @Suppress("SpellCheckingInspection")
-        private val HASH_CHAR_MAP = "0123456789bcdefghjkmnpqrstuvwxyz".mapIndexed { i, char -> char to i }.toMap()
-
-        /**
-         * See https://en.wikipedia.org/wiki/Geohash#Algorithm_and_example
-         */
-        fun decodeGeoHash(hash: String): Triple<Double, Double, Int> =
-            decodeGeoHash(hash, HASH_CHAR_MAP, 5, useMeanValue = true)
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
@@ -73,8 +64,7 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
 
     private class WazeGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
-        override fun decode(hash: String) = decodeGeoHash(hash).let { (lat, lon, z) ->
-            Triple(lat.toScale(6), lon.toScale(6), z)
-        }
+        override fun decode(hash: String) = decodeWazeGeoHash(hash)
+            .let { (lat, lon, z) -> Triple(lat.toScale(6), lon.toScale(6), z) }
     }
 }

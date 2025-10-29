@@ -14,7 +14,7 @@ import kotlin.math.roundToInt
  * - https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
  * - https://github.com/organicmaps/url-processor/blob/d7b873dd1ea044fc6c5b7e63b570855dfe24f259/src/ge0.ts#L120-L156
  */
-fun decodeGeoHash(
+private fun decodeGeoHash(
     hash: String,
     charMap: Map<Char, Int>,
     digitBitCount: Int,
@@ -67,3 +67,50 @@ fun decodeGeoHash(
 
     return Triple(lat, lon, max(z, 0.0).roundToInt())
 }
+
+@Suppress("SpellCheckingInspection")
+private val OPEN_STREET_MAP_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~"
+    .mapIndexed { i, char -> char to i }.toMap()
+
+/**
+ * See https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
+ */
+fun decodeOpenStreetMapGeoHash(hash: String) =
+    decodeGeoHash(hash, OPEN_STREET_MAP_HASH_CHAR_MAP, 6).let { (lat, lon, z) ->
+        // Add relative zoom, which works like this:
+        // - If the hash doesn't end with "-", add 0.
+        // - If the hash ends with "-", add -2.
+        // - If the hash ends with "--", add -1.
+        // - If the hash ends with "---", add 0.
+        // - If the hash ends with "----", add -2.
+        // - etc.
+        val relativeZoom = hash.takeLastWhile { it == '-' }.length.takeIf { it > 0 }
+            ?.let { zoomCharCount -> (zoomCharCount + 2).mod(3) - 2 } ?: 0
+        Triple(lat, lon, max(z + relativeZoom, 0))
+    }
+
+@Suppress("SpellCheckingInspection")
+private val ORGANIC_MAPS_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    .mapIndexed { i, char -> char to i }.toMap()
+
+fun decodeOrganicMapsGeoHash(hash: String): Triple<Double, Double, Int> {
+    val zFromHash = hash.getOrNull(0)
+        ?.let { ORGANIC_MAPS_HASH_CHAR_MAP[it] }
+        ?.let { (it / 4.0 + 4).roundToInt() }
+    val hash = try {
+        hash.substring(1)
+    } catch (_: IndexOutOfBoundsException) {
+        ""
+    }
+    return decodeGeoHash(hash, ORGANIC_MAPS_HASH_CHAR_MAP, 6, isLonOddBits = false, useMeanValue = true)
+        .let { (lat, lon, z) -> Triple(lat, lon, zFromHash ?: z) }
+}
+
+@Suppress("SpellCheckingInspection")
+private val WAZE_HASH_CHAR_MAP = "0123456789bcdefghjkmnpqrstuvwxyz"
+    .mapIndexed { i, char -> char to i }.toMap()
+
+/**
+ * See https://en.wikipedia.org/wiki/Geohash#Algorithm_and_example
+ */
+fun decodeWazeGeoHash(hash: String) = decodeGeoHash(hash, WAZE_HASH_CHAR_MAP, 5, useMeanValue = true)
