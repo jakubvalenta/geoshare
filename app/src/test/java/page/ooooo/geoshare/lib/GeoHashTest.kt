@@ -13,21 +13,21 @@ class GeoHashTest {
     }
 
     @Test
-    fun decodeOpenStreetMapGeoHash_returnsZoomBasedOnHashLength() {
+    fun decodeOpenStreetMapQuadTileHash_returnsZoomBasedOnHashLength() {
         listOf(0, 0, 1, 4, 7, 10, 13, 16, 19, 22).forEachIndexed { i, expectedZoom ->
             Assert.assertEquals(expectedZoom, decodeOpenStreetMapQuadTileHash("9".repeat(i + 1)).third)
         }
     }
 
     @Test
-    fun decodeOpenStreetMapGeoHash_returnsZoomBasedOnHashLengthDecreasedByOne() {
+    fun decodeOpenStreetMapQuadTileHash_returnsZoomBasedOnHashLengthDecreasedByOne() {
         listOf(0, 0, 0, 3, 6, 9, 12, 15, 18, 21).forEachIndexed { i, expectedZoom ->
             Assert.assertEquals(expectedZoom, decodeOpenStreetMapQuadTileHash("9".repeat(i + 1) + "--").third)
         }
     }
 
     @Test
-    fun decodeOpenStreetMapGeoHash_returnsZoomBasedOnHashLengthDecreasedByTwo() {
+    fun decodeOpenStreetMapQuadTileHash_returnsZoomBasedOnHashLengthDecreasedByTwo() {
         listOf(0, 0, 0, 2, 5, 8, 11, 14, 17, 20).forEachIndexed { i, expectedZoom ->
             Assert.assertEquals(expectedZoom, decodeOpenStreetMapQuadTileHash("9".repeat(i + 1) + "-").third)
         }
@@ -68,7 +68,7 @@ class GeoHashTest {
      * https://wiki.openstreetmap.org/wiki/Shortlink#Example
      */
     @Test
-    fun decodeOpenStreetMapGeoHash_osmExample() {
+    fun decodeOpenStreetMapQuadTileHash_osmExample() {
         Assert.assertEquals(
             Triple(51.510772705078125, 0.054931640625, 9),
             decodeOpenStreetMapQuadTileHash("0EEQjE--"),
@@ -80,7 +80,7 @@ class GeoHashTest {
     }
 
     @Test
-    fun decodeOpenStreetMapGeoHash_osmZoom() {
+    fun decodeOpenStreetMapQuadTileHash_osmZoom() {
         Assert.assertEquals(
             Triple(-16.23152732849121, -49.08348083496094, 13),
             decodeOpenStreetMapQuadTileHash("NuJWxJh"),

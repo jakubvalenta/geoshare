@@ -8,6 +8,15 @@ abstract class ConversionPattern<T> {
     open fun matches(uri: Uri): List<T>? = null
 }
 
+class ConversionSchemePattern<T>(
+    val regex: String,
+    val getMatch: (matcher: Matcher) -> T,
+) : ConversionPattern<T>() {
+
+    override fun matches(uri: Uri): List<T>? = Pattern.compile(regex).matcherIfMatches(uri.scheme)
+        ?.let { listOf(getMatch(it)) }
+}
+
 class ConversionHostPattern<T>(
     val regex: String,
     val getMatch: (matcher: Matcher) -> T,
@@ -64,6 +73,9 @@ abstract class ConversionGroupPattern<T> : ConversionPattern<T>() {
 
     fun optional(init: ConversionOptionalPattern<T>.() -> Unit) =
         initMatcher(ConversionOptionalPattern(), init)
+
+    fun scheme(regex: String, getMatch: (matcher: Matcher) -> T) =
+        initMatcher(ConversionSchemePattern(regex, getMatch))
 
     fun host(regex: String, getMatch: (matcher: Matcher) -> T) =
         initMatcher(ConversionHostPattern(regex, getMatch))

@@ -1,9 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 
@@ -12,34 +9,40 @@ class Ge0UrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("ge0://AbCMCNp0LO"))
         assertTrue(doesUriPatternMatch("http://ge0.me/AbCMCNp0LO"))
-        assertTrue(doesUriPatternMatch("https://omaps.app/Umse5f0H8a"))
-        assertTrue(doesUriPatternMatch("https://comaps.at/o4MnIOApKp"))
+        assertTrue(doesUriPatternMatch("https://omaps.app/AbCMCNp0LO"))
+        assertTrue(doesUriPatternMatch("https://comaps.at/AbCMCNp0LO"))
+        assertTrue(doesUriPatternMatch("ge0://AbCMCNp0LO/"))
         assertTrue(doesUriPatternMatch("http://ge0.me/AbCMCNp0LO/"))
-        assertTrue(doesUriPatternMatch("https://omaps.app/Umse5f0H8a/"))
-        assertTrue(doesUriPatternMatch("https://comaps.at/o4MnIOApKp/"))
+        assertTrue(doesUriPatternMatch("https://omaps.app/AbCMCNp0LO/"))
+        assertTrue(doesUriPatternMatch("https://comaps.at/AbCMCNp0LO/"))
+        assertTrue(doesUriPatternMatch("ge0://AbCMCNp0LO/Madagascar"))
         assertTrue(doesUriPatternMatch("http://ge0.me/AbCMCNp0LO/Madagascar"))
-        assertTrue(doesUriPatternMatch("https://omaps.app/Umse5f0H8a/Nova_Iorque"))
-        assertTrue(doesUriPatternMatch("https://comaps.at/o4MnIOApKp/Nova_Iorque"))
+        assertTrue(doesUriPatternMatch("https://omaps.app/AbCMCNp0LO/Madagascar"))
+        assertTrue(doesUriPatternMatch("https://comaps.at/AbCMCNp0LO/Madagascar"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/Umse5f0H8a/Nova_Iorque"))
+        assertFalse(doesUriPatternMatch("https://www.example.com/AbCMCNp0LO/Madagascar"))
     }
 
     @Test
     fun uriPattern_unknownScheme() {
         assertFalse(doesUriPatternMatch("ftp://ge0.me/AbCMCNp0LO/Madagascar"))
-        assertFalse(doesUriPatternMatch("ftp://omaps.app/Umse5f0H8a/Nova_Iorque"))
-        assertFalse(doesUriPatternMatch("ftp://comaps.at/Umse5f0H8a/Nova_Iorque"))
+        assertFalse(doesUriPatternMatch("ftp://omaps.app/AbCMCNp0LO/Madagascar"))
+        assertFalse(doesUriPatternMatch("ftp://comaps.at/AbCMCNp0LO/Madagascar"))
     }
 
     @Test
     fun parseUrl_noPath() {
+        assertNull(parseUrl("ge0:"))
         assertNull(parseUrl("http://ge0.me"))
         assertNull(parseUrl("https://omaps.app"))
         assertNull(parseUrl("https://comaps.at"))
+        assertNull(parseUrl("ge0:/"))
+        assertNull(parseUrl("ge0://"))
         assertNull(parseUrl("http://ge0.me/"))
         assertNull(parseUrl("https://omaps.app/"))
         assertNull(parseUrl("https://comaps.at/"))
@@ -47,6 +50,10 @@ class Ge0UrlConverterTest : BaseUrlConverterTest() {
 
     @Test
     fun parseUrl_shortLink() {
+        assertEquals(
+            Position("51.0000003", "-108.9999868", z = "4"),
+            parseUrl("ge0://ApYSV0YTAl/América_do_Norte"),
+        )
         assertEquals(
             Position("-18.9249433", "46.4416404", z = "4"),
             parseUrl("http://ge0.me/AbCMCNp0LO/Madagascar"),
@@ -59,5 +66,10 @@ class Ge0UrlConverterTest : BaseUrlConverterTest() {
             Position("52.4877385", "13.3815233", z = "14"),
             parseUrl("https://comaps.at/o4MnIOApKp/Kreuzberg"),
         )
+    }
+
+    @Test
+    fun parseUrl_hostThatLooksLikeHash() {
+        assertNull(parseUrl("https://ApYSV0YTAl/"))
     }
 }

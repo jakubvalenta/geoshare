@@ -86,7 +86,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
 
             // Shows automation success message
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
+            onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
 
             // Shows automation preferences button
             onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }

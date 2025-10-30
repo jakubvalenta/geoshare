@@ -11,7 +11,7 @@ class Ge0UrlConverter : UrlConverter.WithUriPattern {
     }
 
     @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(comaps\.at|ge0\.me|omaps\.app)/\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""((https?://)?(comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_ge0_name,
         inputs = listOf(
@@ -22,6 +22,10 @@ class Ge0UrlConverter : UrlConverter.WithUriPattern {
     )
 
     override val conversionUriPattern = conversionPattern<PositionMatch> {
+        all {
+            scheme("ge0") { Ge0HashPositionMatch(it) }
+            host(HASH) { Ge0HashPositionMatch(it) }
+        }
         path("""/$HASH\S*""") { Ge0HashPositionMatch(it) }
     }
 
