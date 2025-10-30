@@ -106,28 +106,23 @@ class GeoHashTest {
     @Test
     fun decodeGe0Hash_examples() {
         Assert.assertEquals(
-            // Reference implementation returns 51.000001, -108.999988 due to different rounding algorithm
-            Triple(51.000000312924385, -108.99998679757118, 4),
+            Triple(51.00000044424087, -108.99998679757118, 4),
             decodeGe0Hash("ApYSV0YTAl"),
         )
         Assert.assertEquals(
-            // Reference implementation returns -18.924943, 46.441639 due to different rounding algorithm
-            Triple(-18.924943283200264, 46.441640406847, 4),
+            Triple(-18.924943217006458, 46.441640406847, 4),
             decodeGe0Hash("AbCMCNp0LO"),
         )
         Assert.assertEquals(
-            // Reference implementation returns 52.4877386, 13.3815234 due to different rounding algorithm
-            Triple(52.48773850500584, 13.381523340940475, 14),
+            Triple(52.48773863770788, 13.381523340940475, 14),
             decodeGe0Hash("o4MnIOApKp"),
         )
         Assert.assertEquals(
-            // Reference implementation returns 40.71274, -74.0059965 due to different rounding algorithm.
-            Triple(40.71274034678936, -74.00599703192711, 9),
+            Triple(40.712740468525084, -74.00599703192711, 9),
             decodeGe0Hash("Umse5f0H8a"),
         )
         Assert.assertEquals(
-            // Reference implementation returns 40.71274, -74.0059965 due to different rounding algorithm.
-            Triple(40.71274034678936, -74.00599703192711, 5),
+            Triple(40.712740468525084, -74.00599703192711, 5),
             decodeGe0Hash("Emse5f0H8a"),
         )
     }
