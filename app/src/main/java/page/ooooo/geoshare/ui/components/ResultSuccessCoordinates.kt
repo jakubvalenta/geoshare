@@ -1,9 +1,11 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
@@ -34,15 +37,24 @@ fun ResultSuccessCoordinates(
 
     ResultCard(
         main = {
-            allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
-                SelectionContainer {
+            Row {
+                allOutputGroups.getLabelTextOutput()?.getText(position, position.points?.size ?: 0)?.let { text ->
                     Text(
                         text,
-                        Modifier
-                            .testTag("geoShareConversionSuccessPositionCoordinates")
-                            .fillMaxWidth(),
+                        Modifier.padding(end = 12.dp),
                         style = MaterialTheme.typography.bodyLarge,
                     )
+                }
+                allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
+                    SelectionContainer {
+                        Text(
+                            text,
+                            Modifier
+                                .testTag("geoShareConversionSuccessPositionCoordinates")
+                                .weight(1f),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                 }
             }
             allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
@@ -71,8 +83,9 @@ fun ResultSuccessCoordinates(
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                     val menuPointOutputs = allPointOutputGroups.getActionOutputs()
                     val textPointOutput = allPointOutputGroups.getTextOutput()
+                    val labelTextPointOutput = allPointOutputGroups.getLabelTextOutput()
                     points.forEachIndexed { i, point ->
-                        ResultSuccessPoint(i, point, textPointOutput, menuPointOutputs, onRun)
+                        ResultSuccessPoint(i, point, textPointOutput, labelTextPointOutput, menuPointOutputs, onRun)
                     }
                 }
             }
@@ -160,6 +173,38 @@ private fun DarkParamsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DescPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultSuccessCoordinates(
+                position = Position("50.123456", "11.123456", desc = "WGS 84"),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkDescPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultSuccessCoordinates(
+                position = Position("50.123456", "11.123456", desc = "WGS 84"),
                 onRun = {},
             )
         }

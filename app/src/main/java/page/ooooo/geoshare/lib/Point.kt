@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import kotlin.random.Random
 
 @Immutable
-data class Point(val lat: String = "0", val lon: String = "0") {
+data class Point(val lat: String = "0", val lon: String = "0", val desc: String? = null) {
     companion object {
         val example: Point = genRandomPoint(minLat = 0.0, maxLon = -100.0)
 

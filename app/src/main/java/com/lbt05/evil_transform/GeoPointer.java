@@ -1,11 +1,11 @@
-package com.lbt05.EvilTransform;
+package com.lbt05.evil_transform;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
 public class GeoPointer {
-    static DecimalFormat df = new DecimalFormat("0.000000");
+    static final DecimalFormat df = new DecimalFormat("0.000000");
     double longitude;
     double latitude;
 

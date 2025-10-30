@@ -26,9 +26,11 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_share)
     }
 
-    override fun getTextOutput(): Output.Text<Point>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Point>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyOutput,

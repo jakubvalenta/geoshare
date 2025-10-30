@@ -44,9 +44,11 @@ object GpxOutputGroup : OutputGroup<Position> {
             stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
-    override fun getTextOutput(): Output.Text<Position>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Position>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         SaveOutput,

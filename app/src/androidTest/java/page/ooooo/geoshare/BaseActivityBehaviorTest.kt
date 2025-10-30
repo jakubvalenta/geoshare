@@ -99,7 +99,7 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
-        if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
+        if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty() || !expectedPosition.mainPoint?.desc.isNullOrEmpty()) {
             val expectedSupportingText = allOutputGroups.getSupportingTextOutput()?.getText(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
         } else {

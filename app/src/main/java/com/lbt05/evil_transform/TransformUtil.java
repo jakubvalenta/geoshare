@@ -1,4 +1,4 @@
-package com.lbt05.EvilTransform;
+package com.lbt05.evil_transform;
 
 public class TransformUtil {
     public static boolean outOfChina(double lat, double lng) {
@@ -27,9 +27,8 @@ public class TransformUtil {
     }
 
     /**
-     *
-     * @param lat纬度
-     * @param lng经度
+     * @param lat 纬度
+     * @param lng 经度
      * @return delta[0] 是纬度差，delta[1]是经度差
      */
     public static double[] delta(double lat, double lng) {

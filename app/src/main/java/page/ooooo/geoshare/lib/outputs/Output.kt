@@ -21,4 +21,9 @@ sealed interface Output<T> {
     interface Text<T> : Output<T> {
         fun getText(value: T, uriQuote: UriQuote = DefaultUriQuote()): String
     }
+
+    interface ComposableText<T> : Output<T> {
+        @Composable
+        fun getText(value: T, num: Int, uriQuote: UriQuote = DefaultUriQuote()): String?
+    }
 }

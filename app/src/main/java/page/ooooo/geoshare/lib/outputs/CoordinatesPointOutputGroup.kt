@@ -12,6 +12,12 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
         override fun getText(value: Point, uriQuote: UriQuote) = formatDegMinSecString(value)
     }
 
+    object LabelTextOutput : Output.ComposableText<Point> {
+        @Composable
+        override fun getText(value: Point, num: Int, uriQuote: UriQuote) =
+            stringResource(R.string.conversion_succeeded_point_number, num)
+    }
+
     object CopyDegMinSecOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
             Action.Copy(formatDegMinSecString(value))
@@ -30,9 +36,11 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
-    override fun getTextOutput(): Output.Text<Point> = TextOutput
+    override fun getTextOutput() = TextOutput
 
-    override fun getSupportingTextOutput(): Output.Text<Point>? = null
+    override fun getLabelTextOutput() = LabelTextOutput
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDegMinSecOutput,

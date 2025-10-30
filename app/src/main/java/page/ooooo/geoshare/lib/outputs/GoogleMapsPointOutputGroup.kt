@@ -20,9 +20,11 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
     }
 
-    override fun getTextOutput(): Output.Text<Point>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Point>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Point>>()
 

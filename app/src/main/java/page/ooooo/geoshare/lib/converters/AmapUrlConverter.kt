@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import androidx.annotation.StringRes
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
-import com.lbt05.EvilTransform.GCJPointer
+import com.lbt05.evil_transform.GCJPointer
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
@@ -19,12 +19,12 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
             DocumentationInput.Url(26, "https://wb.amap.com/"),
         ),
     )
-    override val shortUriPattern = uriPattern
+    override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = ShortUriMethod.HEAD
 
-    override val conversionUriPattern = conversionPattern {
-        query("p", """\w+,$LAT,$LON.+""") { PositionMatch(it) }
-        query("q", """$LAT,$LON.+""") { GCJPositionMatch(it) }
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+        on { queryParams["p"]?.let { it matches """\w+,$LAT,$LON.+""" } } doReturn { GCJPositionMatch(it) }
+        on { queryParams["q"]?.let { it matches """$LAT,$LON.+""" } } doReturn { GCJPositionMatch(it) }
     }
 
     @StringRes
@@ -38,7 +38,9 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
             get() = matcher.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
                 matcher.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
                     GCJPointer(lat, lon).toExactWGSPointer().let { wGSPointer ->
-                        listOf(Point(wGSPointer.latitude.toString(), wGSPointer.longitude.toString()))
+                        listOf(
+                            Point(wGSPointer.latitude.toString(), wGSPointer.longitude.toString(), desc = "WGS 84")
+                        )
                     }
                 }
             }

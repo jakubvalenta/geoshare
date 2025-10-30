@@ -15,6 +15,14 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             formatDegMinSecString(value)
     }
 
+    object LabelTextOutput : Output.ComposableText<Position> {
+        @Composable
+        override fun getText(value: Position, num: Int, uriQuote: UriQuote) =
+            num.takeIf { it > 1 }?.let { num ->
+                stringResource(R.string.conversion_succeeded_point_number, num)
+            }
+    }
+
     object SupportingTextOutput : Output.Text<Position> {
         override fun getText(value: Position, uriQuote: UriQuote) =
             formatParamsString(value)
@@ -90,9 +98,11 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    override fun getTextOutput(): Output.Text<Position> = TextOutput
+    override fun getTextOutput() = TextOutput
 
-    override fun getSupportingTextOutput(): Output.Text<Position> = SupportingTextOutput
+    override fun getLabelTextOutput() = LabelTextOutput
+
+    override fun getSupportingTextOutput() = SupportingTextOutput
 
     override fun getActionOutputs() = listOf(
         CopyDegMinSecOutput,
@@ -126,6 +136,9 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
     private fun formatParamsString(value: Position): String = value.run {
         buildList {
+            mainPoint?.desc.takeUnless { it.isNullOrEmpty() }?.let { description ->
+                add(description)
+            }
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
                 (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
                     val coords = "$lat,$lon"

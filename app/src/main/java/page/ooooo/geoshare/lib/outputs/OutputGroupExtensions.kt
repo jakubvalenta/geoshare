@@ -7,6 +7,9 @@ import page.ooooo.geoshare.lib.UriQuote
 fun <T> List<OutputGroup<T>>.getTextOutput() =
     this.firstNotNullOfOrNull { it.getTextOutput() }
 
+fun <T> List<OutputGroup<T>>.getLabelTextOutput() =
+    this.firstNotNullOfOrNull { it.getLabelTextOutput() }
+
 fun <T> List<OutputGroup<T>>.getSupportingTextOutput() =
     this.firstNotNullOfOrNull { it.getSupportingTextOutput() }
 

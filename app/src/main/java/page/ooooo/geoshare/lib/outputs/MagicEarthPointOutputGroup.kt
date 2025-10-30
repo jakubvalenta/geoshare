@@ -65,9 +65,11 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthUrlConverter.NAME)
     }
 
-    override fun getTextOutput(): Output.Text<Point>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Point>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,

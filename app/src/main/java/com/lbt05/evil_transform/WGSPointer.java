@@ -1,4 +1,4 @@
-package com.lbt05.EvilTransform;
+package com.lbt05.evil_transform;
 
 public class WGSPointer extends GeoPointer {
 

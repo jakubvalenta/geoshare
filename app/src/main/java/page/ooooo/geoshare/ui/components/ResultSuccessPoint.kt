@@ -29,22 +29,25 @@ fun ResultSuccessPoint(
     i: Int,
     point: Point,
     textPointOutput: Output.Text<Point>?,
+    labelTextPointOutput: Output.ComposableText<Point>?,
     menuPointOutputs: List<Output.Action<Point, Action>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
-    val label = stringResource(R.string.conversion_succeeded_point_number, i + 1)
+    val label = labelTextPointOutput?.getText(point, i + 1)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            label,
-            fontStyle = FontStyle.Italic,
-            style = MaterialTheme.typography.bodySmall,
-        )
+        label?.let { text ->
+            Text(
+                text,
+                fontStyle = FontStyle.Italic,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
         SelectionContainer(Modifier.weight(1f)) {
             textPointOutput?.getText(point)?.let { text ->
                 Text(text, style = MaterialTheme.typography.bodySmall)
@@ -85,6 +88,7 @@ private fun DefaultPreview() {
                 i = 3,
                 point = Point.example,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
+                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -101,6 +105,7 @@ private fun DarkPreview() {
                 i = 3,
                 point = Point.example,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
+                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
