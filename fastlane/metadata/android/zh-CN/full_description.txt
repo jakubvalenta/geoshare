@@ -3,14 +3,14 @@
 <b>支持的地图链接</b>
 
 - Google 地图
-- Apple 地图（测试）
-- HERE WeGo（测试）
-- Magic Earth（测试）
-- Mapy.com（测试）
-- OpenStreetMap（测试）
-- OsmAnd（测试）
-- Waze（测试）
-- Yandex 地图（测试）
+- Apple 地图
+- HERE WeGo
+- Magic Earth
+- Mapy.com
+- OpenStreetMap
+- OsmAnd
+- Waze
+- Yandex 地图
 - 坐标
 
 <b>示例用例</b>
