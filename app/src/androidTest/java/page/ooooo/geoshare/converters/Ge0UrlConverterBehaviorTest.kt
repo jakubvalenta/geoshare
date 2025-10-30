@@ -10,6 +10,12 @@ class Ge0UrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
         launchApplication()
         closeIntro()
 
+        // Custom scheme
+        testUri(
+            Position("51.0000003", "-108.9999868", z = "4"),
+            "ge0://ApYSV0YTAl/América_do_Norte",
+        )
+
         // Maps.me short URI
         testUri(
             Position("-18.9249433", "46.4416404", z = "4"),
