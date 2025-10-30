@@ -12,31 +12,31 @@ class Ge0UrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Custom scheme
         testUri(
-            Position("51.0000003", "-108.9999868", z = "4"),
+            Position("51.0000004", "-108.9999868", z = "4"),
             "ge0://ApYSV0YTAl/América_do_Norte",
         )
 
         // Maps.me short URI
         testUri(
-            Position("-18.9249433", "46.4416404", z = "4"),
+            Position("-18.9249432", "46.4416404", z = "4"),
             "http://ge0.me/AbCMCNp0LO/Madagascar",
         )
 
         // Organic Maps short URI
         testUri(
-            Position("40.7127403", "-74.005997", z = "9"),
+            Position("40.7127405", "-74.005997", z = "9"),
             "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )
 
         // CoMaps short URI
         testUri(
-            Position("52.4877385", "13.3815233", z = "14"),
+            Position("52.4877386", "13.3815233", z = "14"),
             "https://comaps.at/o4MnIOApKp/Kreuzberg",
         )
 
         // Text
         testTextUri(
-            Position("51.0000003", "-108.9999868", z = "4"),
+            Position("51.0000004", "-108.9999868", z = "4"),
             "América do Norte, Lancer, Saskatchewan, Canadá\n" +
                     "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
                     "(51.000001, -108.999988)",
