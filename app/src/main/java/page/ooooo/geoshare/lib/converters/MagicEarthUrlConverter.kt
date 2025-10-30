@@ -39,7 +39,7 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     }
 
     @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?magicearth.com/\?\S+""")
+    override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_magic_earth_name,
         inputs = listOf(
@@ -51,6 +51,9 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         all {
             optional {
                 query("z", Z) { PositionMatch(it) }
+            }
+            optional {
+                query("zoom", Z) { PositionMatch(it) }
             }
             first {
                 all {
