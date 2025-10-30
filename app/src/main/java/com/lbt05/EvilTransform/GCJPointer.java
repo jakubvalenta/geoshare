@@ -35,9 +35,7 @@ public class GCJPointer extends GeoPointer {
             dLng = tmp.getLongitude() - this.getLongitude();
             if ((Math.abs(dLat) < threshold) && (Math.abs(dLng) < threshold)) {
                 return currentWGSPointer;
-            } else {
-                System.out.println(dLat + ":" + dLng);
-            }
+            } // else { System.out.println(dLat + ":" + dLng); }
             if (dLat > 0) {
                 pLat = wgsLat;
             } else {

@@ -48,7 +48,7 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
     private class NorthSouthWestEastPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-        override val points: List<Point>?
+        override val points
             get() = matcher.groupOrNull("lat")?.let { lat ->
                 matcher.groupOrNull("lon")?.let { lon ->
                     val latSig = if (matcher.groupOrNull()?.contains('S') == true) "-" else ""

@@ -116,7 +116,7 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
                 Pattern.compile("""!1d$LON!2d$LAT"""),
             ).also { dataPatternsCache = it }
 
-        override val points: List<Point>?
+        override val points
             get() = matcher.groupOrNull("data")?.let { data ->
                 buildList {
                     dataPatterns.forEach { dataPattern ->

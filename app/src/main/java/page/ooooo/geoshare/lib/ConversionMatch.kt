@@ -34,7 +34,7 @@ open class PositionMatch(val matcher: Matcher) {
  * Repeatedly searches for LAT and LON in the input to get points.
  */
 class PointsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-    override val points: List<Point>
+    override val points
         get() = matcher.reset().let { m ->
             buildList {
                 while (m.find()) {
@@ -52,10 +52,8 @@ abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
     private var latLonZCache: Triple<Double, Double, Int>? = null
     val latLonZ: Triple<Double, Double, Int>?
         get() = latLonZCache ?: matcher.groupOrNull("hash")?.let { hash -> decode(hash).also { latLonZCache = it } }
-    override val points: List<Point>?
-        get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(lat.toString(), lon.toString())) }
-    override val z: String?
-        get() = latLonZ?.third?.toString()
+    override val points get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(lat.toString(), lon.toString())) }
+    override val z get() = latLonZ?.third?.toString()
 
     abstract fun decode(hash: String): Triple<Double, Double, Int>
 }
