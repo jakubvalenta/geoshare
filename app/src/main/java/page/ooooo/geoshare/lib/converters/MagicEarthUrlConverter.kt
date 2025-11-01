@@ -50,20 +50,20 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     override val conversionUriPattern = conversionPattern {
         all {
             optional {
-                query("z", Z) { PositionMatch(it) }
+                onUri { queryParams["z"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
             }
             optional {
-                query("zoom", Z) { PositionMatch(it) }
+                onUri { queryParams["zoom"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
             }
             first {
                 all {
-                    query("lat", LAT) { PositionMatch(it) }
-                    query("lon", LON) { PositionMatch(it) }
+                    onUri { queryParams["lat"]?.let { it matcherIfMatches LAT } } doReturn { PositionMatch(it) }
+                    onUri { queryParams["lon"]?.let { it matcherIfMatches LON } } doReturn { PositionMatch(it) }
                 }
-                query("name", Q_PARAM) { PositionMatch(it) }
+                onUri { queryParams["name"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                query("daddr", Q_PARAM) { PositionMatch(it) }
-                query("q", Q_PARAM) { PositionMatch(it) }
+                onUri { queryParams["daddr"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
+                onUri { queryParams["q"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
             }
         }
     }

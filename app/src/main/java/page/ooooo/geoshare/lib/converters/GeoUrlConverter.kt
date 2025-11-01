@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.matcherIfMatches
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
@@ -24,13 +25,13 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val conversionUriPattern = conversionPattern {
         all {
             optional {
-                path("""$LAT,$LON""") { PositionMatch(it) }
+                onUri { path matcherIfMatches """$LAT,$LON""" } doReturn { PositionMatch(it) }
             }
             optional {
-                query("q", Q_PARAM) { PositionMatch(it) }
+                onUri { queryParams["q"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
             }
             optional {
-                query("z", Z) { PositionMatch(it) }
+                onUri { queryParams["z"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
             }
         }
     }

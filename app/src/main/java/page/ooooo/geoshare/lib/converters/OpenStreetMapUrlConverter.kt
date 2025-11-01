@@ -30,13 +30,13 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     )
 
     override val conversionUriPattern = conversionPattern {
-        path("""/go/$HASH""") { OpenStreetMapGeoHashPositionMatch(it) }
-        path(ELEMENT_PATH) { PositionMatch(it) }
-        fragment("""map=$Z/$LAT/$LON.*""") { PositionMatch(it) }
+        onUri { path matcherIfMatches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it) }
+        onUri { path matcherIfMatches ELEMENT_PATH } doReturn { PositionMatch(it) }
+        onUri { fragment matcherIfMatches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it) }
     }
 
     override val conversionHtmlPattern = conversionPattern<PositionMatch> {
-        html(""""lat":$LAT,"lon":$LON""") { PointsPositionMatch(it) }
+        onHtml { this matcherIfFind """"lat":$LAT,"lon":$LON""" } doReturn { PointsPositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null

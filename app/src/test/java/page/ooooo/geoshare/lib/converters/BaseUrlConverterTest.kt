@@ -29,13 +29,13 @@ abstract class BaseUrlConverterTest() {
     }
 
     fun parseHtml(html: String): Position? = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.find(html)?.toPosition()
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.matches(html)?.toPosition()
     } else {
         throw NotImplementedError()
     }
 
     fun parseHtmlRedirect(html: String) = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.find(html)?.toUrlString()
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.matches(html)?.toUrlString()
     } else {
         throw NotImplementedError()
     }

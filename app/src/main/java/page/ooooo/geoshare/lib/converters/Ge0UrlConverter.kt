@@ -22,11 +22,13 @@ class Ge0UrlConverter : UrlConverter.WithUriPattern {
     )
 
     override val conversionUriPattern = conversionPattern<PositionMatch> {
-        all {
-            scheme("ge0") { Ge0HashPositionMatch(it) }
-            host(HASH) { Ge0HashPositionMatch(it) }
-        }
-        path("""/$HASH\S*""") { Ge0HashPositionMatch(it) }
+        onUri {
+            if (scheme == "ge0") {
+                host matcherIfMatches HASH
+            } else {
+                path matcherIfMatches """/$HASH\S*"""
+            }
+        } doReturn { Ge0HashPositionMatch(it) }
     }
 
     private class Ge0HashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {

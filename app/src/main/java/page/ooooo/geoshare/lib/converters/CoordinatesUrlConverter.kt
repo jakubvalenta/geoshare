@@ -50,13 +50,13 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     )
 
     override val conversionUriPattern = conversionPattern {
-        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") {
+        onUri { path matcherIfMatches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" } doReturn {
             DecimalCoordsPositionMatch(it)
         }
-        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") {
+        onUri { path matcherIfMatches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" } doReturn {
             DegreesMinutesSecondsCoordsPositionMatch(it)
         }
-        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") {
+        onUri { path matcherIfMatches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" } doReturn {
             DegreesMinutesCoordsPositionMatch(it)
         }
     }

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.converters
 
+import android.R.attr.path
 import androidx.annotation.StringRes
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
@@ -12,6 +13,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.groupOrNull
+import page.ooooo.geoshare.lib.matcherIfMatches
 
 @Suppress("SpellCheckingInspection")
 class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern {
@@ -34,13 +36,13 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val shortUriMethod = ShortUriMethod.GET
 
     override val conversionUriPattern = conversionPattern {
-        path(COORDS) { NorthSouthWestEastPositionMatch(it) }
+        onUri { path matcherIfMatches COORDS } doReturn { NorthSouthWestEastPositionMatch(it) }
         all {
             optional {
-                query("z", Z) { PositionMatch(it) }
+                onUri { queryParams["z"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
             }
-            query("x", LON) { PositionMatch(it) }
-            query("y", LAT) { PositionMatch(it) }
+            onUri { queryParams["x"]?.let { it matcherIfMatches LON } } doReturn { PositionMatch(it) }
+            onUri { queryParams["y"]?.let { it matcherIfMatches LAT } } doReturn { PositionMatch(it) }
         }
     }
 

@@ -30,16 +30,17 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
 
     @OptIn(ExperimentalEncodingApi::class)
     override val conversionUriPattern = conversionPattern {
-        path("/l/$LAT,$LON") { PositionMatch(it) }
+        onUri { path matcherIfMatches "/l/$LAT,$LON" } doReturn { PositionMatch(it) }
         all {
-            path("/") { PositionMatch(it) }
-            query("map", "$LAT,$LON,$Z") { PositionMatch(it) }
+            onUri { path matcherIfMatches "/" } doReturn { PositionMatch(it) }
+            onUri { queryParams["map"]?.let { it matcherIfMatches "$LAT,$LON,$Z" } } doReturn { PositionMatch(it) }
         }
         all {
             optional {
-                query("map", "$LAT,$LON,$Z") { PositionMatch(it) }
+                onUri { queryParams["map"]?.let { it matcherIfMatches "$LAT,$LON,$Z" } } doReturn { PositionMatch(it) }
             }
-            path("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""") { EncodedPositionMatch(it) }
+            onUri { path matcherIfMatches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" } doReturn
+                    { EncodedPositionMatch(it) }
         }
     }
 

@@ -8,6 +8,8 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.matcherIfFind
+import page.ooooo.geoshare.lib.matcherIfMatches
 
 class YandexMapsUrlConverter() :
     UrlConverter.WithUriPattern,
@@ -50,20 +52,22 @@ class YandexMapsUrlConverter() :
         all {
             optional {
                 first {
-                    query("whatshere%5Bzoom%5D", Z) { PositionMatch(it) }
-                    query("z", Z) { PositionMatch(it) }
+                    onUri { queryParams["whatshere%5Bzoom%5D"]?.let { it matcherIfMatches Z } } doReturn
+                            { PositionMatch(it) }
+                    onUri { queryParams["z"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
                 }
             }
             first {
-                query("whatshere%5Bpoint%5D", "$LON,$LAT") { PositionMatch(it) }
-                query("ll", "$LON,$LAT") { PositionMatch(it) }
-                path("""/maps/org/\d+([/?#].*|$)""") { PositionMatch(it) }
+                onUri { queryParams["whatshere%5Bpoint%5D"]?.let { it matcherIfMatches "$LON,$LAT" } } doReturn
+                        { PositionMatch(it) }
+                onUri { queryParams["ll"]?.let { it matcherIfMatches "$LON,$LAT" } } doReturn { PositionMatch(it) }
+                onUri { path matcherIfMatches """/maps/org/\d+([/?#].*|$)""" } doReturn { PositionMatch(it) }
             }
         }
     }
 
     override val conversionHtmlPattern = conversionPattern {
-        html("""data-coordinates="$LON,$LAT"""") { PositionMatch(it) }
+        onHtml { this matcherIfFind """data-coordinates="$LON,$LAT"""" } doReturn { PositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null

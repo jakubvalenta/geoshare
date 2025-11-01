@@ -18,3 +18,7 @@ fun Matcher.groupOrNull(name: String): String? = try {
 fun Pattern.matcherIfMatches(input: String): Matcher? = this.matcher(input)?.takeIf { it.matches() }
 
 fun Pattern.matcherIfFind(input: String): Matcher? = this.matcher(input)?.takeIf { it.find() }
+
+infix fun String.matcherIfMatches(regex: String): Matcher? = Pattern.compile(regex).matcherIfMatches(this)
+
+infix fun String.matcherIfFind(regex: String): Matcher? = Pattern.compile(regex).matcherIfFind(this)

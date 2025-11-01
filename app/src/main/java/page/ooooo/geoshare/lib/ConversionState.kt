@@ -322,11 +322,11 @@ data class GrantedParseHtmlPermission(
                 ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
             }
         }
-        urlConverter.conversionHtmlPattern?.find(html)?.toPosition()?.let { position ->
+        urlConverter.conversionHtmlPattern?.matches(html)?.toPosition()?.let { position ->
             stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
             return ConversionSucceeded(stateContext, runContext, inputUriString, position)
         }
-        urlConverter.conversionHtmlRedirectPattern?.find(html)?.toUrlString()?.let { redirectUriString ->
+        urlConverter.conversionHtmlRedirectPattern?.matches(html)?.toUrlString()?.let { redirectUriString ->
             stateContext.log.i(
                 null,
                 "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"

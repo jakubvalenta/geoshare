@@ -1,67 +1,39 @@
 package page.ooooo.geoshare.lib
 
 import com.google.re2j.Matcher
-import com.google.re2j.Pattern
 
 abstract class ConversionPattern<T> {
-    open fun find(html: String): List<T>? = null
     open fun matches(uri: Uri): List<T>? = null
+    open fun matches(html: String): List<T>? = null
 }
 
-class ConversionSchemePattern<T>(
-    val regex: String,
-    val getMatch: (matcher: Matcher) -> T,
+class ConversionUriPattern<T>(
+    val condition: Uri.() -> Matcher?,
+    val result: (matcher: Matcher) -> T,
 ) : ConversionPattern<T>() {
+    class Builder<T>(
+        val condition: Uri.() -> Matcher?,
+        val block: (conversionUriPattern: ConversionUriPattern<T>) -> Unit,
+    ) {
+        infix fun doReturn(result: (matcher: Matcher) -> T) = block(ConversionUriPattern(condition, result))
+    }
 
-    override fun matches(uri: Uri): List<T>? = Pattern.compile(regex).matcherIfMatches(uri.scheme)
-        ?.let { listOf(getMatch(it)) }
-}
-
-class ConversionHostPattern<T>(
-    val regex: String,
-    val getMatch: (matcher: Matcher) -> T,
-) : ConversionPattern<T>() {
-
-    override fun matches(uri: Uri): List<T>? = Pattern.compile(regex).matcherIfMatches(uri.host)
-        ?.let { listOf(getMatch(it)) }
-}
-
-class ConversionPathPattern<T>(
-    val regex: String,
-    val getMatch: (matcher: Matcher) -> T,
-) : ConversionPattern<T>() {
-
-    override fun matches(uri: Uri): List<T>? = Pattern.compile(regex).matcherIfMatches(uri.path)
-        ?.let { listOf(getMatch(it)) }
-}
-
-class ConversionQueryParamPattern<T>(
-    val name: String,
-    val regex: String,
-    val getMatch: (matcher: Matcher) -> T,
-) : ConversionPattern<T>() {
-
-    override fun matches(uri: Uri): List<T>? =
-        uri.queryParams[name]?.let { value -> Pattern.compile(regex).matcherIfMatches(value) }
-            ?.let { listOf(getMatch(it)) }
-}
-
-class ConversionFragmentPattern<T>(
-    val regex: String,
-    val getMatch: (matcher: Matcher) -> T,
-) : ConversionPattern<T>() {
-
-    override fun matches(uri: Uri): List<T>? = Pattern.compile(regex).matcherIfMatches(uri.fragment)
-        ?.let { listOf(getMatch(it)) }
+    override fun matches(uri: Uri): List<T>? = uri.condition()?.let { listOf(result(it)) }
 }
 
 class ConversionHtmlPattern<T>(
-    val regex: String,
-    val getMatch: (matcher: Matcher) -> T,
+    val condition: String.() -> Matcher?,
+    val result: (matcher: Matcher) -> T,
 ) : ConversionPattern<T>() {
+    class Builder<T>(
+        val condition: String.() -> Matcher?,
+        val block: (conversionHtmlPattern: ConversionHtmlPattern<T>) -> Unit,
+    ) {
+        infix fun doReturn(result: (matcher: Matcher) -> T) =
+            block(ConversionHtmlPattern(condition, result))
+    }
 
-    override fun find(html: String): List<T>? = Pattern.compile(regex).matcherIfFind(html)
-        ?.let { listOf(getMatch(it)) }
+    override fun matches(html: String): List<T>? = html.condition()?.let { listOf(result(it)) }
 }
 
 abstract class ConversionGroupPattern<T> : ConversionPattern<T>() {
@@ -71,26 +43,11 @@ abstract class ConversionGroupPattern<T> : ConversionPattern<T>() {
 
     fun first(init: ConversionFirstPattern<T>.() -> Unit) = initMatcher(ConversionFirstPattern(), init)
 
-    fun optional(init: ConversionOptionalPattern<T>.() -> Unit) =
-        initMatcher(ConversionOptionalPattern(), init)
+    fun onUri(condition: Uri.() -> Matcher?) = ConversionUriPattern.Builder(condition) { initMatcher(it) }
 
-    fun scheme(regex: String, getMatch: (matcher: Matcher) -> T) =
-        initMatcher(ConversionSchemePattern(regex, getMatch))
+    fun onHtml(condition: String.() -> Matcher?) = ConversionHtmlPattern.Builder(condition) { initMatcher(it) }
 
-    fun host(regex: String, getMatch: (matcher: Matcher) -> T) =
-        initMatcher(ConversionHostPattern(regex, getMatch))
-
-    fun path(regex: String, getMatch: (matcher: Matcher) -> T) =
-        initMatcher(ConversionPathPattern(regex, getMatch))
-
-    fun query(name: String, regex: String, getMatch: (matcher: Matcher) -> T) =
-        initMatcher(ConversionQueryParamPattern(name, regex, getMatch))
-
-    fun fragment(regex: String, getMatch: (matcher: Matcher) -> T) =
-        initMatcher(ConversionFragmentPattern(regex, getMatch))
-
-    fun html(regex: String, getMatch: (matcher: Matcher) -> T) =
-        initMatcher(ConversionHtmlPattern(regex, getMatch))
+    fun optional(init: ConversionOptionalPattern<T>.() -> Unit) = initMatcher(ConversionOptionalPattern(), init)
 
     private fun <U : ConversionPattern<T>> initMatcher(conversionPattern: U, init: U.() -> Unit = {}): U {
         conversionPattern.init()
@@ -100,21 +57,21 @@ abstract class ConversionGroupPattern<T> : ConversionPattern<T>() {
 }
 
 class ConversionOptionalPattern<T> : ConversionGroupPattern<T>() {
-    override fun find(html: String): List<T> = children.mapNotNull { it.find(html) }.flatten()
     override fun matches(uri: Uri): List<T> = children.mapNotNull { it.matches(uri) }.flatten()
+    override fun matches(html: String): List<T> = children.mapNotNull { it.matches(html) }.flatten()
 }
 
 class ConversionAllPattern<T> : ConversionGroupPattern<T>() {
-    override fun find(html: String): List<T>? =
-        children.mapNotNull { it.find(html) }.takeIf { it.size == children.size }?.flatten()
-
     override fun matches(uri: Uri): List<T>? =
         children.mapNotNull { it.matches(uri) }.takeIf { it.size == children.size }?.flatten()
+
+    override fun matches(html: String): List<T>? =
+        children.mapNotNull { it.matches(html) }.takeIf { it.size == children.size }?.flatten()
 }
 
 class ConversionFirstPattern<T> : ConversionGroupPattern<T>() {
-    override fun find(html: String): List<T>? = children.firstNotNullOfOrNull { it.find(html) }
     override fun matches(uri: Uri): List<T>? = children.firstNotNullOfOrNull { it.matches(uri) }
+    override fun matches(html: String): List<T>? = children.firstNotNullOfOrNull { it.matches(html) }
 }
 
 fun <T> conversionPattern(init: ConversionFirstPattern<T>.() -> Unit): ConversionFirstPattern<T> {

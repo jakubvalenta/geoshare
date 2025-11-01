@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.matcherIfMatches
 
 class OsmAndUrlConverter : UrlConverter.WithUriPattern {
     @Suppress("SpellCheckingInspection")
@@ -20,10 +21,10 @@ class OsmAndUrlConverter : UrlConverter.WithUriPattern {
 
     override val conversionUriPattern = conversionPattern {
         all {
-            fragment("""$Z/$LAT/$LON.*""") { PositionMatch(it) }
-            query("pin", """$LAT,$LON""") { PositionMatch(it) }
+            onUri { fragment matcherIfMatches """$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it) }
+            onUri { queryParams["pin"]?.let { it matcherIfMatches """$LAT,$LON""" } } doReturn { PositionMatch(it) }
         }
-        fragment("""$Z/$LAT/$LON.*""") { PositionMatch(it) }
-        query("pin", """$LAT,$LON""") { PositionMatch(it) }
+        onUri { fragment matcherIfMatches """$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it) }
+        onUri { queryParams["pin"]?.let { it matcherIfMatches """$LAT,$LON""" } } doReturn { PositionMatch(it) }
     }
 }
