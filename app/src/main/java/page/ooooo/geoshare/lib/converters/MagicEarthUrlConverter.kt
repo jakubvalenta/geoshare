@@ -47,23 +47,23 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern {
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                onUri { queryParams["z"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
             optional {
-                onUri { queryParams["zoom"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
             first {
                 all {
-                    onUri { queryParams["lat"]?.let { it matcherIfMatches LAT } } doReturn { PositionMatch(it) }
-                    onUri { queryParams["lon"]?.let { it matcherIfMatches LON } } doReturn { PositionMatch(it) }
+                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch(it) }
+                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch(it) }
                 }
-                onUri { queryParams["name"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                onUri { queryParams["daddr"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
-                onUri { queryParams["q"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
             }
         }
     }

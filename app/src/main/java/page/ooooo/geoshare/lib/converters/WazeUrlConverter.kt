@@ -31,28 +31,28 @@ class WazeUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPatte
         ),
     )
 
-    override val conversionUriPattern = conversionPattern {
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                onUri { queryParams["z"]?.let { it matcherIfMatches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
             first {
-                onUri { path matcherIfMatches """/ul/h$HASH""" } doReturn { WazeGeoHashPositionMatch(it) }
-                onUri { queryParams["h"]?.let { it matcherIfMatches HASH } } doReturn { WazeGeoHashPositionMatch(it) }
-                onUri { queryParams["to"]?.let { it matcherIfMatches """ll\.$LAT,$LON""" } } doReturn { PositionMatch(it) }
-                onUri { queryParams["ll"]?.let { it matcherIfMatches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { path matches """/ul/h$HASH""" } doReturn { WazeGeoHashPositionMatch(it) }
+                on { queryParams["h"]?.let { it matches HASH } } doReturn { WazeGeoHashPositionMatch(it) }
+                on { queryParams["to"]?.let { it matches """ll\.$LAT,$LON""" } } doReturn { PositionMatch(it) }
+                on { queryParams["ll"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                onUri { queryParams["latlng"]?.let { it matcherIfMatches "$LAT,$LON" } } doReturn { PositionMatch(it) }
-                onUri { queryParams["q"]?.let { it matcherIfMatches Q_PARAM } } doReturn { PositionMatch(it) }
-                onUri { queryParams["venue_id"]?.let { it matcherIfMatches ".+" } } doReturn { PositionMatch(it) }
-                onUri { queryParams["place"]?.let { it matcherIfMatches ".+" } } doReturn { PositionMatch(it) }
-                onUri { queryParams["to"]?.let { it matcherIfMatches """place\..+""" } } doReturn { PositionMatch(it) }
+                on { queryParams["latlng"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["venue_id"]?.let { it matches ".+" } } doReturn { PositionMatch(it) }
+                on { queryParams["place"]?.let { it matches ".+" } } doReturn { PositionMatch(it) }
+                on { queryParams["to"]?.let { it matches """place\..+""" } } doReturn { PositionMatch(it) }
             }
         }
     }
 
-    override val conversionHtmlPattern = conversionPattern {
-        onHtml { this matcherIfFind """"latLng":{"lat":$LAT,"lng":$LON}""" } doReturn { PositionMatch(it) }
+    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
+        on { this find """"latLng":{"lat":$LAT,"lng":$LON}""" } doReturn { PositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null

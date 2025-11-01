@@ -21,14 +21,9 @@ class Ge0UrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<PositionMatch> {
-        onUri {
-            if (scheme == "ge0") {
-                host matcherIfMatches HASH
-            } else {
-                path matcherIfMatches """/$HASH\S*"""
-            }
-        } doReturn { Ge0HashPositionMatch(it) }
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+        on { if (scheme == "ge0") host matches HASH else path matches """/$HASH\S*""" } doReturn
+                { Ge0HashPositionMatch(it) }
     }
 
     private class Ge0HashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {

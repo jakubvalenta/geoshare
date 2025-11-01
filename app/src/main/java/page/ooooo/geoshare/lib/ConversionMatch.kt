@@ -68,14 +68,14 @@ abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
  * them.
  */
 fun List<PositionMatch>.toPosition() = Position(
-    this.lastNotNullOrNull { it.points?.toImmutableList() }
+    points = this.lastNotNullOrNull { it.points?.toImmutableList() }
         ?: this.lastNotNullOrNull { it.lat }?.let { lat ->
             this.lastNotNullOrNull { it.lon }?.let { lon ->
                 persistentListOf(Point(lat, lon))
             }
         },
-    this.lastNotNullOrNull { it.q },
-    this.lastNotNullOrNull { it.z },
+    q = this.lastNotNullOrNull { it.q },
+    z = this.lastNotNullOrNull { it.z },
 )
 
 open class RedirectMatch(val matcher: Matcher) {

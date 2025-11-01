@@ -29,18 +29,15 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val conversionUriPattern = conversionPattern {
-        onUri { path matcherIfMatches "/l/$LAT,$LON" } doReturn { PositionMatch(it) }
-        all {
-            onUri { path matcherIfMatches "/" } doReturn { PositionMatch(it) }
-            onUri { queryParams["map"]?.let { it matcherIfMatches "$LAT,$LON,$Z" } } doReturn { PositionMatch(it) }
-        }
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+        on { path matches "/l/$LAT,$LON" } doReturn { PositionMatch(it) }
+        on { if (path == "/") queryParams["map"]?.let { it matches "$LAT,$LON,$Z" } else null } doReturn
+                { PositionMatch(it) }
         all {
             optional {
-                onUri { queryParams["map"]?.let { it matcherIfMatches "$LAT,$LON,$Z" } } doReturn { PositionMatch(it) }
+                on { queryParams["map"]?.let { it matches "$LAT,$LON,$Z" } } doReturn { PositionMatch(it) }
             }
-            onUri { path matcherIfMatches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" } doReturn
-                    { EncodedPositionMatch(it) }
+            on { path matches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" } doReturn { EncodedPositionMatch(it) }
         }
     }
 
@@ -58,8 +55,8 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
             get() {
                 val encoded = matcher.groupOrNull("encoded") ?: return null
                 val decoded = Base64.decode(encoded).decodeToString()
-                val lat = decodedLatPattern.matcherIfFind(decoded)?.groupOrNull("lat") ?: return null
-                val lon = decodedLonPattern.matcherIfFind(decoded)?.groupOrNull("lon") ?: return null
+                val lat = decodedLatPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lat") ?: return null
+                val lon = decodedLonPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lon") ?: return null
                 return persistentListOf(Point(lat, lon))
             }
     }

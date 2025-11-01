@@ -29,20 +29,20 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         ),
     )
 
-    override val conversionUriPattern = conversionPattern {
-        onUri { path matcherIfMatches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it) }
-        onUri { path matcherIfMatches ELEMENT_PATH } doReturn { PositionMatch(it) }
-        onUri { fragment matcherIfMatches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it) }
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+        on { path matches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it) }
+        on { path matches ELEMENT_PATH } doReturn { PositionMatch(it) }
+        on { fragment matches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it) }
     }
 
-    override val conversionHtmlPattern = conversionPattern<PositionMatch> {
-        onHtml { this matcherIfFind """"lat":$LAT,"lon":$LON""" } doReturn { PointsPositionMatch(it) }
+    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
+        on { this find """"lat":$LAT,"lon":$LON""" } doReturn { PointsPositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null
 
     override fun getHtmlUrl(uri: Uri): URL? {
-        val m = Pattern.compile(ELEMENT_PATH).matcherIfMatches(uri.path) ?: return null
+        val m = (uri.path matches ELEMENT_PATH) ?: return null
         val type = m.groupOrNull("type") ?: return null
         val id = m.groupOrNull("id") ?: return null
         return URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")

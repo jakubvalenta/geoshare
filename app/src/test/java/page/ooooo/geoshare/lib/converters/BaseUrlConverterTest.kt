@@ -7,13 +7,13 @@ abstract class BaseUrlConverterTest() {
 
     protected var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? = urlConverter.uriPattern.matcherIfFind(uriString)?.group()
+    fun getUri(uriString: String): String? = urlConverter.uriPattern.matcher(uriString).takeIf { it.find() }?.group()
 
     fun doesUriPatternMatch(uriString: String): Boolean = urlConverter.uriPattern.matches(uriString)
 
     fun getShortUri(uriString: String): String? = if (urlConverter is UrlConverter.WithShortUriPattern) {
         (urlConverter as UrlConverter.WithShortUriPattern).let { urlConverter ->
-            urlConverter.shortUriPattern.matcherIfMatches(uriString)?.group()
+            urlConverter.shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.group()
         }
     } else {
         throw NotImplementedError()
