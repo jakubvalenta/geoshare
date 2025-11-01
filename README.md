@@ -134,7 +134,7 @@ a geo: URI:
    creation of the geo: link.
 
 To permanently allow or deny connecting to the map service instead of always
-asking (the default), go to the app’s Preferences.
+asking (the default), go to the app’s Preferences. Note that even with the need for Geo Share to connect to the internet in such situations, it may be considered a more private and secure approach as it wouldn't allow JavaScript-based fingerprinting or code execution.
 
 ## Reporting issues
 
