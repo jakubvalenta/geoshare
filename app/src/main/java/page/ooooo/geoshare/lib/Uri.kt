@@ -129,7 +129,13 @@ data class Uri(
     }
 
     private fun formatQueryParams(): String = queryParams.map {
-        "${it.key}=${uriQuote.encode(it.value.replace('+', ' '), allow = ",")}"
+        buildString {
+            append(it.key)
+            if (it.value.isNotEmpty()) {
+                append("=")
+                append(uriQuote.encode(it.value.replace('+', ' '), allow = ","))
+            }
+        }
     }.joinToString("&")
 
     override fun toString() = StringBuilder().apply {
