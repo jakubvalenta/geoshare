@@ -1,1 +1,2 @@
-- Added support for directions when opening coordinates in Magic Earth.
+- Added a menu that allows copying or opening individual place list points.
+- Added a menu with app-specific actions and added "navigate to" and "navigate via" options for Magic Earth.
