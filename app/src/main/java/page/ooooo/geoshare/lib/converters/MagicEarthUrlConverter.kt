@@ -17,14 +17,23 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         const val NAME = "Magic Earth"
 
         @Suppress("SpellCheckingInspection")
+        const val MAGIC_EARTH_PACKAGE_NAME = "com.generalmagic.magicearth"
+
+        @Suppress("SpellCheckingInspection")
         fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
                 position.apply {
-                    mainPoint?.let { (lat, lon) ->
-                        set("lat", lat)
-                        set("lon", lon)
+                    if (points != null) {
+                        if (points.size > 1) {
+                            set("directions", points.joinToString(";") { (lat, lon) -> "$lat,$lon" }) // TODO
+                        } else {
+                            mainPoint?.let { (lat, lon) ->
+                                set("lat", lat)
+                                set("lon", lon)
+                            }
+                        }
                     }
                     q?.let { q ->
                         set("q", q)

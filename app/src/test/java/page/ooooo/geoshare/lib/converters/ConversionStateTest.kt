@@ -2180,7 +2180,7 @@ class ConversionStateTest {
                 openApp(
                     eq(runContext.context),
                     eq(automationValue.packageName),
-                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                    argThat { toString() == position.toAppUriString(automationValue.packageName, uriQuote) },
                 )
             } doReturn true
         }
@@ -2204,7 +2204,7 @@ class ConversionStateTest {
                 openApp(
                     eq(runContext.context),
                     eq(automationValue.packageName),
-                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                    argThat { toString() == position.toAppUriString(automationValue.packageName, uriQuote) },
                 )
             } doReturn false
         }

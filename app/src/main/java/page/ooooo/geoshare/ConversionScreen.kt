@@ -270,7 +270,7 @@ fun ConversionScreen(
                         )
                         ResultSuccessApps(
                             apps = queryGeoUriApps(),
-                            onOpenApp = { onOpenApp(it, currentState.position.toGeoUriString()) },
+                            onOpenApp = { onOpenApp(it, currentState.position.toAppUriString(it)) },
                             onOpenChooser = { onOpenChooser(currentState.position.toGeoUriString()) },
                             windowSizeClass = windowSizeClass,
                         )

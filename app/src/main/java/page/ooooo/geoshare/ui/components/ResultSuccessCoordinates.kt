@@ -20,6 +20,7 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.truncateMiddle
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -88,7 +89,7 @@ fun ResultSuccessCoordinates(
                         MagicEarthUrlConverter.formatUriString(position),
                     ).map { text ->
                         DropdownMenuItem(
-                            text = { Text(text) },
+                            text = { Text(truncateMiddle(text)) },
                             onClick = {
                                 menuExpanded = false
                                 onCopy(text)

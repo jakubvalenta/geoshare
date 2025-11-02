@@ -4,6 +4,9 @@ import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter.Companion.MAGIC_EARTH_PACKAGE_NAME
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -71,12 +74,19 @@ data class Position(
             ).toString()
         }
 
-    fun toDegMinSecCoordsString(): String {
-        val (latDegInt, latMinInt, latSec) = (mainPoint?.lat?.toDoubleOrNull() ?: 0.0).toDegMinSec()
-        val (lonDegInt, lonMinInt, lonSec) = (mainPoint?.lon?.toDoubleOrNull() ?: 0.0).toDegMinSec()
-        return "${abs(latDegInt)}°\u00a0$latMinInt′\u00a0${latSec.toScale(5)}″\u00a0${if (latDegInt < 0) "S" else "N"}, " +
-                "${abs(lonDegInt)}°\u00a0$lonMinInt′\u00a0${lonSec.toScale(5)}″\u00a0${if (lonDegInt < 0) "W" else "E"}"
-    }
+    fun toAppUriString(packageName: String, uriQuote: UriQuote = DefaultUriQuote()): String =
+        when (packageName) {
+            MAGIC_EARTH_PACKAGE_NAME -> MagicEarthUrlConverter.formatUriString(this, uriQuote)
+            else -> toGeoUriString(uriQuote)
+        }
+
+    fun toDegMinSecCoordsString(): String =
+        (mainPoint?.lat?.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
+            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
+        } +
+                (mainPoint?.lon?.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
+                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
+                }
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")

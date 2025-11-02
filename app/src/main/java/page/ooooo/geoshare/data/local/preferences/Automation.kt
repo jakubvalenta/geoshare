@@ -192,7 +192,7 @@ sealed class AutomationImpl : Automation {
         override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.OpenApp(packageName, position.toGeoUriString(uriQuote))
+            AutomationAction.OpenApp(packageName, position.toAppUriString(packageName, uriQuote))
 
         @Composable
         override fun Label() {
