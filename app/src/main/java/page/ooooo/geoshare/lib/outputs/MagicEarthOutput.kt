@@ -17,6 +17,11 @@ object MagicEarthOutput : Output {
     override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
         formatDisplayUriString(position, uriQuote)
 
+    override fun getPositionExtraUriStrings(position: Position, uriQuote: UriQuote) = listOf(
+        formatDriveToUriString(position.mainPoint ?: Point(), uriQuote),
+        formatDriveViaUriString(position.mainPoint ?: Point(), uriQuote),
+    )
+
     override fun getPointText(point: Point, uriQuote: UriQuote) = null
 
     override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)

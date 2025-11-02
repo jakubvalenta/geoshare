@@ -16,6 +16,8 @@ object GeneralOutput : Output {
 
     override fun getPositionUriString(position: Position, uriQuote: UriQuote) = position.toGeoUriString(uriQuote)
 
+    override fun getPositionExtraUriStrings(position: Position, uriQuote: UriQuote) = emptyList<String>()
+
     override fun getPointText(point: Point, uriQuote: UriQuote) = point.toDegMinSecCoordsString()
 
     override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)

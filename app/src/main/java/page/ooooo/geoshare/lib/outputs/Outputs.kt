@@ -4,7 +4,6 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
-import kotlin.collections.find
 
 object Outputs {
     val default = GeneralOutput
@@ -35,4 +34,15 @@ object Outputs {
     fun getOpenAppUriString(packageName: String, position: Position, uriQuote: UriQuote = DefaultUriQuote()): String =
         extra.find { it.packageNames.contains(packageName) }?.getPositionUriString(position, uriQuote)
             ?: default.getPositionUriString(position, uriQuote)
+
+    fun getOpenAppAllUriStrings(
+        packageName: String,
+        position: Position,
+        uriQuote: UriQuote = DefaultUriQuote(),
+    ): List<String> = buildList {
+        extra.find { it.packageNames.contains(packageName) }?.let { output ->
+            output.getPositionUriString(position, uriQuote)?.let { add(it) }
+            addAll(output.getPositionExtraUriStrings(position, uriQuote))
+        } ?: add(default.getPositionUriString(position, uriQuote))
+    }
 }

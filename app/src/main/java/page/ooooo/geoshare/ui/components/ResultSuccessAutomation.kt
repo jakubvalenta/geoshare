@@ -198,7 +198,7 @@ private fun DefaultPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFinished(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -217,7 +217,7 @@ private fun DarkPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFinished(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -242,7 +242,7 @@ private fun WaitingPreview() {
                     ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                     ConversionRunContext(context, clipboard, saveGpxLauncher),
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -267,7 +267,7 @@ private fun DarkWaitingPreview() {
                     ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                     ConversionRunContext(context, clipboard, saveGpxLauncher),
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -286,7 +286,7 @@ private fun SucceededPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationSucceeded(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -305,7 +305,7 @@ private fun DarSucceededPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationSucceeded(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -324,7 +324,7 @@ private fun FailedPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFailed(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -343,7 +343,7 @@ private fun DarkFailedPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFailed(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
+                    Position.example,
                     AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,

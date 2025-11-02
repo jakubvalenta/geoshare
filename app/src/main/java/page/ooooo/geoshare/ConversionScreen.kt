@@ -1,6 +1,7 @@
 package page.ooooo.geoshare
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,7 +41,6 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -58,6 +58,7 @@ fun ConversionScreen(
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
 ) {
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
@@ -108,11 +109,23 @@ fun ConversionScreen(
         },
         onOpenApp = { packageName, uriString ->
             viewModel.cancel()
-            viewModel.intentTools.openApp(runContext.context, packageName, uriString)
+            if (!viewModel.intentTools.openApp(runContext.context, packageName, uriString)) {
+                Toast.makeText(
+                    context,
+                    R.string.conversion_automation_open_app_failed,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         },
         onOpenChooser = { uriString ->
             viewModel.cancel()
-            viewModel.intentTools.openChooser(runContext.context, uriString)
+            if (!viewModel.intentTools.openChooser(runContext.context, uriString)) {
+                Toast.makeText(
+                    context,
+                    R.string.conversion_succeeded_apps_not_found,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
         },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
@@ -144,8 +157,8 @@ fun ConversionScreen(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onOpenApp: (packageName: String, uriString: String) -> Boolean,
-    onOpenChooser: (uriString: String) -> Boolean,
+    onOpenApp: (packageName: String, uriString: String) -> Unit,
+    onOpenChooser: (uriString: String) -> Unit,
     onRetry: (newUriString: String) -> Unit,
     onSave: () -> Boolean,
 ) {
@@ -272,13 +285,9 @@ fun ConversionScreen(
                         )
                         ResultSuccessApps(
                             apps = queryGeoUriApps(),
-                            onOpenApp = { packageName ->
-                                onOpenApp(
-                                    packageName,
-                                    Outputs.getOpenAppUriString(packageName, currentState.position),
-                                )
-                            },
-                            onOpenChooser = { onOpenChooser(Outputs.default.getPositionUriString(currentState.position)) },
+                            position = currentState.position,
+                            onOpenApp = onOpenApp,
+                            onOpenChooser = onOpenChooser,
                             windowSizeClass = windowSizeClass,
                         )
                     }
@@ -395,7 +404,7 @@ private fun DefaultPreview() {
         ConversionScreen(
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position("50.123456", "11.123456"),
+                Position.example,
                 AutomationImpl.Noop(),
             ),
             changelogShown = true,
@@ -421,8 +430,8 @@ private fun DefaultPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -437,7 +446,7 @@ private fun DarkPreview() {
         ConversionScreen(
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position("50.123456", "11.123456"),
+                Position.example,
                 AutomationImpl.Noop(),
             ),
             changelogShown = true,
@@ -463,8 +472,8 @@ private fun DarkPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -479,7 +488,7 @@ private fun TabletPreview() {
         ConversionScreen(
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position("50.123456", "11.123456"),
+                Position.example,
                 AutomationImpl.Noop(),
             ),
             changelogShown = true,
@@ -505,8 +514,8 @@ private fun TabletPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -525,7 +534,7 @@ private fun AutomationPreview() {
                 ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position("50.123456", "11.123456"),
+                Position.example,
                 AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
             changelogShown = true,
@@ -551,8 +560,8 @@ private fun AutomationPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -571,7 +580,7 @@ private fun DarkAutomationPreview() {
                 ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position("50.123456", "11.123456"),
+                Position.example,
                 AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
             changelogShown = true,
@@ -597,8 +606,8 @@ private fun DarkAutomationPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -617,7 +626,7 @@ private fun TabletAutomationPreview() {
                 ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                Position("50.123456", "11.123456"),
+                Position.example,
                 AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
             ),
             changelogShown = true,
@@ -643,8 +652,8 @@ private fun TabletAutomationPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -675,8 +684,8 @@ private fun ErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -707,8 +716,8 @@ private fun DarkErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -739,8 +748,8 @@ private fun TabletErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -786,8 +795,8 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -833,8 +842,8 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -880,8 +889,8 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -909,8 +918,8 @@ private fun InitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -938,8 +947,8 @@ private fun DarkInitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )
@@ -967,8 +976,8 @@ private fun TabletInitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> true },
-            onOpenChooser = { true },
+            onOpenApp = { _, _ -> },
+            onOpenChooser = {},
             onRetry = {},
             onSave = { true },
         )

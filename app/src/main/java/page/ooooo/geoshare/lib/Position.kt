@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlin.random.Random
 
 @Immutable
 data class Position(
@@ -12,18 +11,14 @@ data class Position(
     val z: String? = null,
 ) {
     companion object {
-        val example: Position = genRandomPosition(minLat = 0.0, maxLon = -100.0)
+        val example: Position = Position(persistentListOf(Point.example), z = "8")
 
         fun genRandomPosition(
             minLat: Double = -50.0,
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
-        ): Position = Position(
-            Random.nextDouble(minLat, maxLat).toScale(6).toString(),
-            Random.nextDouble(minLon, maxLon).toScale(6).toString(),
-            z = "8",
-        )
+        ): Position = Position(persistentListOf(Point.genRandomPoint(minLat, maxLat, minLon, maxLon)), z = "8")
     }
 
     constructor(

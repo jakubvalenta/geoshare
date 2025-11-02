@@ -29,7 +29,7 @@ fun ResultSuccessPoint(
     i: Int,
     point: Point,
     onCopy: (text: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Boolean,
+    onOpenChooser: (uriString: String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var menuExpanded by remember { mutableStateOf(false) }
@@ -103,9 +103,9 @@ private fun DefaultPreview() {
         Surface {
             ResultSuccessPoint(
                 i = 3,
-                point = Point("59.1293656", "-11.4585672"),
+                point = Point.example,
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
             )
         }
     }
@@ -118,9 +118,9 @@ private fun DarkPreview() {
         Surface {
             ResultSuccessPoint(
                 i = 3,
-                point = Point("59.1293656", "-11.4585672"),
+                point = Point.example,
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
             )
         }
     }

@@ -19,6 +19,8 @@ object AppleMapsOutput : Output {
     override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
         formatPositionUriString(position, uriQuote)
 
+    override fun getPositionExtraUriStrings(position: Position, uriQuote: UriQuote) = emptyList<String>()
+
     override fun getPointText(point: Point, uriQuote: UriQuote) = null
 
     override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)

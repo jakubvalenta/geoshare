@@ -26,7 +26,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessCoordinates(
     position: Position,
     onCopy: (text: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Boolean,
+    onOpenChooser: (uriString: String) -> Unit,
     onSave: () -> Boolean,
 ) {
     val spacing = LocalSpacing.current
@@ -123,9 +123,9 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
+                position = Position.example,
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -141,9 +141,9 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
+                position = Position.example,
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -159,9 +159,9 @@ private fun OneAppPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
+                position = Position.example,
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -177,9 +177,9 @@ private fun DarkOneAppPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
+                position = Position.example,
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -195,9 +195,9 @@ private fun ParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
+                position = Position.example.copy(q = "Berlin, Germany", z = "13"),
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -213,9 +213,9 @@ private fun DarkParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
+                position = Position.example.copy(q = "Berlin, Germany", z = "13"),
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -233,13 +233,13 @@ private fun PointsPreview() {
             ResultSuccessCoordinates(
                 position = Position(
                     points = persistentListOf(
-                        Point("59.1293656", "11.4585672"),
-                        Point("59.4154007", "11.659710599999999"),
-                        Point("59.147731699999994", "11.550661199999999"),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
                     ),
                 ),
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
@@ -257,13 +257,13 @@ private fun DarkPointsPreview() {
             ResultSuccessCoordinates(
                 position = Position(
                     points = persistentListOf(
-                        Point("59.1293656", "11.4585672"),
-                        Point("59.4154007", "11.659710599999999"),
-                        Point("59.147731699999994", "11.550661199999999"),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
                     ),
                 ),
                 onCopy = {},
-                onOpenChooser = { true },
+                onOpenChooser = {},
                 onSave = { true },
             )
         }
