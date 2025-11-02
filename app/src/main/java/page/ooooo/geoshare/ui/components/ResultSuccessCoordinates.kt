@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,6 +10,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -19,31 +18,32 @@ import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.GoogleMapsOutput
 import page.ooooo.geoshare.lib.outputs.Outputs
-import page.ooooo.geoshare.lib.truncateMiddle
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
     onCopy: (text: String) -> Unit,
+    onOpenChooser: (uriString: String) -> Boolean,
     onSave: () -> Boolean,
 ) {
-    val separator = "\t\t"
+    val spacing = LocalSpacing.current
     var menuExpanded by remember { mutableStateOf(false) }
 
     ResultCard(
         main = {
             SelectionContainer {
                 Text(
-                    Outputs.default.getMainText(position),
+                    Outputs.default.getPositionText(position),
                     Modifier
                         .testTag("geoShareConversionSuccessPositionCoordinates")
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            position.toParamsString(separator).takeIf { it.isNotEmpty() }?.let {
+            position.toParamsString("\t\t").takeIf { it.isNotEmpty() }?.let {
                 SelectionContainer {
                     Text(
                         it,
@@ -54,18 +54,6 @@ fun ResultSuccessCoordinates(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-            }
-            position.points?.takeIf { it.size > 1 }?.let { points ->
-                SelectionContainer {
-                    Text(
-                        points.mapIndexed { i, (lat, lon) ->
-                            stringResource(R.string.conversion_succeeded_point_number, i + 1) + separator +
-                                    Outputs.default.getMainText(Position(lat, lon))
-                        }.joinToString("\n"),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                // TODO Add context menu for each point with texts to copy and URIs to open
             }
         },
         after = {
@@ -80,14 +68,29 @@ fun ResultSuccessCoordinates(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    Outputs.getAllTexts(position).map { text ->
+                    Outputs.getPositionAllTexts(position).map { text ->
                         DropdownMenuItem(
-                            text = { Text(truncateMiddle(text)) },
+                            text = { Text(text, overflow = TextOverflow.Ellipsis, maxLines = 1) },
                             onClick = {
                                 menuExpanded = false
                                 onCopy(text)
                             },
+                            leadingIcon = {
+                                Icon(
+                                    painterResource(R.drawable.content_copy_24px),
+                                    stringResource(R.string.conversion_succeeded_copy_content_description),
+                                )
+                            },
                         )
+                    }
+                }
+            }
+        },
+        bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
+            {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                    points.forEachIndexed { i, point ->
+                        ResultSuccessPoint(i, point, onCopy, onOpenChooser)
                     }
                 }
             }
@@ -97,7 +100,7 @@ fun ResultSuccessCoordinates(
                 onCopy(position.toGeoUriString())
             }
             ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
-                onCopy(GoogleMapsOutput.getMainText(position))
+                onCopy(GoogleMapsOutput.getPositionText(position))
             }
             ResultCardChip(
                 stringResource(R.string.conversion_succeeded_save_gpx),
@@ -122,6 +125,7 @@ private fun DefaultPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -139,6 +143,7 @@ private fun DarkPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -156,6 +161,7 @@ private fun OneAppPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -173,6 +179,7 @@ private fun DarkOneAppPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456"),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -190,6 +197,7 @@ private fun ParamsPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -207,6 +215,7 @@ private fun DarkParamsPreview() {
             ResultSuccessCoordinates(
                 position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -230,6 +239,7 @@ private fun PointsPreview() {
                     ),
                 ),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }
@@ -253,6 +263,7 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 onCopy = {},
+                onOpenChooser = { true },
                 onSave = { true },
             )
         }

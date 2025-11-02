@@ -253,6 +253,7 @@ fun ConversionScreen(
                     ResultSuccessCoordinates(
                         position = currentState.position,
                         onCopy = onCopy,
+                        onOpenChooser = onOpenChooser,
                         onSave = onSave,
                     )
                 }
@@ -277,7 +278,7 @@ fun ConversionScreen(
                                     Outputs.getOpenAppUriString(packageName, currentState.position),
                                 )
                             },
-                            onOpenChooser = { onOpenChooser(Outputs.default.getMainUriString(currentState.position)) },
+                            onOpenChooser = { onOpenChooser(Outputs.default.getPositionUriString(currentState.position)) },
                             windowSizeClass = windowSizeClass,
                         )
                     }

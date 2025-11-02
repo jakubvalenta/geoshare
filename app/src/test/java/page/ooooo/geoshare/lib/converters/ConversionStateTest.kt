@@ -2278,7 +2278,7 @@ class ConversionStateTest {
             on {
                 openChooser(
                     eq(runContext.context),
-                    argThat { toString() == Outputs.default.getMainUriString(position, uriQuote) },
+                    argThat { toString() == Outputs.default.getPositionUriString(position, uriQuote) },
                 )
             } doReturn true
         }
@@ -2301,7 +2301,7 @@ class ConversionStateTest {
             on {
                 openChooser(
                     eq(runContext.context),
-                    argThat { toString() == Outputs.default.getMainUriString(position, uriQuote) },
+                    argThat { toString() == Outputs.default.getPositionUriString(position, uriQuote) },
                 )
             } doReturn false
         }

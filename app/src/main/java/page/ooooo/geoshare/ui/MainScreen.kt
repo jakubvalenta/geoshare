@@ -234,7 +234,7 @@ fun MainScreen(
                 }
                 TextButton({
                     onUpdateInput(
-                        GoogleMapsOutput.getMainUriString(Position.genRandomPosition())
+                        GoogleMapsOutput.getPositionUriString(Position.genRandomPosition())
                     )
                     setErrorMessageResId(null)
                 }) {

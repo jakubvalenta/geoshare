@@ -10,13 +10,18 @@ object MagicEarthOutput : Output {
     @Suppress("SpellCheckingInspection")
     override val packageNames = listOf("com.generalmagic.magicearth")
 
-    override fun getMainText(position: Position, uriQuote: UriQuote) = formatDisplayUriString(position, uriQuote)
+    override fun getPositionText(position: Position, uriQuote: UriQuote) = formatDisplayUriString(position, uriQuote)
 
-    override fun getExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<String>()
+    override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<String>()
 
-    override fun getMainUriString(position: Position, uriQuote: UriQuote) = formatDisplayUriString(position, uriQuote)
+    override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
+        formatDisplayUriString(position, uriQuote)
 
-    override fun getExtraUriStrings(point: Point, uriQuote: UriQuote) = listOf(
+    override fun getPointText(point: Point, uriQuote: UriQuote) = null
+
+    override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)
+
+    override fun getPointUriStrings(point: Point, uriQuote: UriQuote) = listOf(
         formatDriveToUriString(point, uriQuote),
         formatDriveViaUriString(point, uriQuote),
     )

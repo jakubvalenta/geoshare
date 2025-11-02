@@ -7,6 +7,9 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 
+/**
+ * See https://developers.google.com/maps/documentation/urls/get-started
+ */
 object GoogleMapsOutput : Output {
     override val packageNames = listOf(
         GOOGLE_MAPS_PACKAGE_NAME,
@@ -14,14 +17,20 @@ object GoogleMapsOutput : Output {
         "us.spotco.maps",
     )
 
-    override fun getMainText(position: Position, uriQuote: UriQuote) = getMainUriString(position, uriQuote)
+    override fun getPositionText(position: Position, uriQuote: UriQuote) = getPositionUriString(position, uriQuote)
 
-    override fun getExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<String>()
+    override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<String>()
 
-    /**
-     * See https://developers.google.com/maps/documentation/urls/get-started
-     */
-    override fun getMainUriString(position: Position, uriQuote: UriQuote) = Uri(
+    override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
+        formatPositionUriString(position, uriQuote)
+
+    override fun getPointText(point: Point, uriQuote: UriQuote) = null
+
+    override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)
+
+    override fun getPointUriStrings(point: Point, uriQuote: UriQuote) = listOf(formatPointUriString(point, uriQuote))
+
+    private fun formatPositionUriString(position: Position, uriQuote: UriQuote) = Uri(
         scheme = "https",
         host = "www.google.com",
         path = "/maps",
@@ -40,5 +49,15 @@ object GoogleMapsOutput : Output {
         uriQuote = uriQuote,
     ).toString()
 
-    override fun getExtraUriStrings(point: Point, uriQuote: UriQuote) = emptyList<String>()
+    private fun formatPointUriString(point: Point, uriQuote: UriQuote) = Uri(
+        scheme = "https",
+        host = "www.google.com",
+        path = "/maps",
+        queryParams = buildMap {
+            point.apply {
+                set("q", "$lat,$lon")
+            }
+        }.toImmutableMap(),
+        uriQuote = uriQuote,
+    ).toString()
 }

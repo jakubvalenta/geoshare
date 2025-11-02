@@ -7,8 +7,10 @@ import page.ooooo.geoshare.lib.UriQuote
 
 interface Output {
     val packageNames: List<String>
-    fun getMainText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
-    fun getExtraTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<String>
-    fun getMainUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
-    fun getExtraUriStrings(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<String>
+    fun getPositionText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
+    fun getPositionExtraTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<String>
+    fun getPositionUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
+    fun getPointText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String?
+    fun getPointExtraTexts(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<String>
+    fun getPointUriStrings(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<String>
 }

@@ -7,14 +7,19 @@ import page.ooooo.geoshare.lib.UriQuote
 object GeneralOutput : Output {
     override val packageNames = emptyList<String>()
 
-    override fun getMainText(position: Position, uriQuote: UriQuote) = position.toDegMinSecCoordsString()
+    override fun getPositionText(position: Position, uriQuote: UriQuote) = position.toDegMinSecCoordsString()
 
-    override fun getExtraTexts(position: Position, uriQuote: UriQuote) = listOf(
+    override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = listOf(
         position.toCoordsDecString(),
         position.toGeoUriString(uriQuote),
     )
 
-    override fun getMainUriString(position: Position, uriQuote: UriQuote) = position.toGeoUriString(uriQuote)
+    override fun getPositionUriString(position: Position, uriQuote: UriQuote) = position.toGeoUriString(uriQuote)
 
-    override fun getExtraUriStrings(point: Point, uriQuote: UriQuote) = emptyList<String>()
+    override fun getPointText(point: Point, uriQuote: UriQuote) = point.toDegMinSecCoordsString()
+
+    override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)
+
+    override fun getPointUriStrings(point: Point, uriQuote: UriQuote) =
+        listOf(point.toGeoUriString(uriQuote = uriQuote))
 }

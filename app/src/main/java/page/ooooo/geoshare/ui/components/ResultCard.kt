@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -22,6 +23,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultCard(
     modifier: Modifier = Modifier,
     after: (@Composable () -> Unit)? = null,
+    bottom: (@Composable () -> Unit)? = null,
     chips: @Composable (lastPaddingEnd: Dp) -> Unit,
     main: @Composable ColumnScope.() -> Unit,
 ) {
@@ -46,6 +48,11 @@ fun ResultCard(
                 Column(verticalArrangement = Arrangement.spacedBy(verticalSpace), content = main)
             }
             after?.invoke()
+        }
+        bottom?.let {
+            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+                bottom()
+            }
         }
         Row(
             Modifier
@@ -161,6 +168,124 @@ private fun DarkPreview() {
                             Icon(
                                 painterResource(R.drawable.content_copy_24px),
                                 contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                            )
+                        }
+                    }
+                },
+            ) {
+                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DefaultBottomPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultCard(
+                chips = { lastPaddingEnd ->
+                    ResultCardChip(
+                        "My first chip",
+                        icon = {
+                            Icon(Icons.Default.Refresh, null)
+                        },
+                        onClick = {},
+                    )
+                    ResultCardChip(
+                        "My second chip",
+                        onClick = {},
+                    )
+                    ResultCardChip(
+                        "My third chip",
+                        modifier = Modifier.padding(end = lastPaddingEnd),
+                        onClick = {},
+                    )
+                },
+                after = {
+                    Box {
+                        IconButton({}) {
+                            Icon(
+                                painterResource(R.drawable.content_copy_24px),
+                                contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                            )
+                        }
+                    }
+                },
+                bottom = {
+                    Row {
+                        Text(
+                            "point 1",
+                            Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        IconButton({}, Modifier.size(16.dp)) {
+                            Icon(
+                                painterResource(R.drawable.more_horiz_24px),
+                                contentDescription = stringResource(R.string.nav_menu_content_description),
+                            )
+                        }
+                    }
+                },
+            ) {
+                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkBottomPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultCard(
+                chips = { lastPaddingEnd ->
+                    ResultCardChip(
+                        "My first chip",
+                        icon = {
+                            Icon(Icons.Default.Refresh, null)
+                        },
+                        onClick = {},
+                    )
+                    ResultCardChip(
+                        "My second chip",
+                        onClick = {},
+                    )
+                    ResultCardChip(
+                        "My third chip",
+                        modifier = Modifier.padding(end = lastPaddingEnd),
+                        onClick = {},
+                    )
+                },
+                after = {
+                    Box {
+                        IconButton({}) {
+                            Icon(
+                                painterResource(R.drawable.content_copy_24px),
+                                contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                            )
+                        }
+                    }
+                },
+                bottom = {
+                    Row {
+                        Text(
+                            "point 1",
+                            Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        IconButton({}, Modifier.size(16.dp)) {
+                            Icon(
+                                painterResource(R.drawable.more_horiz_24px),
+                                contentDescription = stringResource(R.string.nav_menu_content_description),
                             )
                         }
                     }

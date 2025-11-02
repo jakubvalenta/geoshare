@@ -144,7 +144,7 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(GoogleMapsOutput.getMainUriString(position, uriQuote))
+            AutomationAction.Copy(GoogleMapsOutput.getPositionUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -160,7 +160,7 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(AppleMapsOutput.getMainUriString(position, uriQuote))
+            AutomationAction.Copy(AppleMapsOutput.getPositionUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -176,7 +176,7 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(MagicEarthOutput.getMainUriString(position, uriQuote))
+            AutomationAction.Copy(MagicEarthOutput.getPositionUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -281,7 +281,7 @@ sealed class AutomationImpl : Automation {
         override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.OpenChooser(Outputs.default.getMainUriString(position, uriQuote))
+            AutomationAction.OpenChooser(Outputs.default.getPositionUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
