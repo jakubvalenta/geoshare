@@ -36,6 +36,10 @@ private sealed interface GridItem {
     class Empty : GridItem
 }
 
+private val iconSize = 46.dp
+private val dropdownButtonSize = 30.dp
+private val dropdownButtonOffset = 20.dp
+
 @Composable
 fun ResultSuccessApps(
     apps: List<IntentTools.App>,
@@ -50,8 +54,11 @@ fun ResultSuccessApps(
     } else {
         4
     }
-    val gridItems =
-        apps.map { GridItem.App(it) } + listOf(GridItem.ShareButton()) + List(columnCount - (apps.size + 1) % columnCount) { GridItem.Empty() }
+    val gridItems = buildList {
+        apps.forEach { add(GridItem.App(it)) }
+        add(GridItem.ShareButton())
+        repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
+    }
 
     Column(
         Modifier
@@ -64,18 +71,14 @@ fun ResultSuccessApps(
                 row.forEach { gridItem ->
                     when (gridItem) {
                         is GridItem.App -> ResultSuccessApp(gridItem.app, position, onOpenApp)
-
-                        is GridItem.ShareButton -> ResultSuccessShare(position, onOpenChooser)
-
-                        is GridItem.Empty -> Box(Modifier.weight(1f))
+                        is GridItem.ShareButton -> ResultSuccessAppShare(position, onOpenChooser)
+                        is GridItem.Empty -> ResultSuccessAppEmpty()
                     }
                 }
             }
         }
     }
 }
-
-private val iconSize = 46.dp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -108,13 +111,17 @@ fun RowScope.ResultSuccessApp(
                 app.label,
             )
             if (openAppUriStrings.size > 1) {
-                Box(Modifier.align(Alignment.TopEnd)) {
+                Box(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(dropdownButtonOffset, -dropdownButtonOffset),
+                ) {
                     FilledIconButton(
                         { menuExpanded = true },
-                        Modifier.size(16.dp),
+                        Modifier.size(dropdownButtonSize),
                         colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = MaterialTheme.colorScheme.onTertiary,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     ) {
                         Icon(
@@ -155,7 +162,7 @@ fun RowScope.ResultSuccessApp(
 }
 
 @Composable
-fun RowScope.ResultSuccessShare(position: Position, onOpenChooser: (uriString: String) -> Unit) {
+fun RowScope.ResultSuccessAppShare(position: Position, onOpenChooser: (uriString: String) -> Unit) {
     Column(Modifier.weight(1f)) {
         FilledIconButton(
             {
@@ -171,6 +178,11 @@ fun RowScope.ResultSuccessShare(position: Position, onOpenChooser: (uriString: S
             )
         }
     }
+}
+
+@Composable
+fun RowScope.ResultSuccessAppEmpty() {
+    Box(Modifier.weight(1f))
 }
 
 // Previews
