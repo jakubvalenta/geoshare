@@ -45,7 +45,7 @@ fun ResultSuccessPoint(
         )
         SelectionContainer(Modifier.weight(1f)) {
             Text(
-                Outputs.default.getPointText(point),
+                Outputs.default.getPointText(point).value,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -60,12 +60,12 @@ fun ResultSuccessPoint(
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false },
             ) {
-                Outputs.getPointAllTexts(point).forEach { text ->
+                Outputs.getPointAllTexts(point).forEach { (value, label) ->
                     DropdownMenuItem(
-                        text = { Text(text, overflow = TextOverflow.Ellipsis, maxLines = 1) },
+                        text = { Text(label(), overflow = TextOverflow.Ellipsis, maxLines = 1) },
                         onClick = {
                             menuExpanded = false
-                            onCopy(text)
+                            onCopy(value)
                         },
                         leadingIcon = {
                             Icon(
@@ -76,12 +76,12 @@ fun ResultSuccessPoint(
                     )
                 }
                 HorizontalDivider()
-                Outputs.getPointUriStrings(point).forEach { uriString ->
+                Outputs.getPointUriStrings(point).forEach { (value, label) ->
                     DropdownMenuItem(
-                        text = { Text(uriString, overflow = TextOverflow.Ellipsis, maxLines = 1) },
+                        text = { Text(label(), overflow = TextOverflow.Ellipsis, maxLines = 1) },
                         onClick = {
                             menuExpanded = false
-                            onOpenChooser(uriString)
+                            onOpenChooser(value)
                         },
                         leadingIcon = {
                             Icon(

@@ -36,7 +36,7 @@ fun ResultSuccessCoordinates(
         main = {
             SelectionContainer {
                 Text(
-                    Outputs.default.getPositionText(position),
+                    Outputs.default.getPositionText(position).value,
                     Modifier
                         .testTag("geoShareConversionSuccessPositionCoordinates")
                         .fillMaxWidth(),
@@ -68,12 +68,12 @@ fun ResultSuccessCoordinates(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    Outputs.getPositionAllTexts(position).map { text ->
+                    Outputs.getPositionAllTexts(position).map { (value, label) ->
                         DropdownMenuItem(
-                            text = { Text(text, overflow = TextOverflow.Ellipsis, maxLines = 1) },
+                            text = { Text(label(), overflow = TextOverflow.Ellipsis, maxLines = 1) },
                             onClick = {
                                 menuExpanded = false
-                                onCopy(text)
+                                onCopy(value)
                             },
                             leadingIcon = {
                                 Icon(
@@ -100,7 +100,7 @@ fun ResultSuccessCoordinates(
                 onCopy(position.toGeoUriString())
             }
             ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
-                onCopy(GoogleMapsOutput.getPositionText(position))
+                onCopy(GoogleMapsOutput.getPositionText(position).value)
             }
             ResultCardChip(
                 stringResource(R.string.conversion_succeeded_save_gpx),

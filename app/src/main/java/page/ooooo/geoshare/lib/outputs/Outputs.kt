@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 
 object Outputs {
-    val default = GeneralOutput
+    val default = CoordinatesOutput
     val extra = listOf(
         GoogleMapsOutput,
         AppleMapsOutput,
@@ -14,24 +14,28 @@ object Outputs {
     )
     val all get() = listOf(default, *extra.toTypedArray())
 
-    fun getPositionAllTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<String> = buildList {
+    fun getPositionAllTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> = buildList {
         all.forEach { output ->
             output.getPositionText(position, uriQuote)?.let { add(it) }
             addAll(output.getPositionExtraTexts(position, uriQuote))
         }
     }
 
-    fun getPointAllTexts(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<String> = buildList {
+    fun getPointAllTexts(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> = buildList {
         all.forEach { output ->
             output.getPointText(point, uriQuote)?.let { add(it) }
             addAll(output.getPointExtraTexts(point, uriQuote))
         }
     }
 
-    fun getPointUriStrings(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<String> =
+    fun getPointUriStrings(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> =
         all.flatMap { it.getPointUriStrings(point, uriQuote) }
 
-    fun getOpenAppUriString(packageName: String, position: Position, uriQuote: UriQuote = DefaultUriQuote()): String =
+    fun getOpenAppUriString(
+        packageName: String,
+        position: Position,
+        uriQuote: UriQuote = DefaultUriQuote(),
+    ): Output.Item =
         extra.find { it.packageNames.contains(packageName) }?.getPositionUriString(position, uriQuote)
             ?: default.getPositionUriString(position, uriQuote)
 
@@ -39,7 +43,7 @@ object Outputs {
         packageName: String,
         position: Position,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ): List<String> = buildList {
+    ): List<Output.Item> = buildList {
         extra.find { it.packageNames.contains(packageName) }?.let { output ->
             output.getPositionUriString(position, uriQuote)?.let { add(it) }
             addAll(output.getPositionExtraUriStrings(position, uriQuote))

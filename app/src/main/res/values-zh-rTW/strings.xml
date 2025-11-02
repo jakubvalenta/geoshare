@@ -119,10 +119,10 @@
     <string name="conversion_automation_share_succeeded">自動分享連結</string>
     <string name="conversion_automation_share_waiting">自動在%1$d中分享連結</string>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">因為 %3$s，正在進行第 %1$d 次嘗試（共 %2$d 次）。</string>
-    <string name="user_preferences_automation_copy_coords">在%1$s格式中複製座標</string>
-    <string name="user_preferences_automation_copy_link">複製%1$s連結</string>
+    <string name="conversion_succeeded_copy_coordinates">在%1$s格式中複製座標</string>
+    <string name="conversion_succeeded_copy_link">複製%1$s連結</string>
     <string name="user_preferences_automation_description">選擇在地圖連結轉換為座標時要自動執行的動作。</string>
     <string name="user_preferences_automation_nothing">什麼也沒有</string>
-    <string name="user_preferences_automation_open_app">開啟%1$s</string>
+    <string name="conversion_succeeded_open_app">開啟%1$s</string>
     <string name="user_preferences_automation_title">自動地</string>
 </resources>

@@ -2182,7 +2182,7 @@ class ConversionStateTest {
                     eq(runContext.context),
                     eq(automationValue.packageName),
                     argThat {
-                        toString() == Outputs.getOpenAppUriString(automationValue.packageName, position, uriQuote)
+                        toString() == Outputs.getOpenAppUriString(automationValue.packageName, position, uriQuote).value
                     },
                 )
             } doReturn true
@@ -2208,7 +2208,7 @@ class ConversionStateTest {
                     eq(runContext.context),
                     eq(automationValue.packageName),
                     argThat {
-                        toString() == Outputs.getOpenAppUriString(automationValue.packageName, position, uriQuote)
+                        toString() == Outputs.getOpenAppUriString(automationValue.packageName, position, uriQuote).value
                     },
                 )
             } doReturn false
@@ -2278,7 +2278,7 @@ class ConversionStateTest {
             on {
                 openChooser(
                     eq(runContext.context),
-                    argThat { toString() == Outputs.default.getPositionUriString(position, uriQuote) },
+                    argThat { toString() == Outputs.default.getPositionUriString(position, uriQuote).value },
                 )
             } doReturn true
         }
@@ -2301,7 +2301,7 @@ class ConversionStateTest {
             on {
                 openChooser(
                     eq(runContext.context),
-                    argThat { toString() == Outputs.default.getPositionUriString(position, uriQuote) },
+                    argThat { toString() == Outputs.default.getPositionUriString(position, uriQuote).value },
                 )
             } doReturn false
         }

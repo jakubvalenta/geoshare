@@ -96,7 +96,7 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                onOpenApp(app.packageName, Outputs.getOpenAppUriString(app.packageName, position))
+                onOpenApp(app.packageName, Outputs.getOpenAppUriString(app.packageName, position).value)
             }
             .weight(1f)
             .testTag("geoShareResultCardApp_${app.packageName}"),
@@ -133,12 +133,12 @@ fun RowScope.ResultSuccessApp(
                         expanded = menuExpanded,
                         onDismissRequest = { menuExpanded = false },
                     ) {
-                        openAppUriStrings.forEach { uriString ->
+                        openAppUriStrings.forEach { (value, label) ->
                             DropdownMenuItem(
-                                text = { Text(uriString, overflow = TextOverflow.Ellipsis, maxLines = 1) },
+                                text = { Text(label(), overflow = TextOverflow.Ellipsis, maxLines = 1) },
                                 onClick = {
                                     menuExpanded = false
-                                    onOpenApp(app.packageName, uriString)
+                                    onOpenApp(app.packageName, value)
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -166,7 +166,7 @@ fun RowScope.ResultSuccessAppShare(position: Position, onOpenChooser: (uriString
     Column(Modifier.weight(1f)) {
         FilledIconButton(
             {
-                onOpenChooser(Outputs.default.getPositionUriString(position))
+                onOpenChooser(Outputs.default.getPositionUriString(position).value)
             },
             Modifier
                 .align(Alignment.CenterHorizontally)

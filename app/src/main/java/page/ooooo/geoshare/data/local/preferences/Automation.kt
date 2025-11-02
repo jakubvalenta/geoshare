@@ -92,7 +92,7 @@ sealed class AutomationImpl : Automation {
         override fun Label() {
             Text(
                 stringResource(
-                    R.string.user_preferences_automation_copy_coords,
+                    R.string.conversion_succeeded_copy_coordinates,
                     Position.example.toCoordsDecString(),
                 )
             )
@@ -113,7 +113,7 @@ sealed class AutomationImpl : Automation {
         override fun Label() {
             Text(
                 stringResource(
-                    R.string.user_preferences_automation_copy_coords,
+                    R.string.conversion_succeeded_copy_coordinates,
                     Position.example.toDegMinSecCoordsString(),
                 )
             )
@@ -144,11 +144,11 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(GoogleMapsOutput.getPositionUriString(position, uriQuote))
+            AutomationAction.Copy(GoogleMapsOutput.getPositionUriString(position, uriQuote).value)
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_copy_link, GoogleMapsUrlConverter.NAME))
+            Text(stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME))
         }
 
         @Composable
@@ -160,11 +160,11 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(AppleMapsOutput.getPositionUriString(position, uriQuote))
+            AutomationAction.Copy(AppleMapsOutput.getPositionUriString(position, uriQuote).value)
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_copy_link, AppleMapsUrlConverter.NAME))
+            Text(stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME))
         }
 
         @Composable
@@ -176,11 +176,11 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(MagicEarthOutput.getPositionUriString(position, uriQuote))
+            AutomationAction.Copy(MagicEarthOutput.getPositionUriString(position, uriQuote).value)
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_copy_link, MagicEarthUrlConverter.NAME))
+            Text(stringResource(R.string.conversion_succeeded_copy_link, MagicEarthUrlConverter.NAME))
         }
 
         @Composable
@@ -197,7 +197,7 @@ sealed class AutomationImpl : Automation {
         override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.OpenApp(packageName, Outputs.getOpenAppUriString(packageName, position, uriQuote))
+            AutomationAction.OpenApp(packageName, Outputs.getOpenAppUriString(packageName, position, uriQuote).value)
 
         @Composable
         override fun Label() {
@@ -212,9 +212,9 @@ sealed class AutomationImpl : Automation {
                         app.label,
                         Modifier.widthIn(max = 24.dp),
                     )
-                    Text(stringResource(R.string.user_preferences_automation_open_app, app.label))
+                    Text(stringResource(R.string.conversion_succeeded_open_app, app.label))
                 }
-            } ?: Text(stringResource(R.string.user_preferences_automation_open_app, packageName))
+            } ?: Text(stringResource(R.string.conversion_succeeded_open_app, packageName))
         }
 
         @Composable
@@ -281,7 +281,7 @@ sealed class AutomationImpl : Automation {
         override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.OpenChooser(Outputs.default.getPositionUriString(position, uriQuote))
+            AutomationAction.OpenChooser(Outputs.default.getPositionUriString(position, uriQuote).value)
 
         @Composable
         override fun Label() {

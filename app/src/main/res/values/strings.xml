@@ -1,7 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
+    <string name="conversion_succeeded_copy_content_description">Copy</string>
+    <string name="conversion_succeeded_copy_coordinates">Copy coordinates in format %1$s</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>
+    <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
+    <string name="conversion_succeeded_open_app">Open %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
+    <string name="conversion_succeeded_open_app_drive_to">Navigate in %1$s</string>
+    <string name="conversion_succeeded_open_app_drive_via">Add waypoint in %1$s</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
     <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
@@ -50,7 +57,6 @@
     <string name="main_input_uri_clear_content_description">Clear</string>
     <string name="main_input_uri_paste_content_description">Paste</string>
     <string name="main_input_uri_supporting_text">e.g. https://maps.app.goo.gl/&#8230; or maps.apple.com/&#8230;</string>
-    <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_random">Random link</string>
@@ -109,11 +115,8 @@
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="user_preferences_title">Preferences</string>
-    <string name="user_preferences_automation_copy_coords">Copy coordinates in format %1$s</string>
-    <string name="user_preferences_automation_copy_link">Copy %1$s link</string>
     <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>
-    <string name="user_preferences_automation_open_app">Open %1$s</string>
     <string name="user_preferences_automation_title">Automation</string>
     <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
     <string name="user_preferences_connection_option_always">Yes</string>
