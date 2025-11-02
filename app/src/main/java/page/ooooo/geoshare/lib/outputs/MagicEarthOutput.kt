@@ -56,7 +56,7 @@ object MagicEarthOutput : Output {
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
-                set("drive_to", "1")
+                set("drive_to", "")
                 point.run {
                     set("lat", lat)
                     set("lon", lon)
@@ -70,7 +70,7 @@ object MagicEarthOutput : Output {
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
-                set("drive_via", "1")
+                set("drive_via", "")
                 point.run {
                     set("lat", lat)
                     set("lon", lon)

@@ -35,8 +35,8 @@ class MagicEarthOutputTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             listOf(
-                "magicearth://?drive_to=1&lat=50.123456&lon=-11.123456",
-                "magicearth://?drive_via=1&lat=50.123456&lon=-11.123456",
+                "magicearth://?drive_to&lat=50.123456&lon=-11.123456",
+                "magicearth://?drive_via&lat=50.123456&lon=-11.123456",
             ),
             MagicEarthOutput.getPointUriStrings(Point("50.123456", "-11.123456"), uriQuote),
         )
