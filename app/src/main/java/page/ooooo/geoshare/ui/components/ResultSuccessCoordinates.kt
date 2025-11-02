@@ -17,9 +17,8 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.outputs.GoogleMapsOutput
+import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.lib.truncateMiddle
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -37,7 +36,7 @@ fun ResultSuccessCoordinates(
         main = {
             SelectionContainer {
                 Text(
-                    position.toDegMinSecCoordsString(),
+                    Outputs.default.getMainText(position),
                     Modifier
                         .testTag("geoShareConversionSuccessPositionCoordinates")
                         .fillMaxWidth(),
@@ -61,11 +60,12 @@ fun ResultSuccessCoordinates(
                     Text(
                         points.mapIndexed { i, (lat, lon) ->
                             stringResource(R.string.conversion_succeeded_point_number, i + 1) + separator +
-                                    Position(lat, lon).toCoordsDecString()
+                                    Outputs.default.getMainText(Position(lat, lon))
                         }.joinToString("\n"),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
+                // TODO Add context menu for each point with texts to copy and URIs to open
             }
         },
         after = {
@@ -80,14 +80,7 @@ fun ResultSuccessCoordinates(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    listOf(
-                        position.toCoordsDecString(),
-                        position.toDegMinSecCoordsString(),
-                        position.toGeoUriString(),
-                        GoogleMapsUrlConverter.formatUriString(position),
-                        AppleMapsUrlConverter.formatUriString(position),
-                        MagicEarthUrlConverter.formatUriString(position),
-                    ).map { text ->
+                    Outputs.getAllTexts(position).map { text ->
                         DropdownMenuItem(
                             text = { Text(truncateMiddle(text)) },
                             onClick = {
@@ -104,7 +97,7 @@ fun ResultSuccessCoordinates(
                 onCopy(position.toGeoUriString())
             }
             ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
-                onCopy(GoogleMapsUrlConverter.formatUriString(position))
+                onCopy(GoogleMapsOutput.getMainText(position))
             }
             ResultCardChip(
                 stringResource(R.string.conversion_succeeded_save_gpx),

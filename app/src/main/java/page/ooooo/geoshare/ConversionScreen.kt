@@ -40,6 +40,7 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -270,8 +271,13 @@ fun ConversionScreen(
                         )
                         ResultSuccessApps(
                             apps = queryGeoUriApps(),
-                            onOpenApp = { onOpenApp(it, currentState.position.toAppUriString(it)) },
-                            onOpenChooser = { onOpenChooser(currentState.position.toGeoUriString()) },
+                            onOpenApp = { packageName ->
+                                onOpenApp(
+                                    packageName,
+                                    Outputs.getOpenAppUriString(packageName, currentState.position),
+                                )
+                            },
+                            onOpenChooser = { onOpenChooser(Outputs.default.getMainUriString(currentState.position)) },
                             windowSizeClass = windowSizeClass,
                         )
                     }

@@ -21,6 +21,10 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.outputs.AppleMapsOutput
+import page.ooooo.geoshare.lib.outputs.GoogleMapsOutput
+import page.ooooo.geoshare.lib.outputs.MagicEarthOutput
+import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -81,7 +85,8 @@ sealed class AutomationImpl : Automation {
         AutomationImpl(),
         Automation.HasSuccessMessage {
 
-        override fun run(position: Position, uriQuote: UriQuote) = AutomationAction.Copy(position.toCoordsDecString())
+        override fun run(position: Position, uriQuote: UriQuote) =
+            AutomationAction.Copy(position.toCoordsDecString())
 
         @Composable
         override fun Label() {
@@ -139,7 +144,7 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(GoogleMapsUrlConverter.formatUriString(position, uriQuote))
+            AutomationAction.Copy(GoogleMapsOutput.getMainUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -155,7 +160,7 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(AppleMapsUrlConverter.formatUriString(position, uriQuote))
+            AutomationAction.Copy(AppleMapsOutput.getMainUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -171,7 +176,7 @@ sealed class AutomationImpl : Automation {
         Automation.HasSuccessMessage {
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.Copy(MagicEarthUrlConverter.formatUriString(position, uriQuote))
+            AutomationAction.Copy(MagicEarthOutput.getMainUriString(position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -192,7 +197,7 @@ sealed class AutomationImpl : Automation {
         override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.OpenApp(packageName, position.toAppUriString(packageName, uriQuote))
+            AutomationAction.OpenApp(packageName, Outputs.getOpenAppUriString(packageName, position, uriQuote))
 
         @Composable
         override fun Label() {
@@ -276,7 +281,7 @@ sealed class AutomationImpl : Automation {
         override val delay = 5.seconds
 
         override fun run(position: Position, uriQuote: UriQuote) =
-            AutomationAction.OpenChooser(position.toGeoUriString(uriQuote))
+            AutomationAction.OpenChooser(Outputs.default.getMainUriString(position, uriQuote))
 
         @Composable
         override fun Label() {

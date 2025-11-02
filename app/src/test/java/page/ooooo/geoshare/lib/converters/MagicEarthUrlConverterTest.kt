@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.lib.converters
 
-import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.*
 import org.junit.Test
-import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 
 class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
@@ -96,46 +94,6 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
         assertEquals(
             Position("50.123456", "-11.123456", z = "3.4"),
             parseUrl("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
-        )
-    }
-
-    @Test
-    fun formatUriString_whenPositionHasCoordinatesAndZoom_returnsUriWithCoordinatesAndZoom() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4",
-            MagicEarthUrlConverter.formatUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
-        )
-    }
-
-    @Test
-    fun formatUriString_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithCoordinatesAndQueryAndZoom() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
-            MagicEarthUrlConverter.formatUriString(
-                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
-            ),
-        )
-    }
-
-    @Test
-    fun formatUriString_whenPositionHasSeveralPoints_returnsUriWithDirections() {
-        assertEquals(
-            @Suppress("SpellCheckingInspection")
-            "magicearth://?directions=spam&q=foo%20bar&zoom=3.4", // TODO
-            MagicEarthUrlConverter.formatUriString(
-                Position(
-                    points = persistentListOf(
-                        Point("59.1293656", "11.4585672"),
-                        Point("59.4154007", "11.659710599999999"),
-                        Point("59.147731699999994", "11.550661199999999"),
-                    ),
-                    q = "foo bar",
-                    z = "3.4",
-                ),
-                uriQuote,
-            ),
         )
     }
 }

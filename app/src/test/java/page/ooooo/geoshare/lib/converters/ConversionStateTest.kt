@@ -17,6 +17,7 @@ import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.outputs.Outputs
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.coroutines.cancellation.CancellationException
@@ -2180,7 +2181,9 @@ class ConversionStateTest {
                 openApp(
                     eq(runContext.context),
                     eq(automationValue.packageName),
-                    argThat { toString() == position.toAppUriString(automationValue.packageName, uriQuote) },
+                    argThat {
+                        toString() == Outputs.getOpenAppUriString(automationValue.packageName, position, uriQuote)
+                    },
                 )
             } doReturn true
         }
@@ -2204,7 +2207,9 @@ class ConversionStateTest {
                 openApp(
                     eq(runContext.context),
                     eq(automationValue.packageName),
-                    argThat { toString() == position.toAppUriString(automationValue.packageName, uriQuote) },
+                    argThat {
+                        toString() == Outputs.getOpenAppUriString(automationValue.packageName, position, uriQuote)
+                    },
                 )
             } doReturn false
         }
@@ -2273,7 +2278,7 @@ class ConversionStateTest {
             on {
                 openChooser(
                     eq(runContext.context),
-                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                    argThat { toString() == Outputs.default.getMainUriString(position, uriQuote) },
                 )
             } doReturn true
         }
@@ -2296,7 +2301,7 @@ class ConversionStateTest {
             on {
                 openChooser(
                     eq(runContext.context),
-                    argThat { toString() == position.toGeoUriString(uriQuote) },
+                    argThat { toString() == Outputs.default.getMainUriString(position, uriQuote) },
                 )
             } doReturn false
         }

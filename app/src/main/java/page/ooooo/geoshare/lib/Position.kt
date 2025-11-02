@@ -3,15 +3,7 @@ package page.ooooo.geoshare.lib
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableMap
-import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter.Companion.MAGIC_EARTH_PACKAGE_NAME
-import kotlin.math.abs
 import kotlin.random.Random
-
-@Immutable
-data class Point(val lat: String = "0", val lon: String = "0")
 
 @Immutable
 data class Position(
@@ -43,7 +35,7 @@ data class Position(
 
     val mainPoint: Point? get() = points?.lastOrNull()
 
-    fun toCoordsDecString(): String = (mainPoint ?: Point()).let { (lat, lon) -> "$lat, $lon" }
+    fun toCoordsDecString(): String = (mainPoint ?: Point()).toCoordsDecString()
 
     fun toParamsString(separator: String): String = buildList {
         q.takeUnless { it.isNullOrEmpty() }?.let { q ->
@@ -60,33 +52,9 @@ data class Position(
     }.joinToString(separator)
 
     fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String =
-        (mainPoint ?: Point()).let { (lat, lon) -> "$lat,$lon" }.let { coords ->
-            Uri(
-                scheme = "geo",
-                path = coords,
-                queryParams = buildMap {
-                    set("q", q ?: coords)
-                    z?.let { z ->
-                        set("z", z)
-                    }
-                }.toImmutableMap(),
-                uriQuote = uriQuote,
-            ).toString()
-        }
+        (mainPoint ?: Point()).toGeoUriString(q = q, z = z, uriQuote = uriQuote)
 
-    fun toAppUriString(packageName: String, uriQuote: UriQuote = DefaultUriQuote()): String =
-        when (packageName) {
-            MAGIC_EARTH_PACKAGE_NAME -> MagicEarthUrlConverter.formatUriString(this, uriQuote)
-            else -> toGeoUriString(uriQuote)
-        }
-
-    fun toDegMinSecCoordsString(): String =
-        (mainPoint?.lat?.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
-            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
-        } +
-                (mainPoint?.lon?.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
-                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
-                }
+    fun toDegMinSecCoordsString(): String = (mainPoint ?: Point()).toDegMinSecCoordsString()
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")

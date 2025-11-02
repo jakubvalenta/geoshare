@@ -16,6 +16,7 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.XiaomiTools
+import page.ooooo.geoshare.lib.outputs.Outputs
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -96,7 +97,7 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val expectedCoordinatesText = expectedPosition.toDegMinSecCoordsString()
+        val expectedCoordinatesText = Outputs.default.getMainText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedCoordinatesText }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
             val expectedParamsText = expectedPosition.toParamsString("\t\t")
