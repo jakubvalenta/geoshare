@@ -15,7 +15,7 @@ class MagicEarthOutputTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             "magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4",
-            MagicEarthOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
+            MagicEarthOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).value,
         )
     }
 
@@ -26,7 +26,7 @@ class MagicEarthOutputTest {
             "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
             MagicEarthOutput.getPositionUriString(
                 Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
-            ),
+            ).value,
         )
     }
 
@@ -38,7 +38,7 @@ class MagicEarthOutputTest {
                 "magicearth://?drive_to&lat=50.123456&lon=-11.123456",
                 "magicearth://?drive_via&lat=50.123456&lon=-11.123456",
             ),
-            MagicEarthOutput.getPointUriStrings(Point("50.123456", "-11.123456"), uriQuote),
+            MagicEarthOutput.getPointUriStrings(Point("50.123456", "-11.123456"), uriQuote).map { it.value },
         )
     }
 }

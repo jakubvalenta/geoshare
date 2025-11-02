@@ -10,7 +10,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -70,7 +69,7 @@ fun ResultSuccessCoordinates(
                 ) {
                     Outputs.getPositionAllTexts(position).map { (value, label) ->
                         DropdownMenuItem(
-                            text = { Text(label(), overflow = TextOverflow.Ellipsis, maxLines = 1) },
+                            text = { Text(label()) },
                             onClick = {
                                 menuExpanded = false
                                 onCopy(value)

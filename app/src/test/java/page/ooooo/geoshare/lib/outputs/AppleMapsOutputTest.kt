@@ -13,7 +13,7 @@ class AppleMapsOutputTest {
     fun getPositionUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         Assert.assertEquals(
             "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
-            AppleMapsOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
+            AppleMapsOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).value,
         )
     }
 
@@ -22,9 +22,8 @@ class AppleMapsOutputTest {
         Assert.assertEquals(
             "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
             AppleMapsOutput.getPositionUriString(
-                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"),
-                uriQuote
-            ),
+                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
+            ).value,
         )
     }
 
@@ -32,7 +31,7 @@ class AppleMapsOutputTest {
     fun getPositionUriString_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         Assert.assertEquals(
             "https://maps.apple.com/?q=foo%20bar&z=3.4",
-            AppleMapsOutput.getPositionUriString(Position(q = "foo bar", z = "3.4"), uriQuote),
+            AppleMapsOutput.getPositionUriString(Position(q = "foo bar", z = "3.4"), uriQuote).value,
         )
     }
 }

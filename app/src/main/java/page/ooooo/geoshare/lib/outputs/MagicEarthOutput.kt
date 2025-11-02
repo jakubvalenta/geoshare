@@ -15,7 +15,7 @@ object MagicEarthOutput : Output {
 
     override fun getPositionText(position: Position, uriQuote: UriQuote) =
         Output.Item(formatDisplayUriString(position, uriQuote)) {
-            stringResource(R.string.conversion_succeeded_copy_link, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
         }
 
     override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<Output.Item>()
@@ -36,7 +36,14 @@ object MagicEarthOutput : Output {
 
     override fun getPointText(point: Point, uriQuote: UriQuote) = null
 
-    override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = getPointUriStrings(point, uriQuote)
+    override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = listOf(
+        Output.Item(formatDriveToUriString(point, uriQuote)) {
+            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
+        },
+        Output.Item(formatDriveViaUriString(point, uriQuote)) {
+            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
+        },
+    )
 
     override fun getPointUriStrings(point: Point, uriQuote: UriQuote) = listOf(
         Output.Item(formatDriveToUriString(point, uriQuote)) {

@@ -5,6 +5,9 @@
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
+    <string name="conversion_succeeded_copy_link_display">Copy link to show map in %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_to">Copy link to navigate in %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_via">Copy link to add waypoint in %1$s</string>
     <string name="conversion_succeeded_open_app">Open %1$s</string>
     <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
     <string name="conversion_succeeded_open_app_drive_to">Navigate in %1$s</string>

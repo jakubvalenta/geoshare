@@ -13,7 +13,7 @@ class GoogleMapsOutputTest {
     fun getPositionUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAsQueryAndZoom() {
         assertEquals(
             "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
-            GoogleMapsOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
+            GoogleMapsOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).value,
         )
     }
 
@@ -21,7 +21,7 @@ class GoogleMapsOutputTest {
     fun getPositionUriString_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         assertEquals(
             "https://www.google.com/maps?q=foo%20bar&z=3.4",
-            GoogleMapsOutput.getPositionUriString(Position(q = "foo bar", z = "3.4"), uriQuote),
+            GoogleMapsOutput.getPositionUriString(Position(q = "foo bar", z = "3.4"), uriQuote).value,
         )
     }
 
@@ -31,7 +31,7 @@ class GoogleMapsOutputTest {
             "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
             GoogleMapsOutput.getPositionUriString(
                 Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
-            ),
+            ).value,
         )
     }
 }
