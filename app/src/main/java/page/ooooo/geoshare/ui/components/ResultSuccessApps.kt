@@ -128,16 +128,13 @@ fun RowScope.ResultSuccessApp(
                             contentDescription = stringResource(R.string.nav_menu_content_description),
                         )
                     }
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false },
-                    ) {
+                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         openAppUriStrings.forEach { (value, label) ->
                             DropdownMenuItem(
                                 text = { Text(label()) },
                                 onClick = {
-                                    menuExpanded = false
                                     onOpenApp(app.packageName, value)
+                                    menuExpanded = false
                                 },
                             )
                         }

@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -17,12 +18,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessPoint(
     i: Int,
@@ -30,8 +33,10 @@ fun ResultSuccessPoint(
     onCopy: (text: String) -> Unit,
     onOpenChooser: (uriString: String) -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
-    var menuExpanded by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
@@ -49,47 +54,36 @@ fun ResultSuccessPoint(
             )
         }
         Box {
-            IconButton({ menuExpanded = true }, Modifier.size(16.dp)) {
+            IconButton({ setSheetVisible(true) }, Modifier.size(16.dp)) {
                 Icon(
                     painterResource(R.drawable.more_horiz_24px),
                     contentDescription = stringResource(R.string.nav_menu_content_description),
                 )
             }
-            // TODO Use ModalBottomSheet
-            DropdownMenu(
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-            ) {
-                Outputs.getPointAllTexts(point).forEach { (value, label) ->
-                    DropdownMenuItem(
-                        text = { Text(label()) },
-                        onClick = {
-                            menuExpanded = false
-                            onCopy(value)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painterResource(R.drawable.content_copy_24px),
-                                stringResource(R.string.conversion_succeeded_copy_content_description),
-                            )
-                        },
-                    )
+        }
+    }
+
+    if (sheetVisible) {
+        ModalBottomSheet(onDismissRequest = { setSheetVisible(false) }, sheetState = sheetState) {
+            Outputs.getPointAllTexts(point).forEach { (value, label) ->
+                ResultSuccessSheetItem(label, supportingText = value) {
+                    onCopy(value)
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setSheetVisible(false)
+                        }
+                    }
                 }
-                HorizontalDivider()
-                Outputs.getPointUriStrings(point).forEach { (value, label) ->
-                    DropdownMenuItem(
-                        text = { Text(label()) },
-                        onClick = {
-                            menuExpanded = false
-                            onOpenChooser(value)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Share,
-                                stringResource(R.string.conversion_succeeded_share),
-                            )
-                        },
-                    )
+            }
+            HorizontalDivider()
+            Outputs.getPointUriStrings(point).forEach { (value, label) ->
+                ResultSuccessSheetItem(label) {
+                    onOpenChooser(value)
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setSheetVisible(false)
+                        }
+                    }
                 }
             }
         }

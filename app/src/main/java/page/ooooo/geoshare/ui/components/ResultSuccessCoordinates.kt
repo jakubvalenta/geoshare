@@ -1,13 +1,17 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,10 +35,10 @@ fun ResultSuccessCoordinates(
     onOpenChooser: (uriString: String) -> Unit,
     onSave: () -> Boolean,
 ) {
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
     val sheetState = rememberModalBottomSheetState()
-    var sheetVisible by remember { mutableStateOf(false) }
+    val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     ResultCard(
         main = {
@@ -61,7 +65,7 @@ fun ResultSuccessCoordinates(
             }
         },
         after = {
-            IconButton({ sheetVisible = true }) {
+            IconButton({ setSheetVisible(true) }) {
                 Icon(
                     painterResource(R.drawable.content_copy_24px),
                     contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
@@ -94,26 +98,16 @@ fun ResultSuccessCoordinates(
     )
 
     if (sheetVisible) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                sheetVisible = false
-            },
-            sheetState = sheetState
-        ) {
+        ModalBottomSheet(onDismissRequest = { setSheetVisible(false) }, sheetState = sheetState) {
             Outputs.getPositionAllTexts(position).map { (value, label) ->
-                ListItem(
-                    headlineContent = { Text(label()) },
-                    modifier = Modifier.clickable {
-                        onCopy(value)
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                sheetVisible = false
-                            }
+                ResultSuccessSheetItem(label, supportingText = value) {
+                    onCopy(value)
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setSheetVisible(false)
                         }
-                    },
-                    supportingContent = { Text(value) },
-                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                )
+                    }
+                }
             }
         }
     }

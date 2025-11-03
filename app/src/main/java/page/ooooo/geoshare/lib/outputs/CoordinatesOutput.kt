@@ -32,6 +32,9 @@ object CoordinatesOutput : Output {
         }
 
     override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = listOf(
+        point.toCoordsDecString().let { value ->
+            Output.Item(value) { stringResource(R.string.conversion_succeeded_copy_coordinates) }
+        },
         Output.Item(point.toGeoUriString(uriQuote = uriQuote)) { stringResource(R.string.conversion_succeeded_copy_geo) },
     )
 
