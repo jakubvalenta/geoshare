@@ -10,7 +10,10 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.*
+import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.data.local.preferences.automation
+import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
 import java.io.IOException
@@ -422,41 +425,18 @@ data class AutomationReady(
     override val position: Position,
     val automation: Automation,
 ) : ConversionState(), HasResult {
-    override suspend fun transition(): State {
-        val success: Boolean? = when (val automationAction = automation.run(position, stateContext.uriQuote)) {
-            is AutomationAction.Noop -> null
-            is AutomationAction.Copy -> stateContext.intentTools.copyToClipboard(
-                runContext.context,
-                runContext.clipboard,
-                automationAction.text,
-            ).let { true }
+    override suspend fun transition(): State =
+        automation.run(position, stateContext.uriQuote).let { outputAction ->
+            when (outputAction?.run(stateContext.intentTools, runContext)) {
+                true if automation is Automation.HasSuccessMessage ->
+                    AutomationSucceeded(inputUriString, position, automation)
 
-            is AutomationAction.OpenApp -> stateContext.intentTools.openApp(
-                runContext.context,
-                automationAction.packageName,
-                automationAction.uriString,
-            )
+                false if automation is Automation.HasErrorMessage ->
+                    AutomationFailed(inputUriString, position, automation)
 
-            is AutomationAction.OpenChooser -> stateContext.intentTools.openChooser(
-                runContext.context,
-                automationAction.uriString,
-            )
-
-            is AutomationAction.SaveGpx -> stateContext.intentTools.launchSaveGpx(
-                runContext.context,
-                runContext.saveGpxLauncher,
-            )
+                else -> AutomationFinished(inputUriString, position, automation)
+            }
         }
-        return when (success) {
-            true if automation is Automation.HasSuccessMessage ->
-                AutomationSucceeded(inputUriString, position, automation)
-
-            false if automation is Automation.HasErrorMessage ->
-                AutomationFailed(inputUriString, position, automation)
-
-            else -> AutomationFinished(inputUriString, position, automation)
-        }
-    }
 }
 
 data class AutomationSucceeded(

@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -33,14 +34,15 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                Point.example.let { point ->
-                    Outputs.getPointAllTexts(point).forEach { (value, label) ->
-                        ResultSuccessSheetItem(label, supportingText = value, onClick = {})
-                    }
-                    HorizontalDivider()
-                    Outputs.getPointUriStrings(point).forEach { (_, label) ->
-                        ResultSuccessSheetItem(label, onClick = {})
-                    }
+                val point = Point.example
+                val labeledActions = Outputs.getActions(point)
+                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Output.Action.Copy }
+                labeledCopyActions.forEach { (action, label) ->
+                    ResultSuccessSheetItem(label, supportingText = (action as Output.Action.Copy).text, onClick = {})
+                }
+                HorizontalDivider()
+                labeledOtherActions.forEach { (_, label) ->
+                    ResultSuccessSheetItem(label, onClick = {})
                 }
             }
         }
@@ -53,14 +55,15 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                Point.example.let { point ->
-                    Outputs.getPointAllTexts(point).forEach { (value, label) ->
-                        ResultSuccessSheetItem(label, supportingText = value, onClick = {})
-                    }
-                    HorizontalDivider()
-                    Outputs.getPointUriStrings(point).forEach { (_, label) ->
-                        ResultSuccessSheetItem(label, onClick = {})
-                    }
+                val point = Point.example
+                val labeledActions = Outputs.getActions(point)
+                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Output.Action.Copy }
+                labeledCopyActions.forEach { (action, label) ->
+                    ResultSuccessSheetItem(label, supportingText = (action as Output.Action.Copy).text, onClick = {})
+                }
+                HorizontalDivider()
+                labeledOtherActions.forEach { (_, label) ->
+                    ResultSuccessSheetItem(label, onClick = {})
                 }
             }
         }

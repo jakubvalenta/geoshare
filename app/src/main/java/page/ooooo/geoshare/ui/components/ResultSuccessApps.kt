@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.MagicEarthOutput
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -43,8 +45,7 @@ private val dropdownButtonOffset = 20.dp
 fun ResultSuccessApps(
     apps: List<IntentTools.App>,
     position: Position,
-    onOpenApp: (packageName: String, uriString: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Unit,
+    onRun: (action: Output.Action) -> Unit,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val spacing = LocalSpacing.current
@@ -58,6 +59,12 @@ fun ResultSuccessApps(
         add(GridItem.ShareButton())
         repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
+    val openAppLabeledActions: List<Output.LabeledAction<Output.Action.OpenApp>> =
+        Outputs.getActions(position).mapNotNull { (action, label) ->
+            if (action is Output.Action.OpenApp) Output.LabeledAction(action, label) else null
+        }
+    val openChooserAction: Output.Action.OpenChooser? =
+        Outputs.getActions(position).firstNotNullOfOrNull { it.action as? Output.Action.OpenChooser }
 
     Column(
         Modifier
@@ -69,8 +76,17 @@ fun ResultSuccessApps(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
-                        is GridItem.App -> ResultSuccessApp(gridItem.app, position, onOpenApp)
-                        is GridItem.ShareButton -> ResultSuccessAppShare(position, onOpenChooser)
+                        is GridItem.App -> gridItem.let { (app) ->
+                            ResultSuccessApp(
+                                packageName = app.packageName,
+                                label = app.label,
+                                icon = app.icon,
+                                labeledActions = openAppLabeledActions.filter { (action) -> action.packageName == app.packageName },
+                                onRun = onRun,
+                            )
+                        }
+
+                        is GridItem.ShareButton -> ResultSuccessAppShare { openChooserAction?.let(onRun) }
                         is GridItem.Empty -> ResultSuccessAppEmpty()
                     }
                 }
@@ -82,12 +98,13 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
-    app: IntentTools.App,
-    position: Position,
-    onOpenApp: (packageName: String, uriString: String) -> Unit,
+    packageName: String,
+    label: String,
+    icon: Drawable,
+    labeledActions: List<Output.LabeledAction<Output.Action.OpenApp>>,
+    onRun: (action: Output.Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val openAppUriStrings = Outputs.getOpenAppAllUriStrings(app.packageName, position)
     var menuExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -95,10 +112,10 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                onOpenApp(app.packageName, Outputs.getOpenAppUriString(app.packageName, position).value)
+                labeledActions.firstOrNull()?.action?.let(onRun)
             }
             .weight(1f)
-            .testTag("geoShareResultCardApp_${app.packageName}"),
+            .testTag("geoShareResultCardApp_${packageName}"),
         verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
         Box(
             Modifier
@@ -106,10 +123,10 @@ fun RowScope.ResultSuccessApp(
                 .size(iconSize),
         ) {
             Image(
-                rememberDrawablePainter(app.icon),
-                app.label,
+                rememberDrawablePainter(icon),
+                label,
             )
-            if (openAppUriStrings.size > 1) {
+            labeledActions.takeIf { it.size > 1 }?.let {
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -129,13 +146,10 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        openAppUriStrings.forEach { (value, label) ->
+                        labeledActions.forEach { (action, label) ->
                             DropdownMenuItem(
                                 text = { Text(label()) },
-                                onClick = {
-                                    onOpenApp(app.packageName, value)
-                                    menuExpanded = false
-                                },
+                                onClick = { onRun(action) },
                             )
                         }
                     }
@@ -143,7 +157,7 @@ fun RowScope.ResultSuccessApp(
             }
         }
         Text(
-            app.label,
+            label,
             Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall,
@@ -152,12 +166,10 @@ fun RowScope.ResultSuccessApp(
 }
 
 @Composable
-fun RowScope.ResultSuccessAppShare(position: Position, onOpenChooser: (uriString: String) -> Unit) {
+fun RowScope.ResultSuccessAppShare(onClick: () -> Unit) {
     Column(Modifier.weight(1f)) {
         FilledIconButton(
-            {
-                onOpenChooser(Outputs.default.getPositionUriString(position).value)
-            },
+            onClick,
             Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(iconSize),
@@ -193,8 +205,7 @@ private fun DefaultPreview() {
                         )
                     },
                     position = Position.example,
-                    onOpenApp = { _, _ -> },
-                    onOpenChooser = {},
+                    onRun = {},
                 )
             }
         }
@@ -217,8 +228,7 @@ private fun DarkPreview() {
                         )
                     },
                     position = Position.example,
-                    onOpenApp = { _, _ -> },
-                    onOpenChooser = {},
+                    onRun = {},
                 )
             }
         }
@@ -241,8 +251,7 @@ private fun OneAppPreview() {
                         ),
                     ),
                     position = Position.example,
-                    onOpenApp = { _, _ -> },
-                    onOpenChooser = {},
+                    onRun = {},
                 )
             }
         }
@@ -265,8 +274,7 @@ private fun DarkOneAppPreview() {
                         ),
                     ),
                     position = Position.example,
-                    onOpenApp = { _, _ -> },
-                    onOpenChooser = {},
+                    onRun = {},
                 )
             }
         }
@@ -282,8 +290,7 @@ private fun NoAppsPreview() {
                 ResultSuccessApps(
                     apps = listOf(),
                     position = Position.example,
-                    onOpenApp = { _, _ -> },
-                    onOpenChooser = {},
+                    onRun = {},
                 )
             }
         }
@@ -299,8 +306,7 @@ private fun DarkNoAppsPreview() {
                 ResultSuccessApps(
                     apps = listOf(),
                     position = Position.example,
-                    onOpenApp = { _, _ -> },
-                    onOpenChooser = {},
+                    onRun = {},
                 )
             }
         }

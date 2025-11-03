@@ -4,13 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -18,10 +16,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -30,20 +28,16 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
-    onCopy: (text: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Unit,
-    onSave: () -> Boolean,
+    onRun: (action: Output.Action) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
-    val sheetState = rememberModalBottomSheetState()
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     ResultCard(
         main = {
             SelectionContainer {
                 Text(
-                    Outputs.default.getPositionText(position).value,
+                    Outputs.getText(position),
                     Modifier
                         .testTag("geoShareConversionSuccessPositionCoordinates")
                         .fillMaxWidth(),
@@ -75,38 +69,25 @@ fun ResultSuccessCoordinates(
             {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                     points.forEachIndexed { i, point ->
-                        ResultSuccessPoint(i, point, onCopy, onOpenChooser)
+                        ResultSuccessPoint(i, point, onRun)
                     }
                 }
             }
         },
-        chips = { lastPaddingEnd ->
-            Outputs.getPositionChipTexts(position).forEach { (value, label) ->
-                ResultCardChip(label()) { onCopy(value) }
-            }
-            ResultCardChip(
-                stringResource(R.string.conversion_succeeded_save_gpx),
-                Modifier.padding(end = lastPaddingEnd),
-            ) {
-                onSave()
+        chips = {
+            Outputs.getChips(position).forEach { (action, label) ->
+                ResultCardChip(label()) {
+                    onRun(action)
+                }
             }
         },
     )
-
-    if (sheetVisible) {
-        ModalBottomSheet(onDismissRequest = { setSheetVisible(false) }, sheetState = sheetState) {
-            Outputs.getPositionAllTexts(position).map { (value, label) ->
-                ResultSuccessSheetItem(label, supportingText = value) {
-                    onCopy(value)
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setSheetVisible(false)
-                        }
-                    }
-                }
-            }
-        }
-    }
+    ResultSuccessSheet(
+        labeledActions = Outputs.getActions(position),
+        sheetVisible = sheetVisible,
+        onSetSheetVisible = setSheetVisible,
+        onRun = onRun,
+    )
 }
 
 // Previews
@@ -121,9 +102,7 @@ private fun DefaultPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example,
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -139,9 +118,7 @@ private fun DarkPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example,
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -157,9 +134,7 @@ private fun OneAppPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example,
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -175,9 +150,7 @@ private fun DarkOneAppPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example,
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -193,9 +166,7 @@ private fun ParamsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -211,9 +182,7 @@ private fun DarkParamsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -235,9 +204,7 @@ private fun PointsPreview() {
                         Point.genRandomPoint(),
                     ),
                 ),
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -259,9 +226,7 @@ private fun DarkPointsPreview() {
                         Point.genRandomPoint(),
                     ),
                 ),
-                onCopy = {},
-                onOpenChooser = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }

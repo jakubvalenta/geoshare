@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,9 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -30,12 +29,9 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessPoint(
     i: Int,
     point: Point,
-    onCopy: (text: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Unit,
+    onRun: (action: Output.Action) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
-    val sheetState = rememberModalBottomSheetState()
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     Row(
@@ -49,7 +45,7 @@ fun ResultSuccessPoint(
         )
         SelectionContainer(Modifier.weight(1f)) {
             Text(
-                Outputs.default.getPointText(point).value,
+                Outputs.getText(point),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -62,32 +58,12 @@ fun ResultSuccessPoint(
             }
         }
     }
-
-    if (sheetVisible) {
-        ModalBottomSheet(onDismissRequest = { setSheetVisible(false) }, sheetState = sheetState) {
-            Outputs.getPointAllTexts(point).forEach { (value, label) ->
-                ResultSuccessSheetItem(label, supportingText = value) {
-                    onCopy(value)
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setSheetVisible(false)
-                        }
-                    }
-                }
-            }
-            HorizontalDivider()
-            Outputs.getPointUriStrings(point).forEach { (value, label) ->
-                ResultSuccessSheetItem(label) {
-                    onOpenChooser(value)
-                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            setSheetVisible(false)
-                        }
-                    }
-                }
-            }
-        }
-    }
+    ResultSuccessSheet(
+        labeledActions = Outputs.getActions(point),
+        sheetVisible = sheetVisible,
+        onSetSheetVisible = setSheetVisible,
+        onRun = onRun,
+    )
 }
 
 @Preview(showBackground = true)
@@ -98,8 +74,7 @@ private fun DefaultPreview() {
             ResultSuccessPoint(
                 i = 3,
                 point = Point.example,
-                onCopy = {},
-                onOpenChooser = {},
+                onRun = {},
             )
         }
     }
@@ -113,8 +88,7 @@ private fun DarkPreview() {
             ResultSuccessPoint(
                 i = 3,
                 point = Point.example,
-                onCopy = {},
-                onOpenChooser = {},
+                onRun = {},
             )
         }
     }

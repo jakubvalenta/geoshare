@@ -11,48 +11,32 @@ object Outputs {
         GoogleMapsOutput,
         AppleMapsOutput,
         MagicEarthOutput,
+        GpxOutput,
     )
     val all get() = listOf(default, *extra.toTypedArray())
 
-    fun getPositionAllTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> = buildList {
-        all.forEach { output ->
-            output.getPositionText(position, uriQuote)?.let { add(it) }
-            addAll(output.getPositionExtraTexts(position, uriQuote))
-        }
-    }
+    fun getText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String =
+        default.getText(position, uriQuote)
 
-    fun getPositionChipTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> =
-        all.flatMap { it.getPositionChipTexts(position, uriQuote) }
+    fun getText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String =
+        default.getText(point, uriQuote)
 
-    fun getPointAllTexts(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> = buildList {
-        all.forEach { output ->
-            output.getPointText(point, uriQuote)?.let { add(it) }
-            addAll(output.getPointExtraTexts(point, uriQuote))
-        }
-    }
-
-    fun getPointUriStrings(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> =
-        all.flatMap { it.getPointUriStrings(point, uriQuote) }
-
-    fun getOpenAppUriString(
-        packageName: String,
+    fun getActions(
         position: Position,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ): Output.Item =
-        extra.find { it.packageNames.contains(packageName) }?.getPositionUriString(position, uriQuote)
-            ?: default.getPositionUriString(position, uriQuote)
+    ): List<Output.LabeledAction<Output.Action>> =
+        all.flatMap { it.getActions(position, uriQuote) }
 
-    fun getOpenAppAllUriStrings(
-        packageName: String,
+    fun getActions(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.LabeledAction<Output.Action>> =
+        all.flatMap { it.getActions(point, uriQuote) }
+
+    fun getChips(
         position: Position,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ): List<Output.Item> = buildList {
-        extra.find { it.packageNames.contains(packageName) }?.let { output ->
-            output.getPositionUriString(position, uriQuote)?.let { add(it) }
-            addAll(output.getPositionExtraUriStrings(position, uriQuote))
-        } ?: add(default.getPositionUriString(position, uriQuote))
-    }
+    ): List<Output.LabeledAction<Output.Action>> =
+        all.flatMap { it.getChips(position, uriQuote) }
 
-    fun genRandomPositionUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
-        all.randomOrNull()?.getPositionUriString(Position.genRandomPosition(), uriQuote)?.value
+    fun genRandomUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
+        all.randomOrNull()?.getActions(Position.genRandomPosition(), uriQuote)
+            ?.firstNotNullOfOrNull { (it.action as? Output.Action.Copy)?.text }
 }

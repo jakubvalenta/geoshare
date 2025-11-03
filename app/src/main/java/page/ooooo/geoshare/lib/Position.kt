@@ -50,15 +50,4 @@ data class Position(
         (mainPoint ?: Point()).toGeoUriString(q = q, z = z, uriQuote = uriQuote)
 
     fun toDegMinSecCoordsString(): String = (mainPoint ?: Point()).toDegMinSecCoordsString()
-
-    fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
-        append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
-        append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
-        append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
-        append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
-        points?.map { (lat, lon) ->
-            append("<wpt lat=\"${uriQuote.encode(lat)}\" lon=\"${uriQuote.encode(lon)}\" />\n")
-        }
-        append("</gpx>\n")
-    }
 }

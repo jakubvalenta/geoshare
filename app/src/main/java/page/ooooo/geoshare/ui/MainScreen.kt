@@ -231,7 +231,7 @@ fun MainScreen(
                     )
                     Text(stringResource(R.string.main_navigate_to_intro))
                 }
-                Outputs.genRandomPositionUriString()?.let { uriString ->
+                Outputs.genRandomUriString()?.let { uriString ->
                     TextButton({
                         onUpdateInput(uriString)
                         setErrorMessageResId(null)

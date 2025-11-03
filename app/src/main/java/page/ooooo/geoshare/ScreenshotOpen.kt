@@ -38,7 +38,7 @@ fun ScreenshotOpen() {
             y = 100,
         ) {
             ScreenshotText(
-                Outputs.default.getPositionText(Position.example).value,
+                Outputs.getText(Position.example),
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,

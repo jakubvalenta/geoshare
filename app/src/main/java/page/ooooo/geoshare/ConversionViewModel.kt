@@ -3,6 +3,7 @@ package page.ooooo.geoshare
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.datastore.preferences.core.MutablePreferences
@@ -21,6 +22,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
+import page.ooooo.geoshare.lib.outputs.Output
 import javax.inject.Inject
 
 @HiltViewModel
@@ -199,6 +201,27 @@ class ConversionViewModel @Inject constructor(
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
             transition()
+        }
+    }
+
+    fun runAction(runContext: ConversionRunContext, action: Output.Action) {
+        viewModelScope.launch {
+            val success = action.run(intentTools, runContext)
+            if (!success) {
+                if (action is Output.Action.OpenApp) {
+                    Toast.makeText(
+                        runContext.context,
+                        R.string.conversion_automation_open_app_failed,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (action is Output.Action.OpenChooser) {
+                    Toast.makeText(
+                        runContext.context,
+                        R.string.conversion_succeeded_apps_not_found,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
         }
     }
 

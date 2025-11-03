@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -23,7 +22,7 @@ fun ResultCard(
     modifier: Modifier = Modifier,
     after: (@Composable () -> Unit)? = null,
     bottom: (@Composable () -> Unit)? = null,
-    chips: @Composable (lastPaddingEnd: Dp) -> Unit,
+    chips: @Composable () -> Unit,
     main: @Composable ColumnScope.() -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -59,7 +58,8 @@ fun ResultCard(
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
-            chips(spacing.windowPadding)
+            chips()
+            Spacer(Modifier.width(spacing.windowPadding))
         }
     }
 }
@@ -99,7 +99,7 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultCard(
-                chips = { lastPaddingEnd ->
+                chips = {
                     ResultCardChip(
                         "My first chip",
                         icon = {
@@ -113,7 +113,6 @@ private fun DefaultPreview() {
                     )
                     ResultCardChip(
                         "My third chip",
-                        modifier = Modifier.padding(end = lastPaddingEnd),
                         onClick = {},
                     )
                 },
@@ -143,7 +142,7 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultCard(
-                chips = { lastPaddingEnd ->
+                chips = {
                     ResultCardChip(
                         "My first chip",
                         icon = {
@@ -157,7 +156,6 @@ private fun DarkPreview() {
                     )
                     ResultCardChip(
                         "My third chip",
-                        modifier = Modifier.padding(end = lastPaddingEnd),
                         onClick = {},
                     )
                 },
@@ -187,7 +185,7 @@ private fun DefaultBottomPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultCard(
-                chips = { lastPaddingEnd ->
+                chips = {
                     ResultCardChip(
                         "My first chip",
                         icon = {
@@ -201,7 +199,6 @@ private fun DefaultBottomPreview() {
                     )
                     ResultCardChip(
                         "My third chip",
-                        modifier = Modifier.padding(end = lastPaddingEnd),
                         onClick = {},
                     )
                 },
@@ -246,7 +243,7 @@ private fun DarkBottomPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultCard(
-                chips = { lastPaddingEnd ->
+                chips = {
                     ResultCardChip(
                         "My first chip",
                         icon = {
@@ -260,7 +257,6 @@ private fun DarkBottomPreview() {
                     )
                     ResultCardChip(
                         "My third chip",
-                        modifier = Modifier.padding(end = lastPaddingEnd),
                         onClick = {},
                     )
                 },
@@ -305,7 +301,7 @@ private fun ErrorPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultCard(
-                chips = { lastPaddingEnd ->
+                chips = {
                     ResultCardChip(
                         "My first chip",
                         icon = {
@@ -319,7 +315,6 @@ private fun ErrorPreview() {
                     )
                     ResultCardChip(
                         "My third chip",
-                        modifier = Modifier.padding(end = lastPaddingEnd),
                         onClick = {},
                     )
                 },
@@ -339,7 +334,7 @@ private fun DarkErrorPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultCard(
-                chips = { lastPaddingEnd ->
+                chips = {
                     ResultCardChip(
                         "My first chip",
                         icon = {
@@ -353,7 +348,6 @@ private fun DarkErrorPreview() {
                     )
                     ResultCardChip(
                         "My third chip",
-                        modifier = Modifier.padding(end = lastPaddingEnd),
                         onClick = {},
                     )
                 },

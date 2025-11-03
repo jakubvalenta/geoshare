@@ -1,7 +1,6 @@
 package page.ooooo.geoshare
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,6 +40,7 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -58,8 +58,6 @@ fun ConversionScreen(
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
@@ -74,12 +72,6 @@ fun ConversionScreen(
             onBack()
         },
         onCancel = { viewModel.cancel() },
-        onCopy = { text ->
-            viewModel.cancel()
-            coroutineScope.launch {
-                viewModel.intentTools.copyToClipboard(runContext.context, runContext.clipboard, text)
-            }
-        },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onFinish = onFinish,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
@@ -107,33 +99,13 @@ fun ConversionScreen(
             viewModel.cancel()
             onNavigateToUserPreferencesAutomationScreen()
         },
-        onOpenApp = { packageName, uriString ->
-            viewModel.cancel()
-            if (!viewModel.intentTools.openApp(runContext.context, packageName, uriString)) {
-                Toast.makeText(
-                    context,
-                    R.string.conversion_automation_open_app_failed,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        },
-        onOpenChooser = { uriString ->
-            viewModel.cancel()
-            if (!viewModel.intentTools.openChooser(runContext.context, uriString)) {
-                Toast.makeText(
-                    context,
-                    R.string.conversion_succeeded_apps_not_found,
-                    Toast.LENGTH_SHORT,
-                ).show()
-            }
-        },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
             viewModel.start(runContext)
         },
-        onSave = {
+        onRun = { action ->
             viewModel.cancel()
-            viewModel.intentTools.launchSaveGpx(runContext.context, runContext.saveGpxLauncher)
+            viewModel.runAction(runContext, action)
         },
     )
 }
@@ -147,7 +119,6 @@ fun ConversionScreen(
     queryGeoUriApps: () -> List<IntentTools.App>,
     onBack: () -> Unit,
     onCancel: () -> Unit,
-    onCopy: (text: String) -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
     onFinish: () -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
@@ -157,10 +128,8 @@ fun ConversionScreen(
     onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onOpenApp: (packageName: String, uriString: String) -> Unit,
-    onOpenChooser: (uriString: String) -> Unit,
     onRetry: (newUriString: String) -> Unit,
-    onSave: () -> Boolean,
+    onRun: (action: Output.Action) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
@@ -263,12 +232,7 @@ fun ConversionScreen(
             currentState is HasResult -> {
                 {
                     Headline(stringResource(R.string.conversion_succeeded_title))
-                    ResultSuccessCoordinates(
-                        position = currentState.position,
-                        onCopy = onCopy,
-                        onOpenChooser = onOpenChooser,
-                        onSave = onSave,
-                    )
+                    ResultSuccessCoordinates(position = currentState.position, onRun = onRun)
                 }
             }
 
@@ -286,8 +250,7 @@ fun ConversionScreen(
                         ResultSuccessApps(
                             apps = queryGeoUriApps(),
                             position = currentState.position,
-                            onOpenApp = onOpenApp,
-                            onOpenChooser = onOpenChooser,
+                            onRun = onRun,
                             windowSizeClass = windowSizeClass,
                         )
                     }
@@ -299,7 +262,7 @@ fun ConversionScreen(
         bottomPane = when {
             (loadingIndicatorTitleResId == null && currentState is HasError) -> {
                 {
-                    TextButton({ onCopy(currentState.inputUriString) }) {
+                    TextButton({ onRun(Output.Action.Copy(currentState.inputUriString)) }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
                                 start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
@@ -311,7 +274,7 @@ fun ConversionScreen(
 
             (loadingIndicatorTitleResId == null && currentState is HasResult) -> {
                 {
-                    TextButton({ onCopy(currentState.inputUriString) }) {
+                    TextButton({ onRun(Output.Action.Copy(currentState.inputUriString)) }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
                                 start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
@@ -420,7 +383,6 @@ private fun DefaultPreview() {
             },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -430,10 +392,8 @@ private fun DefaultPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -462,7 +422,6 @@ private fun DarkPreview() {
             },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -472,10 +431,8 @@ private fun DarkPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -504,7 +461,6 @@ private fun TabletPreview() {
             },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -514,10 +470,8 @@ private fun TabletPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -550,7 +504,6 @@ private fun AutomationPreview() {
             },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -560,10 +513,8 @@ private fun AutomationPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -596,7 +547,6 @@ private fun DarkAutomationPreview() {
             },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -606,10 +556,8 @@ private fun DarkAutomationPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -642,7 +590,6 @@ private fun TabletAutomationPreview() {
             },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -652,10 +599,8 @@ private fun TabletAutomationPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -674,7 +619,6 @@ private fun ErrorPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -684,10 +628,8 @@ private fun ErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -706,7 +648,6 @@ private fun DarkErrorPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -716,10 +657,8 @@ private fun DarkErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -738,7 +677,6 @@ private fun TabletErrorPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -748,10 +686,8 @@ private fun TabletErrorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -785,7 +721,6 @@ private fun LoadingIndicatorPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -795,10 +730,8 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -832,7 +765,6 @@ private fun DarkLoadingIndicatorPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -842,10 +774,8 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -879,7 +809,6 @@ private fun TabletLoadingIndicatorPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -889,10 +818,8 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -908,7 +835,6 @@ private fun InitialPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -918,10 +844,8 @@ private fun InitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -937,7 +861,6 @@ private fun DarkInitialPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -947,10 +870,8 @@ private fun DarkInitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }
@@ -966,7 +887,6 @@ private fun TabletInitialPreview() {
             queryGeoUriApps = { listOf() },
             onBack = {},
             onCancel = {},
-            onCopy = {},
             onDeny = {},
             onFinish = {},
             onGrant = {},
@@ -976,10 +896,8 @@ private fun TabletInitialPreview() {
             onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onOpenApp = { _, _ -> },
-            onOpenChooser = {},
             onRetry = {},
-            onSave = { true },
+            onRun = {},
         )
     }
 }

@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -40,7 +39,7 @@ fun ResultError(
         modifier = Modifier
             .testTag("geoShareConversionError")
             .fillMaxWidth(),
-        chips = { lastPaddingEnd ->
+        chips = {
             if (!retryLoadingIndicatorVisible) {
                 ResultCardChip(
                     stringResource(R.string.conversion_error_retry),
@@ -59,7 +58,6 @@ fun ResultError(
                     icon = {
                         Icon(Icons.Outlined.Info, null)
                     },
-                    modifier = Modifier.padding(end = lastPaddingEnd),
                 ) {
                     onNavigateToUrlConvertersScreen()
                 }
