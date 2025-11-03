@@ -13,6 +13,7 @@ interface Output {
 
     fun getPositionText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): Item?
     fun getPositionExtraTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Item>
+    fun getPositionChipTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Item>
     fun getPositionUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): Item?
     fun getPositionExtraUriStrings(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Item>
     fun getPointText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): Item?

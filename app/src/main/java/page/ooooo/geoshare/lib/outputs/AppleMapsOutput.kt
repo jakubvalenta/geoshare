@@ -22,6 +22,8 @@ object AppleMapsOutput : Output {
 
     override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<Output.Item>()
 
+    override fun getPositionChipTexts(position: Position, uriQuote: UriQuote) = emptyList<Output.Item>()
+
     override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
         Output.Item(formatPositionUriString(position, uriQuote)) {
             stringResource(R.string.conversion_succeeded_open_app, AppleMapsUrlConverter.NAME)

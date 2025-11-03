@@ -21,6 +21,9 @@ object Outputs {
         }
     }
 
+    fun getPositionChipTexts(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> =
+        all.flatMap { it.getPositionChipTexts(position, uriQuote) }
+
     fun getPointAllTexts(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item> = buildList {
         all.forEach { output ->
             output.getPointText(point, uriQuote)?.let { add(it) }
@@ -49,4 +52,7 @@ object Outputs {
             addAll(output.getPositionExtraUriStrings(position, uriQuote))
         } ?: add(default.getPositionUriString(position, uriQuote))
     }
+
+    fun genRandomPositionUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
+        all.randomOrNull()?.getPositionUriString(Position.genRandomPosition(), uriQuote)?.value
 }

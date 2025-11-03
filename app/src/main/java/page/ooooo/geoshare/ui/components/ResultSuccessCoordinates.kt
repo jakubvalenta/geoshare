@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.GoogleMapsOutput
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -82,11 +81,8 @@ fun ResultSuccessCoordinates(
             }
         },
         chips = { lastPaddingEnd ->
-            ResultCardChip(stringResource(R.string.conversion_succeeded_copy_geo)) {
-                onCopy(position.toGeoUriString())
-            }
-            ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
-                onCopy(GoogleMapsOutput.getPositionText(position).value)
+            Outputs.getPositionChipTexts(position).forEach { (value, label) ->
+                ResultCardChip(label()) { onCopy(value) }
             }
             ResultCardChip(
                 stringResource(R.string.conversion_succeeded_save_gpx),

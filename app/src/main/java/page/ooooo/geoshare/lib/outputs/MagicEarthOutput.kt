@@ -20,6 +20,8 @@ object MagicEarthOutput : Output {
 
     override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = emptyList<Output.Item>()
 
+    override fun getPositionChipTexts(position: Position, uriQuote: UriQuote) = emptyList<Output.Item>()
+
     override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
         Output.Item(formatDisplayUriString(position, uriQuote)) {
             stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
