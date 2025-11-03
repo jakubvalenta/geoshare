@@ -92,7 +92,7 @@ sealed class AutomationImpl : Automation {
         override fun Label() {
             Text(
                 stringResource(
-                    R.string.conversion_succeeded_copy_coordinates,
+                    R.string.conversion_succeeded_copy_coordinates_in_format,
                     Position.example.toCoordsDecString(),
                 )
             )
@@ -113,7 +113,7 @@ sealed class AutomationImpl : Automation {
         override fun Label() {
             Text(
                 stringResource(
-                    R.string.conversion_succeeded_copy_coordinates,
+                    R.string.conversion_succeeded_copy_coordinates_in_format,
                     Position.example.toDegMinSecCoordsString(),
                 )
             )

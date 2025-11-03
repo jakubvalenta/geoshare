@@ -122,7 +122,7 @@
     <string name="conversion_automation_share_failed">Не вдалося автоматично поділитися посиланням</string>
     <string name="conversion_automation_share_succeeded">Автоматично опубліковане посилання</string>
     <string name="conversion_automation_share_waiting">Автоматичне поширення посилання через %1$ds</string>
-    <string name="conversion_succeeded_copy_coordinates">Копіювати координати у форматі %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates_in_format">Копіювати координати у форматі %1$s</string>
     <string name="conversion_succeeded_copy_link">Копіювати посилання %1$s</string>
     <string name="user_preferences_automation_description">Виберіть дію, яка має виконуватися автоматично під час перетворення посилання на карту на координати.</string>
     <string name="user_preferences_automation_nothing">Нічого</string>

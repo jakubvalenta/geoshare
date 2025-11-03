@@ -1,7 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
-    <string name="conversion_succeeded_copy_coordinates">Copy coordinates in format %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
+    <string name="conversion_succeeded_copy_coordinates_in_format">Copy coordinates in format %1$s</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>

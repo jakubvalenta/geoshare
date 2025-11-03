@@ -1,17 +1,20 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
@@ -20,7 +23,7 @@ import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
@@ -28,8 +31,10 @@ fun ResultSuccessCoordinates(
     onOpenChooser: (uriString: String) -> Unit,
     onSave: () -> Boolean,
 ) {
+    val scope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
-    var menuExpanded by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var sheetVisible by remember { mutableStateOf(false) }
 
     ResultCard(
         main = {
@@ -56,33 +61,11 @@ fun ResultSuccessCoordinates(
             }
         },
         after = {
-            Box {
-                IconButton({ menuExpanded = true }) {
-                    Icon(
-                        painterResource(R.drawable.content_copy_24px),
-                        contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
-                    )
-                }
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false },
-                ) {
-                    Outputs.getPositionAllTexts(position).map { (value, label) ->
-                        DropdownMenuItem(
-                            text = { Text(label()) },
-                            onClick = {
-                                menuExpanded = false
-                                onCopy(value)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painterResource(R.drawable.content_copy_24px),
-                                    stringResource(R.string.conversion_succeeded_copy_content_description),
-                                )
-                            },
-                        )
-                    }
-                }
+            IconButton({ sheetVisible = true }) {
+                Icon(
+                    painterResource(R.drawable.content_copy_24px),
+                    contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                )
             }
         },
         bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
@@ -109,6 +92,31 @@ fun ResultSuccessCoordinates(
             }
         },
     )
+
+    if (sheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                sheetVisible = false
+            },
+            sheetState = sheetState
+        ) {
+            Outputs.getPositionAllTexts(position).map { (value, label) ->
+                ListItem(
+                    headlineContent = { Text(label()) },
+                    modifier = Modifier.clickable {
+                        onCopy(value)
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                sheetVisible = false
+                            }
+                        }
+                    },
+                    supportingContent = { Text(value) },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                )
+            }
+        }
+    }
 }
 
 // Previews

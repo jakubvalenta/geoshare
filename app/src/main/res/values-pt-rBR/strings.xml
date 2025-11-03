@@ -120,7 +120,7 @@
     <string name="conversion_automation_share_failed">Falha ao compartilhar link automaticamente</string>
     <string name="conversion_automation_share_succeeded">Link compartilhado automaticamente</string>
     <string name="conversion_automation_share_waiting">Compartilhando link automaticamente em %1$ds</string>
-    <string name="conversion_succeeded_copy_coordinates">Copiar coordenadas no formato %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates_in_format">Copiar coordenadas no formato %1$s</string>
     <string name="conversion_succeeded_copy_link">Copiar link do %1$s</string>
     <string name="user_preferences_automation_description">Escolha uma ação para fazer automaticamente quando um link de mapa é convertido para coordenadas.</string>
     <string name="user_preferences_automation_nothing">Nada</string>

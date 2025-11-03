@@ -139,12 +139,6 @@ fun RowScope.ResultSuccessApp(
                                     menuExpanded = false
                                     onOpenApp(app.packageName, value)
                                 },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Share,
-                                        stringResource(R.string.conversion_succeeded_share),
-                                    )
-                                },
                             )
                         }
                     }

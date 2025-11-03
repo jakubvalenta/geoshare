@@ -11,45 +11,31 @@ object CoordinatesOutput : Output {
 
     override fun getPositionText(position: Position, uriQuote: UriQuote) =
         position.toDegMinSecCoordsString().let { value ->
-            Output.Item(value) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates, value)
-            }
+            Output.Item(value) { stringResource(R.string.conversion_succeeded_copy_coordinates) }
         }
 
     override fun getPositionExtraTexts(position: Position, uriQuote: UriQuote) = listOf(
         position.toCoordsDecString().let { value ->
-            Output.Item(value) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates, value)
-            }
+            Output.Item(value) { stringResource(R.string.conversion_succeeded_copy_coordinates) }
         },
-        Output.Item(position.toGeoUriString(uriQuote)) {
-            stringResource(R.string.conversion_succeeded_copy_geo)
-        },
+        Output.Item(position.toGeoUriString(uriQuote)) { stringResource(R.string.conversion_succeeded_copy_geo) },
     )
 
     override fun getPositionUriString(position: Position, uriQuote: UriQuote) =
-        Output.Item(position.toGeoUriString(uriQuote)) {
-            stringResource(R.string.conversion_succeeded_share)
-        }
+        Output.Item(position.toGeoUriString(uriQuote)) { stringResource(R.string.conversion_succeeded_share) }
 
     override fun getPositionExtraUriStrings(position: Position, uriQuote: UriQuote) = emptyList<Output.Item>()
 
     override fun getPointText(point: Point, uriQuote: UriQuote) =
         point.toDegMinSecCoordsString().let { value ->
-            Output.Item(value) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates, value)
-            }
+            Output.Item(value) { stringResource(R.string.conversion_succeeded_copy_coordinates) }
         }
 
     override fun getPointExtraTexts(point: Point, uriQuote: UriQuote) = listOf(
-        Output.Item(point.toGeoUriString(uriQuote = uriQuote)) {
-            stringResource(R.string.conversion_succeeded_copy_geo)
-        },
+        Output.Item(point.toGeoUriString(uriQuote = uriQuote)) { stringResource(R.string.conversion_succeeded_copy_geo) },
     )
 
     override fun getPointUriStrings(point: Point, uriQuote: UriQuote) = listOf(
-        Output.Item(point.toGeoUriString(uriQuote = uriQuote)) {
-            stringResource(R.string.conversion_succeeded_share)
-        },
+        Output.Item(point.toGeoUriString(uriQuote = uriQuote)) { stringResource(R.string.conversion_succeeded_share) },
     )
 }
