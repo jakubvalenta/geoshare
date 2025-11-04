@@ -12,31 +12,31 @@ class AppleMapsOutputTest {
     private val packageNames: List<String> = emptyList()
 
     @Test
-    fun getActions_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
+    fun getOutputs_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
-            AppleMapsOutput.getActions(Position("50.123456", "-11.123456", z = "3.4"), packageNames, uriQuote)
-                .map { it.action },
+            AppleMapsOutputManager.getOutputs(Position("50.123456", "-11.123456", z = "3.4"), packageNames, uriQuote)
+                .mapNotNull { (it as? Output.Action)?.action }
         )
     }
 
     @Test
-    fun getActions_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
+    fun getOutputs_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
-            AppleMapsOutput.getActions(
+            AppleMapsOutputManager.getOutputs(
                 Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), packageNames, uriQuote
             )
-                .map { it.action },
+                .mapNotNull { (it as? Output.Action)?.action }
         )
     }
 
     @Test
-    fun getActions_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
+    fun getOutputs_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?q=foo%20bar&z=3.4")),
-            AppleMapsOutput.getActions(Position(q = "foo bar", z = "3.4"), packageNames, uriQuote)
-                .map { it.action },
+            AppleMapsOutputManager.getOutputs(Position(q = "foo bar", z = "3.4"), packageNames, uriQuote)
+                .mapNotNull { (it as? Output.Action)?.action }
         )
     }
 }

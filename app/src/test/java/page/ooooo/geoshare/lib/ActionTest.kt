@@ -4,11 +4,11 @@ import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class PositionTest {
+class ActionTest {
     private val uriQuote = FakeUriQuote()
 
     @Test
-    fun toGpx() {
+    fun saveGpx_write() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
@@ -19,12 +19,14 @@ class PositionTest {
 </gpx>
 """,
             StringBuilder().apply {
-                Position(
-                    points = persistentListOf(
-                        Point("50.123456", "-11.123456"),
-                        Point("52.5067296", "13.2599309"),
-                    ),
-                ).toGpx(this, uriQuote)
+                Action.SaveGpx(
+                    Position(
+                        points = persistentListOf(
+                            Point("50.123456", "-11.123456"),
+                            Point("52.5067296", "13.2599309"),
+                        ),
+                    )
+                ).write(this, uriQuote)
             }.toString()
         )
     }
@@ -40,11 +42,13 @@ class PositionTest {
 </gpx>
 """,
             StringBuilder().apply {
-                Position(
-                    points = persistentListOf(
-                        Point("\"", "<"),
-                    ),
-                ).toGpx(this, uriQuote)
+                Action.SaveGpx(
+                    Position(
+                        points = persistentListOf(
+                            Point("\"", "<"),
+                        ),
+                    )
+                ).write(this, uriQuote)
             }.toString()
         )
     }
@@ -59,7 +63,9 @@ class PositionTest {
 </gpx>
 """,
             StringBuilder().apply {
-                Position().toGpx(this, uriQuote)
+                Action.SaveGpx(
+                    Position()
+                ).write(this, uriQuote)
             }.toString()
         )
     }

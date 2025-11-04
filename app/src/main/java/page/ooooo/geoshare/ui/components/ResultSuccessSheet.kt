@@ -17,7 +17,7 @@ import page.ooooo.geoshare.lib.outputs.Output
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessSheet(
-    items: List<Output.Item<Action>>,
+    outputs: List<Output.WithAction>,
     sheetVisible: Boolean,
     onSetSheetVisible: (Boolean) -> Unit,
     onRun: (action: Action) -> Unit,
@@ -31,10 +31,10 @@ fun ResultSuccessSheet(
             sheetState = sheetState,
         ) {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                val (labeledCopyActions, labeledOtherActions) = items.partition { it.action is Action.Copy }
-                labeledCopyActions.forEach { (action, label) ->
-                    ResultSuccessSheetItem(label, supportingText = (action as Action.Copy).text) {
-                        onRun(action)
+                val (copyOutputs, otherOutputs) = outputs.partition { it.action is Action.Copy }
+                copyOutputs.forEach { output ->
+                    ResultSuccessSheetItem(output.label, supportingText = (output.action as? Action.Copy)?.text) {
+                        onRun(output.action)
                         coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onSetSheetVisible(false)
@@ -42,12 +42,12 @@ fun ResultSuccessSheet(
                         }
                     }
                 }
-                if (labeledCopyActions.isNotEmpty() && labeledOtherActions.isNotEmpty()) {
+                if (copyOutputs.isNotEmpty() && otherOutputs.isNotEmpty()) {
                     HorizontalDivider()
                 }
-                labeledOtherActions.forEach { (action, label) ->
-                    ResultSuccessSheetItem(label) {
-                        onRun(action)
+                otherOutputs.forEach { output ->
+                    ResultSuccessSheetItem(output.label) {
+                        onRun(output.action)
                         coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onSetSheetVisible(false)

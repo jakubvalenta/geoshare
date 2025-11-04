@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.*
 import kotlin.time.Duration.Companion.seconds
 
-object GpxOutput : Output {
+object GpxOutputManager : OutputManager {
 
     object SaveAutomation : Automation.HasSuccessMessage, Automation.HasErrorMessage, Automation.HasDelay {
         override val type = Automation.Type.SAVE_GPX
@@ -17,7 +17,7 @@ object GpxOutput : Output {
 
         override val delay = 5.seconds
 
-        override fun getAction(position: Position, uriQuote: UriQuote) = Action.SaveGpx()
+        override fun getAction(position: Position, uriQuote: UriQuote) = Action.SaveGpx(position)
 
         @Composable
         override fun Label() {
@@ -35,18 +35,13 @@ object GpxOutput : Output {
             stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
-    override fun getText(position: Position, uriQuote: UriQuote) = null
+    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
+        add(Output.Action(Action.SaveGpx(position)) {
+            stringResource(R.string.conversion_succeeded_save_gpx)
+        })
+    }
 
-    override fun getText(point: Point, uriQuote: UriQuote) = null
-
-    override fun getSupportingText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
-        emptyList<Output.Item<Action>>()
-
-    override fun getActions(point: Point, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
-
-    override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
+    override fun getAutomations(packageNames: List<String>) = listOf(
         SaveAutomation,
     )
 
@@ -54,10 +49,4 @@ object GpxOutput : Output {
         Automation.Type.SAVE_GPX -> SaveAutomation
         else -> null
     }
-
-    override fun getChips(position: Position, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.SaveGpx()) {
-            stringResource(R.string.conversion_succeeded_save_gpx)
-        }
-    )
 }

@@ -17,7 +17,7 @@ class CoordinatesOutputTest {
     fun getSupportingText_returnsQueryAndZoomButNotPoints() {
         assertEquals(
             "foo bar\t\tz3.4",
-            CoordinatesOutput.getSupportingText(
+            CoordinatesOutputManager.getOutputs(
                 Position(
                     q = "foo bar",
                     z = "3.4",
@@ -27,62 +27,63 @@ class CoordinatesOutputTest {
                         Point("59.147731699999994", "11.550661199999999"),
                     ),
                 ),
+                packageNames,
                 uriQuote,
-            )
+            ).getSupportingText(),
         )
     }
 
     @Test
-    fun getActions_returnsSouthWestForNegativeCoordinates() {
+    fun getOutputs_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
             Action.Copy("17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W"),
-            CoordinatesOutput.getActions(Position("-17.2165721", "-149.9470294"), packageNames, uriQuote)
-                .first().action,
+            CoordinatesOutputManager.getOutputs(Position("-17.2165721", "-149.9470294"), packageNames, uriQuote)
+                .firstNotNullOfOrNull { (it as? Output.Action)?.action }
         )
     }
 
     @Test
-    fun getActions_returnsNorthEastForPositiveCoordinates() {
+    fun getOutputs_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
             Action.Copy("52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E"),
-            CoordinatesOutput.getActions(Position("52.5067296", "13.2599309"), packageNames, uriQuote)
-                .first().action,
+            CoordinatesOutputManager.getOutputs(Position("52.5067296", "13.2599309"), packageNames, uriQuote)
+                .firstNotNullOfOrNull { (it as? Output.Action)?.action }
         )
     }
 
     @Test
-    fun getActions_returnsZerosForZeroCoordinates() {
+    fun getOutputs_returnsZerosForZeroCoordinates() {
         assertEquals(
             Action.Copy("0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E"),
-            CoordinatesOutput.getActions(Position("0", "0"), packageNames, uriQuote)
-                .first().action,
+            CoordinatesOutputManager.getOutputs(Position("0", "0"), packageNames, uriQuote)
+                .getActions().first().action,
         )
     }
 
     @Test
-    fun getActions_returnsZeroDegForZeroDegCoordinates() {
+    fun getOutputs_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
             Action.Copy("0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E"),
-            CoordinatesOutput.getActions(Position("0.5", "0.5"), packageNames, uriQuote)
-                .first().action,
+            CoordinatesOutputManager.getOutputs(Position("0.5", "0.5"), packageNames, uriQuote)
+                .firstNotNullOfOrNull { (it as? Output.Action)?.action }
         )
     }
 
     @Test
-    fun getActions_returnsZeroMinForZeroMinCoordinates() {
+    fun getOutputs_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
             Action.Copy("10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W"),
-            CoordinatesOutput.getActions(Position("-10", "-20"), packageNames, uriQuote)
-                .first().action,
+            CoordinatesOutputManager.getOutputs(Position("-10", "-20"), packageNames, uriQuote)
+                .getActions().first().action,
         )
     }
 
     @Test
-    fun getActions_returnsZerosSecForZeroSecCoordinates() {
+    fun getOutputs_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
             Action.Copy("10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W"),
-            CoordinatesOutput.getActions(Position("-10.5", "-20.5"), packageNames, uriQuote)
-                .first().action,
+            CoordinatesOutputManager.getOutputs(Position("-10.5", "-20.5"), packageNames, uriQuote)
+                .getActions().first().action,
         )
     }
 

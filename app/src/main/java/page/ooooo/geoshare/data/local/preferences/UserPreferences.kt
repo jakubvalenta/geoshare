@@ -14,7 +14,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.outputs.Outputs
+import page.ooooo.geoshare.lib.outputs.allOutputManagers
+import page.ooooo.geoshare.lib.outputs.findAutomation
+import page.ooooo.geoshare.lib.outputs.getAutomations
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -178,7 +180,7 @@ val automation = object : OptionsUserPreference<Automation>(
         val packageNames = IntentTools().queryGeoUriPackageNames(context.packageManager)
         return buildList {
             add(Automation.Noop)
-            addAll(Outputs.getAutomations(packageNames))
+            addAll(allOutputManagers.getAutomations(packageNames))
         }.map { automation ->
             UserPreferenceOption(
                 value = automation,
@@ -194,7 +196,7 @@ val automation = object : OptionsUserPreference<Automation>(
     override fun getValue(preferences: Preferences): Automation =
         preferences[typeKey]?.let(Automation.Type::valueOf)?.let { type ->
             preferences[packageNameKey]?.ifEmpty { null }.let { packageName ->
-                Outputs.findAutomation(type, packageName)
+                allOutputManagers.findAutomation(type, packageName)
             }
         } ?: default
 

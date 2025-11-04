@@ -2,7 +2,6 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -26,14 +25,16 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.MagicEarthOutput
+import page.ooooo.geoshare.lib.outputs.allOutputManagers
+import page.ooooo.geoshare.lib.outputs.MagicEarthOutputManager
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.Outputs
+import page.ooooo.geoshare.lib.outputs.getAppActions
+import page.ooooo.geoshare.lib.outputs.getOutputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed interface GridItem {
-    data class App(val app: IntentTools.App, val items: List<Output.Item<Action.OpenApp>>) : GridItem
+    data class App(val app: IntentTools.App, val outputs: List<Output.AppAction>) : GridItem
     class ShareButton : GridItem
     class Empty : GridItem
 }
@@ -44,7 +45,7 @@ private val dropdownButtonOffset = 20.dp
 
 @Composable
 fun ResultSuccessApps(
-    items: List<Output.Item<Action>>,
+    outputs: List<Output>,
     onRun: (action: Action) -> Unit,
     intentTools: IntentTools = IntentTools(),
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
@@ -56,9 +57,9 @@ fun ResultSuccessApps(
     } else {
         4
     }
-    val apps: Map<IntentTools.App, List<Output.Item<Action.OpenApp>>> = items
-        .mapNotNull { (action, label) -> (action as? Action.OpenApp)?.let { action -> Output.Item(action, label) } }
-        .groupBy { (action) -> action.packageName }
+    val apps: Map<IntentTools.App, List<Output.AppAction>> = outputs
+        .getAppActions()
+        .groupBy { (packageName) -> packageName }
         .mapNotNull { (packageName, items) ->
             intentTools.queryApp(context.packageManager, packageName)?.let { app -> app to items }
         }
@@ -70,7 +71,7 @@ fun ResultSuccessApps(
         repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
     val openChooserAction: Action.OpenChooser? =
-        items.firstNotNullOfOrNull { (action) -> (action as? Action.OpenChooser) }
+        outputs.firstNotNullOfOrNull { (it as? Output.Action)?.action as? Action.OpenChooser }
 
     Column(
         Modifier
@@ -82,14 +83,8 @@ fun ResultSuccessApps(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
-                        is GridItem.App -> gridItem.let { (app, items) ->
-                            ResultSuccessApp(
-                                packageName = app.packageName,
-                                label = app.label,
-                                icon = app.icon,
-                                items = items,
-                                onRun = onRun,
-                            )
+                        is GridItem.App -> gridItem.let { (app, outputs) ->
+                            ResultSuccessApp(app, outputs, onRun)
                         }
 
                         is GridItem.ShareButton -> ResultSuccessAppShare { openChooserAction?.let(onRun) }
@@ -105,10 +100,8 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
-    packageName: String,
-    label: String,
-    icon: Drawable,
-    items: List<Output.Item<Action.OpenApp>>,
+    app: IntentTools.App,
+    outputs: List<Output.AppAction>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -119,10 +112,10 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                items.firstOrNull()?.let { (action) -> onRun(action) }
+                outputs.firstOrNull()?.let { (_, action) -> onRun(action) }
             }
             .weight(1f)
-            .testTag("geoShareResultCardApp_${packageName}"),
+            .testTag("geoShareResultCardApp_${app.packageName}"),
         verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
         Box(
             Modifier
@@ -130,10 +123,10 @@ fun RowScope.ResultSuccessApp(
                 .size(iconSize),
         ) {
             Image(
-                rememberDrawablePainter(icon),
-                label,
+                rememberDrawablePainter(app.icon),
+                app.label,
             )
-            items.takeIf { it.size > 1 }?.let {
+            outputs.takeIf { it.size > 1 }?.let {
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -153,7 +146,7 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        items.forEach { (action, label) ->
+                        outputs.forEach { (_, action, label) ->
                             DropdownMenuItem(
                                 text = { Text(label()) },
                                 onClick = { onRun(action) },
@@ -164,7 +157,7 @@ fun RowScope.ResultSuccessApp(
             }
         }
         Text(
-            label,
+            app.label,
             Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall,
@@ -205,7 +198,7 @@ private fun DefaultPreview() {
                 @Suppress("SpellCheckingInspection")
                 val packageNames = listOf(
                     IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                    MagicEarthOutput.PACKAGE_NAME,
+                    MagicEarthOutputManager.PACKAGE_NAME,
                     "app.comaps.fdroid",
                     "app.organicmaps",
                     "com.here.app.maps",
@@ -214,9 +207,8 @@ private fun DefaultPreview() {
                     "us.spotco.maps",
                 )
                 val context = LocalContext.current
-                val position = Position.example
                 ResultSuccessApps(
-                    items = Outputs.getActions(position, packageNames),
+                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -240,7 +232,7 @@ private fun DarkPreview() {
                 @Suppress("SpellCheckingInspection")
                 val packageNames = listOf(
                     IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                    MagicEarthOutput.PACKAGE_NAME,
+                    MagicEarthOutputManager.PACKAGE_NAME,
                     "app.comaps.fdroid",
                     "app.organicmaps",
                     "com.here.app.maps",
@@ -249,9 +241,8 @@ private fun DarkPreview() {
                     "us.spotco.maps",
                 )
                 val context = LocalContext.current
-                val position = Position.example
                 ResultSuccessApps(
-                    items = Outputs.getActions(position, packageNames),
+                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -276,9 +267,8 @@ private fun OneAppPreview() {
                     IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
                 )
                 val context = LocalContext.current
-                val position = Position.example
                 ResultSuccessApps(
-                    items = Outputs.getActions(position, packageNames),
+                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -303,9 +293,8 @@ private fun DarkOneAppPreview() {
                     IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
                 )
                 val context = LocalContext.current
-                val position = Position.example
                 ResultSuccessApps(
-                    items = Outputs.getActions(position, packageNames),
+                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -327,7 +316,7 @@ private fun NoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
-                    items = emptyList(),
+                    outputs = emptyList(),
                     onRun = {},
                 )
             }
@@ -342,7 +331,7 @@ private fun DarkNoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
-                    items = emptyList(),
+                    outputs = emptyList(),
                     onRun = {},
                 )
             }

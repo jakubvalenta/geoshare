@@ -16,7 +16,10 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.XiaomiTools
-import page.ooooo.geoshare.lib.outputs.Outputs
+import page.ooooo.geoshare.lib.outputs.allOutputManagers
+import page.ooooo.geoshare.lib.outputs.getOutputs
+import page.ooooo.geoshare.lib.outputs.getSupportingText
+import page.ooooo.geoshare.lib.outputs.getText
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -97,11 +100,10 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val expectedCoordinatesText = Outputs.getText(expectedPosition)
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedCoordinatesText }
+        val outputs = allOutputManagers.getOutputs(expectedPosition, emptyList())
+        onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == outputs.getText() }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
-            val expectedParamsText = Outputs.getSupportingText(expectedPosition)
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedParamsText }
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == outputs.getSupportingText() }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })
         }

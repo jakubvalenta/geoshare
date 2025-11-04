@@ -20,7 +20,7 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 
-object GeoUriOutput : Output {
+object GeoUriOutputManager : OutputManager {
 
     object CopyGeoUriAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_GEO_URI
@@ -126,27 +126,32 @@ object GeoUriOutput : Output {
             appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
     }
 
-    override fun getText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getText(point: Point, uriQuote: UriQuote) = null
-
-    override fun getSupportingText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
-        listOf<Output.Item<Action>>(
-            Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_geo)
-            },
-        )
-
-    override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatUriString(point, uriQuote = uriQuote))) {
+    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
+        val uriString = formatUriString(position, uriQuote)
+        add(Output.Action(Action.Copy(uriString)) {
             stringResource(R.string.conversion_succeeded_copy_geo)
-        },
-        Output.Item(Action.OpenChooser(formatUriString(point, uriQuote = uriQuote))) {
+        })
+        add(Output.Action(Action.OpenChooser(uriString)) {
             stringResource(R.string.conversion_succeeded_share)
-        },
-    )
+        })
+        packageNames.forEach { packageName ->
+            add(Output.AppAction(packageName, Action.OpenApp(packageName, uriString)) {
+                stringResource(R.string.conversion_succeeded_open_app, packageName)
+            })
+        }
+        position.points?.forEachIndexed { i, point ->
+            val uriString = formatUriString(point, uriQuote = uriQuote)
+            add(Output.PointAction(i, Action.Copy(uriString)) {
+                stringResource(R.string.conversion_succeeded_copy_geo)
+            })
+            add(Output.PointAction(i, Action.OpenChooser(uriString)) {
+                stringResource(R.string.conversion_succeeded_share)
+            })
+        }
+        add(Output.Chip(Action.Copy(uriString)) {
+            stringResource(R.string.conversion_succeeded_copy_geo)
+        })
+    }
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = buildList {
         add(CopyGeoUriAutomation)
@@ -160,12 +165,6 @@ object GeoUriOutput : Output {
         Automation.Type.OPEN_APP if packageName != null -> OpenAppAutomation(packageName)
         else -> null
     }
-
-    override fun getChips(position: Position, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_copy_geo)
-        },
-    )
 
     fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = position.run {
         formatUriString(mainPoint ?: Point(), q = q, z = z, uriQuote = uriQuote)

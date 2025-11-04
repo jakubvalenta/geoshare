@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
  */
-object GoogleMapsOutput : Output {
+object GoogleMapsOutputManager : OutputManager {
     // TODO GOOGLE_MAPS_PACKAGE_NAME
     @Suppress("SpellCheckingInspection")
     // TODO "us.spotco.maps"
@@ -34,24 +34,19 @@ object GoogleMapsOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getText(point: Point, uriQuote: UriQuote) = null
-
-    override fun getSupportingText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
-        listOf<Output.Item<Action>>(
-            Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-            },
-        )
-
-    override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatUriString(point, uriQuote))) {
+    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
+        add(Output.Action(Action.Copy(formatUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-        },
-    )
+        })
+        position.points?.forEachIndexed { i, point ->
+            add(Output.PointAction(i, Action.Copy(formatUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+            })
+        }
+        add(Output.Chip(Action.Copy(formatUriString(position, uriQuote))) {
+            stringResource(R.string.conversion_succeeded_copy_google_maps)
+        })
+    }
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyLinkAutomation,
@@ -61,12 +56,6 @@ object GoogleMapsOutput : Output {
         Automation.Type.COPY_GOOGLE_MAPS_URI -> CopyLinkAutomation
         else -> null
     }
-
-    override fun getChips(position: Position, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_copy_google_maps)
-        }
-    )
 
     private fun formatUriString(position: Position, uriQuote: UriQuote) = Uri(
         scheme = "https",

@@ -13,10 +13,9 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.toDegMinSec
 import page.ooooo.geoshare.lib.toScale
-import kotlin.collections.isNullOrEmpty
 import kotlin.math.abs
 
-object CoordinatesOutput : Output {
+object CoordinatesOutputManager : OutputManager {
 
     object CopyCoordsDecAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_COORDS_DEC
@@ -70,44 +69,25 @@ object CoordinatesOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    override fun getText(position: Position, uriQuote: UriQuote) = formatDegMinSecString(position)
-
-    override fun getText(point: Point, uriQuote: UriQuote) = formatDegMinSecString(point)
-
-    override fun getSupportingText(position: Position, uriQuote: UriQuote): String = position.run {
-        buildList {
-            q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
-                    val coords = "$lat,$lon"
-                    if (q != coords) {
-                        add(q.replace('+', ' '))
-                    }
-                }
-            }
-            z.takeUnless { it.isNullOrEmpty() }?.let { z ->
-                add("z$z")
-            }
-        }.joinToString("\t\t")
+    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
+        val degMinSec = formatDegMinSecString(position)
+        add(Output.Text(degMinSec))
+        add(Output.SupportingText(formatParamsString(position)))
+        add(Output.Action(Action.Copy(degMinSec)) {
+            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        })
+        add(Output.Action(Action.Copy(formatDecString(position))) {
+            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        })
+        position.points?.forEachIndexed { i, point ->
+            add(Output.PointAction(i, Action.Copy(formatDegMinSecString(point))) {
+                stringResource(R.string.conversion_succeeded_copy_coordinates)
+            })
+            add(Output.PointAction(i, Action.Copy(formatDecString(point))) {
+                stringResource(R.string.conversion_succeeded_copy_coordinates)
+            })
+        }
     }
-
-    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
-        listOf<Output.Item<Action>>(
-            Output.Item(Action.Copy(formatDegMinSecString(position))) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates)
-            },
-            Output.Item(Action.Copy(formatDecString(position))) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates)
-            },
-        )
-
-    override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatDegMinSecString(point))) {
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
-        },
-        Output.Item(Action.Copy(formatDecString(point))) {
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
-        },
-    )
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyCoordsDecAutomation,
@@ -119,8 +99,6 @@ object CoordinatesOutput : Output {
         Automation.Type.COPY_COORDS_NSWE_DEC -> CopyCoordsDegMinSecAutomation
         else -> null
     }
-
-    override fun getChips(position: Position, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
 
     private fun formatDecString(position: Position): String = position.run {
         formatDecString(mainPoint ?: Point())
@@ -141,5 +119,21 @@ object CoordinatesOutput : Output {
                 (lon.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
                     "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
                 }
+    }
+
+    private fun formatParamsString(position: Position): String = position.run {
+        buildList {
+            q.takeUnless { it.isNullOrEmpty() }?.let { q ->
+                (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
+                    val coords = "$lat,$lon"
+                    if (q != coords) {
+                        add(q.replace('+', ' '))
+                    }
+                }
+            }
+            z.takeUnless { it.isNullOrEmpty() }?.let { z ->
+                add("z$z")
+            }
+        }.joinToString("\t\t")
     }
 }

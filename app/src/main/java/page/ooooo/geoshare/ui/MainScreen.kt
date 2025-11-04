@@ -30,7 +30,8 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ConversionRunContext
-import page.ooooo.geoshare.lib.outputs.Outputs
+import page.ooooo.geoshare.lib.outputs.allOutputManagers
+import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -231,7 +232,7 @@ fun MainScreen(
                     )
                     Text(stringResource(R.string.main_navigate_to_intro))
                 }
-                Outputs.genRandomUriString()?.let { uriString ->
+                allOutputManagers.genRandomUriString()?.let { uriString ->
                     TextButton({
                         onUpdateInput(uriString)
                         setErrorMessageResId(null)

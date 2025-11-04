@@ -19,8 +19,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.outputs.Outputs
+import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.outputs.allOutputManagers
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.getActions
+import page.ooooo.geoshare.lib.outputs.getOutputs
+import page.ooooo.geoshare.lib.outputs.getPointActions
+import page.ooooo.geoshare.lib.outputs.getPointText
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -28,7 +33,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultSuccessPoint(
     i: Int,
-    point: Point,
+    outputs: List<Output.PointAction>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -45,7 +50,7 @@ fun ResultSuccessPoint(
         )
         SelectionContainer(Modifier.weight(1f)) {
             Text(
-                Outputs.getText(point),
+                outputs.getPointText(),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -59,7 +64,7 @@ fun ResultSuccessPoint(
         }
     }
     ResultSuccessSheet(
-        items = Outputs.getActions(point),
+        outputs = outputs.getActions(),
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
         onRun = onRun,
@@ -73,7 +78,7 @@ private fun DefaultPreview() {
         Surface {
             ResultSuccessPoint(
                 i = 3,
-                point = Point.example,
+                outputs = allOutputManagers.getOutputs(Position.example, emptyList()).getPointActions(),
                 onRun = {},
             )
         }
@@ -87,7 +92,7 @@ private fun DarkPreview() {
         Surface {
             ResultSuccessPoint(
                 i = 3,
-                point = Point.example,
+                outputs = allOutputManagers.getOutputs(Position.example, emptyList()).getPointActions(),
                 onRun = {},
             )
         }

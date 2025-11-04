@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
-object MagicEarthOutput : Output {
+object MagicEarthOutputManager : OutputManager {
     @Suppress("SpellCheckingInspection")
     const val PACKAGE_NAME = "com.generalmagic.magicearth"
 
@@ -30,54 +30,46 @@ object MagicEarthOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getText(point: Point, uriQuote: UriQuote) = null
-
-    override fun getSupportingText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
-        listOf<Output.Item<Action>>(
-            Output.Item(Action.Copy(formatDisplayUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
-            },
-            Output.Item(Action.Copy(formatDriveToUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
-            },
-            Output.Item(Action.Copy(formatDriveViaUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
-            },
-            Output.Item(Action.OpenApp(PACKAGE_NAME, formatDisplayUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
-            },
-            Output.Item(Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
-            },
-            Output.Item(Action.OpenApp(PACKAGE_NAME, formatDriveViaUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
-            },
-        )
-
-    override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatDisplayUriString(point, uriQuote))) {
+    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
+        add(Output.Action(Action.Copy(formatDisplayUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
-        },
-        Output.Item(Action.Copy(formatDriveToUriString(point, uriQuote))) {
+        })
+        add(Output.Action(Action.Copy(formatDriveToUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
-        },
-        Output.Item(Action.Copy(formatDriveViaUriString(point, uriQuote))) {
+        })
+        add(Output.Action(Action.Copy(formatDriveViaUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
-        },
-        Output.Item(Action.OpenChooser(formatDisplayUriString(point, uriQuote))) {
+        })
+        add(Output.Action(Action.OpenApp(PACKAGE_NAME, formatDisplayUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
-        },
-        Output.Item(Action.OpenChooser(formatDriveToUriString(point, uriQuote))) {
+        })
+        add(Output.Action(Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
-        },
-        Output.Item(Action.OpenChooser(formatDriveViaUriString(point, uriQuote))) {
+        })
+        add(Output.Action(Action.OpenApp(PACKAGE_NAME, formatDriveViaUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
-        },
-    )
+        })
+        position.points?.forEachIndexed { i, point ->
+            add(Output.PointAction(i, Action.Copy(formatDisplayUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
+            })
+            add(Output.PointAction(i, Action.Copy(formatDriveToUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
+            })
+            add(Output.PointAction(i, Action.Copy(formatDriveViaUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
+            })
+            add(Output.PointAction(i, Action.OpenChooser(formatDisplayUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
+            })
+            add(Output.PointAction(i, Action.OpenChooser(formatDriveToUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
+            })
+            add(Output.PointAction(i, Action.OpenChooser(formatDriveViaUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
+            })
+        }
+    }
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyLinkAutomation,
@@ -87,8 +79,6 @@ object MagicEarthOutput : Output {
         Automation.Type.COPY_MAGIC_EARTH_URI -> CopyLinkAutomation
         else -> null
     }
-
-    override fun getChips(position: Position, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
 
     private fun formatDisplayUriString(position: Position, uriQuote: UriQuote): String = Uri(
         scheme = "magicearth",

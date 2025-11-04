@@ -21,6 +21,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
+import page.ooooo.geoshare.lib.outputs.Output
 import javax.inject.Inject
 
 @HiltViewModel
@@ -165,9 +166,10 @@ class ConversionViewModel @Inject constructor(
         result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.writer()
-                if (stateContext.currentState is HasResult) {
-                    (stateContext.currentState as HasResult).position.toGpx(writer)
+                val saveGpxAction = (stateContext.currentState as? HasResult)?.outputs?.firstNotNullOfOrNull {
+                    (it as? Output.Action)?.action as? Action.SaveGpx
                 }
+                saveGpxAction?.write(writer)
                 writer.close()
             }
         }

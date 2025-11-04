@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 /**
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
  */
-object AppleMapsOutput : Output {
+object AppleMapsOutputManager : OutputManager {
 
     object CopyLinkAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_APPLE_MAPS_URI
@@ -31,26 +31,18 @@ object AppleMapsOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getText(point: Point, uriQuote: UriQuote) = null
-
-    override fun getSupportingText(position: Position, uriQuote: UriQuote) = null
-
-    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
-        listOf<Output.Item<Action>>(
-            Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-            },
-        )
-
-    override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatUriString(point, uriQuote))) {
+    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
+        add(Output.Action(Action.Copy(formatUriString(position, uriQuote))) {
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-        },
-    )
+        })
+        position.points?.forEachIndexed { i, point ->
+            add(Output.PointAction(i, Action.Copy(formatUriString(point, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
+            })
+        }
+    }
 
-    override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
+    override fun getAutomations(packageNames: List<String>) = listOf(
         CopyLinkAutomation,
     )
 
@@ -58,8 +50,6 @@ object AppleMapsOutput : Output {
         Automation.Type.COPY_APPLE_MAPS_URI -> CopyLinkAutomation
         else -> null
     }
-
-    override fun getChips(position: Position, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
 
     private fun formatUriString(position: Position, uriQuote: UriQuote) = Uri(
         scheme = "https",

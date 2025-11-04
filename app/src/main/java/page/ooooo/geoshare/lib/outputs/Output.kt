@@ -1,33 +1,31 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.Automation
-import page.ooooo.geoshare.lib.Action
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.Action as Action_
 
-interface Output {
-    data class Item<T : Action>(val action: T, val label: @Composable () -> String)
+sealed interface Output {
+    interface WithAction : Output {
+        val action: Action_
+        val label: @Composable () -> String
+    }
 
-    fun getText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
+    data class Action(override val action: Action_, override val label: @Composable () -> String) :
+        WithAction
 
-    fun getText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String?
+    data class AppAction(
+        val packageName: String,
+        override val action: Action_,
+        override val label: @Composable () -> String,
+    ) :
+        WithAction
 
-    fun getSupportingText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
+    data class Chip(override val action: Action_, override val label: @Composable () -> String) :
+        WithAction
 
-    fun getActions(
-        position: Position,
-        packageNames: List<String>,
-        uriQuote: UriQuote = DefaultUriQuote(),
-    ): List<Item<Action>>
+    data class PointAction(val i: Int, override val action: Action_, override val label: @Composable () -> String) :
+        WithAction
 
-    fun getActions(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Item<Action>>
+    data class SupportingText(val text: String) : Output
 
-    fun getAutomations(packageNames: List<String>): List<Automation>
-
-    fun findAutomation(type: Automation.Type, packageName: String?): Automation?
-
-    fun getChips(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Item<Action>>
+    data class Text(val text: String) : Output
 }
