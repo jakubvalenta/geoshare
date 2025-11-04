@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -199,7 +199,7 @@ private fun DefaultPreview() {
                 currentState = AutomationFinished(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -218,7 +218,7 @@ private fun DarkPreview() {
                 currentState = AutomationFinished(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -243,7 +243,7 @@ private fun WaitingPreview() {
                     ConversionRunContext(context, clipboard, saveGpxLauncher),
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -268,7 +268,7 @@ private fun DarkWaitingPreview() {
                     ConversionRunContext(context, clipboard, saveGpxLauncher),
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -287,7 +287,7 @@ private fun SucceededPreview() {
                 currentState = AutomationSucceeded(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -306,7 +306,7 @@ private fun DarSucceededPreview() {
                 currentState = AutomationSucceeded(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -325,7 +325,7 @@ private fun FailedPreview() {
                 currentState = AutomationFailed(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -344,7 +344,7 @@ private fun DarkFailedPreview() {
                 currentState = AutomationFailed(
                     "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     Position.example,
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},

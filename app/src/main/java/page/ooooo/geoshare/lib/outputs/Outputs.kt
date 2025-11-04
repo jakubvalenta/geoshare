@@ -1,19 +1,19 @@
 package page.ooooo.geoshare.lib.outputs
 
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.UriQuote
+import android.content.Context
+import page.ooooo.geoshare.lib.Automation
+import page.ooooo.geoshare.lib.*
 
 object Outputs {
-    val default = CoordinatesOutput
-    val extra = listOf(
+    private val default = CoordinatesOutput
+    private val all = listOf(
+        default,
+        GeoUriOutput,
         GoogleMapsOutput,
         AppleMapsOutput,
         MagicEarthOutput,
         GpxOutput,
     )
-    val all get() = listOf(default, *extra.toTypedArray())
 
     fun getText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String =
         default.getText(position, uriQuote)
@@ -24,19 +24,24 @@ object Outputs {
     fun getActions(
         position: Position,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ): List<Output.LabeledAction<Output.Action>> =
+    ): List<Output.Item<Action>> =
         all.flatMap { it.getActions(position, uriQuote) }
 
-    fun getActions(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.LabeledAction<Output.Action>> =
+    fun getActions(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item<Action>> =
         all.flatMap { it.getActions(point, uriQuote) }
+
+    fun getAutomations(context: Context): List<Automation> = all.flatMap { it.getAutomations(context) }
+
+    fun findAutomation(type: Automation.Type, packageName: String?): Automation? =
+        all.firstNotNullOfOrNull { it.findAutomation(type, packageName) }
 
     fun getChips(
         position: Position,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ): List<Output.LabeledAction<Output.Action>> =
+    ): List<Output.Item<Action>> =
         all.flatMap { it.getChips(position, uriQuote) }
 
     fun genRandomUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
         all.randomOrNull()?.getActions(Position.genRandomPosition(), uriQuote)
-            ?.firstNotNullOfOrNull { (it.action as? Output.Action.Copy)?.text }
+            ?.firstNotNullOfOrNull { (it.action as? Action.Copy)?.text }
 }

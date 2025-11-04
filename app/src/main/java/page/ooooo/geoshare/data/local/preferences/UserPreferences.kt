@@ -12,7 +12,8 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.Automation
+import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -162,41 +163,17 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-private enum class AutomationType {
-    COPY_APPLE_MAPS_URI,
-    COPY_COORDS_DEC,
-    COPY_COORDS_NSWE_DEC,
-    COPY_GEO_URI,
-    COPY_GOOGLE_MAPS_URI,
-    COPY_MAGIC_EARTH_URI,
-    NOOP,
-    OPEN_APP,
-    SAVE_GPX,
-    SHARE,
-}
-
-val automation = object : OptionsUserPreference<AutomationImpl>(
-    default = AutomationImpl.Noop(),
+val automation = object : OptionsUserPreference<Automation?>(
+    default = null,
     options = {
         val context = LocalContext.current
-        listOf(
-            AutomationImpl.Noop() to Modifier,
-            AutomationImpl.CopyCoordsDec() to Modifier.testTag("geoShareUserPreferenceAutomationCopyCoordsDec"),
-            AutomationImpl.CopyCoordsDegMinSec() to Modifier,
-            AutomationImpl.CopyGeoUri() to Modifier,
-            AutomationImpl.CopyGoogleMapsUri() to Modifier,
-            AutomationImpl.CopyAppleMapsUri() to Modifier,
-            AutomationImpl.CopyMagicEarthUri() to Modifier,
-            AutomationImpl.SaveGpx() to Modifier,
-            AutomationImpl.Share() to Modifier,
-            *IntentTools().queryGeoUriApps(context.packageManager)
-                .map { app ->
-                    AutomationImpl.OpenApp(app.packageName) to
-                            Modifier.testTag("geoShareUserPreferenceAutomationOpenApp_${app.packageName}")
-                }
-                .toTypedArray(),
-        ).map { (automation, modifier) ->
-            UserPreferenceOption(automation, modifier) { automation.Label() }
+        Outputs.getAutomations(context).map { automation ->
+            UserPreferenceOption(
+                value = automation,
+                modifier = automation.testTag?.let { Modifier.testTag(it) } ?: Modifier,
+            ) {
+                automation.Label()
+            }
         }
     }
 ) {
@@ -205,40 +182,16 @@ val automation = object : OptionsUserPreference<AutomationImpl>(
 
     override fun getValue(values: UserPreferencesValues) = values.automationValue
 
-    override fun getValue(preferences: Preferences): AutomationImpl {
-        val type = preferences[typeKey]?.let(AutomationType::valueOf) ?: return default
-        return when (type) {
-            AutomationType.COPY_APPLE_MAPS_URI -> AutomationImpl.CopyAppleMapsUri()
-            AutomationType.COPY_COORDS_DEC -> AutomationImpl.CopyCoordsDec()
-            AutomationType.COPY_COORDS_NSWE_DEC -> AutomationImpl.CopyCoordsDegMinSec()
-            AutomationType.COPY_GEO_URI -> AutomationImpl.CopyGeoUri()
-            AutomationType.COPY_GOOGLE_MAPS_URI -> AutomationImpl.CopyGoogleMapsUri()
-            AutomationType.COPY_MAGIC_EARTH_URI -> AutomationImpl.CopyMagicEarthUri()
-            AutomationType.NOOP -> AutomationImpl.Noop()
-            AutomationType.OPEN_APP -> preferences[packageNameKey]?.takeIf { it.isNotEmpty() }?.let { packageName ->
-                AutomationImpl.OpenApp(packageName)
-            } ?: AutomationImpl.Noop()
+    override fun getValue(preferences: Preferences): Automation? =
+        preferences[typeKey]?.let(Automation.Type::valueOf)?.let { type ->
+            preferences[packageNameKey]?.ifEmpty { null }.let { packageName ->
+                Outputs.findAutomation(type, packageName)
+            }
+        } ?: default
 
-            AutomationType.SAVE_GPX -> AutomationImpl.SaveGpx()
-            AutomationType.SHARE -> AutomationImpl.Share()
-        }
-    }
-
-    override fun setValue(preferences: MutablePreferences, value: AutomationImpl) {
-        val (type, packageName) = when (value) {
-            is AutomationImpl.CopyAppleMapsUri -> AutomationType.COPY_APPLE_MAPS_URI to ""
-            is AutomationImpl.CopyCoordsDec -> AutomationType.COPY_COORDS_DEC to ""
-            is AutomationImpl.CopyCoordsDegMinSec -> AutomationType.COPY_COORDS_NSWE_DEC to ""
-            is AutomationImpl.CopyGeoUri -> AutomationType.COPY_GEO_URI to ""
-            is AutomationImpl.CopyGoogleMapsUri -> AutomationType.COPY_GOOGLE_MAPS_URI to ""
-            is AutomationImpl.CopyMagicEarthUri -> AutomationType.COPY_MAGIC_EARTH_URI to ""
-            is AutomationImpl.Noop -> AutomationType.NOOP to ""
-            is AutomationImpl.OpenApp -> AutomationType.OPEN_APP to value.packageName
-            is AutomationImpl.SaveGpx -> AutomationType.SAVE_GPX to ""
-            is AutomationImpl.Share -> AutomationType.SHARE to ""
-        }
-        preferences[typeKey] = type.name
-        preferences[packageNameKey] = packageName
+    override fun setValue(preferences: MutablePreferences, value: Automation?) {
+        preferences[typeKey] = value?.type?.name ?: ""
+        preferences[packageNameKey] = value?.packageName ?: ""
     }
 
     @Composable
@@ -276,7 +229,7 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    val automationValue: AutomationImpl = automation.loading,
+    val automationValue: Automation? = automation.loading,
     val changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
     val connectionPermissionValue: Permission = connectionPermission.loading,
     val introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,

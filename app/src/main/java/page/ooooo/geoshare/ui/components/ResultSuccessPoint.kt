@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -29,7 +29,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessPoint(
     i: Int,
     point: Point,
-    onRun: (action: Output.Action) -> Unit,
+    onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
@@ -59,7 +59,7 @@ fun ResultSuccessPoint(
         }
     }
     ResultSuccessSheet(
-        labeledActions = Outputs.getActions(point),
+        items = Outputs.getActions(point),
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
         onRun = onRun,

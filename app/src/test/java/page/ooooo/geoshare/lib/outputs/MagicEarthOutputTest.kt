@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.outputs
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
@@ -11,34 +12,33 @@ class MagicEarthOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
 
     @Test
-    fun getPositionUriString_whenPositionHasCoordinatesAndZoom_returnsUriWithCoordinatesAndZoom() {
+    fun getActions_whenPositionHasCoordinatesAndZoom_returnsUriWithCoordinatesAndZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            "magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4",
-            MagicEarthOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).value,
+            Action.Copy("magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4"),
+            MagicEarthOutput.getActions(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).first().action,
         )
     }
 
     @Test
-    fun getPositionUriString_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithCoordinatesAndQueryAndZoom() {
+    fun getActions_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithCoordinatesAndQueryAndZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            "magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4",
-            MagicEarthOutput.getPositionUriString(
-                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
-            ).value,
+            Action.Copy("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4"),
+            MagicEarthOutput.getActions(Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote)
+                .first().action,
         )
     }
 
     @Test
-    fun getPointUriStrings_returnsDriveToAndDriveViaUriStrings() {
+    fun getActions_returnsDriveToAndDriveViaUriStrings() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             listOf(
-                "magicearth://?drive_to&lat=50.123456&lon=-11.123456",
-                "magicearth://?drive_via&lat=50.123456&lon=-11.123456",
+                Action.Copy("magicearth://?drive_to&lat=50.123456&lon=-11.123456"),
+                Action.Copy("magicearth://?drive_via&lat=50.123456&lon=-11.123456"),
             ),
-            MagicEarthOutput.getPointUriStrings(Point("50.123456", "-11.123456"), uriQuote).map { it.value },
+            MagicEarthOutput.getActions(Point("50.123456", "-11.123456"), uriQuote).slice(1..2).map { it.action },
         )
     }
 }

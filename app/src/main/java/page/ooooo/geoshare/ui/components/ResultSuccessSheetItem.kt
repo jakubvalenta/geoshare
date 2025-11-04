@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -36,9 +36,9 @@ private fun DefaultPreview() {
             Column {
                 val point = Point.example
                 val labeledActions = Outputs.getActions(point)
-                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Output.Action.Copy }
+                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Action.Copy }
                 labeledCopyActions.forEach { (action, label) ->
-                    ResultSuccessSheetItem(label, supportingText = (action as Output.Action.Copy).text, onClick = {})
+                    ResultSuccessSheetItem(label, supportingText = (action as Action.Copy).text, onClick = {})
                 }
                 HorizontalDivider()
                 labeledOtherActions.forEach { (_, label) ->
@@ -57,9 +57,9 @@ private fun DarkPreview() {
             Column {
                 val point = Point.example
                 val labeledActions = Outputs.getActions(point)
-                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Output.Action.Copy }
+                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Action.Copy }
                 labeledCopyActions.forEach { (action, label) ->
-                    ResultSuccessSheetItem(label, supportingText = (action as Output.Action.Copy).text, onClick = {})
+                    ResultSuccessSheetItem(label, supportingText = (action as Action.Copy).text, onClick = {})
                 }
                 HorizontalDivider()
                 labeledOtherActions.forEach { (_, label) ->

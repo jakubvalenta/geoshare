@@ -35,12 +35,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
+import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -129,7 +129,7 @@ fun ConversionScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onRetry: (newUriString: String) -> Unit,
-    onRun: (action: Output.Action) -> Unit,
+    onRun: (action: Action) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val coroutineScope = rememberCoroutineScope()
@@ -262,7 +262,7 @@ fun ConversionScreen(
         bottomPane = when {
             (loadingIndicatorTitleResId == null && currentState is HasError) -> {
                 {
-                    TextButton({ onRun(Output.Action.Copy(currentState.inputUriString)) }) {
+                    TextButton({ onRun(Action.Copy(currentState.inputUriString)) }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
                                 start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
@@ -274,7 +274,7 @@ fun ConversionScreen(
 
             (loadingIndicatorTitleResId == null && currentState is HasResult) -> {
                 {
-                    TextButton({ onRun(Output.Action.Copy(currentState.inputUriString)) }) {
+                    TextButton({ onRun(Action.Copy(currentState.inputUriString)) }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
                                 start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
@@ -368,7 +368,7 @@ private fun DefaultPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                AutomationImpl.Noop(),
+                CoordinatesOutput.NoopAutomation,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -407,7 +407,7 @@ private fun DarkPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                AutomationImpl.Noop(),
+                CoordinatesOutput.NoopAutomation,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -446,7 +446,7 @@ private fun TabletPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                AutomationImpl.Noop(),
+                CoordinatesOutput.NoopAutomation,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -489,7 +489,7 @@ private fun AutomationPreview() {
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+                GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -532,7 +532,7 @@ private fun DarkAutomationPreview() {
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+                GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -575,7 +575,7 @@ private fun TabletAutomationPreview() {
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME)
+                GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,

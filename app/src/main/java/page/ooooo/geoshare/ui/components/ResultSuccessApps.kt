@@ -23,6 +23,7 @@ import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.MagicEarthOutput
@@ -45,7 +46,7 @@ private val dropdownButtonOffset = 20.dp
 fun ResultSuccessApps(
     apps: List<IntentTools.App>,
     position: Position,
-    onRun: (action: Output.Action) -> Unit,
+    onRun: (action: Action) -> Unit,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val spacing = LocalSpacing.current
@@ -59,12 +60,12 @@ fun ResultSuccessApps(
         add(GridItem.ShareButton())
         repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
-    val openAppLabeledActions: List<Output.LabeledAction<Output.Action.OpenApp>> =
+    val openAppItems: List<Output.Item<Action.OpenApp>> =
         Outputs.getActions(position).mapNotNull { (action, label) ->
-            if (action is Output.Action.OpenApp) Output.LabeledAction(action, label) else null
+            if (action is Action.OpenApp) Output.Item(action, label) else null
         }
-    val openChooserAction: Output.Action.OpenChooser? =
-        Outputs.getActions(position).firstNotNullOfOrNull { it.action as? Output.Action.OpenChooser }
+    val openChooserAction: Action.OpenChooser? =
+        Outputs.getActions(position).firstNotNullOfOrNull { it.action as? Action.OpenChooser }
 
     Column(
         Modifier
@@ -81,7 +82,7 @@ fun ResultSuccessApps(
                                 packageName = app.packageName,
                                 label = app.label,
                                 icon = app.icon,
-                                labeledActions = openAppLabeledActions.filter { (action) -> action.packageName == app.packageName },
+                                items = openAppItems.filter { (action) -> action.packageName == app.packageName },
                                 onRun = onRun,
                             )
                         }
@@ -101,8 +102,8 @@ fun RowScope.ResultSuccessApp(
     packageName: String,
     label: String,
     icon: Drawable,
-    labeledActions: List<Output.LabeledAction<Output.Action.OpenApp>>,
-    onRun: (action: Output.Action) -> Unit,
+    items: List<Output.Item<Action.OpenApp>>,
+    onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var menuExpanded by remember { mutableStateOf(false) }
@@ -112,7 +113,7 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                labeledActions.firstOrNull()?.action?.let(onRun)
+                items.firstOrNull()?.action?.let(onRun)
             }
             .weight(1f)
             .testTag("geoShareResultCardApp_${packageName}"),
@@ -126,7 +127,7 @@ fun RowScope.ResultSuccessApp(
                 rememberDrawablePainter(icon),
                 label,
             )
-            labeledActions.takeIf { it.size > 1 }?.let {
+            items.takeIf { it.size > 1 }?.let {
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -146,7 +147,7 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        labeledActions.forEach { (action, label) ->
+                        items.forEach { (action, label) ->
                             DropdownMenuItem(
                                 text = { Text(label()) },
                                 onClick = { onRun(action) },
@@ -199,7 +200,7 @@ private fun DefaultPreview() {
                 ResultSuccessApps(
                     apps = List(8) { index ->
                         IntentTools.App(
-                            if (index % 2 == 0) BuildConfig.APPLICATION_ID else MagicEarthOutput.packageNames[0],
+                            if (index % 2 == 0) BuildConfig.APPLICATION_ID else MagicEarthOutput.PACKAGE_NAME,
                             "My Map ${index + 1}",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
@@ -222,7 +223,7 @@ private fun DarkPreview() {
                 ResultSuccessApps(
                     apps = List(8) { index ->
                         IntentTools.App(
-                            if (index % 2 == 0) BuildConfig.APPLICATION_ID else MagicEarthOutput.packageNames[0],
+                            if (index % 2 == 0) BuildConfig.APPLICATION_ID else MagicEarthOutput.PACKAGE_NAME,
                             "My Map ${index + 1}",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )

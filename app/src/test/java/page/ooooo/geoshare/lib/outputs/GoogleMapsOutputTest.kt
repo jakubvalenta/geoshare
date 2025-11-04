@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.outputs
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
@@ -10,28 +11,27 @@ class GoogleMapsOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
 
     @Test
-    fun getPositionUriString_whenUriHasCoordinatesAndZoom_returnsCoordinatesAsQueryAndZoom() {
+    fun getActions_whenUriHasCoordinatesAndZoom_returnsCoordinatesAsQueryAndZoom() {
         assertEquals(
-            "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
-            GoogleMapsOutput.getPositionUriString(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).value,
+            listOf(Action.Copy("https://www.google.com/maps?q=50.123456,-11.123456&z=3.4")),
+            GoogleMapsOutput.getActions(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).map { it.action },
         )
     }
 
     @Test
-    fun getPositionUriString_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
+    fun getActions_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         assertEquals(
-            "https://www.google.com/maps?q=foo%20bar&z=3.4",
-            GoogleMapsOutput.getPositionUriString(Position(q = "foo bar", z = "3.4"), uriQuote).value,
+            listOf(Action.Copy("https://www.google.com/maps?q=foo%20bar&z=3.4")),
+            GoogleMapsOutput.getActions(Position(q = "foo bar", z = "3.4"), uriQuote).map { it.action },
         )
     }
 
     @Test
-    fun getPositionUriString_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
+    fun getActions_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
-            "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
-            GoogleMapsOutput.getPositionUriString(
-                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote
-            ).value,
+            listOf(Action.Copy("https://www.google.com/maps?q=50.123456,-11.123456&z=3.4")),
+            GoogleMapsOutput.getActions(Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote)
+                .map { it.action },
         )
     }
 }

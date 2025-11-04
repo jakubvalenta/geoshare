@@ -17,12 +17,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
-import page.ooooo.geoshare.lib.outputs.Output
 import javax.inject.Inject
 
 @HiltViewModel
@@ -96,7 +94,7 @@ class ConversionViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val automation: StateFlow<Automation> = userPreferencesValues.mapLatest {
+    val automation: StateFlow<Automation?> = userPreferencesValues.mapLatest {
         it.automationValue
     }.stateIn(
         viewModelScope,
@@ -204,17 +202,17 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun runAction(runContext: ConversionRunContext, action: Output.Action) {
+    fun runAction(runContext: ConversionRunContext, action: Action) {
         viewModelScope.launch {
             val success = action.run(intentTools, runContext)
             if (!success) {
-                if (action is Output.Action.OpenApp) {
+                if (action is Action.OpenApp) {
                     Toast.makeText(
                         runContext.context,
                         R.string.conversion_automation_open_app_failed,
                         Toast.LENGTH_SHORT
                     ).show()
-                } else if (action is Output.Action.OpenChooser) {
+                } else if (action is Action.OpenChooser) {
                     Toast.makeText(
                         runContext.context,
                         R.string.conversion_succeeded_apps_not_found,

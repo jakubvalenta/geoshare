@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import page.ooooo.geoshare.data.DefaultUserPreferencesRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -47,7 +46,7 @@ class FakeUserPreferencesRepository @Inject constructor() :
 }
 
 val defaultFakeUserPreferences = UserPreferencesValues(
-    automationValue = AutomationImpl.Noop(),
+    automationValue = null,
     changelogShownForVersionCodeValue = 22,
     connectionPermissionValue = Permission.ALWAYS,
     introShownForVersionCodeValue = 0,

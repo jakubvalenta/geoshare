@@ -17,9 +17,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -28,7 +28,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
-    onRun: (action: Output.Action) -> Unit,
+    onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
@@ -83,7 +83,7 @@ fun ResultSuccessCoordinates(
         },
     )
     ResultSuccessSheet(
-        labeledActions = Outputs.getActions(position),
+        items = Outputs.getActions(position),
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
         onRun = onRun,
