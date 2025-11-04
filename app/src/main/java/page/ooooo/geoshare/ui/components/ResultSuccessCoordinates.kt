@@ -83,7 +83,7 @@ fun ResultSuccessCoordinates(
         },
     )
     ResultSuccessSheet(
-        items = Outputs.getActions(position),
+        items = Outputs.getActions(position).filter { it.action !is Action.OpenApp },
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
         onRun = onRun,

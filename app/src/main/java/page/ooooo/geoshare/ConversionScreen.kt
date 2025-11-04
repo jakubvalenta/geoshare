@@ -39,7 +39,6 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -368,7 +367,7 @@ private fun DefaultPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                CoordinatesOutput.NoopAutomation,
+                Automation.Noop,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -407,7 +406,7 @@ private fun DarkPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                CoordinatesOutput.NoopAutomation,
+                Automation.Noop,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -446,7 +445,7 @@ private fun TabletPreview() {
             currentState = AutomationFinished(
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 Position.example,
-                CoordinatesOutput.NoopAutomation,
+                Automation.Noop,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,

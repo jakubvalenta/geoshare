@@ -24,7 +24,7 @@ object GeoUriOutput : Output {
 
     object CopyGeoUriAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_GEO_URI
-        override val packageName = null
+        override val packageName = ""
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
@@ -41,7 +41,7 @@ object GeoUriOutput : Output {
 
     object ShareGeoUriAutomation : Automation.HasErrorMessage, Automation.HasSuccessMessage, Automation.HasDelay {
         override val type = Automation.Type.SHARE
-        override val packageName = null
+        override val packageName = ""
         override val testTag = null
 
         override val delay = 5.seconds
@@ -66,7 +66,7 @@ object GeoUriOutput : Output {
     }
 
     @Immutable
-    class OpenAppAutomation(override val packageName: String) :
+    data class OpenAppAutomation(override val packageName: String) :
         Automation.HasSuccessMessage,
         Automation.HasErrorMessage,
         Automation.HasDelay {

@@ -60,12 +60,8 @@ fun ResultSuccessApps(
         add(GridItem.ShareButton())
         repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
-    val openAppItems: List<Output.Item<Action.OpenApp>> =
-        Outputs.getActions(position).mapNotNull { (action, label) ->
-            if (action is Action.OpenApp) Output.Item(action, label) else null
-        }
-    val openChooserAction: Action.OpenChooser? =
-        Outputs.getActions(position).firstNotNullOfOrNull { it.action as? Action.OpenChooser }
+    val openAppItems: List<Output.Item<Action.OpenApp>> = Outputs.getActions(position)
+        .mapNotNull { (action, label) -> if (action is Action.OpenApp) Output.Item(action, label) else null }
 
     Column(
         Modifier
@@ -79,15 +75,17 @@ fun ResultSuccessApps(
                     when (gridItem) {
                         is GridItem.App -> gridItem.let { (app) ->
                             ResultSuccessApp(
+                                position = position,
                                 packageName = app.packageName,
                                 label = app.label,
                                 icon = app.icon,
-                                items = openAppItems.filter { (action) -> action.packageName == app.packageName },
+                                openAppItems = openAppItems.filter { (action) -> action.packageName == app.packageName },
                                 onRun = onRun,
                             )
                         }
 
-                        is GridItem.ShareButton -> ResultSuccessAppShare { openChooserAction?.let(onRun) }
+                        is GridItem.ShareButton -> ResultSuccessAppShare(position, onRun)
+
                         is GridItem.Empty -> ResultSuccessAppEmpty()
                     }
                 }
@@ -99,10 +97,11 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
+    position: Position,
     packageName: String,
     label: String,
     icon: Drawable,
-    items: List<Output.Item<Action.OpenApp>>,
+    openAppItems: List<Output.Item<Action.OpenApp>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -113,7 +112,7 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                items.firstOrNull()?.action?.let(onRun)
+                onRun(Action.OpenApp(packageName, position.toGeoUriString()))
             }
             .weight(1f)
             .testTag("geoShareResultCardApp_${packageName}"),
@@ -127,7 +126,7 @@ fun RowScope.ResultSuccessApp(
                 rememberDrawablePainter(icon),
                 label,
             )
-            items.takeIf { it.size > 1 }?.let {
+            openAppItems.takeIf { it.size > 1 }?.let {
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -147,7 +146,7 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        items.forEach { (action, label) ->
+                        openAppItems.forEach { (action, label) ->
                             DropdownMenuItem(
                                 text = { Text(label()) },
                                 onClick = { onRun(action) },
@@ -167,10 +166,10 @@ fun RowScope.ResultSuccessApp(
 }
 
 @Composable
-fun RowScope.ResultSuccessAppShare(onClick: () -> Unit) {
+fun RowScope.ResultSuccessAppShare(position: Position, onRun: (action: Action) -> Unit) {
     Column(Modifier.weight(1f)) {
         FilledIconButton(
-            onClick,
+            { onRun(Action.OpenChooser(position.toGeoUriString())) },
             Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(iconSize),

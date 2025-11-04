@@ -2001,9 +2001,9 @@ class ConversionStateTest {
     fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsAutomationReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
-        val automationValue = CoordinatesOutput.NoopAutomation
+        val automationValue = Automation.Noop
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(automation) } doReturn CoordinatesOutput.NoopAutomation
+            onBlocking { getValue(automation) } doReturn Automation.Noop
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -2136,7 +2136,7 @@ class ConversionStateTest {
     fun automationReady_automationIsNoop_returnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
-        val automationValue = CoordinatesOutput.NoopAutomation
+        val automationValue = Automation.Noop
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
         val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)

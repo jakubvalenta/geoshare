@@ -13,22 +13,9 @@ import page.ooooo.geoshare.lib.UriQuote
 
 object CoordinatesOutput : Output {
 
-    object NoopAutomation : Automation.Noop {
-        override val type = Automation.Type.NOOP
-        override val packageName = null
-        override val testTag = null
-
-        override fun getAction(position: Position, uriQuote: UriQuote) = null
-
-        @Composable
-        override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_nothing))
-        }
-    }
-
     object CopyCoordsDecAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_COORDS_DEC
-        override val packageName = null
+        override val packageName = ""
         override val testTag = "geoShareUserPreferenceAutomationCopyCoordsDec"
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
@@ -50,7 +37,7 @@ object CoordinatesOutput : Output {
 
     object CopyCoordsDegMinSecAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_COORDS_NSWE_DEC
-        override val packageName = null
+        override val packageName = ""
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
@@ -90,20 +77,15 @@ object CoordinatesOutput : Output {
         Output.Item(Action.Copy(point.toCoordsDecString())) {
             stringResource(R.string.conversion_succeeded_copy_coordinates)
         },
-        Output.Item(Action.OpenChooser(point.toGeoUriString(uriQuote = uriQuote))) {
-            stringResource(R.string.conversion_succeeded_share)
-        },
     )
 
     override fun getAutomations(context: Context): List<Automation> = listOf(
-        NoopAutomation,
         CopyCoordsDecAutomation,
         CopyCoordsDegMinSecAutomation,
     )
 
     override fun findAutomation(type: Automation.Type, packageName: String?) =
         when (type) {
-            Automation.Type.NOOP -> NoopAutomation
             Automation.Type.COPY_COORDS_DEC -> CopyCoordsDecAutomation
             Automation.Type.COPY_COORDS_NSWE_DEC -> CopyCoordsDegMinSecAutomation
             else -> null

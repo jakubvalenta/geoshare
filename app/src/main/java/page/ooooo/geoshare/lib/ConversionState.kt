@@ -422,10 +422,10 @@ data class AutomationReady(
     val runContext: ConversionRunContext,
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation?,
+    val automation: Automation,
 ) : ConversionState(), HasResult {
     override suspend fun transition(): State =
-        automation?.getAction(position, stateContext.uriQuote).let { outputAction ->
+        automation.getAction(position, stateContext.uriQuote).let { outputAction ->
             when (outputAction?.run(stateContext.intentTools, runContext)) {
                 true if automation is Automation.HasSuccessMessage ->
                     AutomationSucceeded(inputUriString, position, automation)
@@ -471,5 +471,5 @@ data class AutomationFailed(
 data class AutomationFinished(
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation?,
+    val automation: Automation,
 ) : ConversionState(), HasResult

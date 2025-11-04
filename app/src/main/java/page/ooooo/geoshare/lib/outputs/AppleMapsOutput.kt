@@ -17,7 +17,7 @@ object AppleMapsOutput : Output {
 
     object CopyLinkAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_APPLE_MAPS_URI
-        override val packageName = null
+        override val packageName = ""
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
@@ -45,9 +45,6 @@ object AppleMapsOutput : Output {
     override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
         Output.Item(Action.Copy(formatUriString(point, uriQuote))) {
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-        },
-        Output.Item(Action.OpenChooser(formatUriString(point, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_open_app, AppleMapsUrlConverter.NAME)
         },
     )
 

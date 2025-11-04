@@ -94,7 +94,7 @@ class ConversionViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val automation: StateFlow<Automation?> = userPreferencesValues.mapLatest {
+    val automation: StateFlow<Automation> = userPreferencesValues.mapLatest {
         it.automationValue
     }.stateIn(
         viewModelScope,

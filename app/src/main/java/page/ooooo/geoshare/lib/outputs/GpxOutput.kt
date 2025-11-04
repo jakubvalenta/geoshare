@@ -13,7 +13,7 @@ object GpxOutput : Output {
 
     object SaveAutomation : Automation.HasSuccessMessage, Automation.HasErrorMessage, Automation.HasDelay {
         override val type = Automation.Type.SAVE_GPX
-        override val packageName = null
+        override val packageName = ""
         override val testTag = null
 
         override val delay = 5.seconds
@@ -40,7 +40,7 @@ object GpxOutput : Output {
 
     override fun getText(point: Point, uriQuote: UriQuote) = null
 
-    override fun getActions(position: Position, uriQuote: UriQuote) = getChips(position, uriQuote)
+    override fun getActions(position: Position, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
 
     override fun getActions(point: Point, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
 

@@ -163,11 +163,14 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-val automation = object : OptionsUserPreference<Automation?>(
-    default = null,
+val automation = object : OptionsUserPreference<Automation>(
+    default = Automation.Noop,
     options = {
         val context = LocalContext.current
-        Outputs.getAutomations(context).map { automation ->
+        buildList {
+            add(Automation.Noop)
+            addAll(Outputs.getAutomations(context))
+        }.map { automation ->
             UserPreferenceOption(
                 value = automation,
                 modifier = automation.testTag?.let { Modifier.testTag(it) } ?: Modifier,
@@ -182,16 +185,16 @@ val automation = object : OptionsUserPreference<Automation?>(
 
     override fun getValue(values: UserPreferencesValues) = values.automationValue
 
-    override fun getValue(preferences: Preferences): Automation? =
+    override fun getValue(preferences: Preferences): Automation =
         preferences[typeKey]?.let(Automation.Type::valueOf)?.let { type ->
             preferences[packageNameKey]?.ifEmpty { null }.let { packageName ->
                 Outputs.findAutomation(type, packageName)
             }
         } ?: default
 
-    override fun setValue(preferences: MutablePreferences, value: Automation?) {
-        preferences[typeKey] = value?.type?.name ?: ""
-        preferences[packageNameKey] = value?.packageName ?: ""
+    override fun setValue(preferences: MutablePreferences, value: Automation) {
+        preferences[typeKey] = value.type.name
+        preferences[packageNameKey] = value.packageName
     }
 
     @Composable
@@ -229,7 +232,7 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    val automationValue: Automation? = automation.loading,
+    val automationValue: Automation = automation.loading,
     val changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
     val connectionPermissionValue: Permission = connectionPermission.loading,
     val introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,

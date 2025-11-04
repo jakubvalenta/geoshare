@@ -16,7 +16,7 @@ object MagicEarthOutput : Output {
 
     object CopyLinkAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_MAGIC_EARTH_URI
-        override val packageName = null
+        override val packageName = ""
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =

@@ -1,7 +1,10 @@
 package page.ooooo.geoshare.lib
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.res.stringResource
+import page.ooooo.geoshare.R
 import kotlin.time.Duration
 
 sealed interface Automation {
@@ -21,7 +24,7 @@ sealed interface Automation {
     }
 
     val type: Type
-    val packageName: String?
+    val packageName: String
     val testTag: String?
 
     fun getAction(position: Position, uriQuote: UriQuote = DefaultUriQuote()): Action?
@@ -29,7 +32,18 @@ sealed interface Automation {
     @Composable
     fun Label()
 
-    interface Noop : Automation
+    object Noop : Automation {
+        override val type = Type.NOOP
+        override val packageName = ""
+        override val testTag = null
+
+        override fun getAction(position: Position, uriQuote: UriQuote) = null
+
+        @Composable
+        override fun Label() {
+            Text(stringResource(R.string.user_preferences_automation_nothing))
+        }
+    }
 
     interface HasDelay : Automation {
         val delay: Duration
