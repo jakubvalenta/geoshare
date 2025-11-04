@@ -8,22 +8,6 @@ class PositionTest {
     private val uriQuote = FakeUriQuote()
 
     @Test
-    fun toParamsString_returnsQueryAndZoomButNotPoints() {
-        assertEquals(
-            "foo bar \u2022 z3.4",
-            Position(
-                q = "foo bar",
-                z = "3.4",
-                points = persistentListOf(
-                    Point("59.1293656", "11.4585672"),
-                    Point("59.4154007", "11.659710599999999"),
-                    Point("59.147731699999994", "11.550661199999999"),
-                ),
-            ).toParamsString(" \u2022 "),
-        )
-    }
-
-    @Test
     fun toGpx() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>

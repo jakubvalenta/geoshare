@@ -30,20 +30,6 @@ data class Position(
 
     val mainPoint: Point? get() = points?.lastOrNull()
 
-    fun toParamsString(separator: String): String = buildList {
-        q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-            (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
-                val coords = "$lat,$lon"
-                if (q != coords) {
-                    add(q.replace('+', ' '))
-                }
-            }
-        }
-        z.takeUnless { it.isNullOrEmpty() }?.let { z ->
-            add("z$z")
-        }
-    }.joinToString(separator)
-
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
         append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")

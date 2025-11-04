@@ -46,7 +46,7 @@ fun ResultSuccessCoordinates(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            position.toParamsString("\t\t").takeIf { it.isNotEmpty() }?.let {
+            Outputs.getSupportingText(position).takeIf { it.isNotEmpty() }?.let {
                 SelectionContainer {
                     Text(
                         it,

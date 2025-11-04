@@ -100,7 +100,7 @@ abstract class BaseActivityBehaviorTest {
         val expectedCoordinatesText = Outputs.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedCoordinatesText }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
-            val expectedParamsText = expectedPosition.toParamsString("\t\t")
+            val expectedParamsText = Outputs.getSupportingText(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedParamsText }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })

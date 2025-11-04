@@ -15,6 +15,8 @@ interface Output {
 
     fun getText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String?
 
+    fun getSupportingText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
+
     fun getActions(
         position: Position,
         packageNames: List<String>,

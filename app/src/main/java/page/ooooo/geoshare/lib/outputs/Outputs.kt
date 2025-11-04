@@ -19,6 +19,9 @@ object Outputs {
     fun getText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String =
         default.getText(point, uriQuote)
 
+    fun getSupportingText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String =
+        default.getSupportingText(position, uriQuote)
+
     fun getActions(
         position: Position,
         packageNames: List<String>,

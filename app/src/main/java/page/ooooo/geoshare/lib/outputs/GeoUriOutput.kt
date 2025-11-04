@@ -130,6 +130,8 @@ object GeoUriOutput : Output {
 
     override fun getText(point: Point, uriQuote: UriQuote) = null
 
+    override fun getSupportingText(position: Position, uriQuote: UriQuote) = null
+
     override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
         listOf<Output.Item<Action>>(
             Output.Item(Action.Copy(formatUriString(position, uriQuote))) {

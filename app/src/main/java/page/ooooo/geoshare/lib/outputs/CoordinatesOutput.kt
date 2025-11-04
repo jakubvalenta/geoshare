@@ -13,6 +13,7 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.toDegMinSec
 import page.ooooo.geoshare.lib.toScale
+import kotlin.collections.isNullOrEmpty
 import kotlin.math.abs
 
 object CoordinatesOutput : Output {
@@ -72,6 +73,22 @@ object CoordinatesOutput : Output {
     override fun getText(position: Position, uriQuote: UriQuote) = formatDegMinSecString(position)
 
     override fun getText(point: Point, uriQuote: UriQuote) = formatDegMinSecString(point)
+
+    override fun getSupportingText(position: Position, uriQuote: UriQuote): String = position.run {
+        buildList {
+            q.takeUnless { it.isNullOrEmpty() }?.let { q ->
+                (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
+                    val coords = "$lat,$lon"
+                    if (q != coords) {
+                        add(q.replace('+', ' '))
+                    }
+                }
+            }
+            z.takeUnless { it.isNullOrEmpty() }?.let { z ->
+                add("z$z")
+            }
+        }.joinToString("\t\t")
+    }
 
     override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
         listOf<Output.Item<Action>>(

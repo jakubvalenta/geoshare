@@ -1,15 +1,36 @@
 package page.ooooo.geoshare.lib.outputs
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 
 class CoordinatesOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val packageNames: List<String> = emptyList()
+
+    @Test
+    fun getSupportingText_returnsQueryAndZoomButNotPoints() {
+        assertEquals(
+            "foo bar\t\tz3.4",
+            CoordinatesOutput.getSupportingText(
+                Position(
+                    q = "foo bar",
+                    z = "3.4",
+                    points = persistentListOf(
+                        Point("59.1293656", "11.4585672"),
+                        Point("59.4154007", "11.659710599999999"),
+                        Point("59.147731699999994", "11.550661199999999"),
+                    ),
+                ),
+                uriQuote,
+            )
+        )
+    }
 
     @Test
     fun getActions_returnsSouthWestForNegativeCoordinates() {
