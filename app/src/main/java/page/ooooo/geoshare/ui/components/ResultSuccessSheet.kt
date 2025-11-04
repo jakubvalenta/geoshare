@@ -42,7 +42,9 @@ fun ResultSuccessSheet(
                         }
                     }
                 }
-                HorizontalDivider()
+                if (labeledCopyActions.isNotEmpty() && labeledOtherActions.isNotEmpty()) {
+                    HorizontalDivider()
+                }
                 labeledOtherActions.forEach { (action, label) ->
                     ResultSuccessSheetItem(label) {
                         onRun(action)
