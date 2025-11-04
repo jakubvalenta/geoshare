@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Automation
+import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
@@ -93,9 +94,11 @@ data class UserPreferenceOption<T>(
 
 abstract class OptionsUserPreference<T>(
     val default: T,
-    val options: (@Composable () -> List<UserPreferenceOption<T>>),
 ) : UserPreference<T> {
     override val loading = default
+
+    @Composable
+    abstract fun options(): List<UserPreferenceOption<T>>
 
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
@@ -128,24 +131,24 @@ abstract class OptionsUserPreference<T>(
 
 val connectionPermission = object : OptionsUserPreference<Permission>(
     default = Permission.ASK,
-    options = {
-        listOf(
-            UserPreferenceOption(
-                Permission.ALWAYS,
-                Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
-            ) {
-                Text(stringResource(R.string.user_preferences_connection_option_always))
-            },
-            UserPreferenceOption(Permission.ASK) {
-                Text(stringResource(R.string.user_preferences_connection_option_ask))
-            },
-            UserPreferenceOption(Permission.NEVER) {
-                Text(stringResource(R.string.user_preferences_connection_option_never))
-            },
-        )
-    },
 ) {
     private val key = stringPreferencesKey("connect_to_google_permission")
+
+    @Composable
+    override fun options() = listOf(
+        UserPreferenceOption(
+            Permission.ALWAYS,
+            Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
+        ) {
+            Text(stringResource(R.string.user_preferences_connection_option_always))
+        },
+        UserPreferenceOption(Permission.ASK) {
+            Text(stringResource(R.string.user_preferences_connection_option_ask))
+        },
+        UserPreferenceOption(Permission.NEVER) {
+            Text(stringResource(R.string.user_preferences_connection_option_never))
+        },
+    )
 
     override fun getValue(values: UserPreferencesValues) = values.connectionPermissionValue
 
@@ -165,11 +168,17 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
 
 val automation = object : OptionsUserPreference<Automation>(
     default = Automation.Noop,
-    options = {
+) {
+    private val typeKey = stringPreferencesKey("automation")
+    private val packageNameKey = stringPreferencesKey("automation_package_name")
+
+    @Composable
+    override fun options(): List<UserPreferenceOption<Automation>> {
         val context = LocalContext.current
-        buildList {
+        val packageNames = IntentTools().queryGeoUriPackageNames(context.packageManager)
+        return buildList {
             add(Automation.Noop)
-            addAll(Outputs.getAutomations(context))
+            addAll(Outputs.getAutomations(packageNames))
         }.map { automation ->
             UserPreferenceOption(
                 value = automation,
@@ -179,9 +188,6 @@ val automation = object : OptionsUserPreference<Automation>(
             }
         }
     }
-) {
-    private val typeKey = stringPreferencesKey("automation")
-    private val packageNameKey = stringPreferencesKey("automation_package_name")
 
     override fun getValue(values: UserPreferencesValues) = values.automationValue
 

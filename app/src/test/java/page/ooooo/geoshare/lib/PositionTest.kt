@@ -24,54 +24,6 @@ class PositionTest {
     }
 
     @Test
-    fun toDegMinSecCoordsString_returnsSouthWestForNegativeCoordinates() {
-        assertEquals(
-            "17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W",
-            Position("-17.2165721", "-149.9470294").toDegMinSecCoordsString(),
-        )
-    }
-
-    @Test
-    fun toDegMinSecCoordsString_returnsNorthEastForPositiveCoordinates() {
-        assertEquals(
-            "52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E",
-            Position("52.5067296", "13.2599309").toDegMinSecCoordsString(),
-        )
-    }
-
-    @Test
-    fun toDegMinSecCoordsString_returnsZerosForZeroCoordinates() {
-        assertEquals(
-            "0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E",
-            Position("0", "0").toDegMinSecCoordsString(),
-        )
-    }
-
-    @Test
-    fun toDegMinSecCoordsString_returnsZeroDegForZeroDegCoordinates() {
-        assertEquals(
-            "0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E",
-            Position("0.5", "0.5").toDegMinSecCoordsString(),
-        )
-    }
-
-    @Test
-    fun toDegMinSecCoordsString_returnsZeroMinForZeroMinCoordinates() {
-        assertEquals(
-            "10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W",
-            Position("-10", "-20").toDegMinSecCoordsString(),
-        )
-    }
-
-    @Test
-    fun toDegMinSecCoordsString_returnsZerosSecForZeroSecCoordinates() {
-        assertEquals(
-            "10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W",
-            Position("-10.5", "-20.5").toDegMinSecCoordsString(),
-        )
-    }
-
-    @Test
     fun toGpx() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
@@ -21,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.IntentTools
@@ -33,7 +33,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed interface GridItem {
-    data class App(val app: IntentTools.App) : GridItem
+    data class App(val app: IntentTools.App, val items: List<Output.Item<Action.OpenApp>>) : GridItem
     class ShareButton : GridItem
     class Empty : GridItem
 }
@@ -44,24 +44,33 @@ private val dropdownButtonOffset = 20.dp
 
 @Composable
 fun ResultSuccessApps(
-    apps: List<IntentTools.App>,
-    position: Position,
+    items: List<Output.Item<Action>>,
     onRun: (action: Action) -> Unit,
+    intentTools: IntentTools = IntentTools(),
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
+    val context = LocalContext.current
     val spacing = LocalSpacing.current
     val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
         5
     } else {
         4
     }
-    val gridItems = buildList {
-        apps.forEach { add(GridItem.App(it)) }
+    val apps: Map<IntentTools.App, List<Output.Item<Action.OpenApp>>> = items
+        .mapNotNull { (action, label) -> (action as? Action.OpenApp)?.let { action -> Output.Item(action, label) } }
+        .groupBy { (action) -> action.packageName }
+        .mapNotNull { (packageName, items) ->
+            intentTools.queryApp(context.packageManager, packageName)?.let { app -> app to items }
+        }
+        .sortedBy { (app) -> app.label }
+        .toMap()
+    val grid = buildList {
+        apps.forEach { (app, items) -> add(GridItem.App(app, items)) }
         add(GridItem.ShareButton())
         repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
-    val openAppItems: List<Output.Item<Action.OpenApp>> = Outputs.getActions(position)
-        .mapNotNull { (action, label) -> if (action is Action.OpenApp) Output.Item(action, label) else null }
+    val openChooserAction: Action.OpenChooser? =
+        items.firstNotNullOfOrNull { (action) -> (action as? Action.OpenChooser) }
 
     Column(
         Modifier
@@ -69,22 +78,21 @@ fun ResultSuccessApps(
             .padding(top = spacing.large),
         verticalArrangement = Arrangement.spacedBy(spacing.large),
     ) {
-        gridItems.chunked(columnCount).forEach { row ->
+        grid.chunked(columnCount).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
-                        is GridItem.App -> gridItem.let { (app) ->
+                        is GridItem.App -> gridItem.let { (app, items) ->
                             ResultSuccessApp(
-                                position = position,
                                 packageName = app.packageName,
                                 label = app.label,
                                 icon = app.icon,
-                                openAppItems = openAppItems.filter { (action) -> action.packageName == app.packageName },
+                                items = items,
                                 onRun = onRun,
                             )
                         }
 
-                        is GridItem.ShareButton -> ResultSuccessAppShare(position, onRun)
+                        is GridItem.ShareButton -> ResultSuccessAppShare { openChooserAction?.let(onRun) }
 
                         is GridItem.Empty -> ResultSuccessAppEmpty()
                     }
@@ -97,11 +105,10 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
-    position: Position,
     packageName: String,
     label: String,
     icon: Drawable,
-    openAppItems: List<Output.Item<Action.OpenApp>>,
+    items: List<Output.Item<Action.OpenApp>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -112,7 +119,7 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                onRun(Action.OpenApp(packageName, position.toGeoUriString()))
+                items.firstOrNull()?.let { (action) -> onRun(action) }
             }
             .weight(1f)
             .testTag("geoShareResultCardApp_${packageName}"),
@@ -126,7 +133,7 @@ fun RowScope.ResultSuccessApp(
                 rememberDrawablePainter(icon),
                 label,
             )
-            openAppItems.takeIf { it.size > 1 }?.let {
+            items.takeIf { it.size > 1 }?.let {
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -146,7 +153,7 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        openAppItems.forEach { (action, label) ->
+                        items.forEach { (action, label) ->
                             DropdownMenuItem(
                                 text = { Text(label()) },
                                 onClick = { onRun(action) },
@@ -166,10 +173,10 @@ fun RowScope.ResultSuccessApp(
 }
 
 @Composable
-fun RowScope.ResultSuccessAppShare(position: Position, onRun: (action: Action) -> Unit) {
+fun RowScope.ResultSuccessAppShare(onClick: () -> Unit) {
     Column(Modifier.weight(1f)) {
         FilledIconButton(
-            { onRun(Action.OpenChooser(position.toGeoUriString())) },
+            onClick,
             Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(iconSize),
@@ -195,17 +202,29 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                @Suppress("SpellCheckingInspection")
+                val packageNames = listOf(
+                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
+                    MagicEarthOutput.PACKAGE_NAME,
+                    "app.comaps.fdroid",
+                    "app.organicmaps",
+                    "com.here.app.maps",
+                    "cz.seznam.mapy",
+                    "net.osmand.plus",
+                    "us.spotco.maps",
+                )
                 val context = LocalContext.current
+                val position = Position.example
                 ResultSuccessApps(
-                    apps = List(8) { index ->
-                        IntentTools.App(
-                            if (index % 2 == 0) BuildConfig.APPLICATION_ID else MagicEarthOutput.PACKAGE_NAME,
-                            "My Map ${index + 1}",
+                    items = Outputs.getActions(position, packageNames),
+                    onRun = {},
+                    intentTools = object : IntentTools() {
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                            packageName,
+                            "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
-                    },
-                    position = Position.example,
-                    onRun = {},
+                    }
                 )
             }
         }
@@ -218,17 +237,29 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                @Suppress("SpellCheckingInspection")
+                val packageNames = listOf(
+                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
+                    MagicEarthOutput.PACKAGE_NAME,
+                    "app.comaps.fdroid",
+                    "app.organicmaps",
+                    "com.here.app.maps",
+                    "cz.seznam.mapy",
+                    "net.osmand.plus",
+                    "us.spotco.maps",
+                )
                 val context = LocalContext.current
+                val position = Position.example
                 ResultSuccessApps(
-                    apps = List(8) { index ->
-                        IntentTools.App(
-                            if (index % 2 == 0) BuildConfig.APPLICATION_ID else MagicEarthOutput.PACKAGE_NAME,
-                            "My Map ${index + 1}",
+                    items = Outputs.getActions(position, packageNames),
+                    onRun = {},
+                    intentTools = object : IntentTools() {
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                            packageName,
+                            "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
-                    },
-                    position = Position.example,
-                    onRun = {},
+                    }
                 )
             }
         }
@@ -241,17 +272,21 @@ private fun OneAppPreview() {
     AppTheme {
         Surface {
             Column {
+                val packageNames = listOf(
+                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
+                )
                 val context = LocalContext.current
+                val position = Position.example
                 ResultSuccessApps(
-                    apps = listOf(
-                        IntentTools.App(
-                            BuildConfig.APPLICATION_ID,
-                            "My Map App",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-                        ),
-                    ),
-                    position = Position.example,
+                    items = Outputs.getActions(position, packageNames),
                     onRun = {},
+                    intentTools = object : IntentTools() {
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                            packageName,
+                            "$packageName label",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                        )
+                    }
                 )
             }
         }
@@ -264,17 +299,21 @@ private fun DarkOneAppPreview() {
     AppTheme {
         Surface {
             Column {
+                val packageNames = listOf(
+                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
+                )
                 val context = LocalContext.current
+                val position = Position.example
                 ResultSuccessApps(
-                    apps = listOf(
-                        IntentTools.App(
-                            BuildConfig.APPLICATION_ID,
-                            "My Map App",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
-                        ),
-                    ),
-                    position = Position.example,
+                    items = Outputs.getActions(position, packageNames),
                     onRun = {},
+                    intentTools = object : IntentTools() {
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                            packageName,
+                            "$packageName label",
+                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                        )
+                    }
                 )
             }
         }
@@ -288,8 +327,7 @@ private fun NoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
-                    apps = listOf(),
-                    position = Position.example,
+                    items = emptyList(),
                     onRun = {},
                 )
             }
@@ -304,8 +342,7 @@ private fun DarkNoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
-                    apps = listOf(),
-                    position = Position.example,
+                    items = emptyList(),
                     onRun = {},
                 )
             }

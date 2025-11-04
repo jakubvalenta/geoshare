@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.Action
@@ -16,11 +15,15 @@ interface Output {
 
     fun getText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String?
 
-    fun getActions(position: Position, uriQuote: UriQuote = DefaultUriQuote()): List<Item<Action>>
+    fun getActions(
+        position: Position,
+        packageNames: List<String>,
+        uriQuote: UriQuote = DefaultUriQuote(),
+    ): List<Item<Action>>
 
     fun getActions(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Item<Action>>
 
-    fun getAutomations(context: Context): List<Automation>
+    fun getAutomations(packageNames: List<String>): List<Automation>
 
     fun findAutomation(type: Automation.Type, packageName: String?): Automation?
 

@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.content.Context
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -39,11 +38,12 @@ object GoogleMapsOutput : Output {
 
     override fun getText(point: Point, uriQuote: UriQuote) = null
 
-    override fun getActions(position: Position, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
-        Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-        },
-    )
+    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
+        listOf<Output.Item<Action>>(
+            Output.Item(Action.Copy(formatUriString(position, uriQuote))) {
+                stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+            },
+        )
 
     override fun getActions(point: Point, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
         Output.Item(Action.Copy(formatUriString(point, uriQuote))) {
@@ -51,12 +51,14 @@ object GoogleMapsOutput : Output {
         },
     )
 
-    override fun getAutomations(context: Context): List<Automation> = listOf(
+    override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyLinkAutomation,
     )
 
-    override fun findAutomation(type: Automation.Type, packageName: String?) =
-        if (type == Automation.Type.COPY_GOOGLE_MAPS_URI) CopyLinkAutomation else null
+    override fun findAutomation(type: Automation.Type, packageName: String?) = when (type) {
+        Automation.Type.COPY_GOOGLE_MAPS_URI -> CopyLinkAutomation
+        else -> null
+    }
 
     override fun getChips(position: Position, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
         Output.Item(Action.Copy(formatUriString(position, uriQuote))) {

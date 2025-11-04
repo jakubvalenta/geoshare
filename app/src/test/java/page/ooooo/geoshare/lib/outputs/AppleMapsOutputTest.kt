@@ -9,12 +9,14 @@ import page.ooooo.geoshare.lib.UriQuote
 
 class AppleMapsOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
+    private val packageNames: List<String> = emptyList()
 
     @Test
     fun getActions_whenUriHasCoordinatesAndZoom_returnsCoordinatesAndZoom() {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
-            AppleMapsOutput.getActions(Position("50.123456", "-11.123456", z = "3.4"), uriQuote).map { it.action },
+            AppleMapsOutput.getActions(Position("50.123456", "-11.123456", z = "3.4"), packageNames, uriQuote)
+                .map { it.action },
         )
     }
 
@@ -22,7 +24,9 @@ class AppleMapsOutputTest {
     fun getActions_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
-            AppleMapsOutput.getActions(Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote)
+            AppleMapsOutput.getActions(
+                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), packageNames, uriQuote
+            )
                 .map { it.action },
         )
     }
@@ -31,7 +35,8 @@ class AppleMapsOutputTest {
     fun getActions_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?q=foo%20bar&z=3.4")),
-            AppleMapsOutput.getActions(Position(q = "foo bar", z = "3.4"), uriQuote).map { it.action },
+            AppleMapsOutput.getActions(Position(q = "foo bar", z = "3.4"), packageNames, uriQuote)
+                .map { it.action },
         )
     }
 }

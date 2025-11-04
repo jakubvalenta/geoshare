@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.content.Context
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -40,16 +39,19 @@ object GpxOutput : Output {
 
     override fun getText(point: Point, uriQuote: UriQuote) = null
 
-    override fun getActions(position: Position, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
+    override fun getActions(position: Position, packageNames: List<String>, uriQuote: UriQuote) =
+        emptyList<Output.Item<Action>>()
 
     override fun getActions(point: Point, uriQuote: UriQuote) = emptyList<Output.Item<Action>>()
 
-    override fun getAutomations(context: Context): List<Automation> = listOf(
+    override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         SaveAutomation,
     )
 
-    override fun findAutomation(type: Automation.Type, packageName: String?) =
-        if (type == Automation.Type.SAVE_GPX) SaveAutomation else null
+    override fun findAutomation(type: Automation.Type, packageName: String?) = when (type) {
+        Automation.Type.SAVE_GPX -> SaveAutomation
+        else -> null
+    }
 
     override fun getChips(position: Position, uriQuote: UriQuote) = listOf<Output.Item<Action>>(
         Output.Item(Action.SaveGpx()) {

@@ -17,7 +17,7 @@ import page.ooooo.geoshare.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-class IntentTools {
+open class IntentTools {
     companion object {
         const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
     }
@@ -67,7 +67,7 @@ class IntentTools {
         }
     }
 
-    fun queryApp(packageManager: PackageManager, packageName: String): App? {
+    open fun queryApp(packageManager: PackageManager, packageName: String): App? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
@@ -86,7 +86,7 @@ class IntentTools {
         }
     }
 
-    fun queryGeoUriApps(packageManager: PackageManager): List<App> {
+    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
@@ -96,18 +96,15 @@ class IntentTools {
             Log.e(null, "Error when querying apps that support geo: URIs", e)
             return emptyList()
         }
-        return resolveInfos.mapNotNull {
-            try {
-                App(
-                    it.activityInfo.packageName,
-                    it.activityInfo.loadLabel(packageManager).toString(),
-                    it.activityInfo.loadIcon(packageManager),
-                )
+        return resolveInfos.mapNotNull { resolveInfo ->
+            val packageName = try {
+                resolveInfo.activityInfo.packageName
             } catch (e: Exception) {
                 Log.e(null, "Error when loading info about an app that supports geo: URIs", e)
                 null
             }
-        }.filterNot { it.packageName == BuildConfig.APPLICATION_ID }.sortedBy { it.label }
+            packageName?.takeUnless { it == BuildConfig.APPLICATION_ID }
+        }
     }
 
     fun startActivity(context: Context, intent: Intent): Boolean = try {

@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
     companion object {
@@ -44,7 +45,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         nameResId = R.string.converter_coordinates_name,
         inputs = listOf(
             DocumentationInput.Text(20) {
-                stringResource(R.string.example, Position.example.toDegMinSecCoordsString())
+                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Position.example))
             },
         ),
     )

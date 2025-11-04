@@ -30,8 +30,6 @@ data class Position(
 
     val mainPoint: Point? get() = points?.lastOrNull()
 
-    fun toCoordsDecString(): String = (mainPoint ?: Point()).toCoordsDecString()
-
     fun toParamsString(separator: String): String = buildList {
         q.takeUnless { it.isNullOrEmpty() }?.let { q ->
             (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
@@ -45,11 +43,6 @@ data class Position(
             add("z$z")
         }
     }.joinToString(separator)
-
-    fun toGeoUriString(uriQuote: UriQuote = DefaultUriQuote()): String =
-        (mainPoint ?: Point()).toGeoUriString(q = q, z = z, uriQuote = uriQuote)
-
-    fun toDegMinSecCoordsString(): String = (mainPoint ?: Point()).toDegMinSecCoordsString()
 
     fun toGpx(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
         append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")

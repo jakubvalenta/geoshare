@@ -1,7 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.content.Context
-import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.*
 
 object Outputs {
@@ -23,14 +21,15 @@ object Outputs {
 
     fun getActions(
         position: Position,
+        packageNames: List<String>,
         uriQuote: UriQuote = DefaultUriQuote(),
     ): List<Output.Item<Action>> =
-        all.flatMap { it.getActions(position, uriQuote) }
+        all.flatMap { it.getActions(position, packageNames, uriQuote) }
 
     fun getActions(point: Point, uriQuote: UriQuote = DefaultUriQuote()): List<Output.Item<Action>> =
         all.flatMap { it.getActions(point, uriQuote) }
 
-    fun getAutomations(context: Context): List<Automation> = all.flatMap { it.getAutomations(context) }
+    fun getAutomations(packageNames: List<String>): List<Automation> = all.flatMap { it.getAutomations(packageNames) }
 
     fun findAutomation(type: Automation.Type, packageName: String?): Automation? =
         all.firstNotNullOfOrNull { it.findAutomation(type, packageName) }
@@ -42,6 +41,6 @@ object Outputs {
         all.flatMap { it.getChips(position, uriQuote) }
 
     fun genRandomUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
-        all.randomOrNull()?.getActions(Position.genRandomPosition(), uriQuote)
+        all.randomOrNull()?.getActions(Position.genRandomPosition(), emptyList(), uriQuote)
             ?.firstNotNullOfOrNull { (it.action as? Action.Copy)?.text }
 }

@@ -35,8 +35,8 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val point = Point.example
-                val labeledActions = Outputs.getActions(point)
-                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Action.Copy }
+                val items = Outputs.getActions(point)
+                val (labeledCopyActions, labeledOtherActions) = items.partition { (action) -> action is Action.Copy }
                 labeledCopyActions.forEach { (action, label) ->
                     ResultSuccessSheetItem(label, supportingText = (action as Action.Copy).text, onClick = {})
                 }
@@ -56,8 +56,8 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val point = Point.example
-                val labeledActions = Outputs.getActions(point)
-                val (labeledCopyActions, labeledOtherActions) = labeledActions.partition { it.action is Action.Copy }
+                val items = Outputs.getActions(point)
+                val (labeledCopyActions, labeledOtherActions) = items.partition { (action) -> action is Action.Copy }
                 labeledCopyActions.forEach { (action, label) ->
                     ResultSuccessSheetItem(label, supportingText = (action as Action.Copy).text, onClick = {})
                 }

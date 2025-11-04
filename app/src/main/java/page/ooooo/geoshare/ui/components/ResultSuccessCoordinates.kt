@@ -20,6 +20,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.Outputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -27,6 +28,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
+    items: List<Output.Item<Action>>,
     position: Position,
     onRun: (action: Action) -> Unit,
 ) {
@@ -83,7 +85,7 @@ fun ResultSuccessCoordinates(
         },
     )
     ResultSuccessSheet(
-        items = Outputs.getActions(position).filter { it.action !is Action.OpenApp },
+        items = items.filter { it.action !is Action.OpenApp },
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
         onRun = onRun,
@@ -101,6 +103,7 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position.example,
                 onRun = {},
             )
@@ -117,6 +120,7 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position.example,
                 onRun = {},
             )
@@ -133,6 +137,7 @@ private fun OneAppPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position.example,
                 onRun = {},
             )
@@ -149,6 +154,7 @@ private fun DarkOneAppPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position.example,
                 onRun = {},
             )
@@ -165,6 +171,7 @@ private fun ParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
                 onRun = {},
             )
@@ -181,6 +188,7 @@ private fun DarkParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
                 onRun = {},
             )
@@ -197,6 +205,7 @@ private fun PointsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position(
                     points = persistentListOf(
                         Point.genRandomPoint(),
@@ -219,6 +228,7 @@ private fun DarkPointsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
+                items = emptyList(),
                 position = Position(
                     points = persistentListOf(
                         Point.genRandomPoint(),

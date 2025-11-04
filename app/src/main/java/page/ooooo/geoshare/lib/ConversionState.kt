@@ -15,6 +15,8 @@ import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.Outputs
 import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,6 +34,7 @@ interface HasLoadingIndicator {
 interface HasResult {
     val inputUriString: String
     val position: Position
+    val items: List<Output.Item<Action>>
 }
 
 interface HasError {
@@ -378,6 +381,12 @@ data class ConversionSucceeded(
     override val inputUriString: String,
     override val position: Position,
 ) : ConversionState(), HasResult {
+    override val items = Outputs.getActions(
+        position,
+        packageNames = stateContext.intentTools.queryGeoUriPackageNames(runContext.context.packageManager),
+        uriQuote = stateContext.uriQuote,
+    )
+
     override suspend fun transition(): State =
         stateContext.userPreferencesRepository.getValue(automation).let { automation ->
             when (automation) {
@@ -386,10 +395,11 @@ data class ConversionSucceeded(
                     runContext,
                     inputUriString,
                     position,
+                    items,
                     automation
                 )
 
-                else -> AutomationReady(stateContext, runContext, inputUriString, position, automation)
+                else -> AutomationReady(stateContext, runContext, inputUriString, position, items, automation)
             }
         }
 }
@@ -404,6 +414,7 @@ data class AutomationWaiting(
     val runContext: ConversionRunContext,
     override val inputUriString: String,
     override val position: Position,
+    override val items: List<Output.Item<Action>>,
     val automation: Automation.HasDelay,
 ) : ConversionState(), HasResult {
     override suspend fun transition(): State =
@@ -411,9 +422,9 @@ data class AutomationWaiting(
             if (automation.delay.isPositive()) {
                 delay(automation.delay)
             }
-            AutomationReady(stateContext, runContext, inputUriString, position, automation)
+            AutomationReady(stateContext, runContext, inputUriString, position, items, automation)
         } catch (_: CancellationException) {
-            AutomationFinished(inputUriString, position, automation)
+            AutomationFinished(inputUriString, position, items, automation)
         }
 }
 
@@ -422,18 +433,19 @@ data class AutomationReady(
     val runContext: ConversionRunContext,
     override val inputUriString: String,
     override val position: Position,
+    override val items: List<Output.Item<Action>>,
     val automation: Automation,
 ) : ConversionState(), HasResult {
     override suspend fun transition(): State =
         automation.getAction(position, stateContext.uriQuote).let { outputAction ->
             when (outputAction?.run(stateContext.intentTools, runContext)) {
                 true if automation is Automation.HasSuccessMessage ->
-                    AutomationSucceeded(inputUriString, position, automation)
+                    AutomationSucceeded(inputUriString, position, items, automation)
 
                 false if automation is Automation.HasErrorMessage ->
-                    AutomationFailed(inputUriString, position, automation)
+                    AutomationFailed(inputUriString, position, items, automation)
 
-                else -> AutomationFinished(inputUriString, position, automation)
+                else -> AutomationFinished(inputUriString, position, items, automation)
             }
         }
 }
@@ -441,6 +453,7 @@ data class AutomationReady(
 data class AutomationSucceeded(
     override val inputUriString: String,
     override val position: Position,
+    override val items: List<Output.Item<Action>>,
     val automation: Automation.HasSuccessMessage,
 ) : ConversionState(), HasResult {
     override suspend fun transition(): State {
@@ -449,13 +462,14 @@ data class AutomationSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return AutomationFinished(inputUriString, position, automation)
+        return AutomationFinished(inputUriString, position, items, automation)
     }
 }
 
 data class AutomationFailed(
     override val inputUriString: String,
     override val position: Position,
+    override val items: List<Output.Item<Action>>,
     val automation: Automation.HasErrorMessage,
 ) : ConversionState(), HasResult {
     override suspend fun transition(): State {
@@ -464,12 +478,13 @@ data class AutomationFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return AutomationFinished(inputUriString, position, automation)
+        return AutomationFinished(inputUriString, position, items, automation)
     }
 }
 
 data class AutomationFinished(
     override val inputUriString: String,
     override val position: Position,
+    override val items: List<Output.Item<Action>>,
     val automation: Automation,
 ) : ConversionState(), HasResult

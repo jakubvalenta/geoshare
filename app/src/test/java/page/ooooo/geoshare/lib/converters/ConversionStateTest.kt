@@ -19,6 +19,8 @@ import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.GpxOutput
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.Outputs
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.coroutines.cancellation.CancellationException
@@ -34,6 +36,8 @@ class ConversionStateTest {
     private val mockIntentTools: IntentTools = mock {
         on { getIntentUriString(any()) } doThrow NotImplementedError()
         on { createChooserIntent(any()) } doThrow NotImplementedError()
+        on { queryApp(any(), any()) } doThrow NotImplementedError()
+        on { queryGeoUriPackageNames(any()) } doReturn emptyList()
     }
     private val mockNetworkTools: NetworkTools = mock {
         onBlocking {
@@ -64,7 +68,9 @@ class ConversionStateTest {
     )
 
     private fun mockRunContext() = ConversionRunContext(
-        context = mock(),
+        context = mock {
+            on { packageManager } doReturn mock()
+        },
         clipboard = mock(),
         saveGpxLauncher = mock(),
     )
@@ -1998,6 +2004,35 @@ class ConversionStateTest {
     }
 
     @Test
+    fun conversionSucceeded_setsItemsBasedOnQueryGeoUriPackageNames() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position("1", "2")
+        val mockIntentTools: IntentTools = mock {
+            on { queryGeoUriPackageNames(any()) } doReturn listOf(
+                "com.example.foo",
+                "com.example.bar",
+            )
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(automation) } doReturn Automation.Noop
+        }
+        val stateContext = mockStateContext(
+            intentTools = mockIntentTools,
+            userPreferencesRepository = mockUserPreferencesRepository,
+        )
+        val runContext = mockRunContext()
+        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        assertEquals(
+            Outputs.getActions(
+                position,
+                packageNames = mockIntentTools.queryGeoUriPackageNames(mock()),
+                uriQuote = uriQuote,
+            ),
+            state.items,
+        )
+    }
+
+    @Test
     fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsAutomationReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
@@ -2009,7 +2044,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
         assertEquals(
-            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationReady(stateContext, runContext, inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2026,7 +2061,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
         assertEquals(
-            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationReady(stateContext, runContext, inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2043,7 +2078,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
         assertEquals(
-            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, runContext, inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2060,7 +2095,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
         assertEquals(
-            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, runContext, inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2077,7 +2112,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
         assertEquals(
-            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, runContext, inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2093,13 +2128,14 @@ class ConversionStateTest {
     fun automationWaiting_executionIsNotCancelled_waitsAndReturnsAutomationReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GpxOutput.SaveAutomation
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
-        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, items, automationValue)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+                AutomationReady(stateContext, runContext, inputUriString, position, state.items, automationValue),
                 state.transition(),
             )
         }
@@ -2111,10 +2147,11 @@ class ConversionStateTest {
     fun automationWaiting_executionIsCancelled_returnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GpxOutput.SaveAutomation
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
-        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, items, automationValue)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2128,7 +2165,7 @@ class ConversionStateTest {
         }
         assertEquals(
             res,
-            AutomationFinished(inputUriString, position, automationValue),
+            AutomationFinished(inputUriString, position, state.items, automationValue),
         )
     }
 
@@ -2136,12 +2173,13 @@ class ConversionStateTest {
     fun automationReady_automationIsNoop_returnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = Automation.Noop
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationFinished(inputUriString, position, automationValue),
+            AutomationFinished(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2150,6 +2188,7 @@ class ConversionStateTest {
     fun automationReady_automationIsCopyCoords_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = CoordinatesOutput.CopyCoordsDecAutomation
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock {
@@ -2158,14 +2197,14 @@ class ConversionStateTest {
                 copyToClipboard(
                     eq(runContext.context),
                     eq(runContext.clipboard),
-                    argThat { toString() == position.toCoordsDecString() },
+                    argThat { toString() == automationValue.getAction(position, uriQuote).text },
                 )
             } doReturn Unit
         }
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationSucceeded(inputUriString, position, automationValue),
+            AutomationSucceeded(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2174,6 +2213,7 @@ class ConversionStateTest {
     fun automationReady_automationIsOpenApp_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock {
@@ -2187,9 +2227,9 @@ class ConversionStateTest {
             } doReturn true
         }
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationSucceeded(inputUriString, position, automationValue),
+            AutomationSucceeded(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2198,6 +2238,7 @@ class ConversionStateTest {
     fun automationReady_automationIsOpenAppAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock {
@@ -2211,9 +2252,9 @@ class ConversionStateTest {
             } doReturn false
         }
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationFailed(inputUriString, position, automationValue),
+            AutomationFailed(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2222,6 +2263,7 @@ class ConversionStateTest {
     fun automationReady_automationIsSaveGpx_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GpxOutput.SaveAutomation
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock()
@@ -2234,9 +2276,9 @@ class ConversionStateTest {
             eq(runContext.saveGpxLauncher),
         )
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationSucceeded(inputUriString, position, automationValue),
+            AutomationSucceeded(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2245,6 +2287,7 @@ class ConversionStateTest {
     fun automationReady_automationIsSaveGpxAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GpxOutput.SaveAutomation
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock()
@@ -2257,9 +2300,9 @@ class ConversionStateTest {
             eq(runContext.saveGpxLauncher),
         )
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationFailed(inputUriString, position, automationValue),
+            AutomationFailed(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2268,6 +2311,7 @@ class ConversionStateTest {
     fun automationReady_automationIsShare_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.ShareGeoUriAutomation
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock {
@@ -2280,9 +2324,9 @@ class ConversionStateTest {
             } doReturn true
         }
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationSucceeded(inputUriString, position, automationValue),
+            AutomationSucceeded(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2291,6 +2335,7 @@ class ConversionStateTest {
     fun automationReady_automationIsShareAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.ShareGeoUriAutomation
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock {
@@ -2303,9 +2348,9 @@ class ConversionStateTest {
             } doReturn false
         }
         val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationReady(stateContext, runContext, inputUriString, position, items, automationValue)
         assertEquals(
-            AutomationFailed(inputUriString, position, automationValue),
+            AutomationFailed(inputUriString, position, state.items, automationValue),
             state.transition(),
         )
     }
@@ -2314,11 +2359,12 @@ class ConversionStateTest {
     fun automationSucceeded_executionIsNotCancelled_waitsAndReturnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val state = AutomationSucceeded(inputUriString, position, automationValue)
+        val state = AutomationSucceeded(inputUriString, position, items, automationValue)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                AutomationFinished(inputUriString, position, automationValue),
+                AutomationFinished(inputUriString, position, state.items, automationValue),
                 state.transition(),
             )
         }
@@ -2329,8 +2375,9 @@ class ConversionStateTest {
     fun automationSucceeded_executionIsCancelled_returnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val state = AutomationSucceeded(inputUriString, position, automationValue)
+        val state = AutomationSucceeded(inputUriString, position, items, automationValue)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2344,7 +2391,7 @@ class ConversionStateTest {
         }
         assertEquals(
             res,
-            AutomationFinished(inputUriString, position, automationValue),
+            AutomationFinished(inputUriString, position, state.items, automationValue),
         )
     }
 
@@ -2352,11 +2399,12 @@ class ConversionStateTest {
     fun automationFailed_executionIsNotCancelled_waitsAndReturnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val state = AutomationFailed(inputUriString, position, automationValue)
+        val state = AutomationFailed(inputUriString, position, items, automationValue)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                AutomationFinished(inputUriString, position, automationValue),
+                AutomationFinished(inputUriString, position, state.items, automationValue),
                 state.transition(),
             )
         }
@@ -2367,8 +2415,9 @@ class ConversionStateTest {
     fun automationFailed_executionIsCancelled_returnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val state = AutomationFailed(inputUriString, position, automationValue)
+        val state = AutomationFailed(inputUriString, position, items, automationValue)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2382,7 +2431,7 @@ class ConversionStateTest {
         }
         assertEquals(
             res,
-            AutomationFinished(inputUriString, position, automationValue),
+            AutomationFinished(inputUriString, position, state.items, automationValue),
         )
     }
 
@@ -2390,8 +2439,9 @@ class ConversionStateTest {
     fun automationFinished_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position("1", "2")
+        val items = listOf(Output.Item<Action>(Action.Copy("text"), { "label" }))
         val automationValue = GeoUriOutput.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val state = AutomationFinished(inputUriString, position, automationValue)
+        val state = AutomationFinished(inputUriString, position, items, automationValue)
         assertNull(state.transition())
     }
 }
