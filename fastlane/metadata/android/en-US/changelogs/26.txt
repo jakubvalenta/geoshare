@@ -1,2 +1,2 @@
-- Added a menu that allows copying or opening individual place list points.
-- Added a menu with app-specific actions and added "navigate to" and "navigate via" options for Magic Earth.
+- Added a menu to each point of a place list to allow copying or opening individual points.
+- Added a menu with app-specific actions and added "navigate" and "add waypoint" actions for Magic Earth.
