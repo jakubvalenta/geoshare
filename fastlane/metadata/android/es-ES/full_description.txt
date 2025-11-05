@@ -4,10 +4,13 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 
 - Google Maps
 - Apple Maps
+- CoMaps
 - HERE WeGo
 - Magic Earth
+- Maps.me
 - Mapy.com
 - OpenStreetMap
+- Organic Maps
 - OsmAnd
 - Waze
 - Yandex Maps
