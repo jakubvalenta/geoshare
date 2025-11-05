@@ -11,22 +11,32 @@ class MagicEarthOutputTest {
     private val outputGroup = MagicEarthOutputGroup
 
     @Test
-    fun copyOutput_whenPositionHasCoordinatesAndZoom_returnsUriWithCoordinatesAndZoom() {
+    fun copyOutput_whenPositionHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Action.Copy("magicearth://?lat=50.123456&lon=-11.123456&zoom=3.4"),
+            Action.Copy("magicearth://?show_on_map&lat=50.123456&lon=-11.123456"),
             outputGroup.getActionOutputs().first()
-                .getAction(Position("50.123456", "-11.123456", z = "3.4"), uriQuote),
+                .getAction(Position("50.123456", "-11.123456", z = "5"), uriQuote),
         )
     }
 
     @Test
-    fun copyOutput_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithCoordinatesAndQueryAndZoom() {
+    fun copyOutput_whenPositionHasCoordinatesAndQueryAndZoom_returnsSearchAroundUriAndIgnoresZoom() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Action.Copy("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4"),
+            Action.Copy("magicearth://?search_around&lat=50.123456&lon=-11.123456&q=foo%20bar"),
             outputGroup.getActionOutputs().first()
-                .getAction(Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote),
+                .getAction(Position("50.123456", "-11.123456", q = "foo bar", z = "5"), uriQuote),
+        )
+    }
+
+    @Test
+    fun copyOutput_whenPositionHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            Action.Copy("magicearth://?open_search&q=foo%20bar"),
+            outputGroup.getActionOutputs().first()
+                .getAction(Position(q = "foo bar", z = "5"), uriQuote),
         )
     }
 

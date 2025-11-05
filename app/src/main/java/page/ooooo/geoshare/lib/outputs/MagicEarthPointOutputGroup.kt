@@ -6,6 +6,9 @@ import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
@@ -87,17 +90,30 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    private fun formatDisplayUriString(value: Point, uriQuote: UriQuote): String = Uri(
-        scheme = "magicearth",
-        path = "//",
-        queryParams = buildMap {
-            value.apply {
-                set("lat", lat)
-                set("lon", lon)
-            }
-        }.toImmutableMap(),
-        uriQuote = uriQuote,
-    ).toString()
+    fun formatDisplayUriString(value: Point, uriQuote: UriQuote, q: String? = null): String =
+        Uri(
+            scheme = "magicearth",
+            path = "//",
+            queryParams = buildMap {
+                value.apply {
+                    if (q == null) {
+                        set("show_on_map", "")
+                        set("lat", lat)
+                        set("lon", lon)
+                    } else {
+                        if (lat == "0" && lon == "0") {
+                            set("open_search", "")
+                        } else {
+                            set("search_around", "")
+                            set("lat", lat)
+                            set("lon", lon)
+                        }
+                        set("q", q)
+                    }
+                }
+            }.toImmutableMap(),
+            uriQuote = uriQuote,
+        ).toString()
 
     fun formatDriveToUriString(value: Point, uriQuote: UriQuote): String =
         Uri(

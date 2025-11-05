@@ -193,6 +193,6 @@ object GeoUriOutputGroup : OutputGroup<Position> {
     }
 
     fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = position.run {
-        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), q = q, z = z, uriQuote = uriQuote)
+        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), uriQuote, q = q, z = z)
     }
 }

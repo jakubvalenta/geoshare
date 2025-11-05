@@ -3,9 +3,10 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
 object MagicEarthOutputGroup : OutputGroup<Position> {
@@ -118,30 +119,15 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         else -> null
     }
 
-    private fun formatDisplayUriString(position: Position, uriQuote: UriQuote): String = Uri(
-        scheme = "magicearth",
-        path = "//",
-        queryParams = buildMap {
-            position.apply {
-                mainPoint?.apply {
-                    set("lat", lat)
-                    set("lon", lon)
-                }
-                q?.let { q ->
-                    set("q", q)
-                }
-                z?.let { z ->
-                    set("zoom", z)
-                }
-            }
-        }.toImmutableMap(),
-        uriQuote = uriQuote,
-    ).toString()
+    private fun formatDisplayUriString(value: Position, uriQuote: UriQuote): String = value.run {
+        MagicEarthPointOutputGroup.formatDisplayUriString(mainPoint ?: Point(), uriQuote, q = q)
+    }
 
-    private fun formatDriveToUriString(value: Position, uriQuote: UriQuote): String =
-        MagicEarthPointOutputGroup.formatDriveToUriString(value.mainPoint ?: Point(), uriQuote)
+    private fun formatDriveToUriString(value: Position, uriQuote: UriQuote): String = value.run {
+        MagicEarthPointOutputGroup.formatDriveToUriString(mainPoint ?: Point(), uriQuote)
+    }
 
-    private fun formatDriveViaUriString(value: Position, uriQuote: UriQuote): String =
-        MagicEarthPointOutputGroup.formatDriveViaUriString(value.mainPoint ?: Point(), uriQuote)
-
+    private fun formatDriveViaUriString(value: Position, uriQuote: UriQuote): String = value.run {
+        MagicEarthPointOutputGroup.formatDriveViaUriString(mainPoint ?: Point(), uriQuote)
+    }
 }
