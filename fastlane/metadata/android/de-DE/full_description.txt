@@ -4,10 +4,13 @@ Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen insta
 
 - Google Maps
 - Apple Maps
+- CoMaps
 - HERE WeGo
 - Magic Earth
+- Maps.me
 - Mapy.com
 - OpenStreetMap
+- Organic Maps
 - OsmAnd
 - Waze
 - Yandex Maps
