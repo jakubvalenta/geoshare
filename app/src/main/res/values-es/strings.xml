@@ -122,10 +122,10 @@
     <string name="conversion_automation_share_succeeded">Enlace automáticamente compartido</string>
     <string name="conversion_automation_share_waiting">Compartiendo enlace automáticamente en %1$ds</string>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Intento %1$d de %2$d debido a %3$s.</string>
-    <string name="user_preferences_automation_copy_coords">Copiar coordenadas en formato %1$s</string>
-    <string name="user_preferences_automation_copy_link">Copiar enlace de %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates">Copiar coordenadas</string>
+    <string name="conversion_succeeded_copy_link">Copiar enlace de %1$s</string>
     <string name="user_preferences_automation_description">Elige una acción que se ejecute automáticamente cuando un enlace de mapa se convierte a coordenadas.</string>
     <string name="user_preferences_automation_nothing">Nada</string>
-    <string name="user_preferences_automation_open_app">Abrir %1$s</string>
+    <string name="conversion_succeeded_open_app">Abrir %1$s</string>
     <string name="user_preferences_automation_title">Automatización</string>
 </resources>

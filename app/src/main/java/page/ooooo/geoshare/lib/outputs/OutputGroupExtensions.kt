@@ -1,7 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
