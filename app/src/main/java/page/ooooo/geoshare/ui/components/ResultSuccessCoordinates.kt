@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.R.attr.text
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,19 +36,21 @@ fun ResultSuccessCoordinates(
 
     ResultCard(
         main = {
-            SelectionContainer {
-                Text(
-                    allOutputGroups.getTextOutput()?.getText(position) ?: "",
-                    Modifier
-                        .testTag("geoShareConversionSuccessPositionCoordinates")
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-            allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let {
+            allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
                 SelectionContainer {
                     Text(
-                        it,
+                        text,
+                        Modifier
+                            .testTag("geoShareConversionSuccessPositionCoordinates")
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+            allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
+                SelectionContainer {
+                    Text(
+                        text,
                         Modifier
                             .testTag("geoShareConversionSuccessPositionParams")
                             .fillMaxWidth(),

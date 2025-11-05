@@ -38,12 +38,14 @@ fun ScreenshotOpen() {
             x = 86,
             y = 100,
         ) {
-            ScreenshotText(
-                allOutputGroups.getTextOutput()?.getText(Position.example) ?: "",
-                scale,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            allOutputGroups.getTextOutput()?.getText(Position.example)?.let { text ->
+                ScreenshotText(
+                    text,
+                    scale,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
         }
         ScreenshotRow(
             scale,

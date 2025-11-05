@@ -48,10 +48,9 @@ fun ResultSuccessPoint(
             style = MaterialTheme.typography.bodySmall,
         )
         SelectionContainer(Modifier.weight(1f)) {
-            Text(
-                textPointOutput?.getText(point) ?: "",
-                style = MaterialTheme.typography.bodySmall,
-            )
+            textPointOutput?.getText(point)?.let { text ->
+                Text(text, style = MaterialTheme.typography.bodySmall)
+            }
         }
         Box {
             IconButton({ setSheetVisible(true) }, Modifier.size(16.dp)) {
