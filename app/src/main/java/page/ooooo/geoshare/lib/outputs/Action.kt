@@ -7,29 +7,29 @@ import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 
-sealed class Action {
-    abstract suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext): Boolean
+sealed interface Action {
+    suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext): Boolean
 
     @Immutable
-    data class Copy(val text: String) : Action() {
+    data class Copy(val text: String) : Action {
         override suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext) =
             intentTools.copyToClipboard(runContext.context, runContext.clipboard, text).let { true }
     }
 
     @Immutable
-    data class OpenApp(val packageName: String, val uriString: String) : Action() {
+    data class OpenApp(val packageName: String, val uriString: String) : Action {
         override suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext) =
             intentTools.openApp(runContext.context, packageName, uriString)
     }
 
     @Immutable
-    data class OpenChooser(val uriString: String) : Action() {
+    data class OpenChooser(val uriString: String) : Action {
         override suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext) =
             intentTools.openChooser(runContext.context, uriString)
     }
 
     @Immutable
-    data class SaveGpx(val position: Position, val uriQuote: UriQuote = DefaultUriQuote()) : Action() {
+    data class SaveGpx(val position: Position, val uriQuote: UriQuote = DefaultUriQuote()) : Action {
         override suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext) =
             intentTools.launchSaveGpx(runContext.context, runContext.saveGpxLauncher)
 
