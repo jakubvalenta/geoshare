@@ -66,7 +66,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         override val packageName = PACKAGE_NAME
 
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(value, uriQuote))
+            Action.OpenApp(PACKAGE_NAME, formatDriveViaUriString(value, uriQuote))
 
         @Composable
         override fun label() =
