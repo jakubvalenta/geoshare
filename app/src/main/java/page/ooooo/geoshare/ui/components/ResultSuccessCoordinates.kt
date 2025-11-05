@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.R.attr.text
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.*
