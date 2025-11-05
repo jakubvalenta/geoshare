@@ -4,9 +4,7 @@ import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
@@ -16,10 +14,9 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.XiaomiTools
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.getOutputs
-import page.ooooo.geoshare.lib.outputs.getSupportingText
-import page.ooooo.geoshare.lib.outputs.getText
+import page.ooooo.geoshare.lib.outputs.allOutputGroups
+import page.ooooo.geoshare.lib.outputs.getSupportingTextOutput
+import page.ooooo.geoshare.lib.outputs.getTextOutput
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -100,11 +97,10 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val outputs = allOutputManagers.getOutputs(emptyList())
-        val expectedText = outputs.getText(expectedPosition)
+        val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
-            val expectedSupportingText = outputs.getSupportingText(expectedPosition)
+            val expectedSupportingText = allOutputGroups.getSupportingTextOutput()?.getText(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })

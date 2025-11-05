@@ -19,9 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.getOutputs
-import page.ooooo.geoshare.lib.outputs.getText
+import page.ooooo.geoshare.lib.outputs.allOutputGroups
+import page.ooooo.geoshare.lib.outputs.getTextOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -40,7 +39,7 @@ fun ScreenshotOpen() {
             y = 100,
         ) {
             ScreenshotText(
-                allOutputManagers.getOutputs(emptyList()).getText(Position.example),
+                allOutputGroups.getTextOutput()?.getText(Position.example) ?: "",
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,

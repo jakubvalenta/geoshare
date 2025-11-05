@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
-import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.*
@@ -29,7 +28,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
-    outputs: List<Output>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -39,14 +37,14 @@ fun ResultSuccessCoordinates(
         main = {
             SelectionContainer {
                 Text(
-                    outputs.getText(position),
+                    allOutputGroups.getTextOutput()?.getText(position) ?: "",
                     Modifier
                         .testTag("geoShareConversionSuccessPositionCoordinates")
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            outputs.getSupportingText(position).takeIf { it.isNotEmpty() }?.let {
+            allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let {
                 SelectionContainer {
                     Text(
                         it,
@@ -70,16 +68,16 @@ fun ResultSuccessCoordinates(
         bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
             {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-                    outputs.getPointActions().let { outputs ->
-                        points.forEachIndexed { i, point ->
-                            ResultSuccessPoint(i, point, outputs, onRun)
-                        }
+                    val menuPointOutputs = allPointOutputGroups.getActionOutputs()
+                    val textPointOutput = allPointOutputGroups.getTextOutput()
+                    points.forEachIndexed { i, point ->
+                        ResultSuccessPoint(i, point, textPointOutput, menuPointOutputs, onRun)
                     }
                 }
             }
         },
         chips = {
-            outputs.getChips().forEach {
+            allOutputGroups.getChipOutputs().forEach {
                 ResultCardChip(it.label()) { onRun(it.getAction(position)) }
             }
         },
@@ -88,7 +86,8 @@ fun ResultSuccessCoordinates(
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
     ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabel) = outputs.getActions()
+        val (copyActionsAndLabels, otherActionsAndLabel) = allOutputGroups
+            .getActionOutputs()
             .map { it.getAction(position) to it.label() }
             .partition { (action) -> action is Action.Copy }
         copyActionsAndLabels.forEach { (action, label) ->
@@ -119,20 +118,8 @@ private fun DefaultPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
-            @Suppress("SpellCheckingInspection")
-            val packageNames = listOf(
-                IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                MagicEarthOutputManager.PACKAGE_NAME,
-                "app.comaps.fdroid",
-                "app.organicmaps",
-                "com.here.app.maps",
-                "cz.seznam.mapy",
-                "net.osmand.plus",
-                "us.spotco.maps",
-            )
             ResultSuccessCoordinates(
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(packageNames),
                 onRun = {},
             )
         }
@@ -147,56 +134,8 @@ private fun DarkPreview() {
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
-            @Suppress("SpellCheckingInspection")
-            val packageNames = listOf(
-                IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                MagicEarthOutputManager.PACKAGE_NAME,
-                "app.comaps.fdroid",
-                "app.organicmaps",
-                "com.here.app.maps",
-                "cz.seznam.mapy",
-                "net.osmand.plus",
-                "us.spotco.maps",
-            )
             ResultSuccessCoordinates(
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(packageNames),
-                onRun = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OneAppPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
-            val packageNames = listOf(IntentTools.GOOGLE_MAPS_PACKAGE_NAME)
-            ResultSuccessCoordinates(
-                position = Position.example,
-                outputs = allOutputManagers.getOutputs(packageNames),
-                onRun = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkOneAppPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
-            val packageNames = listOf(IntentTools.GOOGLE_MAPS_PACKAGE_NAME)
-            ResultSuccessCoordinates(
-                position = Position.example,
-                outputs = allOutputManagers.getOutputs(packageNames),
                 onRun = {},
             )
         }
@@ -213,7 +152,6 @@ private fun ParamsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 onRun = {},
             )
         }
@@ -230,7 +168,6 @@ private fun DarkParamsPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = "13"),
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 onRun = {},
             )
         }
@@ -253,7 +190,6 @@ private fun PointsPreview() {
                         Point.genRandomPoint(),
                     ),
                 ),
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 onRun = {},
             )
         }
@@ -276,7 +212,6 @@ private fun DarkPointsPreview() {
                         Point.genRandomPoint(),
                     ),
                 ),
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 onRun = {},
             )
         }

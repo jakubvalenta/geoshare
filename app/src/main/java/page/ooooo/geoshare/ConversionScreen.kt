@@ -39,9 +39,7 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.outputs.GeoUriOutputManager
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.getOutputs
+import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -233,7 +231,6 @@ fun ConversionScreen(
                     Headline(stringResource(R.string.conversion_succeeded_title))
                     ResultSuccessCoordinates(
                         position = currentState.position,
-                        outputs = currentState.outputs,
                         onRun = onRun,
                     )
                 }
@@ -252,7 +249,6 @@ fun ConversionScreen(
                         )
                         ResultSuccessApps(
                             position = currentState.position,
-                            outputs = currentState.outputs,
                             onRun = onRun,
                             windowSizeClass = windowSizeClass,
                         )
@@ -370,7 +366,6 @@ private fun DefaultPreview() {
             currentState = AutomationFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = Automation.Noop,
             ),
             changelogShown = true,
@@ -400,7 +395,6 @@ private fun DarkPreview() {
             currentState = AutomationFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = Automation.Noop,
             ),
             changelogShown = true,
@@ -430,7 +424,6 @@ private fun TabletPreview() {
             currentState = AutomationFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = Automation.Noop,
             ),
             changelogShown = true,
@@ -465,8 +458,7 @@ private fun AutomationPreview() {
                 runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(emptyList()),
-                automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -500,8 +492,7 @@ private fun DarkAutomationPreview() {
                 runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(emptyList()),
-                automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -535,8 +526,7 @@ private fun TabletAutomationPreview() {
                 runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                outputs = allOutputManagers.getOutputs(emptyList()),
-                automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,

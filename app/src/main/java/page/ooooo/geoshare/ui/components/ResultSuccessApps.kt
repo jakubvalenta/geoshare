@@ -30,7 +30,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed interface GridItem {
-    data class App(val app: IntentTools.App, val outputs: List<Output.AppAction>) : GridItem
+    data class App(val app: IntentTools.App, val outputs: List<Output.App<Position>>) : GridItem
     class ShareButton : GridItem
     class Empty : GridItem
 }
@@ -42,7 +42,6 @@ private val dropdownButtonOffset = 20.dp
 @Composable
 fun ResultSuccessApps(
     position: Position,
-    outputs: List<Output>,
     onRun: (action: Action) -> Unit,
     intentTools: IntentTools = IntentTools(),
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
@@ -54,8 +53,10 @@ fun ResultSuccessApps(
     } else {
         4
     }
-    val apps: Map<IntentTools.App, List<Output.AppAction>> = outputs
-        .getAppActions()
+    val appOutputs = allOutputGroups.getAppOutputs(
+        packageNames = intentTools.queryGeoUriPackageNames(context.packageManager),
+    )
+    val apps: Map<IntentTools.App, List<Output.App<Position>>> = appOutputs
         .groupBy { it.packageName }
         .mapNotNull { (packageName, items) ->
             intentTools.queryApp(context.packageManager, packageName)?.let { app -> app to items }
@@ -83,7 +84,7 @@ fun ResultSuccessApps(
                         }
 
                         is GridItem.ShareButton -> ResultSuccessAppShare {
-                            outputs.getFirstOpenChooserAction()?.getAction(position)?.let(onRun)
+                            allOutputGroups.getChooserOutput()?.getAction(position)?.let(onRun)
                         }
 
                         is GridItem.Empty -> ResultSuccessAppEmpty()
@@ -99,7 +100,7 @@ fun ResultSuccessApps(
 fun RowScope.ResultSuccessApp(
     position: Position,
     app: IntentTools.App,
-    outputs: List<Output.AppAction>,
+    outputs: List<Output.App<Position>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -145,6 +146,7 @@ fun RowScope.ResultSuccessApp(
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         outputs.forEach {
+                            // TODO Consider hiding the default open geo: URI action from this menu
                             DropdownMenuItem(
                                 text = { Text(it.label()) },
                                 onClick = { onRun(it.getAction(position)) },
@@ -193,27 +195,27 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                @Suppress("SpellCheckingInspection")
-                val packageNames = listOf(
-                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                    MagicEarthOutputManager.PACKAGE_NAME,
-                    "app.comaps.fdroid",
-                    "app.organicmaps",
-                    "com.here.app.maps",
-                    "cz.seznam.mapy",
-                    "net.osmand.plus",
-                    "us.spotco.maps",
-                )
                 val context = LocalContext.current
                 ResultSuccessApps(
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                        )
+
+                        @Suppress("SpellCheckingInspection")
+                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                            GOOGLE_MAPS_PACKAGE_NAME,
+                            MagicEarthOutputGroup.PACKAGE_NAME,
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.here.app.maps",
+                            "cz.seznam.mapy",
+                            "net.osmand.plus",
+                            "us.spotco.maps",
                         )
                     }
                 )
@@ -228,27 +230,27 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                @Suppress("SpellCheckingInspection")
-                val packageNames = listOf(
-                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                    MagicEarthOutputManager.PACKAGE_NAME,
-                    "app.comaps.fdroid",
-                    "app.organicmaps",
-                    "com.here.app.maps",
-                    "cz.seznam.mapy",
-                    "net.osmand.plus",
-                    "us.spotco.maps",
-                )
                 val context = LocalContext.current
                 ResultSuccessApps(
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                        )
+
+                        @Suppress("SpellCheckingInspection")
+                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                            GOOGLE_MAPS_PACKAGE_NAME,
+                            MagicEarthOutputGroup.PACKAGE_NAME,
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.here.app.maps",
+                            "cz.seznam.mapy",
+                            "net.osmand.plus",
+                            "us.spotco.maps",
                         )
                     }
                 )
@@ -263,19 +265,19 @@ private fun OneAppPreview() {
     AppTheme {
         Surface {
             Column {
-                val packageNames = listOf(
-                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                )
                 val context = LocalContext.current
                 ResultSuccessApps(
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                        )
+
+                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                            GOOGLE_MAPS_PACKAGE_NAME,
                         )
                     }
                 )
@@ -290,19 +292,19 @@ private fun DarkOneAppPreview() {
     AppTheme {
         Surface {
             Column {
-                val packageNames = listOf(
-                    IntentTools.GOOGLE_MAPS_PACKAGE_NAME,
-                )
                 val context = LocalContext.current
                 ResultSuccessApps(
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                        )
+
+                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                            GOOGLE_MAPS_PACKAGE_NAME,
                         )
                     }
                 )
@@ -319,7 +321,6 @@ private fun NoAppsPreview() {
             Column {
                 ResultSuccessApps(
                     position = Position.example,
-                    outputs = emptyList(),
                     onRun = {},
                 )
             }
@@ -335,7 +336,6 @@ private fun DarkNoAppsPreview() {
             Column {
                 ResultSuccessApps(
                     position = Position.example,
-                    outputs = emptyList(),
                     onRun = {},
                 )
             }

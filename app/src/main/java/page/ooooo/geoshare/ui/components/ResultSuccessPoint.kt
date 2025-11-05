@@ -23,13 +23,16 @@ import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.collections.map
+import kotlin.collections.partition
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessPoint(
     i: Int,
     point: Point,
-    outputs: List<Output.PointAction>,
+    textPointOutput: Output.Text<Point>?,
+    menuPointOutputs: List<Output.Action<Point, Action>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -46,7 +49,7 @@ fun ResultSuccessPoint(
         )
         SelectionContainer(Modifier.weight(1f)) {
             Text(
-                outputs.getPointText(point),
+                textPointOutput?.getText(point) ?: "",
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -63,7 +66,7 @@ fun ResultSuccessPoint(
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
     ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabel) = outputs
+        val (copyActionsAndLabels, otherActionsAndLabel) = menuPointOutputs
             .map { it.getAction(point) to it.label() }
             .partition { (action) -> action is Action.Copy }
         copyActionsAndLabels.forEach { (action, label) ->
@@ -92,7 +95,8 @@ private fun DefaultPreview() {
             ResultSuccessPoint(
                 i = 3,
                 point = Point.example,
-                outputs = allOutputManagers.getOutputs(emptyList()).getPointActions(),
+                textPointOutput = allPointOutputGroups.getTextOutput(),
+                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
         }
@@ -107,7 +111,8 @@ private fun DarkPreview() {
             ResultSuccessPoint(
                 i = 3,
                 point = Point.example,
-                outputs = allOutputManagers.getOutputs(emptyList()).getPointActions(),
+                textPointOutput = allPointOutputGroups.getTextOutput(),
+                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
         }

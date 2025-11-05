@@ -86,7 +86,7 @@ open class IntentTools {
         }
     }
 
-    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
+    open fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),

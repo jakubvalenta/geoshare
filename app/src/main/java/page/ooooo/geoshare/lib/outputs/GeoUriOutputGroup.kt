@@ -13,15 +13,51 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 
-object GeoUriOutputManager : OutputManager {
+object GeoUriOutputGroup : OutputGroup<Position> {
 
-    object CopyGeoUriAutomation : Automation.HasSuccessMessage {
+    object CopyOutput : Output.Action<Position, Action> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(value, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_geo)
+    }
+
+    object ChooserOutput : Output.Action<Position, Action> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.OpenChooser(formatUriString(value, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_share)
+    }
+
+    @Immutable
+    data class AppOutput(override val packageName: String) : Output.App<Position> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.OpenApp(packageName, formatUriString(value, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app, packageName)
+    }
+
+    object ChipOutput : Output.Action<Position, Action> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(value, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_geo)
+    }
+
+    object CopyAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_GEO_URI
         override val packageName = ""
         override val testTag = null
@@ -38,7 +74,7 @@ object GeoUriOutputManager : OutputManager {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    object ShareGeoUriAutomation : Automation.HasErrorMessage, Automation.HasSuccessMessage, Automation.HasDelay {
+    object ChooserAutomation : Automation.HasErrorMessage, Automation.HasSuccessMessage, Automation.HasDelay {
         override val type = Automation.Type.SHARE
         override val packageName = ""
         override val testTag = null
@@ -65,7 +101,7 @@ object GeoUriOutputManager : OutputManager {
     }
 
     @Immutable
-    data class OpenAppAutomation(override val packageName: String) :
+    data class AppAutomation(override val packageName: String) :
         Automation.HasSuccessMessage,
         Automation.HasErrorMessage,
         Automation.HasDelay {
@@ -125,102 +161,38 @@ object GeoUriOutputManager : OutputManager {
             appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
     }
 
-    object CopyUriOutput : Output.Action {
-        override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, uriQuote))
+    override fun getTextOutput(): Output.Text<Position>? = null
 
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_geo)
-    }
+    override fun getSupportingTextOutput(): Output.Text<Position>? = null
 
-    object OpenChooserOutput : Output.OpenChooserAction {
-        override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(position, uriQuote))
+    override fun getActionOutputs() = listOf(
+        CopyOutput,
+        ChooserOutput,
+    )
 
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_share)
-    }
+    override fun getAppOutputs(packageNames: List<String>) =
+        packageNames.map { AppOutput(it) }
 
-    data class OpenAppOutput(override val packageName: String) : Output.AppAction {
-        override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatUriString(position, uriQuote))
+    override fun getChipOutputs() = listOf(
+        ChipOutput,
+    )
 
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app, packageName)
-    }
-
-    object PointCopyUriOutput : Output.PointAction {
-        override fun getAction(point: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(point, uriQuote = uriQuote))
-
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_geo)
-    }
-
-    object PointOpenChooserOutput : Output.PointAction {
-        override fun getAction(point: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(point, uriQuote = uriQuote))
-
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_share)
-    }
-
-    object ChipCopyUriOutput : Output.Chip {
-        override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, uriQuote))
-
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_geo)
-    }
-
-    override fun getOutputs(packageNames: List<String>) = buildList {
-        add(CopyUriOutput)
-        add(OpenChooserOutput)
-        packageNames.forEach { add(OpenAppOutput(it)) }
-        add(PointCopyUriOutput)
-        add(PointOpenChooserOutput)
-        add(ChipCopyUriOutput)
-    }
+    override fun getChooserOutput() = ChooserOutput
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = buildList {
-        add(CopyGeoUriAutomation)
-        add(ShareGeoUriAutomation)
-        packageNames.forEach { add(OpenAppAutomation(it)) }
+        add(CopyAutomation)
+        add(ChooserAutomation)
+        packageNames.forEach { add(AppAutomation(it)) }
     }
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = when (type) {
-        Automation.Type.COPY_GEO_URI -> CopyGeoUriAutomation
-        Automation.Type.SHARE -> ShareGeoUriAutomation
-        Automation.Type.OPEN_APP if packageName != null -> OpenAppAutomation(packageName)
+        Automation.Type.COPY_GEO_URI -> CopyAutomation
+        Automation.Type.SHARE -> ChooserAutomation
+        Automation.Type.OPEN_APP if packageName != null -> AppAutomation(packageName)
         else -> null
     }
 
     fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = position.run {
-        formatUriString(mainPoint ?: Point(), q = q, z = z, uriQuote = uriQuote)
-    }
-
-    private fun formatUriString(
-        point: Point,
-        q: String? = null,
-        z: String? = null,
-        uriQuote: UriQuote = DefaultUriQuote(),
-    ): String = point.run {
-        Uri(
-            scheme = "geo",
-            path = "$lat,$lon",
-            queryParams = buildMap {
-                set("q", q ?: "$lat,$lon")
-                z?.let { z ->
-                    set("z", z)
-                }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
+        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), q = q, z = z, uriQuote = uriQuote)
     }
 }

@@ -11,9 +11,18 @@ import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 /**
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
  */
-object AppleMapsOutputManager : OutputManager {
+object AppleMapsOutputGroup : OutputGroup<Position> {
 
-    object CopyLinkAutomation : Automation.HasSuccessMessage {
+    object CopyOutput : Output.Action<Position, Action> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(value, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
+    }
+
+    object CopyAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_APPLE_MAPS_URI
         override val packageName = ""
         override val testTag = null
@@ -30,44 +39,35 @@ object AppleMapsOutputManager : OutputManager {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    object CopyLinkOutput : Output.Action {
-        override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, uriQuote))
+    override fun getTextOutput(): Output.Text<Position>? = null
 
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-    }
+    override fun getSupportingTextOutput(): Output.Text<Position>? = null
 
-    object PointCopyLinkOutput : Output.PointAction {
-        override fun getAction(point: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(point, uriQuote))
-
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-    }
-
-    override fun getOutputs(packageNames: List<String>) = listOf(
-        CopyLinkOutput,
-        PointCopyLinkOutput,
+    override fun getActionOutputs() = listOf(
+        CopyOutput,
     )
 
+    override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Position>>()
+
+    override fun getChipOutputs() = emptyList<Output.Action<Position, Action>>()
+
+    override fun getChooserOutput() = null
+
     override fun getAutomations(packageNames: List<String>) = listOf(
-        CopyLinkAutomation,
+        CopyAutomation,
     )
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = when (type) {
-        Automation.Type.COPY_APPLE_MAPS_URI -> CopyLinkAutomation
+        Automation.Type.COPY_APPLE_MAPS_URI -> CopyAutomation
         else -> null
     }
 
-    private fun formatUriString(position: Position, uriQuote: UriQuote) = Uri(
+    private fun formatUriString(value: Position, uriQuote: UriQuote) = Uri(
         scheme = "https",
         host = "maps.apple.com",
         path = "/",
         queryParams = buildMap {
-            position.apply {
+            value.apply {
                 mainPoint?.apply {
                     set("ll", "$lat,$lon")
                 } ?: q?.let { q ->
@@ -76,18 +76,6 @@ object AppleMapsOutputManager : OutputManager {
                 z?.let { z ->
                     set("z", z)
                 }
-            }
-        }.toImmutableMap(),
-        uriQuote = uriQuote,
-    ).toString()
-
-    private fun formatUriString(point: Point, uriQuote: UriQuote) = Uri(
-        scheme = "https",
-        host = "maps.apple.com",
-        path = "/",
-        queryParams = buildMap {
-            point.apply {
-                set("ll", "$lat,$lon")
             }
         }.toImmutableMap(),
         uriQuote = uriQuote,

@@ -11,9 +11,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.getActions
-import page.ooooo.geoshare.lib.outputs.getOutputs
+import page.ooooo.geoshare.lib.outputs.allOutputGroups
+import page.ooooo.geoshare.lib.outputs.getActionOutputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -36,9 +35,9 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                val outputs = allOutputManagers.getOutputs(emptyList())
                 val position = Position.example
-                val (copyActionsAndLabels, otherActionsAndLabel) = outputs.getActions()
+                val (copyActionsAndLabels, otherActionsAndLabel) = allOutputGroups
+                    .getActionOutputs()
                     .map { it.getAction(position) to it.label() }
                     .partition { (action) -> action is Action.Copy }
                 copyActionsAndLabels.forEach { (action, label) ->
@@ -61,9 +60,9 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                val outputs = allOutputManagers.getOutputs(emptyList())
                 val position = Position.example
-                val (copyActionsAndLabels, otherActionsAndLabel) = outputs.getActions()
+                val (copyActionsAndLabels, otherActionsAndLabel) = allOutputGroups
+                    .getActionOutputs()
                     .map { it.getAction(position) to it.label() }
                     .partition { (action) -> action is Action.Copy }
                 copyActionsAndLabels.forEach { (action, label) ->

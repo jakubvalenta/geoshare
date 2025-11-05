@@ -121,7 +121,7 @@
     <string name="conversion_automation_share_failed">Échec du partage automatique du lien</string>
     <string name="conversion_automation_share_succeeded">Lien partagé automatiquement</string>
     <string name="conversion_automation_share_waiting">Lien de partage automatique dans %1$ds</string>
-    <string name="conversion_succeeded_copy_coordinates">Copier les coordonnées au format %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates">Copier les coordonnées</string>
     <string name="conversion_succeeded_copy_link">Copier le lien %1$s</string>
     <string name="user_preferences_automation_description">Choisissez une action à effectuer automatiquement lorsqu’un lien de carte est converti en coordonnées.</string>
     <string name="user_preferences_automation_nothing">Rien</string>

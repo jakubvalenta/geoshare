@@ -11,14 +11,13 @@ import page.ooooo.geoshare.lib.UriQuote
 
 class CoordinatesOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
-    private val packageNames: List<String> = emptyList()
-    private val outputs = CoordinatesOutputManager.getOutputs(packageNames)
+    private val outputGroup = CoordinatesOutputGroup
 
     @Test
-    fun getSupportingText_returnsQueryAndZoomButNotPoints() {
+    fun supportingTextOutput_returnsQueryAndZoomButNotPoints() {
         assertEquals(
             "foo bar\t\tz3.4",
-            outputs.getSupportingText(
+            outputGroup.getSupportingTextOutput().getText(
                 Position(
                     q = "foo bar",
                     z = "3.4",
@@ -33,50 +32,50 @@ class CoordinatesOutputTest {
     }
 
     @Test
-    fun getOutputs_returnsSouthWestForNegativeCoordinates() {
+    fun copyOutput_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
             Action.Copy("17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W"),
-            outputs.getActions().first().getAction(Position("-17.2165721", "-149.9470294"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position("-17.2165721", "-149.9470294"), uriQuote),
         )
     }
 
     @Test
-    fun getOutputs_returnsNorthEastForPositiveCoordinates() {
+    fun copyOutput_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
             Action.Copy("52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E"),
-            outputs.getActions().first().getAction(Position("52.5067296", "13.2599309"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position("52.5067296", "13.2599309"), uriQuote),
         )
     }
 
     @Test
-    fun getOutputs_returnsZerosForZeroCoordinates() {
+    fun copyOutput_returnsZerosForZeroCoordinates() {
         assertEquals(
             Action.Copy("0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E"),
-            outputs.getActions().first().getAction(Position("0", "0"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position("0", "0"), uriQuote),
         )
     }
 
     @Test
-    fun getOutputs_returnsZeroDegForZeroDegCoordinates() {
+    fun copyOutput_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
             Action.Copy("0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E"),
-            outputs.getActions().first().getAction(Position("0.5", "0.5"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position("0.5", "0.5"), uriQuote),
         )
     }
 
     @Test
-    fun getOutputs_returnsZeroMinForZeroMinCoordinates() {
+    fun copyOutput_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
             Action.Copy("10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W"),
-            outputs.getActions().first().getAction(Position("-10", "-20"), uriQuote)
+            outputGroup.getActionOutputs().first().getAction(Position("-10", "-20"), uriQuote)
         )
     }
 
     @Test
-    fun getOutputs_returnsZerosSecForZeroSecCoordinates() {
+    fun copyOutput_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
             Action.Copy("10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W"),
-            outputs.getActions().first().getAction(Position("-10.5", "-20.5"), uriQuote)
+            outputGroup.getActionOutputs().first().getAction(Position("-10.5", "-20.5"), uriQuote)
         )
     }
 

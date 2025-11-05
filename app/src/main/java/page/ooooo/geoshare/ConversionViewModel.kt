@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
-import page.ooooo.geoshare.lib.outputs.getFirstSaveGpxAction
+import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import javax.inject.Inject
 
 @HiltViewModel
@@ -169,8 +169,10 @@ class ConversionViewModel @Inject constructor(
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.writer()
                 (stateContext.currentState as? HasResult)?.let { currentState ->
-                    val saveGpxOutput = currentState.outputs.getFirstSaveGpxAction()
-                    val saveGpxAction = saveGpxOutput?.getAction(currentState.position)
+                    val saveGpxAction = allOutputGroups.firstNotNullOfOrNull { outputGroup ->
+                        outputGroup.getActionOutputs()
+                            .firstNotNullOf { it.getAction(currentState.position) as? Action.SaveGpx }
+                    }
                     saveGpxAction?.write(writer)
                 }
                 writer.close()

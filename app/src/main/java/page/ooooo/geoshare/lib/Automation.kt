@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import kotlin.time.Duration
 
+// TODO Turn Automation into Output.Automation
 sealed interface Automation {
 
     @Immutable

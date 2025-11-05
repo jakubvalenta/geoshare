@@ -3,13 +3,7 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -31,9 +25,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.outputs.GeoUriOutputManager
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.getOutputs
+import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -201,8 +193,7 @@ private fun DefaultPreview() {
                 currentState = AutomationFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -221,8 +212,7 @@ private fun DarkPreview() {
                 currentState = AutomationFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -247,8 +237,7 @@ private fun WaitingPreview() {
                     runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -273,8 +262,7 @@ private fun DarkWaitingPreview() {
                     runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -293,8 +281,7 @@ private fun SucceededPreview() {
                 currentState = AutomationSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -313,8 +300,7 @@ private fun DarSucceededPreview() {
                 currentState = AutomationSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -333,8 +319,7 @@ private fun FailedPreview() {
                 currentState = AutomationFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -353,8 +338,7 @@ private fun DarkFailedPreview() {
                 currentState = AutomationFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(emptyList()),
-                    automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},

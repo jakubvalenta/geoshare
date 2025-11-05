@@ -8,7 +8,16 @@ import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.*
 import kotlin.time.Duration.Companion.seconds
 
-object GpxOutputManager : OutputManager {
+object GpxOutputGroup : OutputGroup<Position> {
+
+    object SaveOutput : Output.Action<Position, Action> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.SaveGpx(value, uriQuote)
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_save_gpx)
+    }
 
     object SaveAutomation : Automation.HasSuccessMessage, Automation.HasErrorMessage, Automation.HasDelay {
         override val type = Automation.Type.SAVE_GPX
@@ -35,18 +44,19 @@ object GpxOutputManager : OutputManager {
             stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
-    object SaveOutput : Output.Chip, Output.SaveGpxAction {
-        override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.SaveGpx(position, uriQuote)
+    override fun getTextOutput(): Output.Text<Position>? = null
 
-        @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_save_gpx)
-    }
+    override fun getSupportingTextOutput(): Output.Text<Position>? = null
 
-    override fun getOutputs(packageNames: List<String>) = listOf(
+    override fun getActionOutputs() = listOf(
         SaveOutput,
     )
+
+    override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Position>>()
+
+    override fun getChipOutputs() = emptyList<Output.Action<Position, Action>>()
+
+    override fun getChooserOutput() = null
 
     override fun getAutomations(packageNames: List<String>) = listOf(
         SaveAutomation,
