@@ -115,4 +115,17 @@
     <string name="conversion_automation_copy_succeeded">Coordenadas fueron copiadas automáticamente</string>
     <string name="conversion_automation_open_app_failed">No fue posible abrir automáticamente %1$s</string>
     <string name="conversion_automation_open_app_succeeded">%1$s fue abierto automáticamente</string>
+    <string name="conversion_automation_open_app_waiting">Abriendo automáticamente %1$s en %2$ds</string>
+    <string name="conversion_automation_save_gpx_succeeded">Se guardó GPX automáticamente</string>
+    <string name="conversion_automation_save_gpx_waiting">Guardando GPX automáticamente en %1$ds</string>
+    <string name="conversion_automation_share_failed">No fue posible compartir el enlace automáticamente</string>
+    <string name="conversion_automation_share_succeeded">Enlace automáticamente compartido</string>
+    <string name="conversion_automation_share_waiting">Compartiendo enlace automáticamente en %1$ds</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Intento %1$d de %2$d debido a %3$s.</string>
+    <string name="user_preferences_automation_copy_coords">Copiar coordenadas en formato %1$s</string>
+    <string name="user_preferences_automation_copy_link">Copiar enlace de %1$s</string>
+    <string name="user_preferences_automation_description">Elige una acción que se ejecute automáticamente cuando un enlace de mapa se convierte a coordenadas.</string>
+    <string name="user_preferences_automation_nothing">Nada</string>
+    <string name="user_preferences_automation_open_app">Abrir %1$s</string>
+    <string name="user_preferences_automation_title">Automatización</string>
 </resources>
