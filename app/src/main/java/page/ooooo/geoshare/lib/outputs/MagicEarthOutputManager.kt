@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
@@ -30,46 +29,134 @@ object MagicEarthOutputManager : OutputManager {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
-        add(Output.Action(Action.Copy(formatDisplayUriString(position, uriQuote))) {
+    object CopyDisplayUriOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatDisplayUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
-        })
-        add(Output.Action(Action.Copy(formatDriveToUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
-        })
-        add(Output.Action(Action.Copy(formatDriveViaUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
-        })
-        add(Output.Action(Action.OpenApp(PACKAGE_NAME, formatDisplayUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
-        })
-        add(Output.Action(Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
-        })
-        add(Output.Action(Action.OpenApp(PACKAGE_NAME, formatDriveViaUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
-        })
-        position.points?.forEachIndexed { i, point ->
-            add(Output.PointAction(i, Action.Copy(formatDisplayUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
-            })
-            add(Output.PointAction(i, Action.Copy(formatDriveToUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
-            })
-            add(Output.PointAction(i, Action.Copy(formatDriveViaUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
-            })
-            add(Output.PointAction(i, Action.OpenChooser(formatDisplayUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
-            })
-            add(Output.PointAction(i, Action.OpenChooser(formatDriveToUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
-            })
-            add(Output.PointAction(i, Action.OpenChooser(formatDriveViaUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
-            })
-        }
     }
+
+    object CopyDriveToUriOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatDriveToUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
+    }
+
+    object CopyDriveViaUriOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatDriveViaUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
+    }
+
+    object OpenAppDisplayUriOutput : Output.AppAction {
+        override val packageName = PACKAGE_NAME
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(PACKAGE_NAME, formatDisplayUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
+    }
+
+    object OpenAppDriveToUriOutput : Output.AppAction {
+        override val packageName = PACKAGE_NAME
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
+    }
+
+    object OpenAppDriveViaUriOutput : Output.AppAction {
+        override val packageName = PACKAGE_NAME
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
+    }
+
+    object PointCopyDisplayUriOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDisplayUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
+    }
+
+    object PointCopyDriveToUriOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDriveToUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
+    }
+
+    object PointCopyDriveViaUriOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDriveViaUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
+    }
+
+    object PointOpenChooserDisplayUriOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.OpenChooser(formatDisplayUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
+    }
+
+    object PointOpenChooserDriveToUriOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.OpenChooser(formatDriveToUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
+    }
+
+    object PointOpenChooserDriveViaUriOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.OpenChooser(formatDriveViaUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
+    }
+
+    override fun getOutputs(packageNames: List<String>) = listOf(
+        CopyDisplayUriOutput,
+        CopyDriveToUriOutput,
+        CopyDriveViaUriOutput,
+        OpenAppDisplayUriOutput,
+        OpenAppDriveToUriOutput,
+        OpenAppDriveViaUriOutput,
+        PointCopyDisplayUriOutput,
+        PointCopyDriveToUriOutput,
+        PointCopyDriveViaUriOutput,
+        PointOpenChooserDisplayUriOutput,
+        PointOpenChooserDriveToUriOutput,
+        PointOpenChooserDriveViaUriOutput,
+    )
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyLinkAutomation,

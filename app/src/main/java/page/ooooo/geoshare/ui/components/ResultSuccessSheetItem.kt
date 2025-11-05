@@ -18,12 +18,12 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
 fun ResultSuccessSheetItem(
-    label: @Composable () -> String,
+    label: String,
     supportingText: String? = null,
     onClick: () -> Unit,
 ) {
     ListItem(
-        headlineContent = { Text(label()) },
+        headlineContent = { Text(label) },
         modifier = Modifier.clickable(onClick = onClick),
         supportingContent = supportingText?.let { { Text(it, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
@@ -36,14 +36,19 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
-                val outputs = allOutputManagers.getOutputs(Position.example, emptyList()).getActions()
-                val (copyOutputs, otherOutputs) = outputs.partition { it.action is Action.Copy }
-                copyOutputs.forEach { output ->
-                    ResultSuccessSheetItem(output.label, supportingText = (output.action as? Action.Copy)?.text) {}
+                val outputs = allOutputManagers.getOutputs(emptyList())
+                val position = Position.example
+                val (copyActionsAndLabels, otherActionsAndLabel) = outputs.getActions()
+                    .map { it.getAction(position) to it.label() }
+                    .partition { (action) -> action is Action.Copy }
+                copyActionsAndLabels.forEach { (action, label) ->
+                    ResultSuccessSheetItem(label, supportingText = (action as? Action.Copy)?.text) {}
                 }
-                HorizontalDivider()
-                otherOutputs.forEach { output ->
-                    ResultSuccessSheetItem(output.label) {}
+                if (copyActionsAndLabels.isNotEmpty() && otherActionsAndLabel.isNotEmpty()) {
+                    HorizontalDivider()
+                }
+                otherActionsAndLabel.forEach { (_, label) ->
+                    ResultSuccessSheetItem(label) {}
                 }
             }
         }
@@ -56,14 +61,19 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
-                val outputs = allOutputManagers.getOutputs(Position.example, emptyList()).getActions()
-                val (copyOutputs, otherOutputs) = outputs.partition { it.action is Action.Copy }
-                copyOutputs.forEach { output ->
-                    ResultSuccessSheetItem(output.label, supportingText = (output.action as? Action.Copy)?.text) {}
+                val outputs = allOutputManagers.getOutputs(emptyList())
+                val position = Position.example
+                val (copyActionsAndLabels, otherActionsAndLabel) = outputs.getActions()
+                    .map { it.getAction(position) to it.label() }
+                    .partition { (action) -> action is Action.Copy }
+                copyActionsAndLabels.forEach { (action, label) ->
+                    ResultSuccessSheetItem(label, supportingText = (action as? Action.Copy)?.text) {}
                 }
-                HorizontalDivider()
-                otherOutputs.forEach { output ->
-                    ResultSuccessSheetItem(output.label) {}
+                if (copyActionsAndLabels.isNotEmpty() && otherActionsAndLabel.isNotEmpty()) {
+                    HorizontalDivider()
+                }
+                otherActionsAndLabel.forEach { (_, label) ->
+                    ResultSuccessSheetItem(label) {}
                 }
             }
         }

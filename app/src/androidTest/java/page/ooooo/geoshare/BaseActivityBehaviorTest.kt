@@ -100,10 +100,12 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val outputs = allOutputManagers.getOutputs(expectedPosition, emptyList())
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == outputs.getText() }
+        val outputs = allOutputManagers.getOutputs(emptyList())
+        val expectedText = outputs.getText(expectedPosition)
+        onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
         if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == outputs.getSupportingText() }
+            val expectedSupportingText = outputs.getSupportingText(expectedPosition)
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })
         }

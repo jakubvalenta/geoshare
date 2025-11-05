@@ -10,13 +10,15 @@ import page.ooooo.geoshare.lib.UriQuote
 class GoogleMapsOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val packageNames: List<String> = emptyList()
+    private val outputs = GoogleMapsOutputManager.getOutputs(packageNames)
 
     @Test
     fun getOutputs_whenUriHasCoordinatesAndZoom_returnsCoordinatesAsQueryAndZoom() {
         assertEquals(
             listOf(Action.Copy("https://www.google.com/maps?q=50.123456,-11.123456&z=3.4")),
-            GoogleMapsOutputManager.getOutputs(Position("50.123456", "-11.123456", z = "3.4"), packageNames, uriQuote)
-                .mapNotNull { (it as? Output.Action)?.action }
+            outputs.getActions().map {
+                it.getAction(Position("50.123456", "-11.123456", z = "3.4"), uriQuote)
+            },
         )
     }
 
@@ -24,8 +26,9 @@ class GoogleMapsOutputTest {
     fun getOutputs_whenUriHasQueryAndZoom_returnsQueryAndZoom() {
         assertEquals(
             listOf(Action.Copy("https://www.google.com/maps?q=foo%20bar&z=3.4")),
-            GoogleMapsOutputManager.getOutputs(Position(q = "foo bar", z = "3.4"), packageNames, uriQuote)
-                .mapNotNull { (it as? Output.Action)?.action }
+            outputs.getActions().map {
+                it.getAction(Position(q = "foo bar", z = "3.4"), uriQuote)
+            },
         )
     }
 
@@ -33,9 +36,9 @@ class GoogleMapsOutputTest {
     fun getOutputs_whenUriHasCoordinatesAndQueryAndZoom_returnsCoordinatesAndZoom() {
         assertEquals(
             listOf(Action.Copy("https://www.google.com/maps?q=50.123456,-11.123456&z=3.4")),
-            GoogleMapsOutputManager.getOutputs(
-                Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), packageNames, uriQuote,
-            ).mapNotNull { (it as? Output.Action)?.action }
+            outputs.getActions().map {
+                it.getAction(Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"), uriQuote)
+            },
         )
     }
 }

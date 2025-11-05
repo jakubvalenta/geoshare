@@ -35,11 +35,18 @@ object GpxOutputManager : OutputManager {
             stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
-    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
-        add(Output.Action(Action.SaveGpx(position)) {
+    object SaveOutput : Output.Chip, Output.SaveGpxAction {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.SaveGpx(position, uriQuote)
+
+        @Composable
+        override fun label() =
             stringResource(R.string.conversion_succeeded_save_gpx)
-        })
     }
+
+    override fun getOutputs(packageNames: List<String>) = listOf(
+        SaveOutput,
+    )
 
     override fun getAutomations(packageNames: List<String>) = listOf(
         SaveAutomation,

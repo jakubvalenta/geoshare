@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Automation
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 
@@ -31,16 +30,28 @@ object AppleMapsOutputManager : OutputManager {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
-        add(Output.Action(Action.Copy(formatUriString(position, uriQuote))) {
+    object CopyLinkOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-        })
-        position.points?.forEachIndexed { i, point ->
-            add(Output.PointAction(i, Action.Copy(formatUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
-            })
-        }
     }
+
+    object PointCopyLinkOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
+    }
+
+    override fun getOutputs(packageNames: List<String>) = listOf(
+        CopyLinkOutput,
+        PointCopyLinkOutput,
+    )
 
     override fun getAutomations(packageNames: List<String>) = listOf(
         CopyLinkAutomation,

@@ -34,19 +34,38 @@ object GoogleMapsOutputManager : OutputManager {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
-        add(Output.Action(Action.Copy(formatUriString(position, uriQuote))) {
+    object CopyLinkOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-        })
-        position.points?.forEachIndexed { i, point ->
-            add(Output.PointAction(i, Action.Copy(formatUriString(point, uriQuote))) {
-                stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-            })
-        }
-        add(Output.Chip(Action.Copy(formatUriString(position, uriQuote))) {
-            stringResource(R.string.conversion_succeeded_copy_google_maps)
-        })
     }
+
+    object PointCopyLinkOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(point, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+    }
+
+    object ChipCopyLinkOutput : Output.Chip {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatUriString(position, uriQuote))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_google_maps)
+    }
+
+    override fun getOutputs(packageNames: List<String>) = listOf(
+        CopyLinkOutput,
+        PointCopyLinkOutput,
+        ChipCopyLinkOutput,
+    )
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyLinkAutomation,

@@ -25,11 +25,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.MagicEarthOutputManager
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.getAppActions
-import page.ooooo.geoshare.lib.outputs.getOutputs
+import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -45,6 +41,7 @@ private val dropdownButtonOffset = 20.dp
 
 @Composable
 fun ResultSuccessApps(
+    position: Position,
     outputs: List<Output>,
     onRun: (action: Action) -> Unit,
     intentTools: IntentTools = IntentTools(),
@@ -59,7 +56,7 @@ fun ResultSuccessApps(
     }
     val apps: Map<IntentTools.App, List<Output.AppAction>> = outputs
         .getAppActions()
-        .groupBy { (packageName) -> packageName }
+        .groupBy { it.packageName }
         .mapNotNull { (packageName, items) ->
             intentTools.queryApp(context.packageManager, packageName)?.let { app -> app to items }
         }
@@ -70,8 +67,6 @@ fun ResultSuccessApps(
         add(GridItem.ShareButton())
         repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
-    val openChooserAction: Action.OpenChooser? =
-        outputs.firstNotNullOfOrNull { (it as? Output.Action)?.action as? Action.OpenChooser }
 
     Column(
         Modifier
@@ -84,10 +79,12 @@ fun ResultSuccessApps(
                 row.forEach { gridItem ->
                     when (gridItem) {
                         is GridItem.App -> gridItem.let { (app, outputs) ->
-                            ResultSuccessApp(app, outputs, onRun)
+                            ResultSuccessApp(position, app, outputs, onRun)
                         }
 
-                        is GridItem.ShareButton -> ResultSuccessAppShare { openChooserAction?.let(onRun) }
+                        is GridItem.ShareButton -> ResultSuccessAppShare {
+                            outputs.getFirstOpenChooserAction()?.getAction(position)?.let(onRun)
+                        }
 
                         is GridItem.Empty -> ResultSuccessAppEmpty()
                     }
@@ -100,6 +97,7 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
+    position: Position,
     app: IntentTools.App,
     outputs: List<Output.AppAction>,
     onRun: (action: Action) -> Unit,
@@ -112,7 +110,7 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                outputs.firstOrNull()?.let { (_, action) -> onRun(action) }
+                outputs.firstOrNull()?.getAction(position)?.let(onRun)
             }
             .weight(1f)
             .testTag("geoShareResultCardApp_${app.packageName}"),
@@ -146,10 +144,10 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        outputs.forEach { (_, action, label) ->
+                        outputs.forEach {
                             DropdownMenuItem(
-                                text = { Text(label()) },
-                                onClick = { onRun(action) },
+                                text = { Text(it.label()) },
+                                onClick = { onRun(it.getAction(position)) },
                             )
                         }
                     }
@@ -208,7 +206,8 @@ private fun DefaultPreview() {
                 )
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -242,7 +241,8 @@ private fun DarkPreview() {
                 )
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -268,7 +268,8 @@ private fun OneAppPreview() {
                 )
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -294,7 +295,8 @@ private fun DarkOneAppPreview() {
                 )
                 val context = LocalContext.current
                 ResultSuccessApps(
-                    outputs = allOutputManagers.getOutputs(Position.example, packageNames),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(packageNames),
                     onRun = {},
                     intentTools = object : IntentTools() {
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
@@ -316,6 +318,7 @@ private fun NoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
+                    position = Position.example,
                     outputs = emptyList(),
                     onRun = {},
                 )
@@ -331,6 +334,7 @@ private fun DarkNoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
+                    position = Position.example,
                     outputs = emptyList(),
                     onRun = {},
                 )

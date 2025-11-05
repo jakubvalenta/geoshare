@@ -200,7 +200,8 @@ private fun DefaultPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -219,7 +220,8 @@ private fun DarkPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -245,7 +247,7 @@ private fun WaitingPreview() {
                     runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -271,7 +273,7 @@ private fun DarkWaitingPreview() {
                     runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -290,7 +292,8 @@ private fun SucceededPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -306,11 +309,11 @@ private fun SucceededPreview() {
 private fun DarSucceededPreview() {
     AppTheme {
         Surface {
-            val position = Position.example
             ResultSuccessAutomation(
                 currentState = AutomationSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    outputs = allOutputManagers.getOutputs(position, emptyList()),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -329,7 +332,8 @@ private fun FailedPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
@@ -348,7 +352,8 @@ private fun DarkFailedPreview() {
             ResultSuccessAutomation(
                 currentState = AutomationFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    outputs = allOutputManagers.getOutputs(Position.example, emptyList()),
+                    position = Position.example,
+                    outputs = allOutputManagers.getOutputs(emptyList()),
                     automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,

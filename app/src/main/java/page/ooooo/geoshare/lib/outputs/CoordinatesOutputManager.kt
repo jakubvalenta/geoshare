@@ -6,13 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Automation
-import page.ooooo.geoshare.lib.Action
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.toDegMinSec
-import page.ooooo.geoshare.lib.toScale
+import page.ooooo.geoshare.lib.*
 import kotlin.math.abs
 
 object CoordinatesOutputManager : OutputManager {
@@ -69,25 +63,60 @@ object CoordinatesOutputManager : OutputManager {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    override fun getOutputs(position: Position, packageNames: List<String>, uriQuote: UriQuote) = buildList {
-        val degMinSec = formatDegMinSecString(position)
-        add(Output.Text(degMinSec))
-        add(Output.SupportingText(formatParamsString(position)))
-        add(Output.Action(Action.Copy(degMinSec)) {
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
-        })
-        add(Output.Action(Action.Copy(formatDecString(position))) {
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
-        })
-        position.points?.forEachIndexed { i, point ->
-            add(Output.PointAction(i, Action.Copy(formatDegMinSecString(point))) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates)
-            })
-            add(Output.PointAction(i, Action.Copy(formatDecString(point))) {
-                stringResource(R.string.conversion_succeeded_copy_coordinates)
-            })
-        }
+    object TextOutput : Output.Text {
+        override fun getText(position: Position, uriQuote: UriQuote) = formatDegMinSecString(position)
     }
+
+    object SupportingTextOutput : Output.SupportingText {
+        override fun getText(position: Position, uriQuote: UriQuote) = formatParamsString(position)
+    }
+
+    object CopyDegMinSecOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatDegMinSecString(position))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_coordinates)
+    }
+
+    object CopyDecOutput : Output.Action {
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatDecString(position))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_coordinates)
+    }
+
+    object PointCopyDegMinSecOutput : Output.PointText, Output.PointAction {
+        override fun getText(point: Point, uriQuote: UriQuote) = formatDegMinSecString(point)
+
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDegMinSecString(point))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_coordinates)
+    }
+
+    object PointCopyDecOutput : Output.PointAction {
+        override fun getAction(point: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDecString(point))
+
+        @Composable
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_coordinates)
+    }
+
+    override fun getOutputs(packageNames: List<String>) = listOf(
+        TextOutput,
+        SupportingTextOutput,
+        CopyDegMinSecOutput,
+        CopyDecOutput,
+        PointCopyDegMinSecOutput,
+        PointCopyDecOutput,
+    )
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyCoordsDecAutomation,

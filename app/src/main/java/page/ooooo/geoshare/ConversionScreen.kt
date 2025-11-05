@@ -232,6 +232,7 @@ fun ConversionScreen(
                 {
                     Headline(stringResource(R.string.conversion_succeeded_title))
                     ResultSuccessCoordinates(
+                        position = currentState.position,
                         outputs = currentState.outputs,
                         onRun = onRun,
                     )
@@ -250,6 +251,7 @@ fun ConversionScreen(
                             onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                         )
                         ResultSuccessApps(
+                            position = currentState.position,
                             outputs = currentState.outputs,
                             onRun = onRun,
                             windowSizeClass = windowSizeClass,
@@ -364,11 +366,11 @@ fun ConversionScreen(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        val position = Position.example
         ConversionScreen(
             currentState = AutomationFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                outputs = allOutputManagers.getOutputs(position, emptyList()),
+                position = Position.example,
+                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = Automation.Noop,
             ),
             changelogShown = true,
@@ -394,11 +396,11 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        val position = Position.example
         ConversionScreen(
             currentState = AutomationFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                outputs = allOutputManagers.getOutputs(position, emptyList()),
+                position = Position.example,
+                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = Automation.Noop,
             ),
             changelogShown = true,
@@ -424,11 +426,11 @@ private fun DarkPreview() {
 @Composable
 private fun TabletPreview() {
     AppTheme {
-        val position = Position.example
         ConversionScreen(
             currentState = AutomationFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                outputs = allOutputManagers.getOutputs(position, emptyList()),
+                position = Position.example,
+                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = Automation.Noop,
             ),
             changelogShown = true,
@@ -457,14 +459,13 @@ private fun AutomationPreview() {
         val context = LocalContext.current
         val clipboard = LocalClipboard.current
         val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
-        val position = Position.example
         ConversionScreen(
             currentState = AutomationWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = position,
-                outputs = allOutputManagers.getOutputs(position, emptyList()),
+                position = Position.example,
+                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
@@ -493,14 +494,13 @@ private fun DarkAutomationPreview() {
         val context = LocalContext.current
         val clipboard = LocalClipboard.current
         val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
-        val position = Position.example
         ConversionScreen(
             currentState = AutomationWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = position,
-                outputs = allOutputManagers.getOutputs(position, emptyList()),
+                position = Position.example,
+                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,
@@ -529,14 +529,13 @@ private fun TabletAutomationPreview() {
         val context = LocalContext.current
         val clipboard = LocalClipboard.current
         val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
-        val position = Position.example
         ConversionScreen(
             currentState = AutomationWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = position,
-                outputs = allOutputManagers.getOutputs(position, emptyList()),
+                position = Position.example,
+                outputs = allOutputManagers.getOutputs(emptyList()),
                 automation = GeoUriOutputManager.OpenAppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
             ),
             changelogShown = true,

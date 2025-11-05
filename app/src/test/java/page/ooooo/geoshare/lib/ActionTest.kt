@@ -25,8 +25,9 @@ class ActionTest {
                             Point("50.123456", "-11.123456"),
                             Point("52.5067296", "13.2599309"),
                         ),
-                    )
-                ).write(this, uriQuote)
+                    ),
+                    uriQuote,
+                ).write(this)
             }.toString()
         )
     }
@@ -47,8 +48,9 @@ class ActionTest {
                         points = persistentListOf(
                             Point("\"", "<"),
                         ),
-                    )
-                ).write(this, uriQuote)
+                    ),
+                    uriQuote,
+                ).write(this)
             }.toString()
         )
     }
@@ -64,8 +66,9 @@ class ActionTest {
 """,
             StringBuilder().apply {
                 Action.SaveGpx(
-                    Position()
-                ).write(this, uriQuote)
+                    Position(),
+                    uriQuote,
+                ).write(this)
             }.toString()
         )
     }

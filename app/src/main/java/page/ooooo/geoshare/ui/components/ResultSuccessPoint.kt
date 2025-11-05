@@ -19,13 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Action
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.outputs.allOutputManagers
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.getActions
-import page.ooooo.geoshare.lib.outputs.getOutputs
-import page.ooooo.geoshare.lib.outputs.getPointActions
-import page.ooooo.geoshare.lib.outputs.getPointText
+import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -33,6 +28,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultSuccessPoint(
     i: Int,
+    point: Point,
     outputs: List<Output.PointAction>,
     onRun: (action: Action) -> Unit,
 ) {
@@ -50,7 +46,7 @@ fun ResultSuccessPoint(
         )
         SelectionContainer(Modifier.weight(1f)) {
             Text(
-                outputs.getPointText(),
+                outputs.getPointText(point),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -64,11 +60,28 @@ fun ResultSuccessPoint(
         }
     }
     ResultSuccessSheet(
-        outputs = outputs.getActions(),
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
-        onRun = onRun,
-    )
+    ) { onHide ->
+        val (copyActionsAndLabels, otherActionsAndLabel) = outputs
+            .map { it.getAction(point) to it.label() }
+            .partition { (action) -> action is Action.Copy }
+        copyActionsAndLabels.forEach { (action, label) ->
+            ResultSuccessSheetItem(label, supportingText = (action as? Action.Copy)?.text) {
+                onRun(action)
+                onHide()
+            }
+        }
+        if (copyActionsAndLabels.isNotEmpty() && otherActionsAndLabel.isNotEmpty()) {
+            HorizontalDivider()
+        }
+        otherActionsAndLabel.forEach { (action, label) ->
+            ResultSuccessSheetItem(label) {
+                onRun(action)
+                onHide()
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -78,7 +91,8 @@ private fun DefaultPreview() {
         Surface {
             ResultSuccessPoint(
                 i = 3,
-                outputs = allOutputManagers.getOutputs(Position.example, emptyList()).getPointActions(),
+                point = Point.example,
+                outputs = allOutputManagers.getOutputs(emptyList()).getPointActions(),
                 onRun = {},
             )
         }
@@ -92,7 +106,8 @@ private fun DarkPreview() {
         Surface {
             ResultSuccessPoint(
                 i = 3,
-                outputs = allOutputManagers.getOutputs(Position.example, emptyList()).getPointActions(),
+                point = Point.example,
+                outputs = allOutputManagers.getOutputs(emptyList()).getPointActions(),
                 onRun = {},
             )
         }

@@ -1,31 +1,54 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.Action as Action_
 
+// TODO Output feels too complicated
 sealed interface Output {
-    interface WithAction : Output {
-        val action: Action_
-        val label: @Composable () -> String
+    interface HasLabel : Output {
+        @Composable
+        fun label(): String
     }
 
-    data class Action(override val action: Action_, override val label: @Composable () -> String) :
-        WithAction
+    interface HasPositionText : Output {
+        fun getText(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String?
+    }
 
-    data class AppAction(
-        val packageName: String,
-        override val action: Action_,
-        override val label: @Composable () -> String,
-    ) :
-        WithAction
+    interface HasPointText : Output {
+        fun getText(point: Point, uriQuote: UriQuote = DefaultUriQuote()): String?
+    }
 
-    data class Chip(override val action: Action_, override val label: @Composable () -> String) :
-        WithAction
+    interface HasPositionAction : Output {
+        fun getAction(position: Position, uriQuote: UriQuote = DefaultUriQuote()): Action_
+    }
 
-    data class PointAction(val i: Int, override val action: Action_, override val label: @Composable () -> String) :
-        WithAction
+    interface HasPointAction : Output {
+        fun getAction(point: Point, uriQuote: UriQuote = DefaultUriQuote()): Action_
+    }
 
-    data class SupportingText(val text: String) : Output
+    interface Action : HasLabel, HasPositionAction
 
-    data class Text(val text: String) : Output
+    interface AppAction : HasLabel, HasPositionAction {
+        val packageName: String
+    }
+
+    interface Chip : HasLabel, HasPositionAction
+
+    interface OpenChooserAction : HasLabel, HasPositionAction
+
+    interface SaveGpxAction : HasLabel, HasPositionAction {
+        override fun getAction(position: Position, uriQuote: UriQuote): Action_.SaveGpx
+    }
+
+    interface PointText : HasPointText
+
+    interface PointAction : HasLabel, HasPointAction
+
+    interface SupportingText : HasPositionText
+
+    interface Text : HasPositionText
 }

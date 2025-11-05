@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
-import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.getFirstSaveGpxAction
 import javax.inject.Inject
 
 @HiltViewModel
@@ -147,18 +147,20 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun grant(doNotAsk: Boolean) {
-        assert(stateContext.currentState is PermissionState)
         viewModelScope.launch {
-            stateContext.currentState = (stateContext.currentState as PermissionState).grant(doNotAsk)
-            transition()
+            (stateContext.currentState as? PermissionState)?.let { currentState ->
+                stateContext.currentState = currentState.grant(doNotAsk)
+                transition()
+            }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        assert(stateContext.currentState is PermissionState)
         viewModelScope.launch {
-            stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
-            transition()
+            (stateContext.currentState as? PermissionState)?.let { currentState ->
+                stateContext.currentState = currentState.deny(doNotAsk)
+                transition()
+            }
         }
     }
 
@@ -166,10 +168,11 @@ class ConversionViewModel @Inject constructor(
         result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.writer()
-                val saveGpxAction = (stateContext.currentState as? HasResult)?.outputs?.firstNotNullOfOrNull {
-                    (it as? Output.Action)?.action as? Action.SaveGpx
+                (stateContext.currentState as? HasResult)?.let { currentState ->
+                    val saveGpxOutput = currentState.outputs.getFirstSaveGpxAction()
+                    val saveGpxAction = saveGpxOutput?.getAction(currentState.position)
+                    saveGpxAction?.write(writer)
                 }
-                saveGpxAction?.write(writer)
                 writer.close()
             }
         }

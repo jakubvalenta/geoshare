@@ -34,6 +34,7 @@ interface HasLoadingIndicator {
 
 interface HasResult {
     val inputUriString: String
+    val position: Position
     val outputs: List<Output>
 }
 
@@ -379,12 +380,10 @@ data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     override val inputUriString: String,
-    val position: Position,
+    override val position: Position,
 ) : ConversionState(), HasResult {
     override val outputs = allOutputManagers.getOutputs(
-        position,
         packageNames = stateContext.intentTools.queryGeoUriPackageNames(runContext.context.packageManager),
-        uriQuote = stateContext.uriQuote,
     )
 
     override suspend fun transition(): State =
@@ -413,7 +412,7 @@ data class AutomationWaiting(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     override val inputUriString: String,
-    val position: Position,
+    override val position: Position,
     override val outputs: List<Output>,
     val automation: Automation.HasDelay,
 ) : ConversionState(), HasResult {
@@ -424,7 +423,7 @@ data class AutomationWaiting(
             }
             AutomationReady(stateContext, runContext, inputUriString, position, outputs, automation)
         } catch (_: CancellationException) {
-            AutomationFinished(inputUriString, outputs, automation)
+            AutomationFinished(inputUriString, position, outputs, automation)
         }
 }
 
@@ -432,7 +431,7 @@ data class AutomationReady(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     override val inputUriString: String,
-    val position: Position,
+    override val position: Position,
     override val outputs: List<Output>,
     val automation: Automation,
 ) : ConversionState(), HasResult {
@@ -440,18 +439,19 @@ data class AutomationReady(
         automation.getAction(position, stateContext.uriQuote).let { outputAction ->
             when (outputAction?.run(stateContext.intentTools, runContext)) {
                 true if automation is Automation.HasSuccessMessage ->
-                    AutomationSucceeded(inputUriString, outputs, automation)
+                    AutomationSucceeded(inputUriString, position, outputs, automation)
 
                 false if automation is Automation.HasErrorMessage ->
-                    AutomationFailed(inputUriString, outputs, automation)
+                    AutomationFailed(inputUriString, position, outputs, automation)
 
-                else -> AutomationFinished(inputUriString, outputs, automation)
+                else -> AutomationFinished(inputUriString, position, outputs, automation)
             }
         }
 }
 
 data class AutomationSucceeded(
     override val inputUriString: String,
+    override val position: Position,
     override val outputs: List<Output>,
     val automation: Automation.HasSuccessMessage,
 ) : ConversionState(), HasResult {
@@ -461,12 +461,13 @@ data class AutomationSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return AutomationFinished(inputUriString, outputs, automation)
+        return AutomationFinished(inputUriString, position, outputs, automation)
     }
 }
 
 data class AutomationFailed(
     override val inputUriString: String,
+    override val position: Position,
     override val outputs: List<Output>,
     val automation: Automation.HasErrorMessage,
 ) : ConversionState(), HasResult {
@@ -476,12 +477,13 @@ data class AutomationFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return AutomationFinished(inputUriString, outputs, automation)
+        return AutomationFinished(inputUriString, position, outputs, automation)
     }
 }
 
 data class AutomationFinished(
     override val inputUriString: String,
+    override val position: Position,
     override val outputs: List<Output>,
     val automation: Automation,
 ) : ConversionState(), HasResult

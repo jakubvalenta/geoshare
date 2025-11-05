@@ -24,11 +24,11 @@ sealed class Action {
     }
 
     @Immutable
-    data class SaveGpx(val position: Position) : Action() {
+    data class SaveGpx(val position: Position, val uriQuote: UriQuote = DefaultUriQuote()) : Action() {
         override suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext) =
             intentTools.launchSaveGpx(runContext.context, runContext.saveGpxLauncher)
 
-        fun write(writer: Appendable, uriQuote: UriQuote = DefaultUriQuote()) = writer.apply {
+        fun write(writer: Appendable) = writer.apply {
             append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
             append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
             append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
