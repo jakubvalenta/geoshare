@@ -12,7 +12,7 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.Automation
+import page.ooooo.geoshare.lib.outputs.Automation
 import javax.inject.Inject
 import javax.inject.Singleton
 

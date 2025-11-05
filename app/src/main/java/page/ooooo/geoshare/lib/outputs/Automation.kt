@@ -1,13 +1,15 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.UriQuote
 import kotlin.time.Duration
 
-// TODO Turn Automation into Output.Automation
 sealed interface Automation {
 
     @Immutable

@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.Action as Action_
+import page.ooooo.geoshare.lib.outputs.Action as Action_
 
 sealed interface Output<T> {
 

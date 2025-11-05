@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Action
+import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.*
@@ -125,7 +125,7 @@ fun RowScope.ResultSuccessApp(
                 rememberDrawablePainter(app.icon),
                 app.label,
             )
-            outputs.takeIf { it.size > 1 }?.let {
+            outputs.drop(1).takeIf { it.isNotEmpty() }?.let {
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -146,7 +146,6 @@ fun RowScope.ResultSuccessApp(
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         outputs.forEach {
-                            // TODO Consider hiding the default open geo: URI action from this menu
                             DropdownMenuItem(
                                 text = { Text(it.label()) },
                                 onClick = { onRun(it.getAction(position)) },

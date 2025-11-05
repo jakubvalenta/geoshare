@@ -12,7 +12,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Automation
+import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.findAutomation

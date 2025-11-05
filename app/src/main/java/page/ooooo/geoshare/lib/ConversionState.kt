@@ -15,6 +15,7 @@ import page.ooooo.geoshare.data.local.preferences.automation
 import page.ooooo.geoshare.data.local.preferences.connectionPermission
 import page.ooooo.geoshare.lib.converters.ShortUriMethod
 import page.ooooo.geoshare.lib.converters.UrlConverter
+import page.ooooo.geoshare.lib.outputs.Automation
 import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 

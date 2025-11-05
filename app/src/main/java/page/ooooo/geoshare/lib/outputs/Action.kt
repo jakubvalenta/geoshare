@@ -1,6 +1,11 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Immutable
+import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.UriQuote
 
 sealed class Action {
     abstract suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext): Boolean

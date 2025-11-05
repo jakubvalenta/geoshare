@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import page.ooooo.geoshare.lib.Action
+import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.getActionOutputs

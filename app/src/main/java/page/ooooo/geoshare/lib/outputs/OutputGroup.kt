@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.outputs
 
-import page.ooooo.geoshare.lib.Action
-import page.ooooo.geoshare.lib.Automation
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.Automation
 
 interface OutputGroup<T> {
     fun getTextOutput(): Output.Text<T>?

@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import page.ooooo.geoshare.lib.outputs.Action
 
 class ActionTest {
     private val uriQuote = FakeUriQuote()
