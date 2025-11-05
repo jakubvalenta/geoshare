@@ -173,7 +173,7 @@ class ConversionViewModel @Inject constructor(
                 (stateContext.currentState as? HasResult)?.let { currentState ->
                     val saveGpxAction = allOutputGroups.firstNotNullOfOrNull { outputGroup ->
                         outputGroup.getActionOutputs()
-                            .firstNotNullOf { it.getAction(currentState.position) as? Action.SaveGpx }
+                            .firstNotNullOfOrNull { it.getAction(currentState.position) as? Action.SaveGpx }
                     }
                     saveGpxAction?.write(writer)
                 }
