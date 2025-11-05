@@ -53,7 +53,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
                     stringResource(R.string.conversion_succeeded_copy_coordinates)
                 )
                 Text(
-                    formatDegMinSecString(Position.example),
+                    formatDecString(Position.example),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
