@@ -9,6 +9,10 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
+/**
+ * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated, for
+ * example the drive_via parameter doesn't work anymore but trial and error showed that navigate_via works.
+ */
 object MagicEarthOutputGroup : OutputGroup<Position> {
     @Suppress("SpellCheckingInspection")
     const val PACKAGE_NAME = "com.generalmagic.magicearth"
@@ -22,18 +26,18 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
     }
 
-    object CopyDriveToOutput : Output.Action<Position, Action> {
+    object CopyNavigateToOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatDriveToUriString(value, uriQuote))
+            Action.Copy(formatNavigateToUriString(value, uriQuote))
 
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
     }
 
-    object CopyDriveViaOutput : Output.Action<Position, Action> {
+    object CopyNavigateViaOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatDriveViaUriString(value, uriQuote))
+            Action.Copy(formatNavigateViaUriString(value, uriQuote))
 
         @Composable
         override fun label() =
@@ -51,26 +55,26 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
     }
 
-    object AppDriveToOutput : Output.App<Position> {
+    object AppNavigateToOutput : Output.App<Position> {
         override val packageName = PACKAGE_NAME
 
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(PACKAGE_NAME, formatDriveToUriString(value, uriQuote))
+            Action.OpenApp(PACKAGE_NAME, formatNavigateToUriString(value, uriQuote))
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthUrlConverter.NAME)
     }
 
-    object AppDriveViaOutput : Output.App<Position> {
+    object AppNavigateViaOutput : Output.App<Position> {
         override val packageName = PACKAGE_NAME
 
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(PACKAGE_NAME, formatDriveViaUriString(value, uriQuote))
+            Action.OpenApp(PACKAGE_NAME, formatNavigateViaUriString(value, uriQuote))
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthUrlConverter.NAME)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -96,14 +100,14 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
-        CopyDriveToOutput,
-        CopyDriveViaOutput,
+        CopyNavigateToOutput,
+        CopyNavigateViaOutput,
     )
 
     override fun getAppOutputs(packageNames: List<String>) = listOf(
         AppDisplayOutput,
-        AppDriveToOutput,
-        AppDriveViaOutput,
+        AppNavigateToOutput,
+        AppNavigateViaOutput,
     )
 
     override fun getChipOutputs() = emptyList<Output.Action<Position, Action>>()
@@ -123,11 +127,11 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         MagicEarthPointOutputGroup.formatDisplayUriString(mainPoint ?: Point(), uriQuote, q = q)
     }
 
-    private fun formatDriveToUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatDriveToUriString(mainPoint ?: Point(), uriQuote)
+    private fun formatNavigateToUriString(value: Position, uriQuote: UriQuote): String = value.run {
+        MagicEarthPointOutputGroup.formatNavigateToUriString(mainPoint ?: Point(), uriQuote)
     }
 
-    private fun formatDriveViaUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatDriveViaUriString(mainPoint ?: Point(), uriQuote)
+    private fun formatNavigateViaUriString(value: Position, uriQuote: UriQuote): String = value.run {
+        MagicEarthPointOutputGroup.formatNavigateViaUriString(mainPoint ?: Point(), uriQuote)
     }
 }

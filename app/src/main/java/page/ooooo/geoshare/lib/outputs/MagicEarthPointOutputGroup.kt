@@ -4,11 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
@@ -21,18 +20,18 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
     }
 
-    object CopyDriveToOutput : Output.Action<Point, Action> {
+    object CopyNavigateToOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatDriveToUriString(value, uriQuote))
+            Action.Copy(formatNavigateToUriString(value, uriQuote))
 
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
     }
 
-    object CopyDriveViaOutput : Output.Action<Point, Action> {
+    object CopyNavigateViaOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatDriveViaUriString(value, uriQuote))
+            Action.Copy(formatNavigateViaUriString(value, uriQuote))
 
         @Composable
         override fun label() =
@@ -48,22 +47,22 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
     }
 
-    object ChooserDriveToOutput : Output.Action<Point, Action> {
+    object ChooserNavigateToOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatDriveToUriString(value, uriQuote))
+            Action.OpenChooser(formatNavigateToUriString(value, uriQuote))
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_drive_to, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthUrlConverter.NAME)
     }
 
-    object ChooserDriveViaOutput : Output.Action<Point, Action> {
+    object ChooserNavigateViaOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatDriveViaUriString(value, uriQuote))
+            Action.OpenChooser(formatNavigateViaUriString(value, uriQuote))
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_drive_via, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthUrlConverter.NAME)
     }
 
     override fun getTextOutput(): Output.Text<Point>? = null
@@ -72,11 +71,11 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
-        CopyDriveToOutput,
-        CopyDriveViaOutput,
+        CopyNavigateToOutput,
+        CopyNavigateViaOutput,
         ChooserDisplayOutput,
-        ChooserDriveToOutput,
-        ChooserDriveViaOutput,
+        ChooserNavigateToOutput,
+        ChooserNavigateViaOutput,
     )
 
     override fun getAppOutputs(packageNames: List<String>) =
@@ -115,12 +114,12 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             uriQuote = uriQuote,
         ).toString()
 
-    fun formatDriveToUriString(value: Point, uriQuote: UriQuote): String =
+    fun formatNavigateToUriString(value: Point, uriQuote: UriQuote): String =
         Uri(
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
-                set("drive_to", "")
+                set("navigate_to", "")
                 value.run {
                     set("lat", lat)
                     set("lon", lon)
@@ -129,12 +128,12 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             uriQuote = uriQuote,
         ).toString()
 
-    fun formatDriveViaUriString(value: Point, uriQuote: UriQuote): String =
+    fun formatNavigateViaUriString(value: Point, uriQuote: UriQuote): String =
         Uri(
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
-                set("drive_via", "")
+                set("navigate_via", "")
                 value.run {
                     set("lat", lat)
                     set("lon", lon)

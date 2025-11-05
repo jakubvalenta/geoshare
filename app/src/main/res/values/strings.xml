@@ -10,8 +10,8 @@
     <string name="conversion_succeeded_copy_link_drive_via">Copy link to add waypoint in %1$s</string>
     <string name="conversion_succeeded_open_app">Open %1$s</string>
     <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
-    <string name="conversion_succeeded_open_app_drive_to">Navigate in %1$s</string>
-    <string name="conversion_succeeded_open_app_drive_via">Add waypoint in %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_to">Navigate in %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_via">Add waypoint in %1$s</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
     <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>

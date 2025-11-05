@@ -45,8 +45,8 @@ class MagicEarthOutputTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             listOf(
-                Action.Copy("magicearth://?drive_to&lat=50.123456&lon=-11.123456"),
-                Action.Copy("magicearth://?drive_via&lat=50.123456&lon=-11.123456"),
+                Action.Copy("magicearth://?navigate_to&lat=50.123456&lon=-11.123456"),
+                Action.Copy("magicearth://?navigate_via&lat=50.123456&lon=-11.123456"),
             ),
             outputGroup.getActionOutputs().slice(1..2).map {
                 it.getAction(Position("50.123456", "-11.123456"), uriQuote)
