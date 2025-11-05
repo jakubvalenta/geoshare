@@ -14,9 +14,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PATH
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 
-class GoogleMapsUrlConverter() :
-    UrlConverter.WithUriPattern,
-    UrlConverter.WithShortUriPattern,
+class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
 
     companion object {
@@ -65,63 +63,62 @@ class GoogleMapsUrlConverter() :
     override val shortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUriPattern = conversionPattern {
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                query("zoom", Z) { PositionMatch(it) }
+                on { scheme matches Z } doReturn { PositionMatch(it) }
+                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch(it) }
                 first {
-                    query("destination", "$LAT,$LON") { PositionMatch(it) }
-                    query("destination", Q_PARAM) { PositionMatch(it) }
-                    query("q", "$LAT,$LON") { PositionMatch(it) }
-                    query("q", Q_PARAM) { PositionMatch(it) }
-                    query("query", "$LAT,$LON") { PositionMatch(it) }
-                    query("query", Q_PARAM) { PositionMatch(it) }
-                    query("viewpoint", "$LAT,$LON") { PositionMatch(it) }
-                    query("center", "$LAT,$LON") { PositionMatch(it) }
+                    on { queryParams["destination"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                    on { queryParams["destination"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                    on { queryParams["q"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                    on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                    on { queryParams["query"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                    on { queryParams["query"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                    on { queryParams["viewpoint"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                    on { queryParams["center"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
                 }
             }
             first {
-                path("""/maps/.*/@[\d.,+-]+,${Z}z/$DATA""") { DataPointsPositionMatch(it) }
-                path("""/maps/.*/$DATA""") { DataPointsPositionMatch(it) }
-                path("""/maps/@$LAT,$LON,${Z}z.*""") { PositionMatch(it) }
-                path("""/maps/@$LAT,$LON.*""") { PositionMatch(it) }
-                path("""/maps/@""") { PositionMatch(it) }
-                path("""/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*""") { PositionMatch(it) }
-                path("""/maps/place/.*/@$LAT,$LON,${Z}z.*""") { PositionMatch(it) }
-                path("""/maps/place/.*/@$LAT,$LON.*""") { PositionMatch(it) }
-                path("""/maps/place/$LAT,$LON.*""") { PositionMatch(it) }
-                path("""/maps/place/$Q_PATH.*""") { PositionMatch(it) }
-                path("""/maps/place//.*""") { PositionMatch(it) }
-                path("""/maps/placelists/list/.*""") { PositionMatch(it) }
-                path("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""") { PositionMatch(it) }
-                path("""/maps/search/$LAT,$LON.*""") { PositionMatch(it) }
-                path("""/maps/search/$Q_PATH.*""") { PositionMatch(it) }
-                path("""/maps/search/""") { PositionMatch(it) }
-                path("""/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""") { PositionMatch(it) }
-                path("""/maps/dir/.*/$LAT,$LON/data[^/]*""") { PositionMatch(it) }
-                path("""/maps/dir/.*/$LAT,$LON/?""") { PositionMatch(it) }
-                path("""/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""") { PositionMatch(it) }
-                path("""/maps/dir/.*/$Q_PATH/data[^/]*""") { PositionMatch(it) }
-                path("""/maps/dir/.*/$Q_PATH/?""") { PositionMatch(it) }
-                path("""/maps/dir/""") { PositionMatch(it) }
-                all {
-                    path("""/maps/d/(edit|viewer)""") { PositionMatch(it) }
-                    query("mid", ".+") { PositionMatch(it) }
-                }
-                path("""/maps/?""") { PositionMatch(it) }
-                path("""/search/?""") { PositionMatch(it) }
-                path("""/?""") { PositionMatch(it) }
+                on { path matches """/maps/.*/@[\d.,+-]+,${Z}z/$DATA""" } doReturn { DataPointsPositionMatch(it) }
+                on { path matches """/maps/.*/$DATA""" } doReturn { DataPointsPositionMatch(it) }
+                on { path matches """/maps/@$LAT,$LON,${Z}z.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/@$LAT,$LON.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/@""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/place/.*/@$LAT,$LON,${Z}z.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/place/.*/@$LAT,$LON.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/place/$LAT,$LON.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/place/$Q_PATH.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/place//.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/placelists/list/.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/search/$LAT,$LON.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/search/$Q_PATH.*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/search/""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/.*/$LAT,$LON/data[^/]*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/.*/$LAT,$LON/?""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/.*/$Q_PATH/data[^/]*""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/.*/$Q_PATH/?""" } doReturn { PositionMatch(it) }
+                on { path matches """/maps/dir/""" } doReturn { PositionMatch(it) }
+                on { if ((path matches """/maps/d/(edit|viewer)""") != null) queryParams["mid"]?.let { it matches ".+" } else null } doReturn
+                        { PositionMatch(it) }
+                on { path matches """/maps/?""" } doReturn { PositionMatch(it) }
+                on { path matches """/search/?""" } doReturn { PositionMatch(it) }
+                on { path matches """/?""" } doReturn { PositionMatch(it) }
             }
         }
     }
 
-    override val conversionHtmlPattern = conversionPattern {
-        html("""/@$LAT,$LON""") { PositionMatch(it) }
-        html("""\[(null,null,|null,\[)$LAT,$LON\]""") { PointsPositionMatch(it) }
+    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
+        on { this find """/@$LAT,$LON""" } doReturn { PositionMatch(it) }
+        on { this find """\[(null,null,|null,\[)$LAT,$LON\]""" } doReturn { PointsPositionMatch(it) }
     }
 
-    override val conversionHtmlRedirectPattern = conversionPattern {
-        html("""data-url="(?P<url>[^"]+)"""") { RedirectMatch(it) }
+    override val conversionHtmlRedirectPattern = conversionPattern<String, RedirectMatch> {
+        on { this find """data-url="(?P<url>[^"]+)"""" } doReturn { RedirectMatch(it) }
     }
 
     @StringRes

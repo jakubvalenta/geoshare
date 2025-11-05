@@ -7,13 +7,13 @@ abstract class BaseUrlConverterTest() {
 
     protected var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? = urlConverter.uriPattern.matcherIfFind(uriString)?.group()
+    fun getUri(uriString: String): String? = urlConverter.uriPattern.matcher(uriString).takeIf { it.find() }?.group()
 
     fun doesUriPatternMatch(uriString: String): Boolean = urlConverter.uriPattern.matches(uriString)
 
     fun getShortUri(uriString: String): String? = if (urlConverter is UrlConverter.WithShortUriPattern) {
         (urlConverter as UrlConverter.WithShortUriPattern).let { urlConverter ->
-            urlConverter.shortUriPattern.matcherIfMatches(uriString)?.group()
+            urlConverter.shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.group()
         }
     } else {
         throw NotImplementedError()
@@ -29,13 +29,13 @@ abstract class BaseUrlConverterTest() {
     }
 
     fun parseHtml(html: String): Position? = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.find(html)?.toPosition()
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlPattern?.matches(html)?.toPosition()
     } else {
         throw NotImplementedError()
     }
 
     fun parseHtmlRedirect(html: String) = if (urlConverter is UrlConverter.WithHtmlPattern) {
-        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.find(html)?.toUrlString()
+        (urlConverter as UrlConverter.WithHtmlPattern).conversionHtmlRedirectPattern?.matches(html)?.toUrlString()
     } else {
         throw NotImplementedError()
     }

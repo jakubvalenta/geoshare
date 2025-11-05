@@ -47,23 +47,23 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern {
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                query("z", Z) { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
             optional {
-                query("zoom", Z) { PositionMatch(it) }
+                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
             first {
                 all {
-                    query("lat", LAT) { PositionMatch(it) }
-                    query("lon", LON) { PositionMatch(it) }
+                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch(it) }
+                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch(it) }
                 }
-                query("name", Q_PARAM) { PositionMatch(it) }
+                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                query("daddr", Q_PARAM) { PositionMatch(it) }
-                query("q", Q_PARAM) { PositionMatch(it) }
+                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
             }
         }
     }

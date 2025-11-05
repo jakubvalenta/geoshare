@@ -7,11 +7,12 @@ import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.find
+import page.ooooo.geoshare.lib.matches
 
-class YandexMapsUrlConverter() :
-    UrlConverter.WithUriPattern,
-    UrlConverter.WithShortUriPattern,
+class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
@@ -46,24 +47,24 @@ class YandexMapsUrlConverter() :
     override val shortUriMethod: ShortUriMethod = ShortUriMethod.HEAD
 
     @Suppress("SpellCheckingInspection")
-    override val conversionUriPattern = conversionPattern {
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
                 first {
-                    query("whatshere%5Bzoom%5D", Z) { PositionMatch(it) }
-                    query("z", Z) { PositionMatch(it) }
+                    on { queryParams["whatshere%5Bzoom%5D"]?.let { it matches Z } } doReturn { PositionMatch(it) }
+                    on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
                 }
             }
             first {
-                query("whatshere%5Bpoint%5D", "$LON,$LAT") { PositionMatch(it) }
-                query("ll", "$LON,$LAT") { PositionMatch(it) }
-                path("""/maps/org/\d+([/?#].*|$)""") { PositionMatch(it) }
+                on { queryParams["whatshere%5Bpoint%5D"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it) }
+                on { queryParams["ll"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it) }
+                on { path matches """/maps/org/\d+([/?#].*|$)""" } doReturn { PositionMatch(it) }
             }
         }
     }
 
-    override val conversionHtmlPattern = conversionPattern {
-        html("""data-coordinates="$LON,$LAT"""") { PositionMatch(it) }
+    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
+        on { this find """data-coordinates="$LON,$LAT"""" } doReturn { PositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = null

@@ -5,13 +5,10 @@ import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.PositionMatch
+import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
-import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.groupOrNull
 
 @Suppress("SpellCheckingInspection")
 class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern {
@@ -33,14 +30,14 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = ShortUriMethod.GET
 
-    override val conversionUriPattern = conversionPattern {
-        path(COORDS) { NorthSouthWestEastPositionMatch(it) }
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+        on { path matches COORDS } doReturn { NorthSouthWestEastPositionMatch(it) }
         all {
             optional {
-                query("z", Z) { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
-            query("x", LON) { PositionMatch(it) }
-            query("y", LAT) { PositionMatch(it) }
+            on { queryParams["x"]?.let { it matches LON } } doReturn { PositionMatch(it) }
+            on { queryParams["y"]?.let { it matches LAT } } doReturn { PositionMatch(it) }
         }
     }
 

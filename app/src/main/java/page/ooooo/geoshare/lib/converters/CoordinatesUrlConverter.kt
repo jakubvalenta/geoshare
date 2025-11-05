@@ -49,16 +49,13 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern {
-        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") {
-            DecimalCoordsPositionMatch(it)
-        }
-        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") {
-            DegreesMinutesSecondsCoordsPositionMatch(it)
-        }
-        path("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") {
-            DegreesMinutesCoordsPositionMatch(it)
-        }
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+        on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" } doReturn
+                { DecimalCoordsPositionMatch(it) }
+        on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" } doReturn
+                { DegreesMinutesSecondsCoordsPositionMatch(it) }
+        on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" } doReturn
+                { DegreesMinutesCoordsPositionMatch(it) }
     }
 
     /**

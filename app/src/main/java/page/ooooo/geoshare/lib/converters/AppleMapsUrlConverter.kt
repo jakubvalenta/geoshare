@@ -48,39 +48,36 @@ class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHt
         ),
     )
 
-    override val conversionUriPattern = conversionPattern {
+    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                query("z", Z) { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
             }
             first {
-                all {
-                    host("maps.apple") { PositionMatch(it) }
-                    path("/p/.+") { PositionMatch(it) }
-                }
-                query("ll", "$LAT,$LON") { PositionMatch(it) }
-                query("coordinate", "$LAT,$LON") { PositionMatch(it) }
-                query("q", "$LAT,$LON") { PositionMatch(it) }
-                query("address", Q_PARAM) { PositionMatch(it) }
-                query("name", Q_PARAM) { PositionMatch(it) }
+                on { if (host == "maps.apple") path matches "/p/.+" else null } doReturn { PositionMatch(it) }
+                on { queryParams["ll"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { queryParams["coordinate"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { queryParams["q"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { queryParams["address"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
                 @Suppress("SpellCheckingInspection")
-                query("auid", ".+") { PositionMatch(it) }
-                query("place-id", ".+") { PositionMatch(it) }
+                on { queryParams["auid"]?.let { it matches ".+" } } doReturn { PositionMatch(it) }
+                on { queryParams["place-id"]?.let { it matches ".+" } } doReturn { PositionMatch(it) }
                 all {
-                    query("q", Q_PARAM) { PositionMatch(it) }
-                    query("sll", "$LAT,$LON") { PositionMatch(it) }
+                    on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                    on { queryParams["sll"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
                 }
-                query("sll", "$LAT,$LON") { PositionMatch(it) }
-                query("center", "$LAT,$LON") { PositionMatch(it) }
-                query("q", Q_PARAM) { DoNotParseHtmlPositionMatch(it) }
+                on { queryParams["sll"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { queryParams["center"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { DoNotParseHtmlPositionMatch(it) }
             }
         }
     }
 
-    override val conversionHtmlPattern = conversionPattern {
+    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
         all {
-            html("""<meta property="place:location:latitude" content="$LAT"""") { PositionMatch(it) }
-            html("""<meta property="place:location:longitude" content="$LON"""") { PositionMatch(it) }
+            on { this find """<meta property="place:location:latitude" content="$LAT"""" } doReturn { PositionMatch(it) }
+            on { this find """<meta property="place:location:longitude" content="$LON"""" } doReturn { PositionMatch(it) }
         }
     }
 
