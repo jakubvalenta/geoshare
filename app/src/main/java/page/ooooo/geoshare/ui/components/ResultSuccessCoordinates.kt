@@ -87,25 +87,16 @@ fun ResultSuccessCoordinates(
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
     ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabel) = allOutputGroups
+        val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
             .getActionOutputs()
             .map { it.getAction(position) to it.label() }
             .partition { (action) -> action is Action.Copy }
-        copyActionsAndLabels.forEach { (action, label) ->
-            ResultSuccessSheetItem(label, supportingText = (action as? Action.Copy)?.text) {
-                onRun(action)
-                onHide()
-            }
-        }
-        if (copyActionsAndLabels.isNotEmpty() && otherActionsAndLabel.isNotEmpty()) {
-            HorizontalDivider()
-        }
-        otherActionsAndLabel.forEach { (action, label) ->
-            ResultSuccessSheetItem(label) {
-                onRun(action)
-                onHide()
-            }
-        }
+        ResultSuccessSheetContent(
+            copyActionsAndLabels = copyActionsAndLabels,
+            otherActionsAndLabels = otherActionsAndLabels,
+            onHide = onHide,
+            onRun = onRun,
+        )
     }
 }
 

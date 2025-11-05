@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
@@ -37,13 +38,14 @@ fun ResultSuccessPoint(
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
+    val label = stringResource(R.string.conversion_succeeded_point_number, i + 1)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            stringResource(R.string.conversion_succeeded_point_number, i + 1),
+            label,
             fontStyle = FontStyle.Italic,
             style = MaterialTheme.typography.bodySmall,
         )
@@ -65,24 +67,16 @@ fun ResultSuccessPoint(
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
     ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabel) = menuPointOutputs
+        val (copyActionsAndLabels, otherActionsAndLabels) = menuPointOutputs
             .map { it.getAction(point) to it.label() }
             .partition { (action) -> action is Action.Copy }
-        copyActionsAndLabels.forEach { (action, label) ->
-            ResultSuccessSheetItem(label, supportingText = (action as? Action.Copy)?.text) {
-                onRun(action)
-                onHide()
-            }
-        }
-        if (copyActionsAndLabels.isNotEmpty() && otherActionsAndLabel.isNotEmpty()) {
-            HorizontalDivider()
-        }
-        otherActionsAndLabel.forEach { (action, label) ->
-            ResultSuccessSheetItem(label) {
-                onRun(action)
-                onHide()
-            }
-        }
+        ResultSuccessSheetContent(
+            copyActionsAndLabels = copyActionsAndLabels,
+            otherActionsAndLabels = otherActionsAndLabels,
+            headline = label,
+            onHide = onHide,
+            onRun = onRun,
+        )
     }
 }
 
