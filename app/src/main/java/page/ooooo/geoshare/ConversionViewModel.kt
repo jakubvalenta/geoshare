@@ -3,6 +3,7 @@ package page.ooooo.geoshare
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.datastore.preferences.core.MutablePreferences
@@ -16,11 +17,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.converters.*
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import javax.inject.Inject
 
 @HiltViewModel
@@ -146,18 +149,20 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun grant(doNotAsk: Boolean) {
-        assert(stateContext.currentState is PermissionState)
         viewModelScope.launch {
-            stateContext.currentState = (stateContext.currentState as PermissionState).grant(doNotAsk)
-            transition()
+            (stateContext.currentState as? PermissionState)?.let { currentState ->
+                stateContext.currentState = currentState.grant(doNotAsk)
+                transition()
+            }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        assert(stateContext.currentState is PermissionState)
         viewModelScope.launch {
-            stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
-            transition()
+            (stateContext.currentState as? PermissionState)?.let { currentState ->
+                stateContext.currentState = currentState.deny(doNotAsk)
+                transition()
+            }
         }
     }
 
@@ -165,8 +170,12 @@ class ConversionViewModel @Inject constructor(
         result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.writer()
-                if (stateContext.currentState is HasResult) {
-                    (stateContext.currentState as HasResult).position.toGpx(writer)
+                (stateContext.currentState as? HasResult)?.let { currentState ->
+                    val saveGpxAction = allOutputGroups.firstNotNullOfOrNull { outputGroup ->
+                        outputGroup.getActionOutputs()
+                            .firstNotNullOfOrNull { it.getAction(currentState.position) as? Action.SaveGpx }
+                    }
+                    saveGpxAction?.write(writer)
                 }
                 writer.close()
             }
@@ -199,6 +208,27 @@ class ConversionViewModel @Inject constructor(
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
             transition()
+        }
+    }
+
+    fun runAction(runContext: ConversionRunContext, action: Action) {
+        viewModelScope.launch {
+            val success = action.run(intentTools, runContext)
+            if (!success) {
+                if (action is Action.OpenApp) {
+                    Toast.makeText(
+                        runContext.context,
+                        R.string.conversion_automation_open_app_failed,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (action is Action.OpenChooser) {
+                    Toast.makeText(
+                        runContext.context,
+                        R.string.conversion_succeeded_apps_not_found,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
         }
     }
 

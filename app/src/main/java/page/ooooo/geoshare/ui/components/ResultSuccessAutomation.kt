@@ -3,13 +3,7 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -29,9 +23,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationImpl
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -197,9 +191,9 @@ private fun DefaultPreview() {
         Surface {
             ResultSuccessAutomation(
                 currentState = AutomationFinished(
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -216,9 +210,9 @@ private fun DarkPreview() {
         Surface {
             ResultSuccessAutomation(
                 currentState = AutomationFinished(
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -239,11 +233,11 @@ private fun WaitingPreview() {
                 rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
             ResultSuccessAutomation(
                 currentState = AutomationWaiting(
-                    ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                    ConversionRunContext(context, clipboard, saveGpxLauncher),
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                    runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -264,11 +258,11 @@ private fun DarkWaitingPreview() {
                 rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
             ResultSuccessAutomation(
                 currentState = AutomationWaiting(
-                    ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                    ConversionRunContext(context, clipboard, saveGpxLauncher),
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                    runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -285,9 +279,9 @@ private fun SucceededPreview() {
         Surface {
             ResultSuccessAutomation(
                 currentState = AutomationSucceeded(
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -304,9 +298,9 @@ private fun DarSucceededPreview() {
         Surface {
             ResultSuccessAutomation(
                 currentState = AutomationSucceeded(
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -323,9 +317,9 @@ private fun FailedPreview() {
         Surface {
             ResultSuccessAutomation(
                 currentState = AutomationFailed(
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -342,9 +336,9 @@ private fun DarkFailedPreview() {
         Surface {
             ResultSuccessAutomation(
                 currentState = AutomationFailed(
-                    "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    Position("50.123456", "11.123456"),
-                    AutomationImpl.OpenApp(GOOGLE_MAPS_PACKAGE_NAME),
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},

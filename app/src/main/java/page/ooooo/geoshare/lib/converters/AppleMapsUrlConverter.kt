@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
@@ -15,28 +14,6 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 class AppleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithHtmlPattern {
     companion object {
         const val NAME = "Apple Maps"
-
-        /**
-         * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
-         */
-        fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-            scheme = "https",
-            host = "maps.apple.com",
-            path = "/",
-            queryParams = buildMap {
-                position.apply {
-                    mainPoint?.let { (lat, lon) ->
-                        set("ll", "$lat,$lon")
-                    } ?: q?.let { q ->
-                        set("q", q)
-                    }
-                    z?.let { z ->
-                        set("z", z)
-                    }
-                }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
     }
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")

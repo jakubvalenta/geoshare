@@ -12,14 +12,14 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.matches
+import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
     override val documentation = Documentation(
-        nameResId = R.string.converter_geo_name,
-        inputs = listOf(
+        nameResId = R.string.converter_geo_name, inputs = listOf(
             DocumentationInput.Text(3) {
-                stringResource(R.string.example, Position.example.toGeoUriString())
+                stringResource(R.string.example, GeoUriOutputGroup.formatUriString(Position.example))
             },
         )
     )

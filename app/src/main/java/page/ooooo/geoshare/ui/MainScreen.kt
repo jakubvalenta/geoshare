@@ -30,14 +30,12 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ConversionRunContext
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.toScale
+import page.ooooo.geoshare.lib.outputs.allOutputGroups
+import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.random.Random
 
 @Composable
 fun MainScreen(
@@ -79,9 +77,9 @@ fun MainScreen(
 fun MainScreen(
     inputUriString: String,
     changelogShown: Boolean,
-    onPaste: (block: (String) -> Unit) -> Unit,
+    onPaste: (block: (text: String) -> Unit) -> Unit,
     onSubmit: () -> Unit,
-    onUpdateInput: (String) -> Unit,
+    onUpdateInput: (uriString: String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
@@ -234,24 +232,18 @@ fun MainScreen(
                     )
                     Text(stringResource(R.string.main_navigate_to_intro))
                 }
-                TextButton({
-                    onUpdateInput(
-                        GoogleMapsUrlConverter.formatUriString(
-                            Position(
-                                Random.nextDouble(-50.0, 80.0).toScale(6).toString(),
-                                Random.nextDouble(-180.0, 180.0).toScale(6).toString(),
-                                z = "8",
-                            )
+                allOutputGroups.genRandomUriString()?.let { uriString ->
+                    TextButton({
+                        onUpdateInput(uriString)
+                        setErrorMessageResId(null)
+                    }) {
+                        Icon(
+                            painterResource(R.drawable.ifl_24px),
+                            null,
+                            Modifier.padding(end = spacing.tiny),
                         )
-                    )
-                    setErrorMessageResId(null)
-                }) {
-                    Icon(
-                        painterResource(R.drawable.ifl_24px),
-                        null,
-                        Modifier.padding(end = spacing.tiny),
-                    )
-                    Text(stringResource(R.string.main_random))
+                        Text(stringResource(R.string.main_random))
+                    }
                 }
             }
         },

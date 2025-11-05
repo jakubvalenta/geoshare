@@ -96,6 +96,7 @@ private fun UserPreferencesScreen(
     onBack: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val navigator = rememberListDetailPaneScaffoldNavigator(
         initialDestinationHistory = listOf(
             if (initialGroupId == null) {
@@ -105,7 +106,6 @@ private fun UserPreferencesScreen(
             },
         ),
     )
-    val scope = rememberCoroutineScope()
     val currentGroup = navigator.currentDestination?.contentKey?.let { id -> groups.find { it.id == id } }
     val listExpanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden
     val detailExpanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden
@@ -123,7 +123,7 @@ private fun UserPreferencesScreen(
                         expanded = listExpanded || detailExpanded,
                         userPreferencesValues = userPreferencesValues,
                         onBack = {
-                            scope.launch {
+                            coroutineScope.launch {
                                 if (navigator.canNavigateBack()) {
                                     navigator.navigateBack()
                                 } else {
@@ -132,7 +132,7 @@ private fun UserPreferencesScreen(
                             }
                         },
                         onNavigateToGroup = { id ->
-                            scope.launch {
+                            coroutineScope.launch {
                                 navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
                             }
                         },
@@ -147,7 +147,7 @@ private fun UserPreferencesScreen(
                             expanded = detailExpanded,
                             userPreferencesValues = userPreferencesValues,
                             onBack = {
-                                scope.launch {
+                                coroutineScope.launch {
                                     if (navigator.canNavigateBack()) {
                                         navigator.navigateBack()
                                     } else {

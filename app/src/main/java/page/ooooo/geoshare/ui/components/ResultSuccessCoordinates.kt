@@ -1,12 +1,14 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -17,36 +19,36 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
-    onCopy: (text: String) -> Unit,
-    onSave: () -> Boolean,
+    onRun: (action: Action) -> Unit,
 ) {
-    val separator = "\t\t"
-    var menuExpanded by remember { mutableStateOf(false) }
+    val spacing = LocalSpacing.current
+    val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     ResultCard(
         main = {
-            SelectionContainer {
-                Text(
-                    position.toDegMinSecCoordsString(),
-                    Modifier
-                        .testTag("geoShareConversionSuccessPositionCoordinates")
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-            position.toParamsString(separator).takeIf { it.isNotEmpty() }?.let {
+            allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
                 SelectionContainer {
                     Text(
-                        it,
+                        text,
+                        Modifier
+                            .testTag("geoShareConversionSuccessPositionCoordinates")
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+            allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
+                SelectionContainer {
+                    Text(
+                        text,
                         Modifier
                             .testTag("geoShareConversionSuccessPositionParams")
                             .fillMaxWidth(),
@@ -55,64 +57,47 @@ fun ResultSuccessCoordinates(
                     )
                 }
             }
-            position.points?.takeIf { it.size > 1 }?.let { points ->
-                SelectionContainer {
-                    Text(
-                        points.mapIndexed { i, (lat, lon) ->
-                            stringResource(R.string.conversion_succeeded_point_number, i + 1) + separator +
-                                    Position(lat, lon).toCoordsDecString()
-                        }.joinToString("\n"),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
         },
         after = {
-            Box {
-                IconButton({ menuExpanded = true }) {
-                    Icon(
-                        painterResource(R.drawable.content_copy_24px),
-                        contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
-                    )
-                }
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false },
-                ) {
-                    listOf(
-                        position.toCoordsDecString(),
-                        position.toDegMinSecCoordsString(),
-                        position.toGeoUriString(),
-                        GoogleMapsUrlConverter.formatUriString(position),
-                        AppleMapsUrlConverter.formatUriString(position),
-                        MagicEarthUrlConverter.formatUriString(position),
-                    ).map { text ->
-                        DropdownMenuItem(
-                            text = { Text(text) },
-                            onClick = {
-                                menuExpanded = false
-                                onCopy(text)
-                            },
-                        )
+            IconButton({ setSheetVisible(true) }) {
+                Icon(
+                    painterResource(R.drawable.content_copy_24px),
+                    contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                )
+            }
+        },
+        bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
+            {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                    val menuPointOutputs = allPointOutputGroups.getActionOutputs()
+                    val textPointOutput = allPointOutputGroups.getTextOutput()
+                    points.forEachIndexed { i, point ->
+                        ResultSuccessPoint(i, point, textPointOutput, menuPointOutputs, onRun)
                     }
                 }
             }
         },
-        chips = { lastPaddingEnd ->
-            ResultCardChip(stringResource(R.string.conversion_succeeded_copy_geo)) {
-                onCopy(position.toGeoUriString())
-            }
-            ResultCardChip(stringResource(R.string.conversion_succeeded_copy_google_maps)) {
-                onCopy(GoogleMapsUrlConverter.formatUriString(position))
-            }
-            ResultCardChip(
-                stringResource(R.string.conversion_succeeded_save_gpx),
-                Modifier.padding(end = lastPaddingEnd),
-            ) {
-                onSave()
+        chips = {
+            allOutputGroups.getChipOutputs().forEach {
+                ResultCardChip(it.label()) { onRun(it.getAction(position)) }
             }
         },
     )
+    ResultSuccessSheet(
+        sheetVisible = sheetVisible,
+        onSetSheetVisible = setSheetVisible,
+    ) { onHide ->
+        val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
+            .getActionOutputs()
+            .map { it.getAction(position) to it.label() }
+            .partition { (action) -> action is Action.Copy }
+        ResultSuccessSheetContent(
+            copyActionsAndLabels = copyActionsAndLabels,
+            otherActionsAndLabels = otherActionsAndLabels,
+            onHide = onHide,
+            onRun = onRun,
+        )
+    }
 }
 
 // Previews
@@ -126,9 +111,8 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
-                onCopy = {},
-                onSave = { true },
+                position = Position.example,
+                onRun = {},
             )
         }
     }
@@ -143,43 +127,8 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
-                onCopy = {},
-                onSave = { true },
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OneAppPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
-            ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
-                onCopy = {},
-                onSave = { true },
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkOneAppPreview() {
-    AppTheme {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
-            ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456"),
-                onCopy = {},
-                onSave = { true },
+                position = Position.example,
+                onRun = {},
             )
         }
     }
@@ -194,9 +143,8 @@ private fun ParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
-                onCopy = {},
-                onSave = { true },
+                position = Position.example.copy(q = "Berlin, Germany", z = "13"),
+                onRun = {},
             )
         }
     }
@@ -211,9 +159,8 @@ private fun DarkParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456", q = "Berlin, Germany", z = "13"),
-                onCopy = {},
-                onSave = { true },
+                position = Position.example.copy(q = "Berlin, Germany", z = "13"),
+                onRun = {},
             )
         }
     }
@@ -230,13 +177,12 @@ private fun PointsPreview() {
             ResultSuccessCoordinates(
                 position = Position(
                     points = persistentListOf(
-                        Point("59.1293656", "11.4585672"),
-                        Point("59.4154007", "11.659710599999999"),
-                        Point("59.147731699999994", "11.550661199999999"),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
                     ),
                 ),
-                onCopy = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }
@@ -253,13 +199,12 @@ private fun DarkPointsPreview() {
             ResultSuccessCoordinates(
                 position = Position(
                     points = persistentListOf(
-                        Point("59.1293656", "11.4585672"),
-                        Point("59.4154007", "11.659710599999999"),
-                        Point("59.147731699999994", "11.550661199999999"),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
                     ),
                 ),
-                onCopy = {},
-                onSave = { true },
+                onRun = {},
             )
         }
     }

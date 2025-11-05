@@ -1,13 +1,15 @@
 package page.ooooo.geoshare.lib.converters
 
 import com.google.re2j.Pattern
-import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.matches
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
@@ -15,27 +17,6 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     companion object {
         const val NAME = "Magic Earth"
-
-        @Suppress("SpellCheckingInspection")
-        fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = Uri(
-            scheme = "magicearth",
-            path = "//",
-            queryParams = buildMap {
-                position.apply {
-                    mainPoint?.let { (lat, lon) ->
-                        set("lat", lat)
-                        set("lon", lon)
-                    }
-                    q?.let { q ->
-                        set("q", q)
-                    }
-                    z?.let { z ->
-                        set("zoom", z)
-                    }
-                }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
     }
 
     @Suppress("SpellCheckingInspection")

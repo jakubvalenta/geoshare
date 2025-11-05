@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib
 
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -431,6 +432,21 @@ class UriTest {
         )) {
             assertEquals(uriString, Uri.parse(uriString, uriQuote).toString())
         }
+    }
+
+    @Test
+    fun toString_formatsQueryParams() {
+        assertEquals(
+            "?empty&foo=bar&1=2",
+            Uri(
+                queryParams = mapOf(
+                    "empty" to "",
+                    "foo" to "bar",
+                    "1" to "2",
+                ).toImmutableMap(),
+                uriQuote = uriQuote,
+            ).toString(),
+        )
     }
 
     @Test

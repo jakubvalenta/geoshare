@@ -8,14 +8,11 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.Position
 
 @RunWith(AndroidJUnit4::class)
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
-    companion object {
-        const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
-    }
-
     private fun waitAndConfirmDialogAndAssertNewWindowIsOpen(
         doNotAsk: Boolean = false,
         resourceName: String,

@@ -120,11 +120,11 @@
     <string name="conversion_automation_share_failed">Неуспешно автоматично споделяне на връзка</string>
     <string name="conversion_automation_share_succeeded">Автоматично споделена връзка</string>
     <string name="conversion_automation_share_waiting">Автоматично споделяне на връзка в %1$ds</string>
-    <string name="user_preferences_automation_copy_coords">Копиране на координати във формат %1$s</string>
-    <string name="user_preferences_automation_copy_link">Копиране на връзка %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates">Копиране на координати</string>
+    <string name="conversion_succeeded_copy_link">Копиране на връзка %1$s</string>
     <string name="user_preferences_automation_description">Изберете действие, което да се извърши автоматично, когато връзка към карта се преобразува в координати.</string>
     <string name="user_preferences_automation_nothing">Нищо</string>
-    <string name="user_preferences_automation_open_app">Отваряне %1$s</string>
+    <string name="conversion_succeeded_open_app">Отваряне %1$s</string>
     <string name="user_preferences_automation_title">Автоматизация</string>
     <string name="main_random">Случайна връзка</string>
 </resources>
