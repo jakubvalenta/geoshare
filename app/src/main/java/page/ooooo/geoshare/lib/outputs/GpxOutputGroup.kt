@@ -54,7 +54,9 @@ object GpxOutputGroup : OutputGroup<Position> {
 
     override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Position>>()
 
-    override fun getChipOutputs() = emptyList<Output.Action<Position, Action>>()
+    override fun getChipOutputs() = listOf(
+        SaveOutput,
+    )
 
     override fun getChooserOutput() = null
 
