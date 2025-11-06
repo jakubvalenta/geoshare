@@ -48,10 +48,11 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label(app: IntentTools.App) =
-            stringResource(
-                if (requiresGCJ()) R.string.conversion_succeeded_open_app_gcj else R.string.conversion_succeeded_open_app,
-                app.label,
-            )
+            if (requiresGCJ()) {
+                stringResource(R.string.conversion_succeeded_open_app_srs, app.label, "GCJ-02")
+            } else {
+                stringResource(R.string.conversion_succeeded_open_app, app.label)
+            }
 
         private fun requiresGCJ(): Boolean = packageName in GoogleMapsOutputGroup.PACKAGE_NAMES
     }
@@ -202,7 +203,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         else -> null
     }
 
-    fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = position.run {
+    fun formatUriString(value: Position, uriQuote: UriQuote = DefaultUriQuote()): String = value.run {
         GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), uriQuote, q = q, z = z)
     }
 }

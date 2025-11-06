@@ -49,7 +49,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label(app: IntentTools.App) =
-            stringResource(R.string.conversion_succeeded_open_app_wgs, app.label)
+            stringResource(R.string.conversion_succeeded_open_app_srs, app.label, "WGS 84")
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {

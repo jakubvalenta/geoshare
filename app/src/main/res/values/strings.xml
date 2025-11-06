@@ -9,6 +9,7 @@
     <string name="conversion_succeeded_copy_link_drive_to">Copy link to navigate in %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_via">Copy link to add waypoint in %1$s</string>
     <string name="conversion_succeeded_open_app">Open %1$s</string>
+    <string name="conversion_succeeded_open_app_srs">Open %1$s (%2$s)</string>
     <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navigate in %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_via">Add waypoint in %1$s</string>
@@ -159,6 +160,4 @@
     <string name="network_exception_server_response_error" translatable="false">server response error</string>
     <string name="network_exception_response_error" translatable="false">response error</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
-    <string name="conversion_succeeded_open_app_wgs">Open %1$s (WGS-84)</string>
-    <string name="conversion_succeeded_open_app_gjc">Open %1$s (GCJ-02)</string>
 </resources>
