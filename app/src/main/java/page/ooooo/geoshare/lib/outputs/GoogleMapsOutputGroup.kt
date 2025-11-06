@@ -2,9 +2,12 @@ package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -14,9 +17,12 @@ import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
  * See https://developers.google.com/maps/documentation/urls/get-started
  */
 object GoogleMapsOutputGroup : OutputGroup<Position> {
-    // TODO GOOGLE_MAPS_PACKAGE_NAME
-    @Suppress("SpellCheckingInspection")
-    // TODO "us.spotco.maps"
+
+    val PACKAGE_NAMES = listOf(
+        GOOGLE_MAPS_PACKAGE_NAME,
+        @Suppress("SpellCheckingInspection")
+        "us.spotco.maps",
+    )
 
     object CopyOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
@@ -34,6 +40,16 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_google_maps)
+    }
+
+    @Immutable
+    data class AppWGSOutput(override val packageName: String) : Output.App<Position> {
+        override fun getAction(value: Position, uriQuote: UriQuote) =
+            Action.OpenApp(packageName, formatUriString(value, uriQuote))
+
+        @Composable
+        override fun label(app: IntentTools.App) =
+            stringResource(R.string.conversion_succeeded_open_app_wgs, app.label)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -63,7 +79,11 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         CopyOutput,
     )
 
-    override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Position>>()
+    override fun getAppOutputs(packageNames: List<String>) = buildList {
+        PACKAGE_NAMES.filter { it in packageNames }.forEach { packageName ->
+            add(AppWGSOutput(packageName))
+        }
+    }
 
     override fun getChipOutputs() = listOf(
         ChipOutput,
