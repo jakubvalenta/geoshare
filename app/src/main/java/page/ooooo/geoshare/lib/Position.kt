@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class Position(
@@ -30,4 +31,6 @@ data class Position(
     ) : this(persistentListOf(Point(lat, lon, desc = desc)), q, z)
 
     val mainPoint: Point? get() = points?.lastOrNull()
+
+    fun toGCJ(): Position = this.copy(points = points?.map { it.toGCJ() }?.toImmutableList())
 }

@@ -18,4 +18,8 @@ data class Point(val lat: String = "0", val lon: String = "0", val desc: String?
             Random.nextDouble(minLon, maxLon).toScale(6).toString(),
         )
     }
+
+    fun isOutOfChina(): Boolean = TransformUtil.outOfChina(lat, lon)
+
+    fun toGCJ(): Point = WGSPointer(lat, lon).toGCJPointer().run { Point(latitude, longitude) }
 }
