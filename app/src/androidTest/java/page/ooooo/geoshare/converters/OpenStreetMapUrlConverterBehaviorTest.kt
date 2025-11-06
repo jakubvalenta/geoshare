@@ -14,7 +14,7 @@ class OpenStreetMapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Coordinates
         testUri(
-            Position(51.49, -0.13, z = "16"),
+            Position(51.49, -0.13, z = 16.0),
             "https://www.openstreetmap.org/#map=16/51.49/-0.13",
         )
 
@@ -92,7 +92,7 @@ class OpenStreetMapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Short URI
         testUri(
-            Position(-16.23152732849121, -49.08348083496094, z = "11"),
+            Position(-16.23152732849121, -49.08348083496094, z = 11.0),
             "https://osm.org/go/NuJWxJh-",
         )
     }

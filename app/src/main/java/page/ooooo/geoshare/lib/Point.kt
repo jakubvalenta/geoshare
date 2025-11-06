@@ -21,9 +21,10 @@ data class Point(val lat: Double = 0.0, val lon: Double = 0.0, val desc: String?
         )
     }
 
+    val latStr: String = lat.toScale(7).toString()
+    val lonStr: String = lon.toScale(7).toString()
+
     fun isOutOfChina(): Boolean = TransformUtil.outOfChina(lat, lon)
 
     fun toGCJ(): Point = WGSPointer(lat, lon).toGCJPointer().run { Point(latitude, longitude) }
-
-    fun toStringPair(): Pair<String, String> = lat.toScale(7).toString() to lon.toScale(7).toString()
 }

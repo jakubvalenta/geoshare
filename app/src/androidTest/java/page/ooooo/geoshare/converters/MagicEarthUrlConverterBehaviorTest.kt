@@ -14,7 +14,7 @@ class MagicEarthUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Query
         testUri(
-            Position(q = "Paris", z = "5"),
+            Position(q = "Paris", z = 5.0),
             "https://magicearth.com/?q=Paris&mapmode=standard&z=5",
         )
         testUri(

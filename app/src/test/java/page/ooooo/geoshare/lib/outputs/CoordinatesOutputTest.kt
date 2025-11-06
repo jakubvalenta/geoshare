@@ -19,7 +19,7 @@ class CoordinatesOutputTest {
             outputGroup.getSupportingTextOutput().getText(
                 Position(
                     q = "foo bar",
-                    z = "3.4",
+                    z = 3.4,
                     points = persistentListOf(
                         Point(59.1293656, 11.4585672),
                         Point(59.4154007, 11.659710599999999),

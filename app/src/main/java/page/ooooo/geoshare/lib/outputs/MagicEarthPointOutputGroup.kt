@@ -99,19 +99,15 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
                 value.apply {
                     if (q == null) {
                         set("show_on_map", "")
-                        value.toStringPair().let { (lat, lon) ->
-                            set("lat", lat)
-                            set("lon", lon)
-                        }
+                        set("lat", latStr)
+                        set("lon", lonStr)
                     } else {
                         if (lat == 0.0 && lon == 0.0) {
                             set("open_search", "")
                         } else {
                             set("search_around", "")
-                            value.toStringPair().let { (lat, lon) ->
-                                set("lat", lat)
-                                set("lon", lon)
-                            }
+                            set("lat", latStr)
+                            set("lon", lonStr)
                         }
                         set("q", q)
                     }
@@ -126,9 +122,9 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             path = "//",
             queryParams = buildMap {
                 set("navigate_to", "")
-                value.toStringPair().let { (lat, lon) ->
-                    set("lat", lat)
-                    set("lon", lon)
+                value.apply {
+                    set("lat", latStr)
+                    set("lon", lonStr)
                 }
             }.toImmutableMap(),
             uriQuote = uriQuote,
@@ -140,9 +136,9 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             path = "//",
             queryParams = buildMap {
                 set("navigate_via", "")
-                value.toStringPair().let { (lat, lon) ->
-                    set("lat", lat)
-                    set("lon", lon)
+                value.apply {
+                    set("lat", latStr)
+                    set("lon", lonStr)
                 }
             }.toImmutableMap(),
             uriQuote = uriQuote,

@@ -51,19 +51,19 @@ class Ge0UrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLink() {
         assertEquals(
-            Position(51.0000004, -108.9999868, z = "4"),
+            Position(51.0000004, -108.9999868, z = 4.0),
             parseUrl("ge0://ApYSV0YTAl/América_do_Norte"),
         )
         assertEquals(
-            Position(-18.9249432, 46.4416404, z = "4"),
+            Position(-18.9249432, 46.4416404, z = 4.0),
             parseUrl("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
-            Position(40.7127405, -74.005997, z = "9"),
+            Position(40.7127405, -74.005997, z = 9.0),
             parseUrl("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
         )
         assertEquals(
-            Position(52.4877386, 13.3815233, z = "14"),
+            Position(52.4877386, 13.3815233, z = 14.0),
             parseUrl("https://comaps.at/o4MnIOApKp/Kreuzberg"),
         )
     }

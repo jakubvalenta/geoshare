@@ -26,8 +26,8 @@ open class PositionMatch(val matcher: Matcher) {
         get() = matcher.groupOrNull("lon")?.toDoubleOrNull()
     open val q: String?
         get() = matcher.groupOrNull("q")
-    open val z: String?
-        get() = matcher.groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
+    open val z: Double?
+        get() = matcher.groupOrNull("z")?.toDoubleOrNull()?.let { max(1.0, min(21.0, it)) }
 }
 
 /**
@@ -47,13 +47,13 @@ class PointsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
 }
 
 abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-    private var latLonZCache: Triple<Double, Double, Int>? = null
-    val latLonZ: Triple<Double, Double, Int>?
+    private var latLonZCache: Triple<Double, Double, Double>? = null
+    val latLonZ: Triple<Double, Double, Double>?
         get() = latLonZCache ?: matcher.groupOrNull("hash")?.let { hash -> decode(hash).also { latLonZCache = it } }
     override val points get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(lat, lon)) }
-    override val z get() = latLonZ?.third?.toString()
+    override val z get() = latLonZ?.third
 
-    abstract fun decode(hash: String): Triple<Double, Double, Int>
+    abstract fun decode(hash: String): Triple<Double, Double, Double>
 }
 
 /**

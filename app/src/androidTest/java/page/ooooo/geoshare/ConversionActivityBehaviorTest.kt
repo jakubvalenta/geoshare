@@ -48,7 +48,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        waitAndAssertPositionIsVisible(Position(52.5067296, 13.2599309, z = "11"))
+        waitAndAssertPositionIsVisible(Position(52.5067296, 13.2599309, z = 11.0))
 
         // Open the coordinates with Google Maps
         onElement { viewIdResourceName == "geoShareResultCardApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
@@ -80,7 +80,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(52.5067296, 13.2599309, z = "11"))
+            waitAndAssertPositionIsVisible(Position(52.5067296, 13.2599309, z = 11.0))
 
             // Shows automation success message
             onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
@@ -106,7 +106,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(52.5067296, 13.2599309, z = "11"))
+            waitAndAssertPositionIsVisible(Position(52.5067296, 13.2599309, z = 11.0))
 
             // Shows automation counter
             onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }

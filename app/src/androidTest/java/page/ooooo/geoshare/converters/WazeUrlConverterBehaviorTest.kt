@@ -12,7 +12,7 @@ class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Coordinates
         testUri(
-            Position(45.6906304, -120.810983, z = "10"),
+            Position(45.6906304, -120.810983, z = 10.0),
             "https://waze.com/ul?ll=45.6906304,-120.810983&z=10",
         )
 
@@ -36,13 +36,13 @@ class WazeUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Short URI
         testUri(
-            Position(19.402564, -99.165666, z = "16"),
+            Position(19.402564, -99.165666, z = 16.0),
             "https://waze.com/ul/h9g3qrkju0",
         )
 
         // Text
         testTextUri(
-            Position(45.829189, 1.259372, z = "16"),
+            Position(45.829189, 1.259372, z = 16.0),
             @Suppress("SpellCheckingInspection")
             "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
         )

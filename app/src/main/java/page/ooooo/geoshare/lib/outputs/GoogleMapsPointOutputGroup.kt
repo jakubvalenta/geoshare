@@ -44,8 +44,8 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         scheme = "https",
         host = "www.google.com",
         path = "/maps",
-        queryParams = value.toStringPair().let { (lat, lon) ->
-            mapOf("q" to "$lat,$lon").toImmutableMap()
+        queryParams = value.run {
+            mapOf("q" to "$latStr,$lonStr").toImmutableMap()
         },
         uriQuote = uriQuote,
     ).toString()

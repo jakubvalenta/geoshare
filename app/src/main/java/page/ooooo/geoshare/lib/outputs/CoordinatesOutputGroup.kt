@@ -140,14 +140,14 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
                 add(description)
             }
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (mainPoint ?: Point()).toStringPair().let { (lat, lon) ->
-                    if (q != "$lat,$lon") {
+                (mainPoint ?: Point()).apply {
+                    if (q != "$latStr,$lonStr") {
                         add(q.replace('+', ' '))
                     }
                 }
             }
-            z.takeUnless { it.isNullOrEmpty() }?.let { z ->
-                add("z$z")
+            zStr?.let { zStr ->
+                add("z$zStr")
             }
         }.joinToString("\t\t")
     }

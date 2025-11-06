@@ -106,13 +106,13 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         path = "/maps",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.toStringPair()?.let { (lat, lon) ->
-                    set("q", "$lat,$lon")
+                mainPoint?.apply {
+                    set("q", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)
                 }
-                z?.let { z ->
-                    set("z", z)
+                zStr?.let { zStr ->
+                    set("z", zStr)
                 }
             }
         }.toImmutableMap(),

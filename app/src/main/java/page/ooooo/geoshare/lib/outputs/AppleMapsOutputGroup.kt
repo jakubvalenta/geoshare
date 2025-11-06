@@ -68,13 +68,13 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         path = "/",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.toStringPair()?.let { (lat, lon) ->
-                    set("ll", "$lat,$lon")
+                mainPoint?.apply {
+                    set("ll", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)
                 }
-                z?.let { z ->
-                    set("z", z)
+                zStr?.let { zStr ->
+                    set("z", zStr)
                 }
             }
         }.toImmutableMap(),

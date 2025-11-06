@@ -48,15 +48,15 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatUriString(value: Point, uriQuote: UriQuote, q: String? = null, z: String? = null): String =
-        value.toStringPair().let { (lat, lon) ->
+    fun formatUriString(value: Point, uriQuote: UriQuote, q: String? = null, zStr: String? = null): String =
+        value.run {
             Uri(
                 scheme = "geo",
-                path = "$lat,$lon",
+                path = "$latStr,$lonStr",
                 queryParams = buildMap {
-                    set("q", q ?: "$lat,$lon")
-                    z?.let { z ->
-                        set("z", z)
+                    set("q", q ?: "$latStr,$lonStr")
+                    zStr?.let { zStr ->
+                        set("z", zStr)
                     }
                 }.toImmutableMap(),
                 uriQuote = uriQuote,

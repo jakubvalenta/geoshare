@@ -156,7 +156,7 @@ private fun ParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position.example.copy(q = "Berlin, Germany", z = "13"),
+                position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
                 onRun = {},
             )
         }
@@ -172,7 +172,7 @@ private fun DarkParamsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position.example.copy(q = "Berlin, Germany", z = "13"),
+                position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
                 onRun = {},
             )
         }

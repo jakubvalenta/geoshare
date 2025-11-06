@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib
 
 import kotlin.math.max
 import kotlin.math.pow
-import kotlin.math.roundToInt
 
 private enum class GeoHashBitOrder { LONLAT, LATLON }
 private enum class GeoHashRoundingMode { LEFT, MIDDLE }
@@ -18,7 +17,7 @@ private fun decodeGeoHash(
     roundingMode: GeoHashRoundingMode = GeoHashRoundingMode.LEFT,
     yCellCountAdjustment: (yBitCount: Int) -> Double = { 0.0 },
     zoomAdjustmentConst: Int = -8,
-): Triple<Double, Double, Int> {
+): Triple<Double, Double, Double> {
 
     // Collect odd bits of the hash into x and even bits into y (or the other way around, if isLonOddBits is false).
     // E.g. base32 hash "ezs" (0b01101_11111_11000) will have x=124 (0b01111100) and y=94 (0b1011110)
@@ -71,7 +70,7 @@ private fun decodeGeoHash(
     // base64 hashes, so we need to multiply it to make it work for base32 hashes too
     z += zoomAdjustmentConst * (digitBitCount.toDouble() / 6.0)
 
-    return Triple(lat, lon, max(z, 0.0).roundToInt())
+    return Triple(lat, lon, max(z, 0.0).toScale(0))
 }
 
 @Suppress("SpellCheckingInspection")
@@ -95,7 +94,7 @@ fun decodeOpenStreetMapQuadTileHash(hash: String) = decodeGeoHash(
     // - etc.
     val relativeZoom = hash.takeLastWhile { it == '-' }.length.takeIf { it > 0 }
         ?.let { zoomCharCount -> (zoomCharCount + 2).mod(3) - 2 } ?: 0
-    Triple(lat, lon, max(z + relativeZoom, 0))
+    Triple(lat, lon, max(z + relativeZoom, 0.0))
 }
 
 @Suppress("SpellCheckingInspection")
@@ -119,7 +118,7 @@ fun decodeGe0Hash(hash: String) = decodeGeoHash(
 ).let { (lat, lon, z) ->
     val zFromHash = hash.getOrNull(0)
         ?.let { ORGANIC_MAPS_HASH_CHAR_MAP[it] }
-        ?.let { (it / 4.0 + 4).roundToInt() }
+        ?.let { (it / 4.0 + 4).toScale(0) }
     Triple(lat, lon, zFromHash ?: z)
 }
 

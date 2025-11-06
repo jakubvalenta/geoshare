@@ -45,8 +45,8 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
         scheme = "https",
         host = "maps.apple.com",
         path = "/",
-        queryParams = value.toStringPair().let { (lat, lon) ->
-            mapOf("ll" to "$lat,$lon").toImmutableMap()
+        queryParams = value.run {
+            mapOf("ll" to "$latStr,$lonStr").toImmutableMap()
         },
         uriQuote = uriQuote,
     ).toString()

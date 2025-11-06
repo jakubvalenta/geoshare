@@ -35,7 +35,7 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
-            Position(51.49, -0.13, z = "16"),
+            Position(51.49, -0.13, z = 16.0),
             parseUrl("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
@@ -43,7 +43,7 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesEncoded() {
         assertEquals(
-            Position(51.49, -0.13, z = "16"),
+            Position(51.49, -0.13, z = 16.0),
             parseUrl("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
         )
     }
@@ -67,11 +67,11 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLink() {
         assertEquals(
-            Position(51.510772705078125, 0.054931640625, z = "9"),
+            Position(51.510772705078125, 0.054931640625, z = 9.0),
             parseUrl("https://osm.org/go/0EEQjE--")
         )
         assertEquals(
-            Position(51.510772705078125, 0.054931640625, z = "9"),
+            Position(51.510772705078125, 0.054931640625, z = 9.0),
             parseUrl("https://openstreetmap.org/go/0EEQjE--")
         )
     }
@@ -79,7 +79,7 @@ class OpenStreetMapUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLinkNegative() {
         assertEquals(
-            Position(-16.23152732849121, -49.08348083496094, z = "11"),
+            Position(-16.23152732849121, -49.08348083496094, z = 11.0),
             parseUrl("https://osm.org/go/NuJWxJh-")
         )
     }

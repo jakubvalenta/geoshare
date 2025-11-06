@@ -61,7 +61,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
-            Position(45.6906304, -120.810983, z = "10"),
+            Position(45.6906304, -120.810983, z = 10.0),
             parseUrl("https://waze.com/ul?ll=45.6906304,-120.810983&z=10")
         )
         assertEquals(
@@ -125,15 +125,15 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLink() {
         assertEquals(
-            Position(45.829189, 1.259372, z = "16"),
+            Position(45.829189, 1.259372, z = 16.0),
             parseUrl("https://waze.com/ul/hu00uswvn3")
         )
         assertEquals(
-            Position(45.829189, 1.259372, z = "16"),
+            Position(45.829189, 1.259372, z = 16.0),
             parseUrl("https://www.waze.com/ul/hu00uswvn3")
         )
         assertEquals(
-            Position(45.829189, 1.259372, z = "16"),
+            Position(45.829189, 1.259372, z = 16.0),
             parseUrl("https://www.waze.com/live-map?h=u00uswvn3")
         )
     }
@@ -141,7 +141,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLinkNegative() {
         assertEquals(
-            Position(19.402564, -99.165666, z = "16"),
+            Position(19.402564, -99.165666, z = 16.0),
             parseUrl("https://waze.com/ul/h9g3qrkju0")
         )
     }

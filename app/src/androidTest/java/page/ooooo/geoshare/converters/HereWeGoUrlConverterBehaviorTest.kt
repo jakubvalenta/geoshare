@@ -8,7 +8,7 @@ class HereWeGoUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun test() {
         // Coordinates
         testUri(
-            Position(50.21972, -0.68453, z = "6.93"),
+            Position(50.21972, -0.68453, z = 6.93),
             "https://wego.here.com/?map=50.21972,-0.68453,6.93",
         )
 

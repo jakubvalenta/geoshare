@@ -80,7 +80,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesOnly() {
         assertEquals(
-            Position(52.5067296, 13.2599309, z = "6"),
+            Position(52.5067296, 13.2599309, z = 6.0),
             parseUrl("https://www.google.com/maps/@52.5067296,13.2599309,6z")
         )
     }
@@ -97,7 +97,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndPositiveCoordinates() {
         assertEquals(
-            Position(52.5067296, 13.2599309, z = "11"),
+            Position(52.5067296, 13.2599309, z = 11.0),
             parseUrl("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910")
         )
     }
@@ -113,7 +113,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndNegativeCoordinates() {
         assertEquals(
-            Position(-17.2165721, -149.9470294, z = "11"),
+            Position(-17.2165721, -149.9470294, z = 11.0),
             parseUrl("https://www.google.com/maps/place/Berlin,+Germany/@-17.2165721,-149.9470294,11z/")
         )
     }
@@ -121,7 +121,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndIntegerCoordinates() {
         assertEquals(
-            Position(52.0, 13.0, z = "11"),
+            Position(52.0, 13.0, z = 11.0),
             parseUrl("https://www.google.com/maps/place/Berlin,+Germany/@52,13,11z/")
         )
     }
@@ -129,7 +129,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndFractionalZoom() {
         assertEquals(
-            Position(52.5067296, 13.2599309, z = "6.33"),
+            Position(52.5067296, 13.2599309, z = 6.33),
             parseUrl("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,6.33z/")
         )
     }
@@ -137,7 +137,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndData() {
         assertEquals(
-            Position(40.785091, -73.968285, z = "15"),
+            Position(40.785091, -73.968285, z = 15.0),
             parseUrl("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
         )
     }
@@ -145,7 +145,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndPositiveCoordinatesAndPositiveDataCoordinates() {
         assertEquals(
-            Position(44.4490541, 26.0888398, z = "11.42"),
+            Position(44.4490541, 26.0888398, z = 11.42),
             @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
         )
@@ -154,7 +154,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAndNegativeCoordinatesAndNegativeDataCoordinates() {
         assertEquals(
-            Position(40.785091, -73.968285, z = "15"),
+            Position(40.785091, -73.968285, z = 15.0),
             parseUrl("https://www.google.com/maps/place/Central+Park/@40.8,-73.9,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2!3d40.785091!4d-73.968285"),
         )
     }
@@ -171,7 +171,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAsCoordinates() {
         assertEquals(
-            Position(52.04, -2.35, z = "15"),
+            Position(52.04, -2.35, z = 15.0),
             parseUrl("https://maps.google.com/maps/place/52.04,-2.35/@52.03877,-2.3416,15z/data=!3m1!1e3")
 
         )
@@ -180,7 +180,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_placeAsCoordinatesWithPlus() {
         assertEquals(
-            Position(52.492611, 13.431726, z = "17"),
+            Position(52.492611, 13.431726, z = 17.0),
             parseUrl("https://www.google.com/maps/place/52.492611,+13.431726/@52.4929475,13.4317905,17z/data=!4m4!3m3!8m2?force=pwa")
         )
     }
@@ -293,7 +293,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_directionsCoordinatesWithCenter() {
         assertEquals(
-            Position(34.0522, -118.2437, z = "16"),
+            Position(34.0522, -118.2437, z = 16.0),
             parseUrl("https://www.google.com/maps/dir/40.7128,-74.0060/34.0522,-118.2437/@52.4844406,13.4217121,16z/")
         )
     }
@@ -301,7 +301,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_directionsPlaceAndCoordinates() {
         assertEquals(
-            Position(48.83887481689453, 2.2740750312805176, z = "8"),
+            Position(48.83887481689453, 2.2740750312805176, z = 8.0),
             @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/")
         )
@@ -334,7 +334,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_directionsFromToViaWithCenter() {
         assertEquals(
-            Position(52.4844406, 13.4217121, z = "16"),
+            Position(52.4844406, 13.4217121, z = 16.0),
             @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
         )
@@ -344,7 +344,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_directionsFromToViaWithCoordinatesInData() {
         assertEquals(
             Position(
-                z = "16",
+                z = 16.0,
                 points = persistentListOf(
                     Point(52.4858222, 13.4236883),
                     Point(52.4881038, 13.4255518),
@@ -376,7 +376,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_apiCenter() {
         assertEquals(
-            Position(-33.712206, 150.311941, z = "12"),
+            Position(-33.712206, 150.311941, z = 12.0),
             parseUrl("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=12&basemap=terrain")
         )
     }
@@ -477,7 +477,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_http() {
         assertEquals(
-            Position(52.5067296, 13.2599309, z = "11"),
+            Position(52.5067296, 13.2599309, z = 11.0),
             parseUrl("http://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
@@ -485,7 +485,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_ukDomain() {
         assertEquals(
-            Position(52.5067296, 13.2599309, z = "11"),
+            Position(52.5067296, 13.2599309, z = 11.0),
             parseUrl("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
@@ -493,7 +493,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_noScheme() {
         assertEquals(
-            Position(52.5067296, 13.2599309, z = "11"),
+            Position(52.5067296, 13.2599309, z = 11.0),
             parseUrl("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }

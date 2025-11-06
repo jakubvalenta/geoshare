@@ -15,7 +15,7 @@ class AppleMapsOutputTest {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
             outputGroup.getActionOutputs().map {
-                it.getAction(Position(50.123456, -11.123456, z = "3.4"), uriQuote)
+                it.getAction(Position(50.123456, -11.123456, z = 3.4), uriQuote)
             }
         )
     }
@@ -25,7 +25,7 @@ class AppleMapsOutputTest {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
             outputGroup.getActionOutputs().map {
-                it.getAction(Position(50.123456, -11.123456, q = "foo bar", z = "3.4"), uriQuote)
+                it.getAction(Position(50.123456, -11.123456, q = "foo bar", z = 3.4), uriQuote)
             }
         )
     }
@@ -35,7 +35,7 @@ class AppleMapsOutputTest {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?q=foo%20bar&z=3.4")),
             outputGroup.getActionOutputs().map {
-                it.getAction(Position(q = "foo bar", z = "3.4"), uriQuote)
+                it.getAction(Position(q = "foo bar", z = 3.4), uriQuote)
             }
         )
     }

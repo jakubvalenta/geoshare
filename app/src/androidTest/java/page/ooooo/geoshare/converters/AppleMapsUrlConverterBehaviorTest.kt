@@ -24,7 +24,7 @@ class AppleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Query
         testUri(
-            Position(50.894967, 4.341626, q = "Central Park", z = "10"),
+            Position(50.894967, 4.341626, q = "Central Park", z = 10.0),
             "https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s",
         )
 

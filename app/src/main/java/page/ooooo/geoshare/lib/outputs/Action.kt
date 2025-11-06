@@ -40,8 +40,8 @@ sealed interface Action {
             append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
             append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
             position.points?.map { point ->
-                point.toStringPair().let { (lat, lon) ->
-                    append("<wpt lat=\"$lat\" lon=\"$lon\"")
+                point.apply {
+                    append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
                 }
                 if (point.desc != null) {
                     append(">\n")

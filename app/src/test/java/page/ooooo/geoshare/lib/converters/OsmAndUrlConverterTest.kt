@@ -35,7 +35,7 @@ class OsmAndUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_fragment() {
         assertEquals(
-            Position(-53.347932, -13.2347, z = "12.5"),
+            Position(-53.347932, -13.2347, z = 12.5),
             parseUrl("https://osmand.net/map#12.5/-53.347932/-13.2347")
         )
     }
@@ -43,7 +43,7 @@ class OsmAndUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterPinTakesPrecedenceOverFragment() {
         assertEquals(
-            Position(52.51628, 13.37771, z = "12.5"),
+            Position(52.51628, 13.37771, z = 12.5),
             parseUrl("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347")
         )
     }
