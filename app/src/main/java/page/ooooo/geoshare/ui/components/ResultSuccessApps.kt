@@ -125,7 +125,7 @@ fun RowScope.ResultSuccessApp(
                 rememberDrawablePainter(app.icon),
                 app.label,
             )
-            outputs.takeIf { it.isNotEmpty() }?.let { outputs ->
+            outputs.takeIf { it.size > 1 }?.let { outputs ->
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
