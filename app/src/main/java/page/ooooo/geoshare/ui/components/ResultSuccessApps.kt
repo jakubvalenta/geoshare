@@ -147,7 +147,7 @@ fun RowScope.ResultSuccessApp(
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         outputs.forEach {
                             DropdownMenuItem(
-                                text = { Text(it.label()) },
+                                text = { Text(it.label(app)) },
                                 onClick = {
                                     menuExpanded = false
                                     onRun(it.getAction(position))

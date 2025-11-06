@@ -44,8 +44,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
             stringResource(R.string.conversion_succeeded_open_app, packageName)
+        override fun label(app: IntentTools.App) =
     }
 
     object ChipOutput : Output.Action<Position, Action> {
