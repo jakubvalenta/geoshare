@@ -9,6 +9,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
@@ -24,18 +25,24 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         "us.spotco.maps",
     )
 
-    object CopyOutput : Output.Action<Position, Action> {
+    @Immutable
+    data class CopyOutput(val srs: Srs) : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, srs, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+        override fun label() = when (srs) {
+            is Srs.WGS84 ->
+                stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+
+            is Srs.GCJ02 ->
+                stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, srs.name)
+        }
     }
 
     object ChipOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.GCJ02, uriQuote))
 
         @Composable
         override fun label() =
@@ -43,13 +50,12 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     }
 
     @Immutable
-    data class AppWGSOutput(override val packageName: String) : Output.App<Position> {
+    data class AppWGS84Output(override val packageName: String) : Output.App<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatUriString(value, uriQuote))
+            Action.OpenApp(packageName, formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
-            stringResource(R.string.conversion_succeeded_open_app_srs, app.label, "WGS 84")
+        override fun label(app: IntentTools.App) = stringResource(R.string.conversion_succeeded_open_app, app.label)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -58,7 +64,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, uriQuote))
+            Action.Copy(formatUriString(position, Srs.GCJ02, uriQuote))
 
         @Composable
         override fun Label() {
@@ -76,12 +82,13 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
-        CopyOutput,
+        CopyOutput(Srs.GCJ02), // TODO Hide if out of China
+        CopyOutput(Srs.WGS84),
     )
 
     override fun getAppOutputs(packageNames: List<String>) = buildList {
         PACKAGE_NAMES.filter { it in packageNames }.forEach { packageName ->
-            add(AppWGSOutput(packageName))
+            add(AppWGS84Output(packageName))
         }
     }
 
@@ -100,13 +107,13 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         else -> null
     }
 
-    private fun formatUriString(value: Position, uriQuote: UriQuote) = Uri(
+    private fun formatUriString(value: Position, srs: Srs, uriQuote: UriQuote) = Uri(
         scheme = "https",
         host = "www.google.com",
         path = "/maps",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.apply {
+                mainPoint?.toSrs(srs)?.apply {
                     set("q", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)

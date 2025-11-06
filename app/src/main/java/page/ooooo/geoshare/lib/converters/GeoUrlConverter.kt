@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.matches
@@ -19,7 +20,7 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val documentation = Documentation(
         nameResId = R.string.converter_geo_name, inputs = listOf(
             DocumentationInput.Text(3) {
-                stringResource(R.string.example, GeoUriOutputGroup.formatUriString(Position.example))
+                stringResource(R.string.example, GeoUriOutputGroup.formatUriString(Position.example, Srs.WGS84))
             },
         )
     )

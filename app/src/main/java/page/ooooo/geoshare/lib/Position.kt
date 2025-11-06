@@ -33,6 +33,4 @@ data class Position(
     val mainPoint: Point? get() = points?.lastOrNull()
 
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
-
-    fun toGCJ(): Position = this.copy(points = points?.map { it.toGCJ() }?.toImmutableList())
 }

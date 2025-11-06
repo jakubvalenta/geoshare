@@ -26,5 +26,8 @@ data class Point(val lat: Double = 0.0, val lon: Double = 0.0, val desc: String?
 
     fun isOutOfChina(): Boolean = TransformUtil.outOfChina(lat, lon)
 
-    fun toGCJ(): Point = WGSPointer(lat, lon).toGCJPointer().run { Point(latitude, longitude) }
+    fun toSrs(srs: Srs): Point = when (srs) {
+        is Srs.WGS84 -> this
+        is Srs.GCJ02 -> WGSPointer(lat, lon).toGCJPointer().run { Point(latitude, longitude) }
+    }
 }

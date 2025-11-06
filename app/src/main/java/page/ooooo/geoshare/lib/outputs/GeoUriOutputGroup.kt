@@ -22,7 +22,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     object CopyOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
         override fun label() =
@@ -31,7 +31,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     object ChooserOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, uriQuote))
+            Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
         override fun label() =
@@ -40,26 +40,21 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     @Immutable
     data class AppOutput(override val packageName: String) : Output.App<Position> {
+        private val srs get() = if (packageName in GoogleMapsOutputGroup.PACKAGE_NAMES) Srs.GCJ02 else Srs.WGS84
+
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(
-                packageName,
-                formatUriString(if (requiresGCJ()) value.toGCJ() else value, uriQuote),
-            )
+            Action.OpenApp(packageName, formatUriString(value, srs, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
-            if (requiresGCJ()) {
-                stringResource(R.string.conversion_succeeded_open_app_srs, app.label, "GCJ-02")
-            } else {
-                stringResource(R.string.conversion_succeeded_open_app, app.label)
-            }
-
-        private fun requiresGCJ(): Boolean = packageName in GoogleMapsOutputGroup.PACKAGE_NAMES
+        override fun label(app: IntentTools.App) = when (srs) {
+            is Srs.WGS84 -> stringResource(R.string.conversion_succeeded_open_app, app.label)
+            is Srs.GCJ02 -> stringResource(R.string.conversion_succeeded_open_app_srs, app.label, srs.name)
+        }
     }
 
     object ChipOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
         override fun label() =
@@ -72,7 +67,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, uriQuote))
+            Action.Copy(formatUriString(position, Srs.WGS84, uriQuote))
 
         @Composable
         override fun Label() {
@@ -91,7 +86,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val delay = 5.seconds
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(position, uriQuote))
+            Action.OpenChooser(formatUriString(position, Srs.WGS84, uriQuote))
 
         @Composable
         override fun Label() {
@@ -121,7 +116,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val delay = 5.seconds
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatUriString(position, uriQuote))
+            Action.OpenApp(packageName, formatUriString(position, Srs.WGS84, uriQuote))
 
         @Composable
         override fun Label() {
@@ -203,7 +198,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         else -> null
     }
 
-    fun formatUriString(value: Position, uriQuote: UriQuote = DefaultUriQuote()): String = value.run {
-        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), uriQuote, q = q, zStr = zStr)
+    fun formatUriString(value: Position, srs: Srs, uriQuote: UriQuote = DefaultUriQuote()): String = value.run {
+        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), srs, uriQuote, q = q, zStr = zStr)
     }
 }

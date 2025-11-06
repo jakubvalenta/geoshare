@@ -10,7 +10,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object CopyOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
         override fun label() =
@@ -19,7 +19,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object ChooserOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, uriQuote))
+            Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
         override fun label() =
@@ -48,8 +48,8 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatUriString(value: Point, uriQuote: UriQuote, q: String? = null, zStr: String? = null): String =
-        value.run {
+    fun formatUriString(value: Point, srs: Srs, uriQuote: UriQuote, q: String? = null, zStr: String? = null): String =
+        value.toSrs(srs).run {
             Uri(
                 scheme = "geo",
                 path = "$latStr,$lonStr",
