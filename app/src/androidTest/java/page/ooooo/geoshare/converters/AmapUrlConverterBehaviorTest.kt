@@ -13,7 +13,7 @@ class AmapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Short URI
         testUri(
-            Position("31.224731304675522", "121.46385323166844", desc = "WGS 84"),
+            Position(31.224731304675522, 121.46385323166844, desc = "WGS 84"),
             "https://surl.amap.com/4mkKGuyJ2bz",
         )
     }

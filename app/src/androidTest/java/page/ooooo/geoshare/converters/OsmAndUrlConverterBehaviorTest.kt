@@ -8,7 +8,7 @@ class OsmAndUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun test() {
         // Coordinates
         testUri(
-            Position("52.51628", "13.37771", z = "15"),
+            Position(52.51628, 13.37771, z = "15"),
             "https://osmand.net/map?pin=52.51628,13.37771#15/52.51628/13.37771",
         )
     }

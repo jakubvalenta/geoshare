@@ -39,7 +39,7 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
                 matcher.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
                     GCJPointer(lat, lon).toExactWGSPointer().let { wGSPointer ->
                         listOf(
-                            Point(wGSPointer.latitude.toString(), wGSPointer.longitude.toString(), desc = "WGS 84")
+                            Point(wGSPointer.latitude, wGSPointer.longitude, desc = "WGS 84")
                         )
                     }
                 }

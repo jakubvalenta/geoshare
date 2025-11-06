@@ -188,7 +188,7 @@ private fun DescPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456", desc = "WGS 84"),
+                position = Position(50.123456, 11.123456, desc = "WGS 84"),
                 onRun = {},
             )
         }
@@ -204,7 +204,7 @@ private fun DarkDescPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position("50.123456", "11.123456", desc = "WGS 84"),
+                position = Position(50.123456, 11.123456, desc = "WGS 84"),
                 onRun = {},
             )
         }

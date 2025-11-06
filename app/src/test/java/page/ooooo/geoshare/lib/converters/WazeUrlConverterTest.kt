@@ -61,11 +61,11 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
-            Position("45.6906304", "-120.810983", z = "10"),
+            Position(45.6906304, -120.810983, z = "10"),
             parseUrl("https://waze.com/ul?ll=45.6906304,-120.810983&z=10")
         )
         assertEquals(
-            Position("45.69063040", "-120.81098300"),
+            Position(45.69063040, -120.81098300),
             parseUrl("https://ul.waze.com/ul?ll=45.69063040%2C-120.81098300&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location")
         )
     }
@@ -73,11 +73,11 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_directionsCoordinates() {
         assertEquals(
-            Position("45.6906304", "-120.810983"),
+            Position(45.6906304, -120.810983),
             parseUrl("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983")
         )
         assertEquals(
-            Position("45.829189", "1.259372"),
+            Position(45.829189, 1.259372),
             parseUrl("https://www.waze.com/live-map/directions?latlng=45.829189%2C1.259372")
         )
     }
@@ -125,15 +125,15 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLink() {
         assertEquals(
-            Position("45.829189", "1.259372", z = "16"),
+            Position(45.829189, 1.259372, z = "16"),
             parseUrl("https://waze.com/ul/hu00uswvn3")
         )
         assertEquals(
-            Position("45.829189", "1.259372", z = "16"),
+            Position(45.829189, 1.259372, z = "16"),
             parseUrl("https://www.waze.com/ul/hu00uswvn3")
         )
         assertEquals(
-            Position("45.829189", "1.259372", z = "16"),
+            Position(45.829189, 1.259372, z = "16"),
             parseUrl("https://www.waze.com/live-map?h=u00uswvn3")
         )
     }
@@ -141,7 +141,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_shortLinkNegative() {
         assertEquals(
-            Position("19.402564", "-99.165666", z = "16"),
+            Position(19.402564, -99.165666, z = "16"),
             parseUrl("https://waze.com/ul/h9g3qrkju0")
         )
     }
@@ -149,7 +149,7 @@ class WazeUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseHtml_containsLatLngJSON_returnsPosition() {
         assertEquals(
-            Position("43.64265563", "-79.387202798"),
+            Position(43.64265563, -79.387202798),
             parseHtml(
                 """<html><script>
                 |{

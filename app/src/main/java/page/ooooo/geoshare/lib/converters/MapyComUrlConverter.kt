@@ -48,13 +48,13 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
     private class NorthSouthWestEastPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-        override val points
-            get() = matcher.groupOrNull("lat")?.let { lat ->
-                matcher.groupOrNull("lon")?.let { lon ->
-                    val latSig = if (matcher.groupOrNull()?.contains('S') == true) "-" else ""
-                    val lonSig = if (matcher.groupOrNull()?.contains('W') == true) "-" else ""
-                    persistentListOf(Point(latSig + lat, lonSig + lon))
-                }
+        override val points: List<Point>?
+            get() {
+                val lat = matcher.groupOrNull("lat")?.toDoubleOrNull() ?: return null
+                val lon = matcher.groupOrNull("lon")?.toDoubleOrNull() ?: return null
+                val latSig = if (matcher.groupOrNull()?.contains('S') == true) -1 else 1
+                val lonSig = if (matcher.groupOrNull()?.contains('W') == true) -1 else 1
+                return persistentListOf(Point(latSig * lat, lonSig * lon))
             }
     }
 }

@@ -122,11 +122,9 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
                     dataPatterns.forEach { dataPattern ->
                         dataPattern.matcher(data).let { m ->
                             while (m.find()) {
-                                try {
-                                    add(Point(m.group("lat"), m.group("lon")))
-                                } catch (_: IllegalArgumentException) {
-                                    // Do nothing
-                                }
+                                val lat = m.groupOrNull("lat")?.toDoubleOrNull() ?: continue
+                                val lon = m.groupOrNull("lon")?.toDoubleOrNull() ?: continue
+                                add(Point(lat, lon))
                             }
                         }
                     }

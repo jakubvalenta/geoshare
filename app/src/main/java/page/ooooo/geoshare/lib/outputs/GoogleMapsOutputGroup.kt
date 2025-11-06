@@ -106,7 +106,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         path = "/maps",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.apply {
+                mainPoint?.toStringPair()?.let { (lat, lon) ->
                     set("q", "$lat,$lon")
                 } ?: q?.let { q ->
                     set("q", q)

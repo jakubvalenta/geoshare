@@ -14,12 +14,10 @@ import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 object AppleMapsOutputGroup : OutputGroup<Position> {
 
     object CopyOutput : Output.Action<Position, Action> {
-        override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+        override fun getAction(value: Position, uriQuote: UriQuote) = Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -70,7 +68,7 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         path = "/",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.apply {
+                mainPoint?.toStringPair()?.let { (lat, lon) ->
                     set("ll", "$lat,$lon")
                 } ?: q?.let { q ->
                     set("q", q)

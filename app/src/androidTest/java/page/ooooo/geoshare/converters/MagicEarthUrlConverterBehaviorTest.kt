@@ -8,7 +8,7 @@ class MagicEarthUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     fun test() {
         // Coordinates
         testUri(
-            Position("48.85649", "2.35216"),
+            Position(48.85649, 2.35216),
             "https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345",
         )
 

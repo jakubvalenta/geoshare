@@ -23,8 +23,8 @@ data class Position(
     }
 
     constructor(
-        lat: String,
-        lon: String,
+        lat: Double,
+        lon: Double,
         q: String? = null,
         z: String? = null,
         desc: String? = null,

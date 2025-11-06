@@ -99,15 +99,19 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
                 value.apply {
                     if (q == null) {
                         set("show_on_map", "")
-                        set("lat", lat)
-                        set("lon", lon)
+                        value.toStringPair().let { (lat, lon) ->
+                            set("lat", lat)
+                            set("lon", lon)
+                        }
                     } else {
-                        if (lat == "0" && lon == "0") {
+                        if (lat == 0.0 && lon == 0.0) {
                             set("open_search", "")
                         } else {
                             set("search_around", "")
-                            set("lat", lat)
-                            set("lon", lon)
+                            value.toStringPair().let { (lat, lon) ->
+                                set("lat", lat)
+                                set("lon", lon)
+                            }
                         }
                         set("q", q)
                     }
@@ -122,7 +126,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             path = "//",
             queryParams = buildMap {
                 set("navigate_to", "")
-                value.run {
+                value.toStringPair().let { (lat, lon) ->
                     set("lat", lat)
                     set("lon", lon)
                 }
@@ -136,7 +140,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             path = "//",
             queryParams = buildMap {
                 set("navigate_via", "")
-                value.run {
+                value.toStringPair().let { (lat, lon) ->
                     set("lat", lat)
                     set("lon", lon)
                 }

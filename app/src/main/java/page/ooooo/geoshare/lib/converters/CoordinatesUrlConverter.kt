@@ -29,13 +29,13 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             deg: String?,
             min: String? = null,
             sec: String? = null,
-        ): String {
+        ): Double {
             val sig = if (southOrWest && sig != "-" || !southOrWest && sig == "-") -1 else 1
             val deg = (deg?.toDouble() ?: 0.0)
             val min = (min?.toDouble() ?: 0.0) / 60
             val sec = (sec?.toDouble() ?: 0.0) / 3600
             val dec = (sig * (deg + min + sec))
-            return dec.toScale(6).toString()
+            return dec.toScale(6)
         }
     }
 

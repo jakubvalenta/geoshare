@@ -57,15 +57,13 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatDecString(value: Point): String = value.run {
-        "$lat, $lon"
-    }
+    fun formatDecString(value: Point): String = value.toStringPair().let { (lat, lon) -> "$lat, $lon" }
 
     fun formatDegMinSecString(value: Point): String = value.run {
-        (lat.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
+        lat.toDegMinSec().let { (deg, min, sec) ->
             "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
         } +
-                (lon.toDoubleOrNull() ?: 0.0).toDegMinSec().let { (deg, min, sec) ->
+                lon.toDegMinSec().let { (deg, min, sec) ->
                     "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
                 }
     }

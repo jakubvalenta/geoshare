@@ -55,8 +55,10 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
             get() {
                 val encoded = matcher.groupOrNull("encoded") ?: return null
                 val decoded = Base64.decode(encoded).decodeToString()
-                val lat = decodedLatPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lat") ?: return null
-                val lon = decodedLonPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lon") ?: return null
+                val lat = decodedLatPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lat")?.toDoubleOrNull()
+                    ?: return null
+                val lon = decodedLonPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lon")?.toDoubleOrNull()
+                    ?: return null
                 return persistentListOf(Point(lat, lon))
             }
     }

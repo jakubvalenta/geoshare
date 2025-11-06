@@ -57,7 +57,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
-            Position("50.0525078", "14.0184810", z = "9"),
+            Position(50.0525078, 14.0184810, z = "9"),
             parseUrl("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
     }
@@ -65,7 +65,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesCsLanguage() {
         assertEquals(
-            Position("50.0525078", "14.0184810", z = "9"),
+            Position(50.0525078, 14.0184810, z = "9"),
             parseUrl("https://mapy.com/cs/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
     }
@@ -73,7 +73,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesCzDomain() {
         assertEquals(
-            Position("50.0525078", "14.0184810", z = "9"),
+            Position(50.0525078, 14.0184810, z = "9"),
             parseUrl("https://mapy.cz/en/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
     }
@@ -81,7 +81,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesOutdoorType() {
         assertEquals(
-            Position("50.0525078", "14.0184810", z = "9"),
+            Position(50.0525078, 14.0184810, z = "9"),
             parseUrl("https://mapy.com/en/turisticka?x=14.0184810&y=50.0525078&z=9")
         )
     }
@@ -89,7 +89,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinatesMissingType() {
         assertEquals(
-            Position("50.0525078", "14.0184810", z = "9"),
+            Position(50.0525078, 14.0184810, z = "9"),
             parseUrl("https://mapy.com/?x=14.0184810&y=50.0525078&z=9")
         )
     }
@@ -97,7 +97,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_place() {
         assertEquals(
-            Position("50.0992553", "14.4336590", z = "19"),
+            Position(50.0992553, 14.4336590, z = "19"),
             parseUrl("https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19")
         )
     }
@@ -105,11 +105,11 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_textCoordinates() {
         assertEquals(
-            Position("41.9966006", "-6.1223825"),
+            Position(41.9966006, -6.1223825),
             parseUrl(uriString = "41.9966006N, 6.1223825W")
         )
         assertEquals(
-            Position("-41.9966006", "6.1223825"),
+            Position(-41.9966006, 6.1223825),
             parseUrl(uriString = "41.9966006S, 6.1223825E")
         )
     }

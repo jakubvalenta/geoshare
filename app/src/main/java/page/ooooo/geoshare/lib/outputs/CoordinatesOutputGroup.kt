@@ -140,9 +140,8 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
                 add(description)
             }
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
-                    val coords = "$lat,$lon"
-                    if (q != coords) {
+                (mainPoint ?: Point()).toStringPair().let { (lat, lon) ->
+                    if (q != "$lat,$lon") {
                         add(q.replace('+', ' '))
                     }
                 }

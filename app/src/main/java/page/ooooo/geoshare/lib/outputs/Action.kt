@@ -39,11 +39,13 @@ sealed interface Action {
             append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
             append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
             append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
-            position.points?.map { (lat, lon, desc) ->
-                append("<wpt lat=\"${uriQuote.encode(lat)}\" lon=\"${uriQuote.encode(lon)}\"")
-                if (desc != null) {
+            position.points?.map { point ->
+                point.toStringPair().let { (lat, lon) ->
+                    append("<wpt lat=\"$lat\" lon=\"$lon\"")
+                }
+                if (point.desc != null) {
                     append(">\n")
-                    append("    <desc>${desc.escapeHTML()}</desc>\n")
+                    append("    <desc>${point.desc.escapeHTML()}</desc>\n")
                     append("</wpt>\n")
                 } else {
                     append(" />\n")

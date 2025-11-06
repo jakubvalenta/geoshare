@@ -21,9 +21,9 @@ class CoordinatesOutputTest {
                     q = "foo bar",
                     z = "3.4",
                     points = persistentListOf(
-                        Point("59.1293656", "11.4585672"),
-                        Point("59.4154007", "11.659710599999999"),
-                        Point("59.147731699999994", "11.550661199999999"),
+                        Point(59.1293656, 11.4585672),
+                        Point(59.4154007, 11.659710599999999),
+                        Point(59.147731699999994, 11.550661199999999),
                     ),
                 ),
             ),
@@ -34,7 +34,7 @@ class CoordinatesOutputTest {
     fun copyOutput_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
             Action.Copy("17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W"),
-            outputGroup.getActionOutputs().first().getAction(Position("-17.2165721", "-149.9470294"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position(-17.2165721, -149.9470294), uriQuote),
         )
     }
 
@@ -42,7 +42,7 @@ class CoordinatesOutputTest {
     fun copyOutput_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
             Action.Copy("52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E"),
-            outputGroup.getActionOutputs().first().getAction(Position("52.5067296", "13.2599309"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position(52.5067296, 13.2599309), uriQuote),
         )
     }
 
@@ -50,7 +50,7 @@ class CoordinatesOutputTest {
     fun copyOutput_returnsZerosForZeroCoordinates() {
         assertEquals(
             Action.Copy("0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E"),
-            outputGroup.getActionOutputs().first().getAction(Position("0", "0"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position(0.0, 0.0), uriQuote),
         )
     }
 
@@ -58,7 +58,7 @@ class CoordinatesOutputTest {
     fun copyOutput_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
             Action.Copy("0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E"),
-            outputGroup.getActionOutputs().first().getAction(Position("0.5", "0.5"), uriQuote),
+            outputGroup.getActionOutputs().first().getAction(Position(0.5, 0.5), uriQuote),
         )
     }
 
@@ -66,7 +66,7 @@ class CoordinatesOutputTest {
     fun copyOutput_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
             Action.Copy("10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W"),
-            outputGroup.getActionOutputs().first().getAction(Position("-10", "-20"), uriQuote)
+            outputGroup.getActionOutputs().first().getAction(Position(-10.0, -20.0), uriQuote)
         )
     }
 
@@ -74,7 +74,7 @@ class CoordinatesOutputTest {
     fun copyOutput_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
             Action.Copy("10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W"),
-            outputGroup.getActionOutputs().first().getAction(Position("-10.5", "-20.5"), uriQuote)
+            outputGroup.getActionOutputs().first().getAction(Position(-10.5, -20.5), uriQuote)
         )
     }
 
