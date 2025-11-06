@@ -159,4 +159,6 @@
     <string name="network_exception_server_response_error" translatable="false">server response error</string>
     <string name="network_exception_response_error" translatable="false">response error</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
+    <string name="conversion_succeeded_open_app_wgs">Open %1$s (WGS-84)</string>
+    <string name="conversion_succeeded_open_app_gjc">Open %1$s (GCJ-02)</string>
 </resources>

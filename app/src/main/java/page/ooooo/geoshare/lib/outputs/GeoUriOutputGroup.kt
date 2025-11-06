@@ -41,11 +41,19 @@ object GeoUriOutputGroup : OutputGroup<Position> {
     @Immutable
     data class AppOutput(override val packageName: String) : Output.App<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatUriString(value, uriQuote))
+            Action.OpenApp(
+                packageName,
+                formatUriString(if (requiresGCJ()) value.toGCJ() else value, uriQuote),
+            )
 
         @Composable
-            stringResource(R.string.conversion_succeeded_open_app, packageName)
         override fun label(app: IntentTools.App) =
+            stringResource(
+                if (requiresGCJ()) R.string.conversion_succeeded_open_app_gcj else R.string.conversion_succeeded_open_app,
+                app.label,
+            )
+
+        private fun requiresGCJ(): Boolean = packageName in GoogleMapsOutputGroup.PACKAGE_NAMES
     }
 
     object ChipOutput : Output.Action<Position, Action> {
