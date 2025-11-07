@@ -6,6 +6,8 @@ import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.network.sockets.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cookies.ConstantCookiesStorage
+import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -102,6 +104,22 @@ open class NetworkTools(
         }
         HttpClient(engine) {
             followRedirects = followRedirectsParam
+            // Bypass consent page https://stackoverflow.com/a/78115353
+            install(HttpCookies) {
+                storage = ConstantCookiesStorage(
+                    Cookie(
+                        name = "CONSENT",
+                        value = "PENDING+987",
+                        domain = "www.google.com",
+                    ),
+                    @Suppress("SpellCheckingInspection")
+                    Cookie(
+                        name = "SOCS",
+                        value = "CAESHAgBEhJnd3NfMjAyMzA4MTAtMF9SQzIaAmRlIAEaBgiAo_CmBg",
+                        domain = "www.google.com",
+                    ),
+                )
+            }
             HttpResponseValidator {
                 validateResponse { response ->
                     if (response.status !in expectedStatusCodes) {
