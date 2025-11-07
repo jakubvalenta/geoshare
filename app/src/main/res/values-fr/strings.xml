@@ -128,4 +128,10 @@
     <string name="conversion_succeeded_open_app">Ouvrir %1$s</string>
     <string name="user_preferences_automation_title">Automatisation</string>
     <string name="main_random">Lien aléatoire</string>
+    <string name="conversion_succeeded_copy_link_display">Copiez le lien pour afficher la carte en %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_to">Copiez le lien pour naviguer dans %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_via">Copiez le lien pour ajouter un point de passage dans %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Afficher la carte en %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_to">Naviguer dans %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_via">Ajouter un point de passage dans %1$s</string>
 </resources>
