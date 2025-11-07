@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.extensions.toDegMinSec
+import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.abs
 
 object CoordinatesPointOutputGroup : OutputGroup<Point> {

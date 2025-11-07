@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.matches
+import page.ooooo.geoshare.lib.extensions.matches
 
 class OsmAndUrlConverter : UrlConverter.WithUriPattern {
     @Suppress("SpellCheckingInspection")

@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.matches
+import page.ooooo.geoshare.lib.extensions.matches
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/

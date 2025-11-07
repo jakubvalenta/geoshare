@@ -39,6 +39,7 @@ import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
@@ -304,7 +305,7 @@ fun ConversionScreen(
                             AnnotatedString.fromHtml(
                                 stringResource(
                                     R.string.conversion_permission_common_text,
-                                    truncateMiddle(currentState.uri.toString()),
+                                    currentState.uri.toString().truncateMiddle(),
                                     appName,
                                 )
                             ),
@@ -330,7 +331,7 @@ fun ConversionScreen(
                             AnnotatedString.fromHtml(
                                 stringResource(
                                     R.string.conversion_permission_common_text,
-                                    truncateMiddle(currentState.uri.toString()),
+                                    currentState.uri.toString().truncateMiddle(),
                                     appName,
                                 )
                             ),

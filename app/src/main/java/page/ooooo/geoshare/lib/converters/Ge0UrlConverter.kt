@@ -4,6 +4,8 @@ import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.toScale
 
 class Ge0UrlConverter : UrlConverter.WithUriPattern {
     companion object {

@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
 import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.matches
+import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {

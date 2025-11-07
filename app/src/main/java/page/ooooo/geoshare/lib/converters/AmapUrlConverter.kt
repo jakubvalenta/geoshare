@@ -8,6 +8,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.matches
 
 @Suppress("SpellCheckingInspection")
 class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern {

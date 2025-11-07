@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib
 import androidx.compose.runtime.Immutable
 import com.lbt05.evil_transform.TransformUtil
 import com.lbt05.evil_transform.WGSPointer
+import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.random.Random
 
 @Immutable

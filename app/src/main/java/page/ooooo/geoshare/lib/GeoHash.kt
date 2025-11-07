@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib
 
+import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.max
 import kotlin.math.pow
 

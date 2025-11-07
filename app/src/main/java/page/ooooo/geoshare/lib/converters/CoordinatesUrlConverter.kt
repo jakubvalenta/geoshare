@@ -7,6 +7,9 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
