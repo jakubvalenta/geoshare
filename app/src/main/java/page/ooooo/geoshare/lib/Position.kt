@@ -33,5 +33,7 @@ data class Position(
 
     val mainPoint: Point? get() = points?.lastOrNull()
 
+    val pointCount: Int get() = points?.size ?: 0
+
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
 }

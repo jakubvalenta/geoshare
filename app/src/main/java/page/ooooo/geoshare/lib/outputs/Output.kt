@@ -28,8 +28,8 @@ sealed interface Output<T> {
         fun getText(value: T, uriQuote: UriQuote = DefaultUriQuote()): String
     }
 
-    interface ComposableText<T> : Output<T> {
+    interface PointLabel<T> : Output<T> {
         @Composable
-        fun getText(value: T, num: Int, uriQuote: UriQuote = DefaultUriQuote()): String?
+        fun getText(value: T, i: Int, pointCount: Int, uriQuote: UriQuote = DefaultUriQuote()): String?
     }
 }

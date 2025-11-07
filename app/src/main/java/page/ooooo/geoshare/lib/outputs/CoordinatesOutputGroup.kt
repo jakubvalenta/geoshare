@@ -11,21 +11,16 @@ import page.ooooo.geoshare.lib.*
 object CoordinatesOutputGroup : OutputGroup<Position> {
 
     object TextOutput : Output.Text<Position> {
-        override fun getText(value: Position, uriQuote: UriQuote) =
-            formatDegMinSecString(value)
+        override fun getText(value: Position, uriQuote: UriQuote) = formatDegMinSecString(value)
     }
 
-    object LabelTextOutput : Output.ComposableText<Position> {
+    object LabelTextOutput : Output.PointLabel<Position> {
         @Composable
-        override fun getText(value: Position, num: Int, uriQuote: UriQuote) =
-            num.takeIf { it > 1 }?.let { num ->
-                stringResource(R.string.conversion_succeeded_point_number, num)
-            }
+        override fun getText(value: Position, i: Int, pointCount: Int, uriQuote: UriQuote) = label(value, i, pointCount)
     }
 
     object SupportingTextOutput : Output.Text<Position> {
-        override fun getText(value: Position, uriQuote: UriQuote) =
-            formatParamsString(value)
+        override fun getText(value: Position, uriQuote: UriQuote) = formatParamsString(value)
     }
 
     object CopyDegMinSecOutput : Output.Action<Position, Action> {
@@ -33,8 +28,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDegMinSecString(value))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecOutput : Output.Action<Position, Action> {
@@ -42,8 +36,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDecString(value))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecAutomation : Automation.HasSuccessMessage {
@@ -136,8 +129,8 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
     private fun formatParamsString(value: Position): String = value.run {
         buildList {
-            mainPoint?.desc.takeUnless { it.isNullOrEmpty() }?.let { description ->
-                add(description)
+            mainPoint?.desc.takeUnless { it.isNullOrEmpty() }?.let { desc ->
+                add(desc)
             }
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
                 (mainPoint ?: Point()).apply {
@@ -150,5 +143,10 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
                 add("z$zStr")
             }
         }.joinToString("\t\t")
+    }
+
+    @Composable
+    private fun label(value: Position, i: Int, pointCount: Int): String = value.run {
+        CoordinatesPointOutputGroup.label(mainPoint ?: Point(), i, pointCount)
     }
 }

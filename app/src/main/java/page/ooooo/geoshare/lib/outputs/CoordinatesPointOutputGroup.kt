@@ -14,28 +14,23 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
         override fun getText(value: Point, uriQuote: UriQuote) = formatDegMinSecString(value)
     }
 
-    object LabelTextOutput : Output.ComposableText<Point> {
+    object LabelTextOutput : Output.PointLabel<Point> {
         @Composable
-        override fun getText(value: Point, num: Int, uriQuote: UriQuote) =
-            stringResource(R.string.conversion_succeeded_point_number, num)
+        override fun getText(value: Point, i: Int, pointCount: Int, uriQuote: UriQuote) = label(value, i, pointCount)
     }
 
     object CopyDegMinSecOutput : Output.Action<Point, Action> {
-        override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatDegMinSecString(value))
+        override fun getAction(value: Point, uriQuote: UriQuote) = Action.Copy(formatDegMinSecString(value))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecOutput : Output.Action<Point, Action> {
-        override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatDecString(value))
+        override fun getAction(value: Point, uriQuote: UriQuote) = Action.Copy(formatDecString(value))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     override fun getTextOutput() = TextOutput
@@ -64,10 +59,18 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
     fun formatDegMinSecString(value: Point): String = value.run {
         lat.toDegMinSec().let { (deg, min, sec) ->
             "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
-        } +
-                lon.toDegMinSec().let { (deg, min, sec) ->
-                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
-                }
+        } + lon.toDegMinSec().let { (deg, min, sec) ->
+            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
+        }
     }
 
+    @Composable
+    fun label(value: Point, i: Int, pointCount: Int): String =
+        if (value.desc?.isNotEmpty() == true) {
+            value.desc
+        } else if (pointCount > 1) {
+            stringResource(R.string.conversion_succeeded_point_number, i + 1)
+        } else {
+            ""
+        }
 }

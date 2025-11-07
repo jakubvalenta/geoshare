@@ -38,7 +38,7 @@ fun ResultSuccessCoordinates(
     ResultCard(
         main = {
             Row {
-                allOutputGroups.getLabelTextOutput()?.getText(position, position.points?.size ?: 0)?.let { text ->
+                allOutputGroups.getLabelTextOutput()?.getText(position, 0, position.pointCount)?.let { text ->
                     Text(
                         text,
                         Modifier.padding(end = 12.dp),
@@ -85,7 +85,15 @@ fun ResultSuccessCoordinates(
                     val textPointOutput = allPointOutputGroups.getTextOutput()
                     val labelTextPointOutput = allPointOutputGroups.getLabelTextOutput()
                     points.forEachIndexed { i, point ->
-                        ResultSuccessPoint(i, point, textPointOutput, labelTextPointOutput, menuPointOutputs, onRun)
+                        ResultSuccessPoint(
+                            i = i,
+                            point = point,
+                            pointCount = position.pointCount,
+                            textPointOutput = textPointOutput,
+                            labelTextPointOutput = labelTextPointOutput,
+                            menuPointOutputs = menuPointOutputs,
+                            onRun = onRun,
+                        )
                     }
                 }
             }

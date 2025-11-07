@@ -36,19 +36,12 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
 
     private class GCJPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-        override val points
-            get() = matcher.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                matcher.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                    GCJPointer(lat, lon).toExactWGSPointer().let { wGSPointer ->
-                        listOf(
-                            Point(
-                                wGSPointer.latitude,
-                                wGSPointer.longitude,
-                                desc = "WGS 84", // TODO Replace point description with custom output parameters
-                            )
-                        )
-                    }
-                }
+        override val points: List<Point>?
+            get() {
+                val lat = matcher.groupOrNull("lat")?.toDoubleOrNull() ?: return null
+                val lon = matcher.groupOrNull("lon")?.toDoubleOrNull() ?: return null
+                val wgsPointer = GCJPointer(lat, lon).toExactWGSPointer()
+                return listOf(Point(wgsPointer.latitude, wgsPointer.longitude))
             }
     }
 }
