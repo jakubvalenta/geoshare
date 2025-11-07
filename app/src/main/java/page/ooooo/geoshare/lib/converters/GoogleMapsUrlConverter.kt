@@ -92,6 +92,7 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
         on { this find """/@$LAT,$LON""" } doReturn { PositionMatch(it) }
         on { this find """\[(null,null,|null,\[)$LAT,$LON\]""" } doReturn { PointsPositionMatch(it) }
+        on { this find """APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""" } doReturn { PositionMatch(it) }
     }
 
     override val conversionHtmlRedirectPattern = conversionPattern<String, RedirectMatch> {

@@ -518,6 +518,16 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     }
 
     @Test
+    fun parseHtml_appInitializationStateOnly() {
+        assertEquals(
+            Position("52.484201500000005", "13.416727700000001"),
+            parseHtml(
+                """/div\u003e\u003c/div\u003e\u003c/div\u003e"]],0];window.APP_INITIALIZATION_STATE=[[[2429.720134961757,13.416727700000001,52.484201500000005],[0,0,0],[1024,768],13.1],[[["m",[17,70414,43002]"""
+            ),
+        )
+    }
+
+    @Test
     fun parseHtml_placeList() {
         assertEquals(
             Position(
