@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.Position
 import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
-class GoogleMapsOutputTest {
+class GoogleMapsOutputGroupTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val outputGroup = GoogleMapsOutputGroup
 
@@ -63,10 +63,10 @@ class GoogleMapsOutputTest {
     fun copyOutput_whenPositionIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             listOf(
-                Action.Copy("https://www.google.com/maps?q=31.2304417,121.4709921"),
+                Action.Copy("https://www.google.com/maps?q=31.2285069,121.4755246"),
             ),
             outputGroup.getActionOutputs().map {
-                it.getAction(Position(Srs.GCJ02, 31.23044166868017, 121.47099209401793), uriQuote)
+                it.getAction(Position(Srs.GCJ02, 31.22850685422705, 121.47552456472106), uriQuote)
             },
         )
     }

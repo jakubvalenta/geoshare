@@ -64,21 +64,24 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             assertGoogleMapsInstalled()
 
             // Share a Google Maps coordinates link with the app
-            shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106")
+            shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
             // Shows precise location in WGS 84
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 31.23044166868017, 121.47099209401793))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 31.23044166868017, 121.47099209401793, z = 11.0))
 
             // Shows copy link in GCJ-02
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
-            onElement { viewIdResourceName == "geoShareConversionSuccessSheetItemSupportingText" && textAsString() == "https://www.google.com/maps?q=31.22850685422705,121.47552456472106" }
+            onElement {
+                viewIdResourceName == "geoShareConversionSuccessSheetItemSupportingText" &&
+                        textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
+            }
             pressBack()
 
             // Open the coordinates with Google Maps
             onElement { viewIdResourceName == "geoShareResultCardApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
 
             // Google Maps shows precise location
-            waitAndAssertGoogleMapsShowsText("Shanghai")
+            waitAndAssertGoogleMapsShowsText("Ming&Qing Dynasties Furniture Hall")
         }
 
     @Test

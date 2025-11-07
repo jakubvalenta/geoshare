@@ -20,14 +20,16 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
     }
 
     object CopyDegMinSecOutput : Output.Action<Point, Action> {
-        override fun getAction(value: Point, uriQuote: UriQuote) = Action.Copy(formatDegMinSecString(value))
+        override fun getAction(value: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDegMinSecString(value))
 
         @Composable
         override fun label(value: Point) = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecOutput : Output.Action<Point, Action> {
-        override fun getAction(value: Point, uriQuote: UriQuote) = Action.Copy(formatDecString(value))
+        override fun getAction(value: Point, uriQuote: UriQuote) =
+            Action.Copy(formatDecString(value))
 
         @Composable
         override fun label(value: Point) = stringResource(R.string.conversion_succeeded_copy_coordinates)
@@ -58,7 +60,7 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
         "$latStr, $lonStr"
     }
 
-    fun formatDegMinSecString(value: Point): String = value.run {
+    fun formatDegMinSecString(value: Point): String = value.toSrs(Srs.WGS84).run {
         lat.toDegMinSec().let { (deg, min, sec) ->
             "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
         } + lon.toDegMinSec().let { (deg, min, sec) ->
