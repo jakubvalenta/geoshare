@@ -32,7 +32,7 @@ class GoogleMapsUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Query
         testUri(
-            Position("52.5200066", "13.404954"),
+            Position("52.5068441", "13.42473175"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
         )
 
