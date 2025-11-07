@@ -128,4 +128,10 @@
     <string name="user_preferences_automation_title">Automação</string>
     <string name="main_input_uri_paste_content_description">Colar</string>
     <string name="main_random">Link aleatório</string>
+    <string name="conversion_succeeded_copy_link_display">Copiar link para mostrar mapa no %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_to">Copiar link para navegar em %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_via">Copiar link para adicionar ponto em %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Mostrar mapa em %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_to">Navegar em %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_via">Adicionar ponto em %1$s</string>
 </resources>
