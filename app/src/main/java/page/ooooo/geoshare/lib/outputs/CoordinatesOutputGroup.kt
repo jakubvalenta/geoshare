@@ -147,7 +147,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
     }
 
     @Composable
-    private fun label(value: Position, i: Int, pointCount: Int): String = value.run {
+    private fun label(value: Position, i: Int, pointCount: Int): String? = value.run {
         CoordinatesPointOutputGroup.label(mainPoint ?: Point(), i, pointCount)
     }
 }
