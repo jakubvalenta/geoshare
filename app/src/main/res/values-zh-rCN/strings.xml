@@ -126,4 +126,10 @@
     <string name="conversion_succeeded_open_app">打开 %1$s</string>
     <string name="user_preferences_automation_title">自动化</string>
     <string name="main_random">随机链接</string>
+    <string name="conversion_succeeded_copy_link_display">复制链接以在 %1$s 中显示地图‌</string>
+    <string name="conversion_succeeded_copy_link_drive_to">复制链接以在 %1$s 中导航</string>
+    <string name="conversion_succeeded_copy_link_drive_via">复制链接以在 %1$s 中添加途经点‌</string>
+    <string name="conversion_succeeded_open_app_display">在 %1$s 中显示地图</string>
+    <string name="conversion_succeeded_open_app_navigate_to">在 %1$s 中导航</string>
+    <string name="conversion_succeeded_open_app_navigate_via">在 %1$s 中添加途经点</string>
 </resources>
