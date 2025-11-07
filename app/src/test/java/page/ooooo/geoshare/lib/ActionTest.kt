@@ -23,8 +23,8 @@ class ActionTest {
                 Action.SaveGpx(
                     Position(
                         points = persistentListOf(
-                            Point(50.123456, -11.123456),
-                            Point(52.5067296, 13.2599309),
+                            Point(Srs.WGS84, 50.123456, -11.123456),
+                            Point(Srs.WGS84, 52.5067296, 13.2599309),
                         ),
                     ),
                     uriQuote,
@@ -49,7 +49,7 @@ class ActionTest {
                 Action.SaveGpx(
                     Position(
                         points = persistentListOf(
-                            Point(50.123456, -11.123456, desc = "<script>alert()</script>"),
+                            Point(Srs.WGS84, 50.123456, -11.123456, desc = "<script>alert()</script>"),
                         ),
                     ), uriQuote
                 ).write(this)

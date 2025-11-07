@@ -4,6 +4,7 @@ import org.junit.Assert
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
 class AppleMapsOutputTest {
@@ -15,7 +16,7 @@ class AppleMapsOutputTest {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
             outputGroup.getActionOutputs().map {
-                it.getAction(Position(50.123456, -11.123456, z = 3.4), uriQuote)
+                it.getAction(Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4), uriQuote)
             }
         )
     }
@@ -25,7 +26,7 @@ class AppleMapsOutputTest {
         Assert.assertEquals(
             listOf(Action.Copy("https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4")),
             outputGroup.getActionOutputs().map {
-                it.getAction(Position(50.123456, -11.123456, q = "foo bar", z = 3.4), uriQuote)
+                it.getAction(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4), uriQuote)
             }
         )
     }

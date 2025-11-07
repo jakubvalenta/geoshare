@@ -47,7 +47,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
     fun formatUriString(value: Point, srs: Srs, uriQuote: UriQuote, q: String? = null, zStr: String? = null): String =
-        value.toSrs(srs).run {
+        value.toStringPair(srs).let { (latStr, lonStr) ->
             Uri(
                 scheme = "geo",
                 path = "$latStr,$lonStr",

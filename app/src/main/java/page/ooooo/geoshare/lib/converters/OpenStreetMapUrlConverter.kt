@@ -19,6 +19,8 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
         const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
     }
 
+    private val srs = Srs.WGS84
+
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_open_street_map_name,
@@ -33,13 +35,13 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     )
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { path matches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it) }
-        on { path matches ELEMENT_PATH } doReturn { PositionMatch(it) }
-        on { fragment matches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it) }
+        on { path matches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it, srs) }
+        on { path matches ELEMENT_PATH } doReturn { PositionMatch(it, srs) }
+        on { fragment matches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it, srs) }
     }
 
     override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
-        on { this find """"lat":$LAT,"lon":$LON""" } doReturn { PointsPositionMatch(it) }
+        on { this find """"lat":$LAT,"lon":$LON""" } doReturn { PointsPositionMatch(it, srs) }
     }
 
     override val conversionHtmlRedirectPattern = null
@@ -57,7 +59,7 @@ class OpenStreetMapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.With
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
-    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher, srs: Srs) : GeoHashPositionMatch(matcher, srs) {
         override fun decode(hash: String) = decodeOpenStreetMapQuadTileHash(hash)
     }
 }

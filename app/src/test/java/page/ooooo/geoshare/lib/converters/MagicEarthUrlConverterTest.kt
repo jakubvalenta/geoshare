@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 
 class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = MagicEarthUrlConverter()
@@ -33,7 +34,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
-            Position(48.85649, 2.35216),
+            Position(Srs.WGS84, 48.85649, 2.35216),
             parseUrl("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345")
         )
     }
@@ -65,7 +66,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parametersLatAndLonTakePrecedenceOverQ() {
         assertEquals(
-            Position(-17.2165721, -149.9470294),
+            Position(Srs.WGS84, -17.2165721, -149.9470294),
             parseUrl("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park")
         )
     }
@@ -91,7 +92,7 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_customScheme() {
         assertEquals(
-            Position(50.123456, -11.123456, z = 3.4),
+            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4),
             parseUrl("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
         )
     }

@@ -9,6 +9,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,6 +26,7 @@ fun ResultSuccessSheet(
     if (sheetVisible) {
         ModalBottomSheet(
             onDismissRequest = { onSetSheetVisible(false) },
+            modifier = Modifier.semantics { testTagsAsResourceId = true },
             sheetState = sheetState,
         ) {
             Column(Modifier.verticalScroll(rememberScrollState())) {

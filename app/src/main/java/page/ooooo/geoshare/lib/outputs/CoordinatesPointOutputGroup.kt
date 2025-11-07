@@ -54,7 +54,9 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatDecString(value: Point): String = value.run { "$latStr, $lonStr" }
+    fun formatDecString(value: Point): String = value.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+        "$latStr, $lonStr"
+    }
 
     fun formatDegMinSecString(value: Point): String = value.run {
         lat.toDegMinSec().let { (deg, min, sec) ->

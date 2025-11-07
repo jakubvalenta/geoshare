@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.matches
@@ -19,6 +20,8 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         const val NAME = "Magic Earth"
     }
 
+    private val srs = Srs.WGS84
+
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_magic_earth_name,
@@ -30,20 +33,20 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
             }
             optional {
-                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
             }
             first {
                 all {
-                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch(it) }
-                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch(it) }
+                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch(it, srs) }
+                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch(it, srs) }
                 }
-                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
                 @Suppress("SpellCheckingInspection")
-                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
             }
         }
     }

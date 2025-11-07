@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 
 /**
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
@@ -48,7 +49,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_coordinates() {
         assertEquals(
-            Position(50.894967, 4.341626),
+            Position(Srs.WGS84, 50.894967, 4.341626),
             parseUrl("https://maps.apple.com/?ll=50.894967,4.341626")
         )
     }
@@ -56,7 +57,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_place() {
         assertEquals(
-            Position(52.4890246, 13.4295963),
+            Position(Srs.WGS84, 52.4890246, 13.4295963),
             parseUrl("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
         )
     }
@@ -64,7 +65,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_view() {
         assertEquals(
-            Position(52.49115540927951, 13.42595574770533),
+            Position(Srs.WGS84, 52.49115540927951, 13.42595574770533),
             parseUrl("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")
         )
     }
@@ -73,7 +74,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_searchQuery() {
         assertEquals(
-            Position(0.0, 0.0, q = "Central Park"),
+            Position(Srs.WGS84, 0.0, 0.0, q = "Central Park"),
             parseUrl("https://maps.apple.com/?q=Central+Park")
         )
     }
@@ -81,7 +82,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_searchLocation() {
         assertEquals(
-            Position(50.894967, 4.341626),
+            Position(Srs.WGS84, 50.894967, 4.341626),
             parseUrl("https://maps.apple.com/?sll=50.894967,4.341626")
         )
     }
@@ -89,7 +90,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_searchLocationAndQuery() {
         assertEquals(
-            Position(50.894967, 4.341626, q = "Central Park", z = 10.0),
+            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0),
             parseUrl("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
         )
     }
@@ -97,7 +98,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_searchLocationAndQueryWithInvalidZoom() {
         assertEquals(
-            Position(50.894967, 4.341626, q = "Central Park"),
+            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park"),
             parseUrl("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
         )
     }
@@ -105,15 +106,15 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_parameterLlTakesPrecedence() {
         assertEquals(
-            Position(-17.2165721, -149.9470294),
+            Position(Srs.WGS84, -17.2165721, -149.9470294),
             parseUrl("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")
         )
         assertEquals(
-            Position(-17.2165721, -149.9470294),
+            Position(Srs.WGS84, -17.2165721, -149.9470294),
             parseUrl("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")
         )
         assertEquals(
-            Position(-17.2165721, -149.9470294),
+            Position(Srs.WGS84, -17.2165721, -149.9470294),
             parseUrl("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")
         )
     }
@@ -177,7 +178,7 @@ class AppleMapsUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseHtml_success() {
         assertEquals(
-            Position(52.4735927, 13.4050798),
+            Position(Srs.WGS84, 52.4735927, 13.4050798),
             @Suppress("SpellCheckingInspection")
             parseHtml(
                 """<html>

@@ -120,11 +120,11 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
     }
 
     private fun formatDecString(value: Position): String = value.run {
-        CoordinatesPointOutputGroup.formatDecString(mainPoint ?: Point())
+        CoordinatesPointOutputGroup.formatDecString(mainPoint ?: Point(Srs.WGS84))
     }
 
     fun formatDegMinSecString(value: Position): String = value.run {
-        CoordinatesPointOutputGroup.formatDegMinSecString(mainPoint ?: Point())
+        CoordinatesPointOutputGroup.formatDegMinSecString(mainPoint ?: Point(Srs.WGS84))
     }
 
     private fun formatParamsString(value: Position): String = value.run {
@@ -134,7 +134,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
                 add(desc)
             }
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (mainPoint ?: Point()).apply {
+                (mainPoint ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     if (q != "$latStr,$lonStr") {
                         add(q.replace('+', ' '))
                     }
@@ -148,6 +148,6 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
     @Composable
     private fun label(value: Position, i: Int, pointCount: Int): String? = value.run {
-        CoordinatesPointOutputGroup.label(mainPoint ?: Point(), i, pointCount)
+        CoordinatesPointOutputGroup.label(mainPoint ?: Point(Srs.WGS84), i, pointCount)
     }
 }

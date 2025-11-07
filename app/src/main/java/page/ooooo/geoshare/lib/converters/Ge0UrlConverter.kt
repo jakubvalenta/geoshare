@@ -12,6 +12,8 @@ class Ge0UrlConverter : UrlConverter.WithUriPattern {
         const val HASH = """(?P<hash>[A-Za-z0-9\-_]{2,})"""
     }
 
+    private val srs = Srs.WGS84
+
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?(comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
     override val documentation = Documentation(
@@ -25,10 +27,10 @@ class Ge0UrlConverter : UrlConverter.WithUriPattern {
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         on { if (scheme == "ge0") host matches HASH else path matches """/$HASH\S*""" } doReturn
-                { Ge0HashPositionMatch(it) }
+                { Ge0HashPositionMatch(it, srs) }
     }
 
-    private class Ge0HashPositionMatch(matcher: Matcher) : GeoHashPositionMatch(matcher) {
+    private class Ge0HashPositionMatch(matcher: Matcher, srs: Srs) : GeoHashPositionMatch(matcher, srs) {
         override fun decode(hash: String) = decodeGe0Hash(hash).let { (lat, lon, z) ->
             Triple(lat.toScale(7), lon.toScale(7), z)
         }

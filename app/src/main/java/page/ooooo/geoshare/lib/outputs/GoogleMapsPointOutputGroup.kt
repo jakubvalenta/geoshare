@@ -44,16 +44,18 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         scheme = "https",
         host = "www.google.com",
         path = "/maps",
-        queryParams = value.toSrs(Srs.GCJ02).run {
+        queryParams = value.toStringPair(Srs.GCJ02).let { (latStr, lonStr) ->
             mapOf("q" to "$latStr,$lonStr").toImmutableMap()
         },
         uriQuote = uriQuote,
     ).toString()
 
     @Composable
-    fun copyLabel(value: Point): String = if (value.isInChina()) {
-        stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, Srs.GCJ02.name)
-    } else {
-        stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+    fun copyLabel(value: Point): String = when (value.srs) {
+        is Srs.WGS84 ->
+            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+
+        else ->
+            stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, value.srs.name)
     }
 }

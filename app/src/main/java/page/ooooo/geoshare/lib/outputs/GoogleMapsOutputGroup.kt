@@ -8,6 +8,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.outputs.GoogleMapsPointOutputGroup.copyLabel
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
@@ -86,7 +87,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         path = "/maps",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.toSrs(Srs.GCJ02)?.apply {
+                mainPoint?.toStringPair(Srs.GCJ02)?.let { (latStr, lonStr) ->
                     set("q", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)
@@ -101,6 +102,6 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
     @Composable
     private fun copyLabel(value: Position) = value.run {
-        GoogleMapsPointOutputGroup.copyLabel(mainPoint ?: Point())
+        GoogleMapsPointOutputGroup.copyLabel(mainPoint ?: Point(Srs.WGS84))
     }
 }

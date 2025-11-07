@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
 sealed interface Action {
@@ -40,7 +41,7 @@ sealed interface Action {
             append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
             append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
             position.points?.map { point ->
-                point.apply {
+                point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
                 }
                 if (point.desc != null) {

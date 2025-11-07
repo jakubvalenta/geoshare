@@ -1,17 +1,19 @@
 package page.ooooo.geoshare.lib.converters
 
 import androidx.annotation.StringRes
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
-import com.lbt05.evil_transform.GCJPointer
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.Srs
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.matches
 
 class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern {
+    private val srs = Srs.GCJ02
+
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(surl|wb)\.amap\.com/\S+""")
     override val documentation = Documentation(
@@ -27,8 +29,8 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
     override val shortUriMethod = ShortUriMethod.HEAD
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { queryParams["p"]?.let { it matches """\w+,$LAT,$LON.+""" } } doReturn { GCJPositionMatch(it) }
-        on { queryParams["q"]?.let { it matches """$LAT,$LON.+""" } } doReturn { GCJPositionMatch(it) }
+        on { queryParams["p"]?.let { it matches """\w+,$LAT,$LON.+""" } } doReturn { PositionMatch(it, srs) }
+        on { queryParams["q"]?.let { it matches """$LAT,$LON.+""" } } doReturn { PositionMatch(it, srs) }
     }
 
     @StringRes
@@ -36,14 +38,4 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
-
-    private class GCJPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-        override val points: List<Point>?
-            get() {
-                val lat = matcher.groupOrNull("lat")?.toDoubleOrNull() ?: return null
-                val lon = matcher.groupOrNull("lon")?.toDoubleOrNull() ?: return null
-                val wgsPointer = GCJPointer(lat, lon).toExactWGSPointer()
-                return listOf(Point(wgsPointer.latitude, wgsPointer.longitude))
-            }
-    }
 }

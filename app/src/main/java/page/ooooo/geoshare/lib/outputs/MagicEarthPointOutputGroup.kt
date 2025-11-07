@@ -5,6 +5,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
@@ -96,13 +97,13 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
-                value.apply {
+                value.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     if (q == null) {
                         set("show_on_map", "")
                         set("lat", latStr)
                         set("lon", lonStr)
                     } else {
-                        if (lat == 0.0 && lon == 0.0) {
+                        if (value.lat == 0.0 && value.lon == 0.0) {
                             set("open_search", "")
                         } else {
                             set("search_around", "")
@@ -122,7 +123,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             path = "//",
             queryParams = buildMap {
                 set("navigate_to", "")
-                value.apply {
+                value.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     set("lat", latStr)
                     set("lon", lonStr)
                 }
@@ -136,7 +137,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             path = "//",
             queryParams = buildMap {
                 set("navigate_via", "")
-                value.apply {
+                value.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     set("lat", latStr)
                     set("lon", lonStr)
                 }

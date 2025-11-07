@@ -45,7 +45,7 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
         scheme = "https",
         host = "maps.apple.com",
         path = "/",
-        queryParams = value.run {
+        queryParams = value.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
             mapOf("ll" to "$latStr,$lonStr").toImmutableMap()
         },
         uriQuote = uriQuote,

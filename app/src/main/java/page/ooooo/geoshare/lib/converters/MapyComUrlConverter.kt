@@ -17,6 +17,8 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
         const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
     }
 
+    private val srs = Srs.WGS84
+
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern =
         Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
@@ -33,13 +35,13 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     override val shortUriMethod = ShortUriMethod.GET
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { path matches COORDS } doReturn { NorthSouthWestEastPositionMatch(it) }
+        on { path matches COORDS } doReturn { NorthSouthWestEastPositionMatch(it, srs) }
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
             }
-            on { queryParams["x"]?.let { it matches LON } } doReturn { PositionMatch(it) }
-            on { queryParams["y"]?.let { it matches LAT } } doReturn { PositionMatch(it) }
+            on { queryParams["x"]?.let { it matches LON } } doReturn { PositionMatch(it, srs) }
+            on { queryParams["y"]?.let { it matches LAT } } doReturn { PositionMatch(it, srs) }
         }
     }
 
@@ -49,14 +51,14 @@ class MapyComUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortU
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
-    private class NorthSouthWestEastPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    private class NorthSouthWestEastPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
         override val points: List<Point>?
             get() {
                 val lat = matcher.groupOrNull("lat")?.toDoubleOrNull() ?: return null
                 val lon = matcher.groupOrNull("lon")?.toDoubleOrNull() ?: return null
                 val latSig = if (matcher.groupOrNull()?.contains('S') == true) -1 else 1
                 val lonSig = if (matcher.groupOrNull()?.contains('W') == true) -1 else 1
-                return persistentListOf(Point(latSig * lat, lonSig * lon))
+                return persistentListOf(Point(srs, latSig * lat, lonSig * lon))
             }
     }
 }

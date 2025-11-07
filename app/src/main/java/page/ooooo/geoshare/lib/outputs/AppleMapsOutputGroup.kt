@@ -69,7 +69,7 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         path = "/",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.apply {
+                mainPoint?.toStringPair(Srs.WGS84)?.let { (latStr, lonStr) ->
                     set("ll", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)

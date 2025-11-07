@@ -8,6 +8,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
@@ -127,14 +128,14 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
     }
 
     private fun formatDisplayUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatDisplayUriString(mainPoint ?: Point(), uriQuote, q = q)
+        MagicEarthPointOutputGroup.formatDisplayUriString(mainPoint ?: Point(Srs.WGS84), uriQuote, q = q)
     }
 
     private fun formatNavigateToUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatNavigateToUriString(mainPoint ?: Point(), uriQuote)
+        MagicEarthPointOutputGroup.formatNavigateToUriString(mainPoint ?: Point(Srs.WGS84), uriQuote)
     }
 
     private fun formatNavigateViaUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatNavigateViaUriString(mainPoint ?: Point(), uriQuote)
+        MagicEarthPointOutputGroup.formatNavigateViaUriString(mainPoint ?: Point(Srs.WGS84), uriQuote)
     }
 }

@@ -109,6 +109,19 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
+    protected fun waitAndAssertGoogleMapsShowsText(expectedText: String) = uiAutomator {
+        // Wait for Google Maps
+        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+
+        // If there is a Google Maps sign in screen, skip it
+        onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Make it your map" }?.also {
+            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() == "skip" }.click()
+        }
+
+        // Verify Google Maps content
+        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == expectedText }
+    }
+
     protected fun shareUri(unsafeUriString: String) = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi
         device.executeShellCommand(

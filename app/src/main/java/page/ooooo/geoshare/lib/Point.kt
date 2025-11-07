@@ -1,13 +1,14 @@
 package page.ooooo.geoshare.lib
 
 import androidx.compose.runtime.Immutable
+import com.lbt05.evil_transform.GCJPointer
 import com.lbt05.evil_transform.TransformUtil
 import com.lbt05.evil_transform.WGSPointer
 import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.random.Random
 
 @Immutable
-data class Point(val lat: Double = 0.0, val lon: Double = 0.0, val desc: String? = null) {
+data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val desc: String? = null) {
     companion object {
         val example: Point = genRandomPoint(minLat = 0.0, maxLon = -100.0)
 
@@ -16,19 +17,27 @@ data class Point(val lat: Double = 0.0, val lon: Double = 0.0, val desc: String?
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
-        ): Point = Point(
-            Random.nextDouble(minLat, maxLat).toScale(6),
-            Random.nextDouble(minLon, maxLon).toScale(6),
-        )
+        ): Point {
+            val lat = Random.nextDouble(minLat, maxLat).toScale(6)
+            val lon = Random.nextDouble(minLon, maxLon).toScale(6)
+            val srs = if (TransformUtil.outOfChina(lat, lon)) Srs.WGS84 else Srs.GCJ02
+            return Point(srs, lat, lon)
+        }
     }
 
-    val latStr: String = lat.toScale(7).toString()
-    val lonStr: String = lon.toScale(7).toString()
+    fun toStringPair(targetSrs: Srs): Pair<String, String> = toSrs(targetSrs).let { (_, lat, lon) ->
+        lat.toScale(7).toString() to lon.toScale(7).toString()
+    }
 
-    fun isInChina(): Boolean = !TransformUtil.outOfChina(lat, lon)
+    fun toSrs(targetSrs: Srs): Point = when (srs) {
+        is Srs.WGS84 -> when (targetSrs) {
+            is Srs.WGS84 -> this
+            is Srs.GCJ02 -> WGSPointer(lat, lon).toGCJPointer().run { Point(targetSrs, latitude, longitude) }
+        }
 
-    fun toSrs(srs: Srs): Point = when (srs) {
-        is Srs.WGS84 -> this
-        is Srs.GCJ02 -> WGSPointer(lat, lon).toGCJPointer().run { Point(latitude, longitude) }
+        is Srs.GCJ02 -> when (targetSrs) {
+            is Srs.WGS84 -> GCJPointer(lat, lon).toExactWGSPointer().run { Point(targetSrs, latitude, longitude) }
+            is Srs.GCJ02 -> this
+        }
     }
 }

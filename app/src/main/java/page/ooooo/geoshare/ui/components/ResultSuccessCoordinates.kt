@@ -22,6 +22,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -71,7 +72,10 @@ fun ResultSuccessCoordinates(
             }
         },
         after = {
-            IconButton({ setSheetVisible(true) }) {
+            IconButton(
+                { setSheetVisible(true) },
+                Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
+            ) {
                 Icon(
                     painterResource(R.drawable.content_copy_24px),
                     contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
@@ -196,7 +200,7 @@ private fun DescPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(50.123456, 11.123456, desc = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, desc = "my point"),
                 onRun = {},
             )
         }
@@ -212,7 +216,7 @@ private fun DarkDescPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(50.123456, 11.123456, desc = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, desc = "my point"),
                 onRun = {},
             )
         }

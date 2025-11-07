@@ -2,6 +2,7 @@ package page.ooooo.geoshare.converters
 
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 
 class AmapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
@@ -12,7 +13,7 @@ class AmapUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Short URI
         testUri(
-            Position(31.224731304675522, 121.46385323166844),
+            Position(Srs.GCJ02, 31.222811749011463, 121.46840706467624),
             "https://surl.amap.com/4mkKGuyJ2bz",
         )
     }

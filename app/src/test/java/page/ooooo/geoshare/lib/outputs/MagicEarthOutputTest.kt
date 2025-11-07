@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
 class MagicEarthOutputTest {
@@ -15,7 +16,7 @@ class MagicEarthOutputTest {
         assertEquals(
             Action.Copy("magicearth://?show_on_map&lat=50.123456&lon=-11.123456"),
             outputGroup.getActionOutputs().first()
-                .getAction(Position(50.123456, -11.123456, z = 5.0), uriQuote),
+                .getAction(Position(Srs.WGS84, 50.123456, -11.123456, z = 5.0), uriQuote),
         )
     }
 
@@ -24,7 +25,7 @@ class MagicEarthOutputTest {
         assertEquals(
             Action.Copy("magicearth://?search_around&lat=50.123456&lon=-11.123456&q=foo%20bar"),
             outputGroup.getActionOutputs().first()
-                .getAction(Position(50.123456, -11.123456, q = "foo bar", z = 5.0), uriQuote),
+                .getAction(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 5.0), uriQuote),
         )
     }
 
@@ -45,7 +46,7 @@ class MagicEarthOutputTest {
                 Action.Copy("magicearth://?navigate_via&lat=50.123456&lon=-11.123456"),
             ),
             outputGroup.getActionOutputs().slice(1..2).map {
-                it.getAction(Position(50.123456, -11.123456), uriQuote)
+                it.getAction(Position(Srs.WGS84, 50.123456, -11.123456), uriQuote)
             },
         )
     }
