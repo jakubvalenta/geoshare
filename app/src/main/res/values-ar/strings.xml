@@ -125,7 +125,7 @@
     <string name="conversion_automation_share_failed">فشل في مشاركة الرابط تلقائيًا</string>
     <string name="conversion_automation_share_succeeded">رابط مشترك تلقائيًا</string>
     <string name="conversion_automation_share_waiting">مشاركة الرابط تلقائيًا خلال %1$d ثانية</string>
-    <string name="conversion_succeeded_copy_coordinates">انسخ الإحداثيات بالصيغة %1$s</string>
+    <string name="conversion_succeeded_copy_coordinates">نسخ الإحداثيات</string>
     <string name="conversion_succeeded_copy_link">انسخ رابط %1$s</string>
     <string name="user_preferences_automation_description">اختر إجراءً ليتم تنفيذه تلقائيًا عند تحويل رابط الخريطة إلى إحداثيات.</string>
     <string name="user_preferences_automation_nothing">لا شيء</string>
