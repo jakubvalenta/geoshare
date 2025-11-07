@@ -4,10 +4,13 @@
 
 - Google 地图
 - Apple 地图
+- CoMaps
 - HERE WeGo
 - Magic Earth
+- Maps.me
 - Mapy.com
 - OpenStreetMap
+- Organic 地图
 - OsmAnd
 - Waze
 - Yandex 地图
