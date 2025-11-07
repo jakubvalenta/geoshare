@@ -8,7 +8,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
-import page.ooooo.geoshare.lib.outputs.GoogleMapsPointOutputGroup.copyLabel
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
