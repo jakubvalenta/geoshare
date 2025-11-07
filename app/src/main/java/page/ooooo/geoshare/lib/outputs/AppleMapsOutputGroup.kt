@@ -17,7 +17,8 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) = Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label() = stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
+        override fun label(value: Position) =
+            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {

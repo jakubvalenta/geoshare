@@ -28,7 +28,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDegMinSecString(value))
 
         @Composable
-        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecOutput : Output.Action<Position, Action> {
@@ -36,7 +36,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDecString(value))
 
         @Composable
-        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecAutomation : Automation.HasSuccessMessage {
@@ -128,6 +128,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
     }
 
     private fun formatParamsString(value: Position): String = value.run {
+        // TODO Mention that all coordinates are in WGS-84
         buildList {
             mainPoint?.desc.takeUnless { it.isNullOrEmpty() }?.let { desc ->
                 add(desc)

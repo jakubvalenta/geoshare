@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
@@ -13,19 +12,12 @@ import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 
 object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
-    @Immutable
-    data class CopyOutput(var srs: Srs) : Output.Action<Point, Action> {
+    object CopyOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, srs, uriQuote))
+            Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label() = when (srs) {
-            is Srs.WGS84 ->
-                stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-
-            is Srs.GCJ02 ->
-                stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, srs.name)
-        }
+        override fun label(value: Point) = copyLabel(value)
     }
 
     override fun getTextOutput() = null
@@ -41,21 +33,27 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
     override fun getChooserOutput() = null
 
     override fun getActionOutputs() = listOf(
-        CopyOutput(Srs.GCJ02), // TODO Hide if out of China
-        CopyOutput(Srs.WGS84),
+        CopyOutput,
     )
 
     override fun getAutomations(packageNames: List<String>) = emptyList<Automation>()
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatUriString(value: Point, srs: Srs, uriQuote: UriQuote) = Uri(
+    fun formatUriString(value: Point, uriQuote: UriQuote) = Uri(
         scheme = "https",
         host = "www.google.com",
         path = "/maps",
-        queryParams = value.toSrs(srs).run {
+        queryParams = value.toSrs(Srs.GCJ02).run {
             mapOf("q" to "$latStr,$lonStr").toImmutableMap()
         },
         uriQuote = uriQuote,
     ).toString()
+
+    @Composable
+    fun copyLabel(value: Point): String = if (value.isInChina()) {
+        stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, Srs.GCJ02)
+    } else {
+        stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+    }
 }

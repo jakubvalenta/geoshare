@@ -25,7 +25,7 @@ data class Point(val lat: Double = 0.0, val lon: Double = 0.0, val desc: String?
     val latStr: String = lat.toScale(7).toString()
     val lonStr: String = lon.toScale(7).toString()
 
-    fun isOutOfChina(): Boolean = TransformUtil.outOfChina(lat, lon)
+    fun isInChina(): Boolean = !TransformUtil.outOfChina(lat, lon)
 
     fun toSrs(srs: Srs): Point = when (srs) {
         is Srs.WGS84 -> this

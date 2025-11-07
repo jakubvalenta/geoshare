@@ -23,14 +23,14 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
         override fun getAction(value: Point, uriQuote: UriQuote) = Action.Copy(formatDegMinSecString(value))
 
         @Composable
-        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label(value: Point) = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) = Action.Copy(formatDecString(value))
 
         @Composable
-        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label(value: Point) = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     override fun getTextOutput() = TextOutput

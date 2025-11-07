@@ -16,7 +16,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             Action.Copy(formatDisplayUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
     }
 
@@ -25,7 +25,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             Action.Copy(formatNavigateToUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
     }
 
@@ -34,7 +34,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             Action.Copy(formatNavigateViaUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
     }
 
@@ -43,7 +43,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             Action.OpenChooser(formatDisplayUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
     }
 
@@ -52,7 +52,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             Action.OpenChooser(formatNavigateToUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthUrlConverter.NAME)
     }
 
@@ -61,7 +61,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
             Action.OpenChooser(formatNavigateViaUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthUrlConverter.NAME)
     }
 

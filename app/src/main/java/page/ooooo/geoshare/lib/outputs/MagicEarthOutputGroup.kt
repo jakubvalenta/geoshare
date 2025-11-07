@@ -24,7 +24,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDisplayUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Position) =
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
     }
 
@@ -33,7 +33,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             Action.Copy(formatNavigateToUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Position) =
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
     }
 
@@ -42,7 +42,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             Action.Copy(formatNavigateViaUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Position) =
             stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
     }
 

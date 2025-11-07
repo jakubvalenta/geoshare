@@ -13,7 +13,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
             Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_copy_geo)
     }
 
@@ -22,7 +22,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
             Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
+        override fun label(value: Point) =
             stringResource(R.string.conversion_succeeded_share)
     }
 
