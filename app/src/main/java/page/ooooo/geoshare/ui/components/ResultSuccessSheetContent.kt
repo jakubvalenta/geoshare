@@ -73,8 +73,9 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                val position = Position.example
                 val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(Position.example) to it.label() }
+                    .map { it.getAction(position) to it.label(position) }
                     .partition { (action) -> action is Action.Copy }
                 ResultSuccessSheetContent(
                     copyActionsAndLabels = copyActionsAndLabels,
@@ -94,8 +95,9 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                val position = Position.example
                 val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(Position.example) to it.label() }
+                    .map { it.getAction(position) to it.label(position) }
                     .partition { (action) -> action is Action.Copy }
                 ResultSuccessSheetContent(
                     copyActionsAndLabels = copyActionsAndLabels,

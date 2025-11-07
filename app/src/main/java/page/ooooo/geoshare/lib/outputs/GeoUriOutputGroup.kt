@@ -25,8 +25,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label(value: Position) =
-            stringResource(R.string.conversion_succeeded_copy_geo)
+        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_copy_geo)
     }
 
     object ChooserOutput : Output.Action<Position, Action> {
@@ -34,8 +33,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label(value: Position) =
-            stringResource(R.string.conversion_succeeded_share)
+        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_share)
     }
 
     @Immutable
@@ -46,10 +44,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatUriString(value, srs, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) = when (srs) {
-            is Srs.WGS84 -> stringResource(R.string.conversion_succeeded_open_app, app.label)
-            is Srs.GCJ02 -> stringResource(R.string.conversion_succeeded_open_app_srs, app.label, srs.name)
-        }
+        override fun label(app: IntentTools.App) = stringResource(R.string.conversion_succeeded_open_app, app.label)
     }
 
     object ChipOutput : Output.Action<Position, Action> {
@@ -57,8 +52,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label(value: Position) =
-            stringResource(R.string.conversion_succeeded_copy_geo)
+        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_copy_geo)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {

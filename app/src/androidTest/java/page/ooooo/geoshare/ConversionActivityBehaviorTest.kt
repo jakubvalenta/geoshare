@@ -65,6 +65,36 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Westend" }
     }
 
+
+    @Test
+    fun conversionScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
+        uiAutomator {
+            assertGoogleMapsInstalled()
+
+            // Share a Google Maps coordinates link with the app
+            shareUri("https://www.google.com/maps/@32.067,120.967")
+
+            // Shows precise location in GCJ-02
+            waitAndAssertPositionIsVisible(Position(51.1982447, 6.4389493))
+
+            // Shows copy link in GCJ-02
+            // TODO "https://www.google.com/maps?q=32.0649007,120.9713379"
+
+            // Open the coordinates with Google Maps
+            onElement { viewIdResourceName == "geoShareResultCardApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
+
+            // Wait for Google Maps
+            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+
+            // If there is a Google Maps sign in screen, skip it
+            onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Make it your map" }?.also {
+                onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() == "skip" }.click()
+            }
+
+            // Verify Google Maps content
+            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Shanghai" }
+        }
+
     @Test
     fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_showsPositionAndCopiesCoords() =
         uiAutomator {

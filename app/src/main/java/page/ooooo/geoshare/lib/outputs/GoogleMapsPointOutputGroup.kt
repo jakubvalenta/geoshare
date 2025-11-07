@@ -52,7 +52,7 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
     @Composable
     fun copyLabel(value: Point): String = if (value.isInChina()) {
-        stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, Srs.GCJ02)
+        stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, Srs.GCJ02.name)
     } else {
         stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
     }
