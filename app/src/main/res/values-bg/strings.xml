@@ -127,4 +127,10 @@
     <string name="conversion_succeeded_open_app">Отваряне %1$s</string>
     <string name="user_preferences_automation_title">Автоматизация</string>
     <string name="main_random">Случайна връзка</string>
+    <string name="conversion_succeeded_copy_link_display">Копиране на връзката за показване на картата в %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_to">Копиране на връзката за навигиране в %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_via">Копиране на връзката за добавяне на точка в %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Показване на картата в %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_to">Навигиране в %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_via">Добавяне на точка от пътя в %1$s</string>
 </resources>
