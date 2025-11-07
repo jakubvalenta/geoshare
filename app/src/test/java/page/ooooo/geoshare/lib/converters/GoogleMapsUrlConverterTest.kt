@@ -221,6 +221,7 @@ class GoogleMapsUrlConverterTest : BaseUrlConverterTest() {
     fun parseUrl_placeListInData() {
         assertEquals(
             Position(),
+            @Suppress("SpellCheckingInspection")
             parseUrl("https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts")
         )
     }

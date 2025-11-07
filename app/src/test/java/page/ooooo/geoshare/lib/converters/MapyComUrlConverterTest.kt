@@ -7,7 +7,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 
-@Suppress("SpellCheckingInspection")
 class MapyComUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter = MapyComUrlConverter()
 
@@ -17,6 +16,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
         assertTrue(doesUriPatternMatch("https://hapticke.mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
         assertTrue(doesUriPatternMatch("https://mapy.cz?x=14.0184810&y=50.0525078&z=9"))
         assertTrue(doesUriPatternMatch("https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9"))
+        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
     }
 
@@ -24,6 +24,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     fun uriPattern_shortUrl() {
         assertTrue(doesUriPatternMatch("https://mapy.com/s/jakuhelasu"))
         assertTrue(doesUriPatternMatch("https://mapy.cz/s/jakuhelasu"))
+        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("mapy.com/s/jakuhelasu"))
     }
 
@@ -41,6 +42,7 @@ class MapyComUrlConverterTest : BaseUrlConverterTest() {
     fun uriPattern_matchersCoordinatesInText() {
         assertEquals(
             "41.9966006N, 6.1223825W",
+            @Suppress("SpellCheckingInspection")
             getUri(uriString = "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha")
         )
     }

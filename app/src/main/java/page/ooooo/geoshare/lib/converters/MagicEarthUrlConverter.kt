@@ -19,7 +19,6 @@ class MagicEarthUrlConverter : UrlConverter.WithUriPattern {
         const val NAME = "Magic Earth"
     }
 
-    @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_magic_earth_name,

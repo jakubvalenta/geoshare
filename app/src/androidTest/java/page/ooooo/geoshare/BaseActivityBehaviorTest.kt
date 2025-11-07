@@ -22,6 +22,7 @@ import kotlin.math.roundToLong
 
 abstract class BaseActivityBehaviorTest {
     companion object {
+        @Suppress("SpellCheckingInspection")
         const val PACKAGE_NAME = "page.ooooo.geoshare.debug"
         const val LAUNCH_TIMEOUT = 10_000L
         const val TIMEOUT = 10_000L
@@ -61,6 +62,7 @@ abstract class BaseActivityBehaviorTest {
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
+            @Suppress("SpellCheckingInspection")
             if (onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "No recent items" || textAsString() == "Aucun élément récent" } != null) {
                 // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
                 device.pressRecentApps()
@@ -110,6 +112,7 @@ abstract class BaseActivityBehaviorTest {
     protected fun shareUri(unsafeUriString: String) = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi
         device.executeShellCommand(
+            @Suppress("SpellCheckingInspection")
             "am start -a android.intent.action.VIEW -d $unsafeUriString -n $PACKAGE_NAME/page.ooooo.geoshare.ConversionActivity $PACKAGE_NAME"
         )
     }

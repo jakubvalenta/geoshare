@@ -10,7 +10,6 @@ class OsmAndUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_fullUrl() {
         assertTrue(doesUriPatternMatch("https://osmand.net/map?pin=52.51628,13.37771"))
-        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("osmand.net/map?pin=52.51628,13.37771"))
     }
 

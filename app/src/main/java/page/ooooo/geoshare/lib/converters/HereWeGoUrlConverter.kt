@@ -18,7 +18,6 @@ class HereWeGoUrlConverter() : UrlConverter.WithUriPattern {
         const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
     }
 
-    @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_here_wego_name,

@@ -10,7 +10,6 @@ class MagicEarthUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_fullUrl() {
         assertTrue(doesUriPatternMatch("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
-        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"))
         assertTrue(doesUriPatternMatch("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4"))
     }

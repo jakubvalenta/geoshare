@@ -10,7 +10,6 @@ class HereWeGoUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_fullUrl() {
         assertTrue(doesUriPatternMatch("https://wego.here.com/?map=50.21972,-0.68453,6.93"))
-        @Suppress("SpellCheckingInspection")
         assertTrue(doesUriPatternMatch("wego.here.com/?map=50.21972,-0.68453,6.93"))
     }
 

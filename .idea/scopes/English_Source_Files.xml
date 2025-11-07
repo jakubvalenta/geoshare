@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="English Source Files" pattern="(file[Geo_Share]:README.md||file[Geo_Share]:fastlane/metadata/android/en-US//*||file[Geo_Share*]:*.java||file[Geo_Share*]:*.kt||file[Geo_Share*]:*.xml)&amp;&amp;!file[Geo_Share.app.main]:res/values-*/strings.xml" />
+</component>

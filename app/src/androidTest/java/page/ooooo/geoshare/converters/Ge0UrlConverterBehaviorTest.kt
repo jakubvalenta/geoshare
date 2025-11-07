@@ -44,7 +44,9 @@ class Ge0UrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
 
         // Text, which will get parsed by GeoUrlConverter, because it contains a geo: URI that precedes the short URI
         testTextUri(
+            @Suppress("SpellCheckingInspection")
             Position(40.7127400, -74.0059965, q = "40.7127400,-74.0059965(Nova Iorque)", z = 9.0),
+            @Suppress("SpellCheckingInspection")
             "Organic Maps: geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                     "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )

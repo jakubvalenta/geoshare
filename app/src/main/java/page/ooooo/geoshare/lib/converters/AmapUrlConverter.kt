@@ -11,8 +11,8 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
 
-@Suppress("SpellCheckingInspection")
 class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern {
+    @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(surl|wb)\.amap\.com/\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_amap_name,
@@ -21,6 +21,8 @@ class AmapUrlConverter : UrlConverter.WithUriPattern, UrlConverter.WithShortUriP
             DocumentationInput.Url(26, "https://wb.amap.com/"),
         ),
     )
+
+    @Suppress("SpellCheckingInspection")
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = ShortUriMethod.HEAD
 

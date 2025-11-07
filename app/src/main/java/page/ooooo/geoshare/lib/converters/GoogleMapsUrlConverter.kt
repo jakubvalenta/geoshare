@@ -42,7 +42,6 @@ class GoogleMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
     override val shortUriMethod = ShortUriMethod.HEAD
 
-    @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {

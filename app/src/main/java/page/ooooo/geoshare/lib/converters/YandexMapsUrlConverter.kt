@@ -46,16 +46,17 @@ class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = ShortUriMethod.HEAD
 
-    @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
                 first {
+                    @Suppress("SpellCheckingInspection")
                     on { queryParams["whatshere%5Bzoom%5D"]?.let { it matches Z } } doReturn { PositionMatch(it) }
                     on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
                 }
             }
             first {
+                @Suppress("SpellCheckingInspection")
                 on { queryParams["whatshere%5Bpoint%5D"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it) }
                 on { queryParams["ll"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it) }
                 on { path matches """/maps/org/\d+([/?#].*|$)""" } doReturn { PositionMatch(it) }

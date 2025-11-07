@@ -4,7 +4,7 @@ import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.max
 import kotlin.math.pow
 
-private enum class GeoHashBitOrder { LONLAT, LATLON }
+private enum class GeoHashBitOrder { LON_LAT, LAT_LON }
 private enum class GeoHashRoundingMode { LEFT, MIDDLE }
 
 /**
@@ -14,7 +14,7 @@ private fun decodeGeoHash(
     hash: String,
     charMap: Map<Char, Int>,
     digitBitCount: Int,
-    bitOrder: GeoHashBitOrder = GeoHashBitOrder.LONLAT,
+    bitOrder: GeoHashBitOrder = GeoHashBitOrder.LON_LAT,
     roundingMode: GeoHashRoundingMode = GeoHashRoundingMode.LEFT,
     yCellCountAdjustment: (yBitCount: Int) -> Double = { 0.0 },
     zoomAdjustmentConst: Int = -8,
@@ -27,8 +27,8 @@ private fun decodeGeoHash(
     var bitCount = 0
     var xBitCount = 0
     val lonPosition = when (bitOrder) {
-        GeoHashBitOrder.LONLAT -> 0
-        GeoHashBitOrder.LATLON -> 1
+        GeoHashBitOrder.LON_LAT -> 0
+        GeoHashBitOrder.LAT_LON -> 1
     }
     hash.forEach { char ->
         charMap[char]?.let { digit ->
@@ -113,7 +113,7 @@ fun decodeGe0Hash(hash: String) = decodeGeoHash(
     },
     charMap = ORGANIC_MAPS_HASH_CHAR_MAP,
     digitBitCount = 6,
-    bitOrder = GeoHashBitOrder.LATLON,
+    bitOrder = GeoHashBitOrder.LAT_LON,
     roundingMode = GeoHashRoundingMode.MIDDLE,
     yCellCountAdjustment = { yBitCount -> -(2.0.pow(yBitCount - 30)) },
 ).let { (lat, lon, z) ->

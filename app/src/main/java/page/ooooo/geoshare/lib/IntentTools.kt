@@ -34,7 +34,9 @@ open class IntentTools {
     ).apply {
         putExtra(
             Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
+                @Suppress("SpellCheckingInspection")
                 ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity"),
+                @Suppress("SpellCheckingInspection")
                 ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity"),
             )
         )

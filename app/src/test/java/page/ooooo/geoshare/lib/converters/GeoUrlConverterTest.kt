@@ -35,8 +35,11 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_replacement() {
         assertEquals(
+
+            @Suppress("SpellCheckingInspection")
             "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
             getUri(
+                @Suppress("SpellCheckingInspection")
                 "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                         "https://omaps.app/Umse5f0H8a/Nova_Iorque"
             )

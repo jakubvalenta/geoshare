@@ -3,7 +3,6 @@ package page.ooooo.geoshare.converters
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
 
-@Suppress("SpellCheckingInspection")
 class MapyComUrlConverterBehaviorTest : BaseUrlConverterBehaviorTest() {
     @Test
     fun test() {
