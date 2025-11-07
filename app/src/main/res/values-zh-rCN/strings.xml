@@ -119,7 +119,7 @@
     <string name="conversion_automation_share_failed">无法自动分享链接</string>
     <string name="conversion_automation_share_succeeded">已自动分享链接</string>
     <string name="conversion_automation_share_waiting">将在 %1$d 秒后自动分享链接</string>
-    <string name="conversion_succeeded_copy_coordinates">以 %1$s 格式复制坐标</string>
+    <string name="conversion_succeeded_copy_coordinates">复制坐标</string>
     <string name="conversion_succeeded_copy_link">复制 %1$s 链接</string>
     <string name="user_preferences_automation_description">选择当地图链接转换为坐标时要自动执行的操作。</string>
     <string name="user_preferences_automation_nothing">无</string>
