@@ -12,8 +12,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.local.preferences.automation
-import page.ooooo.geoshare.data.local.preferences.connectionPermission
+import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
+import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.outputs.*
@@ -259,7 +259,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(connectionPermission)) } doThrow NotImplementedError()
+            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -277,7 +277,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(connectionPermission)) } doThrow NotImplementedError()
+            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -293,7 +293,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(connectionPermission)) } doThrow NotImplementedError()
+            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -310,7 +310,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(eq(connectionPermission)) } doReturn Permission.ALWAYS
+                onBlocking { getValue(eq(ConnectionPermission)) } doReturn Permission.ALWAYS
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -327,7 +327,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(eq(connectionPermission)) } doReturn Permission.ASK
+                onBlocking { getValue(eq(ConnectionPermission)) } doReturn Permission.ASK
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -344,7 +344,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(eq(connectionPermission)) } doReturn Permission.NEVER
+                onBlocking { getValue(eq(ConnectionPermission)) } doReturn Permission.NEVER
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -371,7 +371,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -383,7 +383,7 @@ class ConversionStateTest {
                 state.grant(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectionPermission),
+                eq(ConnectionPermission),
                 any<Permission>(),
             )
         }
@@ -394,7 +394,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -406,7 +406,7 @@ class ConversionStateTest {
                 state.grant(true),
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectionPermission,
+                ConnectionPermission,
                 Permission.ALWAYS,
             )
         }
@@ -417,7 +417,7 @@ class ConversionStateTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -429,7 +429,7 @@ class ConversionStateTest {
                 state.deny(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectionPermission),
+                eq(ConnectionPermission),
                 any<Permission>(),
             )
         }
@@ -439,7 +439,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+            onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -449,7 +449,7 @@ class ConversionStateTest {
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
-            connectionPermission,
+            ConnectionPermission,
             Permission.NEVER,
         )
     }
@@ -900,7 +900,7 @@ class ConversionStateTest {
             on { conversionUriPattern } doReturn mockUriPattern
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(connectionPermission) } doThrow NotImplementedError()
+            onBlocking { getValue(ConnectionPermission) } doThrow NotImplementedError()
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -1028,7 +1028,7 @@ class ConversionStateTest {
                 on { conversionUriPattern } doReturn mockUriPattern
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(connectionPermission) } doReturn Permission.ALWAYS
+                onBlocking { getValue(ConnectionPermission) } doReturn Permission.ALWAYS
             }
             val stateContext = mockStateContext(
                 userPreferencesRepository = mockUserPreferencesRepository,
@@ -1060,7 +1060,7 @@ class ConversionStateTest {
                 on { conversionUriPattern } doReturn mockUriPattern
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(connectionPermission) } doReturn Permission.ASK
+                onBlocking { getValue(ConnectionPermission) } doReturn Permission.ASK
             }
             val stateContext = mockStateContext(
                 userPreferencesRepository = mockUserPreferencesRepository,
@@ -1092,7 +1092,7 @@ class ConversionStateTest {
                 on { conversionUriPattern } doReturn mockUriPattern
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(connectionPermission) } doReturn Permission.NEVER
+                onBlocking { getValue(ConnectionPermission) } doReturn Permission.NEVER
             }
             val stateContext = mockStateContext(
                 userPreferencesRepository = mockUserPreferencesRepository,
@@ -1158,7 +1158,7 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val positionFromUri = Position(q = "bar")
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -1182,7 +1182,7 @@ class ConversionStateTest {
                 state.grant(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
-                eq(connectionPermission),
+                eq(ConnectionPermission),
                 any<Permission>(),
             )
         }
@@ -1194,7 +1194,7 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val positionFromUri = Position(q = "bar")
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+                onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
             val runContext = mockRunContext()
@@ -1218,7 +1218,7 @@ class ConversionStateTest {
                 state.grant(true),
             )
             verify(mockUserPreferencesRepository).setValue(
-                connectionPermission,
+                ConnectionPermission,
                 Permission.ALWAYS,
             )
         }
@@ -1229,7 +1229,7 @@ class ConversionStateTest {
         val uri = Uri.parse(inputUriString, uriQuote)
         val positionFromUri = Position(q = "bar")
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+            onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -1246,7 +1246,7 @@ class ConversionStateTest {
             state.deny(false),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
-            eq(connectionPermission),
+            eq(ConnectionPermission),
             any<Permission>(),
         )
     }
@@ -1257,7 +1257,7 @@ class ConversionStateTest {
         val uri = Uri.parse(inputUriString, uriQuote)
         val positionFromUri = Position(q = "bar")
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { setValue(eq(connectionPermission), any()) } doReturn Unit
+            onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -1274,7 +1274,7 @@ class ConversionStateTest {
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
-            connectionPermission,
+            ConnectionPermission,
             Permission.NEVER,
         )
     }
@@ -2005,7 +2005,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = Automation.Noop
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(automation) } doReturn Automation.Noop
+            onBlocking { getValue(AutomationUserPreference) } doReturn Automation.Noop
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -2022,7 +2022,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = CoordinatesOutputGroup.CopyDecAutomation
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(automation) } doReturn automationValue
+            onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -2039,7 +2039,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(automation) } doReturn automationValue
+            onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -2056,7 +2056,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GpxOutputGroup.SaveAutomation
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(automation) } doReturn automationValue
+            onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()
@@ -2073,7 +2073,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GeoUriOutputGroup.ChooserAutomation
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(automation) } doReturn automationValue
+            onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val runContext = mockRunContext()

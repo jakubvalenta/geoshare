@@ -131,7 +131,7 @@ abstract class OptionsUserPreference<T>(
     }
 }
 
-val connectionPermission = object : OptionsUserPreference<Permission>(
+object ConnectionPermission : OptionsUserPreference<Permission>(
     default = Permission.ASK,
 ) {
     private val key = stringPreferencesKey("connect_to_google_permission")
@@ -168,7 +168,7 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-val automation = object : OptionsUserPreference<Automation>(
+object AutomationUserPreference : OptionsUserPreference<Automation>(
     default = Automation.Noop,
 ) {
     private val typeKey = stringPreferencesKey("automation")
@@ -212,7 +212,7 @@ val automation = object : OptionsUserPreference<Automation>(
     override fun description() = stringResource(R.string.user_preferences_automation_description)
 }
 
-val introShowForVersionCode = object : NullableIntUserPreference(
+object IntroShowForVersionCode : NullableIntUserPreference(
     key = stringPreferencesKey("intro_shown_for_version_code"),
     default = 0,
 ) {
@@ -225,7 +225,7 @@ val introShowForVersionCode = object : NullableIntUserPreference(
     override fun description() = null
 }
 
-val changelogShownForVersionCode = object : NullableIntUserPreference(
+object ChangelogShownForVersionCode : NullableIntUserPreference(
     key = stringPreferencesKey("changelog_shown_for_version_code"),
     default = 22,
     modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
@@ -240,8 +240,8 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    val automationValue: Automation = automation.loading,
-    val changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
-    val connectionPermissionValue: Permission = connectionPermission.loading,
-    val introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
+    val automationValue: Automation = AutomationUserPreference.loading,
+    val changelogShownForVersionCodeValue: Int? = ChangelogShownForVersionCode.loading,
+    val connectionPermissionValue: Permission = ConnectionPermission.loading,
+    val introShownForVersionCodeValue: Int? = IntroShowForVersionCode.loading,
 )

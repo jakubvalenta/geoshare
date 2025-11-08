@@ -31,6 +31,10 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
+import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
+import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
+import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
@@ -52,19 +56,19 @@ data class UserPreferencesGroup(
         val automation = UserPreferencesGroup(
             id = UserPreferencesGroupId.AUTOMATION,
             titleResId = R.string.user_preferences_automation_title,
-            userPreferences = listOf(page.ooooo.geoshare.data.local.preferences.automation),
+            userPreferences = listOf(AutomationUserPreference),
         )
         val connectionPermission = UserPreferencesGroup(
             id = UserPreferencesGroupId.CONNECTION_PERMISSION,
             titleResId = R.string.user_preferences_connection_title,
-            userPreferences = listOf(page.ooooo.geoshare.data.local.preferences.connectionPermission),
+            userPreferences = listOf(ConnectionPermission),
         )
         val developerOptions = UserPreferencesGroup(
             id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
             titleResId = R.string.user_preferences_developer_title,
             userPreferences = listOf(
-                page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode,
-                page.ooooo.geoshare.data.local.preferences.introShowForVersionCode
+                ChangelogShownForVersionCode,
+                IntroShowForVersionCode,
             ),
             visible = BuildConfig.DEBUG,
         )
