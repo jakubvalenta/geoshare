@@ -207,7 +207,11 @@ class ConversionViewModel @Inject constructor(
                 if (action is Action.OpenApp) {
                     Toast.makeText(
                         runContext.context,
-                        R.string.conversion_automation_open_app_failed,
+                        runContext.context.resources.getString(
+                            R.string.conversion_automation_open_app_failed,
+                            intentTools.queryApp(runContext.context.packageManager, action.packageName)?.label
+                                ?: action.packageName,
+                        ),
                         Toast.LENGTH_SHORT
                     ).show()
                 } else if (action is Action.OpenChooser) {
