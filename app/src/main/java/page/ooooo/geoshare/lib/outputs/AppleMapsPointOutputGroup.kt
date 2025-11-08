@@ -21,6 +21,8 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     override fun getTextOutput() = null
@@ -39,11 +41,13 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
 
     override fun getChooserOutput() = null
 
+    override fun getRandomOutput() = null
+
     override fun getAutomations(packageNames: List<String>) = emptyList<Automation>()
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    private fun formatUriString(value: Point, uriQuote: UriQuote) = Uri(
+    private fun formatUriString(value: Point, uriQuote: UriQuote): String = Uri(
         scheme = "https",
         host = "maps.apple.com",
         path = "/",

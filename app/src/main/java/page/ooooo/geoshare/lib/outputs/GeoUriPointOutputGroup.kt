@@ -16,6 +16,8 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object ChooserOutput : Output.Action<Point, Action> {
@@ -24,6 +26,8 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_share)
+
+        override fun isEnabled(value: Point) = true
     }
 
     override fun getTextOutput() = null
@@ -43,6 +47,8 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
     override fun getChipOutputs() = emptyList<Output.Action<Point, Action>>()
 
     override fun getChooserOutput() = ChooserOutput
+
+    override fun getRandomOutput() = null
 
     override fun getAutomations(packageNames: List<String>) = emptyList<Automation>()
 

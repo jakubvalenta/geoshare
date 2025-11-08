@@ -21,6 +21,8 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsInput.NAME)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -56,6 +58,8 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = null
 
+    override fun getRandomOutput() = CopyOutput
+
     override fun getAutomations(packageNames: List<String>) = listOf(
         CopyAutomation,
     )
@@ -65,7 +69,7 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         else -> null
     }
 
-    private fun formatUriString(value: Position, uriQuote: UriQuote) = Uri(
+    private fun formatUriString(value: Position, uriQuote: UriQuote): String = Uri(
         scheme = "https",
         host = "maps.apple.com",
         path = "/",

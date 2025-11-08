@@ -29,6 +29,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object ChooserOutput : Output.Action<Position, Action> {
@@ -37,6 +39,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_share)
+
+        override fun isEnabled(value: Position) = true
     }
 
     @Immutable
@@ -48,6 +52,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label(app: IntentTools.App) = stringResource(R.string.conversion_succeeded_open_app, app.label)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object ChipOutput : Output.Action<Position, Action> {
@@ -56,6 +62,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -181,6 +189,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
     )
 
     override fun getChooserOutput() = ChooserOutput
+
+    override fun getRandomOutput() = CopyOutput
 
     override fun getAutomations(packageNames: List<String>): List<Automation> = buildList {
         add(CopyAutomation)

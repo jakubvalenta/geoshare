@@ -17,6 +17,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
+import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
+import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
@@ -88,7 +91,7 @@ class ConversionViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        page.ooooo.geoshare.data.local.preferences.automation.default,
+        AutomationUserPreference.default,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -112,16 +115,16 @@ class ConversionViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode.default,
+        ChangelogShownForVersionCode.default,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.introShowForVersionCode.default
+        it.introShownForVersionCodeValue != IntroShowForVersionCode.default
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        userPreferencesValues.value.introShownForVersionCodeValue != page.ooooo.geoshare.data.local.preferences.introShowForVersionCode.default,
+        userPreferencesValues.value.introShownForVersionCodeValue != IntroShowForVersionCode.default,
     )
 
     fun start(runContext: ConversionRunContext) {
@@ -204,7 +207,11 @@ class ConversionViewModel @Inject constructor(
                 if (action is Action.OpenApp) {
                     Toast.makeText(
                         runContext.context,
-                        R.string.conversion_automation_open_app_failed,
+                        runContext.context.resources.getString(
+                            R.string.conversion_automation_open_app_failed,
+                            intentTools.queryApp(runContext.context.packageManager, action.packageName)?.label
+                                ?: action.packageName,
+                        ),
                         Toast.LENGTH_SHORT
                     ).show()
                 } else if (action is Action.OpenChooser) {
@@ -219,17 +226,11 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun setChangelogShownForVersionCode(value: Int) {
-        setUserPreferenceValue(
-            page.ooooo.geoshare.data.local.preferences.changelogShownForVersionCode,
-            value,
-        )
+        setUserPreferenceValue(ChangelogShownForVersionCode, value)
     }
 
     fun setIntroShown() {
-        setUserPreferenceValue(
-            page.ooooo.geoshare.data.local.preferences.introShowForVersionCode,
-            BuildConfig.VERSION_CODE,
-        )
+        setUserPreferenceValue(IntroShowForVersionCode, BuildConfig.VERSION_CODE)
     }
 
     fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {

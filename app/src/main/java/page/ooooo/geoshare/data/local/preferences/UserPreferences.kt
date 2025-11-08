@@ -131,7 +131,7 @@ abstract class OptionsUserPreference<T>(
     }
 }
 
-val connectionPermission = object : OptionsUserPreference<Permission>(
+object ConnectionPermission : OptionsUserPreference<Permission>(
     default = Permission.ASK,
 ) {
     private val key = stringPreferencesKey("connect_to_google_permission")
@@ -168,7 +168,7 @@ val connectionPermission = object : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-val automation = object : OptionsUserPreference<Automation>(
+object AutomationUserPreference : OptionsUserPreference<Automation>(
     default = Automation.Noop,
 ) {
     private val typeKey = stringPreferencesKey("automation")
@@ -181,6 +181,27 @@ val automation = object : OptionsUserPreference<Automation>(
         return buildList {
             add(Automation.Noop)
             addAll(allOutputGroups.getAutomations(packageNames))
+        }.sortedBy { automation ->
+            when (automation.type) {
+                Automation.Type.NOOP -> 0
+                Automation.Type.COPY_COORDS_DEC -> 1
+                Automation.Type.COPY_COORDS_NSWE_DEC -> 2
+                Automation.Type.COPY_GEO_URI -> 3
+                Automation.Type.OPEN_APP -> 4
+                Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO -> 5
+                Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW -> 6
+                Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO -> 7
+                Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA -> 8
+                Automation.Type.COPY_APPLE_MAPS_URI -> 9
+                Automation.Type.COPY_GOOGLE_MAPS_URI -> 10
+                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 11
+                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 12
+                Automation.Type.COPY_MAGIC_EARTH_URI -> 13
+                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 14
+                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_VIA_URI -> 15
+                Automation.Type.SAVE_GPX -> 16
+                Automation.Type.SHARE -> 17
+            }
         }.map { automation ->
             UserPreferenceOption(
                 value = automation,
@@ -212,7 +233,7 @@ val automation = object : OptionsUserPreference<Automation>(
     override fun description() = stringResource(R.string.user_preferences_automation_description)
 }
 
-val introShowForVersionCode = object : NullableIntUserPreference(
+object IntroShowForVersionCode : NullableIntUserPreference(
     key = stringPreferencesKey("intro_shown_for_version_code"),
     default = 0,
 ) {
@@ -225,7 +246,7 @@ val introShowForVersionCode = object : NullableIntUserPreference(
     override fun description() = null
 }
 
-val changelogShownForVersionCode = object : NullableIntUserPreference(
+object ChangelogShownForVersionCode : NullableIntUserPreference(
     key = stringPreferencesKey("changelog_shown_for_version_code"),
     default = 22,
     modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
@@ -240,8 +261,8 @@ val changelogShownForVersionCode = object : NullableIntUserPreference(
 }
 
 data class UserPreferencesValues(
-    val automationValue: Automation = automation.loading,
-    val changelogShownForVersionCodeValue: Int? = changelogShownForVersionCode.loading,
-    val connectionPermissionValue: Permission = connectionPermission.loading,
-    val introShownForVersionCodeValue: Int? = introShowForVersionCode.loading,
+    val automationValue: Automation = AutomationUserPreference.loading,
+    val changelogShownForVersionCodeValue: Int? = ChangelogShownForVersionCode.loading,
+    val connectionPermissionValue: Permission = ConnectionPermission.loading,
+    val introShownForVersionCodeValue: Int? = IntroShowForVersionCode.loading,
 )

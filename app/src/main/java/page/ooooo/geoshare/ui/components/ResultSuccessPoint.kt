@@ -68,6 +68,7 @@ fun ResultSuccessPoint(
         onSetSheetVisible = setSheetVisible,
     ) { onHide ->
         val (copyActionsAndLabels, otherActionsAndLabels) = menuPointOutputs
+            .filter { it.isEnabled(point) }
             .map { it.getAction(point) to it.label() }
             .partition { (action) -> action is Action.Copy }
         ResultSuccessSheetContent(

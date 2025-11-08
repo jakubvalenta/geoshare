@@ -11,8 +11,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.local.preferences.automation
-import page.ooooo.geoshare.data.local.preferences.connectionPermission
+import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
+import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.position.Position
@@ -90,7 +90,7 @@ data class ReceivedUri(
             val m = input.shortUriPattern.matcher(uri.toString())
             if (m.matches()) {
                 val uri = Uri.parse(m.group(), stateContext.uriQuote)
-                return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
+                return when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
                     Permission.ALWAYS -> GrantedUnshortenPermission(
                         stateContext,
                         runContext,
@@ -131,14 +131,14 @@ data class RequestedUnshortenPermission(
 
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.ALWAYS)
         }
         return GrantedUnshortenPermission(stateContext, runContext, inputUriString, input, uri)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, runContext, inputUriString, input)
     }
@@ -238,7 +238,7 @@ data class UnshortenedUrl(
             null
         }
         if (input is Input.HasHtml) {
-            return when (permission ?: stateContext.userPreferencesRepository.getValue(connectionPermission)) {
+            return when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlPermission(
                     stateContext, runContext, inputUriString, input, uri, positionFromUri
                 )
@@ -266,7 +266,7 @@ data class RequestedParseHtmlPermission(
 
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.ALWAYS)
         }
         return GrantedParseHtmlPermission(
             stateContext,
@@ -280,7 +280,7 @@ data class RequestedParseHtmlPermission(
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(connectionPermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
         }
         return ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
     }
@@ -380,7 +380,7 @@ data class ConversionSucceeded(
     override val position: Position,
 ) : ConversionState(), HasResult {
     override suspend fun transition(): State =
-        stateContext.userPreferencesRepository.getValue(automation).let { automation ->
+        stateContext.userPreferencesRepository.getValue(AutomationUserPreference).let { automation ->
             when (automation) {
                 is Automation.HasDelay -> AutomationWaiting(
                     stateContext,

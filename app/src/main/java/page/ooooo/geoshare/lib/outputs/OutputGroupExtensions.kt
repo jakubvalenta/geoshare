@@ -32,6 +32,6 @@ fun <T> List<OutputGroup<T>>.findAutomation(type: Automation.Type, packageName: 
     this.firstNotNullOfOrNull { it.findAutomation(type, packageName) }
 
 fun List<OutputGroup<Position>>.genRandomUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
-    this.getActionOutputs()
-        .mapNotNull { (it.getAction(Position.genRandomPosition(), uriQuote) as? Action.Copy)?.text }
-        .randomOrNull()
+    Position.genRandomPosition().let { value ->
+        this.mapNotNull { it.getRandomOutput()?.getAction(value, uriQuote) as? Action.Copy }.randomOrNull()?.text
+    }
