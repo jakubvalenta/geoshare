@@ -35,6 +35,7 @@ class ConversionViewModel @Inject constructor(
         GeoUrlConverter(),
         GoogleMapsUrlConverter(),
         AppleMapsUrlConverter(),
+        AmapUrlConverter(),
         HereWeGoUrlConverter(),
         MagicEarthUrlConverter(),
         MapyComUrlConverter(),

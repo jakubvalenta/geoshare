@@ -5,18 +5,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
  */
 object GoogleMapsOutputGroup : OutputGroup<Position> {
-    // TODO GOOGLE_MAPS_PACKAGE_NAME
-    @Suppress("SpellCheckingInspection")
-    // TODO "us.spotco.maps"
+
+    val PACKAGE_NAMES = listOf(
+        GOOGLE_MAPS_PACKAGE_NAME,
+        @Suppress("SpellCheckingInspection")
+        "us.spotco.maps",
+    )
 
     object CopyOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
@@ -32,8 +34,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
             Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_google_maps)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_google_maps)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -54,6 +55,8 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     }
 
     override fun getTextOutput() = null
+
+    override fun getLabelTextOutput() = null
 
     override fun getSupportingTextOutput() = null
 
@@ -84,13 +87,13 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         path = "/maps",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.apply {
-                    set("q", "$lat,$lon")
+                mainPoint?.toStringPair(Srs.GCJ02)?.let { (latStr, lonStr) ->
+                    set("q", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)
                 }
-                z?.let { z ->
-                    set("z", z)
+                zStr?.let { zStr ->
+                    set("z", zStr)
                 }
             }
         }.toImmutableMap(),

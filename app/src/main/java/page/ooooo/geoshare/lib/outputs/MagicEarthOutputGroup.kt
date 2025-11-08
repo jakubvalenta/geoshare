@@ -2,10 +2,13 @@ package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Point
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
 
@@ -44,37 +47,34 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
     }
 
-    object AppDisplayOutput : Output.App<Position> {
-        override val packageName = PACKAGE_NAME
-
+    @Immutable
+    data class AppDisplayOutput(override val packageName: String) : Output.App<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(PACKAGE_NAME, formatDisplayUriString(value, uriQuote))
+            Action.OpenApp(packageName, formatDisplayUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
+        override fun label(app: IntentTools.App) =
+            stringResource(R.string.conversion_succeeded_open_app_display, app.label)
     }
 
-    object AppNavigateToOutput : Output.App<Position> {
-        override val packageName = PACKAGE_NAME
-
+    @Immutable
+    data class AppNavigateToOutput(override val packageName: String) : Output.App<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(PACKAGE_NAME, formatNavigateToUriString(value, uriQuote))
+            Action.OpenApp(packageName, formatNavigateToUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthUrlConverter.NAME)
+        override fun label(app: IntentTools.App) =
+            stringResource(R.string.conversion_succeeded_open_app_navigate_to, app.label)
     }
 
-    object AppNavigateViaOutput : Output.App<Position> {
-        override val packageName = PACKAGE_NAME
-
+    @Immutable
+    data class AppNavigateViaOutput(override val packageName: String) : Output.App<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(PACKAGE_NAME, formatNavigateViaUriString(value, uriQuote))
+            Action.OpenApp(packageName, formatNavigateViaUriString(value, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthUrlConverter.NAME)
+        override fun label(app: IntentTools.App) =
+            stringResource(R.string.conversion_succeeded_open_app_navigate_via, app.label)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -94,9 +94,11 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getTextOutput(): Output.Text<Position>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Position>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
@@ -104,11 +106,13 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         CopyNavigateViaOutput,
     )
 
-    override fun getAppOutputs(packageNames: List<String>) = listOf(
-        AppDisplayOutput,
-        AppNavigateToOutput,
-        AppNavigateViaOutput,
-    )
+    override fun getAppOutputs(packageNames: List<String>) = buildList {
+        PACKAGE_NAME.takeIf { it in packageNames }?.let { packageName ->
+            add(AppDisplayOutput(packageName))
+            add(AppNavigateToOutput(packageName))
+            add(AppNavigateViaOutput(packageName))
+        }
+    }
 
     override fun getChipOutputs() = emptyList<Output.Action<Position, Action>>()
 
@@ -124,14 +128,14 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
     }
 
     private fun formatDisplayUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatDisplayUriString(mainPoint ?: Point(), uriQuote, q = q)
+        MagicEarthPointOutputGroup.formatDisplayUriString(mainPoint ?: Point(Srs.WGS84), uriQuote, q = q)
     }
 
     private fun formatNavigateToUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatNavigateToUriString(mainPoint ?: Point(), uriQuote)
+        MagicEarthPointOutputGroup.formatNavigateToUriString(mainPoint ?: Point(Srs.WGS84), uriQuote)
     }
 
     private fun formatNavigateViaUriString(value: Position, uriQuote: UriQuote): String = value.run {
-        MagicEarthPointOutputGroup.formatNavigateViaUriString(mainPoint ?: Point(), uriQuote)
+        MagicEarthPointOutputGroup.formatNavigateViaUriString(mainPoint ?: Point(Srs.WGS84), uriQuote)
     }
 }

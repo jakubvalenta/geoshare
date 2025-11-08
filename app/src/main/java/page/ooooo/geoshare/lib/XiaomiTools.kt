@@ -15,8 +15,8 @@ object XiaomiTools {
                 (!getRuntimeProperty("ro.miui.ui.version.name").isNullOrBlank() ||
                         !getRuntimeProperty("ro.mi.os.version.name").isNullOrBlank())
 
-    @Suppress("SpellCheckingInspection")
     private fun getRuntimeProperty(property: String): String? = try {
+        @Suppress("SpellCheckingInspection")
         Runtime.getRuntime().exec("getprop $property").inputStream.use { input ->
             BufferedReader(InputStreamReader(input), 1024).readLine()
         }

@@ -11,13 +11,16 @@ import page.ooooo.geoshare.lib.*
 object CoordinatesOutputGroup : OutputGroup<Position> {
 
     object TextOutput : Output.Text<Position> {
-        override fun getText(value: Position, uriQuote: UriQuote) =
-            formatDegMinSecString(value)
+        override fun getText(value: Position, uriQuote: UriQuote) = formatDegMinSecString(value)
+    }
+
+    object LabelTextOutput : Output.PointLabel<Position> {
+        @Composable
+        override fun getText(value: Position, i: Int, pointCount: Int, uriQuote: UriQuote) = label(value, i, pointCount)
     }
 
     object SupportingTextOutput : Output.Text<Position> {
-        override fun getText(value: Position, uriQuote: UriQuote) =
-            formatParamsString(value)
+        override fun getText(value: Position, uriQuote: UriQuote) = formatParamsString(value)
     }
 
     object CopyDegMinSecOutput : Output.Action<Position, Action> {
@@ -25,8 +28,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDegMinSecString(value))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecOutput : Output.Action<Position, Action> {
@@ -34,8 +36,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
             Action.Copy(formatDecString(value))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_coordinates)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
     }
 
     object CopyDecAutomation : Automation.HasSuccessMessage {
@@ -90,9 +91,11 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    override fun getTextOutput(): Output.Text<Position> = TextOutput
+    override fun getTextOutput() = TextOutput
 
-    override fun getSupportingTextOutput(): Output.Text<Position> = SupportingTextOutput
+    override fun getLabelTextOutput() = LabelTextOutput
+
+    override fun getSupportingTextOutput() = SupportingTextOutput
 
     override fun getActionOutputs() = listOf(
         CopyDegMinSecOutput,
@@ -117,26 +120,30 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
     }
 
     private fun formatDecString(value: Position): String = value.run {
-        CoordinatesPointOutputGroup.formatDecString(mainPoint ?: Point())
+        CoordinatesPointOutputGroup.formatDecString(mainPoint ?: Point(Srs.WGS84))
     }
 
     fun formatDegMinSecString(value: Position): String = value.run {
-        CoordinatesPointOutputGroup.formatDegMinSecString(mainPoint ?: Point())
+        CoordinatesPointOutputGroup.formatDegMinSecString(mainPoint ?: Point(Srs.WGS84))
     }
 
     private fun formatParamsString(value: Position): String = value.run {
         buildList {
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (mainPoint ?: Point("0", "0")).let { (lat, lon) ->
-                    val coords = "$lat,$lon"
-                    if (q != coords) {
+                (mainPoint ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                    if (q != "$latStr,$lonStr") {
                         add(q.replace('+', ' '))
                     }
                 }
             }
-            z.takeUnless { it.isNullOrEmpty() }?.let { z ->
-                add("z$z")
+            zStr?.let { zStr ->
+                add("z$zStr")
             }
         }.joinToString("\t\t")
+    }
+
+    @Composable
+    private fun label(value: Position, i: Int, pointCount: Int): String? = value.run {
+        CoordinatesPointOutputGroup.label(mainPoint ?: Point(Srs.WGS84), i, pointCount)
     }
 }

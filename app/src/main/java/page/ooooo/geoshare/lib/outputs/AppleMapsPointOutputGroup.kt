@@ -21,9 +21,11 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
     }
 
-    override fun getTextOutput(): Output.Text<Point>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Point>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyOutput,
@@ -43,11 +45,9 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
         scheme = "https",
         host = "maps.apple.com",
         path = "/",
-        queryParams = buildMap {
-            value.apply {
-                set("ll", "$lat,$lon")
-            }
-        }.toImmutableMap(),
+        queryParams = value.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+            mapOf("ll" to "$latStr,$lonStr").toImmutableMap()
+        },
         uriQuote = uriQuote,
     ).toString()
 }

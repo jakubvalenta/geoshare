@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,7 +63,16 @@ private fun ResultSuccessSheetItem(
     ListItem(
         headlineContent = { Text(label) },
         modifier = Modifier.clickable(onClick = onClick),
-        supportingContent = supportingText?.let { { Text(it, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
+        supportingContent = supportingText?.let { text ->
+            {
+                Text(
+                    text,
+                    Modifier.testTag("geoShareConversionSuccessSheetItemSupportingText"),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }
@@ -73,8 +83,9 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Column {
+                val position = Position.example
                 val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(Position.example) to it.label() }
+                    .map { it.getAction(position) to it.label() }
                     .partition { (action) -> action is Action.Copy }
                 ResultSuccessSheetContent(
                     copyActionsAndLabels = copyActionsAndLabels,
@@ -94,8 +105,9 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
+                val position = Position.example
                 val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(Position.example) to it.label() }
+                    .map { it.getAction(position) to it.label() }
                     .partition { (action) -> action is Action.Copy }
                 ResultSuccessSheetContent(
                     copyActionsAndLabels = copyActionsAndLabels,

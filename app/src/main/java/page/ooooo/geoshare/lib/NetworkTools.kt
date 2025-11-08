@@ -139,6 +139,7 @@ open class NetworkTools(
             // case of Google Maps or maps link in case of Google Search.
             install(UserAgent) {
                 // Use custom user agent, because BrowserUserAgent() shows unsupported browser error in Apple Maps.
+                @Suppress("SpellCheckingInspection")
                 agent =
                     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
             }

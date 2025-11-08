@@ -125,7 +125,7 @@ fun RowScope.ResultSuccessApp(
                 rememberDrawablePainter(app.icon),
                 app.label,
             )
-            outputs.drop(1).takeIf { it.isNotEmpty() }?.let { outputs ->
+            outputs.takeIf { it.size > 1 }?.let { outputs ->
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -147,7 +147,7 @@ fun RowScope.ResultSuccessApp(
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         outputs.forEach {
                             DropdownMenuItem(
-                                text = { Text(it.label()) },
+                                text = { Text(it.label(app)) },
                                 onClick = {
                                     menuExpanded = false
                                     onRun(it.getAction(position))

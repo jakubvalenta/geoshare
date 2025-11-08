@@ -3,6 +3,8 @@ package page.ooooo.geoshare.lib.outputs
 interface OutputGroup<T> {
     fun getTextOutput(): Output.Text<T>?
 
+    fun getLabelTextOutput(): Output.PointLabel<T>?
+
     fun getSupportingTextOutput(): Output.Text<T>?
 
     fun getActionOutputs(): List<Output.Action<T, Action>>

@@ -3,10 +3,12 @@ package page.ooooo.geoshare.lib
 import com.google.re2j.Matcher
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.lastNotNullOrNull
 import kotlin.math.max
 import kotlin.math.min
 
-open class PositionMatch(val matcher: Matcher) {
+open class PositionMatch(val matcher: Matcher, val srs: Srs) {
     companion object {
         const val MAX_COORD_PRECISION = 17
         const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
@@ -19,45 +21,41 @@ open class PositionMatch(val matcher: Matcher) {
     }
 
     open val points: List<Point>?
-        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(lat, lon)) } }
-    open val lat: String?
-        get() = matcher.groupOrNull("lat")
-    open val lon: String?
-        get() = matcher.groupOrNull("lon")
+        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(srs, lat, lon)) } }
+    open val lat: Double?
+        get() = matcher.groupOrNull("lat")?.toDoubleOrNull()
+    open val lon: Double?
+        get() = matcher.groupOrNull("lon")?.toDoubleOrNull()
     open val q: String?
         get() = matcher.groupOrNull("q")
-    open val z: String?
-        get() = matcher.groupOrNull("z")?.toDouble()?.let { max(1.0, min(21.0, it)) }?.toTrimmedString()
+    open val z: Double?
+        get() = matcher.groupOrNull("z")?.toDoubleOrNull()?.let { max(1.0, min(21.0, it)) }
 }
 
 /**
  * Repeatedly searches for LAT and LON in the input to get points.
  */
-class PointsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-    override val points: List<Point>
+class PointsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
+    override val points
         get() = matcher.reset().let { m ->
             buildList {
                 while (m.find()) {
-                    try {
-                        add(Point(m.group("lat"), m.group("lon")))
-                    } catch (_: IllegalArgumentException) {
-                        // Do nothing
-                    }
+                    val lat = m.groupOrNull("lat")?.toDoubleOrNull() ?: continue
+                    val lon = m.groupOrNull("lon")?.toDoubleOrNull() ?: continue
+                    add(Point(srs, lat, lon))
                 }
             }
         }
 }
 
-abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
-    private var latLonZCache: Triple<Double, Double, Int>? = null
-    val latLonZ: Triple<Double, Double, Int>?
+abstract class GeoHashPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
+    private var latLonZCache: Triple<Double, Double, Double>? = null
+    val latLonZ: Triple<Double, Double, Double>?
         get() = latLonZCache ?: matcher.groupOrNull("hash")?.let { hash -> decode(hash).also { latLonZCache = it } }
-    override val points: List<Point>?
-        get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(lat.toString(), lon.toString())) }
-    override val z: String?
-        get() = latLonZ?.third?.toString()
+    override val points get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(srs, lat, lon)) }
+    override val z get() = latLonZ?.third
 
-    abstract fun decode(hash: String): Triple<Double, Double, Int>
+    abstract fun decode(hash: String): Triple<Double, Double, Double>
 }
 
 /**
@@ -68,14 +66,20 @@ abstract class GeoHashPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
  * them.
  */
 fun List<PositionMatch>.toPosition() = Position(
-    points = this.lastNotNullOrNull { it.points?.toImmutableList() }
-        ?: this.lastNotNullOrNull { it.lat }?.let { lat ->
-            this.lastNotNullOrNull { it.lon }?.let { lon ->
-                persistentListOf(Point(lat, lon))
+    points = this.lastOrNull { it.points != null }?.points?.toImmutableList()
+        ?: this.lastOrNull { it.lat != null }?.let { latPosition ->
+            this.lastOrNull { it.lon != null }?.let { lonPosition ->
+                latPosition.srs.takeIf { it == lonPosition.srs }?.let { srs ->
+                    latPosition.lat?.let { lat ->
+                        lonPosition.lon?.let { lon ->
+                            persistentListOf(Point(srs, lat, lon))
+                        }
+                    }
+                }
             }
         },
-    q = this.lastNotNullOrNull { it.q },
-    z = this.lastNotNullOrNull { it.z },
+    q = this.lastOrNull { it.q != null }?.q,
+    z = this.lastOrNull { it.z != null }?.z,
 )
 
 open class RedirectMatch(val matcher: Matcher) {

@@ -14,8 +14,7 @@ import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
 object AppleMapsOutputGroup : OutputGroup<Position> {
 
     object CopyOutput : Output.Action<Position, Action> {
-        override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+        override fun getAction(value: Position, uriQuote: UriQuote) = Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
         override fun label() =
@@ -39,9 +38,11 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getTextOutput(): Output.Text<Position>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Position>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyOutput,
@@ -68,13 +69,13 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
         path = "/",
         queryParams = buildMap {
             value.apply {
-                mainPoint?.apply {
-                    set("ll", "$lat,$lon")
+                mainPoint?.toStringPair(Srs.WGS84)?.let { (latStr, lonStr) ->
+                    set("ll", "$latStr,$lonStr")
                 } ?: q?.let { q ->
                     set("q", q)
                 }
-                z?.let { z ->
-                    set("z", z)
+                zStr?.let { zStr ->
+                    set("z", zStr)
                 }
             }
         }.toImmutableMap(),

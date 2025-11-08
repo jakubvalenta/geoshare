@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 
 @RunWith(AndroidJUnit4::class)
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -48,22 +49,40 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
+        waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0))
 
         // Open the coordinates with Google Maps
         onElement { viewIdResourceName == "geoShareResultCardApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
 
-        // Wait for Google Maps
-        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
-
-        // If there is a Google Maps sign in screen, skip it
-        onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Make it your map" }?.also {
-            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() == "skip" }.click()
-        }
-
-        // Verify Google Maps content
-        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Westend" }
+        // Google Maps shows precise location
+        waitAndAssertGoogleMapsShowsText("Westend")
     }
+
+    @Test
+    fun conversionScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
+        uiAutomator {
+            assertGoogleMapsInstalled()
+
+            // Share a Google Maps coordinates link with the app
+            shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
+
+            // Shows precise location in WGS 84
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 31.23044166868017, 121.47099209401793, z = 11.0))
+
+            // Shows copy link in GCJ-02
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+            onElement {
+                viewIdResourceName == "geoShareConversionSuccessSheetItemSupportingText" &&
+                        textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
+            }
+            pressBack()
+
+            // Open the coordinates with Google Maps
+            onElement { viewIdResourceName == "geoShareResultCardApp_$GOOGLE_MAPS_PACKAGE_NAME" }.click()
+
+            // Google Maps shows precise location
+            waitAndAssertGoogleMapsShowsText("Ming&Qing Dynasties Furniture Hall")
+        }
 
     @Test
     fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_showsPositionAndCopiesCoords() =
@@ -80,7 +99,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0))
 
             // Shows automation success message
             onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
@@ -106,7 +125,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.5067296", "13.2599309", z = "11"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0))
 
             // Shows automation counter
             onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
@@ -134,7 +153,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = false, "geoShareUnshortenPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.4842015", "13.4167277"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4842015, 13.4167277))
 
             // Return to the home screen
             pressHome()
@@ -156,7 +175,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = true, "geoShareUnshortenPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.4842015", "13.4167277"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4842015, 13.4167277))
 
             // Return to the home screen
             pressHome()
@@ -165,7 +184,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(Position("44.4490541", "26.0888398"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 44.4490541, 26.0888398))
         }
 
     @Test
@@ -235,7 +254,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = false, "geoShareParseHtmlPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.4697882", "13.4257989"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4697882, 13.4257989))
 
             // Return to the home screen
             pressHome()
@@ -257,7 +276,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = true, "geoShareParseHtmlPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.4778665", "13.426398"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4778665, 13.426398))
 
             // Return to the home screen
             pressHome()
@@ -266,7 +285,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(Position("52.4820815", "13.4338421"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4820815, 13.4338421))
         }
 
     @Test
@@ -323,7 +342,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = false, "geoShareParseHtmlPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.4848232", "13.4240791"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4848232, 13.4240791))
 
             // Return to the home screen
             pressHome()
@@ -345,7 +364,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = true, "geoShareParseHtmlPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("52.4834254", "13.4245399"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4834254, 13.4245399))
 
             // Return to the home screen
             pressHome()
@@ -354,7 +373,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(Position("52.4832988", "13.4245179"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4832988, 13.4245179))
         }
 
     @Test
@@ -408,6 +427,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitAndConfirmDialogAndAssertNewWindowIsOpen(doNotAsk = false, "geoShareUnshortenPermissionDialog")
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position("51.1982447", "6.4389493"))
+            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 51.1982447, 6.4389493))
         }
 }

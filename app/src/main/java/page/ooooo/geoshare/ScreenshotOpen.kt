@@ -89,7 +89,6 @@ fun ScreenshotOpen() {
             y = 774,
             horizontalArrangement = Arrangement.spacedBy(with(density) { 70.toDp() * scale }),
         ) {
-            @Suppress("SpellCheckingInspection")
             for (text in listOf("Maps", "Mapy.com", "Organic Maps", "OsmAnd~")) {
                 ScreenshotText(
                     text,

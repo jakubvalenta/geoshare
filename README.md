@@ -18,6 +18,7 @@ map app.
 
 - Google Maps
 - Apple Maps
+- Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
 - Magic Earth

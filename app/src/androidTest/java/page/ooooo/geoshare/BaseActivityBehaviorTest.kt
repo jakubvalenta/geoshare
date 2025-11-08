@@ -22,6 +22,7 @@ import kotlin.math.roundToLong
 
 abstract class BaseActivityBehaviorTest {
     companion object {
+        @Suppress("SpellCheckingInspection")
         const val PACKAGE_NAME = "page.ooooo.geoshare.debug"
         const val LAUNCH_TIMEOUT = 10_000L
         const val TIMEOUT = 10_000L
@@ -61,6 +62,7 @@ abstract class BaseActivityBehaviorTest {
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
+            @Suppress("SpellCheckingInspection")
             if (onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "No recent items" || textAsString() == "Aucun élément récent" } != null) {
                 // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
                 device.pressRecentApps()
@@ -99,7 +101,7 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
-        if (!expectedPosition.q.isNullOrEmpty() || !expectedPosition.z.isNullOrEmpty()) {
+        if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
             val expectedSupportingText = allOutputGroups.getSupportingTextOutput()?.getText(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
         } else {
@@ -107,9 +109,23 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
+    protected fun waitAndAssertGoogleMapsShowsText(expectedText: String) = uiAutomator {
+        // Wait for Google Maps
+        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
+
+        // If there is a Google Maps sign in screen, skip it
+        onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Make it your map" }?.also {
+            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() == "skip" }.click()
+        }
+
+        // Verify Google Maps content
+        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == expectedText }
+    }
+
     protected fun shareUri(unsafeUriString: String) = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi
         device.executeShellCommand(
+            @Suppress("SpellCheckingInspection")
             "am start -a android.intent.action.VIEW -d $unsafeUriString -n $PACKAGE_NAME/page.ooooo.geoshare.ConversionActivity $PACKAGE_NAME"
         )
     }

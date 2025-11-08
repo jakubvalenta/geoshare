@@ -32,6 +32,27 @@
 
                 <data android:mimeType="text/plain"/>
             </intent-filter>
+            <!-- Amap -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="surl.amap.com"
+                        android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="wb.amap.com"
+                        android:scheme="https"/>
+            </intent-filter>
             <!-- Apple Maps -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>

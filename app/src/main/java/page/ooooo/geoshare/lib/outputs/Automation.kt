@@ -12,6 +12,7 @@ import kotlin.time.Duration
 
 sealed interface Automation {
 
+    @Suppress("SpellCheckingInspection")
     @Immutable
     enum class Type {
         COPY_APPLE_MAPS_URI,

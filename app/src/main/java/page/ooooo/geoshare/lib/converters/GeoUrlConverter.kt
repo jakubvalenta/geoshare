@@ -9,17 +9,20 @@ import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.matches
+import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 
 class GeoUrlConverter : UrlConverter.WithUriPattern {
+    private val srs = Srs.WGS84
+
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
     override val documentation = Documentation(
         nameResId = R.string.converter_geo_name, inputs = listOf(
             DocumentationInput.Text(3) {
-                stringResource(R.string.example, GeoUriOutputGroup.formatUriString(Position.example))
+                stringResource(R.string.example, GeoUriOutputGroup.formatUriString(Position.example, Srs.WGS84))
             },
         )
     )
@@ -27,13 +30,13 @@ class GeoUrlConverter : UrlConverter.WithUriPattern {
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                on { path matches """$LAT,$LON""" } doReturn { PositionMatch(it) }
+                on { path matches """$LAT,$LON""" } doReturn { PositionMatch(it, srs) }
             }
             optional {
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
             }
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
             }
         }
     }

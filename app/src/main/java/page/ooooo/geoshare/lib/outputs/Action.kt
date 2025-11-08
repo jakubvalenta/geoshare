@@ -1,10 +1,12 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Immutable
+import io.ktor.util.escapeHTML
 import page.ooooo.geoshare.lib.ConversionRunContext
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
 sealed interface Action {
@@ -38,8 +40,17 @@ sealed interface Action {
             append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
             append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
             append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
-            position.points?.map { (lat, lon) ->
-                append("<wpt lat=\"${uriQuote.encode(lat)}\" lon=\"${uriQuote.encode(lon)}\" />\n")
+            position.points?.map { point ->
+                point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                    append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
+                }
+                if (point.desc != null) {
+                    append(">\n")
+                    append("    <desc>${point.desc.escapeHTML()}</desc>\n")
+                    append("</wpt>\n")
+                } else {
+                    append(" />\n")
+                }
             }
             append("</gpx>\n")
         }

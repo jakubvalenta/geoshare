@@ -7,6 +7,9 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
 
 class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
@@ -29,15 +32,17 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
             deg: String?,
             min: String? = null,
             sec: String? = null,
-        ): String {
+        ): Double {
             val sig = if (southOrWest && sig != "-" || !southOrWest && sig == "-") -1 else 1
             val deg = (deg?.toDouble() ?: 0.0)
             val min = (min?.toDouble() ?: 0.0) / 60
             val sec = (sec?.toDouble() ?: 0.0) / 3600
             val dec = (sig * (deg + min + sec))
-            return dec.toScale(6).toString()
+            return dec.toScale(6)
         }
     }
+
+    private val srs = Srs.WGS84
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
@@ -52,17 +57,17 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" } doReturn
-                { DecimalCoordsPositionMatch(it) }
+                { DecimalCoordsPositionMatch(it, srs) }
         on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" } doReturn
-                { DegreesMinutesSecondsCoordsPositionMatch(it) }
+                { DegreesMinutesSecondsCoordsPositionMatch(it, srs) }
         on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" } doReturn
-                { DegreesMinutesCoordsPositionMatch(it) }
+                { DegreesMinutesCoordsPositionMatch(it, srs) }
     }
 
     /**
      * Decimal, e.g. `N 41.40338, E 2.17403`
      */
-    private class DecimalCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    private class DecimalCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
         override val points: List<Point>
             get() {
                 val lat = degToDec(
@@ -75,14 +80,14 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
                     matcher.groupOrNull("lonSig"),
                     matcher.groupOrNull("lonDeg"),
                 )
-                return persistentListOf(Point(lat, lon))
+                return persistentListOf(Point(srs, lat, lon))
             }
     }
 
     /**
      * Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
      */
-    private class DegreesMinutesSecondsCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    private class DegreesMinutesSecondsCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
         override val points: List<Point>
             get() {
                 val lat = degToDec(
@@ -99,14 +104,14 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
                     matcher.groupOrNull("lonMin"),
                     matcher.groupOrNull("lonSec"),
                 )
-                return persistentListOf(Point(lat, lon))
+                return persistentListOf(Point(srs, lat, lon))
             }
     }
 
     /**
      * Degrees minutes, e.g. `41 24.2028, 2 10.4418`
      */
-    private class DegreesMinutesCoordsPositionMatch(matcher: Matcher) : PositionMatch(matcher) {
+    private class DegreesMinutesCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
         override val points: List<Point>
             get() {
                 val lat = degToDec(
@@ -121,7 +126,7 @@ class CoordinatesUrlConverter : UrlConverter.WithUriPattern {
                     matcher.groupOrNull("lonDeg"),
                     matcher.groupOrNull("lonMin"),
                 )
-                return persistentListOf(Point(lat, lon))
+                return persistentListOf(Point(srs, lat, lon))
             }
     }
 }

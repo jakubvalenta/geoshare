@@ -28,23 +28,27 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessPoint(
     i: Int,
     point: Point,
+    pointCount: Int,
     textPointOutput: Output.Text<Point>?,
+    labelTextPointOutput: Output.PointLabel<Point>?,
     menuPointOutputs: List<Output.Action<Point, Action>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
-    val label = stringResource(R.string.conversion_succeeded_point_number, i + 1)
+    val label = labelTextPointOutput?.getText(point, i, pointCount)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            label,
-            fontStyle = FontStyle.Italic,
-            style = MaterialTheme.typography.bodySmall,
-        )
+        label?.let { text ->
+            Text(
+                text,
+                fontStyle = FontStyle.Italic,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
         SelectionContainer(Modifier.weight(1f)) {
             textPointOutput?.getText(point)?.let { text ->
                 Text(text, style = MaterialTheme.typography.bodySmall)
@@ -84,7 +88,9 @@ private fun DefaultPreview() {
             ResultSuccessPoint(
                 i = 3,
                 point = Point.example,
+                pointCount = 5,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
+                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -100,7 +106,45 @@ private fun DarkPreview() {
             ResultSuccessPoint(
                 i = 3,
                 point = Point.example,
+                pointCount = 5,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
+                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OnePointPreview() {
+    AppTheme {
+        Surface {
+            ResultSuccessPoint(
+                i = 3,
+                point = Point.example,
+                pointCount = 1,
+                textPointOutput = allPointOutputGroups.getTextOutput(),
+                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkOnePointPreview() {
+    AppTheme {
+        Surface {
+            ResultSuccessPoint(
+                i = 0,
+                point = Point.example,
+                pointCount = 1,
+                textPointOutput = allPointOutputGroups.getTextOutput(),
+                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )

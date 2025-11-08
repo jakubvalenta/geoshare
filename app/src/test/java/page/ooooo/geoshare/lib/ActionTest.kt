@@ -23,36 +23,37 @@ class ActionTest {
                 Action.SaveGpx(
                     Position(
                         points = persistentListOf(
-                            Point("50.123456", "-11.123456"),
-                            Point("52.5067296", "13.2599309"),
+                            Point(Srs.WGS84, 50.123456, -11.123456),
+                            Point(Srs.WGS84, 52.5067296, 13.2599309),
                         ),
                     ),
                     uriQuote,
                 ).write(this)
-            }.toString()
+            }.toString(),
         )
     }
 
     @Test
-    fun toGpx_escapesSpecialCharacters() {
+    fun toGpx_escapesDesc() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
-<wpt lat="%22" lon="%3C" />
+<wpt lat="50.123456" lon="-11.123456">
+    <desc>&lt;script&gt;alert()&lt;/script&gt;</desc>
+</wpt>
 </gpx>
 """,
             StringBuilder().apply {
                 Action.SaveGpx(
                     Position(
                         points = persistentListOf(
-                            Point("\"", "<"),
+                            Point(Srs.WGS84, 50.123456, -11.123456, desc = "<script>alert()</script>"),
                         ),
-                    ),
-                    uriQuote,
+                    ), uriQuote
                 ).write(this)
-            }.toString()
+            }.toString(),
         )
     }
 
@@ -70,7 +71,7 @@ class ActionTest {
                     Position(),
                     uriQuote,
                 ).write(this)
-            }.toString()
+            }.toString(),
         )
     }
 }

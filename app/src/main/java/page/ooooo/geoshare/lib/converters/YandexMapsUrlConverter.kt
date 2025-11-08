@@ -7,13 +7,18 @@ import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.find
-import page.ooooo.geoshare.lib.matches
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.matches
 
-class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithShortUriPattern,
+class YandexMapsUrlConverter() :
+    UrlConverter.WithUriPattern,
+    UrlConverter.WithShortUriPattern,
     UrlConverter.WithHtmlPattern {
+
+    private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = Documentation(
@@ -44,27 +49,33 @@ class YandexMapsUrlConverter() : UrlConverter.WithUriPattern, UrlConverter.WithS
     )
     override val shortUriPattern: Pattern =
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
-    override val shortUriMethod: ShortUriMethod = ShortUriMethod.HEAD
+    override val shortUriMethod = ShortUriMethod.HEAD
 
-    @Suppress("SpellCheckingInspection")
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
                 first {
-                    on { queryParams["whatshere%5Bzoom%5D"]?.let { it matches Z } } doReturn { PositionMatch(it) }
-                    on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it) }
+                    @Suppress("SpellCheckingInspection")
+                    on { queryParams["whatshere%5Bzoom%5D"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
+                    on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
                 }
             }
             first {
-                on { queryParams["whatshere%5Bpoint%5D"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it) }
-                on { queryParams["ll"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it) }
-                on { path matches """/maps/org/\d+([/?#].*|$)""" } doReturn { PositionMatch(it) }
+                @Suppress("SpellCheckingInspection")
+                on { queryParams["whatshere%5Bpoint%5D"]?.let { it matches "$LON,$LAT" } } doReturn {
+                    PositionMatch(
+                        it,
+                        srs
+                    )
+                }
+                on { queryParams["ll"]?.let { it matches "$LON,$LAT" } } doReturn { PositionMatch(it, srs) }
+                on { path matches """/maps/org/\d+([/?#].*|$)""" } doReturn { PositionMatch(it, srs) }
             }
         }
     }
 
     override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
-        on { this find """data-coordinates="$LON,$LAT"""" } doReturn { PositionMatch(it) }
+        on { this find """data-coordinates="$LON,$LAT"""" } doReturn { PositionMatch(it, srs) }
     }
 
     override val conversionHtmlRedirectPattern = null

@@ -10,25 +10,25 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object CopyOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_geo)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
     }
 
     object ChooserOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, uriQuote))
+            Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_share)
+        override fun label() = stringResource(R.string.conversion_succeeded_share)
     }
 
-    override fun getTextOutput(): Output.Text<Point>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Point>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyOutput,
@@ -46,17 +46,18 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatUriString(point: Point, uriQuote: UriQuote, q: String? = null, z: String? = null): String = point.run {
-        Uri(
-            scheme = "geo",
-            path = "$lat,$lon",
-            queryParams = buildMap {
-                set("q", q ?: "$lat,$lon")
-                z?.let { z ->
-                    set("z", z)
-                }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
-    }
+    fun formatUriString(value: Point, srs: Srs, uriQuote: UriQuote, q: String? = null, zStr: String? = null): String =
+        value.toStringPair(srs).let { (latStr, lonStr) ->
+            Uri(
+                scheme = "geo",
+                path = "$latStr,$lonStr",
+                queryParams = buildMap {
+                    set("q", q ?: "$latStr,$lonStr")
+                    zStr?.let { zStr ->
+                        set("z", zStr)
+                    }
+                }.toImmutableMap(),
+                uriQuote = uriQuote,
+            ).toString()
+        }
 }

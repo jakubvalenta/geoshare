@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.converters
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.Srs
 
 class GeoUrlConverterTest : BaseUrlConverterTest() {
     override val urlConverter: UrlConverter = GeoUrlConverter()
@@ -35,8 +36,11 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun uriPattern_replacement() {
         assertEquals(
+
+            @Suppress("SpellCheckingInspection")
             "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)",
             getUri(
+                @Suppress("SpellCheckingInspection")
                 "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                         "https://omaps.app/Umse5f0H8a/Nova_Iorque"
             )
@@ -58,7 +62,7 @@ class GeoUrlConverterTest : BaseUrlConverterTest() {
     @Test
     fun parseUrl_returnsAllCoordsAndParams() {
         assertEquals(
-            Position("50.123456", "-11.123456", q = "foo bar", z = "3.4"),
+            Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4),
             parseUrl("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
         )
     }

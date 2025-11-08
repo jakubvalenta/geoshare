@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.extensions
 
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern

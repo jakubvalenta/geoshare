@@ -22,39 +22,37 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     object CopyOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_geo)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
     }
 
     object ChooserOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, uriQuote))
+            Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_share)
+        override fun label() = stringResource(R.string.conversion_succeeded_share)
     }
 
     @Immutable
     data class AppOutput(override val packageName: String) : Output.App<Position> {
+        private val srs get() = if (packageName in GoogleMapsOutputGroup.PACKAGE_NAMES) Srs.GCJ02 else Srs.WGS84
+
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatUriString(value, uriQuote))
+            Action.OpenApp(packageName, formatUriString(value, srs, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app, packageName)
+        override fun label(app: IntentTools.App) = stringResource(R.string.conversion_succeeded_open_app, app.label)
     }
 
     object ChipOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
 
         @Composable
-        override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_geo)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -63,7 +61,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, uriQuote))
+            Action.Copy(formatUriString(position, Srs.WGS84, uriQuote))
 
         @Composable
         override fun Label() {
@@ -82,7 +80,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val delay = 5.seconds
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(position, uriQuote))
+            Action.OpenChooser(formatUriString(position, Srs.WGS84, uriQuote))
 
         @Composable
         override fun Label() {
@@ -112,7 +110,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val delay = 5.seconds
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatUriString(position, uriQuote))
+            Action.OpenApp(packageName, formatUriString(position, Srs.WGS84, uriQuote))
 
         @Composable
         override fun Label() {
@@ -161,9 +159,11 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
     }
 
-    override fun getTextOutput(): Output.Text<Position>? = null
+    override fun getTextOutput() = null
 
-    override fun getSupportingTextOutput(): Output.Text<Position>? = null
+    override fun getLabelTextOutput() = null
+
+    override fun getSupportingTextOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyOutput,
@@ -192,7 +192,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         else -> null
     }
 
-    fun formatUriString(position: Position, uriQuote: UriQuote = DefaultUriQuote()): String = position.run {
-        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(), uriQuote, q = q, z = z)
+    fun formatUriString(value: Position, srs: Srs, uriQuote: UriQuote = DefaultUriQuote()): String = value.run {
+        GeoUriPointOutputGroup.formatUriString(mainPoint ?: Point(Srs.WGS84), srs, uriQuote, q = q, zStr = zStr)
     }
 }
