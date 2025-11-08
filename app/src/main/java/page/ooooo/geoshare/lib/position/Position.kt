@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.position
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
 

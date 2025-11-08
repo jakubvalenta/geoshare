@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.R.id.input
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.position.Position
 
