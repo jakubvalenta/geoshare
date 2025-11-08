@@ -5,7 +5,9 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.AppleMapsUrlConverter
+import page.ooooo.geoshare.lib.inputs.AppleMapsInput
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Srs
 
 /**
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
@@ -18,7 +20,7 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link, AppleMapsInput.NAME)
     }
 
     override fun getTextOutput() = null

@@ -33,6 +33,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
+import page.ooooo.geoshare.ui.components.UserPreferencesListPane
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Keep

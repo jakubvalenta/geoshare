@@ -4,6 +4,9 @@ import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 
 class ActionTest {
     private val uriQuote = FakeUriQuote()

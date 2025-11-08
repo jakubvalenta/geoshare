@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.outputs
 
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.UriQuote
 
 fun <T> List<OutputGroup<T>>.getTextOutput() =

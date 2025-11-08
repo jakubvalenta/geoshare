@@ -5,6 +5,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.lastNotNullOrNull
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 import kotlin.math.max
 import kotlin.math.min
 

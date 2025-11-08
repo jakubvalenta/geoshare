@@ -43,8 +43,8 @@ fun MainScreen(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToConversionScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
@@ -66,8 +66,8 @@ fun MainScreen(
         onUpdateInput = { viewModel.updateInput(it) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,
+        onNavigateToInputsScreen = onNavigateToInputsScreen,
         onNavigateToIntroScreen = onNavigateToIntroScreen,
-        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
     )
 }
@@ -82,8 +82,8 @@ fun MainScreen(
     onUpdateInput: (uriString: String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     val density = LocalDensity.current
@@ -99,7 +99,7 @@ fun MainScreen(
                 onNavigateToAboutScreen = onNavigateToAboutScreen,
                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
             )
         },
@@ -216,7 +216,7 @@ fun MainScreen(
                     .padding(top = spacing.large)
                     .padding(horizontal = spacing.windowPadding),
             ) {
-                TextButton(onNavigateToUrlConvertersScreen) {
+                TextButton(onNavigateToInputsScreen) {
                     Icon(
                         Icons.Outlined.Info,
                         null,
@@ -266,7 +266,7 @@ private fun DefaultPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -285,7 +285,7 @@ private fun DarkPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -304,7 +304,7 @@ private fun TabletPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -323,7 +323,7 @@ private fun FilledAndChangelogBadgedPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -341,8 +341,8 @@ private fun DarkFilledAndChangelogBadgedPreview() {
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }
@@ -361,7 +361,7 @@ private fun TabletFilledAndChangelogBadgedPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
         )
     }

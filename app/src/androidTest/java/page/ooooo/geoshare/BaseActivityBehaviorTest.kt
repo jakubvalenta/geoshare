@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
-import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.XiaomiTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.getSupportingTextOutput
@@ -135,8 +135,8 @@ abstract class BaseActivityBehaviorTest {
         onElement(block = block).click()
     }
 
-    protected fun goToUrlConvertersScreen() {
-        goToMenuItem { viewIdResourceName == "geoShareMainMenuUrlConverters" }
+    protected fun goToInputsScreen() {
+        goToMenuItem { viewIdResourceName == "geoShareMainMenuInputs" }
     }
 
     private fun goToUserPreferencesScreen() {

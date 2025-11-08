@@ -27,8 +27,8 @@ fun MainMenu(
     changelogShown: Boolean = true,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -90,10 +90,10 @@ fun MainMenu(
             )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.url_converters_title)) },
-                modifier = Modifier.testTag("geoShareMainMenuUrlConverters"),
+                modifier = Modifier.testTag("geoShareMainMenuInputs"),
                 onClick = {
                     menuExpanded = false
-                    onNavigateToUrlConvertersScreen()
+                    onNavigateToInputsScreen()
                 },
                 leadingIcon = {
                     BadgedBox(
@@ -130,8 +130,8 @@ private fun DefaultPreview() {
                 changelogShown = false,
                 onNavigateToAboutScreen = {},
                 onNavigateToFaqScreen = {},
+                onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
-                onNavigateToUrlConvertersScreen = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -147,8 +147,8 @@ private fun DarkPreview() {
                 changelogShown = false,
                 onNavigateToAboutScreen = {},
                 onNavigateToFaqScreen = {},
+                onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
-                onNavigateToUrlConvertersScreen = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }

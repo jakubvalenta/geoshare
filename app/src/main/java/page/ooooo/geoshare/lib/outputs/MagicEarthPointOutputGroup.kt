@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Srs
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.inputs.MagicEarthInput
 
 object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
@@ -18,7 +18,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthInput.NAME)
     }
 
     object CopyNavigateToOutput : Output.Action<Point, Action> {
@@ -27,7 +27,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME)
     }
 
     object CopyNavigateViaOutput : Output.Action<Point, Action> {
@@ -36,7 +36,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthInput.NAME)
     }
 
     object ChooserDisplayOutput : Output.Action<Point, Action> {
@@ -45,7 +45,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthInput.NAME)
     }
 
     object ChooserNavigateToOutput : Output.Action<Point, Action> {
@@ -54,7 +54,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthInput.NAME)
     }
 
     object ChooserNavigateViaOutput : Output.Action<Point, Action> {
@@ -63,7 +63,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthInput.NAME)
     }
 
     override fun getTextOutput() = null
