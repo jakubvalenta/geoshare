@@ -34,9 +34,9 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         override fun isEnabled(value: Point) = true
     }
 
-    object CopyDisplayStreetViewOutput : Output.Action<Point, Action> {
+    object CopyStreetViewOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatDisplayStreetViewUriString(value, uriQuote))
+            Action.Copy(formatStreetViewUriString(value, uriQuote))
 
         @Composable
         override fun label() =
@@ -56,9 +56,9 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         override fun isEnabled(value: Point) = true
     }
 
-    object ChooserDisplayStreetViewOutput : Output.Action<Point, Action> {
+    object ChooserStreetViewOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatDisplayStreetViewUriString(value, uriQuote))
+            Action.OpenChooser(formatStreetViewUriString(value, uriQuote))
 
         @Composable
         override fun label() =
@@ -73,19 +73,21 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
     override fun getSupportingTextOutput() = null
 
+    override fun getActionOutputs() = listOf(
+        CopyDisplayOutput,
+        CopyNavigateToOutput,
+        CopyStreetViewOutput,
+        ChooserNavigateToOutput,
+        ChooserStreetViewOutput,
+    )
+
     override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Point>>()
 
     override fun getChipOutputs() = emptyList<Output.Action<Point, Action>>()
 
     override fun getChooserOutput() = null
 
-    override fun getActionOutputs() = listOf(
-        CopyDisplayOutput,
-        CopyNavigateToOutput,
-        CopyDisplayStreetViewOutput,
-        ChooserNavigateToOutput,
-        ChooserDisplayStreetViewOutput,
-    )
+    override fun getRandomOutput() = null
 
     override fun getAutomations(packageNames: List<String>) = emptyList<Automation>()
 
@@ -110,7 +112,7 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         uriQuote = uriQuote,
     ).toString()
 
-    private fun formatDisplayStreetViewUriString(value: Point, uriQuote: UriQuote): String = Uri(
+    private fun formatStreetViewUriString(value: Point, uriQuote: UriQuote): String = Uri(
         scheme = "google.streetview",
         path = value.toStringPair(Srs.GCJ02).let { (latStr, lonStr) -> "$latStr,$lonStr" }.let { coords ->
             @Suppress("SpellCheckingInspection")

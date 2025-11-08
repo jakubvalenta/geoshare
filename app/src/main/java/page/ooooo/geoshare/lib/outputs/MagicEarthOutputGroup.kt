@@ -1,9 +1,18 @@
 package page.ooooo.geoshare.lib.outputs
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.position.Point
@@ -11,6 +20,8 @@ import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.inputs.MagicEarthInput
+import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated, for
@@ -90,7 +101,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         override fun isEnabled(value: Position) = true
     }
 
-    object CopyAutomation : Automation.HasSuccessMessage {
+    object CopyDisplayAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_MAGIC_EARTH_URI
         override val packageName = ""
         override val testTag = null
@@ -105,6 +116,162 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
+    }
+
+    object CopyNavigateToAutomation : Automation.HasSuccessMessage {
+        override val type = Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI
+        override val packageName = ""
+        override val testTag = null
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatNavigateToUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            Text(stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME))
+        }
+
+        @Composable
+        override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
+    }
+
+    object CopyNavigateViaAutomation : Automation.HasSuccessMessage {
+        override val type = Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_VIA_URI
+        override val packageName = ""
+        override val testTag = null
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatNavigateViaUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            Text(stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthInput.NAME))
+        }
+
+        @Composable
+        override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
+    }
+
+    @Immutable
+    data class AppNavigateToAutomation(override val packageName: String) :
+        Automation.HasSuccessMessage,
+        Automation.HasErrorMessage,
+        Automation.HasDelay {
+
+        override val type = Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO
+        override val testTag = null
+
+        override val delay = 5.seconds
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(packageName, formatNavigateToUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            val spacing = LocalSpacing.current
+            queryApp()?.let { app ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        rememberDrawablePainter(app.icon),
+                        app.label,
+                        Modifier.widthIn(max = 24.dp),
+                    )
+                    Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, app.label))
+                }
+            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, packageName))
+        }
+
+        @Composable
+        override fun successText() =
+            stringResource(
+                R.string.conversion_automation_open_app_succeeded,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun errorText() =
+            stringResource(
+                R.string.conversion_automation_open_app_failed,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun waitingText(counterSec: Int) =
+            stringResource(
+                R.string.conversion_automation_open_app_waiting,
+                queryApp()?.label ?: packageName,
+                counterSec,
+            )
+
+        private var appCache: IntentTools.App? = null
+
+        @Composable
+        private fun queryApp(): IntentTools.App? =
+            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+    }
+
+    @Immutable
+    data class AppNavigateViaAutomation(override val packageName: String) :
+        Automation.HasSuccessMessage,
+        Automation.HasErrorMessage,
+        Automation.HasDelay {
+
+        override val type = Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA
+        override val testTag = null
+
+        override val delay = 5.seconds
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(packageName, formatNavigateViaUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            val spacing = LocalSpacing.current
+            queryApp()?.let { app ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        rememberDrawablePainter(app.icon),
+                        app.label,
+                        Modifier.widthIn(max = 24.dp),
+                    )
+                    Text(stringResource(R.string.conversion_succeeded_open_app_navigate_via, app.label))
+                }
+            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_navigate_via, packageName))
+        }
+
+        @Composable
+        override fun successText() =
+            stringResource(
+                R.string.conversion_automation_open_app_succeeded,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun errorText() =
+            stringResource(
+                R.string.conversion_automation_open_app_failed,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun waitingText(counterSec: Int) =
+            stringResource(
+                R.string.conversion_automation_open_app_waiting,
+                queryApp()?.label ?: packageName,
+                counterSec,
+            )
+
+        private var appCache: IntentTools.App? = null
+
+        @Composable
+        private fun queryApp(): IntentTools.App? =
+            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
     }
 
     override fun getTextOutput() = null
@@ -131,12 +298,24 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = null
 
-    override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
-        CopyAutomation,
-    )
+    override fun getRandomOutput() = CopyDisplayOutput
+
+    override fun getAutomations(packageNames: List<String>) = buildList {
+        add(CopyDisplayAutomation)
+        add(CopyNavigateToAutomation)
+        add(CopyNavigateViaAutomation)
+        PACKAGE_NAME.takeIf { it in packageNames }?.let { packageName ->
+            add(AppNavigateToAutomation(packageName))
+            add(AppNavigateViaAutomation(packageName))
+        }
+    }
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = when (type) {
-        Automation.Type.COPY_MAGIC_EARTH_URI -> CopyAutomation
+        Automation.Type.COPY_MAGIC_EARTH_URI -> CopyDisplayAutomation
+        Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> CopyNavigateToAutomation
+        Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_VIA_URI -> CopyNavigateViaAutomation
+        Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO if packageName != null -> AppNavigateToAutomation(packageName)
+        Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA if packageName != null -> AppNavigateViaAutomation(packageName)
         else -> null
     }
 

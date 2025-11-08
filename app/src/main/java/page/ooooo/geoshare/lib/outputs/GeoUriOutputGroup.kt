@@ -190,6 +190,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = ChooserOutput
 
+    override fun getRandomOutput() = CopyOutput
+
     override fun getAutomations(packageNames: List<String>): List<Automation> = buildList {
         add(CopyAutomation)
         add(ChooserAutomation)

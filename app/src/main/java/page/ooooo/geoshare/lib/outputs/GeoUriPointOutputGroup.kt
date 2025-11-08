@@ -48,6 +48,8 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     override fun getChooserOutput() = ChooserOutput
 
+    override fun getRandomOutput() = null
+
     override fun getAutomations(packageNames: List<String>) = emptyList<Automation>()
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null

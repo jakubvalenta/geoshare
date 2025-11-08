@@ -58,6 +58,8 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = null
 
+    override fun getRandomOutput() = CopyOutput
+
     override fun getAutomations(packageNames: List<String>) = listOf(
         CopyAutomation,
     )

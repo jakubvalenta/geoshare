@@ -1,9 +1,18 @@
 package page.ooooo.geoshare.lib.outputs
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
@@ -13,6 +22,8 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
@@ -47,9 +58,9 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         override fun isEnabled(value: Position) = true
     }
 
-    object CopyDisplayStreetViewOutput : Output.Action<Position, Action> {
+    object CopyStreetViewOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatDisplayStreetViewUriString(value, uriQuote))
+            Action.Copy(formatStreetViewUriString(value, uriQuote))
 
         @Composable
         override fun label() =
@@ -81,9 +92,9 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     }
 
     @Immutable
-    data class AppDisplayStreetViewOutput(override val packageName: String) : Output.App<Position> {
+    data class AppStreetViewOutput(override val packageName: String) : Output.App<Position> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenApp(packageName, formatDisplayStreetViewUriString(value, uriQuote))
+            Action.OpenApp(packageName, formatStreetViewUriString(value, uriQuote))
 
         @Composable
         override fun label(app: IntentTools.App) =
@@ -92,7 +103,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         override fun isEnabled(value: Position) = value.mainPoint != null
     }
 
-    object CopyAutomation : Automation.HasSuccessMessage {
+    object CopyDisplayAutomation : Automation.HasSuccessMessage {
         override val type = Automation.Type.COPY_GOOGLE_MAPS_URI
         override val packageName = ""
         override val testTag = null
@@ -109,6 +120,162 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
+    object CopyNavigateToAutomation : Automation.HasSuccessMessage {
+        override val type = Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI
+        override val packageName = ""
+        override val testTag = null
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatNavigateToUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            Text(stringResource(R.string.conversion_succeeded_copy_link_drive_to, GoogleMapsInput.NAME))
+        }
+
+        @Composable
+        override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
+    }
+
+    object CopyStreetViewAutomation : Automation.HasSuccessMessage {
+        override val type = Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI
+        override val packageName = ""
+        override val testTag = null
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.Copy(formatStreetViewUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            Text(stringResource(R.string.conversion_succeeded_copy_link_street_view, GoogleMapsInput.NAME))
+        }
+
+        @Composable
+        override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
+    }
+
+    @Immutable
+    data class AppNavigateToAutomation(override val packageName: String) :
+        Automation.HasSuccessMessage,
+        Automation.HasErrorMessage,
+        Automation.HasDelay {
+
+        override val type = Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO
+        override val testTag = null
+
+        override val delay = 5.seconds
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(packageName, formatNavigateToUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            val spacing = LocalSpacing.current
+            queryApp()?.let { app ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        rememberDrawablePainter(app.icon),
+                        app.label,
+                        Modifier.widthIn(max = 24.dp),
+                    )
+                    Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, app.label))
+                }
+            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, packageName))
+        }
+
+        @Composable
+        override fun successText() =
+            stringResource(
+                R.string.conversion_automation_open_app_succeeded,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun errorText() =
+            stringResource(
+                R.string.conversion_automation_open_app_failed,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun waitingText(counterSec: Int) =
+            stringResource(
+                R.string.conversion_automation_open_app_waiting,
+                queryApp()?.label ?: packageName,
+                counterSec,
+            )
+
+        private var appCache: IntentTools.App? = null
+
+        @Composable
+        private fun queryApp(): IntentTools.App? =
+            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+    }
+
+    @Immutable
+    data class AppStreetViewAutomation(override val packageName: String) :
+        Automation.HasSuccessMessage,
+        Automation.HasErrorMessage,
+        Automation.HasDelay {
+
+        override val type = Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW
+        override val testTag = null
+
+        override val delay = 5.seconds
+
+        override fun getAction(position: Position, uriQuote: UriQuote) =
+            Action.OpenApp(packageName, formatStreetViewUriString(position, uriQuote))
+
+        @Composable
+        override fun Label() {
+            val spacing = LocalSpacing.current
+            queryApp()?.let { app ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        rememberDrawablePainter(app.icon),
+                        app.label,
+                        Modifier.widthIn(max = 24.dp),
+                    )
+                    Text(stringResource(R.string.conversion_succeeded_open_app_street_view, app.label))
+                }
+            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_street_view, packageName))
+        }
+
+        @Composable
+        override fun successText() =
+            stringResource(
+                R.string.conversion_automation_open_app_succeeded,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun errorText() =
+            stringResource(
+                R.string.conversion_automation_open_app_failed,
+                queryApp()?.label ?: packageName,
+            )
+
+        @Composable
+        override fun waitingText(counterSec: Int) =
+            stringResource(
+                R.string.conversion_automation_open_app_waiting,
+                queryApp()?.label ?: packageName,
+                counterSec,
+            )
+
+        private var appCache: IntentTools.App? = null
+
+        @Composable
+        private fun queryApp(): IntentTools.App? =
+            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+    }
+
     override fun getTextOutput() = null
 
     override fun getLabelTextOutput() = null
@@ -118,13 +285,13 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
         CopyNavigateToOutput,
-        CopyDisplayStreetViewOutput,
+        CopyStreetViewOutput,
     )
 
     override fun getAppOutputs(packageNames: List<String>) = buildList {
         PACKAGE_NAMES.filter { it in packageNames }.forEach { packageName ->
             add(AppNavigateToOutput(packageName))
-            add(AppDisplayStreetViewOutput(packageName))
+            add(AppStreetViewOutput(packageName))
         }
     }
 
@@ -134,12 +301,24 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = null
 
-    override fun getAutomations(packageNames: List<String>) = listOf(
-        CopyAutomation,
-    )
+    override fun getRandomOutput() = CopyDisplayOutput
+
+    override fun getAutomations(packageNames: List<String>) = buildList {
+        add(CopyDisplayAutomation)
+        add(CopyNavigateToAutomation)
+        add(CopyStreetViewAutomation)
+        PACKAGE_NAMES.filter { it in packageNames }.forEach { packageName ->
+            add(AppNavigateToAutomation(packageName))
+            add(AppStreetViewAutomation(packageName))
+        }
+    }
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = when (type) {
-        Automation.Type.COPY_GOOGLE_MAPS_URI -> CopyAutomation
+        Automation.Type.COPY_GOOGLE_MAPS_URI -> CopyDisplayAutomation
+        Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> CopyNavigateToAutomation
+        Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> CopyStreetViewAutomation
+        Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO if packageName != null -> AppNavigateToAutomation(packageName)
+        Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW if packageName != null -> AppStreetViewAutomation(packageName)
         else -> null
     }
 
@@ -174,7 +353,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         uriQuote = uriQuote,
     ).toString()
 
-    private fun formatDisplayStreetViewUriString(value: Position, uriQuote: UriQuote): String = Uri(
+    private fun formatStreetViewUriString(value: Position, uriQuote: UriQuote): String = Uri(
         scheme = "google.streetview",
         path = value.run {
             mainPoint?.toStringPair(Srs.GCJ02)?.let { (latStr, lonStr) -> "$latStr,$lonStr" }

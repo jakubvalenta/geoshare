@@ -63,6 +63,8 @@ object GpxOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = null
 
+    override fun getRandomOutput() = null
+
     override fun getAutomations(packageNames: List<String>) = listOf(
         SaveAutomation,
     )

@@ -99,6 +99,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
     override fun getChooserOutput() = null
 
+    override fun getRandomOutput() = null
+
     override fun getAutomations(packageNames: List<String>) = emptyList<Automation>()
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null

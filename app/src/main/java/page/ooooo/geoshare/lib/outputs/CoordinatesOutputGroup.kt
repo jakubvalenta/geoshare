@@ -115,6 +115,8 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
     override fun getChooserOutput() = null
 
+    override fun getRandomOutput() = CopyDecOutput
+
     override fun getAutomations(packageNames: List<String>): List<Automation> = listOf(
         CopyDecAutomation,
         CopyDegMinSecAutomation,

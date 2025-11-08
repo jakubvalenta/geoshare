@@ -15,6 +15,8 @@ interface OutputGroup<T> {
 
     fun getChooserOutput(): Output.Action<T, Action>?
 
+    fun getRandomOutput(): Output.Action<T, Action>?
+
     fun getAutomations(packageNames: List<String>): List<Automation>
 
     fun findAutomation(type: Automation.Type, packageName: String?): Automation?
