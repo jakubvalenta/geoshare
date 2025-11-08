@@ -25,7 +25,8 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
             Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label(value: Position) = copyLabel(value)
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
     }
 
     object ChipOutput : Output.Action<Position, Action> {
@@ -33,7 +34,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
             Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_copy_google_maps)
+        override fun label() = stringResource(R.string.conversion_succeeded_copy_google_maps)
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {
@@ -98,9 +99,4 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         }.toImmutableMap(),
         uriQuote = uriQuote,
     ).toString()
-
-    @Composable
-    private fun copyLabel(value: Position) = value.run {
-        GoogleMapsPointOutputGroup.copyLabel(mainPoint ?: Point(Srs.WGS84))
-    }
 }

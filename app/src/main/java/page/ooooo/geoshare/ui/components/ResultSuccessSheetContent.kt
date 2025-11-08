@@ -85,7 +85,7 @@ private fun DefaultPreview() {
             Column {
                 val position = Position.example
                 val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(position) to it.label(position) }
+                    .map { it.getAction(position) to it.label() }
                     .partition { (action) -> action is Action.Copy }
                 ResultSuccessSheetContent(
                     copyActionsAndLabels = copyActionsAndLabels,
@@ -107,7 +107,7 @@ private fun DarkPreview() {
             Column {
                 val position = Position.example
                 val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(position) to it.label(position) }
+                    .map { it.getAction(position) to it.label() }
                     .partition { (action) -> action is Action.Copy }
                 ResultSuccessSheetContent(
                     copyActionsAndLabels = copyActionsAndLabels,

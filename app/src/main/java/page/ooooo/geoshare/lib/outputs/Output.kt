@@ -12,7 +12,7 @@ sealed interface Output<T> {
         fun getAction(value: T, uriQuote: UriQuote = DefaultUriQuote()): U
 
         @Composable
-        fun label(value: T): String
+        fun label(): String
     }
 
     interface App<T> : Output<T> {

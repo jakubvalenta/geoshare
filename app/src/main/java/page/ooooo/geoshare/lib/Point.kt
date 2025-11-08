@@ -30,14 +30,14 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
     }
 
     fun toSrs(targetSrs: Srs): Point = when (srs) {
-        is Srs.WGS84 -> when (targetSrs) {
-            is Srs.WGS84 -> this
-            is Srs.GCJ02 -> WGSPointer(lat, lon).toGCJPointer().run { Point(targetSrs, latitude, longitude) }
+        Srs.WGS84 -> when (targetSrs) {
+            Srs.WGS84 -> this
+            Srs.GCJ02 -> WGSPointer(lat, lon).toGCJPointer().run { Point(targetSrs, latitude, longitude) }
         }
 
-        is Srs.GCJ02 -> when (targetSrs) {
-            is Srs.WGS84 -> GCJPointer(lat, lon).toExactWGSPointer().run { Point(targetSrs, latitude, longitude) }
-            is Srs.GCJ02 -> this
+        Srs.GCJ02 -> when (targetSrs) {
+            Srs.WGS84 -> GCJPointer(lat, lon).toExactWGSPointer().run { Point(targetSrs, latitude, longitude) }
+            Srs.GCJ02 -> this
         }
     }
 }

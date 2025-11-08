@@ -17,7 +17,7 @@ object AppleMapsPointOutputGroup : OutputGroup<Point> {
             Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label(value: Point) =
+        override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link, AppleMapsUrlConverter.NAME)
     }
 

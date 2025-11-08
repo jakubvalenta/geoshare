@@ -15,7 +15,7 @@ object GpxOutputGroup : OutputGroup<Position> {
             Action.SaveGpx(value, uriQuote)
 
         @Composable
-        override fun label(value: Position) = stringResource(R.string.conversion_succeeded_save_gpx)
+        override fun label() = stringResource(R.string.conversion_succeeded_save_gpx)
     }
 
     object SaveAutomation : Automation.HasSuccessMessage, Automation.HasErrorMessage, Automation.HasDelay {

@@ -17,7 +17,8 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
             Action.Copy(formatUriString(value, uriQuote))
 
         @Composable
-        override fun label(value: Point) = copyLabel(value)
+        override fun label() =
+            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
     }
 
     override fun getTextOutput() = null
@@ -49,13 +50,4 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         },
         uriQuote = uriQuote,
     ).toString()
-
-    @Composable
-    fun copyLabel(value: Point): String = when (value.srs) {
-        is Srs.WGS84 ->
-            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
-
-        else ->
-            stringResource(R.string.conversion_succeeded_copy_link_srs, GoogleMapsUrlConverter.NAME, value.srs.name)
-    }
 }
