@@ -1,4 +1,3 @@
 - Fixed Google Maps link processing due to a new URL format.
 - Added a menu to each point of a place list to allow copying or opening individual points.
 - Added a menu with app-specific actions and added "navigate" and "add waypoint" actions for Magic Earth.
-- Added Amap (AutoNavi) support.
