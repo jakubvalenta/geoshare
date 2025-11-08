@@ -34,17 +34,23 @@ map app.
 **Example use cases**
 
 When someone sends you a Google Maps link, but you prefer using OpenStreetMap,
-you can quickly open the same location in OsmAnd or Organic Maps.
+you can quickly **open the same location** in OsmAnd or Organic Maps.
 
 When you like Google Maps for finding places, but you prefer a different app for
-navigation, you can easily switch from Google Maps to your favorite navigation
-app.
+navigation, you can easily switch from Google Maps to your favorite
+**navigation app**.
 
 **Other features**
 
-- Show the geographic coordinates of a map link and copy them to clipboard as a
-  geo: link.
-- Paste map links directly into the app, instead of sharing them with it.
+- Shows the **geographic coordinates** of a map link and allows copying them to
+  clipboard in various formats, for example as a geo: link.
+- Allows choosing an action to perform **automatically** when a map link is
+  converted to coordinates.
+- Allows **launching navigation** in selected apps with one tap.
+- Retries repeatedly when the **internet connection** is patchy.
+- Allows **pasting map links** directly into the app, instead of sharing them
+  with it.
+- Has an interface that adapts to **tablets**.
 
 ## Intro
 
@@ -54,40 +60,29 @@ Share a location from your map app or web browser.
 
 ![Screenshot of Google Maps’ share screen](./docs/map_app.webp)
 
-Choose _Open_ and Geo Share will let you open the same location in any installed
-map app.
+Choose _Geo Share_ and the app will let you open the same location in any
+installed map app.
 
-![Screenshot of Geo Share's share screen](./docs/geo_share_open.webp)
+![Screenshot of Geo Share’s share screen](./docs/geo_share_open.webp)
 
 ### Configure Android to open links to Google Maps in alternative maps (optional)
 
 First, go to Settings > Apps > Maps > _Open by default_ and turn off the opening
 of links in this app.
 
-![Screenshot of Google Maps' Open by default
+![Screenshot of Google Maps’ Open by default
 settings](./docs/open_by_default_google_maps.webp)
 
 Then go to Settings > Apps > Geo Share > _Open by default_, turn on the opening
-of links in this app, and tap <i>Add links</i>.
+of links in this app, and tap _Add links_.
 
-![Screenshot of Geo Share's Open by default
+![Screenshot of Geo Share’s Open by default
 settings](./docs/open_by_default_geo_share.webp)
 
 Select at least `maps.google.com` and `maps.app.goo.gl`. If some links are
 grayed out, other Google apps are set to open them by default. You can find
 these apps and turn off the opening of links for them, like we did for Google
 Maps.
-
-### How to copy geographic coordinates
-
-Choose _Copy geo\:_ when sharing a location from your map app.
-
-![Screenshot of Google Maps' share screen](./docs/map_app.webp)
-
-Or open Geo Share and paste your map link there.
-
-![Screenshot of Geo Share's geographic coordinates
-form](./docs/geo_share_main.webp)
 
 ## How it works and privacy considerations
 
@@ -96,8 +91,8 @@ that can be opened by other map apps. To create a geo: link, geographic
 coordinates are required. Geo Share extracts them from the map URL.
 
 However, not all map URLs include coordinates. In such cases, Geo Share will
-**prompt you for permission to connect to the map service** (Google Maps, Apple
-Maps etc.) and retrieve the coordinates from either HTTP headers or the HTML
+**prompt you for permission to connect to the map service (Google Maps, Apple
+Maps etc.)** and retrieve the coordinates from either HTTP headers or the HTML
 document of the link.
 
 More precisely, there are three scenarios how Geo Share converts a map URL into
@@ -135,30 +130,34 @@ a geo: URI:
    creation of the geo: link.
 
 To permanently allow or deny connecting to the map service instead of always
-asking (the default), go to the app’s Preferences. Note that even with the need for Geo Share to connect to the internet in such situations, it may be considered a more private and secure approach as it wouldn't allow JavaScript-based fingerprinting or code execution.
+asking (the default), go to the app’s Preferences.
+
+Note that even with the need for Geo Share to connect to the internet in such
+situations, it may be considered a more private and secure approach as it
+wouldn’t allow JavaScript-based fingerprinting or code execution.
 
 ## Reporting issues
 
-Geo Share supports many types of Google Maps and Apple Maps links. If you still
-find a link that doesn’t work, please [report an
-issue](https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml).
+Geo Share supports many types of map links. If you still find a link that
+doesn’t work,
+please [report an issue](https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml).
 
 ## Screenshots
 
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"
-alt="Screenshot of Geo Share's main screen"
+alt="Screenshot of Geo Share’s main screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"
-alt="Screenshot of Geo Share's result screen"
+alt="Screenshot of Geo Share’s result screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"
-alt="Screenshot of Geo Share's automation configuration screen"
+alt="Screenshot of Geo Share’s automation configuration screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
 alt="Screenshot of Geo Share asking for permission to connect to Google"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
 [<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png"
-alt="Screenshot of Geo Share's intro screen"
+alt="Screenshot of Geo Share’s intro screen"
 width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png)
 
 ## Installation
@@ -234,7 +233,7 @@ To share a URI input with the app running in emulator, run:
 adb -s emulator-5554 shell am start -W -a android.intent.action.VIEW -d 'https://maps.apple.com/?q=Central+Park\&sll=50.894967,4.341626\&z=10\&t=s' page.ooooo.geoshare.debug
 ```
 
-Don't forget to escape the `&` character.
+Don’t forget to escape the `&` character.
 
 To share a text input, run:
 
@@ -244,7 +243,7 @@ adb -s emulator-5554 shell am start -W -a android.intent.action.SEND -t text/pla
 
 ## Contributing
 
-Your contributions are welcome! To show that you'd like to work on a bug, or
+Your contributions are welcome! To show that you’d like to work on a bug, or
 feature request, please comment on the relevant [GitHub
 issue](https://github.com/jakubvalenta/geoshare/issues) or create a new one.
 
