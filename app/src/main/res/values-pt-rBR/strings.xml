@@ -134,4 +134,6 @@
     <string name="conversion_succeeded_open_app_display">Mostrar mapa em %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navegar em %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_via">Adicionar ponto em %1$s</string>
+    <string name="converter_amap_loading_indicator_title">Conectando-se ao Amap…</string>
+    <string name="converter_amap_permission_title">Conectar ao Amap?</string>
 </resources>
