@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.ui
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
@@ -10,9 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.ui.MainScreen
+import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.lib.ConversionRunContext
-import page.ooooo.geoshare.ui.*
 
 @Serializable
 object AboutRoute

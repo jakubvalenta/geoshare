@@ -1,4 +1,4 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -21,8 +21,10 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.ui.components.ParagraphHtml
+import page.ooooo.geoshare.ConversionViewModel
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

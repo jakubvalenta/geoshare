@@ -1,12 +1,12 @@
-package page.ooooo.geoshare
+package page.ooooo.geoshare.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.lib.ConversionRunContext
-import page.ooooo.geoshare.ui.*
 
 @Composable
 fun ConversionNavigation(runContext: ConversionRunContext, viewModel: ConversionViewModel, onFinish: () -> Unit) {
