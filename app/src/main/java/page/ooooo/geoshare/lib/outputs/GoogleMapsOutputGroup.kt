@@ -87,7 +87,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label(app: IntentTools.App) =
-            stringResource(R.string.conversion_succeeded_open_app_display, app.label)
+            stringResource(R.string.conversion_succeeded_open_app_street_view, app.label)
 
         override fun isEnabled(value: Position) = value.mainPoint != null
     }
@@ -181,7 +181,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
                 ?: "0,0"
         }.let { coords ->
             @Suppress("SpellCheckingInspection")
-            "cbll=$coords&cbp=0,30,0,0,-15"
+            "cbll=$coords"
         },
         uriQuote = uriQuote,
     ).toString()

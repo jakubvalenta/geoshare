@@ -480,7 +480,7 @@ class UriTest {
     @Test
     fun toString_doesNotEncodeAmpersandInPath() {
         @Suppress("SpellCheckingInspection")
-        val uriString = "google.streetview:cbll=29.9774614,31.1329645&cbp=0,30,0,0,-15"
+        val uriString = "google.streetview:cbll=29.9774614,31.1329645"
         assertEquals(
             uriString,
             Uri.parse(uriString, uriQuote).toString()

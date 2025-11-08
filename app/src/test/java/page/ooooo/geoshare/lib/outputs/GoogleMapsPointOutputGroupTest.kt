@@ -18,10 +18,10 @@ class GoogleMapsPointOutputGroupTest {
                 Action.Copy("https://www.google.com/maps?q=50.123456,-11.123456"),
                 Action.Copy("google.navigation:q=50.123456,-11.123456"),
                 @Suppress("SpellCheckingInspection")
-                Action.Copy("google.streetview:cbll=50.123456,-11.123456&cbp=0,30,0,0,-15"),
+                Action.Copy("google.streetview:cbll=50.123456,-11.123456"),
                 Action.OpenChooser("google.navigation:q=50.123456,-11.123456"),
                 @Suppress("SpellCheckingInspection")
-                Action.OpenChooser("google.streetview:cbll=50.123456,-11.123456&cbp=0,30,0,0,-15"),
+                Action.OpenChooser("google.streetview:cbll=50.123456,-11.123456"),
             ),
             Point(Srs.WGS84, 50.123456, -11.123456).let { point ->
                 outputGroup.getActionOutputs()
@@ -38,10 +38,10 @@ class GoogleMapsPointOutputGroupTest {
                 Action.Copy("https://www.google.com/maps?q=31.2285067,121.475524"),
                 Action.Copy("google.navigation:q=31.2285067,121.475524"),
                 @Suppress("SpellCheckingInspection")
-                Action.Copy("google.streetview:cbll=31.2285067,121.475524&cbp=0,30,0,0,-15"),
+                Action.Copy("google.streetview:cbll=31.2285067,121.475524"),
                 Action.OpenChooser("google.navigation:q=31.2285067,121.475524"),
                 @Suppress("SpellCheckingInspection")
-                Action.OpenChooser("google.streetview:cbll=31.2285067,121.475524&cbp=0,30,0,0,-15"),
+                Action.OpenChooser("google.streetview:cbll=31.2285067,121.475524"),
             ),
             Point(Srs.WGS84, 31.23044166868017, 121.47099209401793).let { point ->
                 outputGroup.getActionOutputs()
@@ -58,10 +58,10 @@ class GoogleMapsPointOutputGroupTest {
                 Action.Copy("https://www.google.com/maps?q=31.2285069,121.4755246"),
                 Action.Copy("google.navigation:q=31.2285069,121.4755246"),
                 @Suppress("SpellCheckingInspection")
-                Action.Copy("google.streetview:cbll=31.2285069,121.4755246&cbp=0,30,0,0,-15"),
+                Action.Copy("google.streetview:cbll=31.2285069,121.4755246"),
                 Action.OpenChooser("google.navigation:q=31.2285069,121.4755246"),
                 @Suppress("SpellCheckingInspection")
-                Action.OpenChooser("google.streetview:cbll=31.2285069,121.4755246&cbp=0,30,0,0,-15"),
+                Action.OpenChooser("google.streetview:cbll=31.2285069,121.4755246"),
             ),
             Point(Srs.GCJ02, 31.22850685422705, 121.47552456472106).let { point ->
                 outputGroup.getActionOutputs()

@@ -114,7 +114,7 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         scheme = "google.streetview",
         path = value.toStringPair(Srs.GCJ02).let { (latStr, lonStr) -> "$latStr,$lonStr" }.let { coords ->
             @Suppress("SpellCheckingInspection")
-            "cbll=$coords&cbp=0,30,0,0,-15"
+            "cbll=$coords"
         },
         uriQuote = uriQuote,
     ).toString()
