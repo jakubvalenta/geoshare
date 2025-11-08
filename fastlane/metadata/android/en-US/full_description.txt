@@ -25,12 +25,14 @@ When you like Google Maps for finding places, but you prefer a different app for
 
 <b>Other features</b>
 
-- Shows the <br>geographic coordinates</b> of a map link and allows copying them to clipboard in various formats, for example as a geo: link.
-- Allows choosing an action to perform <br>automatically</b> when a map link is converted to coordinates.
-- Allows <br>launching navigation</b> in selected apps with one tap.
-- Retries repeatedly when the <br>internet connection</b> is patchy.
-- Allows <br>pasting map links</b> directly into the app, instead of sharing them with it.
-- Has an interface that adapts to <br>tablets</b>.
+- Shows the <b>geographic coordinates</b> of a map link and allows copying them to clipboard in various formats, for example as a geo: link.
+- Shows all points of a <b>place list</b> link.
+- Allows performing an action <b>automatically</b> when a map link is processed.
+- Allows <b>launching navigation</b> in selected apps.
+- Allows saving a location as a <b>GPX file</b>.
+- Retries on <b>patchy internet connection</b>.
+- Allows <b>pasting map links</b> directly into the app, instead of sharing them with it.
+- Interface adapts to <b>tablets</b>.
 
 <b>How it works and privacy considerations</b>
 

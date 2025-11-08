@@ -48,13 +48,14 @@ navigation, you can easily switch from Google Maps to your favorite
 
 - Shows the **geographic coordinates** of a map link and allows copying them to
   clipboard in various formats, for example as a geo: link.
-- Allows choosing an action to perform **automatically** when a map link is
-  converted to coordinates.
-- Allows **launching navigation** in selected apps with one tap.
-- Retries repeatedly when the **internet connection** is patchy.
+- Shows all points of a **place list** link.
+- Allows performing an action **automatically** when a map link is processed.
+- Allows **launching navigation** in selected apps.
+- Allows saving a location as a **GPX file**.
+- Retries on **patchy internet connection**.
 - Allows **pasting map links** directly into the app, instead of sharing them
   with it.
-- Has an interface that adapts to **tablets**.
+- Interface adapts to **tablets**.
 
 ## Intro
 
