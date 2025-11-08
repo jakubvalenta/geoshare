@@ -19,8 +19,8 @@ object AmapInput : Input.HasUri, Input.HasShortUri {
     override val documentation = Input.Documentation(
         nameResId = R.string.converter_amap_name,
         inputs = listOf(
-            Input.DocumentationInput.Url(26, "https://surl.amap.com/"), // FIXME
-            Input.DocumentationInput.Url(26, "https://wb.amap.com/"), // FIXME
+            Input.DocumentationInput.Url(27, "https://surl.amap.com/"),
+            Input.DocumentationInput.Url(27, "https://wb.amap.com/"),
         ),
     )
 
