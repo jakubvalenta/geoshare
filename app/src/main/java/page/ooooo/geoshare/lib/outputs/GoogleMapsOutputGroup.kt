@@ -30,10 +30,11 @@ import kotlin.time.Duration.Companion.seconds
  */
 object GoogleMapsOutputGroup : OutputGroup<Position> {
 
+    @Suppress("SpellCheckingInspection")
+    const val GMAPS_WV_PACKAGE_NAME = "us.spotco.maps"
     val PACKAGE_NAMES = listOf(
         GOOGLE_MAPS_PACKAGE_NAME,
-        @Suppress("SpellCheckingInspection")
-        "us.spotco.maps",
+        GMAPS_WV_PACKAGE_NAME,
     )
 
     object CopyDisplayOutput : Output.Action<Position, Action> {
@@ -289,7 +290,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     )
 
     override fun getAppOutputs(packageNames: List<String>) = buildList {
-        PACKAGE_NAMES.filter { it in packageNames }.forEach { packageName ->
+        PACKAGE_NAMES.filter { it != GMAPS_WV_PACKAGE_NAME && it in packageNames }.forEach { packageName ->
             add(AppNavigateToOutput(packageName))
             add(AppStreetViewOutput(packageName))
         }
@@ -307,7 +308,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         add(CopyDisplayAutomation)
         add(CopyNavigateToAutomation)
         add(CopyStreetViewAutomation)
-        PACKAGE_NAMES.filter { it in packageNames }.forEach { packageName ->
+        PACKAGE_NAMES.filter { it != GMAPS_WV_PACKAGE_NAME && it in packageNames }.forEach { packageName ->
             add(AppNavigateToAutomation(packageName))
             add(AppStreetViewAutomation(packageName))
         }
