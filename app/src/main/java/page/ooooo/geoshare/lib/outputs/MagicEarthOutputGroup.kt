@@ -17,6 +17,7 @@ import page.ooooo.geoshare.lib.inputs.MagicEarthInput
  * example the drive_via parameter doesn't work anymore but trial and error showed that navigate_via works.
  */
 object MagicEarthOutputGroup : OutputGroup<Position> {
+
     @Suppress("SpellCheckingInspection")
     const val PACKAGE_NAME = "com.generalmagic.magicearth"
 
@@ -27,6 +28,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyNavigateToOutput : Output.Action<Position, Action> {
@@ -36,6 +39,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyNavigateViaOutput : Output.Action<Position, Action> {
@@ -45,6 +50,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Position) = true
     }
 
     @Immutable
@@ -55,6 +62,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label(app: IntentTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_display, app.label)
+
+        override fun isEnabled(value: Position) = true
     }
 
     @Immutable
@@ -65,6 +74,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label(app: IntentTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_to, app.label)
+
+        override fun isEnabled(value: Position) = true
     }
 
     @Immutable
@@ -75,6 +86,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
         @Composable
         override fun label(app: IntentTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_via, app.label)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyAutomation : Automation.HasSuccessMessage {

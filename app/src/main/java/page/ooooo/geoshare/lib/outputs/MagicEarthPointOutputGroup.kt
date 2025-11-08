@@ -19,6 +19,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object CopyNavigateToOutput : Output.Action<Point, Action> {
@@ -28,6 +30,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object CopyNavigateViaOutput : Output.Action<Point, Action> {
@@ -37,6 +41,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object ChooserDisplayOutput : Output.Action<Point, Action> {
@@ -46,6 +52,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object ChooserNavigateToOutput : Output.Action<Point, Action> {
@@ -55,6 +63,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object ChooserNavigateViaOutput : Output.Action<Point, Action> {
@@ -64,6 +74,8 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         @Composable
         override fun label() =
             stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthInput.NAME)
+
+        override fun isEnabled(value: Point) = true
     }
 
     override fun getTextOutput() = null
@@ -81,8 +93,7 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         ChooserNavigateViaOutput,
     )
 
-    override fun getAppOutputs(packageNames: List<String>) =
-        emptyList<Output.App<Point>>()
+    override fun getAppOutputs(packageNames: List<String>) = emptyList<Output.App<Point>>()
 
     override fun getChipOutputs() = emptyList<Output.Action<Point, Action>>()
 

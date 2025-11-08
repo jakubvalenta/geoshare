@@ -148,7 +148,7 @@ data class Uri(
         if (host.isNotEmpty()) {
             append(host)
         }
-        append(uriQuote.encode(path, allow = "!+,/=@"))
+        append(uriQuote.encode(path, allow = "!&+,/=@"))
         if (queryParams.isNotEmpty()) {
             append("?${formatQueryParams()}")
         }

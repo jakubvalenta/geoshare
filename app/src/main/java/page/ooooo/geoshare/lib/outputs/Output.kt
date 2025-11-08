@@ -13,6 +13,8 @@ sealed interface Output<T> {
 
         @Composable
         fun label(): String
+
+        fun isEnabled(value: T): Boolean
     }
 
     interface App<T> : Output<T> {
@@ -22,6 +24,8 @@ sealed interface Output<T> {
 
         @Composable
         fun label(app: IntentTools.App): String
+
+        fun isEnabled(value: T): Boolean
     }
 
     interface Text<T> : Output<T> {

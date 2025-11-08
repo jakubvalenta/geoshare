@@ -104,9 +104,11 @@ fun ResultSuccessCoordinates(
             }
         },
         chips = {
-            allOutputGroups.getChipOutputs().forEach {
-                ResultCardChip(it.label()) { onRun(it.getAction(position)) }
-            }
+            allOutputGroups.getChipOutputs()
+                .filter { it.isEnabled(position) }
+                .forEach {
+                    ResultCardChip(it.label()) { onRun(it.getAction(position)) }
+                }
         },
     )
     ResultSuccessSheet(
@@ -115,6 +117,7 @@ fun ResultSuccessCoordinates(
     ) { onHide ->
         val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
             .getActionOutputs()
+            .filter { it.isEnabled(position) }
             .map { it.getAction(position) to it.label() }
             .partition { (action) -> action is Action.Copy }
         ResultSuccessSheetContent(

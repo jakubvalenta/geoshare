@@ -16,6 +16,8 @@ object GpxOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_save_gpx)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object SaveAutomation : Automation.HasSuccessMessage, Automation.HasErrorMessage, Automation.HasDelay {

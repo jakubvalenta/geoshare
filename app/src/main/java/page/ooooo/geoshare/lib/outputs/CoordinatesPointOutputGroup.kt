@@ -27,6 +27,8 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+
+        override fun isEnabled(value: Point) = true
     }
 
     object CopyDecOutput : Output.Action<Point, Action> {
@@ -35,6 +37,8 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+
+        override fun isEnabled(value: Point) = true
     }
 
     override fun getTextOutput() = TextOutput

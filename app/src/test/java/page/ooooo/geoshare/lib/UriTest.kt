@@ -478,6 +478,16 @@ class UriTest {
     }
 
     @Test
+    fun toString_doesNotEncodeAmpersandInPath() {
+        @Suppress("SpellCheckingInspection")
+        val uriString = "google.streetview:cbll=29.9774614,31.1329645&cbp=0,30,0,0,-15"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
     fun toUrl_addsHttpsSchemeIfNecessary() {
         assertEquals("https://foo/bar", Uri.parse("https://foo/bar", uriQuote).toUrl().toString())
         assertEquals("https://foo", Uri.parse("https://foo", uriQuote).toUrl().toString())

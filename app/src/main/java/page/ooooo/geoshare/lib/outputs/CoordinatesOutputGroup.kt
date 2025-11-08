@@ -32,6 +32,8 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyDecOutput : Output.Action<Position, Action> {
@@ -40,6 +42,8 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_coordinates)
+
+        override fun isEnabled(value: Position) = true
     }
 
     object CopyDecAutomation : Automation.HasSuccessMessage {
