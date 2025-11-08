@@ -3,7 +3,19 @@ Partilhe um ligação de mapa com o Geo Share e a app abrirá ele em outra app d
 <b>Ligações de mapa com apoio</b>
 
 - Google Maps
-- Apple Maps (em beta)
+- Apple Maps
+- Amap (AutoNavi)
+- CoMaps
+- HERE WeGo
+- Magic Earth
+- Maps.me
+- Mapy.com
+- OpenStreetMap
+- Organic Maps
+- OsmAnd
+- Waze
+- Yandex Maps
+- Coordenadas
 
 <b>Exemplos de como usar</b>
 
