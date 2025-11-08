@@ -129,9 +129,6 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
     private fun formatParamsString(value: Position): String = value.run {
         buildList {
-            mainPoint?.desc.takeUnless { it.isNullOrEmpty() }?.let { desc ->
-                add(desc)
-            }
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
                 (mainPoint ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     if (q != "$latStr,$lonStr") {

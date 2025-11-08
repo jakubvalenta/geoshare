@@ -39,7 +39,7 @@ fun ResultSuccessCoordinates(
     ResultCard(
         main = {
             Row {
-                allOutputGroups.getLabelTextOutput()?.getText(position, 0, position.pointCount)?.let { text ->
+                allOutputGroups.getLabelTextOutput()?.getText(position, position.pointCount - 1, position.pointCount)?.let { text ->
                     Text(
                         text,
                         Modifier.padding(end = 12.dp),
