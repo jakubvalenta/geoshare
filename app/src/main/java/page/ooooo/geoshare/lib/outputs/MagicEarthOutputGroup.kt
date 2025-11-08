@@ -6,11 +6,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.Srs
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.converters.MagicEarthUrlConverter
+import page.ooooo.geoshare.lib.inputs.MagicEarthInput
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated, for
@@ -26,7 +26,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthInput.NAME)
     }
 
     object CopyNavigateToOutput : Output.Action<Position, Action> {
@@ -35,7 +35,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME)
     }
 
     object CopyNavigateViaOutput : Output.Action<Position, Action> {
@@ -44,7 +44,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthInput.NAME)
     }
 
     @Immutable
@@ -87,7 +87,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link, MagicEarthUrlConverter.NAME))
+            Text(stringResource(R.string.conversion_succeeded_copy_link, MagicEarthInput.NAME))
         }
 
         @Composable

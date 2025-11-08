@@ -15,6 +15,9 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 

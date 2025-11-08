@@ -24,13 +24,13 @@ object ConversionRoute
 object FaqRoute
 
 @Serializable
+object InputsRoute
+
+@Serializable
 object IntroRoute
 
 @Serializable
 object MainRoute
-
-@Serializable
-object UrlConvertersRoute
 
 @Serializable
 data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
@@ -63,7 +63,7 @@ fun MainNavigation(runContext: ConversionRunContext, viewModel: ConversionViewMo
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToUrlConvertersScreen = { navController.navigate(UrlConvertersRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
@@ -88,14 +88,14 @@ fun MainNavigation(runContext: ConversionRunContext, viewModel: ConversionViewMo
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToConversionScreen = { navController.navigate(ConversionRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToUrlConvertersScreen = { navController.navigate(UrlConvertersRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 viewModel = viewModel,
             )
         }
-        composable<UrlConvertersRoute> {
-            UrlConvertersScreen(
+        composable<InputsRoute> {
+            InputsScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 viewModel = viewModel,
             )

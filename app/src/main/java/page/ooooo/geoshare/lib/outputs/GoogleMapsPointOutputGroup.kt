@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Point
-import page.ooooo.geoshare.lib.Srs
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 
 object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
@@ -18,7 +18,7 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsInput.NAME)
     }
 
     override fun getTextOutput() = null

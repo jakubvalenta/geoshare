@@ -7,7 +7,9 @@ import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
@@ -26,7 +28,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun label() =
-            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME)
+            stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsInput.NAME)
     }
 
     object ChipOutput : Output.Action<Position, Action> {
@@ -47,7 +49,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsUrlConverter.NAME))
+            Text(stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsInput.NAME))
         }
 
         @Composable

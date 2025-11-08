@@ -25,8 +25,8 @@ fun ConversionNavigation(runContext: ConversionRunContext, viewModel: Conversion
                 onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToUrlConvertersScreen = { navController.navigate(UrlConvertersRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
@@ -39,14 +39,14 @@ fun ConversionNavigation(runContext: ConversionRunContext, viewModel: Conversion
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
             )
         }
-        composable<IntroRoute> {
-            IntroScreen(
+        composable<InputsRoute> {
+            InputsScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )
         }
-        composable<UrlConvertersRoute> {
-            UrlConvertersScreen(
+        composable<IntroRoute> {
+            IntroScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )

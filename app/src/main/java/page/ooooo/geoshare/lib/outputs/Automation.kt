@@ -6,7 +6,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.UriQuote
 import kotlin.time.Duration
 

@@ -1,10 +1,10 @@
 package page.ooooo.geoshare.lib
 
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.lib.converters.UrlConverter
+import page.ooooo.geoshare.lib.inputs.Input
 
 data class ConversionStateContext(
-    val urlConverters: List<UrlConverter> = emptyList(),
+    val inputs: List<Input> = emptyList(),
     val intentTools: IntentTools = IntentTools(),
     val networkTools: NetworkTools = NetworkTools(),
     val userPreferencesRepository: UserPreferencesRepository,

@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.outputs
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Position
-import page.ooooo.geoshare.lib.Srs
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
 class GoogleMapsOutputGroupTest {

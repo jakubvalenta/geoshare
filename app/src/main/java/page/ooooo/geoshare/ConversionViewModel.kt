@@ -20,7 +20,7 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.converters.*
+import page.ooooo.geoshare.lib.inputs.*
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
@@ -31,24 +31,9 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    val urlConverters = listOf(
-        GeoUrlConverter(),
-        GoogleMapsUrlConverter(),
-        AppleMapsUrlConverter(),
-        AmapUrlConverter(),
-        HereWeGoUrlConverter(),
-        MagicEarthUrlConverter(),
-        MapyComUrlConverter(),
-        OpenStreetMapUrlConverter(),
-        Ge0UrlConverter(),
-        OsmAndUrlConverter(),
-        WazeUrlConverter(),
-        YandexMapsUrlConverter(),
-        CoordinatesUrlConverter(),
-    )
     val intentTools = IntentTools()
     val stateContext = ConversionStateContext(
-        urlConverters = urlConverters,
+        inputs = allInputs,
         intentTools = intentTools,
         userPreferencesRepository = userPreferencesRepository,
     ) { newState ->
@@ -109,8 +94,8 @@ class ConversionViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val changelogShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
         it.changelogShownForVersionCodeValue?.let { changelogShownForVersionCodeValue ->
-            urlConverters.all { urlConverter ->
-                urlConverter.documentation.inputs.all { input ->
+            stateContext.inputs.all { input ->
+                input.documentation.inputs.all { input ->
                     input.addedInVersionCode <= changelogShownForVersionCodeValue
                 }
             }

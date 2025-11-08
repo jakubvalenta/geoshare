@@ -6,6 +6,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.extensions.toDegMinSec
 import page.ooooo.geoshare.lib.extensions.toScale
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Srs
 import kotlin.math.abs
 
 object CoordinatesPointOutputGroup : OutputGroup<Point> {

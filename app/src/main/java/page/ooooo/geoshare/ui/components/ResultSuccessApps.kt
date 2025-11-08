@@ -24,7 +24,7 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.Position
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing

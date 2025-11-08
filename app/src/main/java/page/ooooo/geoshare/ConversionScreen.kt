@@ -38,11 +38,12 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.State
-import page.ooooo.geoshare.lib.converters.GoogleMapsUrlConverter
+import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -54,8 +55,8 @@ fun ConversionScreen(
     onFinish: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
@@ -84,13 +85,13 @@ fun ConversionScreen(
             viewModel.cancel()
             onNavigateToFaqScreen()
         },
+        onNavigateToInputsScreen = {
+            viewModel.cancel()
+            onNavigateToInputsScreen()
+        },
         onNavigateToIntroScreen = {
             viewModel.cancel()
             onNavigateToIntroScreen()
-        },
-        onNavigateToUrlConvertersScreen = {
-            viewModel.cancel()
-            onNavigateToUrlConvertersScreen()
         },
         onNavigateToUserPreferencesScreen = {
             viewModel.cancel()
@@ -124,8 +125,8 @@ fun ConversionScreen(
     onGrant: (doNotAsk: Boolean) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUrlConvertersScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onRetry: (newUriString: String) -> Unit,
@@ -158,8 +159,8 @@ fun ConversionScreen(
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = onNavigateToAboutScreen,
                 onNavigateToFaqScreen = onNavigateToFaqScreen,
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
                 onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
             )
         },
@@ -215,7 +216,7 @@ fun ConversionScreen(
                         currentState.errorMessageResId,
                         currentState.inputUriString,
                         retryLoadingIndicatorVisible,
-                        onNavigateToUrlConvertersScreen = onNavigateToUrlConvertersScreen,
+                        onNavigateToInputsScreen = onNavigateToInputsScreen,
                         onRetry = {
                             coroutineScope.launch {
                                 // Show a loading indicator for a while to indicate that conversion is being retried.
@@ -381,7 +382,7 @@ private fun DefaultPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -410,7 +411,7 @@ private fun DarkPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -439,7 +440,7 @@ private fun TabletPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -473,7 +474,7 @@ private fun AutomationPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -507,7 +508,7 @@ private fun DarkAutomationPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -541,7 +542,7 @@ private fun TabletAutomationPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -569,7 +570,7 @@ private fun ErrorPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -597,7 +598,7 @@ private fun DarkErrorPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -625,7 +626,7 @@ private fun TabletErrorPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -651,7 +652,7 @@ private fun LoadingIndicatorPreview() {
                 ),
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsUrlConverter(),
+                GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
@@ -668,7 +669,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -694,7 +695,7 @@ private fun DarkLoadingIndicatorPreview() {
                 ),
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsUrlConverter(),
+                GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
@@ -711,7 +712,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -737,7 +738,7 @@ private fun TabletLoadingIndicatorPreview() {
                 ),
                 ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                GoogleMapsUrlConverter(),
+                GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
@@ -754,7 +755,7 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -779,7 +780,7 @@ private fun InitialPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -804,7 +805,7 @@ private fun DarkInitialPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
@@ -829,7 +830,7 @@ private fun TabletInitialPreview() {
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
-            onNavigateToUrlConvertersScreen = {},
+            onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},

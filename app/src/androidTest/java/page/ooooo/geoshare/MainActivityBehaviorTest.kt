@@ -42,7 +42,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun urlConvertersScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
+    fun inputsScreen_whenOpenWithOldVersionCode_showsRecentInputsAndSavesNewVersionCode() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()
@@ -50,15 +50,15 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
 
-        // Go to the url converters screen
-        goToUrlConvertersScreen()
+        // Go to the inputs screen
+        goToInputsScreen()
 
-        // Shows only those url converters that have been added since version 22
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Mapy.com" }
+        // Shows only those inputs that have been added since version 22
+        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Mapy.com" }
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") })
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Google Maps" })
 
         // Go to main screen
         pressBack()
@@ -67,12 +67,12 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
 
-        // Go to the url converters screen
-        goToUrlConvertersScreen()
+        // Go to the inputs screen
+        goToInputsScreen()
 
-        // Shows all url converters
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") }
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" }
+        // Shows all inputs
+        onElement { viewIdResourceName == "geoShareInputsHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") }
+        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Google Maps" }
 
         // Go to main screen
         pressBack()
@@ -89,13 +89,13 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
 
-        // Go to the url converters screen
-        goToUrlConvertersScreen()
+        // Go to the inputs screen
+        goToInputsScreen()
 
-        // Shows only url converters added since version 19
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "HERE WeGo" }
-        onElement { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Magic Earth" }
+        // Shows only inputs added since version 19
+        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "HERE WeGo" }
+        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Magic Earth" }
         waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareUrlConvertersHeadline" && textAsString() == "Google Maps" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Google Maps" })
     }
 }
