@@ -1,2 +1,2 @@
 - Added Amap (AutoNavi) support.
-- Added "navigate to" and "display street view" to the Google Maps app menu.
+- Added "navigate to" and "street view" to Google Maps app menu.
