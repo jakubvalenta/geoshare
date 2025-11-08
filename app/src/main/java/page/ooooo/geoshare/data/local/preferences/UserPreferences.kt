@@ -181,6 +181,27 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
         return buildList {
             add(Automation.Noop)
             addAll(allOutputGroups.getAutomations(packageNames))
+        }.sortedBy { automation ->
+            when (automation.type) {
+                Automation.Type.NOOP -> 0
+                Automation.Type.COPY_COORDS_DEC -> 1
+                Automation.Type.COPY_COORDS_NSWE_DEC -> 2
+                Automation.Type.COPY_GEO_URI -> 3
+                Automation.Type.OPEN_APP -> 4
+                Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO -> 5
+                Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW -> 6
+                Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO -> 7
+                Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA -> 8
+                Automation.Type.COPY_APPLE_MAPS_URI -> 9
+                Automation.Type.COPY_GOOGLE_MAPS_URI -> 10
+                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 11
+                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 12
+                Automation.Type.COPY_MAGIC_EARTH_URI -> 13
+                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 14
+                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_VIA_URI -> 15
+                Automation.Type.SAVE_GPX -> 16
+                Automation.Type.SHARE -> 17
+            }
         }.map { automation ->
             UserPreferenceOption(
                 value = automation,
