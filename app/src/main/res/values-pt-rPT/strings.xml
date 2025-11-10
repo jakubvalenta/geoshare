@@ -55,7 +55,7 @@
     <string name="about_title">Sobre</string>
     <string name="about_app_icon_content_description">Ícone do aplicação</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
-    <string name="about_text"><![CDATA[<p>O %1$s é uma app livre e de código aberto distribuído sob a licença <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou mais nova.</p><br><p>Pode encontrar o código-fonte no <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, onde também pode <a href="https://github.com/jakubvalenta/geoshare/issues">relatar problemas</a>.</p><br><p>O seu retorno é bem vindo. Pode contactar-me em <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
+    <string name="about_text"><![CDATA[<p>O %1$s é uma app livre e de código aberto distribuído sob a licença <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou mais nova.</p><br><p>Pode encontrar o código-fonte no <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, onde também pode <a href="https://github.com/jakubvalenta/geoshare/issues">relatar problemas</a>.</p><br><p>O seu retorno é bem-vindo. Pode contactar-me em <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="permission_do_not_ask">Não me pergunte novamente</string>
     <string name="faq_title">Perguntas frequentes</string>
     <string name="faq_how_it_works_headline">Como funciona e considerações de privacidade</string>
