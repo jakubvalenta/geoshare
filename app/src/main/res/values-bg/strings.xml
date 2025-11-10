@@ -133,4 +133,6 @@
     <string name="conversion_succeeded_open_app_display">Показване на картата в %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навигиране в %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_via">Добавяне на точка от пътя в %1$s</string>
+    <string name="converter_amap_loading_indicator_title">Свързване с Amap…</string>
+    <string name="converter_amap_permission_title">Свързване с Amap?</string>
 </resources>
