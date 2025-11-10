@@ -81,7 +81,7 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
                 on { path matches """/maps/search/$Q_PATH.*""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/maps/search/""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" } doReturn
-                        { PositionMatch(it, srs) }
+                    { PositionMatch(it, srs) }
                 on { path matches """/maps/dir/.*/$LAT,$LON/data[^/]*""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/maps/dir/.*/$LAT,$LON/?""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" } doReturn { PositionMatch(it, srs) }
@@ -89,7 +89,7 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
                 on { path matches """/maps/dir/.*/$Q_PATH/?""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/maps/dir/""" } doReturn { PositionMatch(it, srs) }
                 on { if ((path matches """/maps/d/(edit|viewer)""") != null) queryParams["mid"]?.let { it matches ".+" } else null } doReturn
-                        { PositionMatch(it, srs) }
+                    { PositionMatch(it, srs) }
                 on { path matches """/maps/?""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/search/?""" } doReturn { PositionMatch(it, srs) }
                 on { path matches """/?""" } doReturn { PositionMatch(it, srs) }
