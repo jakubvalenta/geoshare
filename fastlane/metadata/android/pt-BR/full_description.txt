@@ -19,17 +19,23 @@ Compartilhe um link de mapa com o Geo Share e o app abrirá ele em outro app de 
 
 <b>Exemplos de como usar</b>
 
-Quando alguém te manda um link do Google Maps, mas você prefere usar o OpenStreetMap, você pode abrir a mesma localização rapidamente no OsmAnd ou no Organic Maps.
+Quando alguém te manda um link do Google Maps, mas você prefere usar o OpenStreetMap, você pode abrir rapidamente <b>a mesma localização</b> no OsmAnd ou no CoMaps.
 
-Se você gosta do Google Maps para encontrar lugares, mas prefere usar outro app para a navegação, você pode alternar facilmente do Google Maps para o seu app de navegação preferido.
+Se você gosta do Google Maps para encontrar lugares, mas prefere usar outro app para a navegação, você pode alternar facilmente do Google Maps para o seu <b>app de navegação</b> preferido.
 
 <b>Outros recursos</b>
 
-- Mostrar as coordenadas geográficas de um link de mapa e copiar elas para a área de transferência como um link geo:.
-- Colar os links de mapa diretamente no app, em vez de compartilhá-los com ele.
+- Mostra as <b>coordenadas geográficas</b> de um link de mapa e copia elas em vários formatos, como um link geo:.
+- Mostra todos os pontos de um link de uma <b>lista de lugares</b>.
+- Permite realizar uma ação <b>automaticamente</b> quando um link de mapa é processado
+- Permite <b>abrir a navegação</b> em apps selecionados.
+- Permite salavar uma localização como um <b>arquivo GPX</b>.
+- Tenta novamente em <b>conexões instáveis à internet</b>.
+- Permite <b>colar links de mapa</b> diretamente no app, em vez de compartilhá-los com ele.
+- A interface é adaptada para <b>tablets</b>
 
 <b>Como funciona e considerações de privacidade</b>
 
 O Geo Share converte links de mapa (exemplo: https://maps.app.goo.gl/...) em links geo: que podem ser abertos por outros apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O Geo Share extrai elas da URL de mapa.
 
-Porém, nem todas as URLs incluem coordenadas. Nestes casos, o Geo Share te pedirá permissão para conectar ao mapa (como o Google Maps, Apple Maps, etc.) e obter as coordenadas ou dos cabeçalhos HTTP ou do documento HTML do link. Para informações mais detalhadas, confira a tela de perguntas frequentes no app.
+Porém, nem todas as URLs incluem coordenadas. Nestes casos, o Geo Share <b>te pedirá permissão para conectar ao mapa (como o Google Maps, Apple Maps, etc.)</b> e obter as coordenadas ou dos cabeçalhos HTTP ou do documento HTML do link. Para informações mais detalhadas, confira a tela de perguntas frequentes no app.
