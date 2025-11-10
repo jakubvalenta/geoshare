@@ -4,6 +4,7 @@ Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une aut
 
 - Google Maps
 - Apple Maps
+- Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
 - Magic Earth

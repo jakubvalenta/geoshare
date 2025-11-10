@@ -128,4 +128,12 @@
     <string name="conversion_succeeded_open_app">Otevřít %1$s</string>
     <string name="main_input_uri_paste_content_description">Vložit</string>
     <string name="main_random">Náhodný odkaz</string>
+    <string name="conversion_succeeded_copy_link_display">Kopírovat odkaz na zobrazení mapy v %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_to">Kopírovat odkaz na navigaci v %1$s</string>
+    <string name="conversion_succeeded_copy_link_drive_via">Kopírovat odkaz na přidání bodu trasy v %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Zobrazit mapu v %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_to">Navigovat v %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_via">Přidat bod trasy v %1$s</string>
+    <string name="converter_amap_loading_indicator_title">Spojování s Amap…</string>
+    <string name="converter_amap_permission_title">Spojit se s Amap?</string>
 </resources>

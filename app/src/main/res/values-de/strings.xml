@@ -108,4 +108,31 @@
     <string name="url_converters_recent_info">%1$s hat kürzlich Unterstützung für neue Kartendienste erhalten.</string>
     <string name="url_converters_settings_button_content_description">Android-Einstellungen öffnen</string>
     <string name="main_input_uri_paste_content_description">Einfügen</string>
+    <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
+    <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>
+    <string name="conversion_succeeded_copy_link_display">Link zum Anzeigen der Karte in %1$s kopieren</string>
+    <string name="conversion_succeeded_copy_link_drive_to">Link zum Navigieren in %1$s kopieren</string>
+    <string name="conversion_succeeded_copy_link_drive_via">Link zum Hinzufügen eines Wegpunkts in %1$s kopieren</string>
+    <string name="conversion_succeeded_open_app">%1$s öffnen</string>
+    <string name="conversion_succeeded_open_app_display">Karte in %1$s anzeigen</string>
+    <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
+    <string name="conversion_succeeded_open_app_navigate_via">Wegpunkt in %1$s hinzufügen</string>
+    <string name="conversion_succeeded_save_gpx_failed">Das Speichern der GPX-Datei ist fehlgeschlagen</string>
+    <string name="main_random">Zufälliger Link</string>
+    <string name="converter_amap_loading_indicator_title">Verbindung mit Amap…</string>
+    <string name="converter_amap_permission_title">Mit Amap Verbinden?</string>
+    <string name="conversion_automation_copy_link_succeeded">Link wurde automatisch kopiert</string>
+    <string name="conversion_automation_copy_succeeded">Koordinaten wurden automatisch kopiert</string>
+    <string name="conversion_automation_open_app_failed">Das automatische Öffnen von %1$s ist fehlgeschlagen</string>
+    <string name="conversion_automation_open_app_succeeded">%1$s wurde automatisch geöffnet</string>
+    <string name="conversion_automation_open_app_waiting">%1$s wird in %2$d s automatisch geöffnet</string>
+    <string name="conversion_automation_save_gpx_succeeded">GPX-Datei wurde automatisch gespeichert</string>
+    <string name="conversion_automation_save_gpx_waiting">GPX-Datei wird automatisch in %1$d s gespeichert</string>
+    <string name="conversion_automation_share_failed">Automatisches Teilen des Links ist fehlgeschlagen</string>
+    <string name="conversion_automation_share_succeeded">Link wurde automatisch geteilt</string>
+    <string name="conversion_automation_share_waiting">Link wird in %1$d s automatisch geteilt</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Versuch %1$d aus %2$d wegen %3$s.</string>
+    <string name="user_preferences_automation_description">Wähle eine Aktion aus, die automatisch ausgeführt werden soll, wenn ein Kartenlink in Koordinaten umgewandelt wird.</string>
+    <string name="user_preferences_automation_nothing">Nichts</string>
+    <string name="user_preferences_automation_title">Automatisierung</string>
 </resources>
