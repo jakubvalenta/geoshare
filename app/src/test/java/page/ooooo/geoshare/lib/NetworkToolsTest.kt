@@ -89,12 +89,10 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
-        mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)).use { source ->
-            assertEquals(
-                "test content",
-                source.readString(),
-            )
+        val text = mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)) { source ->
+            source.readString()
         }
+        assertEquals("test content", text)
         verify(mockNetworkTools).connect(
             engine = eq(mockEngine),
             url = eq(url),
@@ -116,12 +114,10 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)).use { source ->
-            assertEquals(
-                "test content",
-                source.readString(),
-            )
+        val text = mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)) { source ->
+            source.readString()
         }
+        assertEquals("test content", text)
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)

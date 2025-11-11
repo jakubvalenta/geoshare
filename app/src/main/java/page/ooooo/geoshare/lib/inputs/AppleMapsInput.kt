@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.*
 
 object AppleMapsInput : Input.HasUri, Input.HasHtml {
@@ -34,28 +34,33 @@ object AppleMapsInput : Input.HasUri, Input.HasHtml {
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                pattern {
+                    (Z_PATTERN match queryParams["z"])?.toZ(srs)
+                }
             }
             first {
                 pattern { if (host == "maps.apple" && path.startsWith("/p/")) Position(srs) else null }
-                pattern { queryParams["ll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
-                pattern { queryParams["coordinate"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
-                pattern { queryParams["q"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
-                pattern { queryParams["address"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
-                pattern { queryParams["name"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
-                @Suppress("SpellCheckingInspection")
-                pattern { queryParams["auid"]?.isNotEmpty()?.let { Position(srs) } }
-                pattern { queryParams["place-id"]?.isNotEmpty()?.let { Position(srs) } }
-                all {
-                    pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
-                    pattern { queryParams["sll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern {
+                    (LAT_LON_PATTERN match queryParams["ll"])?.toLatLon(srs)
                 }
-                pattern { queryParams["sll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
-                pattern { queryParams["center"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { (LAT_LON_PATTERN match queryParams["coordinate"])?.toLatLon(srs) }
+                pattern { (LAT_LON_PATTERN match queryParams["q"])?.toLatLon(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["address"])?.toQ(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["name"])?.toQ(srs) }
+                @Suppress("SpellCheckingInspection")
+                pattern { if (!queryParams["auid"].isNullOrEmpty()) Position(srs) else null }
+                pattern { if (!queryParams["place-id"].isNullOrEmpty()) Position(srs) else null }
+                all {
+                    pattern { (Q_PARAM_PATTERN match queryParams["q"])?.toQ(srs) }
+                    pattern { (LAT_LON_PATTERN match queryParams["sll"])?.toLatLon(srs) }
+                }
+                pattern { (LAT_LON_PATTERN match queryParams["sll"])?.toLatLon(srs) }
+                pattern { (LAT_LON_PATTERN match queryParams["center"])?.toLatLon(srs) }
                 pattern {
                     // Set point to 0,0 to avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
-                    queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.groupOrNull("q")
-                        ?.let { q -> Position(srs, lat = 0.0, lon = 0.0, q = q) }
+                    (Q_PARAM_PATTERN match queryParams["q"])?.groupOrNull("q")?.let { q ->
+                        Position(srs, lat = 0.0, lon = 0.0, q = q)
+                    }
                 }
             }
         }
@@ -69,7 +74,7 @@ object AppleMapsInput : Input.HasUri, Input.HasHtml {
             var lon: Double? = null
             for (line in generateSequence { this.readLine() }) {
                 if (lat == null) {
-                    (line find latPattern)?.groupOrNull("lat")?.toDoubleOrNull()?.let { newLat ->
+                    (latPattern find line)?.groupOrNull("lat")?.toDoubleOrNull()?.let { newLat ->
                         lat = newLat
                         if (lon != null) {
                             break
@@ -77,7 +82,7 @@ object AppleMapsInput : Input.HasUri, Input.HasHtml {
                     }
                 }
                 if (lon == null) {
-                    (line find lonPattern)?.groupOrNull("lon")?.toDoubleOrNull()?.let { newLon ->
+                    (lonPattern find line)?.groupOrNull("lon")?.toDoubleOrNull()?.let { newLon ->
                         lon = newLon
                         if (lat != null) {
                             break

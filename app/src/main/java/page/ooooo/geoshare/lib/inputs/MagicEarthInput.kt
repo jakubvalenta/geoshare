@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.ConversionPattern.Companion.Q_PARAM_PATTERN
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.toQ
@@ -35,24 +35,22 @@ object MagicEarthInput : Input.HasUri {
         all {
             optional {
                 first {
-                    pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
-                    pattern { queryParams["zoom"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                    pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
+                    pattern { (Z_PATTERN match queryParams["zoom"])?.toZ(srs) }
                 }
             }
             first {
                 pattern {
-                    (queryParams["lat"]?.let { it matches LAT_PATTERN })?.groupOrNull("lat")?.toDoubleOrNull()
-                        ?.let { lat ->
-                            (queryParams["lon"]?.let { it matches LON_PATTERN })?.groupOrNull("lon")?.toDoubleOrNull()
-                                ?.let { lon ->
-                                    Position(srs, lat, lon)
-                                }
+                    (LAT_PATTERN match queryParams["lat"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                        (LON_PATTERN match queryParams["lon"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                            Position(srs, lat, lon)
                         }
+                    }
                 }
-                pattern { queryParams["name"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["name"])?.toQ(srs) }
                 @Suppress("SpellCheckingInspection")
-                pattern { queryParams["daddr"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
-                pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["daddr"])?.toQ(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["q"])?.toQ(srs) }
             }
         }
     }

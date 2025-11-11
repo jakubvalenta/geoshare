@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.ConversionPattern
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.MAX_COORD_PRECISION
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
 import page.ooooo.geoshare.lib.position.Position
@@ -42,7 +42,7 @@ object CoordinatesInput : Input.HasUri {
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         // Decimal, e.g. `N 41.40338, E 2.17403`
         pattern {
-            (path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")?.let { m ->
+            ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
                 Position(
                     srs,
                     lat = degToDec(
@@ -61,7 +61,7 @@ object CoordinatesInput : Input.HasUri {
 
         // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
         pattern {
-            (path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""")?.let { m ->
+            ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
                 Position(
                     srs,
                     degToDec(
@@ -84,7 +84,7 @@ object CoordinatesInput : Input.HasUri {
 
         // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
         pattern {
-            (path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""")?.let { m ->
+            ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
                 Position(
                     srs,
                     degToDec(

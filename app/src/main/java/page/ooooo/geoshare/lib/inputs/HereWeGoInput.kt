@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -32,23 +32,27 @@ object HereWeGoInput : Input.HasUri {
 
     @OptIn(ExperimentalEncodingApi::class)
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        pattern { (path matches "/l/$LAT,$LON")?.toLatLon(srs) }
-        pattern { queryParams["map"]?.takeIf { path == "/" }?.let { it matches "$LAT,$LON,$Z" }?.toLatLonZ(srs) }
+        pattern { ("""/l/$LAT,$LON""" match path)?.toLatLon(srs) }
+        pattern { if (path == "/") ("""$LAT,$LON,$Z""" match queryParams["map"])?.toLatLonZ(srs) else null }
         all {
             optional {
-                pattern { queryParams["map"]?.let { it matches ".*,$Z" }?.toZ(srs) }
+                pattern { (""".*,$Z""" match queryParams["map"])?.toZ(srs) }
             }
             pattern {
-                (path matches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""")?.groupOrNull("encoded")?.let { encoded ->
-                    Base64.decode(encoded).decodeToString().let { decoded ->
-                        (decoded find """(lat=|"latitude":)$LAT""")?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                            (decoded find """(lon=|"longitude":)$LON""")?.groupOrNull("lon")?.toDoubleOrNull()
-                                ?.let { lon ->
-                                    Position(srs, lat, lon)
+                ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
+                    ?.let { encoded ->
+                        Base64.decode(encoded).decodeToString().let { decoded ->
+                            ("""(lat=|"latitude":)$LAT""" find decoded)?.groupOrNull("lat")
+                                ?.toDoubleOrNull()
+                                ?.let { lat ->
+                                    ("""(lon=|"longitude":)$LON""" find decoded)?.groupOrNull("lon")
+                                        ?.toDoubleOrNull()
+                                        ?.let { lon ->
+                                            Position(srs, lat, lon)
+                                        }
                                 }
                         }
                     }
-                }
             }
         }
     }

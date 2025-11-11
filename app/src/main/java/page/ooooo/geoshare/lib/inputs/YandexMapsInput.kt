@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON_LAT_PATTERN
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.toLatLon
@@ -57,15 +57,15 @@ object YandexMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
             optional {
                 first {
                     @Suppress("SpellCheckingInspection")
-                    pattern { queryParams["whatshere%5Bzoom%5D"]?.let { it matches Z_PATTERN }?.toZ(srs) }
-                    pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                    pattern { (Z_PATTERN match queryParams["whatshere%5Bzoom%5D"])?.toZ(srs) }
+                    pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
                 }
             }
             first {
                 @Suppress("SpellCheckingInspection")
-                pattern { queryParams["whatshere%5Bpoint%5D"]?.let { it matches LON_LAT_PATTERN }?.toLatLon(srs) }
-                pattern { queryParams["ll"]?.let { it matches LON_LAT_PATTERN }?.toLatLon(srs) }
-                pattern { (path matches """/maps/org/\d+([/?#].*|$)""")?.let { Position(srs) } }
+                pattern { (LON_LAT_PATTERN match queryParams["whatshere%5Bpoint%5D"])?.toLatLon(srs) }
+                pattern { (LON_LAT_PATTERN match queryParams["ll"])?.toLatLon(srs) }
+                pattern { ("""/maps/org/\d+([/?#].*|$)""" match path)?.let { Position(srs) } }
             }
         }
     }
@@ -74,7 +74,7 @@ object YandexMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
         pattern {
             val pattern = Pattern.compile("""data-coordinates="$LON,$LAT"""")
             generateSequence { this.readLine() }
-                .firstNotNullOfOrNull { line -> line find pattern }
+                .firstNotNullOfOrNull { line -> pattern find line }
                 ?.toLatLon(srs)
         }
     }

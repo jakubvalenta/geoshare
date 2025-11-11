@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.position.*
 
@@ -43,25 +43,24 @@ object WazeInput : Input.HasUri, Input.HasHtml {
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
             }
             first {
                 pattern {
-                    ((path matches """/ul/h$HASH""") ?: queryParams["h"]?.let { it matches HASH })?.groupOrNull("hash")
-                        ?.let { hash ->
-                            decodeWazeGeoHash(hash).let { (lat, lon, z) ->
-                                Position(srs, lat = lat.toScale(6), lon = lon.toScale(6), z = z)
-                            }
+                    (("""/ul/h$HASH""" match path) ?: (HASH match queryParams["h"]))?.groupOrNull("hash")?.let { hash ->
+                        decodeWazeGeoHash(hash).let { (lat, lon, z) ->
+                            Position(srs, lat = lat.toScale(6), lon = lon.toScale(6), z = z)
                         }
+                    }
                 }
-                pattern { queryParams["to"]?.let { it matches """ll\.$LAT,$LON""" }?.toLatLon(srs) }
-                pattern { queryParams["ll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { ("""ll\.$LAT,$LON""" match queryParams["to"])?.toLatLon(srs) }
+                pattern { (LAT_LON_PATTERN match queryParams["ll"])?.toLatLon(srs) }
                 @Suppress("SpellCheckingInspection")
-                pattern { queryParams["latlng"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
-                pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
-                pattern { queryParams["venue_id"]?.isNotEmpty()?.let { Position(srs) } }
-                pattern { queryParams["place"]?.isNotEmpty()?.let { Position(srs) } }
-                pattern { queryParams["to"]?.takeIf { it.startsWith("place.") }?.let { Position(srs) } }
+                pattern { (LAT_LON_PATTERN match queryParams["latlng"])?.toLatLon(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["q"])?.toQ(srs) }
+                pattern { if (!queryParams["venue_id"].isNullOrEmpty()) Position(srs) else null }
+                pattern { if (!queryParams["place"].isNullOrEmpty()) Position(srs) else null }
+                pattern { if (queryParams["to"]?.startsWith("place.") == true) Position(srs) else null }
             }
         }
     }
@@ -70,7 +69,7 @@ object WazeInput : Input.HasUri, Input.HasHtml {
         pattern {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             generateSequence { this.readLine() }
-                .firstNotNullOfOrNull { line -> line find pattern }
+                .firstNotNullOfOrNull { line -> pattern find line }
                 ?.toLatLon(srs)
         }
     }

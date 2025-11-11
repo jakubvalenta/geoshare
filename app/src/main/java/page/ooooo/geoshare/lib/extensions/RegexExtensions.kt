@@ -15,20 +15,26 @@ fun Matcher.groupOrNull(name: String): String? = try {
     null
 }
 
-infix fun String.matches(pattern: Pattern): Matcher? =
-    pattern.matcher(this).takeIf { it.matches() }
+infix fun Pattern.find(input: String?): Matcher? = input?.let { input ->
+    this.matcher(input).takeIf { it.find() }
+}
 
-infix fun String.matches(regex: String): Matcher? =
-    this matches Pattern.compile(regex)
+infix fun Pattern.findAll(input: String?): Sequence<Matcher> = input?.let { input ->
+    this.matcher(input).let { m -> generateSequence { m.takeIf { it.find() } } }
+} ?: emptySequence()
 
-infix fun String.find(pattern: Pattern): Matcher? =
-    pattern.matcher(this).takeIf { it.find() }
+infix fun Pattern.match(input: String?): Matcher? = input?.let { input ->
+    this.matcher(input).takeIf { it.matches() }
+}
 
-infix fun String.find(regex: String): Matcher? =
-    this find Pattern.compile(regex)
+infix fun String.find(input: String?): Matcher? = input?.let { input ->
+    Pattern.compile(this) find input
+}
 
-infix fun String.findAll(pattern: Pattern): Sequence<Matcher> =
-    pattern.matcher(this).let { m -> generateSequence { m.takeIf { it.find() } } }
+infix fun String.findAll(input: String?): Sequence<Matcher> = input?.let { input ->
+    Pattern.compile(this) findAll input
+} ?: emptySequence()
 
-infix fun String.findAll(regex: String): Sequence<Matcher> =
-    this findAll Pattern.compile(regex)
+infix fun String.match(input: String?): Matcher? = input?.let { input ->
+    Pattern.compile(this) match input
+}

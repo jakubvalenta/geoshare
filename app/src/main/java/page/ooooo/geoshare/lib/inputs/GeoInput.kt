@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_LON_PATTERN
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.Q_PARAM_PATTERN
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.lib.position.*
 
@@ -27,13 +27,13 @@ object GeoInput : Input.HasUri {
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                pattern { (path matches LAT_LON_PATTERN)?.toLatLon(srs) }
+                pattern { (LAT_LON_PATTERN match path)?.toLatLon(srs) }
             }
             optional {
-                pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
+                pattern { (Q_PARAM_PATTERN match queryParams["q"])?.toQ(srs) }
             }
             optional {
-                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
             }
         }
     }

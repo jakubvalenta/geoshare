@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.ConversionPattern
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.toLatLon
@@ -30,10 +30,9 @@ object AmapInput : Input.HasUri, Input.HasShortUri {
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        pattern { queryParams["p"]?.let { it matches """\w+,$LAT,$LON.+""" }?.toLatLon(srs) }
-        pattern { queryParams["q"]?.let { it matches """$LAT,$LON.+""" }?.toLatLon(srs) }
+        pattern { ("""\w+,$LAT,$LON.+""" match queryParams["p"])?.toLatLon(srs) }
+        pattern { ("""$LAT,$LON.+""" match queryParams["q"])?.toLatLon(srs) }
     }
-
 
     @StringRes
     override val permissionTitleResId = R.string.converter_amap_permission_title

@@ -13,7 +13,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.toLatLon
@@ -41,21 +41,21 @@ object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
 
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         pattern {
-            (path matches """/go/$HASH""")?.groupOrNull("hash")?.let { hash ->
+            ("""/go/$HASH""" match path)?.groupOrNull("hash")?.let { hash ->
                 decodeOpenStreetMapQuadTileHash(hash).let { (lat, lon, z) ->
                     Position(srs, lat, lon, z = z)
                 }
             }
         }
-        pattern { (path matches ELEMENT_PATH)?.let { Position(srs) } }
-        pattern { (fragment matches """map=$Z/$LAT/$LON.*""")?.toLatLonZ(srs) }
+        pattern { (ELEMENT_PATH match path)?.let { Position(srs) } }
+        pattern { ("""map=$Z/$LAT/$LON.*""" match fragment)?.toLatLonZ(srs) }
     }
 
     override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
         listPattern {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             generateSequence { this@listPattern.readLine() }
-                .flatMap { line -> line findAll pattern }
+                .flatMap { line -> pattern findAll line }
                 .mapNotNull { m -> m.toLatLon(srs) }
                 .toList()
         }
@@ -64,7 +64,7 @@ object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
     override val conversionHtmlRedirectPattern = null
 
     override fun getHtmlUrl(uri: Uri): URL? {
-        val m = (uri.path matches ELEMENT_PATH) ?: return null
+        val m = (ELEMENT_PATH match uri.path) ?: return null
         val type = m.groupOrNull("type") ?: return null
         val id = m.groupOrNull("id") ?: return null
         return URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")

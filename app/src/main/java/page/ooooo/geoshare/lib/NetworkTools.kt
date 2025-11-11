@@ -47,7 +47,7 @@ open class NetworkTools(
     data class Retry(val count: Int, val tr: NetworkException)
 
     @Throws(NetworkException::class)
-    suspend fun requestLocationHeader(
+    open suspend fun requestLocationHeader(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -65,19 +65,20 @@ open class NetworkTools(
     }
 
     @Throws(NetworkException::class)
-    suspend fun getSource(
+    open suspend fun <T> getSource(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): Source = withContext(dispatcher) {
+        block: (source: Source) -> T,
+    ): T = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             val channel: ByteReadChannel = response.body()
-            channel.asSource().buffered()
+            channel.asSource().buffered().use(block)
         }
     }
 
     @Throws(NetworkException::class)
-    suspend fun getRedirectUrlString(
+    open suspend fun getRedirectUrlString(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,

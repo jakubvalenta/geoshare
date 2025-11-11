@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.ConversionPattern
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeGe0Hash
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
@@ -29,7 +29,7 @@ object Ge0Input : Input.HasUri {
 
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         pattern {
-            (if (scheme == "ge0") host matches HASH else path matches """/$HASH\S*""")?.groupOrNull("hash")
+            (if (scheme == "ge0") HASH match host else """/$HASH\S*""" match path)?.groupOrNull("hash")
                 ?.let { hash ->
                     decodeGe0Hash(hash).let { (lat, lon, z) ->
                         Position(srs, lat.toScale(7), lon.toScale(7), z = z)

@@ -6,7 +6,7 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.merge
 
@@ -15,12 +15,12 @@ abstract class BaseInputTest() {
 
     protected var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? = (uriString find input.uriPattern)?.group()
+    fun getUri(uriString: String): String? = (input.uriPattern find uriString)?.group()
 
     fun doesUriPatternMatch(uriString: String): Boolean = input.uriPattern.matches(uriString)
 
     fun getShortUri(uriString: String): String? =
-        (uriString matches (input as Input.HasShortUri).shortUriPattern)?.group()
+        ((input as Input.HasShortUri).shortUriPattern match uriString)?.group()
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 

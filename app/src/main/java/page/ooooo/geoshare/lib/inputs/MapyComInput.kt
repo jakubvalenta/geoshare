@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON_PATTERN
 import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.toZ
@@ -36,7 +36,7 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
 
     override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         pattern {
-            (path matches COORDS)?.let { m ->
+            (COORDS match path)?.let { m ->
                 m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
                     m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
                         val latSig = if (m.groupOrNull()?.contains('S') == true) -1 else 1
@@ -48,11 +48,11 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
         }
         all {
             optional {
-                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
             }
             pattern {
-                queryParams["y"]?.let { it matches LAT_PATTERN }?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                    queryParams["x"]?.let { it matches LON_PATTERN }?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                (LAT_PATTERN match queryParams["y"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                    (LON_PATTERN match queryParams["x"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
                         Position(srs, lat, lon)
                     }
                 }
