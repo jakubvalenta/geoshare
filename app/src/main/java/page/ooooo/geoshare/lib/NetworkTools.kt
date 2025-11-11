@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib
 
-import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -14,12 +13,12 @@ import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.core.remaining
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.io.RawSink
+import kotlinx.io.Source
+import kotlinx.io.buffered
 import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.io.use
@@ -77,24 +76,14 @@ open class NetworkTools(
     }
 
     @Throws(NetworkException::class)
-    suspend fun getText(
+    suspend fun getSource(
         url: URL,
-        sink: RawSink,
-        bufferSize: Long = 1024 * 1024,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): Unit = withContext(dispatcher) {
+    ): Source = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             val channel: ByteReadChannel = response.body()
-            var count = 0L
-            sink.use {
-                while (!channel.exhausted()) {
-                    val chunk = channel.readRemaining(bufferSize)
-                    count += chunk.remaining
-                    chunk.transferTo(sink)
-                    Log.d(null, "Received $count bytes from ${response.contentLength()} for $url")
-                }
-            }
+            channel.asSource().buffered()
         }
     }
 

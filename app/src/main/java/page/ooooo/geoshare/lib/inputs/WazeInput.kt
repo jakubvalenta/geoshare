@@ -3,6 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
+import kotlinx.io.Source
+import kotlinx.io.readLine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
@@ -38,25 +40,35 @@ object WazeInput : Input.HasUri, Input.HasHtml {
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
             }
             first {
                 on { path matches """/ul/h$HASH""" } doReturn { WazeGeoHashPositionMatch(it, srs) }
                 on { queryParams["h"]?.let { it matches HASH } } doReturn { WazeGeoHashPositionMatch(it, srs) }
-                on { queryParams["to"]?.let { it matches """ll\.$LAT,$LON""" } } doReturn { PositionMatch(it, srs) }
-                on { queryParams["ll"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["to"]?.let { it matches """ll\.$LAT,$LON""" } } doReturn {
+                    PositionMatch.LatLon(
+                        it,
+                        srs
+                    )
+                }
+                on { queryParams["ll"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch.LatLon(it, srs) }
                 @Suppress("SpellCheckingInspection")
-                on { queryParams["latlng"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch(it, srs) }
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
-                on { queryParams["venue_id"]?.let { it matches ".+" } } doReturn { PositionMatch(it, srs) }
-                on { queryParams["place"]?.let { it matches ".+" } } doReturn { PositionMatch(it, srs) }
-                on { queryParams["to"]?.let { it matches """place\..+""" } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["latlng"]?.let { it matches "$LAT,$LON" } } doReturn { PositionMatch.LatLon(it, srs) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
+                on { queryParams["venue_id"]?.let { it matches ".+" } } doReturn { PositionMatch.Empty(it, srs) }
+                on { queryParams["place"]?.let { it matches ".+" } } doReturn { PositionMatch.Empty(it, srs) }
+                on { queryParams["to"]?.let { it matches """place\..+""" } } doReturn { PositionMatch.Empty(it, srs) }
             }
         }
     }
 
-    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
-        on { this find """"latLng":{"lat":$LAT,"lng":$LON}""" } doReturn { PositionMatch(it, srs) }
+    override val conversionHtmlPattern = conversionPattern<Source, PositionMatch> {
+        on {
+            val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
+            generateSequence { this.readLine() }.firstNotNullOfOrNull { line ->
+                line find pattern
+            }
+        } doReturn { PositionMatch.LatLon(it, srs) }
     }
 
     override val conversionHtmlRedirectPattern = null
@@ -67,8 +79,9 @@ object WazeInput : Input.HasUri, Input.HasHtml {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
 
-    private class WazeGeoHashPositionMatch(matcher: Matcher, srs: Srs) : GeoHashPositionMatch(matcher, srs) {
-        override fun decode(hash: String) = decodeWazeGeoHash(hash)
-            .let { (lat, lon, z) -> Triple(lat.toScale(6), lon.toScale(6), z) }
+    private class WazeGeoHashPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.GeoHash(matcher, srs) {
+        override fun decode(hash: String) = decodeWazeGeoHash(hash).let { (lat, lon, z) ->
+            Triple(lat.toScale(6), lon.toScale(6), z)
+        }
     }
 }

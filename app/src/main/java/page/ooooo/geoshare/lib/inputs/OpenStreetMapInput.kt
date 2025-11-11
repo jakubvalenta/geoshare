@@ -3,12 +3,14 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
+import kotlinx.io.Source
+import kotlinx.io.readLine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
-import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.position.Srs
@@ -35,12 +37,18 @@ object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         on { path matches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it, srs) }
-        on { path matches ELEMENT_PATH } doReturn { PositionMatch(it, srs) }
-        on { fragment matches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it, srs) }
+        on { path matches ELEMENT_PATH } doReturn { PositionMatch.Empty(it, srs) }
+        on { fragment matches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch.LatLonZ(it, srs) }
     }
 
-    override val conversionHtmlPattern = conversionPattern<String, PositionMatch> {
-        on { this find """"lat":$LAT,"lon":$LON""" } doReturn { PointsPositionMatch(it, srs) }
+    override val conversionHtmlPattern = conversionPattern<Source, PositionMatch> {
+        onEach {
+            sequence {
+                for (line in generateSequence { this@onEach.readLine() }) {
+                    yieldAll(line findAll """"lat":$LAT,"lon":$LON""")
+                }
+            }
+        } doReturn { PositionMatch.LatLon(it, srs) }
     }
 
     override val conversionHtmlRedirectPattern = null
@@ -58,7 +66,7 @@ object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
 
-    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher, srs: Srs) : GeoHashPositionMatch(matcher, srs) {
+    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.GeoHash(matcher, srs) {
         override fun decode(hash: String) = decodeOpenStreetMapQuadTileHash(hash)
     }
 }

@@ -303,9 +303,9 @@ data class GrantedParseHtmlPermission(
             stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri")
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
-        val html = try {
+        val source = try {
             stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
-            stateContext.networkTools.getText(htmlUrl, retry)
+            stateContext.networkTools.getSource(htmlUrl, retry)
         } catch (_: CancellationException) {
             return ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)
         } catch (tr: NetworkTools.RecoverableException) {
@@ -325,25 +325,27 @@ data class GrantedParseHtmlPermission(
                 ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
             }
         }
-        input.conversionHtmlPattern?.matches(html)?.toPosition()?.let { position ->
-            stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
-            return ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        source.use {
+            input.conversionHtmlPattern?.matches(source)?.toPosition()?.let { position ->
+                stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
+                return ConversionSucceeded(stateContext, runContext, inputUriString, position)
+            }
         }
-        input.conversionHtmlRedirectPattern?.matches(html)?.toUrlString()?.let { redirectUriString ->
-            stateContext.log.i(
-                null,
-                "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"
-            )
-            val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
-            return ReceivedUri(
-                stateContext,
-                runContext,
-                inputUriString,
-                input,
-                redirectUri,
-                Permission.ALWAYS
-            )
-        }
+        // input.conversionHtmlRedirectPattern?.matches(html)?.toUrlString()?.let { redirectUriString ->
+        //     stateContext.log.i(
+        //         null,
+        //         "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"
+        //     )
+        //     val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
+        //     return ReceivedUri(
+        //         stateContext,
+        //         runContext,
+        //         inputUriString,
+        //         input,
+        //         redirectUri,
+        //         Permission.ALWAYS
+        //     )
+        // }
         stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
         return ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
     }

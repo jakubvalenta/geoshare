@@ -24,10 +24,13 @@ object OsmAndInput : Input.HasUri {
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
-            on { fragment matches """$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it, srs) }
-            on { queryParams["pin"]?.let { it matches """$LAT,$LON""" } } doReturn { PositionMatch(it, srs) }
+            optional {
+                on { fragment matches """$Z/.*""" } doReturn { PositionMatch(it, srs) }
+            }
+            first {
+                on { queryParams["pin"]?.let { it matches """$LAT,$LON""" } } doReturn { PositionMatch(it, srs) }
+                on { fragment matches """$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it, srs) }
+            }
         }
-        on { fragment matches """$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it, srs) }
-        on { queryParams["pin"]?.let { it matches """$LAT,$LON""" } } doReturn { PositionMatch(it, srs) }
     }
 }

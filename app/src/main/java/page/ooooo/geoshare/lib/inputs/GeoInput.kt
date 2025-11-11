@@ -30,13 +30,13 @@ object GeoInput : Input.HasUri {
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                on { path matches """$LAT,$LON""" } doReturn { PositionMatch(it, srs) }
+                on { path matches """$LAT,$LON""" } doReturn { PositionMatch.LatLon(it, srs) }
             }
             optional {
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
             }
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
             }
         }
     }

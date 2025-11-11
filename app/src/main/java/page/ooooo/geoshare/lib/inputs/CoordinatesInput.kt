@@ -3,15 +3,15 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
-import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionMatch.Companion.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
-import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
@@ -43,77 +43,74 @@ object CoordinatesInput : Input.HasUri {
 
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" } doReturn
-                { DecimalCoordsPositionMatch(it, srs) }
+            { DecCoordsPositionMatch(it, srs) }
         on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" } doReturn
-                { DegreesMinutesSecondsCoordsPositionMatch(it, srs) }
+            { DegMinSecCoordsPositionMatch(it, srs) }
         on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" } doReturn
-                { DegreesMinutesCoordsPositionMatch(it, srs) }
+            { DegMinCoordsPositionMatch(it, srs) }
     }
 
     /**
      * Decimal, e.g. `N 41.40338, E 2.17403`
      */
-    private class DecimalCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-        override val points: List<Point>
-            get() {
-                val lat = degToDec(
+    private class DecCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
+        override val latLon
+            get() = Pair(
+                degToDec(
                     matcher.groupOrNull()?.contains('S') == true,
                     matcher.groupOrNull("latSig"),
                     matcher.groupOrNull("latDeg"),
-                )
-                val lon = degToDec(
+                ),
+                degToDec(
                     matcher.groupOrNull()?.contains('W') == true,
                     matcher.groupOrNull("lonSig"),
                     matcher.groupOrNull("lonDeg"),
-                )
-                return persistentListOf(Point(srs, lat, lon))
-            }
+                ),
+            )
     }
 
     /**
      * Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
      */
-    private class DegreesMinutesSecondsCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-        override val points: List<Point>
-            get() {
-                val lat = degToDec(
+    private class DegMinSecCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
+        override val latLon
+            get() = Pair(
+                degToDec(
                     matcher.groupOrNull()?.contains('S') == true,
                     matcher.groupOrNull("latSig"),
                     matcher.groupOrNull("latDeg"),
                     matcher.groupOrNull("latMin"),
                     matcher.groupOrNull("latSec"),
-                )
-                val lon = degToDec(
+                ),
+                degToDec(
                     matcher.groupOrNull()?.contains('W') == true,
                     matcher.groupOrNull("lonSig"),
                     matcher.groupOrNull("lonDeg"),
                     matcher.groupOrNull("lonMin"),
                     matcher.groupOrNull("lonSec"),
-                )
-                return persistentListOf(Point(srs, lat, lon))
-            }
+                ),
+            )
     }
 
     /**
      * Degrees minutes, e.g. `41 24.2028, 2 10.4418`
      */
-    private class DegreesMinutesCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-        override val points: List<Point>
-            get() {
-                val lat = degToDec(
+    private class DegMinCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
+        override val latLon
+            get() = Pair(
+                degToDec(
                     matcher.groupOrNull()?.contains('S') == true,
                     matcher.groupOrNull("latSig"),
                     matcher.groupOrNull("latDeg"),
                     matcher.groupOrNull("latMin"),
-                )
-                val lon = degToDec(
+                ),
+                degToDec(
                     matcher.groupOrNull()?.contains('W') == true,
                     matcher.groupOrNull("lonSig"),
                     matcher.groupOrNull("lonDeg"),
                     matcher.groupOrNull("lonMin"),
                 )
-                return persistentListOf(Point(srs, lat, lon))
-            }
+            )
     }
 
     private fun degToDec(

@@ -3,12 +3,13 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
-import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.PositionMatch
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
 import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
 import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.position.Point
@@ -38,10 +39,10 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
         on { path matches COORDS } doReturn { NorthSouthWestEastPositionMatch(it, srs) }
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
             }
-            on { queryParams["x"]?.let { it matches LON } } doReturn { PositionMatch(it, srs) }
-            on { queryParams["y"]?.let { it matches LAT } } doReturn { PositionMatch(it, srs) }
+            on { queryParams["x"]?.let { it matches LON } } doReturn { PositionMatch.Lon(it, srs) }
+            on { queryParams["y"]?.let { it matches LAT } } doReturn { PositionMatch.Lat(it, srs) }
         }
     }
 
@@ -51,14 +52,14 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
 
-    private class NorthSouthWestEastPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-        override val points: List<Point>?
-            get() {
-                val lat = matcher.groupOrNull("lat")?.toDoubleOrNull() ?: return null
-                val lon = matcher.groupOrNull("lon")?.toDoubleOrNull() ?: return null
-                val latSig = if (matcher.groupOrNull()?.contains('S') == true) -1 else 1
-                val lonSig = if (matcher.groupOrNull()?.contains('W') == true) -1 else 1
-                return persistentListOf(Point(srs, latSig * lat, lonSig * lon))
+    private class NorthSouthWestEastPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
+        override val latLon
+            get() = matcher.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                matcher.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                    val latSig = if (matcher.groupOrNull()?.contains('S') == true) -1 else 1
+                    val lonSig = if (matcher.groupOrNull()?.contains('W') == true) -1 else 1
+                    Pair(latSig * lat, lonSig * lon)
+                }
             }
     }
 }

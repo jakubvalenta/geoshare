@@ -6,18 +6,23 @@ interface ConversionPattern<I, M> {
     fun matches(input: I): List<M>?
 }
 
-class ConversionInputPattern<I, M>(
-    val condition: I.() -> Matcher?,
+class ConversionInputPattern<I, M>(val block: I.() -> M?) : ConversionPattern<I, M> {
+    override fun matches(input: I): List<M>? = input.block()?.let { listOf(it) }
+}
+
+class ConversionInputEachPattern<I, M>(
+    val condition: I.() -> Sequence<Matcher>,
     val result: (matcher: Matcher) -> M,
 ) : ConversionPattern<I, M> {
     class Builder<I, M>(
-        val condition: I.() -> Matcher?,
-        val block: (conversionUriPattern: ConversionInputPattern<I, M>) -> Unit,
+        val condition: I.() -> Sequence<Matcher>,
+        val block: (conversionUriPattern: ConversionInputEachPattern<I, M>) -> Unit,
     ) {
-        infix fun doReturn(result: (matcher: Matcher) -> M) = block(ConversionInputPattern(condition, result))
+        infix fun doReturn(result: (matcher: Matcher) -> M) = block(ConversionInputEachPattern(condition, result))
     }
 
-    override fun matches(input: I): List<M>? = input.condition()?.let { listOf(result(it)) }
+    override fun matches(input: I): List<M>? =
+        input.condition().map(result).toList().takeIf { it.isNotEmpty() }?.reversed()
 }
 
 abstract class ConversionGroupPattern<I, M> : ConversionPattern<I, M> {
@@ -27,7 +32,10 @@ abstract class ConversionGroupPattern<I, M> : ConversionPattern<I, M> {
 
     fun first(init: ConversionFirstPattern<I, M>.() -> Unit) = initMatcher(ConversionFirstPattern(), init)
 
-    fun on(condition: I.() -> Matcher?) = ConversionInputPattern.Builder(condition) { initMatcher(it) }
+    fun on(condition: I.() -> M?) = ConversionInputPattern.Builder(condition) { initMatcher(it) }
+
+    fun onEach(condition: I.() -> Sequence<Matcher>) =
+        ConversionInputEachPattern.Builder(condition) { initMatcher(it) }
 
     fun optional(init: ConversionOptionalPattern<I, M>.() -> Unit) = initMatcher(ConversionOptionalPattern(), init)
 

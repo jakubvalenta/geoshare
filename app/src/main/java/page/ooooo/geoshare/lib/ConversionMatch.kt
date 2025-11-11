@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib
 
 import com.google.re2j.Matcher
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.lastNotNullOrNull
@@ -11,7 +10,7 @@ import page.ooooo.geoshare.lib.position.Srs
 import kotlin.math.max
 import kotlin.math.min
 
-open class PositionMatch(val matcher: Matcher, val srs: Srs) {
+sealed interface PositionMatch {
     companion object {
         const val MAX_COORD_PRECISION = 17
         const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
@@ -22,68 +21,99 @@ open class PositionMatch(val matcher: Matcher, val srs: Srs) {
         const val Q_PARAM = """(?P<q>.+)"""
         const val Q_PATH = """(?P<q>[^/]+)"""
     }
-
-    open val points: List<Point>?
-        get() = lat?.let { lat -> lon?.let { lon -> persistentListOf(Point(srs, lat, lon)) } }
-    open val lat: Double?
-        get() = matcher.groupOrNull("lat")?.toDoubleOrNull()
-    open val lon: Double?
-        get() = matcher.groupOrNull("lon")?.toDoubleOrNull()
-    open val q: String?
-        get() = matcher.groupOrNull("q")
-    open val z: Double?
-        get() = matcher.groupOrNull("z")?.toDoubleOrNull()?.let { max(1.0, min(21.0, it)) }
 }
 
-/**
- * Repeatedly searches for LAT and LON in the input to get points.
- */
-class PointsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-    override val points
-        get() = matcher.reset().let { m ->
-            buildList {
-                while (m.find()) {
-                    val lat = m.groupOrNull("lat")?.toDoubleOrNull() ?: continue
-                    val lon = m.groupOrNull("lon")?.toDoubleOrNull() ?: continue
-                    add(Point(srs, lat, lon))
-                }
+data class IncompletePosition(
+    val srs: Srs,
+    val lat: Double? = null,
+    val lon: Double? = null,
+    val q: String? = null,
+    val z: Double? = null,
+)
+
+class IncompletePoint {
+    var srs: Srs? = null
+    var lat: Double? = null
+    var lon: Double? = null
+
+    fun read(): Point? = srs?.let { srs ->
+        lat?.let { lat ->
+            lon?.let { lon ->
+                this.srs = null
+                this.lat = null
+                this.lon = null
+                Point(srs, lat, lon)
             }
         }
+    }
 }
 
-abstract class GeoHashPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-    private var latLonZCache: Triple<Double, Double, Double>? = null
-    val latLonZ: Triple<Double, Double, Double>?
-        get() = latLonZCache ?: matcher.groupOrNull("hash")?.let { hash -> decode(hash).also { latLonZCache = it } }
-    override val points get() = latLonZ?.let { (lat, lon) -> persistentListOf(Point(srs, lat, lon)) }
-    override val z get() = latLonZ?.third
+fun Matcher.toIncompleteLatLonPosition(srs: Srs): IncompletePosition? =
+    this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+        this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+            IncompletePosition(srs, lat = lat, lon = lon)
+        }
+    }
 
-    abstract fun decode(hash: String): Triple<Double, Double, Double>
-}
-
-/**
- * Create a position from a list of matches.
- *
- * Get points from the last match that has not null `points` property. If such a match doesn't exist, find the last
- * match that has not null `lat` property and the last match that has not null `lon` property and create a point from
- * them.
- */
-fun List<PositionMatch>.toPosition() = Position(
-    points = this.lastOrNull { it.points != null }?.points?.toImmutableList()
-        ?: this.lastOrNull { it.lat != null }?.let { latPosition ->
-            this.lastOrNull { it.lon != null }?.let { lonPosition ->
-                latPosition.srs.takeIf { it == lonPosition.srs }?.let { srs ->
-                    latPosition.lat?.let { lat ->
-                        lonPosition.lon?.let { lon ->
-                            persistentListOf(Point(srs, lat, lon))
-                        }
-                    }
-                }
+fun Matcher.toIncompleteLatLonZPosition(srs: Srs): IncompletePosition? =
+    this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+        this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+            this.groupOrNull("z")?.toDoubleOrNull()?.let { z ->
+                IncompletePosition(srs, lat = lat, lon = lon, z = z)
             }
-        },
-    q = this.lastOrNull { it.q != null }?.q,
-    z = this.lastOrNull { it.z != null }?.z,
-)
+        }
+    }
+
+fun Matcher.toIncompleteLatPosition(srs: Srs): IncompletePosition? =
+    this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+        IncompletePosition(srs, lat = lat)
+    }
+
+fun Matcher.toIncompleteLonPosition(srs: Srs): IncompletePosition? =
+    this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+        IncompletePosition(srs, lon = lon)
+    }
+
+fun Matcher.toIncompleteQPosition(srs: Srs): IncompletePosition? =
+    this.groupOrNull("q")?.let { q ->
+        IncompletePosition(srs, q = q)
+    }
+
+fun Matcher.toIncompleteZPosition(srs: Srs): IncompletePosition? =
+    this.groupOrNull("z")?.toDoubleOrNull()?.let {
+        IncompletePosition(srs, z = max(1.0, min(21.0, it)))
+    }
+
+fun Sequence<IncompletePosition>.toPosition(): Position {
+    val points: MutableList<Point> = mutableListOf()
+    val incompletePoint = IncompletePoint()
+    var q: String? = null
+    var z: Double? = null
+    for (incompletePosition in this) {
+        if (incompletePosition.lat != null && incompletePosition.lon != null) {
+            points.add(Point(incompletePosition.srs, incompletePosition.lat, incompletePosition.lon))
+        } else if (incompletePosition.lat != null) {
+            incompletePoint.srs = incompletePosition.srs
+            incompletePoint.lat = incompletePosition.lat
+            incompletePoint.read()?.let { point ->
+                points.add(point)
+            }
+        } else if (incompletePosition.lon != null) {
+            incompletePoint.srs = incompletePosition.srs
+            incompletePoint.lon = incompletePosition.lon
+            incompletePoint.read()?.let { point ->
+                points.add(point)
+            }
+        }
+        if (incompletePosition.q != null) {
+            q = incompletePosition.q
+        }
+        if (incompletePosition.z != null) {
+            z = incompletePosition.z
+        }
+    }
+    return Position(points.toImmutableList(), q = q, z = z)
+}
 
 open class RedirectMatch(val matcher: Matcher) {
     open val url: String? get() = matcher.groupOrNull("url")

@@ -17,6 +17,7 @@ import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import java.net.SocketTimeoutException
@@ -892,7 +893,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
             on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                override val points = position.points
+                override val point: Point? = position.mainPoint
                 override val q = position.q
             })
         }
@@ -922,7 +923,7 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = null
+                    override val point: Point? = null
                     override val q = positionFromUri.q
                 })
             }
@@ -956,7 +957,7 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = null
+                    override val point: Point? = null
                     override val q = positionFromUri.q
                 })
             }
@@ -989,7 +990,7 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = null
+                    override val point: Point? = null
                     override val q = positionFromUri.q
                 })
             }
@@ -1020,7 +1021,7 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = null
+                    override val point: Point? = null
                     override val q = positionFromUri.q
                 })
             }
@@ -1052,7 +1053,7 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = null
+                    override val point: Point? = null
                     override val q = positionFromUri.q
                 })
             }
@@ -1084,7 +1085,7 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val mockUriPattern: ConversionFirstPattern<Uri, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = null
+                    override val point: Point? = null
                     override val q = positionFromUri.q
                 })
             }
@@ -1580,7 +1581,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0, q = "fromHtml")
         val mockHtmlPattern: ConversionFirstPattern<String, PositionMatch> = mock {
             on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                override val points = position.points
+                override val point: Point? = position.mainPoint
                 override val q = position.q
             })
         }
@@ -1633,7 +1634,7 @@ class ConversionStateTest {
         val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, q = "fromHtml")
         val mockHtmlPattern: ConversionFirstPattern<String, PositionMatch> = mock {
             on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                override val points = positionFromHtml.points
+                override val point: Point? = positionFromHtml.mainPoint
                 override val q = positionFromHtml.q
             })
         }
@@ -1686,7 +1687,7 @@ class ConversionStateTest {
             val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, q = "fromHtml")
             val mockHtmlPattern: ConversionFirstPattern<String, PositionMatch> = mock {
                 on { matches(any()) } doReturn listOf(object : PositionMatch(mock(), Srs.WGS84) {
-                    override val points = positionFromHtml.points
+                    override val point: Point? = positionFromHtml.mainPoint
                     override val q = positionFromHtml.q
                 })
             }

@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.lib.inputs
 
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.position.Position
 
 abstract class BaseInputTest() {
@@ -8,21 +10,21 @@ abstract class BaseInputTest() {
 
     protected var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? = input.uriPattern.matcher(uriString).takeIf { it.find() }?.group()
+    fun getUri(uriString: String): String? = (uriString find input.uriPattern)?.group()
 
     fun doesUriPatternMatch(uriString: String): Boolean = input.uriPattern.matches(uriString)
 
-    fun getShortUri(uriString: String): String? = (input as Input.HasShortUri)
-        .shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.group()
+    fun getShortUri(uriString: String): String? =
+        (uriString matches (input as Input.HasShortUri).shortUriPattern)?.group()
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
-    fun parseUrl(uriString: String): Position? = (input as Input.HasUri)
-        .conversionUriPattern.matches(Uri.parse(uriString, uriQuote))?.toPosition()
+    fun parseUrl(uriString: String): Position? =
+        (input as Input.HasUri).conversionUriPattern.matches(Uri.parse(uriString, uriQuote))?.toPosition()
 
-    fun parseHtml(html: String): Position? = (input as Input.HasHtml)
-        .conversionHtmlPattern?.matches(html)?.toPosition()
+    fun parseHtml(html: String): Position? =
+        (input as Input.HasHtml).conversionHtmlPattern?.matches(html)?.toPosition()
 
-    fun parseHtmlRedirect(html: String) = (input as Input.HasHtml)
-        .conversionHtmlRedirectPattern?.matches(html)?.toUrlString()
+    fun parseHtmlRedirect(html: String) =
+        (input as Input.HasHtml).conversionHtmlRedirectPattern?.matches(html)?.toUrlString()
 }

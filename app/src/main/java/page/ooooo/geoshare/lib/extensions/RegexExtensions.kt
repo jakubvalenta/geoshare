@@ -15,8 +15,20 @@ fun Matcher.groupOrNull(name: String): String? = try {
     null
 }
 
+infix fun String.matches(pattern: Pattern): Matcher? =
+    pattern.matcher(this).takeIf { it.matches() }
+
 infix fun String.matches(regex: String): Matcher? =
-    Pattern.compile(regex).matcher(this)?.takeIf { it.matches() }
+    this matches Pattern.compile(regex)
+
+infix fun String.find(pattern: Pattern): Matcher? =
+    pattern.matcher(this).takeIf { it.find() }
 
 infix fun String.find(regex: String): Matcher? =
-    Pattern.compile(regex).matcher(this)?.takeIf { it.find() }
+    this find Pattern.compile(regex)
+
+infix fun String.findAll(pattern: Pattern): Sequence<Matcher> =
+    pattern.matcher(this).let { m -> generateSequence { m.takeIf { it.find() } } }
+
+infix fun String.findAll(regex: String): Sequence<Matcher> =
+    this findAll Pattern.compile(regex)

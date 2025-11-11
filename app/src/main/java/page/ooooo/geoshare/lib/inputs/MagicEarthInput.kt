@@ -31,20 +31,20 @@ object MagicEarthInput : Input.HasUri {
     override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
             }
             optional {
-                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
             }
             first {
                 all {
-                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch(it, srs) }
-                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch(it, srs) }
+                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch.Lat(it, srs) }
+                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch.Lon(it, srs) }
                 }
-                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
                 @Suppress("SpellCheckingInspection")
-                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
+                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
+                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
             }
         }
     }
