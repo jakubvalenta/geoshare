@@ -4,6 +4,7 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 
 - Google Maps
 - Apple Maps
+- Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -18,17 +19,23 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 
 <b>Ejemplo de casos de uso</b>
 
-Cuando alguien te envía un enlace de Google Maps, pero prefieres usar OpenStreetMap, puedes rápidamente abrir la misma localización en OsmAnd u Organic Maps.
+Cuando alguien te envía un enlace de Google Maps, pero prefieres usar OpenStreetMap, puedes rápidamente <b>abrir la misma localización</b> en OsmAnd u Organic Maps.
 
-Cuando te gusta Google Maps para encontrar lugares, pero prefieres una aplicación diferente para navegar, puedes fácilmente cambiar de Google Maps a tu aplicación de navegación favorita.
+Cuando te gusta Google Maps para encontrar lugares, pero prefieres una aplicación diferente para navegar, puedes fácilmente cambiar de Google Maps a tu <b>aplicación de navegación</b> favorita.
 
 <b>Otras funcionalidades</b>
 
-- Muestra las coordenadas geográficas de un enlace de mapa y las copia al portapapeles como un enlace geo:.
-- Pega enlaces de mapa directamente a la aplicación, en lugar de compartirlos con ella.
+- Muestra las <b>coordenadas geográficas</b> de un enlace de mapa y permite copiarlas a el portapapeles en diferente formatos, como por ejemplo en un enlace geo:.
+- Muestra todos los puntos de un enlace de <b>lista de lugares</b>.
+- Permite ejecutar una acción <b>automáticamente</b> cuando el enlace de mapa es procesado.
+- Permite <b>iniciar la navegación</b> en aplicaciones seleccionadas.
+- Permite guardar una localización como un <b>archivo GPX</b>.
+- Vuelve a intentar en <b>conexiones de internet inestables</b>.
+- Permite <b>pegar enlaces de mapa</b> directamente a la aplicación, en lugar de compartirlos con ella.
+- La interfaz se adapta a <b>tabletas</b>.
 
 <b>Cómo funciona y consideraciones de privacidad</b>
 
 Geo Share convierte enlaces de mapa (p.e. https://maps.app.goo.gl/...) en enlaces geo: que pueden abrirse en otras aplicaciones de mapa. Para crear un enlace geo:, coordenadas geográficas son requeridas. Geo Share los extrae de la URL del mapa.
 
-Sin embargo, no todas las URL de mapa incluyen coordenadas. En estos casos, Geo Share te pedirá permiso para conectarse a un servicio de mapas (Google Maps, Apple Maps, etc.) y obtener las coordenadas de las cabeceras HTTP o del documento HTML del enlace. Para mayor información detallada, consulta la pantalla de Preguntas Frecuentes de la aplicación.
+Sin embargo, no todas las URL de mapa incluyen coordenadas. En estos casos, Geo Share te <b>pedirá permiso para conectarse a un servicio de mapas (Google Maps, Apple Maps, etc.)</b> y obtener las coordenadas de las cabeceras HTTP o del documento HTML del enlace. Para mayor información detallada, consulta la pantalla de Preguntas Frecuentes de la aplicación.
