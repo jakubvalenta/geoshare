@@ -1,19 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
-import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.toZ
 
 object MapyComInput : Input.HasUri, Input.HasShortUri {
     private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
@@ -35,14 +34,29 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.GET
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { path matches COORDS } doReturn { NorthSouthWestEastPositionMatch(it, srs) }
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
+        pattern {
+            (path matches COORDS)?.let { m ->
+                m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                    m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                        val latSig = if (m.groupOrNull()?.contains('S') == true) -1 else 1
+                        val lonSig = if (m.groupOrNull()?.contains('W') == true) -1 else 1
+                        Position(srs, latSig * lat, lonSig * lon)
+                    }
+                }
+            }
+        }
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
+                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
             }
-            on { queryParams["x"]?.let { it matches LON } } doReturn { PositionMatch.Lon(it, srs) }
-            on { queryParams["y"]?.let { it matches LAT } } doReturn { PositionMatch.Lat(it, srs) }
+            pattern {
+                queryParams["y"]?.let { it matches LAT_PATTERN }?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                    queryParams["x"]?.let { it matches LON_PATTERN }?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                        Position(srs, lat, lon)
+                    }
+                }
+            }
         }
     }
 
@@ -51,15 +65,4 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
-
-    private class NorthSouthWestEastPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
-        override val latLon
-            get() = matcher.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                matcher.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                    val latSig = if (matcher.groupOrNull()?.contains('S') == true) -1 else 1
-                    val lonSig = if (matcher.groupOrNull()?.contains('W') == true) -1 else 1
-                    Pair(latSig * lat, lonSig * lon)
-                }
-            }
-    }
 }

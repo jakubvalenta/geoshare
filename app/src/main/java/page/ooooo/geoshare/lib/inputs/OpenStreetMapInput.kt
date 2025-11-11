@@ -1,19 +1,23 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.toLatLon
+import page.ooooo.geoshare.lib.position.toLatLonZ
 import java.net.URL
 
 object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
@@ -35,20 +39,26 @@ object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { path matches """/go/$HASH""" } doReturn { OpenStreetMapGeoHashPositionMatch(it, srs) }
-        on { path matches ELEMENT_PATH } doReturn { PositionMatch.Empty(it, srs) }
-        on { fragment matches """map=$Z/$LAT/$LON.*""" } doReturn { PositionMatch.LatLonZ(it, srs) }
-    }
-
-    override val conversionHtmlPattern = conversionPattern<Source, PositionMatch> {
-        onEach {
-            sequence {
-                for (line in generateSequence { this@onEach.readLine() }) {
-                    yieldAll(line findAll """"lat":$LAT,"lon":$LON""")
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
+        pattern {
+            (path matches """/go/$HASH""")?.groupOrNull("hash")?.let { hash ->
+                decodeOpenStreetMapQuadTileHash(hash).let { (lat, lon, z) ->
+                    Position(srs, lat, lon, z = z)
                 }
             }
-        } doReturn { PositionMatch.LatLon(it, srs) }
+        }
+        pattern { (path matches ELEMENT_PATH)?.let { Position(srs) } }
+        pattern { (fragment matches """map=$Z/$LAT/$LON.*""")?.toLatLonZ(srs) }
+    }
+
+    override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
+        listPattern {
+            val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
+            generateSequence { this@listPattern.readLine() }
+                .flatMap { line -> line findAll pattern }
+                .mapNotNull { m -> m.toLatLon(srs) }
+                .toList()
+        }
     }
 
     override val conversionHtmlRedirectPattern = null
@@ -65,8 +75,4 @@ object OpenStreetMapInput : Input.HasUri, Input.HasHtml {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
-
-    private class OpenStreetMapGeoHashPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.GeoHash(matcher, srs) {
-        override fun decode(hash: String) = decodeOpenStreetMapQuadTileHash(hash)
-    }
 }

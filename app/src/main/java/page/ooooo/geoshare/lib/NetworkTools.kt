@@ -65,17 +65,6 @@ open class NetworkTools(
     }
 
     @Throws(NetworkException::class)
-    suspend fun getText(
-        url: URL,
-        retry: Retry? = null,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): String = withContext(dispatcher) {
-        connect(engine, url, retry = retry) { response ->
-            response.body<String>()
-        }
-    }
-
-    @Throws(NetworkException::class)
     suspend fun getSource(
         url: URL,
         retry: Retry? = null,

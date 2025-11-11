@@ -1,13 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.R.attr.path
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.decodeGe0Hash
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.extensions.toScale
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
 object Ge0Input : Input.HasUri {
@@ -26,17 +27,12 @@ object Ge0Input : Input.HasUri {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, IncompletePosition> {
-        on {
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
+        pattern {
             (if (scheme == "ge0") host matches HASH else path matches """/$HASH\S*""")?.groupOrNull("hash")
                 ?.let { hash ->
                     decodeGe0Hash(hash).let { (lat, lon, z) ->
-                        IncompletePosition(
-                            srs,
-                            lat = lat.toScale(7),
-                            lon = lon.toScale(7),
-                            z = z,
-                        )
+                        Position(srs, lat.toScale(7), lon.toScale(7), z = z)
                     }
                 }
         }

@@ -5,15 +5,17 @@ import com.google.re2j.Pattern
 import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_LON_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Q_PARAM_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.*
 
 object AppleMapsInput : Input.HasUri, Input.HasHtml {
     const val NAME = "Apple Maps"
@@ -29,37 +31,38 @@ object AppleMapsInput : Input.HasUri, Input.HasHtml {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, IncompletePosition> {
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z }?.toIncompleteZPosition(srs) }
+                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
             }
             first {
-                on { if (host == "maps.apple") (path matches "/p/.+")?.let { IncompletePosition(srs) } else null }
-                on { queryParams["ll"]?.let { it matches "$LAT,$LON" }?.toIncompleteLatLonPosition(srs) }
-                on { queryParams["coordinate"]?.let { it matches "$LAT,$LON" }?.toIncompleteLatLonPosition(srs) }
-                on { queryParams["q"]?.let { it matches "$LAT,$LON" }?.toIncompleteLatLonPosition(srs) }
-                on { queryParams["address"]?.let { it matches Q_PARAM }?.toIncompleteQPosition(srs) }
-                on { queryParams["name"]?.let { it matches Q_PARAM }?.toIncompleteQPosition(srs) }
+                pattern { if (host == "maps.apple" && path.startsWith("/p/")) Position(srs) else null }
+                pattern { queryParams["ll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { queryParams["coordinate"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { queryParams["q"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { queryParams["address"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
+                pattern { queryParams["name"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
                 @Suppress("SpellCheckingInspection")
-                on { queryParams["auid"]?.let { it matches ".+" }?.let { IncompletePosition(srs) } }
-                on { queryParams["place-id"]?.let { it matches ".+" }?.let { IncompletePosition(srs) } }
+                pattern { queryParams["auid"]?.isNotEmpty()?.let { Position(srs) } }
+                pattern { queryParams["place-id"]?.isNotEmpty()?.let { Position(srs) } }
                 all {
-                    on { queryParams["q"]?.let { it matches Q_PARAM }?.toIncompleteQPosition(srs) }
-                    on { queryParams["sll"]?.let { it matches "$LAT,$LON" }?.toIncompleteLatLonPosition(srs) }
+                    pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
+                    pattern { queryParams["sll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
                 }
-                on { queryParams["sll"]?.let { it matches "$LAT,$LON" }?.toIncompleteLatLonPosition(srs) }
-                on { queryParams["center"]?.let { it matches "$LAT,$LON" }?.toIncompleteLatLonPosition(srs) }
-                on {
+                pattern { queryParams["sll"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { queryParams["center"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern {
                     // Set point to 0,0 to avoid parsing HTML for this URI. Because parsing HTML for this URI doesn't work.
-                    queryParams["q"]?.let { it matches Q_PARAM }?.toIncompleteQPosition(srs)?.copy(lat = 0.0, lon = 0.0)
+                    queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.groupOrNull("q")
+                        ?.let { q -> Position(srs, lat = 0.0, lon = 0.0, q = q) }
                 }
             }
         }
     }
 
-    override val conversionHtmlPattern = conversionPattern<Source, IncompletePosition> {
-        on {
+    override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
+        pattern {
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             var lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
             var lat: Double? = null
@@ -84,7 +87,7 @@ object AppleMapsInput : Input.HasUri, Input.HasHtml {
             }
             lat?.let { lat ->
                 lon?.let { lon ->
-                    IncompletePosition(srs, lat, lon)
+                    Position(srs, lat, lon)
                 }
             }
         }

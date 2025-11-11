@@ -1,9 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
-import page.ooooo.geoshare.lib.*
+import kotlinx.io.asSource
+import kotlinx.io.buffered
+import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.merge
 
 abstract class BaseInputTest() {
     protected abstract val input: Input
@@ -20,11 +25,15 @@ abstract class BaseInputTest() {
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
     fun parseUrl(uriString: String): Position? =
-        (input as Input.HasUri).conversionUriPattern.matches(Uri.parse(uriString, uriQuote))?.toPosition()
+        (input as Input.HasUri).conversionUriPattern.match(Uri.parse(uriString, uriQuote))?.merge()
 
     fun parseHtml(html: String): Position? =
-        (input as Input.HasHtml).conversionHtmlPattern?.matches(html)?.toPosition()
+        html.byteInputStream().asSource().buffered().use { source ->
+            (input as Input.HasHtml).conversionHtmlPattern?.match(source)?.merge()
+        }
 
     fun parseHtmlRedirect(html: String) =
-        (input as Input.HasHtml).conversionHtmlRedirectPattern?.matches(html)?.toUrlString()
+        html.byteInputStream().asSource().buffered().use { source ->
+            (input as Input.HasHtml).conversionHtmlRedirectPattern?.match(source)?.lastOrNull()
+        }
 }

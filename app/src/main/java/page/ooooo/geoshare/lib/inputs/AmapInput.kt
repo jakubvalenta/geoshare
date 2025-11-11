@@ -3,15 +3,14 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.IncompletePosition
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.matches
-import page.ooooo.geoshare.lib.toIncompleteLatLonPosition
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.toLatLon
 
 object AmapInput : Input.HasUri, Input.HasShortUri {
     private val srs = Srs.GCJ02
@@ -30,10 +29,11 @@ object AmapInput : Input.HasUri, Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override val conversionUriPattern = conversionPattern<Uri, IncompletePosition> {
-        on { queryParams["p"]?.let { it matches """\w+,$LAT,$LON.+""" }?.toIncompleteLatLonPosition(srs) }
-        on { queryParams["q"]?.let { it matches """$LAT,$LON.+""" }?.toIncompleteLatLonPosition(srs) }
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
+        pattern { queryParams["p"]?.let { it matches """\w+,$LAT,$LON.+""" }?.toLatLon(srs) }
+        pattern { queryParams["q"]?.let { it matches """$LAT,$LON.+""" }?.toLatLon(srs) }
     }
+
 
     @StringRes
     override val permissionTitleResId = R.string.converter_amap_permission_title

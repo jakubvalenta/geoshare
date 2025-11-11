@@ -3,17 +3,14 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_LON_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Q_PARAM_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.position.*
 
 object GeoInput : Input.HasUri {
     private val srs = Srs.WGS84
@@ -27,16 +24,16 @@ object GeoInput : Input.HasUri {
         )
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                on { path matches """$LAT,$LON""" } doReturn { PositionMatch.LatLon(it, srs) }
+                pattern { (path matches LAT_LON_PATTERN)?.toLatLon(srs) }
             }
             optional {
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
+                pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
             }
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
+                pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
             }
         }
     }

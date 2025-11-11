@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.google.re2j.Pattern
 import kotlinx.io.Source
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.position.Position
 import java.net.URL
 
 sealed interface Input {
@@ -28,12 +29,12 @@ sealed interface Input {
     }
 
     interface HasUri : Input {
-        val conversionUriPattern: ConversionPattern<Uri, IncompletePosition>
+        val conversionUriPattern: ConversionPattern<Uri, Position>
     }
 
     interface HasHtml : Input {
-        val conversionHtmlPattern: ConversionPattern<Source, IncompletePosition>?
-        val conversionHtmlRedirectPattern: ConversionPattern<String, RedirectMatch>?
+        val conversionHtmlPattern: ConversionPattern<Source, Position>?
+        val conversionHtmlRedirectPattern: ConversionPattern<Source, String>?
         fun getHtmlUrl(uri: Uri): URL? = uri.toUrl()
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int

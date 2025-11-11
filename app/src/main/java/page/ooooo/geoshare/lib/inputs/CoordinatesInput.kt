@@ -1,13 +1,11 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.MAX_COORD_PRECISION
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
 import page.ooooo.geoshare.lib.extensions.toScale
@@ -41,76 +39,69 @@ object CoordinatesInput : Input.HasUri {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" } doReturn
-            { DecCoordsPositionMatch(it, srs) }
-        on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" } doReturn
-            { DegMinSecCoordsPositionMatch(it, srs) }
-        on { path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" } doReturn
-            { DegMinCoordsPositionMatch(it, srs) }
-    }
-
-    /**
-     * Decimal, e.g. `N 41.40338, E 2.17403`
-     */
-    private class DecCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
-        override val latLon
-            get() = Pair(
-                degToDec(
-                    matcher.groupOrNull()?.contains('S') == true,
-                    matcher.groupOrNull("latSig"),
-                    matcher.groupOrNull("latDeg"),
-                ),
-                degToDec(
-                    matcher.groupOrNull()?.contains('W') == true,
-                    matcher.groupOrNull("lonSig"),
-                    matcher.groupOrNull("lonDeg"),
-                ),
-            )
-    }
-
-    /**
-     * Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-     */
-    private class DegMinSecCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
-        override val latLon
-            get() = Pair(
-                degToDec(
-                    matcher.groupOrNull()?.contains('S') == true,
-                    matcher.groupOrNull("latSig"),
-                    matcher.groupOrNull("latDeg"),
-                    matcher.groupOrNull("latMin"),
-                    matcher.groupOrNull("latSec"),
-                ),
-                degToDec(
-                    matcher.groupOrNull()?.contains('W') == true,
-                    matcher.groupOrNull("lonSig"),
-                    matcher.groupOrNull("lonDeg"),
-                    matcher.groupOrNull("lonMin"),
-                    matcher.groupOrNull("lonSec"),
-                ),
-            )
-    }
-
-    /**
-     * Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-     */
-    private class DegMinCoordsPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
-        override val latLon
-            get() = Pair(
-                degToDec(
-                    matcher.groupOrNull()?.contains('S') == true,
-                    matcher.groupOrNull("latSig"),
-                    matcher.groupOrNull("latDeg"),
-                    matcher.groupOrNull("latMin"),
-                ),
-                degToDec(
-                    matcher.groupOrNull()?.contains('W') == true,
-                    matcher.groupOrNull("lonSig"),
-                    matcher.groupOrNull("lonDeg"),
-                    matcher.groupOrNull("lonMin"),
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
+        // Decimal, e.g. `N 41.40338, E 2.17403`
+        pattern {
+            (path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""")?.let { m ->
+                Position(
+                    srs,
+                    lat = degToDec(
+                        m.groupOrNull()?.contains('S') == true,
+                        m.groupOrNull("latSig"),
+                        m.groupOrNull("latDeg"),
+                    ),
+                    lon = degToDec(
+                        m.groupOrNull()?.contains('W') == true,
+                        m.groupOrNull("lonSig"),
+                        m.groupOrNull("lonDeg"),
+                    ),
                 )
-            )
+            }
+        }
+
+        // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
+        pattern {
+            (path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""")?.let { m ->
+                Position(
+                    srs,
+                    degToDec(
+                        m.groupOrNull()?.contains('S') == true,
+                        m.groupOrNull("latSig"),
+                        m.groupOrNull("latDeg"),
+                        m.groupOrNull("latMin"),
+                        m.groupOrNull("latSec"),
+                    ),
+                    degToDec(
+                        m.groupOrNull()?.contains('W') == true,
+                        m.groupOrNull("lonSig"),
+                        m.groupOrNull("lonDeg"),
+                        m.groupOrNull("lonMin"),
+                        m.groupOrNull("lonSec"),
+                    ),
+                )
+            }
+        }
+
+        // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
+        pattern {
+            (path matches """$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""")?.let { m ->
+                Position(
+                    srs,
+                    degToDec(
+                        m.groupOrNull()?.contains('S') == true,
+                        m.groupOrNull("latSig"),
+                        m.groupOrNull("latDeg"),
+                        m.groupOrNull("latMin"),
+                    ),
+                    degToDec(
+                        m.groupOrNull()?.contains('W') == true,
+                        m.groupOrNull("lonSig"),
+                        m.groupOrNull("lonDeg"),
+                        m.groupOrNull("lonMin"),
+                    ),
+                )
+            }
+        }
     }
 
     private fun degToDec(

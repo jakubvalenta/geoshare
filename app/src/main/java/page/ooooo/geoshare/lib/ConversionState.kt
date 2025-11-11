@@ -10,12 +10,13 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
+import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.merge
 import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
@@ -223,12 +224,11 @@ data class UnshortenedUrl(
 ) : ConversionState() {
     override suspend fun transition(): State {
         val positionFromUri = if (input is Input.HasUri) {
-            val conversionMatchers = input.conversionUriPattern.matches(uri)
-            if (conversionMatchers == null) {
+            val positionFromUrl = input.conversionUriPattern.match(uri)?.merge()
+            if (positionFromUrl == null) {
                 stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
                 return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
             }
-            val positionFromUrl = conversionMatchers.toPosition()
             stateContext.log.i(null, "URI Pattern: Converted $uri to $positionFromUrl")
             if (positionFromUrl.points?.isNotEmpty() == true) {
                 return ConversionSucceeded(stateContext, runContext, inputUriString, positionFromUrl)
@@ -326,26 +326,27 @@ data class GrantedParseHtmlPermission(
             }
         }
         source.use {
-            input.conversionHtmlPattern?.matches(source)?.toPosition()?.let { position ->
+            input.conversionHtmlPattern?.match(source)?.merge()?.let { position ->
                 stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
                 return ConversionSucceeded(stateContext, runContext, inputUriString, position)
             }
         }
-        // input.conversionHtmlRedirectPattern?.matches(html)?.toUrlString()?.let { redirectUriString ->
-        //     stateContext.log.i(
-        //         null,
-        //         "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"
-        //     )
-        //     val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
-        //     return ReceivedUri(
-        //         stateContext,
-        //         runContext,
-        //         inputUriString,
-        //         input,
-        //         redirectUri,
-        //         Permission.ALWAYS
-        //     )
-        // }
+        // FIXME HTML redirect
+        input.conversionHtmlRedirectPattern?.match(source)?.lastOrNull()?.let { redirectUriString ->
+            stateContext.log.i(
+                null,
+                "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"
+            )
+            val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
+            return ReceivedUri(
+                stateContext,
+                runContext,
+                inputUriString,
+                input,
+                redirectUri,
+                Permission.ALWAYS
+            )
+        }
         stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
         return ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
     }

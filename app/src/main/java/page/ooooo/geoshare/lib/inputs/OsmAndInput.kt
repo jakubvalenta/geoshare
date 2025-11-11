@@ -2,14 +2,14 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_LON_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
 import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.position.*
 
 object OsmAndInput : Input.HasUri {
     private val srs = Srs.WGS84
@@ -22,14 +22,14 @@ object OsmAndInput : Input.HasUri {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                on { fragment matches """$Z/.*""" } doReturn { PositionMatch(it, srs) }
+                pattern { (fragment matches """$Z/.*""")?.toZ(srs) }
             }
             first {
-                on { queryParams["pin"]?.let { it matches """$LAT,$LON""" } } doReturn { PositionMatch(it, srs) }
-                on { fragment matches """$Z/$LAT/$LON.*""" } doReturn { PositionMatch(it, srs) }
+                pattern { queryParams["pin"]?.let { it matches LAT_LON_PATTERN }?.toLatLon(srs) }
+                pattern { (fragment matches """$Z/$LAT/$LON.*""")?.toLatLonZ(srs) }
             }
         }
     }

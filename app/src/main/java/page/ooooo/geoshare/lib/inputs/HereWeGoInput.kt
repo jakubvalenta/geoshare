@@ -1,21 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.IncompletePosition
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.toIncompleteLatLonPosition
-import page.ooooo.geoshare.lib.toIncompleteLatLonZPosition
+import page.ooooo.geoshare.lib.position.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -36,31 +31,25 @@ object HereWeGoInput : Input.HasUri {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val conversionUriPattern = conversionPattern<Uri, IncompletePosition> {
-        on { (path matches "/l/$LAT,$LON")?.toIncompleteLatLonPosition(srs) }
-        on {
-            if (path == "/") queryParams["map"]?.let { it matches "$LAT,$LON,$Z" }
-                ?.toIncompleteLatLonZPosition(srs) else null
-        }
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
+        pattern { (path matches "/l/$LAT,$LON")?.toLatLon(srs) }
+        pattern { queryParams["map"]?.takeIf { path == "/" }?.let { it matches "$LAT,$LON,$Z" }?.toLatLonZ(srs) }
         all {
             optional {
-                on { queryParams["map"]?.let { it matches ".*,$Z" } } doReturn { PositionMatch.Zoom(it, srs) }
+                pattern { queryParams["map"]?.let { it matches ".*,$Z" }?.toZ(srs) }
             }
-            on { path matches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" } doReturn
-                { EncodedPositionMatch(it, srs) }
+            pattern {
+                (path matches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""")?.groupOrNull("encoded")?.let { encoded ->
+                    Base64.decode(encoded).decodeToString().let { decoded ->
+                        (decoded find """(lat=|"latitude":)$LAT""")?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                            (decoded find """(lon=|"longitude":)$LON""")?.groupOrNull("lon")?.toDoubleOrNull()
+                                ?.let { lon ->
+                                    Position(srs, lat, lon)
+                                }
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    private class EncodedPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch.LatLon(matcher, srs) {
-        override val latLon: Pair<Double, Double>?
-            get() {
-                val encoded = matcher.groupOrNull("encoded") ?: return null
-                val decoded = Base64.decode(encoded).decodeToString()
-                val lat = (decoded find """(lat=|"latitude":)$LAT""")?.groupOrNull("lat")?.toDoubleOrNull()
-                    ?: return null
-                val lon = (decoded find """(lon=|"longitude":)$LON""")?.groupOrNull("lon")?.toDoubleOrNull()
-                    ?: return null
-                return Pair(lat, lon)
-            }
     }
 }

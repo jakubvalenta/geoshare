@@ -2,15 +2,18 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Q_PARAM_PATTERN
+import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.toQ
+import page.ooooo.geoshare.lib.position.toZ
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
@@ -28,23 +31,28 @@ object MagicEarthInput : Input.HasUri {
         ),
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
+    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
         all {
             optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
-            }
-            optional {
-                on { queryParams["zoom"]?.let { it matches Z } } doReturn { PositionMatch.Zoom(it, srs) }
+                first {
+                    pattern { queryParams["z"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                    pattern { queryParams["zoom"]?.let { it matches Z_PATTERN }?.toZ(srs) }
+                }
             }
             first {
-                all {
-                    on { queryParams["lat"]?.let { it matches LAT } } doReturn { PositionMatch.Lat(it, srs) }
-                    on { queryParams["lon"]?.let { it matches LON } } doReturn { PositionMatch.Lon(it, srs) }
+                pattern {
+                    (queryParams["lat"]?.let { it matches LAT_PATTERN })?.groupOrNull("lat")?.toDoubleOrNull()
+                        ?.let { lat ->
+                            (queryParams["lon"]?.let { it matches LON_PATTERN })?.groupOrNull("lon")?.toDoubleOrNull()
+                                ?.let { lon ->
+                                    Position(srs, lat, lon)
+                                }
+                        }
                 }
-                on { queryParams["name"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
+                pattern { queryParams["name"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
                 @Suppress("SpellCheckingInspection")
-                on { queryParams["daddr"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch.Query(it, srs) }
+                pattern { queryParams["daddr"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
+                pattern { queryParams["q"]?.let { it matches Q_PARAM_PATTERN }?.toQ(srs) }
             }
         }
     }

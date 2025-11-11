@@ -10,6 +10,7 @@ import io.ktor.util.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.readString
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -84,14 +85,16 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun getText_requestReturns200_callsConnectAndReturnsResponseBody() = runTest {
+    fun getSource_requestReturns200_callsConnectAndReturnsResponseBody() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
-        assertEquals(
-            "test content",
-            mockNetworkTools.getText(url, dispatcher = StandardTestDispatcher(testScheduler)),
-        )
+        mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)).use { source ->
+            assertEquals(
+                "test content",
+                source.readString(),
+            )
+        }
         verify(mockNetworkTools).connect(
             engine = eq(mockEngine),
             url = eq(url),
@@ -104,7 +107,7 @@ class NetworkToolsTest {
     }
 
     @Test
-    fun getText_200Response() = runTest {
+    fun getSource_200Response() = runTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { _ ->
             respond(
@@ -113,10 +116,12 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        assertEquals(
-            "test content",
-            mockNetworkTools.getText(url, dispatcher = StandardTestDispatcher(testScheduler)),
-        )
+        mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)).use { source ->
+            assertEquals(
+                "test content",
+                source.readString(),
+            )
+        }
         val lastRequest = mockEngine.requestHistory.last()
         val clientConfig = lastRequest.attributes[AttributeKey<HttpClientConfig<*>>("client-config")]
         assertEquals(lastRequest.method, HttpMethod.Get)
