@@ -106,7 +106,7 @@
     <string name="url_converters_filter_recent">Recientemente agregado</string>
     <string name="url_converters_default_handler_enabled">Abre por defecto en %1$s</string>
     <string name="url_converters_default_handler_disabled">No abre por defecto en %1$s</string>
-    <string name="url_converters_recent_info">%1$s recientemente obtuvo soporte para nuevos servicios de mapa</string>
+    <string name="url_converters_recent_info">%1$s recientemente obtuvo soporte para nuevos servicios de mapa.</string>
     <string name="url_converters_settings_button_content_description">Abrir ajustes de Android</string>
     <string name="conversion_succeeded_save_gpx_failed">No fue posible guardar GPX</string>
     <string name="main_input_uri_paste_content_description">Pegar</string>
