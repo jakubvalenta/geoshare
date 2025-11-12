@@ -309,15 +309,13 @@ data class GrantedParseHtmlPermission(
             stateContext.networkTools.getSource(htmlUrl, retry) { source ->
                 val position = input.conversionHtmlPattern?.match(source)?.merge()
                 if (position != null) {
-                    stateContext.log.i(null, "HTML Pattern: parsed $htmlUrl to $position")
+                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $position")
                     ConversionSucceeded(stateContext, runContext, inputUriString, position)
                 } else {
                     val redirectUriString = input.conversionHtmlRedirectPattern?.match(source)?.lastOrNull()
                     if (redirectUriString != null) {
-                        // FIXME HTML redirect
                         stateContext.log.i(
-                            null,
-                            "HTML Redirect Pattern: parsed $htmlUrl to redirect URI $redirectUriString"
+                            null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
                         )
                         val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                         ReceivedUri(

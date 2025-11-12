@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.io.Source
 import kotlinx.io.asSource
 import kotlinx.io.buffered
+import kotlinx.io.readLine
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -1604,18 +1605,29 @@ class ConversionStateTest {
             val positionFromUri = Position(q = "bar")
             val redirectUriString = "https://maps.apple.com/foo-redirect"
             val redirectUri = Uri.parse(redirectUriString, uriQuote)
-            val html = "<html></html>"
-            val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-                on { match(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionPattern.First<Source, String> = mock {
-                on { match(any()) } doReturn listOf(redirectUriString)
-            }
             val mockInput = object : Input.HasHtml {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = mockHtmlPattern
-                override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
+                override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
+                    pattern {
+                        // Exhaust the whole source
+                        generateSequence { this.readLine() }.count() // FIXME The test fails, because we exhaust the source
+                        null
+                    }
+                }
+                override val conversionHtmlRedirectPattern = ConversionPattern.first<Source, String> {
+                    pattern {
+                        // Try to read all lines of the source again
+                        var i = 0
+                        generateSequence {
+                            fakeLog.i(null, "Reading line ${i++}")
+                            this.readLine()
+                                .also { line -> if (line == null) fakeLog.i(null, "Exhausted") }
+                        }
+                            .firstNotNullOfOrNull { line -> line == redirectUriString }
+                            ?.let { redirectUriString }
+                    }
+                }
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
             }
@@ -1623,7 +1635,12 @@ class ConversionStateTest {
                 inputs = listOf(mockInput),
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        html
+                        """
+                            apples
+                            oranges
+                            $redirectUriString
+                            spam
+                        """.trimIndent()
                     } else {
                         super.onGetSource(url)
                     }
