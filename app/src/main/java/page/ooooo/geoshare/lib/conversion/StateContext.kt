@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.conversion
 
 abstract class StateContext {
     companion object {

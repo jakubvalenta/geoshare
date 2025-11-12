@@ -1,7 +1,4 @@
-package page.ooooo.geoshare.lib
-
-import kotlin.collections.flatten
-import com.google.re2j.Pattern as Pattern_
+package page.ooooo.geoshare.lib.conversion
 
 abstract class ConversionPattern<I, M> {
 
@@ -15,12 +12,12 @@ abstract class ConversionPattern<I, M> {
         const val Q_PARAM = """(?P<q>.+)"""
         const val Q_PATH = """(?P<q>[^/]+)"""
 
-        val LAT_PATTERN: Pattern_ = Pattern_.compile(LAT)
-        val LON_PATTERN: Pattern_ = Pattern_.compile(LON)
-        val LAT_LON_PATTERN: Pattern_ = Pattern_.compile("$LAT,$LON")
-        val LON_LAT_PATTERN: Pattern_ = Pattern_.compile("$LON,$LAT")
-        val Z_PATTERN: Pattern_ = Pattern_.compile(Z)
-        val Q_PARAM_PATTERN: Pattern_ = Pattern_.compile(Q_PARAM)
+        val LAT_PATTERN: com.google.re2j.Pattern = com.google.re2j.Pattern.compile(LAT)
+        val LON_PATTERN: com.google.re2j.Pattern = com.google.re2j.Pattern.compile(LON)
+        val LAT_LON_PATTERN: com.google.re2j.Pattern = com.google.re2j.Pattern.compile("$LAT,$LON")
+        val LON_LAT_PATTERN: com.google.re2j.Pattern = com.google.re2j.Pattern.compile("$LON,$LAT")
+        val Z_PATTERN: com.google.re2j.Pattern = com.google.re2j.Pattern.compile(Z)
+        val Q_PARAM_PATTERN: com.google.re2j.Pattern = com.google.re2j.Pattern.compile(Q_PARAM)
 
         fun <I, M> first(init: First<I, M>.() -> Unit): First<I, M> {
             val conversionPattern = First<I, M>()

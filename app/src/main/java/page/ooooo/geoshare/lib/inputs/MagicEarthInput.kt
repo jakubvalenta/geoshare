@@ -2,11 +2,11 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionPattern
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT_PATTERN
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON_PATTERN
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.Q_PARAM_PATTERN
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
+import page.ooooo.geoshare.lib.conversion.ConversionPattern
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT_PATTERN
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON_PATTERN
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Q_PARAM_PATTERN
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match

@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 
 @Composable
 fun ConversionNavigation(runContext: ConversionRunContext, viewModel: ConversionViewModel, onFinish: () -> Unit) {

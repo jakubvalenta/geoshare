@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.google.re2j.Pattern
 import kotlinx.io.Source
 import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.conversion.ConversionPattern
 import page.ooooo.geoshare.lib.position.Position
 import java.net.URL
 

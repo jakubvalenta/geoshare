@@ -5,11 +5,11 @@ import com.google.re2j.Pattern
 import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionPattern
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.LAT
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.LON_LAT_PATTERN
-import page.ooooo.geoshare.lib.ConversionPattern.Companion.Z_PATTERN
+import page.ooooo.geoshare.lib.conversion.ConversionPattern
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON_LAT_PATTERN
+import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.match

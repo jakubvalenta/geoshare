@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionPattern
+import page.ooooo.geoshare.lib.conversion.ConversionPattern
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeGe0Hash
 import page.ooooo.geoshare.lib.extensions.groupOrNull

@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Immutable
 import io.ktor.util.escapeHTML
-import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.position.Position

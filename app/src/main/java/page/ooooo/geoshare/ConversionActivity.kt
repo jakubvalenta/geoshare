@@ -11,7 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.AndroidEntryPoint
-import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 import page.ooooo.geoshare.ui.ConversionNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 

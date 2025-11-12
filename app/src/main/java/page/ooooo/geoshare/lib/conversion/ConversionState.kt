@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.conversion
 
 import android.content.Context
 import android.content.Intent
@@ -13,6 +13,9 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
+import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.lib.SourceCache
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.position.Position
@@ -319,7 +322,8 @@ data class GrantedParseHtmlPermission(
                         stateContext.log.i(
                             null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
                         )
-                        val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
+                        val redirectUri =
+                            Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                         ReceivedUri(
                             stateContext,
                             runContext,
