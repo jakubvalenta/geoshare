@@ -225,7 +225,8 @@ data class UnshortenedUrl(
 ) : ConversionState() {
     override suspend fun transition(): State {
         val positionFromUri = if (input is Input.HasUri) {
-            val positionFromUrl = input.conversionUriPattern.match(uri)?.merge()
+            val positionsFromUrl = input.conversionUriPattern.match(uri)
+            val positionFromUrl = positionsFromUrl?.merge()
             if (positionFromUrl == null) {
                 stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
                 return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
@@ -307,12 +308,13 @@ data class GrantedParseHtmlPermission(
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
             stateContext.networkTools.getSource(htmlUrl, retry) { source ->
-                val position = input.conversionHtmlPattern?.match(source)?.merge()
+                val sourceCache = SourceCache(source)
+                val position = input.conversionHtmlPattern?.match(sourceCache.writer)?.merge()
                 if (position != null) {
                     stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $position")
                     ConversionSucceeded(stateContext, runContext, inputUriString, position)
                 } else {
-                    val redirectUriString = input.conversionHtmlRedirectPattern?.match(source)?.lastOrNull()
+                    val redirectUriString = input.conversionHtmlRedirectPattern?.match(sourceCache.reader)?.lastOrNull()
                     if (redirectUriString != null) {
                         stateContext.log.i(
                             null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"

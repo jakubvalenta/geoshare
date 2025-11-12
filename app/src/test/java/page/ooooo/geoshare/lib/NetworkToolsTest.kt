@@ -10,6 +10,7 @@ import io.ktor.util.*
 import io.ktor.util.network.*
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.buffered
 import kotlinx.io.readString
 import org.junit.Assert.*
 import org.junit.Test
@@ -90,7 +91,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
         val text = mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)) { source ->
-            source.readString()
+            source.buffered().readString()
         }
         assertEquals("test content", text)
         verify(mockNetworkTools).connect(
@@ -115,7 +116,7 @@ class NetworkToolsTest {
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         val text = mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)) { source ->
-            source.readString()
+            source.buffered().readString()
         }
         assertEquals("test content", text)
         val lastRequest = mockEngine.requestHistory.last()

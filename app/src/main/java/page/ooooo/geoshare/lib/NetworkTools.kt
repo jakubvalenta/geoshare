@@ -17,11 +17,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.io.Source
-import kotlinx.io.buffered
+import kotlinx.io.RawSource
 import page.ooooo.geoshare.R
 import java.net.URL
-import kotlin.io.use
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -69,11 +67,11 @@ open class NetworkTools(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        block: (source: Source) -> T,
+        block: (source: RawSource) -> T,
     ): T = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             val channel: ByteReadChannel = response.body()
-            channel.asSource().buffered().use(block)
+            channel.asSource().use(block)
         }
     }
 

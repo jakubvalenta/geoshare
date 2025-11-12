@@ -6,9 +6,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.RawSource
 import kotlinx.io.Source
 import kotlinx.io.asSource
-import kotlinx.io.buffered
 import kotlinx.io.readLine
 import org.junit.Assert.*
 import org.junit.Test
@@ -60,8 +60,8 @@ class ConversionStateTest {
             url: URL,
             retry: Retry?,
             dispatcher: CoroutineDispatcher,
-            block: (source: Source) -> T,
-        ): T = block(onGetSource(url).byteInputStream().asSource().buffered())
+            block: (source: RawSource) -> T,
+        ): T = block(onGetSource(url).byteInputStream().asSource())
 
         open fun onGetSource(url: URL): String {
             throw NotImplementedError()
@@ -862,7 +862,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringButThereIsNoPointAndPermissionIsAlways_returnsGrantedParseHtmlPermission() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNoPointAndPermissionIsAlways_returnsGrantedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -898,7 +898,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringButThereIsNoPointAndPermissionIsAsk_returnsRequestedParseHtmlPermission() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNoPointAndPermissionIsAsk_returnsRequestedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -933,7 +933,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringButThereIsNoPointAndPermissionIsNever_returnsParseHtmlFailed() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNoPointAndPermissionIsNever_returnsParseHtmlFailed() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -966,7 +966,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringButThereIsNoPointAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedParseHtmlPermission() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNoPointAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1000,7 +1000,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringButThereIsNoPointAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedParseHtmlPermission() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNoPointAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1034,7 +1034,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_uriPatternMatchesInputUriStringButThereIsNoPointAndPermissionIsNullAndPreferencePermissionIsNever_returnsParseHtmlFailed() =
+    fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsNoPointAndPermissionIsNullAndPreferencePermissionIsNever_returnsParseHtmlFailed() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1598,7 +1598,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlButHtmlRedirectPatternMatchesHtmlAbsoluteUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
+    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndExhaustsTheWholeSourceAndHtmlRedirectPatternMatchesHtmlAbsoluteUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1611,21 +1611,16 @@ class ConversionStateTest {
                 override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
                     pattern {
                         // Exhaust the whole source
-                        generateSequence { this.readLine() }.count() // FIXME The test fails, because we exhaust the source
+                        generateSequence { this.readLine() }
+                            .firstOrNull { line -> "fifth" in line }
                         null
                     }
                 }
                 override val conversionHtmlRedirectPattern = ConversionPattern.first<Source, String> {
                     pattern {
-                        // Try to read all lines of the source again
-                        var i = 0
-                        generateSequence {
-                            fakeLog.i(null, "Reading line ${i++}")
-                            this.readLine()
-                                .also { line -> if (line == null) fakeLog.i(null, "Exhausted") }
-                        }
-                            .firstNotNullOfOrNull { line -> line == redirectUriString }
-                            ?.let { redirectUriString }
+                        // Read all lines of the source again -- uses cache
+                        generateSequence { this.readLine() }
+                            .firstNotNullOfOrNull { line -> redirectUriString.takeIf { redirectUriString in line } }
                     }
                 }
                 override val permissionTitleResId = -1
@@ -1635,12 +1630,13 @@ class ConversionStateTest {
                 inputs = listOf(mockInput),
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        """
-                            apples
-                            oranges
-                            $redirectUriString
-                            spam
-                        """.trimIndent()
+                        listOf(
+                            "first",
+                            "second",
+                            "third",
+                            redirectUriString,
+                            "fifth",
+                        ).joinToString("\n") { it.repeat(2048) }
                     } else {
                         super.onGetSource(url)
                     }
@@ -1657,7 +1653,62 @@ class ConversionStateTest {
         }
 
     @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlButHtmlRedirectPatternMatchesHtmlRelativeUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
+    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndDoesNotExhaustTheWholeSourceAndHtmlRedirectPatternMatchesHtmlAbsoluteUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
+        runTest {
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val positionFromUri = Position(q = "bar")
+            val redirectUriString = "https://maps.apple.com/foo-redirect"
+            val redirectUri = Uri.parse(redirectUriString, uriQuote)
+            val mockInput = object : Input.HasHtml {
+                override val uriPattern: Pattern = Pattern.compile(".")
+                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
+                override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
+                    pattern {
+                        // Read from the source but don't exhaust it
+                        generateSequence { this.readLine() }
+                            .firstOrNull { line -> "second" in line }
+                        null
+                    }
+                }
+                override val conversionHtmlRedirectPattern = ConversionPattern.first<Source, String> {
+                    pattern {
+                        // Read all lines of the source again -- uses partially cache and partially the source
+                        generateSequence { this.readLine() }
+                            .firstNotNullOfOrNull { line -> redirectUriString.takeIf { redirectUriString in line } }
+                    }
+                }
+                override val permissionTitleResId = -1
+                override val loadingIndicatorTitleResId = -1
+            }
+            val stateContext = mockStateContext(
+                inputs = listOf(mockInput),
+                networkTools = object : MockNetworkTools() {
+                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
+                        listOf(
+                            "first",
+                            "second",
+                            "third",
+                            redirectUriString,
+                            "fifth",
+                        ).joinToString("\n") { it.repeat(2048) }
+                    } else {
+                        super.onGetSource(url)
+                    }
+                },
+            )
+            val runContext = mockRunContext()
+            val state = GrantedParseHtmlPermission(
+                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
+            )
+            assertEquals(
+                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndHtmlRedirectPatternMatchesHtmlRelativeUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
