@@ -29,6 +29,12 @@ object WazeInput : Input.HasUri, Input.HasHtml {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
+    // 1 https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
+    // 2 https://www.waze.com/ul?venue_id=183894452.1839010060.260192
+    // 3 https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
+    // 4 https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
+    // TODO override val uriReplacement: String =
+
     override val documentation = Input.Documentation(
         nameResId = R.string.converter_waze_name,
         inputs = listOf(

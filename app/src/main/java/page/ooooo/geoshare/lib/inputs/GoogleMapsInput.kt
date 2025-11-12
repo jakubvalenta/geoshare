@@ -1,7 +1,13 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.R.attr.data
+import android.R.attr.path
+import android.R.attr.scheme
 import androidx.annotation.StringRes
+import com.google.re2j.Matcher
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
@@ -46,88 +52,67 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        all {
-            optional {
-                first {
-                    pattern { (Z_PATTERN match scheme)?.toZ(srs) }
-                    pattern { (Z_PATTERN match queryParams["zoom"])?.toZ(srs) }
-                    pattern { ("""/maps/.*/@[\d.,+-]+,${Z}z.*""" match path)?.toZ(srs) }
-                }
-                first {
-                    pattern {
-                        (LAT_LON_PATTERN match queryParams["destination"])?.toLatLon(srs)
-                    }
-                    pattern { (Q_PARAM_PATTERN match queryParams["destination"])?.toQ(srs) }
-                    pattern { (LAT_LON_PATTERN match queryParams["q"])?.toLatLon(srs) }
-                    pattern { (Q_PARAM_PATTERN match queryParams["q"])?.toQ(srs) }
-                    pattern { (LAT_LON_PATTERN match queryParams["query"])?.toLatLon(srs) }
-                    pattern { (Q_PARAM_PATTERN match queryParams["query"])?.toQ(srs) }
-                    pattern { (LAT_LON_PATTERN match queryParams["viewpoint"])?.toLatLon(srs) }
-                    pattern { (LAT_LON_PATTERN match queryParams["center"])?.toLatLon(srs) }
-                }
-            }
-            first {
-                listPattern {
-                    sequence {
-                        ("""/maps/.*/$DATA""" match path)?.groupOrNull("data")?.let { data ->
-                            ("""!3d$LAT!4d$LON""" find data)?.let { m ->
-                                yield(m)
-                                return@sequence
-                            }
-                            yieldAll("""!1d$LON!2d$LAT""" findAll data)
-                        }
-                    }.mapNotNull { m -> m.toLatLon(srs) }.toList()
-                }
-                pattern { ("""/maps/@$LAT,$LON,${Z}z.*""" match path)?.toLatLonZ(srs) }
-                pattern { ("""/maps/@$LAT,$LON.*""" match path)?.toLatLon(srs) }
-                pattern { ("""/maps/@""" match path)?.let { Position(srs) } }
-                pattern { ("""/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*""" match path)?.toLatLonZ(srs) }
-                pattern { ("""/maps/place/.*/@$LAT,$LON,${Z}z.*""" match path)?.toLatLonZ(srs) }
-                pattern { ("""/maps/place/.*/@$LAT,$LON.*""" match path)?.toLatLon(srs) }
-                pattern { ("""/maps/place/$LAT,$LON.*""" match path)?.toLatLon(srs) }
-                pattern { ("""/maps/place/$Q_PATH.*""" match path)?.toQ(srs) }
-                pattern { ("""/maps/place//.*""" match path)?.let { Position(srs) } }
-                pattern { ("""/maps/placelists/list/.*""" match path)?.let { Position(srs) } }
-                pattern { ("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path)?.let { Position(srs) } }
-                pattern { ("""/maps/search/$LAT,$LON.*""" match path)?.toLatLon(srs) }
-                pattern { ("""/maps/search/$Q_PATH.*""" match path)?.toQ(srs) }
-                pattern { ("""/maps/search/""" match path)?.let { Position(srs) } }
-                pattern { ("""/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" match path)?.toLatLonZ(srs) }
-                pattern { ("""/maps/dir/.*/$LAT,$LON/data[^/]*""" match path)?.toLatLon(srs) }
-                pattern { ("""/maps/dir/.*/$LAT,$LON/?""" match path)?.toLatLon(srs) }
-                pattern { ("""/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" match path)?.toLatLonZ(srs) }
-                pattern { ("""/maps/dir/.*/$Q_PATH/data[^/]*""" match path)?.toQ(srs) }
-                pattern { ("""/maps/dir/.*/$Q_PATH/?""" match path)?.toQ(srs) }
-                pattern { ("""/maps/dir/""" match path)?.let { Position(srs) } }
-                pattern {
-                    if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) {
-                        Position(srs)
-                    } else {
-                        null
-                    }
-                }
-                pattern { ("""/maps/?""" match path)?.let { Position(srs) } }
-                pattern { ("""/search/?""" match path)?.let { Position(srs) } }
-                pattern { ("""/?""" match path)?.let { Position(srs) } }
-            }
-        }
+    override val conversionUriPattern = ConversionPattern<Uri>(srs) {
+        val data = ("""/maps/.*/$DATA""" match path)?.groupOrNull("data")
+
+        latLonAll { """!1d$LON!2d$LAT""" findAll data }
+        latLon { """!3d$LAT!4d$LON""" find data }
+        latLonZ { """/maps/@$LAT,$LON,${Z}z.*""" match path }
+        latLon { """/maps/@$LAT,$LON.*""" match path }
+        latLonZ { """/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*""" match path }
+        latLonZ { """/maps/place/.*/@$LAT,$LON,${Z}z.*""" match path }
+        latLon { """/maps/place/.*/@$LAT,$LON.*""" match path }
+        latLon { """/maps/place/$LAT,$LON.*""" match path }
+        latLon { """/maps/search/$LAT,$LON.*""" match path }
+        latLonZ { """/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" match path }
+        latLon { """/maps/dir/.*/$LAT,$LON/data[^/]*""" match path }
+        latLon { """/maps/dir/.*/$LAT,$LON/?""" match path }
+        latLonZ { """/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" match path }
+        latLon { LAT_LON_PATTERN match queryParams["destination"] }
+        latLon { LAT_LON_PATTERN match queryParams["q"] }
+        latLon { LAT_LON_PATTERN match queryParams["query"] }
+        latLon { LAT_LON_PATTERN match queryParams["viewpoint"] }
+        latLon { LAT_LON_PATTERN match queryParams["center"] }
+        q { Q_PARAM_PATTERN match queryParams["destination"] }
+        q { Q_PARAM_PATTERN match queryParams["q"] }
+        q { Q_PARAM_PATTERN match queryParams["query"] }
+        q { """/maps/place/$Q_PATH.*""" match path }
+        q { """/maps/search/$Q_PATH.*""" match path }
+        q { """/maps/dir/.*/$Q_PATH/data[^/]*""" match path }
+        q { """/maps/dir/.*/$Q_PATH/?""" match path }
+        htmlUri { ("""/?""" match path)?.let { this } }
+        htmlUri { ("""/maps/?""" match path)?.let { this } }
+        htmlUri { ("""/maps/@""" match path)?.let { this } }
+        htmlUri { ("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path)?.let { this } }
+        htmlUri { ("""/maps/dir/.*""" match path)?.let { this } }
+        htmlUri { ("""/maps/place/.*""" match path)?.let { this } }
+        htmlUri { ("""/maps/placelists/list/.*""" match path)?.let { this } }
+        htmlUri { ("""/maps/search/.*""" match path)?.let { this } }
+        htmlUri { ("""/search/?""" match path)?.let { this } }
+        htmlUri { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) this else null }
+        z { Z_PATTERN match scheme }
+        z { Z_PATTERN match queryParams["zoom"] }
     }
 
-    override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
-        listPattern {
+    override val conversionHtmlPattern = ConversionPattern<Source>(srs) {
+        latLonAll {
             val mainPointPatterns = listOf(
                 Pattern.compile("""/@$LAT,$LON"""),
                 Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT"""),
             )
             val extraPointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
+            val redirectPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
             var mainPosition: Position? = null
             val extraPositions: MutableList<Position> = mutableListOf()
+            var redirectUriString: String? = null
             for (line in generateSequence { this@listPattern.readLine() }) {
                 if (mainPosition == null) {
                     mainPointPatterns
                         .firstNotNullOfOrNull { pattern -> pattern find line }?.toLatLon(srs)
                         ?.let { mainPosition = it }
+                }
+                if (redirectUriString == null) {
+                    (redirectPattern find line)?.groupOrNull("url")?.let { redirectUriString = it }
                 }
                 (extraPointPattern findAll line)
                     .mapNotNull { m -> m.toLatLon(srs) }
@@ -135,21 +120,14 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
             }
             if (extraPositions.isNotEmpty()) {
                 // If the URI is a place list, ignore the APP_INITIALIZATION_STATE point and only take the other points
-                extraPositions
+                extraPositions.map { ConversionHtmlResult.Finished(it) }
             } else if (mainPosition != null) {
-                listOf(mainPosition)
+                listOf(ConversionHtmlResult.Finished(mainPosition))
+            } else if (redirectUriString != null) {
+                listOf(ConversionHtmlResult.RequiresRedirect(redirectUriString))
             } else {
                 emptyList()
             }
-        }
-    }
-
-    override val conversionHtmlRedirectPattern = ConversionPattern.first<Source, String> {
-        pattern {
-            val pattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
-            generateSequence { this.readLine() }
-                .firstNotNullOfOrNull { line -> pattern find line }
-                ?.groupOrNull("url")
         }
     }
 

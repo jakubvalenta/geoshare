@@ -51,31 +51,25 @@ data class Position(
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
 }
 
-fun Matcher.toLatLon(srs: Srs): Position? =
+fun Matcher.toPosition(srs: Srs, defaultZ: Double? = null): Position? =
     this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
         this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-            Position(srs, lat = lat, lon = lon)
+            Position(srs, lat, lon, z = this.toZ() ?: defaultZ)
         }
     }
 
-fun Matcher.toLatLonZ(srs: Srs): Position? =
+fun Matcher.toPoint(srs: Srs): Point? =
     this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
         this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-            this.groupOrNull("z")?.toDoubleOrNull()?.let { z ->
-                Position(srs, lat = lat, lon = lon, z = max(1.0, min(21.0, z)))
-            }
+            Point(srs, lat, lon)
         }
     }
 
-fun Matcher.toQ(srs: Srs): Position? =
-    this.groupOrNull("q")?.let { q ->
-        Position(srs, q = q)
-    }
+fun Matcher.toQ(): String? =
+    this.groupOrNull("q")
 
-fun Matcher.toZ(srs: Srs): Position? =
-    this.groupOrNull("z")?.toDoubleOrNull()?.let {
-        Position(srs, z = max(1.0, min(21.0, it)))
-    }
+fun Matcher.toZ(): Double? =
+    this.groupOrNull("z")?.toDoubleOrNull()?.let { max(1.0, min(21.0, it)) }
 
 fun List<Position>.merge(): Position {
     val points: MutableList<Point> = mutableListOf()
