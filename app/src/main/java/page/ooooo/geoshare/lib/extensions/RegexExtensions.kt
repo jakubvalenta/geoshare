@@ -21,7 +21,7 @@ infix fun Pattern.find(input: String?): Matcher? = input?.let { input ->
 
 infix fun Pattern.findAll(input: String?): Sequence<Matcher> = input?.let { input ->
     this.matcher(input).let { m -> generateSequence { m.takeIf { it.find() } } }
-} ?: emptySequence()
+}.orEmpty()
 
 infix fun Pattern.match(input: String?): Matcher? = input?.let { input ->
     this.matcher(input).takeIf { it.matches() }
@@ -33,7 +33,7 @@ infix fun String.find(input: String?): Matcher? = input?.let { input ->
 
 infix fun String.findAll(input: String?): Sequence<Matcher> = input?.let { input ->
     Pattern.compile(this) findAll input
-} ?: emptySequence()
+}.orEmpty()
 
 infix fun String.match(input: String?): Matcher? = input?.let { input ->
     Pattern.compile(this) match input

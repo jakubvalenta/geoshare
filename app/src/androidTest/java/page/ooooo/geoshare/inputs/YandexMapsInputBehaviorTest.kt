@@ -28,5 +28,11 @@ class YandexMapsInputBehaviorTest : BaseInputBehaviorTest() {
             Position(Srs.WGS84, 50.111192, 8.668963, z = 14.19),
             "https://yandex.com/maps/-/CLAvMI18",
         )
+
+        // Organization
+        testUri(
+            Position(Srs.WGS84, 50.111192, 8.668963, z = 14.19),
+            "https://yandex.com/maps/org/94933420809",
+        )
     }
 }
