@@ -116,22 +116,31 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
 
     override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
         listPattern {
-            val linkPattern = Pattern.compile("""/@$LAT,$LON""")
-            val pointPatterns = listOf(
+            val mainPointPatterns = listOf(
+                Pattern.compile("""/@$LAT,$LON"""),
                 Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT"""),
-                Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]"""),
             )
-            sequence {
-                for (line in generateSequence { this@listPattern.readLine() }) {
-                    (linkPattern find line)?.let { m ->
-                        yield(m)
-                        break
-                    }
-                    pointPatterns.forEach { pattern ->
-                        yieldAll(pattern findAll line)
-                    }
+            val extraPointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
+            var mainPosition: Position? = null
+            val extraPositions: MutableList<Position> = mutableListOf()
+            for (line in generateSequence { this@listPattern.readLine() }) {
+                if (mainPosition == null) {
+                    mainPointPatterns
+                        .firstNotNullOfOrNull { pattern -> pattern find line }?.toLatLon(srs)
+                        ?.let { mainPosition = it }
                 }
-            }.mapNotNull { m -> m.toLatLon(srs) }.toList()
+                (extraPointPattern findAll line)
+                    .mapNotNull { m -> m.toLatLon(srs) }
+                    .forEach { extraPositions.add(it) }
+            }
+            if (extraPositions.isNotEmpty()) {
+                // If the URI is a place list, ignore the APP_INITIALIZATION_STATE point and only take the other points
+                extraPositions
+            } else if (mainPosition != null) {
+                listOf(mainPosition)
+            } else {
+                emptyList()
+            }
         }
     }
 
