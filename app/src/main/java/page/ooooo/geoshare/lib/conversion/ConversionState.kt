@@ -306,7 +306,6 @@ data class GrantedParseHtmlPermission(
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
             stateContext.networkTools.getSource(htmlUrl, retry) { source ->
-                // TODO Delete SourceCache
                 val positionFromHtmlBuilder = input.parseHtml(source.buffered())
                 val positionFromHtml = positionFromHtmlBuilder.position
                 // TODO Simplify result checking
