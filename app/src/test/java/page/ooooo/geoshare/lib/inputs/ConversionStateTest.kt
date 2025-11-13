@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.io.RawSource
 import kotlinx.io.Source
 import kotlinx.io.asSource
-import kotlinx.io.readLine
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -21,32 +20,13 @@ import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.conversion.AutomationFailed
-import page.ooooo.geoshare.lib.conversion.AutomationFinished
-import page.ooooo.geoshare.lib.conversion.AutomationReady
-import page.ooooo.geoshare.lib.conversion.AutomationSucceeded
-import page.ooooo.geoshare.lib.conversion.AutomationWaiting
-import page.ooooo.geoshare.lib.conversion.ConversionFailed
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
-import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.DeniedConnectionPermission
-import page.ooooo.geoshare.lib.conversion.GrantedParseHtmlPermission
-import page.ooooo.geoshare.lib.conversion.GrantedUnshortenPermission
-import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.ParseHtmlFailed
-import page.ooooo.geoshare.lib.conversion.ReceivedIntent
-import page.ooooo.geoshare.lib.conversion.ReceivedUri
-import page.ooooo.geoshare.lib.conversion.ReceivedUriString
-import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
-import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
-import page.ooooo.geoshare.lib.conversion.State
-import page.ooooo.geoshare.lib.conversion.UnshortenedUrl
+import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.lib.outputs.GpxOutputGroup
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
 import java.net.SocketTimeoutException
 import java.net.URL
@@ -292,7 +272,7 @@ class ConversionStateTest {
         val mockInput = object : Input {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-            override val conversionUriPattern: ConversionPattern<Uri, Position> = ConversionPattern.first {}
+            override fun parseUri(uri: Uri) = PositionBuilder(Srs.WGS84)
         }
         val stateContext = mockStateContext(inputs = listOf(mockInput))
         val runContext = mockRunContext()
@@ -804,6 +784,7 @@ class ConversionStateTest {
             override val shortUriMethod = Input.ShortUriMethod.GET
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
+            override fun parseUri(uri: Uri) = PositionBuilder(Srs.WGS84)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -839,11 +820,8 @@ class ConversionStateTest {
     fun unshortenedUrl_uriPatternDoesNotMatchInputUriString_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-            on { match(any()) } doReturn null
-        }
         val mockGoogleMapsInput: GoogleMapsInput = mock {
-            on { conversionUriPattern } doReturn mockUriPattern
+            on { parseUri(any()) } doReturn PositionBuilder(Srs.WGS84)
         }
         val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
         val runContext = mockRunContext()
@@ -860,12 +838,11 @@ class ConversionStateTest {
     fun unshortenedUrl_uriPatternMatchesInputUriStringAndThereIsAPoint_returnsSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val position = Position(Srs.WGS84, 1.0, 2.0)
-        val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-            on { match(any()) } doReturn listOf(Position(position.points, q = position.q))
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            setLatLon { 1.0 to 2.0 }
         }
         val mockGoogleMapsInput: GoogleMapsInput = mock {
-            on { conversionUriPattern } doReturn mockUriPattern
+            on { parseUri(any()) } doReturn positionBuilder
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(ConnectionPermission) } doThrow NotImplementedError()
@@ -877,7 +854,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, position),
+            ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position),
             state.transition(),
         )
     }
@@ -887,19 +864,12 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-                on { match(any()) } doReturn listOf(
-                    Position(
-                        Srs.WGS84,
-                        q = positionFromUri.q,
-                    ),
-                )
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
             }
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { conversionUriPattern } doReturn mockUriPattern
+                on { parseUri(any()) } doReturn positionBuilder
             }
-
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val runContext = mockRunContext()
             val state = UnshortenedUrl(
@@ -912,7 +882,7 @@ class ConversionStateTest {
             )
             assertEquals(
                 GrantedParseHtmlPermission(
-                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionFromUri
+                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionBuilder
                 ),
                 state.transition(),
             )
@@ -923,17 +893,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-                on { match(any()) } doReturn listOf(
-                    Position(
-                        Srs.WGS84,
-                        q = positionFromUri.q
-                    ),
-                )
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
             }
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { conversionUriPattern } doReturn mockUriPattern
+                on { parseUri(any()) } doReturn positionBuilder
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val runContext = mockRunContext()
@@ -947,7 +911,7 @@ class ConversionStateTest {
             )
             assertEquals(
                 RequestedParseHtmlPermission(
-                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionFromUri
+                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionBuilder
                 ),
                 state.transition(),
             )
@@ -958,17 +922,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-                on { match(any()) } doReturn listOf(
-                    Position(
-                        Srs.WGS84,
-                        q = positionFromUri.q
-                    ),
-                )
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
             }
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { conversionUriPattern } doReturn mockUriPattern
+                on { parseUri(any()) } doReturn positionBuilder
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val runContext = mockRunContext()
@@ -981,7 +939,7 @@ class ConversionStateTest {
                 Permission.NEVER
             )
             assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder),
                 state.transition(),
             )
         }
@@ -991,17 +949,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-                on { match(any()) } doReturn listOf(
-                    Position(
-                        Srs.WGS84,
-                        q = positionFromUri.q
-                    ),
-                )
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
             }
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { conversionUriPattern } doReturn mockUriPattern
+                on { parseUri(any()) } doReturn positionBuilder
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 onBlocking { getValue(ConnectionPermission) } doReturn Permission.ALWAYS
@@ -1014,7 +966,7 @@ class ConversionStateTest {
             val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
             assertEquals(
                 GrantedParseHtmlPermission(
-                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionFromUri
+                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionBuilder
                 ),
                 state.transition(),
             )
@@ -1025,17 +977,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-                on { match(any()) } doReturn listOf(
-                    Position(
-                        Srs.WGS84,
-                        q = positionFromUri.q
-                    ),
-                )
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
             }
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { conversionUriPattern } doReturn mockUriPattern
+                on { parseUri(any()) } doReturn positionBuilder
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 onBlocking { getValue(ConnectionPermission) } doReturn Permission.ASK
@@ -1048,7 +994,7 @@ class ConversionStateTest {
             val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
             assertEquals(
                 RequestedParseHtmlPermission(
-                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionFromUri
+                    stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, positionBuilder
                 ),
                 state.transition(),
             )
@@ -1059,17 +1005,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockUriPattern: ConversionPattern.First<Uri, Position> = mock {
-                on { match(any()) } doReturn listOf(
-                    Position(
-                        Srs.WGS84,
-                        q = positionFromUri.q
-                    ),
-                )
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
             }
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { conversionUriPattern } doReturn mockUriPattern
+                on { parseUri(any()) } doReturn positionBuilder
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 onBlocking { getValue(ConnectionPermission) } doReturn Permission.NEVER
@@ -1081,7 +1021,7 @@ class ConversionStateTest {
             val runContext = mockRunContext()
             val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
             assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder),
                 state.transition(),
             )
         }
@@ -1089,15 +1029,19 @@ class ConversionStateTest {
     @Test
     fun unshortenedUrl_inputHasNeitherConversionUriPatternNorConversionHtmlPattern_returnsParseHtmlFailed() =
         runTest {
+            // TODO This test feels redundant
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
+            val positionBuilder = PositionBuilder(Srs.WGS84)
             val mockInput = object : Input.HasShortUri {
+                // TODO It feels like a simple Input instead of Input.HasShortUri should be sufficient
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
                 override val shortUriPattern: Pattern = Pattern.compile(".")
                 override val shortUriMethod = Input.ShortUriMethod.HEAD
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
+                override fun parseUri(uri: Uri) = positionBuilder
             }
             val stateContext = mockStateContext(inputs = listOf(mockInput))
             val runContext = mockRunContext()
@@ -1105,7 +1049,7 @@ class ConversionStateTest {
                 stateContext, runContext, inputUriString, mockInput, uri, Permission.ALWAYS
             )
             assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, null),
+                ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder),
                 state.transition(),
             )
         }
@@ -1114,7 +1058,10 @@ class ConversionStateTest {
     fun requestedParseHtmlPermission_transition_returnsNull() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = URL(inputUriString)
+        }
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
         val state = RequestedParseHtmlPermission(
@@ -1123,7 +1070,7 @@ class ConversionStateTest {
             inputUriString,
             GoogleMapsInput,
             uri,
-            positionFromUri
+            positionBuilder
         )
         assertNull(state.transition())
     }
@@ -1133,7 +1080,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
@@ -1145,7 +1095,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri
+                positionBuilder
             )
             assertEquals(
                 GrantedParseHtmlPermission(
@@ -1154,7 +1104,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri
+                    positionBuilder
                 ),
                 state.grant(false),
             )
@@ -1169,7 +1119,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
@@ -1181,7 +1134,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri
+                positionBuilder
             )
             assertEquals(
                 GrantedParseHtmlPermission(
@@ -1190,7 +1143,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri
+                    positionBuilder
                 ),
                 state.grant(true),
             )
@@ -1204,7 +1157,10 @@ class ConversionStateTest {
     fun requestedParseHtmlPermission_denyWithDoNotAskFalse_doesNotSavePreferenceAndReturnsParseHtmlFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = URL(inputUriString)
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
@@ -1216,10 +1172,10 @@ class ConversionStateTest {
             inputUriString,
             GoogleMapsInput,
             uri,
-            positionFromUri
+            positionBuilder
         )
         assertEquals(
-            ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder),
             state.deny(false),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
@@ -1232,7 +1188,10 @@ class ConversionStateTest {
     fun requestedParseHtmlPermission_denyWithDoNotAskTrue_savesPreferenceAndReturnsParseHtmlFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = URL(inputUriString)
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
@@ -1244,10 +1203,10 @@ class ConversionStateTest {
             inputUriString,
             GoogleMapsInput,
             uri,
-            positionFromUri
+            positionBuilder
         )
         assertEquals(
-            ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder),
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -1257,51 +1216,51 @@ class ConversionStateTest {
     }
 
     @Test
-    fun grantedParseHtmlPermission_inputSupportsNeitherHtmlPatternNorRedirectPattern_returnsParseHtmlFailed() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val html = "<html></html>"
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = null
-                override val conversionHtmlRedirectPattern = null
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext,
-                runContext,
-                inputUriString,
-                mockInput,
-                uri,
-                positionFromUri
-            )
-            assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
-                state.transition(),
-            )
+    fun grantedParseHtmlPermission_parseHtmlReturnsNothing_returnsParseHtmlFailed() = runTest {
+        val inputUriString = "https://maps.apple.com/foo"
+        val uri = Uri.parse(inputUriString, uriQuote)
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = URL(inputUriString)
         }
+        val html = "<html></html>"
+        val mockInput = object : Input.HasHtml {
+            override val uriPattern: Pattern = Pattern.compile(".")
+            override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
+            override val permissionTitleResId = -1
+            override val loadingIndicatorTitleResId = -1
+            override fun parseUri(uri: Uri) = positionBuilder
+            override fun parseHtml(source: Source) = PositionBuilder(Srs.WGS84)
+        }
+        val stateContext = mockStateContext(
+            inputs = listOf(mockInput),
+            networkTools = object : MockNetworkTools() {
+                override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
+                    html
+                } else {
+                    super.onGetSource(url)
+                }
+            },
+        )
+        val runContext = mockRunContext()
+        val state = GrantedParseHtmlPermission(
+            stateContext, runContext, inputUriString, mockInput, uri, positionBuilder
+        )
+        assertEquals(
+            ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder),
+            state.transition(),
+        )
+    }
 
     @Test
     fun grantedParseHtmlPermission_inputUriStringIsInvalidURL_returnsConversionFailedWithGeneralErrorMessage() =
         runTest {
             val inputUriString = "https://[invalid:ipv6]/"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val html = "<html></html>"
             val stateContext = mockStateContext(networkTools = object : MockNetworkTools() {
                 override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
@@ -1317,7 +1276,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri
+                positionBuilder
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
@@ -1330,7 +1289,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
@@ -1347,7 +1309,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri
+                positionBuilder
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_cancelled, inputUriString),
@@ -1360,7 +1322,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val tr = NetworkTools.RecoverableException(
                 R.string.network_exception_socket_timeout, SocketTimeoutException(),
             )
@@ -1380,7 +1345,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri
+                positionBuilder
             )
             assertEquals(
                 GrantedParseHtmlPermission(
@@ -1389,7 +1354,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri,
+                    positionBuilder,
                     NetworkTools.Retry(1, tr),
                 ),
                 state.transition(),
@@ -1401,7 +1366,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val tr = NetworkTools.RecoverableException(
                 R.string.network_exception_socket_timeout, SocketTimeoutException(),
             )
@@ -1421,7 +1389,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                positionBuilder,
                 retry = NetworkTools.Retry(1, tr),
             )
             assertEquals(
@@ -1431,7 +1399,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri,
+                    positionBuilder,
                     NetworkTools.Retry(2, tr),
                 ),
                 state.transition(),
@@ -1443,7 +1411,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
@@ -1463,7 +1434,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri
+                positionBuilder
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
@@ -1476,7 +1447,10 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
@@ -1491,7 +1465,7 @@ class ConversionStateTest {
             )
             val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri, positionFromUri
+                stateContext, runContext, inputUriString, GoogleMapsInput, uri, positionBuilder
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_parse_html_connection_error, inputUriString),
@@ -1501,21 +1475,25 @@ class ConversionStateTest {
 
     @Test
     fun grantedParseHtmlPermission_inputUriStringHasNoScheme_callsGetTextWithUrlWithHttpsScheme() = runTest {
+        // TODO This test should not work
         val inputUriString = "maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
         val html = "<html></html>"
-        val position = Position(Srs.WGS84, 1.0, 2.0, q = "fromHtml")
-        val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-            on { match(any()) } doReturn listOf(Position(position.points, q = position.q))
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = URL(inputUriString)
+        }
+        val positionFromHtmlBuilder = PositionBuilder(Srs.WGS84).apply {
+            setLatLon { 1.0 to 2.0 }
+            q = "fromHtml"
         }
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-            override val conversionHtmlPattern = mockHtmlPattern
-            override val conversionHtmlRedirectPattern = null
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
+            override fun parseUri(uri: Uri) = positionBuilder
+            override fun parseHtml(source: Source) = positionFromHtmlBuilder
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1529,33 +1507,35 @@ class ConversionStateTest {
         )
         val runContext = mockRunContext()
         val state = GrantedParseHtmlPermission(
-            stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
+            stateContext, runContext, inputUriString, mockInput, uri, positionBuilder
         )
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, position),
+            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtmlBuilder.position),
             state.transition(),
         )
     }
 
     @Test
-    fun grantedParseHtmlPermission_htmlPatternMatchesHtml_callsGetHtmlUrlAndGetTextAndReturnsSucceeded() = runTest {
+    fun grantedParseHtmlPermission_parseHtmlReturnsBuilder_callsGetHtmlUrlAndGetTextAndReturnsSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
-        val htmlUrl = URL("https://api.apple.com/foo.json")
         val html = "<html></html>"
-        val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, q = "fromHtml")
-        val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-            on { match(any()) } doReturn listOf(Position(positionFromHtml.points, q = positionFromHtml.q))
+        val htmlUrl = URL("https://api.apple.com/foo.json")
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = htmlUrl
+        }
+        val positionFromHtmlBuilder = PositionBuilder(Srs.WGS84).apply {
+            setLatLon { 1.0 to 2.0 }
+            q = "fromHtml"
         }
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-            override val conversionHtmlPattern = mockHtmlPattern
-            override val conversionHtmlRedirectPattern = null
-            override fun getHtmlUrl(uri: Uri): URL = htmlUrl
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
+            override fun parseUri(uri: Uri) = positionBuilder
+            override fun parseHtml(source: Source) = positionFromHtmlBuilder
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1569,323 +1549,50 @@ class ConversionStateTest {
         )
         val runContext = mockRunContext()
         val state = GrantedParseHtmlPermission(
-            stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
+            stateContext, runContext, inputUriString, mockInput, uri, positionBuilder
         )
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml),
+            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtmlBuilder.position),
             state.transition(),
         )
     }
 
     @Test
-    fun grantedParseHtmlPermission_htmlPatternMatchesHtmlAndGetHtmlUrlReturnsNull_returnsConversionFailedWithGenericMessage() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val htmlUrl = URL("https://api.apple.com/foo.json")
-            val html = "<html></html>"
-            val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, q = "fromHtml")
-            val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-                on { match(any()) } doReturn listOf(Position(positionFromHtml.points, q = positionFromHtml.q))
-            }
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = mockHtmlPattern
-                override val conversionHtmlRedirectPattern = null
-                override fun getHtmlUrl(uri: Uri) = null
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == htmlUrl.toString()) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
-            )
-            assertEquals(
-                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndExhaustsTheWholeSourceAndHtmlRedirectPatternMatchesHtmlAbsoluteUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val redirectUriString = "https://maps.apple.com/foo-redirect"
-            val redirectUri = Uri.parse(redirectUriString, uriQuote)
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
-                    pattern {
-                        // Exhaust the whole source
-                        generateSequence { this.readLine() }
-                            .firstOrNull { line -> "fifth" in line }
-                        null
-                    }
-                }
-                override val conversionHtmlRedirectPattern = ConversionPattern.first<Source, String> {
-                    pattern {
-                        // Read all lines of the source again -- uses cache
-                        generateSequence { this.readLine() }
-                            .firstNotNullOfOrNull { line -> redirectUriString.takeIf { redirectUriString in line } }
-                    }
-                }
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        listOf(
-                            "first",
-                            "second",
-                            "third",
-                            redirectUriString,
-                            "fifth",
-                        ).joinToString("\n") { it.repeat(2048) }
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
-            )
-            assertEquals(
-                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndDoesNotExhaustTheWholeSourceAndHtmlRedirectPatternMatchesHtmlAbsoluteUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val redirectUriString = "https://maps.apple.com/foo-redirect"
-            val redirectUri = Uri.parse(redirectUriString, uriQuote)
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
-                    pattern {
-                        // Read from the source but don't exhaust it
-                        generateSequence { this.readLine() }
-                            .firstOrNull { line -> "second" in line }
-                        null
-                    }
-                }
-                override val conversionHtmlRedirectPattern = ConversionPattern.first<Source, String> {
-                    pattern {
-                        // Read all lines of the source again -- uses partially cache and partially the source
-                        generateSequence { this.readLine() }
-                            .firstNotNullOfOrNull { line -> redirectUriString.takeIf { redirectUriString in line } }
-                    }
-                }
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        listOf(
-                            "first",
-                            "second",
-                            "third",
-                            redirectUriString,
-                            "fifth",
-                        ).joinToString("\n") { it.repeat(2048) }
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
-            )
-            assertEquals(
-                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndHtmlRedirectPatternMatchesHtmlRelativeUrl_returnsReceivedUriWithTheRedirectUrlAndPermissionAlways() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val redirectUriString = "foo-redirect"
-            val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
-            val html = "<html></html>"
-            val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-                on { match(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionPattern.First<Source, String> = mock {
-                on { match(any()) } doReturn listOf(redirectUriString)
-            }
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = mockHtmlPattern
-                override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
-            )
-            assertEquals(
-                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndHtmlRedirectPatternIsMissingMatchingGroup_returnsParseHtmlFailed() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val html = "<html></html>"
-            val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-                on { match(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionPattern.First<Source, String> = mock {
-                on { match(any()) } doReturn emptyList()
-            }
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = mockHtmlPattern
-                override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
-            )
-            assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedParseHtmlPermission_htmlPatternDoesNotMatchHtmlAndHtmlRedirectPatternAlsoDoesNotMatchHtml_returnsParseHtmlFailed() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val html = "<html></html>"
-            val mockHtmlPattern: ConversionPattern.First<Source, Position> = mock {
-                on { match(any()) } doReturn null
-            }
-            val mockHtmlRedirectPattern: ConversionPattern.First<Source, String> = mock {
-                on { match(any()) } doReturn null
-            }
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
-                override val conversionHtmlPattern = mockHtmlPattern
-                override val conversionHtmlRedirectPattern = mockHtmlRedirectPattern
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val runContext = mockRunContext()
-            val state = GrantedParseHtmlPermission(
-                stateContext, runContext, inputUriString, mockInput, uri, positionFromUri
-            )
-            assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun parseHtmlFailed_positionFromUriHasPoint_returnsConversionSucceeded() = runTest {
+    fun grantedParseHtmlPermission_builderUrlIsNull_returnsConversionFailedWithGenericMessage() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val positionFromUri = Position(Srs.WGS84, 1.0, 2.0)
-        val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
-        assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromUri),
-            state.transition(),
+        val uri = Uri.parse(inputUriString, uriQuote)
+        val html = "<html></html>"
+        val htmlUrl = URL("https://api.apple.com/foo.json")
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+            url = null
+        }
+        val positionFromHtmlBuilder = PositionBuilder(Srs.WGS84).apply {
+            setLatLon { 1.0 to 2.0 }
+            q = "fromHtml"
+        }
+        val mockInput = object : Input.HasHtml {
+            override val uriPattern: Pattern = Pattern.compile(".")
+            override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
+            override val permissionTitleResId = -1
+            override val loadingIndicatorTitleResId = -1
+            override fun parseUri(uri: Uri) = positionBuilder
+            override fun parseHtml(source: Source) = positionFromHtmlBuilder
+        }
+        val stateContext = mockStateContext(
+            inputs = listOf(mockInput),
+            networkTools = object : MockNetworkTools() {
+                override fun onGetSource(url: URL): String = if (url.toString() == htmlUrl.toString()) {
+                    html
+                } else {
+                    super.onGetSource(url)
+                }
+            },
         )
-    }
-
-    @Test
-    fun parseHtmlFailed_positionFromUriHasQuery_returnsConversionSucceeded() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val positionFromUri = Position(q = "foo")
-        val stateContext = mockStateContext()
         val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
-        assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromUri),
-            state.transition(),
+        val state = GrantedParseHtmlPermission(
+            stateContext, runContext, inputUriString, mockInput, uri, positionBuilder
         )
-    }
-
-    @Test
-    fun parseHtmlFailed_positionFromUriIsEmpty_returnsConversionFailed() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val positionFromUri = Position()
-        val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),
@@ -1893,11 +1600,133 @@ class ConversionStateTest {
     }
 
     @Test
-    fun parseHtmlFailed_positionFromUriIsNull_returnsConversionFailed() = runTest {
+    fun grantedParseHtmlPermission_parseHtmlReturnsAbsoluteUrl_returnsReceivedUriWithTheUrlAndPermissionAlways() =
+        runTest {
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
+            val redirectUriString = "https://maps.apple.com/foo-redirect"
+            val redirectUri = Uri.parse(redirectUriString, uriQuote)
+            val mockInput = object : Input.HasHtml {
+                override val uriPattern: Pattern = Pattern.compile(".")
+                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
+                override val permissionTitleResId = -1
+                override val loadingIndicatorTitleResId = -1
+                override fun parseUri(uri: Uri) = positionBuilder
+                override fun parseHtml(source: Source) = PositionBuilder(Srs.WGS84).apply {
+                    url = URL(redirectUriString)
+                }
+            }
+            val stateContext = mockStateContext(
+                inputs = listOf(mockInput),
+                networkTools = object : MockNetworkTools() {
+                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
+                        listOf(
+                            "first",
+                            "second",
+                            "third",
+                            redirectUriString,
+                            "fifth",
+                        ).joinToString("\n") { it.repeat(2048) }
+                    } else {
+                        super.onGetSource(url)
+                    }
+                },
+            )
+            val runContext = mockRunContext()
+            val state = GrantedParseHtmlPermission(
+                stateContext, runContext, inputUriString, mockInput, uri, positionBuilder
+            )
+            assertEquals(
+                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlPermission_parseHtmlReturnsRelativeUrl_returnsReceivedUriWithTheUrlAndPermissionAlways() =
+        runTest {
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+                q = "bar"
+                url = URL(inputUriString)
+            }
+            val redirectUriString = "foo-redirect"
+            val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
+            val html = "<html></html>"
+            val mockInput = object : Input.HasHtml {
+                override val uriPattern: Pattern = Pattern.compile(".")
+                override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
+                override val permissionTitleResId = -1
+                override val loadingIndicatorTitleResId = -1
+                override fun parseUri(uri: Uri) = positionBuilder
+                override fun parseHtml(source: Source) = PositionBuilder(Srs.WGS84).apply {
+                    url = URL(redirectUriString)
+                }
+            }
+            val stateContext = mockStateContext(
+                inputs = listOf(mockInput),
+                networkTools = object : MockNetworkTools() {
+                    override fun onGetSource(url: URL): String = if (url.toString() == inputUriString) {
+                        html
+                    } else {
+                        super.onGetSource(url)
+                    }
+                },
+            )
+            val runContext = mockRunContext()
+            val state = GrantedParseHtmlPermission(
+                stateContext, runContext, inputUriString, mockInput, uri, positionBuilder
+            )
+            assertEquals(
+                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun parseHtmlFailed_positionBuilderHasPoint_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            setLatLon { 1.0 to 2.0 }
+        }
         val stateContext = mockStateContext()
         val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, null)
+        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
+        assertEquals(
+            ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun parseHtmlFailed_positionBuilderHasQuery_returnsConversionSucceeded() = runTest {
+        val inputUriString = "https://maps.apple.com/foo"
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+        }
+        val stateContext = mockStateContext()
+        val runContext = mockRunContext()
+        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
+        assertEquals(
+            ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun parseHtmlFailed_positionBuilderIsEmpty_returnsConversionFailed() = runTest {
+        val inputUriString = "https://maps.apple.com/foo"
+        val positionBuilder = PositionBuilder(Srs.WGS84).apply {
+            q = "bar"
+        }
+        val stateContext = mockStateContext()
+        val runContext = mockRunContext()
+        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),

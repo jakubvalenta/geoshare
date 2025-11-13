@@ -8,7 +8,6 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.merge
 
 abstract class BaseInputTest() {
     protected abstract val input: Input
@@ -24,16 +23,8 @@ abstract class BaseInputTest() {
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
-    fun parseUrl(uriString: String): Position? =
-        (input as Input.HasUri).conversionUriPattern.match(Uri.parse(uriString, uriQuote))?.merge()
+    fun parseUri(uriString: String): Position = input.parseUri(Uri.parse(uriString, uriQuote)).position
 
-    fun parseHtml(html: String): Position? =
-        html.byteInputStream().asSource().buffered().use { source ->
-            (input as Input.HasHtml).conversionHtmlPattern?.match(source)?.merge()
-        }
-
-    fun parseHtmlRedirect(html: String) =
-        html.byteInputStream().asSource().buffered().use { source ->
-            (input as Input.HasHtml).conversionHtmlRedirectPattern?.match(source)?.lastOrNull()
-        }
+    fun parseHtml(html: String): Position =
+        (input as Input.HasHtml).parseHtml(html.byteInputStream().asSource().buffered()).position
 }

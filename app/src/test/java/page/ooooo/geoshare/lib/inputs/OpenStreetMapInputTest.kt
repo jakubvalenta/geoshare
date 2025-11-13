@@ -34,70 +34,54 @@ class OpenStreetMapInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUrl_coordinates() {
+    fun parseUri_coordinates() {
         assertEquals(
             Position(Srs.WGS84, 51.49, -0.13, z = 16.0),
-            parseUrl("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
+            parseUri("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
 
     @Test
-    fun parseUrl_coordinatesEncoded() {
+    fun parseUri_coordinatesEncoded() {
         assertEquals(
             Position(Srs.WGS84, 51.49, -0.13, z = 16.0),
-            parseUrl("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
+            parseUri("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
         )
     }
 
     @Test
-    fun parseUrl_element() {
-        assertEquals(
-            Position(),
-            parseUrl("https://www.openstreetmap.org/node/6284640534"),
-        )
-        assertEquals(
-            Position(),
-            parseUrl("https://www.openstreetmap.org/relation/910699"),
-        )
-        assertEquals(
-            Position(),
-            parseUrl("https://www.openstreetmap.org/way/596674456"),
-        )
-    }
-
-    @Test
-    fun parseUrl_shortLink() {
-        assertEquals(
-            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
-            parseUrl("https://osm.org/go/0EEQjE--")
-        )
-        assertEquals(
-            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
-            parseUrl("https://openstreetmap.org/go/0EEQjE--")
-        )
-    }
-
-    @Test
-    fun parseUrl_shortLinkNegative() {
-        assertEquals(
-            Position(Srs.WGS84, -16.23152732849121, -49.08348083496094, z = 11.0),
-            parseUrl("https://osm.org/go/NuJWxJh-")
-        )
-    }
-
-    @Test
-    fun getHtmlUrl_element() {
+    fun parseUri_element() {
         assertEquals(
             URL("https://www.openstreetmap.org/api/0.6/node/6284640534.json"),
-            input.getHtmlUrl(Uri.parse("https://www.openstreetmap.org/node/6284640534", uriQuote)),
+            input.parseUri(Uri.parse("https://www.openstreetmap.org/node/6284640534")).url,
         )
         assertEquals(
             URL("https://www.openstreetmap.org/api/0.6/relation/910699/full.json"),
-            input.getHtmlUrl(Uri.parse("https://www.openstreetmap.org/relation/910699", uriQuote)),
+            input.parseUri(Uri.parse("https://www.openstreetmap.org/relation/910699")).url,
         )
         assertEquals(
             URL("https://www.openstreetmap.org/api/0.6/way/596674456/full.json"),
-            input.getHtmlUrl(Uri.parse("https://www.openstreetmap.org/way/596674456", uriQuote)),
+            input.parseUri(Uri.parse("https://www.openstreetmap.org/way/596674456")).url,
+        )
+    }
+
+    @Test
+    fun parseUri_shortLink() {
+        assertEquals(
+            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
+            parseUri("https://osm.org/go/0EEQjE--")
+        )
+        assertEquals(
+            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
+            parseUri("https://openstreetmap.org/go/0EEQjE--")
+        )
+    }
+
+    @Test
+    fun parseUri_shortLinkNegative() {
+        assertEquals(
+            Position(Srs.WGS84, -16.23152732849121, -49.08348083496094, z = 11.0),
+            parseUri("https://osm.org/go/NuJWxJh-")
         )
     }
 

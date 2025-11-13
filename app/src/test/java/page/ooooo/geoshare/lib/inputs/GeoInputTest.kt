@@ -42,36 +42,36 @@ class GeoInputTest : BaseInputTest() {
             getUri(
                 @Suppress("SpellCheckingInspection")
                 "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
-                        "https://omaps.app/Umse5f0H8a/Nova_Iorque"
+                    "https://omaps.app/Umse5f0H8a/Nova_Iorque"
             )
         )
     }
 
     @Test
-    fun parseUrl_noPathOrKnownUrlQueryParams() {
+    fun parseUri_noPathOrKnownUrlQueryParams() {
         assertEquals(
             Position(),
-            parseUrl("geo:"),
+            parseUri("geo:"),
         )
         assertEquals(
             Position(),
-            parseUrl("geo:?spam=1"),
+            parseUri("geo:?spam=1"),
         )
     }
 
     @Test
-    fun parseUrl_returnsAllCoordsAndParams() {
+    fun parseUri_returnsAllCoordsAndParams() {
         assertEquals(
             Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4),
-            parseUrl("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
+            parseUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
         )
     }
 
     @Test
-    fun parseUrl_returnsQOnly() {
+    fun parseUri_returnsQOnly() {
         assertEquals(
             Position(q = "foo bar"),
-            parseUrl("geo:?q=foo%20bar"),
+            parseUri("geo:?q=foo%20bar"),
         )
     }
 }

@@ -6,7 +6,7 @@ import kotlinx.io.Source
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.position.PositionBuilder
 
-sealed interface Input {
+interface Input {
 
     data class Documentation(val nameResId: Int, val inputs: List<DocumentationInput>)
 

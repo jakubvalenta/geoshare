@@ -49,71 +49,71 @@ class MapyComInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUrl_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUrl("https://mapy.com"))
-        assertNull(parseUrl("https://mapy.com/en"))
-        assertNull(parseUrl("https://mapy.com/en/"))
-        assertNull(parseUrl("https://mapy.com/en/zakladni"))
-        assertNull(parseUrl("https://mapy.com/en/zakladni?spam=1"))
+    fun parseUri_noPathOrKnownUrlQueryParams() {
+        assertNull(parseUri("https://mapy.com"))
+        assertNull(parseUri("https://mapy.com/en"))
+        assertNull(parseUri("https://mapy.com/en/"))
+        assertNull(parseUri("https://mapy.com/en/zakladni"))
+        assertNull(parseUri("https://mapy.com/en/zakladni?spam=1"))
     }
 
     @Test
-    fun parseUrl_coordinates() {
+    fun parseUri_coordinates() {
         assertEquals(
             Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0),
-            parseUrl("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+            parseUri("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
     }
 
     @Test
-    fun parseUrl_coordinatesCsLanguage() {
+    fun parseUri_coordinatesCsLanguage() {
         assertEquals(
             Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0),
-            parseUrl("https://mapy.com/cs/zakladni?x=14.0184810&y=50.0525078&z=9")
+            parseUri("https://mapy.com/cs/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
     }
 
     @Test
-    fun parseUrl_coordinatesCzDomain() {
+    fun parseUri_coordinatesCzDomain() {
         assertEquals(
             Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0),
-            parseUrl("https://mapy.cz/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+            parseUri("https://mapy.cz/en/zakladni?x=14.0184810&y=50.0525078&z=9")
         )
     }
 
     @Test
-    fun parseUrl_coordinatesOutdoorType() {
+    fun parseUri_coordinatesOutdoorType() {
         assertEquals(
             Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0),
-            parseUrl("https://mapy.com/en/turisticka?x=14.0184810&y=50.0525078&z=9")
+            parseUri("https://mapy.com/en/turisticka?x=14.0184810&y=50.0525078&z=9")
         )
     }
 
     @Test
-    fun parseUrl_coordinatesMissingType() {
+    fun parseUri_coordinatesMissingType() {
         assertEquals(
             Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0),
-            parseUrl("https://mapy.com/?x=14.0184810&y=50.0525078&z=9")
+            parseUri("https://mapy.com/?x=14.0184810&y=50.0525078&z=9")
         )
     }
 
     @Test
-    fun parseUrl_place() {
+    fun parseUri_place() {
         assertEquals(
             Position(Srs.WGS84, 50.0992553, 14.4336590, z = 19.0),
-            parseUrl("https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19")
+            parseUri("https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19")
         )
     }
 
     @Test
-    fun parseUrl_textCoordinates() {
+    fun parseUri_textCoordinates() {
         assertEquals(
             Position(Srs.WGS84, 41.9966006, -6.1223825),
-            parseUrl(uriString = "41.9966006N, 6.1223825W")
+            parseUri(uriString = "41.9966006N, 6.1223825W")
         )
         assertEquals(
             Position(Srs.WGS84, -41.9966006, 6.1223825),
-            parseUrl(uriString = "41.9966006S, 6.1223825E")
+            parseUri(uriString = "41.9966006S, 6.1223825E")
         )
     }
 
