@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
@@ -49,25 +50,35 @@ object WazeInput : Input.HasHtml {
             setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
             setUriString {
-                if (!queryParams["venue_id"].isNullOrEmpty()) {
-                    // TODO Replace Waze venue URL
-                    // 1 https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
-                    // 2 https://www.waze.com/ul?venue_id=183894452.1839010060.260192
-                    // 3 https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
-                    // 4 https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
-                    uri.toString()
-                } else {
-                    null
+                queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
+                    // To skip some redirects when downloading HTML, replace this URL:
+                    // https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
+                    // or this URL:
+                    // https://www.waze.com/ul?venue_id=183894452.1839010060.260192
+                    // with this one:
+                    // https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
+                    Uri(
+                        scheme = "https",
+                        host = "www.waze.com",
+                        path = "/live-map/directions",
+                        queryParams = persistentMapOf("to" to "place.w.$venueId"),
+                        uriQuote = uri.uriQuote,
+                    ).toString()
                 }
             }
             setUriString {
-                if (!queryParams["place"].isNullOrEmpty()) {
-                    // TODO Replace Waze place URL
-                    // 3 https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
-                    // 4 https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
-                    uri.toString()
-                } else {
-                    null
+                queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
+                    // To skip some redirects when downloading HTML, replace this URL:
+                    // https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
+                    // with this one:
+                    // https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
+                    Uri(
+                        scheme = "https",
+                        host = "www.waze.com",
+                        path = "/live-map/directions",
+                        queryParams = persistentMapOf("to" to "place.$placeId"),
+                        uriQuote = uri.uriQuote,
+                    ).toString()
                 }
             }
             setUriString { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }

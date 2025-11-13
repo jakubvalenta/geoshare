@@ -104,7 +104,7 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsPlace() {
         assertEquals(
-            Position() to "https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192",
+            Position() to "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192",
             parseUri("https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192")
         )
         assertEquals(
@@ -124,11 +124,11 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_place() {
         assertEquals(
-            Position() to "https://ul.waze.com/ul?venue_id=183894452.1839010060.260192&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location",
+            Position() to "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192",
             parseUri("https://ul.waze.com/ul?venue_id=183894452.1839010060.260192&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location")
         )
         assertEquals(
-            Position() to "https://www.waze.com/ul?venue_id=183894452.1839010060.260192",
+            Position() to "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192",
             parseUri("https://www.waze.com/ul?venue_id=183894452.1839010060.260192")
         )
     }
