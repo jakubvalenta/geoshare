@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import com.google.re2j.Matcher
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
@@ -51,13 +50,6 @@ data class Position(
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
 }
 
-fun Matcher.toPosition(srs: Srs, defaultZ: Double? = null): Position? =
-    this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-        this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-            Position(srs, lat, lon, z = this.toZ() ?: defaultZ)
-        }
-    }
-
 fun Matcher.toPoint(srs: Srs): Point? =
     this.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
         this.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
@@ -65,26 +57,20 @@ fun Matcher.toPoint(srs: Srs): Point? =
         }
     }
 
+fun Matcher.toPointAndZ(srs: Srs): Pair<Point, Double>? =
+    this.toPoint(srs)?.let { point ->
+        this.toZ()?.let { z ->
+            point to z
+        }
+    }
+
 fun Matcher.toQ(): String? =
     this.groupOrNull("q")
 
 fun Matcher.toZ(): Double? =
-    this.groupOrNull("z")?.toDoubleOrNull()?.let { max(1.0, min(21.0, it)) }
-
-fun List<Position>.merge(): Position {
-    val points: MutableList<Point> = mutableListOf()
-    var q: String? = null
-    var z: Double? = null
-    for (position in this) {
-        if (position.points != null) {
-            points.addAll(position.points)
-        }
-        if (position.q != null) {
-            q = position.q
-        }
-        if (position.z != null) {
-            z = position.z
-        }
+    this.groupOrNull("z")?.toDoubleOrNull()?.let { z ->
+        max(1.0, min(21.0, z))
     }
-    return Position(points.takeIf { it.isNotEmpty() }?.toImmutableList(), q = q, z = z)
-}
+
+fun Matcher.toUriString(): String? =
+    this.groupOrNull("url")

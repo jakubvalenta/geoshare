@@ -6,15 +6,12 @@ import com.google.re2j.Pattern
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.io.Source
+import kotlinx.io.readLine
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import kotlin.math.max
-import kotlin.math.min
+import page.ooooo.geoshare.lib.position.*
 
-class ConversionPattern<I>(val srs: Srs, init: ConversionPattern<I>.() -> Unit) {
+interface ConversionPattern {
 
     companion object {
         const val MAX_COORD_PRECISION = 17
@@ -32,126 +29,185 @@ class ConversionPattern<I>(val srs: Srs, init: ConversionPattern<I>.() -> Unit) 
         val LON_LAT_PATTERN: Pattern = Pattern.compile("$LON,$LAT")
         val Z_PATTERN: Pattern = Pattern.compile(Z)
         val Q_PARAM_PATTERN: Pattern = Pattern.compile(Q_PARAM)
-    }
 
-    sealed interface Block<I> {
-        data class LatLon<I>(val block: I.() -> Matcher?) : Block<I>
-        data class LatLonAll<I>(val block: I.() -> Sequence<Matcher>) : Block<I>
-        data class LatLonZ<I>(val block: I.() -> Matcher?) : Block<I>
-        data class Q<I>(val block: I.() -> Matcher?) : Block<I>
-        data class Z<I>(val block: I.() -> Matcher?) : Block<I>
-        data class HtmlUri<I>(val block: I.() -> Uri?) : Block<I>
+        fun uriPattern(srs: Srs, init: ConversionUriPattern.() -> Unit): ConversionUriPattern {
+            val conversionUriPattern = ConversionUriPattern(srs)
+            conversionUriPattern.init()
+            return conversionUriPattern
+        }
+
+        fun htmlPattern(srs: Srs, init: ConversionHtmlPattern.() -> Unit): ConversionHtmlPattern {
+            val conversionHtmlPattern = ConversionHtmlPattern(srs)
+            conversionHtmlPattern.init()
+            return conversionHtmlPattern
+        }
     }
 
     @Immutable
-    data class Result(val position: Position, val htmlUri: Uri? = null)
+    data class Result(val position: Position, val uriString: String? = null)
 
-    val blocks: MutableList<Block<I>> = mutableListOf()
+    abstract class Group<C> {
+        protected val children: MutableList<C> = mutableListOf()
 
-    init {
-        this.init()
+        protected fun <P : C> initChild(child: P, init: P.() -> Unit = {}): P {
+            child.init()
+            children.add(child)
+            return child
+        }
     }
 
-    fun latLon(block: I.() -> Matcher?) {
-        blocks.add(Block.LatLon(block))
+    sealed interface UriPattern
+
+    class PointsUriPattern(private val block: Uri.() -> Matcher?) : UriPattern {
+        fun match(srs: Srs, uri: Uri): ImmutableList<Point>? =
+            block.invoke(uri)?.toPoint(srs)?.let { persistentListOf(it) }
     }
 
-    fun latLonAll(block: I.() -> Sequence<Matcher>) {
-        blocks.add(Block.LatLonAll(block))
+    class PointsAndZoomUriPattern(private val block: Uri.() -> Matcher?) : UriPattern {
+        fun match(srs: Srs, uri: Uri): Pair<ImmutableList<Point>, Double>? =
+            block.invoke(uri)?.toPointAndZ(srs)?.let { (point, z) -> persistentListOf(point) to z }
     }
 
-    fun latLonZ(block: I.() -> Matcher?) {
-        blocks.add(Block.LatLonZ(block))
+    class PointsSequenceUriPattern(private val block: Uri.() -> Sequence<Matcher>) : UriPattern {
+        fun match(srs: Srs, uri: Uri): ImmutableList<Point>? =
+            block.invoke(uri).mapNotNull { it.toPoint(srs) }.toImmutableList().takeIf { it.isNotEmpty() }
     }
 
-    fun q(block: I.() -> Matcher?) {
-        blocks.add(Block.Q(block))
+    class QueryUriPattern(private val block: Uri.() -> Matcher?) : UriPattern {
+        fun match(uri: Uri): String? = block.invoke(uri)?.toQ()
     }
 
-    fun z(block: I.() -> Matcher?) {
-        blocks.add(Block.Z(block))
+    class ZoomUriPattern(private val block: Uri.() -> Matcher?) : UriPattern {
+        fun match(uri: Uri): Double? = block.invoke(uri)?.toZ()
     }
 
-    fun htmlUri(block: I.() -> Uri?) {
-        blocks.add(Block.HtmlUri(block))
+    class UriStringUriPattern(private val block: Uri.() -> Uri?) : UriPattern {
+        fun match(uri: Uri): String? = block.invoke(uri)?.toString()
     }
 
-    fun match(input: I): Result {
-        var points: ImmutableList<Point>? = null
-        var q: String? = null
-        var z: Double? = null
-        var htmlUri: Uri? = null
+    class ConversionUriPattern(private val srs: Srs) : Group<UriPattern>() {
 
-        for (matcher in blocks) {
-            when (matcher) {
-                is Block.LatLon<I> ->
-                    if (points == null) {
-                        matcher.block.invoke(input)?.let { m ->
-                            m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                                m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                                    points = persistentListOf(Point(srs, lat, lon))
-                                }
-                            }
+        fun points(block: Uri.() -> Matcher?) = initChild(PointsUriPattern(block))
+
+        fun pointsAndZoom(block: Uri.() -> Matcher?) = initChild(PointsAndZoomUriPattern(block))
+
+        fun pointsSequence(block: Uri.() -> Sequence<Matcher>) = initChild(PointsSequenceUriPattern(block))
+
+        fun query(block: Uri.() -> Matcher?) = initChild(QueryUriPattern(block))
+
+        fun zoom(block: Uri.() -> Matcher?) = initChild(ZoomUriPattern(block))
+
+        fun uriString(block: Uri.() -> Uri?) = initChild(UriStringUriPattern(block))
+
+        fun match(uri: Uri): Result {
+            var points: ImmutableList<Point>? = null
+            var q: String? = null
+            var z: Double? = null
+            var uriString: String? = null
+
+            for (child in children) {
+                when (child) {
+                    is PointsUriPattern -> if (points == null) {
+                        child.match(srs, uri)?.let { points = it }
+                    }
+
+                    is PointsAndZoomUriPattern -> if (points == null) {
+                        child.match(srs, uri)?.let {
+                            points = it.first
+                            z = it.second
                         }
                     }
 
-                is Block.LatLonAll<I> ->
-                    if (points == null) {
-                        points = matcher.block.invoke(input)
-                            .mapNotNull { m ->
-                                m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                                    m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                                        Point(srs, lat, lon)
-                                    }
-                                }
-                            }
-                            .toImmutableList()
-                            .takeIf { it.isNotEmpty() }
+                    is PointsSequenceUriPattern -> if (points == null) {
+                        points = child.match(srs, uri)
                     }
 
-                is Block.LatLonZ<I> ->
-                    if (points == null) {
-                        matcher.block.invoke(input)?.let { m ->
-                            m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                                m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                                    m.groupOrNull("z")?.toDoubleOrNull()?.let { newZ ->
-                                        points = persistentListOf(Point(srs, lat, lon))
-                                        z = max(1.0, min(21.0, newZ))
-                                    }
-                                }
-                            }
-                        }
+                    is QueryUriPattern -> if (q == null) {
+                        q = child.match(uri)
                     }
 
-                is Block.Q<I> -> {
-                    if (q == null) {
-                        matcher.block.invoke(input)
-                            ?.groupOrNull("q")
-                            ?.let { q = it }
+                    is ZoomUriPattern -> if (z == null) {
+                        z = child.match(uri)
                     }
-                }
 
-                is Block.Z<I> -> {
-                    if (z == null) {
-                        matcher.block.invoke(input)
-                            ?.groupOrNull("z")
-                            ?.toDoubleOrNull()
-                            ?.let { z = max(1.0, min(21.0, it)) }
-                    }
-                }
-
-                is Block.HtmlUri<I> -> {
-                    if (htmlUri == null) {
-                        matcher.block.invoke(input)
-                            ?.let { htmlUri = it }
+                    is UriStringUriPattern -> if (uriString == null) {
+                        uriString = child.match(uri)
                     }
                 }
             }
-        }
 
-        return Result(
-            position = Position(points, q = q, z = z),
-            htmlUri = htmlUri,
-        )
+            return Result(
+                position = Position(points, q = q, z = z),
+                uriString = uriString,
+            )
+        }
+    }
+
+    sealed interface LinePattern
+
+    data class PointLinePattern(private val block: String.() -> Matcher?) : LinePattern {
+        fun match(srs: Srs, line: String): Point? = block.invoke(line)?.toPoint(srs)
+    }
+
+    data class DefaultPointsLinePattern(private val block: String.() -> Matcher?) : LinePattern {
+        fun match(srs: Srs, line: String): ImmutableList<Point>? =
+            block.invoke(line)?.toPoint(srs)?.let { persistentListOf(it) }
+    }
+
+    data class UriStringLinePattern(private val block: String.() -> Matcher?) : LinePattern {
+        fun match(line: String): String? = block.invoke(line)?.toUriString()
+    }
+
+    sealed interface HtmlPattern
+
+    class ForEachLinePattern : Group<LinePattern>(), HtmlPattern {
+
+        fun point(block: String.() -> Matcher?) = initChild(PointLinePattern(block))
+
+        fun defaultPoints(block: String.() -> Matcher?) = initChild(DefaultPointsLinePattern(block))
+
+        fun uriString(block: String.() -> Matcher?) = initChild(UriStringLinePattern(block))
+
+        fun match(srs: Srs, input: Source): Result {
+            val points: MutableList<Point> = mutableListOf()
+            var defaultPoints: ImmutableList<Point>? = null
+            var uriString: String? = null
+
+            for (line in generateSequence { input.readLine() }) {
+                for (child in children) {
+                    when (child) {
+                        is PointLinePattern ->
+                            child.match(srs, line)?.let { points.add(it) }
+
+                        is DefaultPointsLinePattern -> if (defaultPoints == null) {
+                            child.match(srs, line)?.let { defaultPoints = it }
+                        }
+
+                        is UriStringLinePattern -> if (uriString == null) {
+                            child.match(line).let { uriString = it }
+                        }
+                    }
+                }
+            }
+
+            return Result(
+                position = Position(points.takeIf { it.isNotEmpty() }?.toImmutableList() ?: defaultPoints),
+                uriString = uriString,
+            )
+        }
+    }
+
+    class ConversionHtmlPattern(private val srs: Srs) : Group<HtmlPattern>() {
+
+        fun forEachLine(init: ForEachLinePattern.() -> Unit) = initChild(ForEachLinePattern(), init)
+
+        fun match(input: Source): Result? {
+            for (child in children) {
+                when (child) {
+                    is ForEachLinePattern -> return child.match(srs, input)
+                }
+            }
+            return null
+        }
     }
 }
