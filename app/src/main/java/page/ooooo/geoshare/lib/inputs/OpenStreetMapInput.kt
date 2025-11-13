@@ -34,10 +34,10 @@ object OpenStreetMapInput : Input.HasHtml {
     )
 
     override val conversionUriPattern = ConversionPattern.uriPattern(srs) {
-        pointsAndZoomTriple {
+        setLatLonZoom {
             ("""/go/$HASH""" match path)?.groupOrNull("hash")?.let { decodeOpenStreetMapQuadTileHash(it) }
         }
-        url {
+        setUrl {
             (ELEMENT_PATH match path)?.let { m ->
                 m.groupOrNull("type")?.let { type ->
                     m.groupOrNull("id")?.let { id ->
@@ -46,13 +46,13 @@ object OpenStreetMapInput : Input.HasHtml {
                 }
             }
         }
-        pointsAndZoom { """map=$Z/$LAT/$LON.*""" match fragment }
+        setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
     }
 
     override val conversionHtmlPattern = ConversionPattern.htmlPattern(srs) {
         val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
         forEachLine {
-            pointsSequence { pattern findAll this }
+            addPointsFromSequenceOfMatchers { pattern findAll this }
         }
     }
 

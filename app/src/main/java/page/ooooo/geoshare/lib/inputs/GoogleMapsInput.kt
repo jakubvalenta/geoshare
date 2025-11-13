@@ -18,7 +18,6 @@ import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.toUrl
 
 object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     const val NAME = "Google Maps"
@@ -45,7 +44,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
     override val conversionUriPattern = ConversionPattern.uriPattern(srs) {
-        pointsSequence {
+        addPointsFromSequenceOfMatchers {
             sequence {
                 ("""/maps/.*/$DATA""" match path)?.groupOrNull("data")?.let { data ->
                     ("""!3d$LAT!4d$LON""" find data)?.let {
@@ -56,41 +55,41 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 }
             }
         }
-        pointsAndZoom { """/maps/@$LAT,$LON,${Z}z.*""" match path }
-        points { """/maps/@$LAT,$LON.*""" match path }
-        pointsAndZoom { """/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*""" match path }
-        pointsAndZoom { """/maps/place/.*/@$LAT,$LON,${Z}z.*""" match path }
-        points { """/maps/place/.*/@$LAT,$LON.*""" match path }
-        points { """/maps/place/$LAT,$LON.*""" match path }
-        points { """/maps/search/$LAT,$LON.*""" match path }
-        pointsAndZoom { """/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" match path }
-        points { """/maps/dir/.*/$LAT,$LON/data[^/]*""" match path }
-        points { """/maps/dir/.*/$LAT,$LON/?""" match path }
-        pointsAndZoom { """/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" match path }
-        points { LAT_LON_PATTERN match queryParams["destination"] }
-        points { LAT_LON_PATTERN match queryParams["q"] }
-        points { LAT_LON_PATTERN match queryParams["query"] }
-        points { LAT_LON_PATTERN match queryParams["viewpoint"] }
-        points { LAT_LON_PATTERN match queryParams["center"] }
-        query { Q_PARAM_PATTERN match queryParams["destination"] }
-        query { Q_PARAM_PATTERN match queryParams["q"] }
-        query { Q_PARAM_PATTERN match queryParams["query"] }
-        query { """/maps/place/$Q_PATH.*""" match path }
-        query { """/maps/search/$Q_PATH.*""" match path }
-        query { """/maps/dir/.*/$Q_PATH/data[^/]*""" match path }
-        query { """/maps/dir/.*/$Q_PATH/?""" match path }
-        url { ("""/?""" match path)?.toUrl() }
-        url { ("""/maps/?""" match path)?.toUrl() }
-        url { ("""/maps/@""" match path)?.toUrl() }
-        url { ("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path)?.toUrl() }
-        url { ("""/maps/dir/.*""" match path)?.toUrl() }
-        url { ("""/maps/place/.*""" match path)?.toUrl() }
-        url { ("""/maps/placelists/list/.*""" match path)?.toUrl() }
-        url { ("""/maps/search/.*""" match path)?.toUrl() }
-        url { ("""/search/?""" match path)?.toUrl() }
-        url { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) this.toUrl() else null }
-        zoom { Z_PATTERN match scheme }
-        zoom { Z_PATTERN match queryParams["zoom"] }
+        setPointAndZoomFromMatcher { """/maps/@$LAT,$LON,${Z}z.*""" match path }
+        setPointFromMatcher { """/maps/@$LAT,$LON.*""" match path }
+        setPointAndZoomFromMatcher { """/maps/place/$LAT,$LON/@[\d.,+-]+,${Z}z.*""" match path }
+        setPointAndZoomFromMatcher { """/maps/place/.*/@$LAT,$LON,${Z}z.*""" match path }
+        setPointFromMatcher { """/maps/place/.*/@$LAT,$LON.*""" match path }
+        setPointFromMatcher { """/maps/place/$LAT,$LON.*""" match path }
+        setPointFromMatcher { """/maps/search/$LAT,$LON.*""" match path }
+        setPointAndZoomFromMatcher { """/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" match path }
+        setPointFromMatcher { """/maps/dir/.*/$LAT,$LON/data[^/]*""" match path }
+        setPointFromMatcher { """/maps/dir/.*/$LAT,$LON/?""" match path }
+        setPointAndZoomFromMatcher { """/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" match path }
+        setPointFromMatcher { LAT_LON_PATTERN match queryParams["destination"] }
+        setPointFromMatcher { LAT_LON_PATTERN match queryParams["q"] }
+        setPointFromMatcher { LAT_LON_PATTERN match queryParams["query"] }
+        setPointFromMatcher { LAT_LON_PATTERN match queryParams["viewpoint"] }
+        setPointFromMatcher { LAT_LON_PATTERN match queryParams["center"] }
+        setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["destination"] }
+        setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
+        setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["query"] }
+        setQueryFromMatcher { """/maps/place/$Q_PATH.*""" match path }
+        setQueryFromMatcher { """/maps/search/$Q_PATH.*""" match path }
+        setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/data[^/]*""" match path }
+        setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/?""" match path }
+        setUrl { if (("""/?""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/?""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/@""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/dir/.*""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/place/.*""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/placelists/list/.*""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/search/.*""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/search/?""" match path) != null) this.toUrl() else null }
+        setUrl { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) this.toUrl() else null }
+        setZoomFromMatcher { Z_PATTERN match scheme }
+        setZoomFromMatcher { Z_PATTERN match queryParams["zoom"] }
     }
 
     override val conversionHtmlPattern = ConversionPattern.htmlPattern(srs) {
@@ -99,10 +98,10 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
         val defaultPointPattern2 = Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
         val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
         forEachLine {
-            pointsSequence { pointPattern findAll this }
-            defaultPoints { defaultPointPattern1 find this }
-            defaultPoints { defaultPointPattern2 find this }
-            url { uriPattern find this }
+            addPointsFromSequenceOfMatchers { pointPattern findAll this }
+            setDefaultPointFromMatcher { defaultPointPattern1 find this }
+            setDefaultPointFromMatcher { defaultPointPattern2 find this }
+            setUrlFromMatcher { uriPattern find this }
         }
     }
 

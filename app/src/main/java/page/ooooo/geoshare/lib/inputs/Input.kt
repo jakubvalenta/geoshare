@@ -17,7 +17,7 @@ sealed interface Input {
 
     val uriPattern: Pattern
     val documentation: Documentation
-    val conversionUriPattern: ConversionPattern.ConversionUriPattern
+    val conversionUriPattern: ConversionPattern.UriPattern
 
     interface HasShortUri : Input {
         val shortUriPattern: Pattern
@@ -27,7 +27,7 @@ sealed interface Input {
     }
 
     interface HasHtml : Input {
-        val conversionHtmlPattern: ConversionPattern.ConversionHtmlPattern
+        val conversionHtmlPattern: ConversionPattern.HtmlPattern
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
     }
