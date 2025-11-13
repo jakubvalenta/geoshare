@@ -232,8 +232,11 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeListInData() {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
-            Position() to "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts",
+            Pair(
+                Position(),
+                @Suppress("SpellCheckingInspection")
+                "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts",
+            ),
             @Suppress("SpellCheckingInspection")
             parseUri("https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts")
         )
