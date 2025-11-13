@@ -1,3 +1,4 @@
 - Added Amap (AutoNavi) support.
 - Added "navigate to" and "street view" to Google Maps app menu.
 - Improved connection speed.
+- Improved Yandex Maps organization link precision.

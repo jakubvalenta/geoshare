@@ -108,18 +108,11 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_containsDataCoordinates_returnsPosition() {
+    fun parseHtml_containsCoordinates_returnsPosition() {
         assertEquals(
-            Position(Srs.WGS84, 50.106376, 8.664164) to null,
-            parseHtml("""<html><div data-coordinates="8.664164,50.106376"></div></html>""")
-        )
-    }
-
-    @Test
-    fun parseHtml_containsInvalidDataCoordinates_returnsNull() {
-        assertEquals(
-            Position() to null,
-            parseHtml("""<html><div data-coordinates="spam"></div></html>""")
+            Position(Srs.WGS84, 50.107130, 8.660903) to null,
+            @Suppress("SpellCheckingInspection")
+            parseHtml("""3ad6&amp;theme=light&amp;lang=en_US&amp;size=520%2C440&amp;l=map&amp;spn=0.009641%2C0.005481&amp;ll=8.660903%2C50.107130&amp;lg=0&amp;cr=0&amp;pt=8.664164%2C50.106376%2Cplacemark&amp;signature=cSM2mE5qjL5""")
         )
     }
 

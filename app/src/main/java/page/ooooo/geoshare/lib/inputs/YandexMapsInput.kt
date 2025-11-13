@@ -58,7 +58,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override fun parseHtml(source: Source) = source.run {
         PositionBuilder(srs).apply {
-            val pattern = Pattern.compile("""data-coordinates="$LON,$LAT"""")
+            val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             for (line in generateSequence { source.readLine() }) {
                 (pattern find line)?.toPoint(srs)?.let { point ->
                     points.add(point)
