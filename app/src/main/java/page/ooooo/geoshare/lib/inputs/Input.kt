@@ -2,7 +2,9 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.runtime.Composable
 import com.google.re2j.Pattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
+import kotlinx.io.Source
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.position.PositionBuilder
 
 sealed interface Input {
 
@@ -17,7 +19,8 @@ sealed interface Input {
 
     val uriPattern: Pattern
     val documentation: Documentation
-    val conversionUriPattern: ConversionPattern.UriPattern
+
+    fun parseUri(uri: Uri): PositionBuilder
 
     interface HasShortUri : Input {
         val shortUriPattern: Pattern
@@ -27,8 +30,9 @@ sealed interface Input {
     }
 
     interface HasHtml : Input {
-        val conversionHtmlPattern: ConversionPattern.HtmlPattern
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
+
+        fun parseHtml(source: Source): PositionBuilder
     }
 }

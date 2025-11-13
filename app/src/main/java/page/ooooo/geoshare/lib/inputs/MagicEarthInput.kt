@@ -2,23 +2,15 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Q_PARAM_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.toQ
-import page.ooooo.geoshare.lib.position.toZ
+import page.ooooo.geoshare.lib.position.*
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
-object MagicEarthInput : Input.HasUri {
+object MagicEarthInput : Input {
     const val NAME = "Magic Earth"
 
     private val srs = Srs.WGS84
@@ -31,27 +23,21 @@ object MagicEarthInput : Input.HasUri {
         ),
     )
 
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        all {
-            optional {
-                first {
-                    pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
-                    pattern { (Z_PATTERN match queryParams["zoom"])?.toZ(srs) }
-                }
-            }
-            first {
-                pattern {
-                    (LAT_PATTERN match queryParams["lat"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                        (LON_PATTERN match queryParams["lon"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                            Position(srs, lat, lon)
-                        }
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setLatLon {
+                (LAT_PATTERN match queryParams["lat"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                    (LON_PATTERN match queryParams["lon"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                        lat to lon
                     }
                 }
-                pattern { (Q_PARAM_PATTERN match queryParams["name"])?.toQ(srs) }
-                @Suppress("SpellCheckingInspection")
-                pattern { (Q_PARAM_PATTERN match queryParams["daddr"])?.toQ(srs) }
-                pattern { (Q_PARAM_PATTERN match queryParams["q"])?.toQ(srs) }
             }
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["name"] }
+            @Suppress("SpellCheckingInspection")
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["daddr"] }
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
+            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
+            setZoomFromMatcher { Z_PATTERN match queryParams["zoom"] }
         }
     }
 }

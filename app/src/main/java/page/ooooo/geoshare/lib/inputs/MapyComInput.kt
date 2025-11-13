@@ -3,18 +3,12 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.toZ
+import page.ooooo.geoshare.lib.position.*
 
-object MapyComInput : Input.HasUri, Input.HasShortUri {
+object MapyComInput : Input.HasShortUri {
     private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
 
     private val srs = Srs.WGS84
@@ -34,29 +28,27 @@ object MapyComInput : Input.HasUri, Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.GET
 
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        pattern {
-            (COORDS match path)?.let { m ->
-                m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                    m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                        val latSig = if (m.groupOrNull()?.contains('S') == true) -1 else 1
-                        val lonSig = if (m.groupOrNull()?.contains('W') == true) -1 else 1
-                        Position(srs, latSig * lat, lonSig * lon)
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setLatLon {
+                (COORDS match path)?.let { m ->
+                    m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
+                        m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
+                            val latSig = if (m.groupOrNull()?.contains('S') == true) -1 else 1
+                            val lonSig = if (m.groupOrNull()?.contains('W') == true) -1 else 1
+                            latSig * lat to lonSig * lon
+                        }
                     }
                 }
             }
-        }
-        all {
-            optional {
-                pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
-            }
-            pattern {
+            setLatLon {
                 (LAT_PATTERN match queryParams["y"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
                     (LON_PATTERN match queryParams["x"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                        Position(srs, lat, lon)
+                        lat to lon
                     }
                 }
             }
+            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
         }
     }
 

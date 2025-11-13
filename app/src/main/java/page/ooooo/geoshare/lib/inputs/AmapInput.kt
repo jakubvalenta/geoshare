@@ -3,16 +3,14 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.LAT
+import page.ooooo.geoshare.lib.position.LON
+import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.toLatLon
 
-object AmapInput : Input.HasUri, Input.HasShortUri {
+object AmapInput : Input.HasShortUri {
     private val srs = Srs.GCJ02
 
     @Suppress("SpellCheckingInspection")
@@ -29,9 +27,11 @@ object AmapInput : Input.HasUri, Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        pattern { ("""\w+,$LAT,$LON.+""" match queryParams["p"])?.toLatLon(srs) }
-        pattern { ("""$LAT,$LON.+""" match queryParams["q"])?.toLatLon(srs) }
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setPointFromMatcher { """\w+,$LAT,$LON.+""" match queryParams["p"] }
+            setPointFromMatcher { """$LAT,$LON.+""" match queryParams["q"] }
+        }
     }
 
     @StringRes

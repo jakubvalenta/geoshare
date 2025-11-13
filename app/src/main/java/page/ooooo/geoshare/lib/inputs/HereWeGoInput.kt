@@ -2,10 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -14,7 +10,7 @@ import page.ooooo.geoshare.lib.position.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object HereWeGoInput : Input.HasUri {
+object HereWeGoInput : Input {
     private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
 
     private val srs = Srs.WGS84
@@ -31,14 +27,11 @@ object HereWeGoInput : Input.HasUri {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        pattern { ("""/l/$LAT,$LON""" match path)?.toLatLon(srs) }
-        pattern { if (path == "/") ("""$LAT,$LON,$Z""" match queryParams["map"])?.toLatLonZ(srs) else null }
-        all {
-            optional {
-                pattern { (""".*,$Z""" match queryParams["map"])?.toZ(srs) }
-            }
-            pattern {
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setPointFromMatcher { """/l/$LAT,$LON""" match path }
+            setPointAndZoomFromMatcher { ("""$LAT,$LON,$Z""" match queryParams["map"])?.takeIf { path == "/" } }
+            setLatLon {
                 ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
                     ?.let { encoded ->
                         Base64.decode(encoded).decodeToString().let { decoded ->
@@ -48,12 +41,13 @@ object HereWeGoInput : Input.HasUri {
                                     ("""(lon=|"longitude":)$LON""" find decoded)?.groupOrNull("lon")
                                         ?.toDoubleOrNull()
                                         ?.let { lon ->
-                                            Position(srs, lat, lon)
+                                            lat to lon
                                         }
                                 }
                         }
                     }
             }
+            setZoomFromMatcher { """.*,$Z""" match queryParams["map"] }
         }
     }
 }

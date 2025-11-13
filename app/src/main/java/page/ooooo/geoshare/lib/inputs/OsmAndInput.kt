@@ -2,16 +2,11 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT_LON_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.*
 
-object OsmAndInput : Input.HasUri {
+object OsmAndInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
@@ -22,15 +17,11 @@ object OsmAndInput : Input.HasUri {
         ),
     )
 
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        all {
-            optional {
-                pattern { ("""$Z/.*""" match fragment)?.toZ(srs) }
-            }
-            first {
-                pattern { (LAT_LON_PATTERN match queryParams["pin"])?.toLatLon(srs) }
-                pattern { ("""$Z/$LAT/$LON.*""" match fragment)?.toLatLonZ(srs) }
-            }
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setPointFromMatcher { LAT_LON_PATTERN match queryParams["pin"] }
+            setPointAndZoomFromMatcher { """$Z/$LAT/$LON.*""" match fragment }
+            setZoomFromMatcher { """$Z/.*""" match fragment }
         }
     }
 }

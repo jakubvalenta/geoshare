@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.position
 
 import com.google.re2j.Matcher
+import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.extensions.groupOrNull
@@ -9,7 +10,24 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.sequences.mapNotNull
 
+const val MAX_COORD_PRECISION = 17
+const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
+const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?"""
+const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
+const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
+const val Z = """(?P<z>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+const val Q_PARAM = """(?P<q>.+)"""
+const val Q_PATH = """(?P<q>[^/]+)"""
+
+val LAT_PATTERN: Pattern = Pattern.compile(LAT)
+val LON_PATTERN: Pattern = Pattern.compile(LON)
+val LAT_LON_PATTERN: Pattern = Pattern.compile("$LAT,$LON")
+val LON_LAT_PATTERN: Pattern = Pattern.compile("$LON,$LAT")
+val Z_PATTERN: Pattern = Pattern.compile(Z)
+val Q_PARAM_PATTERN: Pattern = Pattern.compile(Q_PARAM)
+
 class PositionBuilder(val srs: Srs) {
+
     var points: MutableList<Point> = mutableListOf()
     var defaultPoint: Point? = null
     var q: String? = null
@@ -37,6 +55,14 @@ class PositionBuilder(val srs: Srs) {
             block()?.toPointAndZ(srs)?.let { (point, newZ) ->
                 points.add(point)
                 z = newZ
+            }
+        }
+    }
+
+    fun setLatLon(block: () -> Pair<Double, Double>?) {
+        if (points.isEmpty()) {
+            block()?.let { (lat, lon) ->
+                points.add(Point(srs, lat, lon))
             }
         }
     }

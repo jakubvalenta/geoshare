@@ -27,7 +27,6 @@ import page.ooooo.geoshare.lib.conversion.AutomationReady
 import page.ooooo.geoshare.lib.conversion.AutomationSucceeded
 import page.ooooo.geoshare.lib.conversion.AutomationWaiting
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
 import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
@@ -290,7 +289,7 @@ class ConversionStateTest {
     fun receivedUri_inputDoesNotSupportShortUri_returnsUnshortenedUrlAndPassesPermission() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val mockInput = object : Input.HasUri {
+        val mockInput = object : Input {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation = Input.Documentation(nameResId = -1, inputs = emptyList())
             override val conversionUriPattern: ConversionPattern<Uri, Position> = ConversionPattern.first {}

@@ -2,16 +2,15 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import kotlinx.io.Source
+import kotlinx.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.*
 import java.net.URL
 
 object OpenStreetMapInput : Input.HasHtml {
@@ -33,26 +32,32 @@ object OpenStreetMapInput : Input.HasHtml {
         ),
     )
 
-    override val conversionUriPattern = ConversionPattern.uriPattern(srs) {
-        setLatLonZoom {
-            ("""/go/$HASH""" match path)?.groupOrNull("hash")?.let { decodeOpenStreetMapQuadTileHash(it) }
-        }
-        setUrl {
-            (ELEMENT_PATH match path)?.let { m ->
-                m.groupOrNull("type")?.let { type ->
-                    m.groupOrNull("id")?.let { id ->
-                        URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setLatLonZoom {
+                ("""/go/$HASH""" match path)?.groupOrNull("hash")?.let { hash ->
+                    decodeOpenStreetMapQuadTileHash(hash)
+                }
+            }
+            setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
+            setUrl {
+                (ELEMENT_PATH match path)?.let { m ->
+                    m.groupOrNull("type")?.let { type ->
+                        m.groupOrNull("id")?.let { id ->
+                            URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")
+                        }
                     }
                 }
             }
         }
-        setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
     }
 
-    override val conversionHtmlPattern = ConversionPattern.htmlPattern(srs) {
-        val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
-        forEachLine {
-            addPointsFromSequenceOfMatchers { pattern findAll this }
+    override fun parseHtml(source: Source) = source.run {
+        PositionBuilder(srs).apply {
+            val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
+            for (line in generateSequence { source.readLine() }) {
+                addPointsFromSequenceOfMatchers { pattern findAll line }
+            }
         }
     }
 

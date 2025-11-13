@@ -5,20 +5,12 @@ import com.google.re2j.Pattern
 import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionPattern
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LAT
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.LON_LAT_PATTERN
-import page.ooooo.geoshare.lib.conversion.ConversionPattern.Companion.Z_PATTERN
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.toLatLon
-import page.ooooo.geoshare.lib.position.toZ
+import page.ooooo.geoshare.lib.position.*
 
-object YandexMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
+object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
@@ -52,34 +44,26 @@ object YandexMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override val conversionUriPattern = ConversionPattern.first<Uri, Position> {
-        all {
-            optional {
-                first {
-                    @Suppress("SpellCheckingInspection")
-                    pattern { (Z_PATTERN match queryParams["whatshere%5Bzoom%5D"])?.toZ(srs) }
-                    pattern { (Z_PATTERN match queryParams["z"])?.toZ(srs) }
-                }
-            }
-            first {
-                @Suppress("SpellCheckingInspection")
-                pattern { (LON_LAT_PATTERN match queryParams["whatshere%5Bpoint%5D"])?.toLatLon(srs) }
-                pattern { (LON_LAT_PATTERN match queryParams["ll"])?.toLatLon(srs) }
-                pattern { ("""/maps/org/\d+([/?#].*|$)""" match path)?.let { Position(srs) } }
-            }
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            @Suppress("SpellCheckingInspection")
+            setPointFromMatcher { LON_LAT_PATTERN match queryParams["whatshere%5Bpoint%5D"] }
+            setPointFromMatcher { LON_LAT_PATTERN match queryParams["ll"] }
+            @Suppress("SpellCheckingInspection")
+            setZoomFromMatcher { Z_PATTERN match queryParams["whatshere%5Bzoom%5D"] }
+            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
+            setUrl { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toUrl() else null }
         }
     }
 
-    override val conversionHtmlPattern = ConversionPattern.first<Source, Position> {
-        pattern {
+    override fun parseHtml(source: Source) = source.run {
+        PositionBuilder(srs).apply {
             val pattern = Pattern.compile("""data-coordinates="$LON,$LAT"""")
-            generateSequence { this.readLine() }
-                .firstNotNullOfOrNull { line -> pattern find line }
-                ?.toLatLon(srs)
+            for (line in generateSequence { source.readLine() }) {
+                setPointFromMatcher { pattern find line }
+            }
         }
     }
-
-    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

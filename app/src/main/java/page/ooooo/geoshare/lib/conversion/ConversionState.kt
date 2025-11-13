@@ -19,6 +19,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.PositionBuilder
 import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
@@ -226,30 +227,30 @@ data class UnshortenedUrl(
     val permission: Permission?,
 ) : ConversionState() {
     override suspend fun transition(): State {
-        val conversionUriResult = input.conversionUriPattern.match(uri)
+        val positionBuilder = input.parseUri(uri)
         // TODO Simplify result checking
-        stateContext.log.i(null, "URI Pattern: Converted $uri to ${conversionUriResult.position}")
-        if (!conversionUriResult.position.points.isNullOrEmpty()) {
-            return ConversionSucceeded(stateContext, runContext, inputUriString, conversionUriResult.position)
+        stateContext.log.i(null, "URI Pattern: Converted $uri to ${positionBuilder.position}")
+        if (!positionBuilder.position.points.isNullOrEmpty()) {
+            return ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position)
         }
-        if (conversionUriResult.position.q.isNullOrEmpty() && conversionUriResult.url == null) {
+        if (positionBuilder.position.q.isNullOrEmpty() && positionBuilder.url == null) {
             stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
             return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
         }
         if (input is Input.HasHtml) {
             return when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
                 Permission.ALWAYS -> GrantedParseHtmlPermission(
-                    stateContext, runContext, inputUriString, input, uri, conversionUriResult
+                    stateContext, runContext, inputUriString, input, uri, positionBuilder
                 )
 
                 Permission.ASK -> RequestedParseHtmlPermission(
-                    stateContext, runContext, inputUriString, input, uri, conversionUriResult
+                    stateContext, runContext, inputUriString, input, uri, positionBuilder
                 )
 
-                Permission.NEVER -> ParseHtmlFailed(stateContext, runContext, inputUriString, conversionUriResult)
+                Permission.NEVER -> ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
             }
         }
-        return ParseHtmlFailed(stateContext, runContext, inputUriString, conversionUriResult)
+        return ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
     }
 }
 
@@ -259,7 +260,7 @@ data class RequestedParseHtmlPermission(
     val inputUriString: String,
     val input: Input.HasHtml,
     val uri: Uri,
-    val conversionUriResult: ConversionPattern.Result,
+    val positionBuilder: PositionBuilder,
 ) : ConversionState(), PermissionState {
     override val permissionTitleResId: Int = input.permissionTitleResId
 
@@ -273,7 +274,7 @@ data class RequestedParseHtmlPermission(
             inputUriString,
             input,
             uri,
-            conversionUriResult,
+            positionBuilder,
         )
     }
 
@@ -281,7 +282,7 @@ data class RequestedParseHtmlPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
         }
-        return ParseHtmlFailed(stateContext, runContext, inputUriString, conversionUriResult)
+        return ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
     }
 }
 
@@ -291,13 +292,13 @@ data class GrantedParseHtmlPermission(
     val inputUriString: String,
     val input: Input.HasHtml,
     val uri: Uri,
-    val conversionUriResult: ConversionPattern.Result,
+    val positionBuilder: PositionBuilder,
     val retry: NetworkTools.Retry? = null,
 ) : ConversionState(), HasLoadingIndicator {
     override val loadingIndicatorTitleResId: Int = input.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
-        val htmlUrl = conversionUriResult.url
+        val htmlUrl = positionBuilder.url
         if (htmlUrl == null) {
             stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri")
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
@@ -306,14 +307,14 @@ data class GrantedParseHtmlPermission(
         return try {
             stateContext.networkTools.getSource(htmlUrl, retry) { source ->
                 // TODO Delete SourceCache
-                val conversionHtmlResult = input.conversionHtmlPattern.match(source.buffered())
-                val positionFromHtml = conversionHtmlResult?.position
+                val positionFromHtmlBuilder = input.parseHtml(source.buffered())
+                val positionFromHtml = positionFromHtmlBuilder.position
                 // TODO Simplify result checking
-                if (!positionFromHtml?.points.isNullOrEmpty()) {
+                if (!positionFromHtml.points.isNullOrEmpty()) {
                     stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")
                     ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml)
                 } else {
-                    val redirectUriString = conversionHtmlResult?.url?.toString()
+                    val redirectUriString = positionFromHtmlBuilder.url?.toString()
                     if (redirectUriString != null) {
                         stateContext.log.i(
                             null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
@@ -329,7 +330,7 @@ data class GrantedParseHtmlPermission(
                         )
                     } else {
                         stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
-                        ParseHtmlFailed(stateContext, runContext, inputUriString, conversionUriResult)
+                        ParseHtmlFailed(stateContext, runContext, inputUriString, positionBuilder)
                     }
                 }
             }
@@ -342,7 +343,7 @@ data class GrantedParseHtmlPermission(
                 inputUriString,
                 input,
                 uri,
-                conversionUriResult,
+                positionBuilder,
                 retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
             )
         } catch (tr: NetworkTools.UnrecoverableException) {
@@ -369,11 +370,11 @@ data class ParseHtmlFailed(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     val inputUriString: String,
-    val conversionUriResult: ConversionPattern.Result,
+    val positionBuilder: PositionBuilder,
 ) : ConversionState() {
     override suspend fun transition() =
-        if (!conversionUriResult.position.points.isNullOrEmpty() || !conversionUriResult.position.q.isNullOrEmpty()) {
-            ConversionSucceeded(stateContext, runContext, inputUriString, conversionUriResult.position)
+        if (!positionBuilder.position.points.isNullOrEmpty() || !positionBuilder.position.q.isNullOrEmpty()) {
+            ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position)
         } else {
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
