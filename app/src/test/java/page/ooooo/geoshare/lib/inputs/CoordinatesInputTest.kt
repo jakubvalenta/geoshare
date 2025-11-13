@@ -24,15 +24,15 @@ class CoordinatesInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_unknownPath() {
-        assertNull(parseUri(""))
-        assertNull(parseUri("spam"))
+        assertNull(parseUriGetPosition(""))
+        assertNull(parseUriGetPosition("spam"))
     }
 
     @Test
     fun parseUri_decimal() {
         assertEquals(
             Position(Srs.WGS84, 41.40338, 2.17403),
-            parseUri("41.40338, 2.17403")
+            parseUriGetPosition("41.40338, 2.17403")
         )
     }
 
@@ -40,7 +40,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_decimalDegreeSign() {
         assertEquals(
             Position(Srs.WGS84, 50.21972, -0.68453),
-            parseUri("50.21972°\u00a0N, 0.68453°\u00a0W")
+            parseUriGetPosition("50.21972°\u00a0N, 0.68453°\u00a0W")
         )
     }
 
@@ -48,7 +48,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_decimalNorthEastAfter() {
         assertEquals(
             Position(Srs.WGS84, 41.996601, 6.122383),
-            parseUri("41.9966006N, 6.1223825E")
+            parseUriGetPosition("41.9966006N, 6.1223825E")
         )
     }
 
@@ -56,7 +56,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_decimalNorthEastBefore() {
         assertEquals(
             Position(Srs.WGS84, 41.40338, 2.17403),
-            parseUri("N 41.40338, E 2.17403")
+            parseUriGetPosition("N 41.40338, E 2.17403")
         )
     }
 
@@ -64,7 +64,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_decimalNegativeNorthEastBefore() {
         assertEquals(
             Position(Srs.WGS84, -68.648556, -152.775879),
-            parseUri("N -68.648556 E -152.775879")
+            parseUriGetPosition("N -68.648556 E -152.775879")
         )
     }
 
@@ -72,7 +72,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_decimalSouthWestBefore() {
         assertEquals(
             Position(Srs.WGS84, -68.648556, -152.775879),
-            parseUri("S 68.648556 W 152.775879")
+            parseUriGetPosition("S 68.648556 W 152.775879")
         )
     }
 
@@ -80,7 +80,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_decimalSouthEastAfter() {
         assertEquals(
             Position(Srs.WGS84, -41.996601, -6.122383),
-            parseUri("41.9966006S, 6.1223825W")
+            parseUriGetPosition("41.9966006S, 6.1223825W")
         )
     }
 
@@ -88,11 +88,11 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutesSecondsTypographic() {
         assertEquals(
             Position(Srs.WGS84, 31.0, 36.5),
-            parseUri("""31° 0′ 0″ N, 36° 30′ 0″ E""")
+            parseUriGetPosition("""31° 0′ 0″ N, 36° 30′ 0″ E""")
         )
         assertEquals(
             Position(Srs.WGS84, 31.95, 35.933333),
-            parseUri("""31°57′N 35°56′E""")
+            parseUriGetPosition("""31°57′N 35°56′E""")
         )
     }
 
@@ -100,7 +100,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutesSecondsNorthEastAfter() {
         assertEquals(
             Position(Srs.WGS84, 41.403389, 2.174028),
-            parseUri("""41°24'12.2"N 2°10'26.5"E""")
+            parseUriGetPosition("""41°24'12.2"N 2°10'26.5"E""")
         )
     }
 
@@ -108,7 +108,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutesSecondsSouthWestAfter() {
         assertEquals(
             Position(Srs.WGS84, -68.648556, -152.775879),
-            parseUri("""68°38'54.8016S 152°46'33.1644W""")
+            parseUriGetPosition("""68°38'54.8016S 152°46'33.1644W""")
         )
     }
 
@@ -116,7 +116,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutesSecondsNegativeNorthEastBefore() {
         assertEquals(
             Position(Srs.WGS84, -68.648556, -152.775879),
-            parseUri("""N -68° 38' 54.8016 E -152° 46' 33.1644""")
+            parseUriGetPosition("""N -68° 38' 54.8016 E -152° 46' 33.1644""")
         )
     }
 
@@ -124,7 +124,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutes() {
         assertEquals(
             Position(Srs.WGS84, 41.40338, 2.17403),
-            parseUri("41 24.2028, 2 10.4418")
+            parseUriGetPosition("41 24.2028, 2 10.4418")
         )
     }
 
@@ -132,7 +132,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutesWhole() {
         assertEquals(
             Position(Srs.WGS84, 31.95, 35.933333),
-            parseUri("31°57′N 35°56′E")
+            parseUriGetPosition("31°57′N 35°56′E")
         )
     }
 
@@ -140,7 +140,7 @@ class CoordinatesInputTest : BaseInputTest() {
     fun parseUri_degreesMinutesNegative() {
         assertEquals(
             Position(Srs.WGS84, -68.648556, -152.775879),
-            parseUri("-68 38.913360, -152 46.552740")
+            parseUriGetPosition("-68 38.913360, -152 46.552740")
         )
     }
 }

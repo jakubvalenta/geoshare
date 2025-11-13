@@ -11,7 +11,6 @@ import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.*
-import java.net.URL
 
 object OpenStreetMapInput : Input.HasHtml {
     private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
@@ -39,11 +38,11 @@ object OpenStreetMapInput : Input.HasHtml {
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
             }
             setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
-            setUrl {
+            setUriString {
                 (ELEMENT_PATH match path)?.let { m ->
                     m.groupOrNull("type")?.let { type ->
                         m.groupOrNull("id")?.let { id ->
-                            URL("https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json")
+                            "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
                         }
                     }
                 }

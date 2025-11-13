@@ -28,7 +28,7 @@ class OsmAndInputTest : BaseInputTest() {
     fun parseUri_pin() {
         assertEquals(
             Position(Srs.WGS84, 52.51628, 13.37771),
-            parseUri("https://osmand.net/map?pin=52.51628,13.37771")
+            parseUriGetPosition("https://osmand.net/map?pin=52.51628,13.37771")
         )
     }
 
@@ -36,7 +36,7 @@ class OsmAndInputTest : BaseInputTest() {
     fun parseUri_fragment() {
         assertEquals(
             Position(Srs.WGS84, -53.347932, -13.2347, z = 12.5),
-            parseUri("https://osmand.net/map#12.5/-53.347932/-13.2347")
+            parseUriGetPosition("https://osmand.net/map#12.5/-53.347932/-13.2347")
         )
     }
 
@@ -44,7 +44,7 @@ class OsmAndInputTest : BaseInputTest() {
     fun parseUri_parameterPinTakesPrecedenceOverFragment() {
         assertEquals(
             Position(Srs.WGS84, 52.51628, 13.37771, z = 12.5),
-            parseUri("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347")
+            parseUriGetPosition("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347")
         )
     }
 }

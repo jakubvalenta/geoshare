@@ -27,19 +27,19 @@ object AppleMapsInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["address"] }
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["name"] }
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["ll"] }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["coordinate"] }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["q"] }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["sll"] }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["center"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["address"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["name"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
             setZoomFromMatcher { (Z_PATTERN match queryParams["z"]) }
-            setUrl { if (host == "maps.apple" && path.startsWith("/p/")) uri.toUrl() else null }
+            setUriString { if (host == "maps.apple" && path.startsWith("/p/")) uri.toString() else null }
             @Suppress("SpellCheckingInspection")
-            setUrl { if (!queryParams["auid"].isNullOrEmpty()) uri.toUrl() else null }
-            setUrl { if (!queryParams["place-id"].isNullOrEmpty()) uri.toUrl() else null }
+            setUriString { if (!queryParams["auid"].isNullOrEmpty()) uri.toString() else null }
+            setUriString { if (!queryParams["place-id"].isNullOrEmpty()) uri.toString() else null }
         }
     }
 

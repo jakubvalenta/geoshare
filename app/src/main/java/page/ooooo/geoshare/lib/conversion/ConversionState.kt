@@ -21,6 +21,8 @@ import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import java.io.IOException
+import java.net.MalformedURLException
+import java.net.URL
 import kotlin.time.Duration.Companion.seconds
 
 open class ConversionState : State {
@@ -233,7 +235,7 @@ data class UnshortenedUrl(
         if (!positionBuilder.position.points.isNullOrEmpty()) {
             return ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position)
         }
-        if (positionBuilder.position.q.isNullOrEmpty() && positionBuilder.url == null) {
+        if (positionBuilder.position.q.isNullOrEmpty() && positionBuilder.uriString == null) {
             stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
             return ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
         }
@@ -298,7 +300,9 @@ data class GrantedParseHtmlPermission(
     override val loadingIndicatorTitleResId: Int = input.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
-        val htmlUrl = positionBuilder.url
+        val htmlUrl = positionBuilder.uriString?.let { uriString ->
+            Uri.parse(uriString, stateContext.uriQuote).toUrl()
+        }
         if (htmlUrl == null) {
             stateContext.log.e(null, "HTML Pattern: Failed to get HTML URL for $uri")
             return ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
@@ -313,7 +317,7 @@ data class GrantedParseHtmlPermission(
                     stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")
                     ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml)
                 } else {
-                    val redirectUriString = positionFromHtmlBuilder.url?.toString()
+                    val redirectUriString = positionFromHtmlBuilder.uriString
                     if (redirectUriString != null) {
                         stateContext.log.i(
                             null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
@@ -372,6 +376,7 @@ data class ParseHtmlFailed(
     val positionBuilder: PositionBuilder,
 ) : ConversionState() {
     override suspend fun transition() =
+        // TODO Improve check
         if (!positionBuilder.position.points.isNullOrEmpty() || !positionBuilder.position.q.isNullOrEmpty()) {
             ConversionSucceeded(stateContext, runContext, inputUriString, positionBuilder.position)
         } else {

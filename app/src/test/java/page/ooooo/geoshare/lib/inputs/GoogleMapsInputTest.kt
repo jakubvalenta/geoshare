@@ -1,14 +1,11 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.io.asSource
-import kotlinx.io.buffered
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import java.net.URL
 
 class GoogleMapsInputTest : BaseInputTest() {
     override val input = GoogleMapsInput
@@ -63,29 +60,32 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() {
         assertEquals(
-            Position(),
+            Position() to "https://maps.google.com",
             parseUri("https://maps.google.com")
         )
         assertEquals(
-            Position(),
+            Position() to "https://maps.google.com/",
             parseUri("https://maps.google.com/")
         )
         assertEquals(
-            Position(),
+            Position() to "https://maps.google.com/?spam=1",
             parseUri("https://maps.google.com/?spam=1")
         )
     }
 
     @Test
     fun parseUri_unknownPath() {
-        assertNull(parseUri("https://maps.google.com/spam"))
+        assertEquals(
+            Position() to null,
+            parseUri("https://maps.google.com/spam")
+        )
     }
 
     @Test
     fun parseUri_coordinatesOnly() {
         assertEquals(
             Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 6.0),
-            parseUri("https://www.google.com/maps/@52.5067296,13.2599309,6z")
+            parseUriGetPosition("https://www.google.com/maps/@52.5067296,13.2599309,6z")
         )
     }
 
@@ -93,7 +93,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_coordinatesInChina() {
         assertEquals(
             Position(Srs.GCJ02, 31.22850685422705, 121.47552456472106, z = 11.0),
-            parseUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
+            parseUriGetPosition("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
         )
     }
 
@@ -102,7 +102,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 53.512825, 57.6891441),
             @Suppress("SpellCheckingInspection")
-            parseUri("https://www.google.com/maps/@53.512825,57.6891441,0a,75y,90t/data=abc?utm_source=mstt_0&g_ep=def")
+            parseUriGetPosition("https://www.google.com/maps/@53.512825,57.6891441,0a,75y,90t/data=abc?utm_source=mstt_0&g_ep=def")
         )
     }
 
@@ -110,7 +110,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndPositiveCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0),
-            parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910")
+            parseUriGetPosition("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910")
         )
     }
 
@@ -118,7 +118,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndPositiveCoordinatesWithManyDecimalPlaces() {
         assertEquals(
             Position(Srs.GCJ02, 44.448337599999995, 26.0834555),
-            parseUri("https://www.google.com/maps/place/Strada+Occidentului+7,+Bucure%C8%99ti,+Romania/data=!4m6!3m5!1s0x40b201fdfa573623:0x4f53bb5ad3fdc97f!7e2!8m2!3d44.448337599999995!4d26.0834555?utm_source=mstt_1&entry=gps&coh=192189&g_ep=abc")
+            parseUriGetPosition("https://www.google.com/maps/place/Strada+Occidentului+7,+Bucure%C8%99ti,+Romania/data=!4m6!3m5!1s0x40b201fdfa573623:0x4f53bb5ad3fdc97f!7e2!8m2!3d44.448337599999995!4d26.0834555?utm_source=mstt_1&entry=gps&coh=192189&g_ep=abc")
         )
     }
 
@@ -126,7 +126,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndNegativeCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, -17.2165721, -149.9470294, z = 11.0),
-            parseUri("https://www.google.com/maps/place/Berlin,+Germany/@-17.2165721,-149.9470294,11z/")
+            parseUriGetPosition("https://www.google.com/maps/place/Berlin,+Germany/@-17.2165721,-149.9470294,11z/")
         )
     }
 
@@ -134,7 +134,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndIntegerCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 52.0, 13.0, z = 11.0),
-            parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52,13,11z/")
+            parseUriGetPosition("https://www.google.com/maps/place/Berlin,+Germany/@52,13,11z/")
         )
     }
 
@@ -142,7 +142,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndFractionalZoom() {
         assertEquals(
             Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 6.33),
-            parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,6.33z/")
+            parseUriGetPosition("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,6.33z/")
         )
     }
 
@@ -150,7 +150,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndData() {
         assertEquals(
             Position(Srs.GCJ02, 40.785091, -73.968285, z = 15.0),
-            parseUri("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
+            parseUriGetPosition("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
         )
     }
 
@@ -159,7 +159,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 44.4490541, 26.0888398, z = 11.42),
             @Suppress("SpellCheckingInspection")
-            parseUri("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
+            parseUriGetPosition("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
         )
     }
 
@@ -167,7 +167,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndNegativeCoordinatesAndNegativeDataCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 40.785091, -73.968285, z = 15.0),
-            parseUri("https://www.google.com/maps/place/Central+Park/@40.8,-73.9,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2!3d40.785091!4d-73.968285"),
+            parseUriGetPosition("https://www.google.com/maps/place/Central+Park/@40.8,-73.9,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2!3d40.785091!4d-73.968285"),
         )
     }
 
@@ -175,7 +175,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAndPositiveDataCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 44.4490541, 26.0888398),
-            parseUri("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate,+Calea+Victoriei+202+Bucure%C8%99ti,+Bucuresti+010098,+Rom%C3%A2nia/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
+            parseUriGetPosition("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate,+Calea+Victoriei+202+Bucure%C8%99ti,+Bucuresti+010098,+Rom%C3%A2nia/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
 
         )
     }
@@ -184,7 +184,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAsCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 52.04, -2.35, z = 15.0),
-            parseUri("https://maps.google.com/maps/place/52.04,-2.35/@52.03877,-2.3416,15z/data=!3m1!1e3")
+            parseUriGetPosition("https://maps.google.com/maps/place/52.04,-2.35/@52.03877,-2.3416,15z/data=!3m1!1e3")
 
         )
     }
@@ -193,7 +193,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeAsCoordinatesWithPlus() {
         assertEquals(
             Position(Srs.GCJ02, 52.492611, 13.431726, z = 17.0),
-            parseUri("https://www.google.com/maps/place/52.492611,+13.431726/@52.4929475,13.4317905,17z/data=!4m4!3m3!8m2?force=pwa")
+            parseUriGetPosition("https://www.google.com/maps/place/52.492611,+13.431726/@52.4929475,13.4317905,17z/data=!4m4!3m3!8m2?force=pwa")
         )
     }
 
@@ -201,7 +201,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeCoordinatesOnly() {
         assertEquals(
             Position(Srs.GCJ02, 52.03877, -2.3416),
-            parseUri("https://maps.google.com/maps/place/52.03877,-2.3416/data=!3m1!1e3")
+            parseUriGetPosition("https://maps.google.com/maps/place/52.03877,-2.3416/data=!3m1!1e3")
         )
     }
 
@@ -209,14 +209,14 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_placeOnly() {
         assertEquals(
             Position(q = "Poznań Old Town, 61-001 Poznań, Poland"),
-            parseUri("https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd")
+            parseUriGetPosition("https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd")
         )
     }
 
     @Test
     fun parseUri_placeWithoutName() {
         assertEquals(
-            Position(null, null),
+            Position() to "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda",
             parseUri("https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda")
         )
     }
@@ -224,7 +224,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeList() {
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi",
             parseUri("https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi")
         )
     }
@@ -232,7 +232,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeListInData() {
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts",
             @Suppress("SpellCheckingInspection")
             parseUri("https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts")
         )
@@ -242,7 +242,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_searchCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 48.8584, 2.2945),
-            parseUri("https://www.google.com/maps/search/48.8584,2.2945")
+            parseUriGetPosition("https://www.google.com/maps/search/48.8584,2.2945")
         )
     }
 
@@ -250,7 +250,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_searchPlace() {
         assertEquals(
             Position(q = "restaurants near me"),
-            parseUri("https://www.google.com/maps/search/restaurants+near+me")
+            parseUriGetPosition("https://www.google.com/maps/search/restaurants+near+me")
         )
     }
 
@@ -258,7 +258,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_searchQueryCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 47.5951518, -122.3316393),
-            parseUri("https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=47.5951518,-122.3316393&api=1")
+            parseUriGetPosition("https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=47.5951518,-122.3316393&api=1")
         )
     }
 
@@ -267,7 +267,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             Position(q = "centurylink+field"),
-            parseUri("https://www.google.com/maps/search/?api=1&query=centurylink%2Bfield")
+            parseUriGetPosition("https://www.google.com/maps/search/?api=1&query=centurylink%2Bfield")
         )
     }
 
@@ -275,11 +275,11 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_parameterQTakesPrecedence() {
         assertEquals(
             Position(Srs.GCJ02, 40.7128, -74.0060),
-            parseUri("https://www.google.com/?q=40.7128,-74.0060&viewpoint=34.0522,-118.2437")
+            parseUriGetPosition("https://www.google.com/?q=40.7128,-74.0060&viewpoint=34.0522,-118.2437")
         )
         assertEquals(
             Position(Srs.GCJ02, 40.7128, -74.0060),
-            parseUri("https://www.google.com/?q=40.7128,-74.0060&center=34.0522,-118.2437")
+            parseUriGetPosition("https://www.google.com/?q=40.7128,-74.0060&center=34.0522,-118.2437")
         )
     }
 
@@ -287,11 +287,11 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_parameterDestinationTakesPrecedence() {
         assertEquals(
             Position(q = "Cherbourg,France"),
-            parseUri("https://www.google.com/?destination=Cherbourg,France&q=Paris,France")
+            parseUriGetPosition("https://www.google.com/?destination=Cherbourg,France&q=Paris,France")
         )
         assertEquals(
             Position(q = "Cherbourg,France"),
-            parseUri("https://www.google.com/?destination=Cherbourg,France&query=Paris,France")
+            parseUriGetPosition("https://www.google.com/?destination=Cherbourg,France&query=Paris,France")
         )
     }
 
@@ -299,7 +299,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_directionsCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 34.0522, -118.2437),
-            parseUri("https://www.google.com/maps/dir/40.7128,-74.0060/34.0522,-118.2437")
+            parseUriGetPosition("https://www.google.com/maps/dir/40.7128,-74.0060/34.0522,-118.2437")
         )
     }
 
@@ -307,7 +307,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_directionsCoordinatesWithCenter() {
         assertEquals(
             Position(Srs.GCJ02, 34.0522, -118.2437, z = 16.0),
-            parseUri("https://www.google.com/maps/dir/40.7128,-74.0060/34.0522,-118.2437/@52.4844406,13.4217121,16z/")
+            parseUriGetPosition("https://www.google.com/maps/dir/40.7128,-74.0060/34.0522,-118.2437/@52.4844406,13.4217121,16z/")
         )
     }
 
@@ -316,7 +316,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 48.83887481689453, 2.2740750312805176, z = 8.0),
             @Suppress("SpellCheckingInspection")
-            parseUri("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/")
+            parseUriGetPosition("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/")
         )
     }
 
@@ -324,7 +324,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_directionsFromTo() {
         assertEquals(
             Position(q = "Los Angeles, CA"),
-            parseUri("https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA")
+            parseUriGetPosition("https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA")
         )
     }
 
@@ -332,7 +332,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_directionsFromToWithInvalidData() {
         assertEquals(
             Position(q = "Potsdam"),
-            parseUri("https://www.google.com/maps/dir/Berlin/Potsdam/data=spam")
+            parseUriGetPosition("https://www.google.com/maps/dir/Berlin/Potsdam/data=spam")
         )
     }
 
@@ -340,7 +340,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_directionsFromToVia() {
         assertEquals(
             Position(q = "Washington, DC"),
-            parseUri("https://www.google.com/maps/dir/New+York,+NY/Philadelphia,+PA/Washington,+DC")
+            parseUriGetPosition("https://www.google.com/maps/dir/New+York,+NY/Philadelphia,+PA/Washington,+DC")
         )
     }
 
@@ -349,7 +349,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 52.4844406, 13.4217121, z = 16.0),
             @Suppress("SpellCheckingInspection")
-            parseUri("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
+            parseUriGetPosition("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
         )
     }
 
@@ -365,14 +365,14 @@ class GoogleMapsInputTest : BaseInputTest() {
                 ),
             ),
             @Suppress("SpellCheckingInspection")
-            parseUri("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2")
+            parseUriGetPosition("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2")
         )
     }
 
     @Test
     fun parseUri_directionsEmpty() {
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/maps/dir/",
             parseUri("https://www.google.com/maps/dir/")
         )
     }
@@ -382,7 +382,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 48.8584, 2.2945),
             @Suppress("SpellCheckingInspection")
-            parseUri("https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120")
+            parseUriGetPosition("https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120")
         )
     }
 
@@ -390,7 +390,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_apiCenter() {
         assertEquals(
             Position(Srs.GCJ02, -33.712206, 150.311941, z = 12.0),
-            parseUri("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=12&basemap=terrain")
+            parseUriGetPosition("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=12&basemap=terrain")
         )
     }
 
@@ -398,7 +398,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_apiCenterWithInvalidZoom() {
         assertEquals(
             Position(Srs.GCJ02, -33.712206, 150.311941),
-            parseUri("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=spam&basemap=terrain")
+            parseUriGetPosition("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=spam&basemap=terrain")
         )
     }
 
@@ -406,7 +406,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_apiDirections() {
         assertEquals(
             Position(q = "Cherbourg,France"),
-            parseUri("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France")
+            parseUriGetPosition("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France")
         )
     }
 
@@ -414,7 +414,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_apiViewpoint() {
         assertEquals(
             Position(Srs.GCJ02, 48.857832, 2.295226),
-            parseUri("https://www.google.com/maps/@?fov=80&pitch=38&heading=-45&viewpoint=48.857832,2.295226&map_action=pano&api=1")
+            parseUriGetPosition("https://www.google.com/maps/@?fov=80&pitch=38&heading=-45&viewpoint=48.857832,2.295226&map_action=pano&api=1")
         )
     }
 
@@ -422,7 +422,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_qParameterCoordinates() {
         assertEquals(
             Position(Srs.GCJ02, 48.857832, 2.295226),
-            parseUri("https://www.google.com/maps?foo=bar&q=48.857832,2.295226&spam")
+            parseUriGetPosition("https://www.google.com/maps?foo=bar&q=48.857832,2.295226&spam")
         )
     }
 
@@ -430,7 +430,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_qParameterCoordinatesWithTrailingSlash() {
         assertEquals(
             Position(Srs.GCJ02, 48.857832, 2.295226),
-            parseUri("https://www.google.com/maps/?q=48.857832,2.295226")
+            parseUriGetPosition("https://www.google.com/maps/?q=48.857832,2.295226")
         )
     }
 
@@ -438,7 +438,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_qParameterCoordinatesWithEmptyPath() {
         assertEquals(
             Position(Srs.GCJ02, 39.797573, 18.370173),
-            parseUri("https://maps.google.com/?q=39.797573,18.370173&entry=gps&g_ep=abc&shorturl=1")
+            parseUriGetPosition("https://maps.google.com/?q=39.797573,18.370173&entry=gps&g_ep=abc&shorturl=1")
         )
     }
 
@@ -446,7 +446,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_qParameterPlace() {
         assertEquals(
             Position(q = "Central Park"),
-            parseUri("https://www.google.com/maps?foo=bar&q=Central Park&spam")
+            parseUriGetPosition("https://www.google.com/maps?foo=bar&q=Central Park&spam")
         )
     }
 
@@ -455,14 +455,14 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             Position(q = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
-            parseUri("https://maps.google.com?q=Caf%C3%A9+Heinemann,+Bismarckstra%C3%9Fe+91,+41061+M%C3%B6nchengladbach")
+            parseUriGetPosition("https://maps.google.com?q=Caf%C3%A9+Heinemann,+Bismarckstra%C3%9Fe+91,+41061+M%C3%B6nchengladbach")
         )
     }
 
     @Test
     fun parseUri_qParameterEmpty() {
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/maps",
             parseUri("https://www.google.com/maps")
         )
     }
@@ -470,7 +470,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_googleSearch() {
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/search?sca_esv=123&hl=en",
             parseUri("https://www.google.com/search?sca_esv=123&hl=en")
         )
     }
@@ -478,11 +478,11 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_myMaps() {
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/maps/d/edit?mid=abcdef",
             parseUri("https://www.google.com/maps/d/edit?mid=abcdef")
         )
         assertEquals(
-            Position(),
+            Position() to "https://www.google.com/maps/d/viewer?mid=abcdef",
             parseUri("https://www.google.com/maps/d/viewer?mid=abcdef")
         )
     }
@@ -491,7 +491,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_http() {
         assertEquals(
             Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0),
-            parseUri("http://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
+            parseUriGetPosition("http://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
 
@@ -499,7 +499,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_ukDomain() {
         assertEquals(
             Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0),
-            parseUri("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
+            parseUriGetPosition("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
 
@@ -507,7 +507,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_noScheme() {
         assertEquals(
             Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0),
-            parseUri("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
+            parseUriGetPosition("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
 
@@ -516,7 +516,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 44.4490541, 26.0888398),
             @Suppress("SpellCheckingInspection")
-            parseHtml(
+            parseHtmlGetPosition(
                 """<html>
 <head>
   <script>
@@ -534,7 +534,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseHtml_appInitializationStateOnly() {
         assertEquals(
             Position(Srs.GCJ02, 52.484201500000005, 13.416727700000001),
-            parseHtml(
+            parseHtmlGetPosition(
                 """/div\u003e\u003c/div\u003e\u003c/div\u003e"]],0];window.APP_INITIALIZATION_STATE=[[[2429.720134961757,13.416727700000001,52.484201500000005],[0,0,0],[1024,768],13.1],[[["m",[17,70414,43002]"""
             ),
         )
@@ -551,7 +551,7 @@ class GoogleMapsInputTest : BaseInputTest() {
                 )
             ),
             @Suppress("SpellCheckingInspection")
-            parseHtml(
+            parseHtmlGetPosition(
                 """<html>
 <head>
   <script>
@@ -574,7 +574,7 @@ class GoogleMapsInputTest : BaseInputTest() {
                     Point(Srs.GCJ02, 5.5592846, -0.19743059999999998),
                 )
             ),
-            parseHtml(
+            parseHtmlGetPosition(
                 """ll,"Ghana",null,"",[null,null,5.5592846,-0.19743059999999998],["1143791729983858547","-469"""
             ),
         )
@@ -597,7 +597,7 @@ class GoogleMapsInputTest : BaseInputTest() {
                 )
             ),
             @Suppress("SpellCheckingInspection")
-            parseHtml(
+            parseHtmlGetPosition(
                 """<html>
 <head>
   <script>
@@ -616,7 +616,7 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.GCJ02, 59.1293656, 11.4585672),
             @Suppress("SpellCheckingInspection")
-            parseHtml(
+            parseHtmlGetPosition(
                 """<html>
 <head>
   <script>
@@ -632,21 +632,24 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_failure() {
-        assertNull(parseHtml("spam"))
+        assertNull(parseHtmlGetPosition("spam"))
     }
 
     @Test
     fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() {
-        assertNull(parseHtml("<html></html>"))
+        assertNull(parseHtmlGetPosition("<html></html>"))
     }
 
     @Test
     fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() {
         assertEquals(
+            Pair(
+                Position(),
+                @Suppress("SpellCheckingInspection")
+                "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
+            ),
             @Suppress("SpellCheckingInspection")
-            URL("/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de"),
-            @Suppress("SpellCheckingInspection")
-            input.parseHtml(
+            parseHtml(
                 """<html>
 <body>
   <a
@@ -655,24 +658,25 @@ class GoogleMapsInputTest : BaseInputTest() {
   >Camino del Quinto</a>
 </body>
 </html>
-""".byteInputStream().asSource().buffered()
-            ).url
+"""
+            )
         )
     }
 
     @Test
     fun parseHtml_googleSearchHtmlContainsAbsoluteUrl_returnsIt() {
-        val html = """<html><a href="" data-url="https://www.example.com/foo"></a></html>"""
         assertEquals(
-            URL("https://www.example.com/foo"),
-            input.parseHtml(html.byteInputStream().asSource().buffered()).url
+            Position() to "https://www.example.com/foo",
+            parseHtml("""<html><a href="" data-url="https://www.example.com/foo"></a></html>""")
         )
     }
 
     @Test
     fun parseHtml_googleSearchHtmlContainsInvalidUrl_returnsNull() {
-        val html = """<html><a href="" data-url="abc"></a></html>"""
-        assertNull(parseHtml(html))
+        assertEquals(
+            Position() to null,
+            parseHtml("""<html><a href="" data-url="abc"></a></html>""")
+        )
     }
 
     @Test

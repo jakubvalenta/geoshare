@@ -22,8 +22,8 @@ object GeoInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointFromMatcher { LAT_LON_PATTERN match path }
             setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
+            setPointFromMatcher { LAT_LON_PATTERN match path }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
         }
     }

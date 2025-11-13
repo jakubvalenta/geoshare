@@ -48,29 +48,29 @@ object WazeInput : Input.HasHtml {
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["latlng"] }
             setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-            setUrl {
+            setUriString {
                 if (!queryParams["venue_id"].isNullOrEmpty()) {
                     // TODO Replace Waze venue URL
                     // 1 https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
                     // 2 https://www.waze.com/ul?venue_id=183894452.1839010060.260192
                     // 3 https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
                     // 4 https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
-                    uri.toUrl()
+                    uri.toString()
                 } else {
                     null
                 }
             }
-            setUrl {
+            setUriString {
                 if (!queryParams["place"].isNullOrEmpty()) {
                     // TODO Replace Waze place URL
                     // 3 https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
                     // 4 https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
-                    uri.toUrl()
+                    uri.toString()
                 } else {
                     null
                 }
             }
-            setUrl { if (queryParams["to"]?.startsWith("place.") == true) uri.toUrl() else null }
+            setUriString { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
         }
     }
 

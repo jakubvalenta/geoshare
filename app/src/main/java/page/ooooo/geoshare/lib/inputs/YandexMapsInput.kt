@@ -52,7 +52,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
             @Suppress("SpellCheckingInspection")
             setZoomFromMatcher { Z_PATTERN match queryParams["whatshere%5Bzoom%5D"] }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-            setUrl { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toUrl() else null }
+            setUriString { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
         }
     }
 

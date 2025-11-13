@@ -72,17 +72,17 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             setQueryFromMatcher { """/maps/search/$Q_PATH.*""" match path }
             setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/data[^/]*""" match path }
             setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/?""" match path }
-            setUrl { if (("""/?""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/?""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/@""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/dir/.*""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/place/.*""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/placelists/list/.*""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/search/.*""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/search/?""" match path) != null) uri.toUrl() else null }
-            setUrl { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) uri.toUrl() else null }
-            setZoomFromMatcher { Z_PATTERN match scheme }
+            setUriString { if (("""/?""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/?""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/@""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/dir/.*""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/place/.*""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/placelists/list/.*""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/search/.*""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/search/?""" match path) != null) uri.toString() else null }
+            setUriString { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) uri.toString() else null }
+            setZoomFromMatcher { """/maps/.*/@[\d.,+-]+,${Z}z/data[^/]*""" match path }
             setZoomFromMatcher { Z_PATTERN match queryParams["zoom"] }
         }
     }
@@ -97,7 +97,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 addPointsFromSequenceOfMatchers { pointPattern findAll line }
                 setDefaultPointFromMatcher { defaultPointPattern1 find line }
                 setDefaultPointFromMatcher { defaultPointPattern2 find line }
-                setUrlFromMatcher { uriPattern find line }
+                setUriStringFromMatcher { uriPattern find line }
             }
         }
     }

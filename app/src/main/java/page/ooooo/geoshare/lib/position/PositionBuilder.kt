@@ -5,7 +5,6 @@ import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import java.net.URL
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.sequences.mapNotNull
@@ -32,7 +31,7 @@ class PositionBuilder(val srs: Srs) {
     var defaultPoint: Point? = null
     var q: String? = null
     var z: Double? = null
-    var url: URL? = null
+    var uriString: String? = null
 
     val position: Position
         get() = Position(
@@ -41,6 +40,8 @@ class PositionBuilder(val srs: Srs) {
             q = q,
             z = z,
         )
+
+    fun toPair(): Pair<Position, String?> = position to uriString
 
     fun setPointFromMatcher(block: () -> Matcher?) {
         if (points.isEmpty()) {
@@ -89,7 +90,7 @@ class PositionBuilder(val srs: Srs) {
     }
 
     fun setQueryFromMatcher(block: () -> Matcher?) {
-        if (q == null) {
+        if (points.isEmpty() && q == null) {
             q = block()?.toQ()
         }
     }
@@ -100,16 +101,16 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
-    fun setUrl(block: () -> URL?) {
-        if (url == null) {
-            url = block()
+    fun setUriString(block: () -> String?) {
+        if (uriString == null) {
+            uriString = block()
         }
     }
 
-    fun setUrlFromMatcher(block: () -> Matcher?) {
-        if (url == null) {
-            block()?.toUrl()?.let {
-                url = it
+    fun setUriStringFromMatcher(block: () -> Matcher?) {
+        if (uriString == null) {
+            block()?.toUriString()?.let {
+                uriString = it
             }
         }
     }
@@ -137,5 +138,5 @@ fun Matcher.toZ(): Double? =
         max(1.0, min(21.0, z))
     }
 
-fun Matcher.toUrl(): URL? =
-    this.groupOrNull("url")?.let { URL(it) }
+fun Matcher.toUriString(): String? =
+    this.groupOrNull("url")

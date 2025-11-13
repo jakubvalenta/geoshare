@@ -23,11 +23,17 @@ abstract class BaseInputTest() {
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
-    fun parseUri(uriString: String): Position? =
-        input.parseUri(Uri.parse(uriString, uriQuote)).position
-            .takeIf { it.mainPoint != null || it.q != null || it.z != null }
+    fun parseUri(uriString: String): Pair<Position, String?> =
+        input.parseUri(Uri.parse(uriString, uriQuote)).toPair()
 
-    fun parseHtml(html: String): Position? =
+    fun parseUriGetPosition(uriString: String): Position? =
+        input.parseUri(Uri.parse(uriString, uriQuote)).position
+            .takeIf { !it.points.isNullOrEmpty() || it.q != null || it.z != null }
+
+    fun parseHtml(html: String): Pair<Position, String?> =
+        (input as Input.HasHtml).parseHtml(html.byteInputStream().asSource().buffered()).toPair()
+
+    fun parseHtmlGetPosition(html: String): Position? =
         (input as Input.HasHtml).parseHtml(html.byteInputStream().asSource().buffered()).position
             .takeIf { it.mainPoint != null || it.q != null || it.z != null }
 }

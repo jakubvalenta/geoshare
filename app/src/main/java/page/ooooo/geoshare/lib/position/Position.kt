@@ -37,7 +37,7 @@ data class Position(
         q: String? = null,
         z: Double? = null,
         desc: String? = null,
-    ) : this(persistentListOf(), q, z)
+    ) : this(null, q, z)
 
     val mainPoint: Point? get() = points?.lastOrNull()
 

@@ -50,10 +50,10 @@ class GeoInputTest : BaseInputTest() {
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() {
         assertNull(
-            parseUri("geo:"),
+            parseUriGetPosition("geo:"),
         )
         assertNull(
-            parseUri("geo:?spam=1"),
+            parseUriGetPosition("geo:?spam=1"),
         )
     }
 
@@ -61,7 +61,7 @@ class GeoInputTest : BaseInputTest() {
     fun parseUri_returnsAllCoordsAndParams() {
         assertEquals(
             Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4),
-            parseUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
+            parseUriGetPosition("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
         )
     }
 
@@ -69,7 +69,7 @@ class GeoInputTest : BaseInputTest() {
     fun parseUri_returnsQOnly() {
         assertEquals(
             Position(q = "foo bar"),
-            parseUri("geo:?q=foo%20bar"),
+            parseUriGetPosition("geo:?q=foo%20bar"),
         )
     }
 }

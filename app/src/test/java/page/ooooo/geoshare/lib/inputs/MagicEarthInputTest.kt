@@ -27,15 +27,15 @@ class MagicEarthInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUri("https://magicearth.com/"))
-        assertNull(parseUri("https://magicearth.com/?spam=1"))
+        assertNull(parseUriGetPosition("https://magicearth.com/"))
+        assertNull(parseUriGetPosition("https://magicearth.com/?spam=1"))
     }
 
     @Test
     fun parseUri_coordinates() {
         assertEquals(
             Position(Srs.WGS84, 48.85649, 2.35216),
-            parseUri("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345")
+            parseUriGetPosition("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345")
         )
     }
 
@@ -43,7 +43,7 @@ class MagicEarthInputTest : BaseInputTest() {
     fun parseUri_place() {
         assertEquals(
             Position(q = "Central Park"),
-            parseUri("https://magicearth.com/?name=Central Park")
+            parseUriGetPosition("https://magicearth.com/?name=Central Park")
         )
     }
 
@@ -51,7 +51,7 @@ class MagicEarthInputTest : BaseInputTest() {
     fun parseUri_search() {
         assertEquals(
             Position(q = "Paris", z = 5.0),
-            parseUri("https://magicearth.com/?q=Paris&mapmode=standard&z=5")
+            parseUriGetPosition("https://magicearth.com/?q=Paris&mapmode=standard&z=5")
         )
     }
 
@@ -59,7 +59,7 @@ class MagicEarthInputTest : BaseInputTest() {
     fun parseUri_destinationAddress() {
         assertEquals(
             Position(q = "CH1 6BJ United Kingdom"),
-            parseUri("https://magicearth.com/?daddr=CH1+6BJ+United+Kingdom")
+            parseUriGetPosition("https://magicearth.com/?daddr=CH1+6BJ+United+Kingdom")
         )
     }
 
@@ -67,7 +67,7 @@ class MagicEarthInputTest : BaseInputTest() {
     fun parseUri_parametersLatAndLonTakePrecedenceOverQ() {
         assertEquals(
             Position(Srs.WGS84, -17.2165721, -149.9470294),
-            parseUri("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park")
+            parseUriGetPosition("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park")
         )
     }
 
@@ -76,7 +76,7 @@ class MagicEarthInputTest : BaseInputTest() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUri("https://magicearth.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
+            parseUriGetPosition("https://magicearth.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
     }
 
@@ -85,7 +85,7 @@ class MagicEarthInputTest : BaseInputTest() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             Position(q = "Reuterplatz"),
-            parseUri("https://magicearth.com/?name=Reuterplatz&q=Central%20Park")
+            parseUriGetPosition("https://magicearth.com/?name=Reuterplatz&q=Central%20Park")
         )
     }
 
@@ -93,7 +93,7 @@ class MagicEarthInputTest : BaseInputTest() {
     fun parseUri_customScheme() {
         assertEquals(
             Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4),
-            parseUri("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
+            parseUriGetPosition("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
         )
     }
 }
