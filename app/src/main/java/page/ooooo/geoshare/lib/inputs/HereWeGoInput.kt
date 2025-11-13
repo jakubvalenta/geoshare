@@ -1,21 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
-import com.google.re2j.Matcher
 import com.google.re2j.Pattern
-import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.matches
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.position.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object HereWeGoInput : Input.HasUri {
+object HereWeGoInput : Input {
     private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
 
     private val srs = Srs.WGS84
@@ -32,38 +27,27 @@ object HereWeGoInput : Input.HasUri {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        on { path matches "/l/$LAT,$LON" } doReturn { PositionMatch(it, srs) }
-        on { if (path == "/") queryParams["map"]?.let { it matches "$LAT,$LON,$Z" } else null } doReturn
-                { PositionMatch(it, srs) }
-        all {
-            optional {
-                on { queryParams["map"]?.let { it matches "$LAT,$LON,$Z" } } doReturn { PositionMatch(it, srs) }
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setPointFromMatcher { """/l/$LAT,$LON""" match path }
+            setPointAndZoomFromMatcher { ("""$LAT,$LON,$Z""" match queryParams["map"])?.takeIf { path == "/" } }
+            setLatLon {
+                ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
+                    ?.let { encoded ->
+                        Base64.decode(encoded).decodeToString().let { decoded ->
+                            ("""(lat=|"latitude":)$LAT""" find decoded)?.groupOrNull("lat")
+                                ?.toDoubleOrNull()
+                                ?.let { lat ->
+                                    ("""(lon=|"longitude":)$LON""" find decoded)?.groupOrNull("lon")
+                                        ?.toDoubleOrNull()
+                                        ?.let { lon ->
+                                            lat to lon
+                                        }
+                                }
+                        }
+                    }
             }
-            on { path matches """/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" } doReturn
-                    { EncodedPositionMatch(it, srs) }
-        }
-    }
-
-    private class EncodedPositionMatch(matcher: Matcher, srs: Srs) : PositionMatch(matcher, srs) {
-        var decodedLatPatternCache: Pattern? = null
-        val decodedLatPattern: Pattern
-            get() = decodedLatPatternCache ?: Pattern.compile("""(lat=|"latitude":)$LAT""")
-                .also { decodedLatPatternCache = it }
-        var decodedLonPatternCache: Pattern? = null
-        val decodedLonPattern: Pattern
-            get() = decodedLonPatternCache ?: Pattern.compile("""(lon=|"longitude":)$LON""")
-                .also { decodedLonPatternCache = it }
-
-        override val points: List<Point>?
-            get() {
-                val encoded = matcher.groupOrNull("encoded") ?: return null
-                val decoded = Base64.decode(encoded).decodeToString()
-                val lat = decodedLatPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lat")?.toDoubleOrNull()
-                    ?: return null
-                val lon = decodedLonPattern.matcher(decoded)?.takeIf { it.find() }?.groupOrNull("lon")?.toDoubleOrNull()
-                    ?: return null
-                return persistentListOf(Point(srs, lat, lon))
-            }
+            setZoomFromMatcher { """.*,$Z""" match queryParams["map"] }
+        }.toPair()
     }
 }

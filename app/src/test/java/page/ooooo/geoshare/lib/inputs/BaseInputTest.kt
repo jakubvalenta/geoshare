@@ -1,6 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
-import page.ooooo.geoshare.lib.*
+import kotlinx.io.asSource
+import kotlinx.io.buffered
+import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Position
 
 abstract class BaseInputTest() {
@@ -8,21 +14,18 @@ abstract class BaseInputTest() {
 
     protected var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? = input.uriPattern.matcher(uriString).takeIf { it.find() }?.group()
+    fun getUri(uriString: String): String? = (input.uriPattern find uriString)?.group()
 
     fun doesUriPatternMatch(uriString: String): Boolean = input.uriPattern.matches(uriString)
 
-    fun getShortUri(uriString: String): String? = (input as Input.HasShortUri)
-        .shortUriPattern.matcher(uriString)?.takeIf { it.matches() }?.group()
+    fun getShortUri(uriString: String): String? =
+        ((input as Input.HasShortUri).shortUriPattern match uriString)?.group()
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
-    fun parseUrl(uriString: String): Position? = (input as Input.HasUri)
-        .conversionUriPattern.matches(Uri.parse(uriString, uriQuote))?.toPosition()
+    fun parseUri(uriString: String): Pair<Position, String?> =
+        input.parseUri(Uri.parse(uriString, uriQuote))
 
-    fun parseHtml(html: String): Position? = (input as Input.HasHtml)
-        .conversionHtmlPattern?.matches(html)?.toPosition()
-
-    fun parseHtmlRedirect(html: String) = (input as Input.HasHtml)
-        .conversionHtmlRedirectPattern?.matches(html)?.toUrlString()
+    fun parseHtml(html: String): Pair<Position, String?> =
+        (input as Input.HasHtml).parseHtml(html.byteInputStream().asSource().buffered())
 }

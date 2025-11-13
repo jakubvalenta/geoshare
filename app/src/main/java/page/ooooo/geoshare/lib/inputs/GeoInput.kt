@@ -3,19 +3,12 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.PositionMatch
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LAT
-import page.ooooo.geoshare.lib.PositionMatch.Companion.LON
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Q_PARAM
-import page.ooooo.geoshare.lib.PositionMatch.Companion.Z
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversionPattern
-import page.ooooo.geoshare.lib.extensions.matches
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.position.*
 
-object GeoInput : Input.HasUri {
+object GeoInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
@@ -27,17 +20,11 @@ object GeoInput : Input.HasUri {
         )
     )
 
-    override val conversionUriPattern = conversionPattern<Uri, PositionMatch> {
-        all {
-            optional {
-                on { path matches """$LAT,$LON""" } doReturn { PositionMatch(it, srs) }
-            }
-            optional {
-                on { queryParams["q"]?.let { it matches Q_PARAM } } doReturn { PositionMatch(it, srs) }
-            }
-            optional {
-                on { queryParams["z"]?.let { it matches Z } } doReturn { PositionMatch(it, srs) }
-            }
-        }
+    override fun parseUri(uri: Uri) = uri.run {
+        PositionBuilder(srs).apply {
+            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
+            setPointFromMatcher { LAT_LON_PATTERN match path }
+            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
+        }.toPair()
     }
 }

@@ -29,7 +29,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu

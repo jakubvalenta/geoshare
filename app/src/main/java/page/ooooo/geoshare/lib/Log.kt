@@ -22,32 +22,32 @@ class DefaultLog : ILog {
 
 class FakeLog : ILog {
     override fun e(tag: String?, msg: String): Int {
-        print(msg)
+        println(msg)
         return 1
     }
 
     override fun e(tag: String?, msg: String, tr: Throwable): Int {
-        print("$msg, ${tr.stackTraceToString()}")
+        println("$msg, ${tr.stackTraceToString()}")
         return 1
     }
 
     override fun i(tag: String?, msg: String): Int {
-        print(msg)
+        println(msg)
         return 1
     }
 
     override fun i(tag: String?, msg: String, tr: Throwable): Int {
-        print("$msg, ${tr.stackTraceToString()}")
+        println("$msg, ${tr.stackTraceToString()}")
         return 1
     }
 
     override fun w(tag: String?, msg: String): Int {
-        print(msg)
+        println(msg)
         return 1
     }
 
     override fun w(tag: String?, msg: String, tr: Throwable): Int {
-        print("$msg, ${tr.stackTraceToString()}")
+        println("$msg, ${tr.stackTraceToString()}")
         return 1
     }
 }

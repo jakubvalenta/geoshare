@@ -23,8 +23,14 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.conversion.AutomationFailed
+import page.ooooo.geoshare.lib.conversion.AutomationFinished
+import page.ooooo.geoshare.lib.conversion.AutomationSucceeded
+import page.ooooo.geoshare.lib.conversion.AutomationWaiting
+import page.ooooo.geoshare.lib.conversion.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.HasResult
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -46,8 +52,8 @@ fun ResultSuccessAutomation(
             if (
                 animationsEnabled &&
                 (currentState is AutomationWaiting ||
-                        currentState is AutomationSucceeded ||
-                        currentState is AutomationFailed)
+                    currentState is AutomationSucceeded ||
+                    currentState is AutomationFailed)
             ) {
                 // To make the message appear with an animation, first start with null state and only later change it to
                 // the current state (using LaunchedEffect).

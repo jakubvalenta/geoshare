@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 
 @Serializable
 object AboutRoute

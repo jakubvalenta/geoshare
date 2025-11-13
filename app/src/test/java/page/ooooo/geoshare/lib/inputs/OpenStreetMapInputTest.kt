@@ -6,8 +6,6 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.Uri
-import java.net.URL
 
 class OpenStreetMapInputTest : BaseInputTest() {
     override val input = OpenStreetMapInput
@@ -34,70 +32,54 @@ class OpenStreetMapInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUrl_coordinates() {
+    fun parseUri_coordinates() {
         assertEquals(
-            Position(Srs.WGS84, 51.49, -0.13, z = 16.0),
-            parseUrl("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
+            Position(Srs.WGS84, 51.49, -0.13, z = 16.0) to null,
+            parseUri("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
 
     @Test
-    fun parseUrl_coordinatesEncoded() {
+    fun parseUri_coordinatesEncoded() {
         assertEquals(
-            Position(Srs.WGS84, 51.49, -0.13, z = 16.0),
-            parseUrl("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
+            Position(Srs.WGS84, 51.49, -0.13, z = 16.0) to null,
+            parseUri("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
         )
     }
 
     @Test
-    fun parseUrl_element() {
+    fun parseUri_element() {
         assertEquals(
-            Position(),
-            parseUrl("https://www.openstreetmap.org/node/6284640534"),
+            Position() to "https://www.openstreetmap.org/api/0.6/node/6284640534.json",
+            parseUri("https://www.openstreetmap.org/node/6284640534"),
         )
         assertEquals(
-            Position(),
-            parseUrl("https://www.openstreetmap.org/relation/910699"),
+            Position() to "https://www.openstreetmap.org/api/0.6/relation/910699/full.json",
+            parseUri("https://www.openstreetmap.org/relation/910699"),
         )
         assertEquals(
-            Position(),
-            parseUrl("https://www.openstreetmap.org/way/596674456"),
-        )
-    }
-
-    @Test
-    fun parseUrl_shortLink() {
-        assertEquals(
-            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
-            parseUrl("https://osm.org/go/0EEQjE--")
-        )
-        assertEquals(
-            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
-            parseUrl("https://openstreetmap.org/go/0EEQjE--")
+            Position() to "https://www.openstreetmap.org/api/0.6/way/596674456/full.json",
+            parseUri("https://www.openstreetmap.org/way/596674456"),
         )
     }
 
     @Test
-    fun parseUrl_shortLinkNegative() {
+    fun parseUri_shortLink() {
         assertEquals(
-            Position(Srs.WGS84, -16.23152732849121, -49.08348083496094, z = 11.0),
-            parseUrl("https://osm.org/go/NuJWxJh-")
+            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0) to null,
+            parseUri("https://osm.org/go/0EEQjE--"),
+        )
+        assertEquals(
+            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0) to null,
+            parseUri("https://openstreetmap.org/go/0EEQjE--"),
         )
     }
 
     @Test
-    fun getHtmlUrl_element() {
+    fun parseUri_shortLinkNegative() {
         assertEquals(
-            URL("https://www.openstreetmap.org/api/0.6/node/6284640534.json"),
-            input.getHtmlUrl(Uri.parse("https://www.openstreetmap.org/node/6284640534", uriQuote)),
-        )
-        assertEquals(
-            URL("https://www.openstreetmap.org/api/0.6/relation/910699/full.json"),
-            input.getHtmlUrl(Uri.parse("https://www.openstreetmap.org/relation/910699", uriQuote)),
-        )
-        assertEquals(
-            URL("https://www.openstreetmap.org/api/0.6/way/596674456/full.json"),
-            input.getHtmlUrl(Uri.parse("https://www.openstreetmap.org/way/596674456", uriQuote)),
+            Position(Srs.WGS84, -16.23152732849121, -49.08348083496094, z = 11.0) to null,
+            parseUri("https://osm.org/go/NuJWxJh-"),
         )
     }
 
@@ -110,7 +92,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
                 points = persistentListOf(
                     Point(Srs.WGS84, 45.4771659, 9.2297918),
                 ),
-            ),
+            ) to null,
             parseHtml(json),
         )
     }
@@ -163,7 +145,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
                     Point(Srs.WGS84, 45.4776315, 9.2296597),
                     Point(Srs.WGS84, 45.4774366, 9.2292100),
                 ),
-            ),
+            ) to null,
             parseHtml(json),
         )
     }
@@ -180,7 +162,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
                     Point(Srs.WGS84, 45.4771159, 9.2296361),
                     Point(Srs.WGS84, 45.4772950, 9.2296354),
                 ),
-            ),
+            ) to null,
             parseHtml(json),
         )
     }

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -202,6 +203,7 @@ private fun DefaultPreview() {
                     position = Position.example,
                     onRun = {},
                     intentTools = object : IntentTools() {
+                        @SuppressLint("LocalContextGetResourceValueCall")
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
@@ -237,6 +239,7 @@ private fun DarkPreview() {
                     position = Position.example,
                     onRun = {},
                     intentTools = object : IntentTools() {
+                        @SuppressLint("LocalContextGetResourceValueCall")
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
@@ -272,6 +275,7 @@ private fun OneAppPreview() {
                     position = Position.example,
                     onRun = {},
                     intentTools = object : IntentTools() {
+                        @SuppressLint("LocalContextGetResourceValueCall")
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",
@@ -299,6 +303,7 @@ private fun DarkOneAppPreview() {
                     position = Position.example,
                     onRun = {},
                     intentTools = object : IntentTools() {
+                        @SuppressLint("LocalContextGetResourceValueCall")
                         override fun queryApp(packageManager: PackageManager, packageName: String) = App(
                             packageName,
                             "$packageName label",

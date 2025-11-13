@@ -17,7 +17,7 @@ data class Uri(
     val path: String = "",
     val queryParams: ImmutableMap<String, String> = persistentMapOf(),
     val fragment: String = "",
-    private val uriQuote: UriQuote = DefaultUriQuote(),
+    val uriQuote: UriQuote = DefaultUriQuote(),
 ) {
     companion object {
         fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Uri {

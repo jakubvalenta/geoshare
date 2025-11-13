@@ -6,17 +6,18 @@ import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.network.sockets.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.cookies.ConstantCookiesStorage
-import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.io.RawSource
 import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.math.pow
@@ -44,7 +45,7 @@ open class NetworkTools(
     data class Retry(val count: Int, val tr: NetworkException)
 
     @Throws(NetworkException::class)
-    suspend fun requestLocationHeader(
+    open suspend fun requestLocationHeader(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -62,18 +63,20 @@ open class NetworkTools(
     }
 
     @Throws(NetworkException::class)
-    suspend fun getText(
+    open suspend fun <T> getSource(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): String = withContext(dispatcher) {
+        block: (source: RawSource) -> T,
+    ): T = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
-            response.body<String>()
+            val channel: ByteReadChannel = response.body()
+            channel.asSource().use(block)
         }
     }
 
     @Throws(NetworkException::class)
-    suspend fun getRedirectUrlString(
+    open suspend fun getRedirectUrlString(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -102,7 +105,7 @@ open class NetworkTools(
             log.i(null, "Waiting ${timeMillis}ms before retry ${retry.count} of $MAX_RETRIES for $url")
             delay(timeMillis)
         }
-        HttpClient(engine) {
+        return HttpClient(engine) {
             followRedirects = followRedirectsParam
             // Bypass consent page https://stackoverflow.com/a/78115353
             install(HttpCookies) {
@@ -144,10 +147,10 @@ open class NetworkTools(
                     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
             }
         }.use { client ->
-            val response = try {
-                client.request(url) {
+            try {
+                client.prepareRequest(url) {
                     method = httpMethod
-                }
+                }.execute(block)
             } catch (tr: UnresolvedAddressException) {
                 log.w(null, "Unresolved address for $url", tr)
                 throw RecoverableException(R.string.network_exception_unresolved_address, tr)
@@ -170,7 +173,6 @@ open class NetworkTools(
                 log.e(null, "Unknown network exception for $url", tr)
                 throw UnrecoverableException(R.string.network_exception_unknown, tr)
             }
-            return block(response)
         }
     }
 }

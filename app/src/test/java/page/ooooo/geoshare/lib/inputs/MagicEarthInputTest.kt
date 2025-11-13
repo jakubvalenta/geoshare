@@ -26,74 +26,80 @@ class MagicEarthInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUrl_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUrl("https://magicearth.com/"))
-        assertNull(parseUrl("https://magicearth.com/?spam=1"))
-    }
-
-    @Test
-    fun parseUrl_coordinates() {
+    fun parseUri_noPathOrKnownUrlQueryParams() {
         assertEquals(
-            Position(Srs.WGS84, 48.85649, 2.35216),
-            parseUrl("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345")
+            Position() to null,
+            parseUri("https://magicearth.com/")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://magicearth.com/?spam=1")
         )
     }
 
     @Test
-    fun parseUrl_place() {
+    fun parseUri_coordinates() {
         assertEquals(
-            Position(q = "Central Park"),
-            parseUrl("https://magicearth.com/?name=Central Park")
+            Position(Srs.WGS84, 48.85649, 2.35216) to null,
+            parseUri("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345")
         )
     }
 
     @Test
-    fun parseUrl_search() {
+    fun parseUri_place() {
         assertEquals(
-            Position(q = "Paris", z = 5.0),
-            parseUrl("https://magicearth.com/?q=Paris&mapmode=standard&z=5")
+            Position(q = "Central Park") to null,
+            parseUri("https://magicearth.com/?name=Central Park")
         )
     }
 
     @Test
-    fun parseUrl_destinationAddress() {
+    fun parseUri_search() {
         assertEquals(
-            Position(q = "CH1 6BJ United Kingdom"),
-            parseUrl("https://magicearth.com/?daddr=CH1+6BJ+United+Kingdom")
+            Position(q = "Paris", z = 5.0) to null,
+            parseUri("https://magicearth.com/?q=Paris&mapmode=standard&z=5")
         )
     }
 
     @Test
-    fun parseUrl_parametersLatAndLonTakePrecedenceOverQ() {
+    fun parseUri_destinationAddress() {
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294),
-            parseUrl("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park")
+            Position(q = "CH1 6BJ United Kingdom") to null,
+            parseUri("https://magicearth.com/?daddr=CH1+6BJ+United+Kingdom")
         )
     }
 
     @Test
-    fun parseUrl_parameterDestinationAddressTakesPrecedenceOverQ() {
+    fun parseUri_parametersLatAndLonTakePrecedenceOverQ() {
+        assertEquals(
+            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
+            parseUri("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park")
+        )
+    }
+
+    @Test
+    fun parseUri_parameterDestinationAddressTakesPrecedenceOverQ() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUrl("https://magicearth.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
+            Position(q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
+            parseUri("https://magicearth.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
     }
 
     @Test
-    fun parseUrl_parameterNameTakesPrecedenceOverQ() {
+    fun parseUri_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz"),
-            parseUrl("https://magicearth.com/?name=Reuterplatz&q=Central%20Park")
+            Position(q = "Reuterplatz") to null,
+            parseUri("https://magicearth.com/?name=Reuterplatz&q=Central%20Park")
         )
     }
 
     @Test
-    fun parseUrl_customScheme() {
+    fun parseUri_customScheme() {
         assertEquals(
-            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4),
-            parseUrl("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
+            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4) to null,
+            parseUri("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
         )
     }
 }

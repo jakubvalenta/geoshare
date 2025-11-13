@@ -32,6 +32,13 @@ data class Position(
         desc: String? = null,
     ) : this(persistentListOf(Point(srs, lat, lon, desc)), q, z)
 
+    constructor(
+        srs: Srs,
+        q: String? = null,
+        z: Double? = null,
+        desc: String? = null,
+    ) : this(null, q, z)
+
     val mainPoint: Point? get() = points?.lastOrNull()
 
     val pointCount: Int get() = points?.size ?: 0
