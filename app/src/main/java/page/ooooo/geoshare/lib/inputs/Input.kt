@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.google.re2j.Pattern
 import kotlinx.io.Source
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Position
 
 interface Input {
 
@@ -20,7 +20,7 @@ interface Input {
     val uriPattern: Pattern
     val documentation: Documentation
 
-    fun parseUri(uri: Uri): PositionBuilder
+    fun parseUri(uri: Uri): Pair<Position, String?>
 
     interface HasShortUri : Input {
         val shortUriPattern: Pattern
@@ -33,6 +33,6 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
-        fun parseHtml(source: Source): PositionBuilder
+        fun parseHtml(source: Source): Pair<Position, String?>
     }
 }

@@ -83,9 +83,7 @@ class PositionBuilder(val srs: Srs) {
 
     fun setDefaultPointFromMatcher(block: () -> Matcher?) {
         if (defaultPoint == null) {
-            block()?.toPoint(srs)?.let {
-                defaultPoint = it
-            }
+            defaultPoint = block()?.toPoint(srs)
         }
     }
 
@@ -102,16 +100,14 @@ class PositionBuilder(val srs: Srs) {
     }
 
     fun setUriString(block: () -> String?) {
-        if (uriString == null) {
+        if (points.isEmpty() && uriString == null) {
             uriString = block()
         }
     }
 
     fun setUriStringFromMatcher(block: () -> Matcher?) {
-        if (uriString == null) {
-            block()?.toUriString()?.let {
-                uriString = it
-            }
+        if (points.isEmpty() && uriString == null) {
+            uriString = block()?.toUriString()
         }
     }
 }
@@ -134,9 +130,7 @@ fun Matcher.toQ(): String? =
     this.groupOrNull("q")
 
 fun Matcher.toZ(): Double? =
-    this.groupOrNull("z")?.toDoubleOrNull()?.let { z ->
-        max(1.0, min(21.0, z))
-    }
+    this.groupOrNull("z")?.toDoubleOrNull()?.let { z -> max(1.0, min(21.0, z)) }
 
 fun Matcher.toUriString(): String? =
     this.groupOrNull("url")

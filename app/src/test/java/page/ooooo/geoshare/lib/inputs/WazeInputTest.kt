@@ -51,35 +51,53 @@ class WazeInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUriGetPosition("https://waze.com"))
-        assertNull(parseUriGetPosition("https://waze.com/"))
-        assertNull(parseUriGetPosition("https://waze.com/ul"))
-        assertNull(parseUriGetPosition("https://waze.com/ul/?spam=1"))
-        assertNull(parseUriGetPosition("https://waze.com/live-map"))
-        assertNull(parseUriGetPosition("https://waze.com/live-map/?spam=1"))
+        assertEquals(
+            Position() to null,
+            parseUri("https://waze.com")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://waze.com/")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://waze.com/ul")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://waze.com/ul/?spam=1")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://waze.com/live-map")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://waze.com/live-map/?spam=1")
+        )
     }
 
     @Test
     fun parseUri_coordinates() {
         assertEquals(
-            Position(Srs.WGS84, 45.6906304, -120.810983, z = 10.0),
-            parseUriGetPosition("https://waze.com/ul?ll=45.6906304,-120.810983&z=10")
+            Position(Srs.WGS84, 45.6906304, -120.810983, z = 10.0) to null,
+            parseUri("https://waze.com/ul?ll=45.6906304,-120.810983&z=10")
         )
         assertEquals(
-            Position(Srs.WGS84, 45.69063040, -120.81098300),
-            parseUriGetPosition("https://ul.waze.com/ul?ll=45.69063040%2C-120.81098300&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location")
+            Position(Srs.WGS84, 45.69063040, -120.81098300) to null,
+            parseUri("https://ul.waze.com/ul?ll=45.69063040%2C-120.81098300&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location")
         )
     }
 
     @Test
     fun parseUri_directionsCoordinates() {
         assertEquals(
-            Position(Srs.WGS84, 45.6906304, -120.810983),
-            parseUriGetPosition("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983")
+            Position(Srs.WGS84, 45.6906304, -120.810983) to null,
+            parseUri("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983")
         )
         assertEquals(
-            Position(Srs.WGS84, 45.829189, 1.259372),
-            parseUriGetPosition("https://www.waze.com/live-map/directions?latlng=45.829189%2C1.259372")
+            Position(Srs.WGS84, 45.829189, 1.259372) to null,
+            parseUri("https://www.waze.com/live-map/directions?latlng=45.829189%2C1.259372")
         )
     }
 
@@ -118,40 +136,40 @@ class WazeInputTest : BaseInputTest() {
     @Test
     fun parseUri_search() {
         assertEquals(
-            Position(q = "66 Acacia Avenue"),
-            parseUriGetPosition("https://waze.com/ul?q=66%20Acacia%20Avenue")
+            Position(q = "66 Acacia Avenue") to null,
+            parseUri("https://waze.com/ul?q=66%20Acacia%20Avenue")
         )
     }
 
     @Test
     fun parseUri_shortLink() {
         assertEquals(
-            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0),
-            parseUriGetPosition("https://waze.com/ul/hu00uswvn3")
+            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0) to null,
+            parseUri("https://waze.com/ul/hu00uswvn3")
         )
         assertEquals(
-            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0),
-            parseUriGetPosition("https://www.waze.com/ul/hu00uswvn3")
+            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0) to null,
+            parseUri("https://www.waze.com/ul/hu00uswvn3")
         )
         assertEquals(
-            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0),
-            parseUriGetPosition("https://www.waze.com/live-map?h=u00uswvn3")
+            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0) to null,
+            parseUri("https://www.waze.com/live-map?h=u00uswvn3")
         )
     }
 
     @Test
     fun parseUri_shortLinkNegative() {
         assertEquals(
-            Position(Srs.WGS84, 19.402564, -99.165666, z = 16.0),
-            parseUriGetPosition("https://waze.com/ul/h9g3qrkju0")
+            Position(Srs.WGS84, 19.402564, -99.165666, z = 16.0) to null,
+            parseUri("https://waze.com/ul/h9g3qrkju0")
         )
     }
 
     @Test
     fun parseHtml_containsLatLngJSON_returnsPosition() {
         assertEquals(
-            Position(Srs.WGS84, 43.64265563, -79.387202798),
-            parseHtmlGetPosition(
+            Position(Srs.WGS84, 43.64265563, -79.387202798) to null,
+            parseHtml(
                 """<html><script>
                 |{
                 |  "routing": {
@@ -175,15 +193,17 @@ class WazeInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_containsInvalidDataCoordinates_returnsNull() {
-        assertNull(
-            parseHtmlGetPosition("""<html><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>""")
+        assertEquals(
+            Position() to null,
+            parseHtml("""<html><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>""")
         )
     }
 
     @Test
     fun parseHtml_doesNotContainCoordinates_returnsNull() {
-        assertNull(
-            parseHtmlGetPosition("""<html></html>""")
+        assertEquals(
+            Position() to null,
+            parseHtml("""<html></html>""")
         )
     }
 }

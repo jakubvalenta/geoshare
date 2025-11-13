@@ -38,6 +38,6 @@ object MagicEarthInput : Input {
             setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
             setZoomFromMatcher { Z_PATTERN match queryParams["zoom"] }
-        }
+        }.toPair()
     }
 }

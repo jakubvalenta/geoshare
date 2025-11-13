@@ -33,6 +33,6 @@ object Ge0Input : Input {
                     ?.let { hash -> decodeGe0Hash(hash) }
                     ?.let { (lat, lon, z) -> Triple(lat.toScale(7), lon.toScale(7), z) }
             }
-        }
+        }.toPair()
     }
 }

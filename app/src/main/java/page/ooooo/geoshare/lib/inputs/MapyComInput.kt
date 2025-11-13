@@ -49,7 +49,7 @@ object MapyComInput : Input.HasShortUri {
                 }
             }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-        }
+        }.toPair()
     }
 
     @StringRes

@@ -100,7 +100,7 @@ object CoordinatesInput : Input {
                     )
                 }
             }
-        }
+        }.toPair()
     }
 
     private fun degToDec(

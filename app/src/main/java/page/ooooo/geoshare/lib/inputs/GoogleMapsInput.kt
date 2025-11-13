@@ -57,7 +57,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             setPointFromMatcher { """/maps/place/$LAT,$LON.*""" match path }
             setPointFromMatcher { """/maps/search/$LAT,$LON.*""" match path }
             setPointAndZoomFromMatcher { """/maps/dir/.*/$LAT,$LON/@[\d.,+-]+,${Z}z/?[^/]*""" match path }
-            setPointFromMatcher { """/maps/dir/.*/$LAT,$LON/data[^/]*""" match path }
+            setPointFromMatcher { """/maps/dir/.*/$LAT,$LON/data=.*""" match path }
             setPointFromMatcher { """/maps/dir/.*/$LAT,$LON/?""" match path }
             setPointAndZoomFromMatcher { """/maps/dir/.*/@$LAT,$LON,${Z}z/?[^/]*""" match path }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["destination"] }
@@ -70,7 +70,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["query"] }
             setQueryFromMatcher { """/maps/place/$Q_PATH.*""" match path }
             setQueryFromMatcher { """/maps/search/$Q_PATH.*""" match path }
-            setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/data[^/]*""" match path }
+            setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/data=.*""" match path }
             setQueryFromMatcher { """/maps/dir/.*/$Q_PATH/?""" match path }
             setUriString { if (("""/?""" match path) != null) uri.toString() else null }
             setUriString { if (("""/maps/?""" match path) != null) uri.toString() else null }
@@ -82,9 +82,9 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             setUriString { if (("""/maps/search/.*""" match path) != null) uri.toString() else null }
             setUriString { if (("""/search/?""" match path) != null) uri.toString() else null }
             setUriString { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) uri.toString() else null }
-            setZoomFromMatcher { """/maps/.*/@[\d.,+-]+,${Z}z/data[^/]*""" match path }
+            setZoomFromMatcher { """/maps/.*/@[\d.,+-]+,${Z}z/data=.*""" match path }
             setZoomFromMatcher { Z_PATTERN match queryParams["zoom"] }
-        }
+        }.toPair()
     }
 
     override fun parseHtml(source: Source) = source.run {
@@ -99,7 +99,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 setDefaultPointFromMatcher { defaultPointPattern2 find line }
                 setUriStringFromMatcher { uriPattern find line }
             }
-        }
+        }.toPair()
     }
 
     @StringRes

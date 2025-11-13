@@ -71,7 +71,7 @@ object WazeInput : Input.HasHtml {
                 }
             }
             setUriString { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
-        }
+        }.toPair()
     }
 
     override fun parseHtml(source: Source) = source.run {
@@ -83,7 +83,7 @@ object WazeInput : Input.HasHtml {
                     break
                 }
             }
-        }
+        }.toPair()
     }
 
     @StringRes

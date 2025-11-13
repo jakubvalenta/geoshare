@@ -22,6 +22,6 @@ object OsmAndInput : Input {
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["pin"] }
             setPointAndZoomFromMatcher { """$Z/$LAT/$LON.*""" match fragment }
             setZoomFromMatcher { """$Z/.*""" match fragment }
-        }
+        }.toPair()
     }
 }

@@ -40,7 +40,7 @@ object AppleMapsInput : Input.HasHtml {
             @Suppress("SpellCheckingInspection")
             setUriString { if (!queryParams["auid"].isNullOrEmpty()) uri.toString() else null }
             setUriString { if (!queryParams["place-id"].isNullOrEmpty()) uri.toString() else null }
-        }
+        }.toPair()
     }
 
     override fun parseHtml(source: Source) = source.run {
@@ -61,7 +61,7 @@ object AppleMapsInput : Input.HasHtml {
                     break
                 }
             }
-        }
+        }.toPair()
     }
 
     @StringRes

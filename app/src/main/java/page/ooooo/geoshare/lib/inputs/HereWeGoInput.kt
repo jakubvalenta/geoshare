@@ -48,6 +48,6 @@ object HereWeGoInput : Input {
                     }
             }
             setZoomFromMatcher { """.*,$Z""" match queryParams["map"] }
-        }
+        }.toPair()
     }
 }

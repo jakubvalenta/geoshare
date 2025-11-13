@@ -41,32 +41,42 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() {
-        assertNull(parseUriGetPosition("https://maps.apple.com"))
-        assertNull(parseUriGetPosition("https://maps.apple.com/"))
-        assertNull(parseUriGetPosition("https://maps.apple.com/?spam=1"))
+        assertEquals(
+            Position() to null,
+            parseUri("https://maps.apple.com")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://maps.apple.com/")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://maps.apple.com/?spam=1")
+        )
     }
 
     @Test
     fun parseUri_coordinates() {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626),
-            parseUriGetPosition("https://maps.apple.com/?ll=50.894967,4.341626")
+            Position(Srs.WGS84, 50.894967, 4.341626) to null,
+            parseUri("https://maps.apple.com/?ll=50.894967,4.341626")
         )
     }
 
     @Test
     fun parseUri_place() {
         assertEquals(
-            Position(Srs.WGS84, 52.4890246, 13.4295963),
-            parseUriGetPosition("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, 52.4890246, 13.4295963, q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
+            parseUri("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
         )
     }
 
     @Test
     fun parseUri_view() {
         assertEquals(
-            Position(Srs.WGS84, 52.49115540927951, 13.42595574770533),
-            parseUriGetPosition("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")
+            Position(Srs.WGS84, 52.49115540927951, 13.42595574770533) to null,
+            parseUri("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")
         )
     }
 
@@ -81,40 +91,40 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchLocation() {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626),
-            parseUriGetPosition("https://maps.apple.com/?sll=50.894967,4.341626")
+            Position(Srs.WGS84, 50.894967, 4.341626) to null,
+            parseUri("https://maps.apple.com/?sll=50.894967,4.341626")
         )
     }
 
     @Test
     fun parseUri_searchLocationAndQuery() {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0),
-            parseUriGetPosition("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
+            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0) to null,
+            parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
         )
     }
 
     @Test
     fun parseUri_searchLocationAndQueryWithInvalidZoom() {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park"),
-            parseUriGetPosition("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
+            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park") to null,
+            parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
         )
     }
 
     @Test
     fun parseUri_parameterLlTakesPrecedence() {
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294),
-            parseUriGetPosition("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")
+            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
+            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")
         )
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294),
-            parseUriGetPosition("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")
+            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
+            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")
         )
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294),
-            parseUriGetPosition("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")
+            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
+            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")
         )
     }
 
@@ -122,13 +132,13 @@ class AppleMapsInputTest : BaseInputTest() {
     fun parseUri_parameterAddressTakesPrecedence() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUriGetPosition("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
+            Position(q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
+            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz 3, 12047 Berlin, Germany"),
-            parseUriGetPosition("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")
+            Position(q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
+            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")
         )
     }
 
@@ -136,8 +146,8 @@ class AppleMapsInputTest : BaseInputTest() {
     fun parseUri_parameterNameTakesPrecedenceOverQ() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz"),
-            parseUriGetPosition("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")
+            Position(q = "Reuterplatz") to null,
+            parseUri("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")
         )
     }
 
@@ -180,9 +190,9 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_success() {
         assertEquals(
-            Position(Srs.WGS84, 52.4735927, 13.4050798),
+            Position(Srs.WGS84, 52.4735927, 13.4050798) to null,
             @Suppress("SpellCheckingInspection")
-            parseHtmlGetPosition(
+            parseHtml(
                 """<html>
 <head>
   <title>Tempelhofer Feld</title>
@@ -198,6 +208,9 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_failure() {
-        assertNull(parseHtmlGetPosition("spam"))
+        assertEquals(
+            Position() to null,
+            parseHtml("spam"),
+        )
     }
 }

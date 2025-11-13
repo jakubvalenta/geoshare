@@ -25,6 +25,6 @@ object GeoInput : Input {
             setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
             setPointFromMatcher { LAT_LON_PATTERN match path }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-        }
+        }.toPair()
     }
 }

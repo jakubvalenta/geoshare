@@ -31,7 +31,7 @@ object AmapInput : Input.HasShortUri {
         PositionBuilder(srs).apply {
             setPointFromMatcher { """\w+,$LAT,$LON.+""" match queryParams["p"] }
             setPointFromMatcher { """$LAT,$LON.+""" match queryParams["q"] }
-        }
+        }.toPair()
     }
 
     @StringRes

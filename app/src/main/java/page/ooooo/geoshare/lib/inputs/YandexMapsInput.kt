@@ -53,7 +53,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
             setZoomFromMatcher { Z_PATTERN match queryParams["whatshere%5Bzoom%5D"] }
             setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
             setUriString { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
-        }
+        }.toPair()
     }
 
     override fun parseHtml(source: Source) = source.run {
@@ -65,7 +65,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
                     break
                 }
             }
-        }
+        }.toPair()
     }
 
     @StringRes

@@ -38,39 +38,69 @@ class Ge0InputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPath() {
-        assertNull(parseUriGetPosition("ge0:"))
-        assertNull(parseUriGetPosition("http://ge0.me"))
-        assertNull(parseUriGetPosition("https://omaps.app"))
-        assertNull(parseUriGetPosition("https://comaps.at"))
-        assertNull(parseUriGetPosition("ge0:/"))
-        assertNull(parseUriGetPosition("ge0://"))
-        assertNull(parseUriGetPosition("http://ge0.me/"))
-        assertNull(parseUriGetPosition("https://omaps.app/"))
-        assertNull(parseUriGetPosition("https://comaps.at/"))
+        assertEquals(
+            Position() to null,
+            parseUri("ge0:")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("http://ge0.me")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://omaps.app")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://comaps.at")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("ge0:/")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("ge0://")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("http://ge0.me/")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://omaps.app/")
+        )
+        assertEquals(
+            Position() to null,
+            parseUri("https://comaps.at/")
+        )
     }
 
     @Test
     fun parseUri_shortLink() {
         assertEquals(
-            Position(Srs.WGS84, 51.0000004, -108.9999868, z = 4.0),
-            parseUriGetPosition("ge0://ApYSV0YTAl/América_do_Norte"),
+            Position(Srs.WGS84, 51.0000004, -108.9999868, z = 4.0) to null,
+            parseUri("ge0://ApYSV0YTAl/América_do_Norte"),
         )
         assertEquals(
-            Position(Srs.WGS84, -18.9249432, 46.4416404, z = 4.0),
-            parseUriGetPosition("http://ge0.me/AbCMCNp0LO/Madagascar"),
+            Position(Srs.WGS84, -18.9249432, 46.4416404, z = 4.0) to null,
+            parseUri("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
-            Position(Srs.WGS84, 40.7127405, -74.005997, z = 9.0),
-            parseUriGetPosition("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
+            Position(Srs.WGS84, 40.7127405, -74.005997, z = 9.0) to null,
+            parseUri("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
         )
         assertEquals(
-            Position(Srs.WGS84, 52.4877386, 13.3815233, z = 14.0),
-            parseUriGetPosition("https://comaps.at/o4MnIOApKp/Kreuzberg"),
+            Position(Srs.WGS84, 52.4877386, 13.3815233, z = 14.0) to null,
+            parseUri("https://comaps.at/o4MnIOApKp/Kreuzberg"),
         )
     }
 
     @Test
     fun parseUri_hostThatLooksLikeHash() {
-        assertNull(parseUriGetPosition("https://ApYSV0YTAl/"))
+        assertEquals(
+            Position() to null,
+            parseUri("https://ApYSV0YTAl/")
+        )
     }
 }

@@ -47,7 +47,7 @@ object OpenStreetMapInput : Input.HasHtml {
                     }
                 }
             }
-        }
+        }.toPair()
     }
 
     override fun parseHtml(source: Source) = source.run {
@@ -56,7 +56,7 @@ object OpenStreetMapInput : Input.HasHtml {
             for (line in generateSequence { source.readLine() }) {
                 addPointsFromSequenceOfMatchers { pattern findAll line }
             }
-        }
+        }.toPair()
     }
 
     @StringRes

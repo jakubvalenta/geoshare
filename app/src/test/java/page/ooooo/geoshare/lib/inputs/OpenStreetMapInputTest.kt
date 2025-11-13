@@ -34,16 +34,16 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinates() {
         assertEquals(
-            Position(Srs.WGS84, 51.49, -0.13, z = 16.0),
-            parseUriGetPosition("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
+            Position(Srs.WGS84, 51.49, -0.13, z = 16.0) to null,
+            parseUri("https://www.openstreetmap.org/#map=16/51.49/-0.13"),
         )
     }
 
     @Test
     fun parseUri_coordinatesEncoded() {
         assertEquals(
-            Position(Srs.WGS84, 51.49, -0.13, z = 16.0),
-            parseUriGetPosition("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
+            Position(Srs.WGS84, 51.49, -0.13, z = 16.0) to null,
+            parseUri("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
         )
     }
 
@@ -66,20 +66,20 @@ class OpenStreetMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLink() {
         assertEquals(
-            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
-            parseUriGetPosition("https://osm.org/go/0EEQjE--"),
+            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0) to null,
+            parseUri("https://osm.org/go/0EEQjE--"),
         )
         assertEquals(
-            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0),
-            parseUriGetPosition("https://openstreetmap.org/go/0EEQjE--"),
+            Position(Srs.WGS84, 51.510772705078125, 0.054931640625, z = 9.0) to null,
+            parseUri("https://openstreetmap.org/go/0EEQjE--"),
         )
     }
 
     @Test
     fun parseUri_shortLinkNegative() {
         assertEquals(
-            Position(Srs.WGS84, -16.23152732849121, -49.08348083496094, z = 11.0),
-            parseUriGetPosition("https://osm.org/go/NuJWxJh-"),
+            Position(Srs.WGS84, -16.23152732849121, -49.08348083496094, z = 11.0) to null,
+            parseUri("https://osm.org/go/NuJWxJh-"),
         )
     }
 
@@ -92,8 +92,8 @@ class OpenStreetMapInputTest : BaseInputTest() {
                 points = persistentListOf(
                     Point(Srs.WGS84, 45.4771659, 9.2297918),
                 ),
-            ),
-            parseHtmlGetPosition(json),
+            ) to null,
+            parseHtml(json),
         )
     }
 
@@ -145,8 +145,8 @@ class OpenStreetMapInputTest : BaseInputTest() {
                     Point(Srs.WGS84, 45.4776315, 9.2296597),
                     Point(Srs.WGS84, 45.4774366, 9.2292100),
                 ),
-            ),
-            parseHtmlGetPosition(json),
+            ) to null,
+            parseHtml(json),
         )
     }
 
@@ -162,8 +162,8 @@ class OpenStreetMapInputTest : BaseInputTest() {
                     Point(Srs.WGS84, 45.4771159, 9.2296361),
                     Point(Srs.WGS84, 45.4772950, 9.2296354),
                 ),
-            ),
-            parseHtmlGetPosition(json),
+            ) to null,
+            parseHtml(json),
         )
     }
 }
