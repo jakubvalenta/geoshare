@@ -18,8 +18,9 @@ import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.toUrl
 
-object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
+object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     const val NAME = "Google Maps"
     private const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
     private const val DATA = """data=(?P<data>.*(!3d$LAT_NUM!4d$LON_NUM|!1d$LON_NUM!2d$LAT_NUM).*)"""
@@ -78,16 +79,16 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
         query { """/maps/search/$Q_PATH.*""" match path }
         query { """/maps/dir/.*/$Q_PATH/data[^/]*""" match path }
         query { """/maps/dir/.*/$Q_PATH/?""" match path }
-        uriString { ("""/?""" match path)?.let { this } }
-        uriString { ("""/maps/?""" match path)?.let { this } }
-        uriString { ("""/maps/@""" match path)?.let { this } }
-        uriString { ("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path)?.let { this } }
-        uriString { ("""/maps/dir/.*""" match path)?.let { this } }
-        uriString { ("""/maps/place/.*""" match path)?.let { this } }
-        uriString { ("""/maps/placelists/list/.*""" match path)?.let { this } }
-        uriString { ("""/maps/search/.*""" match path)?.let { this } }
-        uriString { ("""/search/?""" match path)?.let { this } }
-        uriString { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) this else null }
+        url { ("""/?""" match path)?.toUrl() }
+        url { ("""/maps/?""" match path)?.toUrl() }
+        url { ("""/maps/@""" match path)?.toUrl() }
+        url { ("""/maps/@/data=!3m1!4b1!4m3!11m2!2s.+!3e3""" match path)?.toUrl() }
+        url { ("""/maps/dir/.*""" match path)?.toUrl() }
+        url { ("""/maps/place/.*""" match path)?.toUrl() }
+        url { ("""/maps/placelists/list/.*""" match path)?.toUrl() }
+        url { ("""/maps/search/.*""" match path)?.toUrl() }
+        url { ("""/search/?""" match path)?.toUrl() }
+        url { if (("""/maps/d/(edit|viewer)""" match path) != null && !queryParams["mid"].isNullOrEmpty()) this.toUrl() else null }
         zoom { Z_PATTERN match scheme }
         zoom { Z_PATTERN match queryParams["zoom"] }
     }
@@ -98,10 +99,10 @@ object GoogleMapsInput : Input.HasUri, Input.HasShortUri, Input.HasHtml {
         val defaultPointPattern2 = Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
         val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
         forEachLine {
-            point { pointPattern find this }
+            pointsSequence { pointPattern findAll this }
             defaultPoints { defaultPointPattern1 find this }
             defaultPoints { defaultPointPattern2 find this }
-            uriString { uriPattern find this }
+            url { uriPattern find this }
         }
     }
 

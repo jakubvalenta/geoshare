@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.R.attr.host
+import android.R.attr.path
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import kotlinx.io.Source
@@ -97,8 +99,6 @@ object AppleMapsInput : Input.HasUri, Input.HasHtml {
             }
         }
     }
-
-    override val conversionHtmlRedirectPattern = null
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title

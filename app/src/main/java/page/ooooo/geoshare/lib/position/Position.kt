@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
+import java.net.URL
 import kotlin.math.max
 import kotlin.math.min
 
@@ -72,5 +73,5 @@ fun Matcher.toZ(): Double? =
         max(1.0, min(21.0, z))
     }
 
-fun Matcher.toUriString(): String? =
-    this.groupOrNull("url")
+fun Matcher.toUrl(): URL? =
+    this.groupOrNull("url")?.let { URL(it) }

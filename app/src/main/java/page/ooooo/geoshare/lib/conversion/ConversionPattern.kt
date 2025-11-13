@@ -10,6 +10,7 @@ import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.position.*
+import java.net.URL
 
 interface ConversionPattern {
 
@@ -44,7 +45,7 @@ interface ConversionPattern {
     }
 
     @Immutable
-    data class Result(val position: Position, val uriString: String? = null)
+    data class Result(val position: Position, val url: URL? = null)
 
     abstract class Group<C> {
         protected val children: MutableList<C> = mutableListOf()
@@ -68,6 +69,11 @@ interface ConversionPattern {
             block.invoke(uri)?.toPointAndZ(srs)?.let { (point, z) -> persistentListOf(point) to z }
     }
 
+    class PointsAndZoomTripleUriPattern(private val block: Uri.() -> Triple<Double, Double, Double>?) : UriPattern {
+        fun match(srs: Srs, uri: Uri): Pair<ImmutableList<Point>, Double>? =
+            block.invoke(uri)?.let { (lat, lon, z) -> persistentListOf(Point(srs, lat, lon)) to z }
+    }
+
     class PointsSequenceUriPattern(private val block: Uri.() -> Sequence<Matcher>) : UriPattern {
         fun match(srs: Srs, uri: Uri): ImmutableList<Point>? =
             block.invoke(uri).mapNotNull { it.toPoint(srs) }.toImmutableList().takeIf { it.isNotEmpty() }
@@ -81,8 +87,8 @@ interface ConversionPattern {
         fun match(uri: Uri): Double? = block.invoke(uri)?.toZ()
     }
 
-    class UriStringUriPattern(private val block: Uri.() -> Uri?) : UriPattern {
-        fun match(uri: Uri): String? = block.invoke(uri)?.toString()
+    class UrlUriPattern(private val block: Uri.() -> URL?) : UriPattern {
+        fun match(uri: Uri): URL? = block.invoke(uri)
     }
 
     class ConversionUriPattern(private val srs: Srs) : Group<UriPattern>() {
@@ -91,19 +97,22 @@ interface ConversionPattern {
 
         fun pointsAndZoom(block: Uri.() -> Matcher?) = initChild(PointsAndZoomUriPattern(block))
 
+        fun pointsAndZoomTriple(block: Uri.() -> Triple<Double, Double, Double>?) =
+            initChild(PointsAndZoomTripleUriPattern(block))
+
         fun pointsSequence(block: Uri.() -> Sequence<Matcher>) = initChild(PointsSequenceUriPattern(block))
 
         fun query(block: Uri.() -> Matcher?) = initChild(QueryUriPattern(block))
 
         fun zoom(block: Uri.() -> Matcher?) = initChild(ZoomUriPattern(block))
 
-        fun uriString(block: Uri.() -> Uri?) = initChild(UriStringUriPattern(block))
+        fun url(block: Uri.() -> URL?) = initChild(UrlUriPattern(block))
 
         fun match(uri: Uri): Result {
             var points: ImmutableList<Point>? = null
             var q: String? = null
             var z: Double? = null
-            var uriString: String? = null
+            var url: URL? = null
 
             for (child in children) {
                 when (child) {
@@ -112,6 +121,13 @@ interface ConversionPattern {
                     }
 
                     is PointsAndZoomUriPattern -> if (points == null) {
+                        child.match(srs, uri)?.let {
+                            points = it.first
+                            z = it.second
+                        }
+                    }
+
+                    is PointsAndZoomTripleUriPattern -> if (points == null) {
                         child.match(srs, uri)?.let {
                             points = it.first
                             z = it.second
@@ -130,23 +146,24 @@ interface ConversionPattern {
                         z = child.match(uri)
                     }
 
-                    is UriStringUriPattern -> if (uriString == null) {
-                        uriString = child.match(uri)
+                    is UrlUriPattern -> if (url == null) {
+                        url = child.match(uri)
                     }
                 }
             }
 
             return Result(
                 position = Position(points, q = q, z = z),
-                uriString = uriString,
+                url = url,
             )
         }
     }
 
     sealed interface LinePattern
 
-    data class PointLinePattern(private val block: String.() -> Matcher?) : LinePattern {
-        fun match(srs: Srs, line: String): Point? = block.invoke(line)?.toPoint(srs)
+    data class PointsSequenceLinePattern(private val block: String.() -> Sequence<Matcher>) : LinePattern {
+        fun match(srs: Srs, line: String): Sequence<Point> =
+            block.invoke(line).mapNotNull { it.toPoint(srs) }
     }
 
     data class DefaultPointsLinePattern(private val block: String.() -> Matcher?) : LinePattern {
@@ -154,37 +171,37 @@ interface ConversionPattern {
             block.invoke(line)?.toPoint(srs)?.let { persistentListOf(it) }
     }
 
-    data class UriStringLinePattern(private val block: String.() -> Matcher?) : LinePattern {
-        fun match(line: String): String? = block.invoke(line)?.toUriString()
+    data class UrlLinePattern(private val block: String.() -> Matcher?) : LinePattern {
+        fun match(line: String): URL? = block.invoke(line)?.toUrl()
     }
 
     sealed interface HtmlPattern
 
     class ForEachLinePattern : Group<LinePattern>(), HtmlPattern {
 
-        fun point(block: String.() -> Matcher?) = initChild(PointLinePattern(block))
+        fun pointsSequence(block: String.() -> Sequence<Matcher>) = initChild(PointsSequenceLinePattern(block))
 
         fun defaultPoints(block: String.() -> Matcher?) = initChild(DefaultPointsLinePattern(block))
 
-        fun uriString(block: String.() -> Matcher?) = initChild(UriStringLinePattern(block))
+        fun url(block: String.() -> Matcher?) = initChild(UrlLinePattern(block))
 
         fun match(srs: Srs, input: Source): Result {
             val points: MutableList<Point> = mutableListOf()
             var defaultPoints: ImmutableList<Point>? = null
-            var uriString: String? = null
+            var url: URL? = null
 
             for (line in generateSequence { input.readLine() }) {
                 for (child in children) {
                     when (child) {
-                        is PointLinePattern ->
-                            child.match(srs, line)?.let { points.add(it) }
+                        is PointsSequenceLinePattern ->
+                            child.match(srs, line).let { points.addAll(it) }
 
                         is DefaultPointsLinePattern -> if (defaultPoints == null) {
                             child.match(srs, line)?.let { defaultPoints = it }
                         }
 
-                        is UriStringLinePattern -> if (uriString == null) {
-                            child.match(line).let { uriString = it }
+                        is UrlLinePattern -> if (url == null) {
+                            child.match(line).let { url = it }
                         }
                     }
                 }
@@ -192,7 +209,7 @@ interface ConversionPattern {
 
             return Result(
                 position = Position(points.takeIf { it.isNotEmpty() }?.toImmutableList() ?: defaultPoints),
-                uriString = uriString,
+                url = url,
             )
         }
     }
