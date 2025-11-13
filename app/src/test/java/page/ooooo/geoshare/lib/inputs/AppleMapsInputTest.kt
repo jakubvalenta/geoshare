@@ -67,7 +67,7 @@ class AppleMapsInputTest : BaseInputTest() {
     fun parseUri_place() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 52.4890246, 13.4295963, q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
+            Position(Srs.WGS84, 52.4890246, 13.4295963) to null,
             parseUri("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
         )
     }
@@ -97,7 +97,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_searchLocationAndQuery() {
+    fun parseUri_searchLocationAndQueryAndZoom_returnsPointAndQueryAndZoom() {
         assertEquals(
             Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0) to null,
             parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
@@ -105,7 +105,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_searchLocationAndQueryWithInvalidZoom() {
+    fun parseUri_searchLocationAndQueryAndInvalidZoom_returnsPointAndQuery() {
         assertEquals(
             Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park") to null,
             parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
