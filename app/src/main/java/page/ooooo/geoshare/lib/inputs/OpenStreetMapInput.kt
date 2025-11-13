@@ -35,9 +35,8 @@ object OpenStreetMapInput : Input.HasHtml {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             setLatLonZoom {
-                ("""/go/$HASH""" match path)?.groupOrNull("hash")?.let { hash ->
-                    decodeOpenStreetMapQuadTileHash(hash)
-                }
+                ("""/go/$HASH""" match path)?.groupOrNull("hash")
+                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
             }
             setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
             setUrl {

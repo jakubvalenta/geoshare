@@ -60,7 +60,10 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile("""data-coordinates="$LON,$LAT"""")
             for (line in generateSequence { source.readLine() }) {
-                setPointFromMatcher { pattern find line }
+                (pattern find line)?.toPoint(srs)?.let { point ->
+                    points.add(point)
+                    break
+                }
             }
         }
     }

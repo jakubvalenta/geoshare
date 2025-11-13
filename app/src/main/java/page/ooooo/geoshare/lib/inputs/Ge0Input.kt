@@ -6,6 +6,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeGe0Hash
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
 
@@ -30,6 +31,7 @@ object Ge0Input : Input {
             setLatLonZoom {
                 (if (scheme == "ge0") HASH match host else """/$HASH\S*""" match path)?.groupOrNull("hash")
                     ?.let { hash -> decodeGe0Hash(hash) }
+                    ?.let { (lat, lon, z) -> Triple(lat.toScale(7), lon.toScale(7), z) }
             }
         }
     }

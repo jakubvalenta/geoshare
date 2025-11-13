@@ -38,11 +38,9 @@ object WazeInput : Input.HasHtml {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             setLatLonZoom {
-                (("""/ul/h$HASH""" match path) ?: (HASH match queryParams["h"]))?.groupOrNull("hash")?.let { hash ->
-                    decodeWazeGeoHash(hash).let { (lat, lon, z) ->
-                        Triple(lat.toScale(6), lon.toScale(6), z)
-                    }
-                }
+                (("""/ul/h$HASH""" match path) ?: (HASH match queryParams["h"]))?.groupOrNull("hash")
+                    ?.let { hash -> decodeWazeGeoHash(hash) }
+                    ?.let { (lat, lon, z) -> Triple(lat.toScale(6), lon.toScale(6), z) }
             }
             setPointFromMatcher { """ll\.$LAT,$LON""" match queryParams["to"] }
             setPointFromMatcher { LAT_LON_PATTERN match queryParams["ll"] }
@@ -80,7 +78,10 @@ object WazeInput : Input.HasHtml {
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             for (line in generateSequence { source.readLine() }) {
-                setPointFromMatcher { pattern find line } // FIXME
+                (pattern find line)?.toPoint(srs)?.let { point ->
+                    points.add(point)
+                    break
+                }
             }
         }
     }

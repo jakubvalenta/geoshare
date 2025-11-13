@@ -2,8 +2,10 @@ package page.ooooo.geoshare.lib.inputs
 
 import org.junit.Assert.*
 import org.junit.Test
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import java.net.URL
 
 class YandexMapsInputTest : BaseInputTest() {
     override val input = YandexMapsInput
@@ -74,16 +76,16 @@ class YandexMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_orgOnly() {
         assertEquals(
-            Position(),
-            parseUri("https://yandex.com/maps/org/94933420809")
+            URL("https://yandex.com/maps/org/94933420809"),
+            input.parseUri(Uri.parse("https://yandex.com/maps/org/94933420809", uriQuote)).url,
         )
         assertEquals(
-            Position(),
-            parseUri("https://yandex.com/maps/org/94933420809/")
+            URL("https://yandex.com/maps/org/94933420809/"),
+            input.parseUri(Uri.parse("https://yandex.com/maps/org/94933420809/", uriQuote)).url,
         )
         assertEquals(
-            Position(),
-            parseUri("https://yandex.com/maps/org/94933420809?spam")
+            URL("https://yandex.com/maps/org/94933420809?spam"),
+            input.parseUri(Uri.parse("https://yandex.com/maps/org/94933420809?spam", uriQuote)).url,
         )
     }
 

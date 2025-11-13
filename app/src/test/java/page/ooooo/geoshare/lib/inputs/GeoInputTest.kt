@@ -49,12 +49,10 @@ class GeoInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() {
-        assertEquals(
-            Position(),
+        assertNull(
             parseUri("geo:"),
         )
-        assertEquals(
-            Position(),
+        assertNull(
             parseUri("geo:?spam=1"),
         )
     }

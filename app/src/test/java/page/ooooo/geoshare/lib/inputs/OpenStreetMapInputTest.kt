@@ -53,15 +53,15 @@ class OpenStreetMapInputTest : BaseInputTest() {
     fun parseUri_element() {
         assertEquals(
             URL("https://www.openstreetmap.org/api/0.6/node/6284640534.json"),
-            input.parseUri(Uri.parse("https://www.openstreetmap.org/node/6284640534")).url,
+            input.parseUri(Uri.parse("https://www.openstreetmap.org/node/6284640534", uriQuote)).url,
         )
         assertEquals(
             URL("https://www.openstreetmap.org/api/0.6/relation/910699/full.json"),
-            input.parseUri(Uri.parse("https://www.openstreetmap.org/relation/910699")).url,
+            input.parseUri(Uri.parse("https://www.openstreetmap.org/relation/910699", uriQuote)).url,
         )
         assertEquals(
             URL("https://www.openstreetmap.org/api/0.6/way/596674456/full.json"),
-            input.parseUri(Uri.parse("https://www.openstreetmap.org/way/596674456")).url,
+            input.parseUri(Uri.parse("https://www.openstreetmap.org/way/596674456", uriQuote)).url,
         )
     }
 
