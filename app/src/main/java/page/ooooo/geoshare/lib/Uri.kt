@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.lib
 
 import androidx.compose.runtime.Immutable
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.collections.immutable.*
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -14,7 +12,7 @@ import java.net.URL
 data class Uri(
     val scheme: String = "",
     val host: String = "",
-    val path: String = "",
+    val pathParts: ImmutableList<String> = persistentListOf(),
     val queryParams: ImmutableMap<String, String> = persistentMapOf(),
     val fragment: String = "",
     val uriQuote: UriQuote = DefaultUriQuote(),
@@ -72,7 +70,11 @@ data class Uri(
             return Uri(
                 scheme = scheme,
                 host = host,
-                path = uriQuote.decode(path),
+                pathParts = if (path != "") {
+                    path.split('/').map { uriQuote.decode(it) }.toImmutableList()
+                } else {
+                    persistentListOf()
+                },
                 queryParams = parseQueryParams(query, uriQuote),
                 fragment = uriQuote.decode(fragment),
                 uriQuote = uriQuote,
@@ -92,6 +94,40 @@ data class Uri(
                 }.toImmutableMap()
             }
     }
+
+    constructor(
+        scheme: String = "",
+        host: String = "",
+        path: String,
+        queryParams: ImmutableMap<String, String> = persistentMapOf(),
+        fragment: String = "",
+        uriQuote: UriQuote = DefaultUriQuote(),
+    ) : this(
+        scheme = scheme,
+        host = host,
+        pathParts = path.split('/').map { uriQuote.decode(it) }.toImmutableList(),
+        queryParams = queryParams,
+        fragment = fragment,
+        uriQuote = uriQuote,
+    )
+
+    val path: String get() = pathParts.joinToString("/")
+
+    fun copy(
+        scheme: String? = null,
+        host: String? = null,
+        path: String? = null,
+        queryParams: ImmutableMap<String, String>? = null,
+        fragment: String? = null,
+        uriQuote: UriQuote? = null,
+    ) = Uri(
+        scheme = scheme ?: this.scheme,
+        host = host ?: this.host,
+        path = path ?: this.path,
+        queryParams = queryParams ?: this.queryParams,
+        fragment = fragment ?: this.fragment,
+        uriQuote = uriQuote ?: this.uriQuote,
+    )
 
     fun toAbsoluteUri(baseUri: Uri): Uri = if (host.isEmpty()) {
         if (path.startsWith("//")) {

@@ -332,8 +332,26 @@ class UriTest {
     }
 
     @Test
+    fun parse_doesNotDecodeSlashInPath() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            Uri(
+                scheme = "https",
+                host = "www.google.com",
+                path = "/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120",
+                uriQuote = uriQuote,
+            ),
+            @Suppress("SpellCheckingInspection")
+            Uri.parse(
+                "https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120",
+                uriQuote,
+            )
+        )
+    }
+
+    @Test
     fun toAbsoluteUri_inputUrlHasSchemeAndHost() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://www.example.com/my-path", uriQuote),
             Uri.parse("https://www.example.com/my-path", uriQuote).toAbsoluteUri(baseUri)
@@ -342,7 +360,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasMissingSchemeAndMissingHostAndRelativePathWithOnePart_returnsUrlWithDefaultSchemeAndHostAndPath() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://example.com/default/my-relative", uriQuote),
             Uri.parse("my-relative", uriQuote).toAbsoluteUri(baseUri)
@@ -351,7 +369,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasMissingSchemeAndMissingHostAndRelativePathWithMultipleParts_returnsUrlWithDefaultSchemeAndHostAndPath() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://example.com/default/my-relative/path", uriQuote),
             Uri.parse("my-relative/path", uriQuote).toAbsoluteUri(baseUri)
@@ -360,7 +378,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasMissingSchemeAndMissingHostAndAbsolutePath_returnsUrlWithDefaultSchemeAndHost() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://example.com/my-absolute/path", uriQuote),
             Uri.parse("/my-absolute/path", uriQuote).toAbsoluteUri(baseUri)
@@ -369,7 +387,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasRelativeScheme_returnsUrlWithDefaultScheme() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri("https", path = "//my-host.example.com/my-path", uriQuote = uriQuote),
             Uri.parse("//my-host.example.com/my-path", uriQuote).toAbsoluteUri(baseUri)
@@ -378,7 +396,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasHttpsSchemeAndHost_returnsUrlUnchanged() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://my-host", uriQuote),
             Uri.parse("https://my-host", uriQuote).toAbsoluteUri(baseUri)
@@ -387,7 +405,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasHttpsSchemeAndHostAndPath_returnsUrlUnchanged() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://my-host/my-path", uriQuote),
             Uri.parse("https://my-host/my-path", uriQuote).toAbsoluteUri(baseUri)
@@ -400,7 +418,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlHasFtpSchemeAndHost_returnUrlUnchanged() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("ftp://my-host", uriQuote),
             Uri.parse("ftp://my-host", uriQuote).toAbsoluteUri(baseUri)
@@ -409,7 +427,7 @@ class UriTest {
 
     @Test
     fun toAbsoluteUri_inputUrlIsGeoUri_returnHttpsUri() {
-        val baseUri = Uri("https", "example.com", "/default")
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(
             Uri.parse("https://example.com/default/1,2", uriQuote),
             Uri.parse("geo:1,2", uriQuote).toAbsoluteUri(baseUri)
