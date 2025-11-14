@@ -3,9 +3,10 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
@@ -25,19 +26,19 @@ object MagicEarthInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setLatLon {
-                (LAT_PATTERN match queryParams["lat"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                    (LON_PATTERN match queryParams["lon"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                        lat to lon
+            setPointIfEmpty {
+                (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
+                    (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
+                        LatLonZ(lat, lon, null)
                     }
                 }
             }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["name"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
             @Suppress("SpellCheckingInspection")
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["daddr"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
-            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-            setZoomFromMatcher { Z_PATTERN match queryParams["zoom"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
+            setZIfEmpty { Z_PATTERN matchZ queryParams["zoom"] }
         }.toPair()
     }
 }

@@ -4,9 +4,10 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object MapyComInput : Input.HasShortUri {
     private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
@@ -30,25 +31,24 @@ object MapyComInput : Input.HasShortUri {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setLatLon {
+            setPointIfEmpty {
                 (COORDS match path)?.let { m ->
-                    m.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                        m.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                            val latSig = if (m.groupOrNull()?.contains('S') == true) -1 else 1
-                            val lonSig = if (m.groupOrNull()?.contains('W') == true) -1 else 1
-                            latSig * lat to lonSig * lon
-                        }
+                    m.toLatLon()?.let { (lat, lon) ->
+                        val wholeMatch = m.groupOrNull()
+                        val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
+                        val lonSig = if (wholeMatch?.contains('W') == true) -1 else 1
+                        LatLonZ(latSig * lat, lonSig * lon, null)
                     }
                 }
             }
-            setLatLon {
-                (LAT_PATTERN match queryParams["y"])?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat ->
-                    (LON_PATTERN match queryParams["x"])?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon ->
-                        lat to lon
+            setPointIfEmpty {
+                (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
+                    (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
+                        LatLonZ(lat, lon, null)
                     }
                 }
             }
-            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
+            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
         }.toPair()
     }
 

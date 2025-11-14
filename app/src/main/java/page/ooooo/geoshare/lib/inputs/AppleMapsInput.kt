@@ -6,10 +6,10 @@ import kotlinx.io.Source
 import kotlinx.io.readLine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object AppleMapsInput : Input.HasHtml {
     const val NAME = "Apple Maps"
@@ -27,27 +27,30 @@ object AppleMapsInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["ll"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["coordinate"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["q"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["address"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["name"] }
-            if (points.isEmpty()) {
-                (Q_PARAM_PATTERN match queryParams["q"])?.toQ()?.let { newQ ->
-                    (LAT_LON_PATTERN match queryParams["sll"])?.toPoint(srs)?.let { point ->
-                        points.add(point)
-                        q = newQ
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["address"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+            setQWithCenterIfEmpty {
+                (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
+                    (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
+                        Triple(newQ, lat, lon)
                     }
                 }
             }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["sll"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["center"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
-            setZoomFromMatcher { (Z_PATTERN match queryParams["z"]) }
-            setUriString { if (host == "maps.apple" && path.startsWith("/p/")) uri.toString() else null }
-            @Suppress("SpellCheckingInspection")
-            setUriString { if (!queryParams["auid"].isNullOrEmpty()) uri.toString() else null }
-            setUriString { if (!queryParams["place-id"].isNullOrEmpty()) uri.toString() else null }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setZIfEmpty { (Z_PATTERN matchZ queryParams["z"]) }
+            setUriStringIfEmpty {
+                uri.takeIf {
+                    host == "maps.apple" && path.startsWith("/p/") ||
+                        @Suppress("SpellCheckingInspection")
+                        !queryParams["auid"].isNullOrEmpty() ||
+                        !queryParams["place-id"].isNullOrEmpty()
+                }?.toString()
+            }
         }.toPair()
     }
 
@@ -59,13 +62,13 @@ object AppleMapsInput : Input.HasHtml {
             var lon: Double? = null
             for (line in generateSequence { source.readLine() }) {
                 if (lat == null) {
-                    (latPattern find line)?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat = it }
+                    (latPattern find line)?.toLat()?.let { lat = it }
                 }
                 if (lon == null) {
-                    (lonPattern find line)?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon = it }
+                    (lonPattern find line)?.toLon()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
-                    setLatLon { lat to lon }
+                    addPoint { LatLonZ(lat, lon, null) }
                     break
                 }
             }

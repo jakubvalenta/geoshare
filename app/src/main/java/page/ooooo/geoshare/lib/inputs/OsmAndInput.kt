@@ -3,8 +3,10 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.matchLatLonZ
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object OsmAndInput : Input {
     private val srs = Srs.WGS84
@@ -19,9 +21,9 @@ object OsmAndInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["pin"] }
-            setPointAndZoomFromMatcher { """$Z/$LAT/$LON.*""" match fragment }
-            setZoomFromMatcher { """$Z/.*""" match fragment }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["pin"] }
+            setPointIfEmpty { """$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+            setZIfEmpty { """$Z/.*""" matchZ fragment }
         }.toPair()
     }
 }

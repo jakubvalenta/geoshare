@@ -7,10 +7,10 @@ import kotlinx.io.readLine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
-import page.ooooo.geoshare.lib.extensions.findAll
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object OpenStreetMapInput : Input.HasHtml {
     private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
@@ -33,12 +33,13 @@ object OpenStreetMapInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setLatLonZoom {
-                ("""/go/$HASH""" match path)?.groupOrNull("hash")
+            setPointIfEmpty {
+                ("""/go/$HASH""" matchHash path)
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                    ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
             }
-            setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
-            setUriString {
+            setPointIfEmpty { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+            setUriStringIfEmpty {
                 (ELEMENT_PATH match path)?.let { m ->
                     m.groupOrNull("type")?.let { type ->
                         m.groupOrNull("id")?.let { id ->
@@ -54,7 +55,7 @@ object OpenStreetMapInput : Input.HasHtml {
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             for (line in generateSequence { source.readLine() }) {
-                addPointsFromSequenceOfMatchers { pattern findAll line }
+                addPoints { pattern findAllLatLonZ line }
             }
         }.toPair()
     }

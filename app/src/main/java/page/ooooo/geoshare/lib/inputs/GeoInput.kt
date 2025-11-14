@@ -4,9 +4,13 @@ import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchLatLonZ
+import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object GeoInput : Input {
     private val srs = Srs.WGS84
@@ -22,9 +26,9 @@ object GeoInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
-            setPointFromMatcher { LAT_LON_PATTERN match path }
-            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
+            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ path }
+            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
         }.toPair()
     }
 }

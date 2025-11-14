@@ -3,10 +3,10 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -29,25 +29,20 @@ object HereWeGoInput : Input {
     @OptIn(ExperimentalEncodingApi::class)
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointFromMatcher { """/l/$LAT,$LON""" match path }
-            setPointAndZoomFromMatcher { ("""$LAT,$LON,$Z""" match queryParams["map"])?.takeIf { path == "/" } }
-            setLatLon {
-                ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
-                    ?.let { encoded ->
-                        Base64.decode(encoded).decodeToString().let { decoded ->
-                            ("""(lat=|"latitude":)$LAT""" find decoded)?.groupOrNull("lat")
-                                ?.toDoubleOrNull()
-                                ?.let { lat ->
-                                    ("""(lon=|"longitude":)$LON""" find decoded)?.groupOrNull("lon")
-                                        ?.toDoubleOrNull()
-                                        ?.let { lon ->
-                                            lat to lon
-                                        }
-                                }
+            setPointIfEmpty { """/l/$LAT,$LON""" matchLatLonZ path }
+            setPointIfEmpty { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZ queryParams["map"]) else null }
+            setPointIfEmpty {
+                ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")?.let { encoded ->
+                    Base64.decode(encoded).decodeToString().let { decoded ->
+                        ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
+                            ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
+                                LatLonZ(lat, lon, null)
+                            }
                         }
                     }
+                }
             }
-            setZoomFromMatcher { """.*,$Z""" match queryParams["map"] }
+            setZIfEmpty { """.*,$Z""" matchZ queryParams["map"] }
         }.toPair()
     }
 }

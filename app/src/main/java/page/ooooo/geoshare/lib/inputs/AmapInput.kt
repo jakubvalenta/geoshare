@@ -4,9 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.LAT
-import page.ooooo.geoshare.lib.position.LON
+import page.ooooo.geoshare.lib.extensions.matchLatLonZ
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
 
@@ -29,8 +27,8 @@ object AmapInput : Input.HasShortUri {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointFromMatcher { """\w+,$LAT,$LON.+""" match queryParams["p"] }
-            setPointFromMatcher { """$LAT,$LON.+""" match queryParams["q"] }
+            setPointIfEmpty { """\w+,$LAT,$LON.+""" matchLatLonZ queryParams["p"] }
+            setPointIfEmpty { """$LAT,$LON.+""" matchLatLonZ queryParams["q"] }
         }.toPair()
     }
 
