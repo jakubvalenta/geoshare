@@ -87,6 +87,15 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
+    fun setDefaultPointAndZoomFromMatcher(block: () -> Matcher?) {
+        if (defaultPoint == null) {
+            block()?.toPointAndZ(srs)?.let { (point, newZ) ->
+                defaultPoint = point
+                z = newZ
+            }
+        }
+    }
+
     fun setQueryFromMatcher(block: () -> Matcher?) {
         if (points.isEmpty() && q == null) {
             q = block()?.toQ()
@@ -119,11 +128,9 @@ fun Matcher.toPoint(srs: Srs): Point? =
         }
     }
 
-fun Matcher.toPointAndZ(srs: Srs): Pair<Point, Double>? =
+fun Matcher.toPointAndZ(srs: Srs): Pair<Point, Double?>? =
     this.toPoint(srs)?.let { point ->
-        this.toZ()?.let { z ->
-            point to z
-        }
+        point to this.toZ()
     }
 
 fun Matcher.toQ(): String? =
