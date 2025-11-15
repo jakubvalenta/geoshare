@@ -45,8 +45,8 @@ class GeoUriOutputGroupTest {
     fun copyOutput_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameInTheQParam() {
         assertEquals(
             listOf(
-                Action.Copy("geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)"),
-                Action.OpenChooser("geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)"),
+                Action.Copy("geo:50.123456,-11.123456?q=50.123456,-11.123456(foo+bar)"),
+                Action.OpenChooser("geo:50.123456,-11.123456?q=50.123456,-11.123456(foo+bar)"),
             ),
             Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar").let { position ->
                 outputGroup.getActionOutputs()
@@ -60,8 +60,8 @@ class GeoUriOutputGroupTest {
     fun copyOutput_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithTheQAndZParams() {
         assertEquals(
             listOf(
-                Action.Copy("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
-                Action.OpenChooser("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
+                Action.Copy("geo:50.123456,-11.123456?q=foo+bar&z=3.4"),
+                Action.OpenChooser("geo:50.123456,-11.123456?q=foo+bar&z=3.4"),
             ),
             Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4).let { position ->
                 outputGroup.getActionOutputs()
@@ -75,7 +75,7 @@ class GeoUriOutputGroupTest {
     fun appOutput_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameUnlessThePackageNameHasNameDisabled() {
         assertEquals(
             listOf(
-                Action.OpenApp("com.example.test", "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)"),
+                Action.OpenApp("com.example.test", "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo+bar)"),
                 @Suppress("SpellCheckingInspection")
                 Action.OpenApp("de.schildbach.oeffi", "geo:50.123456,-11.123456?q=50.123456,-11.123456"),
             ),

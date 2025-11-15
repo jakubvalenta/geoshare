@@ -79,7 +79,7 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
     @Composable
     fun label(value: Point, i: Int, pointCount: Int): String? =
         if (!value.name.isNullOrEmpty()) {
-            value.name
+            value.name.replace('+', ' ')
         } else if (pointCount > 1) {
             stringResource(R.string.conversion_succeeded_point_number, i + 1)
         } else {

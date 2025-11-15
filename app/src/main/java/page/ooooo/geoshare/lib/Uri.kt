@@ -93,6 +93,31 @@ data class Uri(
                     paramName to paramValue
                 }.toImmutableMap()
             }
+
+        fun formatQueryParams(
+            queryParams: ImmutableMap<String, String>,
+            allow: String = ",",
+            uriQuote: UriQuote,
+        ): String {
+            val plusAllowed = '+' in allow
+            return queryParams.map {
+                buildString {
+                    append(it.key)
+                    if (it.value.isNotEmpty()) {
+                        append("=")
+                        val cleanValue = if (plusAllowed) {
+                            it.value.replace(' ', '+')
+                        } else {
+                            it.value.replace('+', ' ')
+                        }
+                        append(uriQuote.encode(cleanValue, allow = allow))
+                    }
+                }
+            }.joinToString("&")
+        }
+
+        fun formatPath(path: String, allow: String = "!&+,/=@", uriQuote: UriQuote): String =
+            uriQuote.encode(path, allow = allow)
     }
 
     constructor(
@@ -164,16 +189,6 @@ data class Uri(
         null
     }
 
-    private fun formatQueryParams(): String = queryParams.map {
-        buildString {
-            append(it.key)
-            if (it.value.isNotEmpty()) {
-                append("=")
-                append(uriQuote.encode(it.value.replace('+', ' '), allow = ",()"))
-            }
-        }
-    }.joinToString("&")
-
     override fun toString() = StringBuilder().apply {
         if (scheme.isNotEmpty()) {
             append("$scheme:")
@@ -184,9 +199,9 @@ data class Uri(
         if (host.isNotEmpty()) {
             append(host)
         }
-        append(uriQuote.encode(path, allow = "!&+,/=@"))
+        append(formatPath(path, uriQuote = uriQuote))
         if (queryParams.isNotEmpty()) {
-            append("?${formatQueryParams()}")
+            append("?${formatQueryParams(queryParams, uriQuote = uriQuote)}")
         }
         if (fragment.isNotEmpty()) {
             append("#$fragment")
