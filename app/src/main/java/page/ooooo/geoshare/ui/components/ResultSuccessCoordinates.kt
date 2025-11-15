@@ -39,6 +39,7 @@ fun ResultSuccessCoordinates(
     ResultCard(
         main = {
             Row {
+                // TODO Fixe line breaking when label text is too long
                 allOutputGroups.getLabelTextOutput()?.getText(position, position.pointCount - 1, position.pointCount)
                     ?.let { text ->
                         Text(

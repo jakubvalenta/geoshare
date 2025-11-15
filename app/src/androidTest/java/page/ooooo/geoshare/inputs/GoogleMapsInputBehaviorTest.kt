@@ -26,6 +26,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates and query (business)
         testUri(
+            @Suppress("SpellCheckingInspection")
             Position(
                 Srs.WGS84,
                 50.4484901,
