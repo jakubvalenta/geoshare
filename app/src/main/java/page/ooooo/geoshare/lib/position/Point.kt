@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.random.Random
 
 @Immutable
-data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val desc: String? = null) {
+data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val name: String? = null) {
     companion object {
         val example: Point = genRandomPoint(minLat = 0.0, maxLon = -100.0)
 

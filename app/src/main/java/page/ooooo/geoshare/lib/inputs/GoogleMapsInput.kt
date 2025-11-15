@@ -58,17 +58,16 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
 
                 firstPart in parseUriParts || firstPart.startsWith('@') -> {
                     // Parse URI
-                    val defaultPointPattern: Pattern = Pattern.compile("""@$LAT,$LON(,${Z}z)?.*""")
                     val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
                     parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
                         if (part.startsWith("data=")) {
                             setPointIfEmpty { """!3d$LAT!4d$LON""" findLatLonZ part }
                             addPoints { """!1d$LON!2d$LAT""" findAllLatLonZ part }
                         } else if (part.startsWith('@')) {
-                            setDefaultPointIfEmpty { defaultPointPattern matchLatLonZ part }
+                            setDefaultPointIfEmpty { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZ part }
                         } else {
                             setPointIfEmpty { pointPattern matchLatLonZ part }
-                            setQIfEmpty { Q_PATH_PATTERN matchQ part }
+                            setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
                         }
                     }
                     setUriStringIfEmpty { uri.toString() }

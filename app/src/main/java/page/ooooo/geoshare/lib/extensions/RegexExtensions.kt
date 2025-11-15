@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.extensions
 import com.google.re2j.Matcher
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.lib.position.LatLonZ
-import kotlin.sequences.orEmpty
 
 fun Matcher.groupOrNull(): String? = try {
     this.group()
@@ -53,6 +52,14 @@ infix fun Pattern.matchLatLonZ(input: String?): LatLonZ? = input?.let { input ->
     (this match input)?.let { m ->
         m.toLatLon()?.let { (lat, lon) ->
             LatLonZ(lat, lon, m.toZ())
+        }
+    }
+}
+
+infix fun Pattern.matchLatLonZQ(input: String?): Pair<LatLonZ, String?>? = input?.let { input ->
+    (this match input)?.let { m ->
+        m.toLatLon()?.let { (lat, lon) ->
+            LatLonZ(lat, lon, m.toZ()) to m.toQ()
         }
     }
 }
@@ -115,6 +122,9 @@ fun Matcher.toQ(): String? =
 
 fun Matcher.toZ(): Double? =
     this.groupOrNull("z")?.toDoubleOrNull()
+
+fun Matcher.toLabel(): String? =
+    this.groupOrNull("label")
 
 fun Matcher.toUriString(): String? =
     this.groupOrNull("url")

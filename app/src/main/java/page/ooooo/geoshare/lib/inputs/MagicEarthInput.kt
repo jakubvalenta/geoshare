@@ -33,10 +33,11 @@ object MagicEarthInput : Input {
                     }
                 }
             }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["name"] }
+            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
             @Suppress("SpellCheckingInspection")
             setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
             setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
             setZIfEmpty { Z_PATTERN matchZ queryParams["zoom"] }
         }.toPair()

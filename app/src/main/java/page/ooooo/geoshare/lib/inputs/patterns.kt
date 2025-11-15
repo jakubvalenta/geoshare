@@ -8,8 +8,8 @@ const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?"""
 const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
 const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
 const val Z = """(?P<z>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
-const val Q_PARAM = """(?P<q>.+)"""
-const val Q_PATH = """(?P<q>[^/]+)"""
+const val Q_PARAM = """$LAT,$LON|(?P<q>.+)"""  // If it contains LAT,LON then don't consider it a query
+const val Q_PATH = """$LAT,$LON|(?P<q>[^/]+)"""  // If it contains LAT,LON then don't consider it a query
 
 val LAT_PATTERN: Pattern = Pattern.compile(LAT)
 val LON_PATTERN: Pattern = Pattern.compile(LON)

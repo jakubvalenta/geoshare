@@ -197,14 +197,14 @@ private fun DarkParamsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun DescPreview() {
+private fun LabelPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, desc = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "my point"),
                 onRun = {},
             )
         }
@@ -213,14 +213,14 @@ private fun DescPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkDescPreview() {
+private fun DarkLabelPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, desc = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "my point"),
                 onRun = {},
             )
         }

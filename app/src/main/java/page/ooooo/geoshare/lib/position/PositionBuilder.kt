@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.position
 
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
@@ -11,12 +10,15 @@ class PositionBuilder(val srs: Srs) {
     private var defaultPoint: Point? = null
     private var q: String? = null
     private var z: Double? = null
+    private var name: String? = null
     private var uriString: String? = null
 
     val position: Position
         get() = Position(
-            points.takeIf { it.isNotEmpty() }?.toImmutableList()
-                ?: defaultPoint?.let { persistentListOf(it) },
+            (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) })?.apply {
+                // Set label on the last point
+                removeLastOrNull()?.copy(name = name)?.let { add(it) }
+            }?.toImmutableList(),
             q = q,
             z = z?.let { max(1.0, min(21.0, it)) },
         )
@@ -59,11 +61,23 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
-    fun setQWithCenterIfEmpty(block: () -> Triple<String, Double, Double>?) {
+    fun setQOrNameIfEmpty(block: () -> String?) {
         if (q == null && defaultPoint == null && points.isEmpty()) {
+            q = block()
+        } else if (name == null) {
+            name = block()
+        }
+    }
+
+    fun setQWithCenterIfEmpty(block: () -> Triple<String, Double, Double>?) {
+        if (q == null) {
             block()?.let { (newQ, lat, lon) ->
-                q = newQ
-                points.add(Point(srs, lat, lon))
+                if (defaultPoint == null && points.isEmpty()) {
+                    q = newQ
+                    points.add(Point(srs, lat, lon))
+                } else {
+                    name = newQ
+                }
             }
         }
     }

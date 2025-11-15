@@ -109,7 +109,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0) to null,
+            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany") to null,
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910")
         )
     }
@@ -117,7 +117,13 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveCoordinatesWithManyDecimalPlaces() {
         assertEquals(
-            Position(Srs.GCJ02, 44.448337599999995, 26.0834555) to null,
+            @Suppress("SpellCheckingInspection")
+            Position(
+                Srs.GCJ02,
+                44.448337599999995,
+                26.0834555,
+                name = "Strada Occidentului 7, București, Romania",
+            ) to null,
             parseUri("https://www.google.com/maps/place/Strada+Occidentului+7,+Bucure%C8%99ti,+Romania/data=!4m6!3m5!1s0x40b201fdfa573623:0x4f53bb5ad3fdc97f!7e2!8m2!3d44.448337599999995!4d26.0834555?utm_source=mstt_1&entry=gps&coh=192189&g_ep=abc")
         )
     }
@@ -125,7 +131,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndNegativeCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, -17.2165721, -149.9470294, z = 11.0) to null,
+            Position(Srs.GCJ02, -17.2165721, -149.9470294, z = 11.0, name = "Berlin, Germany") to null,
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@-17.2165721,-149.9470294,11z/")
         )
     }
@@ -133,7 +139,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndIntegerCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, 52.0, 13.0, z = 11.0) to null,
+            Position(Srs.GCJ02, 52.0, 13.0, z = 11.0, name = "Berlin, Germany") to null,
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52,13,11z/")
         )
     }
@@ -141,7 +147,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndFractionalZoom() {
         assertEquals(
-            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 6.33) to null,
+            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 6.33, name = "Berlin, Germany") to null,
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,6.33z/")
         )
     }
@@ -149,7 +155,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndData() {
         assertEquals(
-            Position(Srs.GCJ02, 40.785091, -73.968285, z = 15.0) to null,
+            Position(Srs.GCJ02, 40.785091, -73.968285, z = 15.0, name = "Central Park") to null,
             parseUri("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
         )
     }
@@ -157,7 +163,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveCoordinatesAndPositiveDataCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, 44.4490541, 26.0888398, z = 11.42) to null,
+            Position(Srs.GCJ02, 44.4490541, 26.0888398, z = 11.42, name = "RAI - Romantic & Intimate") to null,
             @Suppress("SpellCheckingInspection")
             parseUri("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
         )
@@ -166,7 +172,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndNegativeCoordinatesAndNegativeDataCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, 40.785091, -73.968285, z = 15.0) to null,
+            Position(Srs.GCJ02, 40.785091, -73.968285, z = 15.0, name = "Central Park") to null,
             parseUri("https://www.google.com/maps/place/Central+Park/@40.8,-73.9,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2!3d40.785091!4d-73.968285"),
         )
     }
@@ -174,7 +180,13 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveDataCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, 44.4490541, 26.0888398) to null,
+            @Suppress("SpellCheckingInspection")
+            Position(
+                Srs.GCJ02,
+                44.4490541,
+                26.0888398,
+                name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098, România"
+            ) to null,
             parseUri("https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate,+Calea+Victoriei+202+Bucure%C8%99ti,+Bucuresti+010098,+Rom%C3%A2nia/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs")
 
         )
@@ -318,7 +330,14 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsPlaceAndCoordinates() {
         assertEquals(
-            Position(Srs.GCJ02, 48.83887481689453, 2.2740750312805176, z = 8.0) to null,
+            @Suppress("SpellCheckingInspection")
+            Position(
+                Srs.GCJ02,
+                48.83887481689453,
+                2.2740750312805176,
+                z = 8.0,
+                name = "Hôpital Européen Georges Pompidou Assistance Publique-Hôpitaux de Paris,20 r Leblanc, 75015 Paris",
+            ) to null,
             @Suppress("SpellCheckingInspection")
             parseUri("https://www.google.com/maps/dir/My+location/H%c3%b4pital+Europ%c3%a9en+Georges+Pompidou+Assistance+Publique-H%c3%b4pitaux+de+Paris,20+r+Leblanc%2c+75015+Paris/@48.83887481689453,2.2740750312805176,8z/")
         )
@@ -351,7 +370,14 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromToViaWithCenter() {
         assertEquals(
-            Position(Srs.GCJ02, 52.4844406, 13.4217121, z = 16.0) to null,
+            @Suppress("SpellCheckingInspection")
+            Position(
+                Srs.GCJ02,
+                52.4844406,
+                13.4217121,
+                z = 16.0,
+                name = "Reuterstraße 1, Berlin-Neukölln, Germany",
+            ) to null,
             @Suppress("SpellCheckingInspection")
             parseUri("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/")
         )
@@ -360,12 +386,13 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromToViaWithCoordinatesInData() {
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(
                 z = 16.0,
                 points = persistentListOf(
                     Point(Srs.GCJ02, 52.4858222, 13.4236883),
                     Point(Srs.GCJ02, 52.4881038, 13.4255518),
-                    Point(Srs.GCJ02, 52.4807739, 13.4300356),
+                    Point(Srs.GCJ02, 52.4807739, 13.4300356, name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 ),
             ) to null,
             @Suppress("SpellCheckingInspection")
@@ -494,7 +521,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_http() {
         assertEquals(
-            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0) to null,
+            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany") to null,
             parseUri("http://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
@@ -502,7 +529,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_ukDomain() {
         assertEquals(
-            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0) to null,
+            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany") to null,
             parseUri("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }
@@ -510,7 +537,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_noScheme() {
         assertEquals(
-            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0) to null,
+            Position(Srs.GCJ02, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany") to null,
             parseUri("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
         )
     }

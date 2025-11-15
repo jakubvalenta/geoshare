@@ -44,9 +44,9 @@ sealed interface Action {
                 point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
                 }
-                if (point.desc != null) {
+                if (point.name != null) {
                     append(">\n")
-                    append("    <desc>${point.desc.escapeHTML()}</desc>\n")
+                    append("    <name>${point.name.escapeHTML()}</name>\n")
                     append("</wpt>\n")
                 } else {
                     append(" />\n")

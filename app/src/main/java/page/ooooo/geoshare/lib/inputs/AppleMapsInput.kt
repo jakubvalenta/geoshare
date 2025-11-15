@@ -31,7 +31,7 @@ object AppleMapsInput : Input.HasHtml {
             setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
             setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
             setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["address"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
             setQWithCenterIfEmpty {
                 (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
                     (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
