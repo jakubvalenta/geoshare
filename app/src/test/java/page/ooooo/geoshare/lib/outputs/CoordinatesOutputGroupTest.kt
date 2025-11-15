@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
-class CoordinatesOutputTest {
+class CoordinatesOutputGroupTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val outputGroup = CoordinatesOutputGroup
 
