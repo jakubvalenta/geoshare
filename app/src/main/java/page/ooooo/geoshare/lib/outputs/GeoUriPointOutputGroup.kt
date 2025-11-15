@@ -82,7 +82,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
                 }
             }
                 .takeIf { it.isNotEmpty() }
-                ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()+", uriQuote = uriQuote) }
+                ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
                 ?.let { append("?$it") }
         }
     }
