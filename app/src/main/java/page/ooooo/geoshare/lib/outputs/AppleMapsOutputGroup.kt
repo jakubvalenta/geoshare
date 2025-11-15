@@ -44,9 +44,9 @@ object AppleMapsOutputGroup : OutputGroup<Position> {
 
     override fun getTextOutput() = null
 
-    override fun getLabelTextOutput() = null
+    override fun getNameOutput() = null
 
-    override fun getSupportingTextOutput() = null
+    override fun getDescriptionOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyOutput,

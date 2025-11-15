@@ -38,7 +38,7 @@ fun ResultSuccessSheetContent(
         )
     }
     copyActionsAndLabels.forEach { (action, label) ->
-        ResultSuccessSheetItem(label, supportingText = (action as? Action.Copy)?.text) {
+        ResultSuccessSheetItem(label, description = (action as? Action.Copy)?.text) {
             onRun(action)
             onHide()
         }
@@ -57,17 +57,17 @@ fun ResultSuccessSheetContent(
 @Composable
 private fun ResultSuccessSheetItem(
     label: String,
-    supportingText: String? = null,
+    description: String? = null,
     onClick: () -> Unit,
 ) {
     ListItem(
         headlineContent = { Text(label) },
         modifier = Modifier.clickable(onClick = onClick),
-        supportingContent = supportingText?.let { text ->
+        supportingContent = description?.let { text ->
             {
                 Text(
                     text,
-                    Modifier.testTag("geoShareConversionSuccessSheetItemSupportingText"),
+                    Modifier.testTag("geoShareConversionSuccessSheetItemDescription"),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

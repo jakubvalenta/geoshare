@@ -69,9 +69,9 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
     override fun getTextOutput() = null
 
-    override fun getLabelTextOutput() = null
+    override fun getNameOutput() = null
 
-    override fun getSupportingTextOutput() = null
+    override fun getDescriptionOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,

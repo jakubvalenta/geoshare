@@ -30,19 +30,19 @@ fun ResultSuccessPoint(
     point: Point,
     pointCount: Int,
     textPointOutput: Output.Text<Point>?,
-    labelTextPointOutput: Output.PointLabel<Point>?,
+    namePointOutput: Output.PointLabel<Point>?,
     menuPointOutputs: List<Output.Action<Point, Action>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
-    val label = labelTextPointOutput?.getText(point, i, pointCount)
+    val name = namePointOutput?.getText(point, i, pointCount)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        label?.let { text ->
+        name?.let { text ->
             Text(
                 text,
                 fontStyle = FontStyle.Italic,
@@ -74,7 +74,7 @@ fun ResultSuccessPoint(
         ResultSuccessSheetContent(
             copyActionsAndLabels = copyActionsAndLabels,
             otherActionsAndLabels = otherActionsAndLabels,
-            headline = label,
+            headline = name,
             onHide = onHide,
             onRun = onRun,
         )
@@ -91,7 +91,7 @@ private fun DefaultPreview() {
                 point = Point.example,
                 pointCount = 5,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -109,7 +109,7 @@ private fun DarkPreview() {
                 point = Point.example,
                 pointCount = 5,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -127,7 +127,7 @@ private fun OnePointPreview() {
                 point = Point.example,
                 pointCount = 1,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -145,7 +145,7 @@ private fun DarkOnePointPreview() {
                 point = Point.example,
                 pointCount = 1,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )

@@ -17,13 +17,13 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
         override fun getText(value: Position, uriQuote: UriQuote) = formatDegMinSecString(value)
     }
 
-    object LabelTextOutput : Output.PointLabel<Position> {
+    object NameOutput : Output.PointLabel<Position> {
         @Composable
-        override fun getText(value: Position, i: Int, pointCount: Int, uriQuote: UriQuote) = label(value, i, pointCount)
+        override fun getText(value: Position, i: Int, pointCount: Int, uriQuote: UriQuote) = name(value, i, pointCount)
     }
 
-    object SupportingTextOutput : Output.Text<Position> {
-        override fun getText(value: Position, uriQuote: UriQuote) = formatParamsString(value)
+    object DescriptionOutput : Output.Text<Position> {
+        override fun getText(value: Position, uriQuote: UriQuote) = formatDescriptionString(value)
     }
 
     object CopyDegMinSecOutput : Output.Action<Position, Action> {
@@ -100,9 +100,9 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
 
     override fun getTextOutput() = TextOutput
 
-    override fun getLabelTextOutput() = LabelTextOutput
+    override fun getNameOutput() = NameOutput
 
-    override fun getSupportingTextOutput() = SupportingTextOutput
+    override fun getDescriptionOutput() = DescriptionOutput
 
     override fun getActionOutputs() = listOf(
         CopyDegMinSecOutput,
@@ -136,7 +136,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
         CoordinatesPointOutputGroup.formatDegMinSecString(mainPoint ?: Point(Srs.WGS84))
     }
 
-    private fun formatParamsString(value: Position): String = value.run {
+    private fun formatDescriptionString(value: Position): String = value.run {
         buildList {
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
                 (mainPoint ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
@@ -152,7 +152,7 @@ object CoordinatesOutputGroup : OutputGroup<Position> {
     }
 
     @Composable
-    private fun label(value: Position, i: Int, pointCount: Int): String? = value.run {
-        CoordinatesPointOutputGroup.label(mainPoint ?: Point(Srs.WGS84), i, pointCount)
+    private fun name(value: Position, i: Int, pointCount: Int): String? = value.run {
+        CoordinatesPointOutputGroup.name(mainPoint ?: Point(Srs.WGS84), i, pointCount)
     }
 }

@@ -7,11 +7,11 @@ import page.ooooo.geoshare.lib.UriQuote
 fun <T> List<OutputGroup<T>>.getTextOutput() =
     this.firstNotNullOfOrNull { it.getTextOutput() }
 
-fun <T> List<OutputGroup<T>>.getLabelTextOutput() =
-    this.firstNotNullOfOrNull { it.getLabelTextOutput() }
+fun <T> List<OutputGroup<T>>.getNameOutput() =
+    this.firstNotNullOfOrNull { it.getNameOutput() }
 
-fun <T> List<OutputGroup<T>>.getSupportingTextOutput() =
-    this.firstNotNullOfOrNull { it.getSupportingTextOutput() }
+fun <T> List<OutputGroup<T>>.getDescriptionOutput() =
+    this.firstNotNullOfOrNull { it.getDescriptionOutput() }
 
 fun <T> List<OutputGroup<T>>.getAppOutputs(packageNames: List<String>) =
     this.flatMap { it.getAppOutputs(packageNames) }

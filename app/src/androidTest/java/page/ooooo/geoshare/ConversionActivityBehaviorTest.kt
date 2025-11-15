@@ -72,8 +72,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows copy link in GCJ-02
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
             onElement {
-                viewIdResourceName == "geoShareConversionSuccessSheetItemSupportingText" &&
-                        textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
+                viewIdResourceName == "geoShareConversionSuccessSheetItemDescription" &&
+                    textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
             }
             pressBack()
 

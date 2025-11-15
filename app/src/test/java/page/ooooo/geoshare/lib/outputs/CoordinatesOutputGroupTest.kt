@@ -14,10 +14,10 @@ class CoordinatesOutputGroupTest {
     private val outputGroup = CoordinatesOutputGroup
 
     @Test
-    fun supportingTextOutput_returnsQueryAndZoomButNotPoints() {
+    fun descriptionOutput_returnsQueryAndZoomButNotPoints() {
         assertEquals(
             "foo bar\t\tz3.4",
-            outputGroup.getSupportingTextOutput().getText(
+            outputGroup.getDescriptionOutput().getText(
                 Position(
                     q = "foo bar",
                     z = 3.4,

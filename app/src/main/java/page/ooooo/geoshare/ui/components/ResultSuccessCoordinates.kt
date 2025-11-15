@@ -1,11 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -20,10 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -38,13 +34,17 @@ fun ResultSuccessCoordinates(
 
     ResultCard(
         main = {
-            Row {
-                // TODO Fixe line breaking when label text is too long
-                allOutputGroups.getLabelTextOutput()?.getText(position, position.pointCount - 1, position.pointCount)
+            FlowRow(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
+            ) {
+                allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
                     ?.let { text ->
                         Text(
                             text,
-                            Modifier.padding(end = 12.dp),
+                            Modifier
+                                .testTag("geoShareConversionSuccessPositionName")
+                                .padding(end = 12.dp),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
@@ -52,20 +52,18 @@ fun ResultSuccessCoordinates(
                     SelectionContainer {
                         Text(
                             text,
-                            Modifier
-                                .testTag("geoShareConversionSuccessPositionCoordinates")
-                                .weight(1f),
+                            Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }
             }
-            allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
+            allOutputGroups.getDescriptionOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
                 SelectionContainer {
                     Text(
                         text,
                         Modifier
-                            .testTag("geoShareConversionSuccessPositionParams")
+                            .testTag("geoShareConversionSuccessPositionDescription")
                             .fillMaxWidth(),
                         fontStyle = FontStyle.Italic,
                         style = MaterialTheme.typography.bodySmall,
@@ -89,14 +87,14 @@ fun ResultSuccessCoordinates(
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                     val menuPointOutputs = allPointOutputGroups.getActionOutputs()
                     val textPointOutput = allPointOutputGroups.getTextOutput()
-                    val labelTextPointOutput = allPointOutputGroups.getLabelTextOutput()
+                    val namePointOutput = allPointOutputGroups.getNameOutput()
                     points.forEachIndexed { i, point ->
                         ResultSuccessPoint(
                             i = i,
                             point = point,
                             pointCount = position.pointCount,
                             textPointOutput = textPointOutput,
-                            labelTextPointOutput = labelTextPointOutput,
+                            namePointOutput = namePointOutput,
                             menuPointOutputs = menuPointOutputs,
                             onRun = onRun,
                         )

@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.XiaomiTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
-import page.ooooo.geoshare.lib.outputs.getSupportingTextOutput
+import page.ooooo.geoshare.lib.outputs.getDescriptionOutput
 import page.ooooo.geoshare.lib.outputs.getTextOutput
 import page.ooooo.geoshare.lib.position.Position
 import kotlin.math.pow
@@ -101,20 +101,18 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
-        // TODO Test point name
-        // if (expectedPosition.mainPoint?.name != null) {
-        //     val expectedLabelText = allOutputGroups.getLabelTextOutput()?.getText(
-        //         expectedPosition, 0, expectedPosition.pointCount
-        //     )
-        //     onElement { viewIdResourceName == "geoShareConversionSuccessPositionLabel" && textAsString() == expectedSupportingText }
-        // } else {
-        //     assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionLabel" })
-        // }
-        if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
-            val expectedSupportingText = allOutputGroups.getSupportingTextOutput()?.getText(expectedPosition)
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
+        val expectedPositionName = expectedPosition.mainPoint?.name
+        if (expectedPositionName != null) {
+            val expectedName = expectedPositionName.replace('+', ' ')
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
         } else {
-            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })
+            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionName" })
+        }
+        if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
+            val expectedDescription = allOutputGroups.getDescriptionOutput()?.getText(expectedPosition)
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" && textAsString() == expectedDescription }
+        } else {
+            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })
         }
     }
 

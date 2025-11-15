@@ -16,7 +16,7 @@ class PositionBuilder(val srs: Srs) {
     val position: Position
         get() = Position(
             (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) })?.apply {
-                // Set label on the last point
+                // Set name on the last point
                 removeLastOrNull()?.copy(name = name)?.let { add(it) }
             }?.toImmutableList(),
             q = q,
