@@ -106,7 +106,6 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
     fun formatDisplayUriString(value: Point, uriQuote: UriQuote, q: String? = null): String =
-        // TODO Format name
         Uri(
             scheme = "magicearth",
             path = "//",
@@ -116,6 +115,9 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
                         set("show_on_map", "")
                         set("lat", latStr)
                         set("lon", lonStr)
+                        value.name?.let { name ->
+                            set("name", name)
+                        }
                     } else {
                         if (value.lat == 0.0 && value.lon == 0.0) {
                             set("open_search", "")
@@ -132,7 +134,6 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         ).toString()
 
     fun formatNavigateToUriString(value: Point, uriQuote: UriQuote): String =
-        // TODO Format name
         Uri(
             scheme = "magicearth",
             path = "//",
@@ -147,7 +148,6 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
         ).toString()
 
     fun formatNavigateViaUriString(value: Point, uriQuote: UriQuote): String =
-        // TODO Format name
         Uri(
             scheme = "magicearth",
             path = "//",
