@@ -31,12 +31,12 @@ object GeoInput : Input {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             ("""$LAT,$LON(\((?P<name>.+)\))?""" match queryParams["q"])?.let { m ->
-                setPointIfEmpty { m.toLatLon()?.let { (lat, lon) -> LatLonZ(lat, lon, null) } }
+                setPointIfNull { m.toLatLon()?.let { (lat, lon) -> LatLonZ(lat, lon, null) } }
                 setQOrNameIfEmpty { m.groupOrNull("name") }
             }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ path }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ path }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
         }.toPair()
     }
 }

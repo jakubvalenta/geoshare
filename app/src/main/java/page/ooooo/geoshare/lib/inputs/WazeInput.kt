@@ -37,18 +37,18 @@ object WazeInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty {
+            setPointIfNull {
                 (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
                     ?.let { hash -> decodeWazeGeoHash(hash) }
                     ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(6), lon.toScale(6), z) }
             }
-            setPointIfEmpty { """ll\.$LAT,$LON""" matchLatLonZ queryParams["to"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+            setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZ queryParams["to"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
             @Suppress("SpellCheckingInspection")
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["latlng"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
-            setUriStringIfEmpty {
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["latlng"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+            setUriStringIfNull {
                 queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
                     // To skip some redirects when downloading HTML, replace this URL:
                     // https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
@@ -65,7 +65,7 @@ object WazeInput : Input.HasHtml {
                     ).toString()
                 }
             }
-            setUriStringIfEmpty {
+            setUriStringIfNull {
                 queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
                     // To skip some redirects when downloading HTML, replace this URL:
                     // https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
@@ -80,7 +80,7 @@ object WazeInput : Input.HasHtml {
                     ).toString()
                 }
             }
-            setUriStringIfEmpty { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
+            setUriStringIfNull { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
         }.toPair()
     }
 

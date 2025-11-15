@@ -33,13 +33,13 @@ object OpenStreetMapInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty {
+            setPointIfNull {
                 ("""/go/$HASH""" matchHash path)
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                     ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
             }
-            setPointIfEmpty { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
-            setUriStringIfEmpty {
+            setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+            setUriStringIfNull {
                 (ELEMENT_PATH match path)?.let { m ->
                     m.groupOrNull("type")?.let { type ->
                         m.groupOrNull("id")?.let { id ->

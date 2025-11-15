@@ -26,20 +26,20 @@ object MagicEarthInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty {
+            setPointIfNull {
                 (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
                     (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
                         LatLonZ(lat, lon, null)
                     }
                 }
             }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["name"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["name"] }
             setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
             @Suppress("SpellCheckingInspection")
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
             setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["zoom"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
         }.toPair()
     }
 }

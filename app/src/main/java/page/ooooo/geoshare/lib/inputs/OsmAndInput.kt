@@ -21,9 +21,9 @@ object OsmAndInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["pin"] }
-            setPointIfEmpty { """$Z/$LAT/$LON.*""" matchLatLonZ fragment }
-            setZIfEmpty { """$Z/.*""" matchZ fragment }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["pin"] }
+            setPointIfNull { """$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+            setZIfNull { """$Z/.*""" matchZ fragment }
         }.toPair()
     }
 }

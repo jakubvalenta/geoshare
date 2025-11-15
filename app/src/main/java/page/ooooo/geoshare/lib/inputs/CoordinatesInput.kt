@@ -42,7 +42,7 @@ object CoordinatesInput : Input {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             // Decimal, e.g. `N 41.40338, E 2.17403`
-            setPointIfEmpty {
+            setPointIfNull {
                 ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
                     LatLonZ(
                         degToDec(
@@ -61,7 +61,7 @@ object CoordinatesInput : Input {
             }
 
             // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-            setPointIfEmpty {
+            setPointIfNull {
                 ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
                     LatLonZ(
                         degToDec(
@@ -84,7 +84,7 @@ object CoordinatesInput : Input {
             }
 
             // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-            setPointIfEmpty {
+            setPointIfNull {
                 ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
                     LatLonZ(
                         degToDec(

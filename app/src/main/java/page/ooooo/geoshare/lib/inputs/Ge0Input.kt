@@ -28,7 +28,7 @@ object Ge0Input : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty {
+            setPointIfNull {
                 (if (scheme == "ge0") HASH matchHash host else """/$HASH\S*""" matchHash path)
                     ?.let { hash -> decodeGe0Hash(hash) }
                     ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(7), lon.toScale(7), z) }

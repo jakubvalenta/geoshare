@@ -31,7 +31,7 @@ object MapyComInput : Input.HasShortUri {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty {
+            setPointIfNull {
                 (COORDS match path)?.let { m ->
                     m.toLatLon()?.let { (lat, lon) ->
                         val wholeMatch = m.groupOrNull()
@@ -41,14 +41,14 @@ object MapyComInput : Input.HasShortUri {
                     }
                 }
             }
-            setPointIfEmpty {
+            setPointIfNull {
                 (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
                     (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
                         LatLonZ(lat, lon, null)
                     }
                 }
             }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
         }.toPair()
     }
 

@@ -51,12 +51,12 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             @Suppress("SpellCheckingInspection")
-            setPointIfEmpty { LON_LAT_PATTERN matchLatLonZ queryParams["whatshere%5Bpoint%5D"] }
-            setPointIfEmpty { LON_LAT_PATTERN matchLatLonZ queryParams["ll"] }
+            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["whatshere%5Bpoint%5D"] }
+            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["ll"] }
             @Suppress("SpellCheckingInspection")
-            setZIfEmpty { Z_PATTERN matchZ queryParams["whatshere%5Bzoom%5D"] }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }
-            setUriStringIfEmpty { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
+            setZIfNull { Z_PATTERN matchZ queryParams["whatshere%5Bzoom%5D"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+            setUriStringIfNull { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
         }.toPair()
     }
 

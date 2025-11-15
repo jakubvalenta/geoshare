@@ -27,8 +27,8 @@ object AmapInput : Input.HasShortUri {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty { """\w+,$LAT,$LON.+""" matchLatLonZ queryParams["p"] }
-            setPointIfEmpty { """$LAT,$LON.+""" matchLatLonZ queryParams["q"] }
+            setPointIfNull { """\w+,$LAT,$LON.+""" matchLatLonZ queryParams["p"] }
+            setPointIfNull { """$LAT,$LON.+""" matchLatLonZ queryParams["q"] }
         }.toPair()
     }
 

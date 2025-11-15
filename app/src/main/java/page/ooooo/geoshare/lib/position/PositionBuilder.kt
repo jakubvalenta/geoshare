@@ -7,7 +7,7 @@ import kotlin.math.min
 class PositionBuilder(val srs: Srs) {
 
     private var points: MutableList<Point> = mutableListOf()
-    private var defaultPoint: Point? = null
+    private var defaultPoint: Point? = null  // Used only if points are empty
     private var q: String? = null
     private var z: Double? = null
     private var name: String? = null
@@ -25,7 +25,7 @@ class PositionBuilder(val srs: Srs) {
 
     fun toPair(): Pair<Position, String?> = position to uriString
 
-    fun setPointIfEmpty(block: () -> LatLonZ?) {
+    fun setPointIfNull(block: () -> LatLonZ?) {
         if (points.isEmpty()) {
             block()?.let { (lat, lon, newZ) ->
                 points.add(Point(srs, lat, lon))
@@ -36,7 +36,7 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
-    fun setDefaultPointIfEmpty(block: () -> LatLonZ?) {
+    fun setDefaultPointIfNull(block: () -> LatLonZ?) {
         if (defaultPoint == null) {
             block()?.let { (lat, lon, newZ) ->
                 defaultPoint = Point(srs, lat, lon)
@@ -55,7 +55,7 @@ class PositionBuilder(val srs: Srs) {
         points.addAll(block().map { (lat, lon) -> Point(srs, lat, lon) })
     }
 
-    fun setQIfEmpty(block: () -> String?) {
+    fun setQIfNull(block: () -> String?) {
         if (q == null && defaultPoint == null && points.isEmpty()) {
             q = block()
         }
@@ -69,7 +69,7 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
-    fun setQWithCenterIfEmpty(block: () -> Triple<String, Double, Double>?) {
+    fun setQWithCenterIfNull(block: () -> Triple<String, Double, Double>?) {
         if (q == null) {
             block()?.let { (newQ, lat, lon) ->
                 if (defaultPoint == null && points.isEmpty()) {
@@ -82,13 +82,13 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
-    fun setZIfEmpty(block: () -> Double?) {
+    fun setZIfNull(block: () -> Double?) {
         if (z == null) {
             z = block()
         }
     }
 
-    fun setUriStringIfEmpty(block: () -> String?) {
+    fun setUriStringIfNull(block: () -> String?) {
         if (uriString == null && defaultPoint == null && points.isEmpty()) {
             uriString = block()
         }

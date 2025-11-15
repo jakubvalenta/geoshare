@@ -36,15 +36,15 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             // Try query parameters for all URLs
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["destination"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["query"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["viewpoint"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["destination"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["query"] }
-            setZIfEmpty { Z_PATTERN matchZ queryParams["zoom"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["destination"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["query"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["viewpoint"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
 
             val parseHtmlParts = setOf("", "@", "d", "placelists")
             val parseUriParts = setOf("dir", "place", "search")
@@ -53,7 +53,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             when {
                 firstPart == null || firstPart in parseHtmlParts -> {
                     // Skip URI parsing and go to HTML parsing
-                    setUriStringIfEmpty { uri.toString() }
+                    setUriStringIfNull { uri.toString() }
                 }
 
                 firstPart in parseUriParts || firstPart.startsWith('@') -> {
@@ -61,16 +61,16 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                     val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
                     parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
                         if (part.startsWith("data=")) {
-                            setPointIfEmpty { """!3d$LAT!4d$LON""" findLatLonZ part }
+                            setPointIfNull { """!3d$LAT!4d$LON""" findLatLonZ part }
                             addPoints { """!1d$LON!2d$LAT""" findAllLatLonZ part }
                         } else if (part.startsWith('@')) {
-                            setDefaultPointIfEmpty { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZ part }
+                            setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZ part }
                         } else {
-                            setPointIfEmpty { pointPattern matchLatLonZ part }
+                            setPointIfNull { pointPattern matchLatLonZ part }
                             setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
                         }
                     }
-                    setUriStringIfEmpty { uri.toString() }
+                    setUriStringIfNull { uri.toString() }
                 }
             }
         }.toPair()
@@ -84,9 +84,9 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
             for (line in generateSequence { source.readLine() }) {
                 addPoints { pointPattern findAllLatLonZ line }
-                setDefaultPointIfEmpty { defaultPointPattern1 findLatLonZ line }
-                setDefaultPointIfEmpty { defaultPointPattern2 findLatLonZ line }
-                setUriStringIfEmpty { uriPattern findUriString line }
+                setDefaultPointIfNull { defaultPointPattern1 findLatLonZ line }
+                setDefaultPointIfNull { defaultPointPattern2 findLatLonZ line }
+                setUriStringIfNull { uriPattern findUriString line }
             }
         }.toPair()
     }

@@ -29,9 +29,9 @@ object HereWeGoInput : Input {
     @OptIn(ExperimentalEncodingApi::class)
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty { """/l/$LAT,$LON""" matchLatLonZ path }
-            setPointIfEmpty { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZ queryParams["map"]) else null }
-            setPointIfEmpty {
+            setPointIfNull { """/l/$LAT,$LON""" matchLatLonZ path }
+            setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZ queryParams["map"]) else null }
+            setPointIfNull {
                 ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")?.let { encoded ->
                     Base64.decode(encoded).decodeToString().let { decoded ->
                         ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
@@ -42,7 +42,7 @@ object HereWeGoInput : Input {
                     }
                 }
             }
-            setZIfEmpty { """.*,$Z""" matchZ queryParams["map"] }
+            setZIfNull { """.*,$Z""" matchZ queryParams["map"] }
         }.toPair()
     }
 }

@@ -27,23 +27,23 @@ object AppleMapsInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["address"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
             setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
-            setQWithCenterIfEmpty {
+            setQWithCenterIfNull {
                 (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
                     (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
                         Triple(newQ, lat, lon)
                     }
                 }
             }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
-            setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
-            setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setZIfEmpty { (Z_PATTERN matchZ queryParams["z"]) }
-            setUriStringIfEmpty {
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setZIfNull { (Z_PATTERN matchZ queryParams["z"]) }
+            setUriStringIfNull {
                 uri.takeIf {
                     host == "maps.apple" && path.startsWith("/p/") ||
                         @Suppress("SpellCheckingInspection")
