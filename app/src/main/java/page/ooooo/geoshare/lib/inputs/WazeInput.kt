@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
 

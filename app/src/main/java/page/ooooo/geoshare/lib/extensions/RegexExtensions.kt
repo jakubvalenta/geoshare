@@ -56,14 +56,6 @@ infix fun Pattern.matchLatLonZ(input: String?): LatLonZ? = input?.let { input ->
     }
 }
 
-infix fun Pattern.matchLatLonZQ(input: String?): Pair<LatLonZ, String?>? = input?.let { input ->
-    (this match input)?.let { m ->
-        m.toLatLon()?.let { (lat, lon) ->
-            LatLonZ(lat, lon, m.toZ()) to m.toQ()
-        }
-    }
-}
-
 infix fun Pattern.matchQ(input: String?): String? = input?.let { input ->
     this.matcher(input).takeIf { it.matches() }?.toQ()
 }
@@ -122,9 +114,6 @@ fun Matcher.toQ(): String? =
 
 fun Matcher.toZ(): Double? =
     this.groupOrNull("z")?.toDoubleOrNull()
-
-fun Matcher.toLabel(): String? =
-    this.groupOrNull("label")
 
 fun Matcher.toUriString(): String? =
     this.groupOrNull("url")
