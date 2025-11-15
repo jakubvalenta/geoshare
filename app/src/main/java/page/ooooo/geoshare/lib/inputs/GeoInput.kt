@@ -4,10 +4,14 @@ import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.matchLatLonZ
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toLatLon
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
@@ -26,6 +30,10 @@ object GeoInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
+            ("""$LAT,$LON(\((?P<name>.+)\))?""" match queryParams["q"])?.let { m ->
+                setPointIfEmpty { m.toLatLon()?.let { (lat, lon) -> LatLonZ(lat, lon, null) } }
+                setQOrNameIfEmpty { m.groupOrNull("name") }
+            }
             setQIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
             setPointIfEmpty { LAT_LON_PATTERN matchLatLonZ path }
             setZIfEmpty { Z_PATTERN matchZ queryParams["z"] }

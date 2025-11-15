@@ -37,11 +37,7 @@ infix fun Pattern.findAll(input: String?): Sequence<Matcher> = input?.let { inpu
 }.orEmpty()
 
 infix fun Pattern.findAllLatLonZ(input: String?): Sequence<LatLonZ> = input?.let { input ->
-    (this findAll input).mapNotNull { m ->
-        m.toLatLon()?.let { (lat, lon) ->
-            LatLonZ(lat, lon, m.toZ())
-        }
-    }
+    (this findAll input).mapNotNull { m -> m.toLatLonZ() }
 }.orEmpty()
 
 infix fun Pattern.match(input: String?): Matcher? = input?.let { input ->
@@ -49,11 +45,7 @@ infix fun Pattern.match(input: String?): Matcher? = input?.let { input ->
 }
 
 infix fun Pattern.matchLatLonZ(input: String?): LatLonZ? = input?.let { input ->
-    (this match input)?.let { m ->
-        m.toLatLon()?.let { (lat, lon) ->
-            LatLonZ(lat, lon, m.toZ())
-        }
-    }
+    (this match input)?.toLatLonZ()
 }
 
 infix fun Pattern.matchQ(input: String?): String? = input?.let { input ->
@@ -62,6 +54,10 @@ infix fun Pattern.matchQ(input: String?): String? = input?.let { input ->
 
 infix fun Pattern.matchZ(input: String?): Double? = input?.let { input ->
     this.matcher(input).takeIf { it.matches() }?.toZ()
+}
+
+infix fun Pattern.matchHash(input: String?): String? = input?.let { input ->
+    this.matcher(input).takeIf { it.matches() }?.toHash()
 }
 
 infix fun String.find(input: String?): Matcher? = input?.let { input ->
@@ -93,7 +89,7 @@ infix fun String.matchZ(input: String?): Double? = input?.let { input ->
 }
 
 infix fun String.matchHash(input: String?): String? = input?.let { input ->
-    (Pattern.compile(this) match input)?.groupOrNull("hash")
+    Pattern.compile(this) matchHash input
 }
 
 fun Matcher.toLat(): Double? =
@@ -109,6 +105,11 @@ fun Matcher.toLatLon(): Pair<Double, Double>? =
         }
     }
 
+fun Matcher.toLatLonZ(): LatLonZ? =
+    this.toLatLon()?.let { (lat, lon) ->
+        LatLonZ(lat, lon, this.toZ())
+    }
+
 fun Matcher.toQ(): String? =
     this.groupOrNull("q")
 
@@ -117,3 +118,6 @@ fun Matcher.toZ(): Double? =
 
 fun Matcher.toUriString(): String? =
     this.groupOrNull("url")
+
+fun Matcher.toHash(): String? =
+    this.groupOrNull("hash")
