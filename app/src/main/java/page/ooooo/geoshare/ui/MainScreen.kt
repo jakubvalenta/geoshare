@@ -232,18 +232,18 @@ fun MainScreen(
                     )
                     Text(stringResource(R.string.main_navigate_to_intro))
                 }
-                allOutputGroups.genRandomUriString()?.let { uriString ->
-                    TextButton({
+                TextButton({
+                    allOutputGroups.genRandomUriString()?.let { uriString ->
                         onUpdateInput(uriString)
-                        setErrorMessageResId(null)
-                    }) {
-                        Icon(
-                            painterResource(R.drawable.ifl_24px),
-                            null,
-                            Modifier.padding(end = spacing.tiny),
-                        )
-                        Text(stringResource(R.string.main_random))
                     }
+                    setErrorMessageResId(null)
+                }) {
+                    Icon(
+                        painterResource(R.drawable.ifl_24px),
+                        null,
+                        Modifier.padding(end = spacing.tiny),
+                    )
+                    Text(stringResource(R.string.main_random))
                 }
             }
         },
