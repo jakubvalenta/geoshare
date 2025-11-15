@@ -15,6 +15,7 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.XiaomiTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
+import page.ooooo.geoshare.lib.outputs.getLabelTextOutput
 import page.ooooo.geoshare.lib.outputs.getSupportingTextOutput
 import page.ooooo.geoshare.lib.outputs.getTextOutput
 import kotlin.math.pow
@@ -101,6 +102,14 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
+        // if (expectedPosition.mainPoint?.name != null) {
+        //     val expectedLabelText = allOutputGroups.getLabelTextOutput()?.getText(
+        //         expectedPosition, 0, expectedPosition.pointCount
+        //     )
+        //     onElement { viewIdResourceName == "geoShareConversionSuccessPositionLabel" && textAsString() == expectedSupportingText }
+        // } else {
+        //     assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionLabel" })
+        // }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
             val expectedSupportingText = allOutputGroups.getSupportingTextOutput()?.getText(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
