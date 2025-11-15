@@ -20,7 +20,8 @@ data class Position(
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
-        ): Position = Position(persistentListOf(Point.genRandomPoint(minLat, maxLat, minLon, maxLon)), z = 8.0)
+            name: String = "My point",
+        ): Position = Position(persistentListOf(Point.genRandomPoint(minLat, maxLat, minLon, maxLon, name)), z = 8.0)
     }
 
     constructor(

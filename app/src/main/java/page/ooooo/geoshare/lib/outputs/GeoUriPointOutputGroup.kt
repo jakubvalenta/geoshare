@@ -12,7 +12,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object CopyOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, Srs.WGS84, uriQuote))
+            Action.Copy(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
@@ -22,7 +22,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object ChooserOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, Srs.WGS84, uriQuote))
+            Action.OpenChooser(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_share)
@@ -54,7 +54,14 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     override fun findAutomation(type: Automation.Type, packageName: String?) = null
 
-    fun formatUriString(value: Point, srs: Srs, uriQuote: UriQuote, q: String? = null, zStr: String? = null): String =
+    fun formatUriString(
+        value: Point,
+        srs: Srs,
+        nameDisabled: Boolean,
+        uriQuote: UriQuote,
+        q: String? = null,
+        zStr: String? = null,
+    ): String =
         value.toStringPair(srs).let { (latStr, lonStr) ->
             Uri(
                 scheme = "geo",
@@ -63,7 +70,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
                     if (q != null) {
                         set("q", q)
                     } else if (value.lat != 0.0 && value.lon != 0.0) {
-                        if (value.name != null) {
+                        if (!nameDisabled && value.name != null) {
                             set("q", "$latStr,$lonStr(${value.name})")
                         } else {
                             set("q", "$latStr,$lonStr")

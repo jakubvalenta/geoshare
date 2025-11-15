@@ -32,7 +32,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
     @Suppress("SpellCheckingInspection")
     const val GMAPS_WV_PACKAGE_NAME = "us.spotco.maps"
-    val PACKAGE_NAMES = listOf(
+    val PACKAGE_NAMES = setOf(
         GOOGLE_MAPS_PACKAGE_NAME,
         GMAPS_WV_PACKAGE_NAME,
     )
@@ -290,7 +290,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     )
 
     override fun getAppOutputs(packageNames: List<String>) = buildList {
-        PACKAGE_NAMES.filter { it != GMAPS_WV_PACKAGE_NAME && it in packageNames }.forEach { packageName ->
+        packageNames.filter { it in PACKAGE_NAMES && it != GMAPS_WV_PACKAGE_NAME }.forEach { packageName ->
             add(AppNavigateToOutput(packageName))
             add(AppStreetViewOutput(packageName))
         }
@@ -308,7 +308,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         add(CopyDisplayAutomation)
         add(CopyNavigateToAutomation)
         add(CopyStreetViewAutomation)
-        PACKAGE_NAMES.filter { it != GMAPS_WV_PACKAGE_NAME && it in packageNames }.forEach { packageName ->
+        packageNames.filter { it in PACKAGE_NAMES && it != GMAPS_WV_PACKAGE_NAME }.forEach { packageName ->
             add(AppNavigateToAutomation(packageName))
             add(AppStreetViewAutomation(packageName))
         }

@@ -18,11 +18,12 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
+            name: String = "My point",
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
             val lon = Random.nextDouble(minLon, maxLon).toScale(6)
             val srs = if (TransformUtil.outOfChina(lat, lon)) Srs.WGS84 else Srs.GCJ02
-            return Point(srs, lat, lon)
+            return Point(srs, lat, lon, name)
         }
     }
 

@@ -23,7 +23,10 @@ object GeoUriInput : Input {
     override val documentation = Input.Documentation(
         nameResId = R.string.converter_geo_name, inputs = listOf(
             Input.DocumentationInput.Text(3) {
-                stringResource(R.string.example, GeoUriOutputGroup.formatUriString(Position.example, Srs.WGS84))
+                stringResource(
+                    R.string.example,
+                    GeoUriOutputGroup.formatUriString(Position.example, Srs.WGS84, nameDisabled = false),
+                )
             },
         )
     )

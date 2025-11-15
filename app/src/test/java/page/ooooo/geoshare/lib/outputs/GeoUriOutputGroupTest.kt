@@ -70,4 +70,26 @@ class GeoUriOutputGroupTest {
             },
         )
     }
+
+    @Test
+    fun appOutput_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameUnlessThePackageNameHasNameDisabled() {
+        assertEquals(
+            listOf(
+                Action.OpenApp("com.example.test", "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)"),
+                @Suppress("SpellCheckingInspection")
+                Action.OpenApp("de.schildbach.oeffi", "geo:50.123456,-11.123456?q=50.123456,-11.123456"),
+            ),
+            Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar").let { position ->
+                outputGroup.getAppOutputs(
+                    listOf(
+                        "com.example.test",
+                        @Suppress("SpellCheckingInspection")
+                        "de.schildbach.oeffi",
+                    )
+                )
+                    .filter { it.isEnabled(position) }
+                    .map { it.getAction(position, uriQuote) }
+            },
+        )
+    }
 }
