@@ -169,7 +169,7 @@ data class Uri(
             append(it.key)
             if (it.value.isNotEmpty()) {
                 append("=")
-                append(uriQuote.encode(it.value.replace('+', ' '), allow = ","))
+                append(uriQuote.encode(it.value.replace('+', ' '), allow = ",()"))
             }
         }
     }.joinToString("&")

@@ -60,7 +60,15 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
                 scheme = "geo",
                 path = "$latStr,$lonStr",
                 queryParams = buildMap {
-                    set("q", q ?: "$latStr,$lonStr")
+                    if (q != null) {
+                        set("q", q)
+                    } else if (value.lat != 0.0 && value.lon != 0.0) {
+                        if (value.name != null) {
+                            set("q", "$latStr,$lonStr(${value.name})")
+                        } else {
+                            set("q", "$latStr,$lonStr")
+                        }
+                    }
                     zStr?.let { zStr ->
                         set("z", zStr)
                     }
