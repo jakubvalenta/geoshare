@@ -5,8 +5,8 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
-class GeoInputTest : BaseInputTest() {
-    override val input: Input = GeoInput
+class GeoUriInputTest : BaseInputTest() {
+    override val input: Input = GeoUriInput
 
     @Test
     fun uriPattern_geoUri() {

@@ -79,7 +79,7 @@ class ConversionStateTest {
     }
 
     private fun mockStateContext(
-        inputs: List<Input> = listOf(GeoInput, GoogleMapsInput),
+        inputs: List<Input> = listOf(GeoUriInput, GoogleMapsInput),
         intentTools: IntentTools = mockIntentTools,
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
@@ -147,7 +147,7 @@ class ConversionStateTest {
         val runContext = mockRunContext()
         val state = ReceivedUriString(stateContext, runContext, inputUriString)
         assertEquals(
-            ReceivedUri(stateContext, runContext, inputUriString, GeoInput, uri, null),
+            ReceivedUri(stateContext, runContext, inputUriString, GeoUriInput, uri, null),
             state.transition(),
         )
     }

@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
 
-object Ge0Input : Input {
+object MapsMeInput : Input {
     private const val HASH = """(?P<hash>[A-Za-z0-9\-_]{2,})"""
 
     private val srs = Srs.WGS84

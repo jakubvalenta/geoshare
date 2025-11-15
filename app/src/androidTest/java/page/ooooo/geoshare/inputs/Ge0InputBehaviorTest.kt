@@ -39,17 +39,17 @@ class Ge0InputBehaviorTest : BaseInputBehaviorTest() {
         testTextUri(
             Position(Srs.WGS84, 51.0000004, -108.9999868, z = 4.0),
             "América do Norte, Lancer, Saskatchewan, Canadá\n" +
-                    "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
-                    "(51.000001, -108.999988)",
+                "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
+                "(51.000001, -108.999988)",
         )
 
-        // Text, which will get parsed by GeoInput, because it contains a geo: URI that precedes the short URI
+        // Text, which will get parsed by GeoUriInput, because it contains a geo: URI that precedes the short URI
         testTextUri(
             @Suppress("SpellCheckingInspection")
             Position(Srs.WGS84, 40.7127400, -74.0059965, q = "40.7127400,-74.0059965(Nova Iorque)", z = 9.0),
             @Suppress("SpellCheckingInspection")
             "Organic Maps: geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
-                    "https://omaps.app/Umse5f0H8a/Nova_Iorque",
+                "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )
     }
 }

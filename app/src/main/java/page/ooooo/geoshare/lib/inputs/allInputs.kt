@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 val allInputs: List<Input> = listOf(
-    GeoInput,
+    GeoUriInput,
     GoogleMapsInput,
     AppleMapsInput,
     AmapInput,
@@ -9,7 +9,7 @@ val allInputs: List<Input> = listOf(
     MagicEarthInput,
     MapyComInput,
     OpenStreetMapInput,
-    Ge0Input,
+    MapsMeInput,
     OsmAndInput,
     WazeInput,
     YandexMapsInput,

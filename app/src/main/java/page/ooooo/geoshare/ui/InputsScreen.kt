@@ -342,7 +342,7 @@ private fun DefaultPreview() {
             filters = listOf(Recent(), All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
@@ -369,7 +369,7 @@ private fun DarkPreview() {
             filters = listOf(Recent(), All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
@@ -396,7 +396,7 @@ private fun AllPreview() {
             filters = listOf(All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
@@ -423,7 +423,7 @@ private fun DarkAllPreview() {
             filters = listOf(All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
