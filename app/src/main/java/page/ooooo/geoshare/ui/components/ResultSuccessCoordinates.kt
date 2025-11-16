@@ -1,7 +1,10 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -13,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
@@ -34,28 +36,13 @@ fun ResultSuccessCoordinates(
 
     ResultCard(
         main = {
-            FlowRow(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-            ) {
-                allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
-                    ?.let { text ->
-                        Text(
-                            text,
-                            Modifier
-                                .testTag("geoShareConversionSuccessPositionName")
-                                .padding(end = 12.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    }
-                allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
-                    SelectionContainer {
-                        Text(
-                            text,
-                            Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    }
+            allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
+                SelectionContainer {
+                    Text(
+                        text,
+                        Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
                 }
             }
             allOutputGroups.getDescriptionOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
@@ -64,14 +51,15 @@ fun ResultSuccessCoordinates(
                         text,
                         Modifier
                             .testTag("geoShareConversionSuccessPositionDescription")
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(top = spacing.tiny, bottom = spacing.small),
                         fontStyle = FontStyle.Italic,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
         },
-        after = {
+        end = {
             IconButton(
                 { setSheetVisible(true) },
                 Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
@@ -82,6 +70,16 @@ fun ResultSuccessCoordinates(
                 )
             }
         },
+        top = allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
+            ?.let { text ->
+                {
+                    Text(
+                        text,
+                        Modifier.testTag("geoShareConversionSuccessPositionName"),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            },
         bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
             {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
@@ -164,7 +162,7 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ParamsPreview() {
+private fun DescriptionPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -180,7 +178,7 @@ private fun ParamsPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkParamsPreview() {
+private fun DarkDescriptionPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -263,6 +261,54 @@ private fun DarkPointsPreview() {
                         Point.genRandomPoint(),
                         Point.genRandomPoint(),
                     ),
+                ),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PointsAndDescriptionPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultSuccessCoordinates(
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                    ),
+                    q = "Berlin, Germany",
+                    z = 13.0,
+                ),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPointsAndDescriptionPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultSuccessCoordinates(
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                    ),
+                    q = "Berlin, Germany",
+                    z = 13.0,
                 ),
                 onRun = {},
             )

@@ -14,41 +14,52 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultCard(
     modifier: Modifier = Modifier,
-    after: (@Composable () -> Unit)? = null,
+    end: (@Composable () -> Unit)? = null,
+    top: (@Composable () -> Unit)? = null,
     bottom: (@Composable () -> Unit)? = null,
     chips: @Composable () -> Unit,
     main: @Composable ColumnScope.() -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val verticalSpace = spacing.small
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(verticalSpace),
-    ) {
+    Column(modifier) {
+        top?.let {
+            Column(
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+            ) {
+                top()
+            }
+        }
         Row(
             Modifier.padding(
                 start = spacing.windowPadding,
-                end = (if (after != null) 4.dp else spacing.windowPadding),
+                end = (if (end != null) 4.dp else spacing.windowPadding),
+                bottom = spacing.small,
             ),
         ) {
-            Row(
+            Column(
                 Modifier
                     .weight(1f)
-                    .padding(top = 12.dp, bottom = if (after == null) 4.dp else 0.dp),
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(verticalSpace), content = main)
-            }
-            after?.invoke()
+                    .padding(top = 12.dp, bottom = if (end == null) 4.dp else 0.dp),
+                content = main,
+            )
+            end?.invoke()
         }
         bottom?.let {
-            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+            Column(
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(bottom = spacing.small)
+            ) {
                 bottom()
             }
         }
@@ -116,7 +127,7 @@ private fun DefaultPreview() {
                         onClick = {},
                     )
                 },
-                after = {
+                end = {
                     Box {
                         IconButton({}) {
                             Icon(
@@ -127,7 +138,10 @@ private fun DefaultPreview() {
                     }
                 },
             ) {
-                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -159,7 +173,7 @@ private fun DarkPreview() {
                         onClick = {},
                     )
                 },
-                after = {
+                end = {
                     Box {
                         IconButton({}) {
                             Icon(
@@ -170,7 +184,10 @@ private fun DarkPreview() {
                     }
                 },
             ) {
-                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -178,7 +195,7 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun DefaultBottomPreview() {
+private fun DefaultTopAndBottomPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -202,7 +219,7 @@ private fun DefaultBottomPreview() {
                         onClick = {},
                     )
                 },
-                after = {
+                end = {
                     Box {
                         IconButton({}) {
                             Icon(
@@ -210,6 +227,14 @@ private fun DefaultBottomPreview() {
                                 contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
                             )
                         }
+                    }
+                },
+                top = {
+                    Row {
+                        Text(
+                            "My point",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 },
                 bottom = {
@@ -228,7 +253,10 @@ private fun DefaultBottomPreview() {
                     }
                 },
             ) {
-                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -236,7 +264,7 @@ private fun DefaultBottomPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkBottomPreview() {
+private fun DarkTopAndBottomPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -260,7 +288,7 @@ private fun DarkBottomPreview() {
                         onClick = {},
                     )
                 },
-                after = {
+                end = {
                     Box {
                         IconButton({}) {
                             Icon(
@@ -286,7 +314,10 @@ private fun DarkBottomPreview() {
                     }
                 },
             ) {
-                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -319,7 +350,10 @@ private fun ErrorPreview() {
                     )
                 },
             ) {
-                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -352,7 +386,10 @@ private fun DarkErrorPreview() {
                     )
                 },
             ) {
-                Text("My main text", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
