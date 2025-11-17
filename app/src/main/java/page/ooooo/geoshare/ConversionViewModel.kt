@@ -11,11 +11,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
@@ -183,7 +185,7 @@ class ConversionViewModel @Inject constructor(
 
     private fun transition() {
         transitionJob?.cancel()
-        transitionJob = viewModelScope.launch {
+        transitionJob = viewModelScope.launch(Dispatchers.IO) {
             try {
                 stateContext.transition()
             } catch (tr: Exception) {
