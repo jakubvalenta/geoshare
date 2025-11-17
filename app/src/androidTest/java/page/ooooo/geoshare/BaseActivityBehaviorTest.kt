@@ -51,14 +51,19 @@ abstract class BaseActivityBehaviorTest {
         device.pressRecentApps()
         waitForStableInActiveWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val menu = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Geo Share" }
-            if (menu != null) {
-                // On Android API >= 36.1, use the dropdown menu
-                menu.click()
-                onElement { textAsString() == "Clear" }.click()
+            val clearAll = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Clear all" }
+            if (clearAll != null) {
+                clearAll.click()
             } else {
-                // On Android API >= 28, swipe from the center of the screen towards the upper edge
-                device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
+                val menu = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Geo Share" }
+                if (menu != null) {
+                    // On Android API >= 36.1, use the dropdown menu
+                    menu.click()
+                    onElement { textAsString() == "Clear" }.click()
+                } else {
+                    // On Android API >= 28, swipe from the center of the screen towards the upper edge
+                    device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
+                }
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
@@ -101,10 +106,10 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
-        val expectedPositionName = expectedPosition.mainPoint?.name?.replace('+', ' ')
+        val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
             ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
-        if (expectedPositionName != null) {
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedPositionName }
+        if (expectedName != null) {
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionName" })
         }

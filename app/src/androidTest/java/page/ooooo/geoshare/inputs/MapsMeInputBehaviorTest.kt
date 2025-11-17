@@ -4,7 +4,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
-class Ge0InputBehaviorTest : BaseInputBehaviorTest() {
+class MapsMeInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
     fun test() {
         // Launch app and close intro
@@ -46,7 +46,7 @@ class Ge0InputBehaviorTest : BaseInputBehaviorTest() {
         // Text, which will get parsed by GeoUriInput, because it contains a geo: URI that precedes the short URI
         testTextUri(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 40.7127400, -74.0059965, name = "Nova Iorque", z = 9.0),
+            Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque"),
             @Suppress("SpellCheckingInspection")
             "Organic Maps: geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                 "https://omaps.app/Umse5f0H8a/Nova_Iorque",
