@@ -2,9 +2,8 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import io.ktor.utils.io.*
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.io.Source
-import kotlinx.io.readLine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeWazeGeoHash
@@ -84,10 +83,11 @@ object WazeInput : Input.HasHtml {
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
-            for (line in generateSequence { source.readLine() }) {
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
                 (pattern findLatLonZ line)?.let { (lat, lon, z) ->
                     addPoint { LatLonZ(lat, lon, z) }
                     break

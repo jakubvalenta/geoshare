@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Point
@@ -543,7 +544,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_link() {
+    fun parseHtml_link() = runTest {
         assertEquals(
             Position(Srs.GCJ02, 44.4490541, 26.0888398) to null,
             @Suppress("SpellCheckingInspection")
@@ -562,7 +563,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_appInitializationStateOnly() {
+    fun parseHtml_appInitializationStateOnly() = runTest {
         assertEquals(
             Position(Srs.GCJ02, 52.484201500000005, 13.416727700000001) to null,
             parseHtml(
@@ -572,7 +573,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_placeList() {
+    fun parseHtml_placeList() = runTest {
         assertEquals(
             Position(
                 points = persistentListOf(
@@ -598,7 +599,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_placeListHighPrecision() {
+    fun parseHtml_placeListHighPrecision() = runTest {
         assertEquals(
             Position(
                 points = persistentListOf(
@@ -612,7 +613,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_myMaps() {
+    fun parseHtml_myMaps() = runTest {
         assertEquals(
             Position(
                 points = persistentListOf(
@@ -643,7 +644,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_placeListOnePoint() {
+    fun parseHtml_placeListOnePoint() = runTest {
         assertEquals(
             Position(Srs.GCJ02, 59.1293656, 11.4585672) to null,
             @Suppress("SpellCheckingInspection")
@@ -662,7 +663,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_failure() {
+    fun parseHtml_failure() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("spam"),
@@ -670,7 +671,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() {
+    fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("<html></html>"),
@@ -678,7 +679,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() {
+    fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() = runTest {
         assertEquals(
             Pair(
                 Position(),
@@ -701,7 +702,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsAbsoluteUrl_returnsIt() {
+    fun parseHtml_googleSearchHtmlContainsAbsoluteUrl_returnsIt() = runTest {
         assertEquals(
             Position() to "https://www.example.com/foo",
             parseHtml("""<html><a href="" data-url="https://www.example.com/foo"></a></html>""")
@@ -709,7 +710,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsInvalidUrl_returnsIt() {
+    fun parseHtml_googleSearchHtmlContainsInvalidUrl_returnsIt() = runTest {
         assertEquals(
             Position() to "spam",
             parseHtml("""<html><a href="" data-url="spam"></a></html>""")

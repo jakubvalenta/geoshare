@@ -2,8 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import kotlinx.io.Source
-import kotlinx.io.readLine
+import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
@@ -54,13 +53,14 @@ object AppleMapsInput : Input.HasHtml {
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
         PositionBuilder(srs).apply {
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
             var lat: Double? = null
             var lon: Double? = null
-            for (line in generateSequence { source.readLine() }) {
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
                 if (lat == null) {
                     (latPattern find line)?.toLat()?.let { lat = it }
                 }

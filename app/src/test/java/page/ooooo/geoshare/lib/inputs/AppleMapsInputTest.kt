@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -188,7 +189,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_success() {
+    fun parseHtml_success() = runTest {
         assertEquals(
             Position(Srs.WGS84, 52.4735927, 13.4050798) to null,
             @Suppress("SpellCheckingInspection")
@@ -207,7 +208,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_failure() {
+    fun parseHtml_failure() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("spam"),

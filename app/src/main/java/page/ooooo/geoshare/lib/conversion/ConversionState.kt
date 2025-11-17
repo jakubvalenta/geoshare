@@ -8,8 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.io.buffered
+import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
@@ -164,9 +165,11 @@ data class GrantedUnshortenPermission(
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         return try {
-            val locationHeader = when (input.shortUriMethod) {
-                Input.ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
-                Input.ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
+            val locationHeader = withContext(Dispatchers.IO) {
+                when (input.shortUriMethod) {
+                    Input.ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
+                    Input.ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
+                }
             }
             if (locationHeader != null) {
                 val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
@@ -306,28 +309,30 @@ data class GrantedParseHtmlPermission(
         }
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
-            stateContext.networkTools.getSource(htmlUrl, retry) { source ->
-                val (positionFromHtml, redirectUriString) = input.parseHtml(source.buffered())
-                if (!positionFromHtml.points.isNullOrEmpty()) {
-                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")
-                    ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml)
-                } else if (redirectUriString != null) {
-                    stateContext.log.i(
-                        null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
-                    )
-                    val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
-                    ReceivedUri(
-                        stateContext,
-                        runContext,
-                        inputUriString,
-                        input,
-                        redirectUri,
-                        Permission.ALWAYS,
-                    )
-                } else {
-                    stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
-                    ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
+            val (positionFromHtml, redirectUriString) = withContext(Dispatchers.IO) {
+                stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
+                    input.parseHtml(channel)
                 }
+            }
+            if (!positionFromHtml.points.isNullOrEmpty()) {
+                stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")
+                ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml)
+            } else if (redirectUriString != null) {
+                stateContext.log.i(
+                    null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"
+                )
+                val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
+                ReceivedUri(
+                    stateContext,
+                    runContext,
+                    inputUriString,
+                    input,
+                    redirectUri,
+                    Permission.ALWAYS,
+                )
+            } else {
+                stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
+                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri)
             }
         } catch (_: CancellationException) {
             ConversionFailed(R.string.conversion_failed_cancelled, inputUriString)

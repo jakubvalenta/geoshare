@@ -2,13 +2,11 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.Intent
 import com.google.re2j.Pattern
-import kotlinx.coroutines.CoroutineDispatcher
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import kotlinx.io.RawSource
-import kotlinx.io.Source
-import kotlinx.io.asSource
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -39,7 +37,6 @@ class ConversionStateTest {
         override suspend fun requestLocationHeader(
             url: URL,
             retry: Retry?,
-            dispatcher: CoroutineDispatcher,
         ): String? = onRequestLocationHeader(url)
 
         open fun onRequestLocationHeader(url: URL): String? {
@@ -49,7 +46,6 @@ class ConversionStateTest {
         override suspend fun getRedirectUrlString(
             url: URL,
             retry: Retry?,
-            dispatcher: CoroutineDispatcher,
         ): String = onGetRedirectUrlString(url)
 
         open fun onGetRedirectUrlString(url: URL): String {
@@ -59,9 +55,8 @@ class ConversionStateTest {
         override suspend fun <T> getSource(
             url: URL,
             retry: Retry?,
-            dispatcher: CoroutineDispatcher,
-            block: (source: RawSource) -> T,
-        ): T = block(onGetSource(url).byteInputStream().asSource())
+            block: suspend (source: ByteReadChannel) -> T,
+        ): T = block(onGetSource(url).byteInputStream().toByteReadChannel())
 
         open fun onGetSource(url: URL): String {
             throw NotImplementedError()
@@ -1263,7 +1258,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override fun parseHtml(source: Source): Pair<Position, String?> = Pair(Position(), null)
+            override suspend fun parseHtml(channel: ByteReadChannel): Pair<Position, String?> = Pair(Position(), null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1530,7 +1525,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override fun parseHtml(source: Source) = Pair(positionFromHtml, null)
+            override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1575,7 +1570,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override fun parseHtml(source: Source) = Pair(positionFromHtml, null)
+            override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1621,7 +1616,7 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override fun parseHtml(source: Source) = Pair(Position(), redirectUriString)
+                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(Position(), redirectUriString)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),
@@ -1674,7 +1669,7 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override fun parseHtml(source: Source) = Pair(Position(), redirectUriString)
+                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(Position(), redirectUriString)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),

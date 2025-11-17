@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
-import kotlinx.io.asSource
-import kotlinx.io.buffered
+import io.ktor.utils.io.jvm.javaio.*
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
@@ -26,6 +25,6 @@ abstract class BaseInputTest() {
     fun parseUri(uriString: String): Pair<Position, String?> =
         input.parseUri(Uri.parse(uriString, uriQuote))
 
-    fun parseHtml(html: String): Pair<Position, String?> =
-        (input as Input.HasHtml).parseHtml(html.byteInputStream().asSource().buffered())
+    suspend fun parseHtml(html: String): Pair<Position, String?> =
+        (input as Input.HasHtml).parseHtml(html.byteInputStream().toByteReadChannel())
 }

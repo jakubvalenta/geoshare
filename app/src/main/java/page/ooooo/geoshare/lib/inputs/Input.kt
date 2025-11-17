@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.runtime.Composable
 import com.google.re2j.Pattern
-import kotlinx.io.Source
+import io.ktor.utils.io.ByteReadChannel
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.position.Position
 
@@ -33,6 +33,6 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
-        fun parseHtml(source: Source): Pair<Position, String?>
+        suspend fun parseHtml(channel: ByteReadChannel): Pair<Position, String?>
     }
 }

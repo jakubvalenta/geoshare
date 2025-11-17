@@ -2,8 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import kotlinx.io.Source
-import kotlinx.io.readLine
+import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
@@ -51,10 +50,11 @@ object OpenStreetMapInput : Input.HasHtml {
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
-            for (line in generateSequence { source.readLine() }) {
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
                 addPoints { pattern findAllLatLonZ line }
             }
         }.toPair()

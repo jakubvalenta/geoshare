@@ -2,8 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import kotlinx.io.Source
-import kotlinx.io.readLine
+import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
@@ -76,13 +75,14 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
         PositionBuilder(srs).apply {
             val pointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
             val defaultPointPattern1 = Pattern.compile("""/@$LAT,$LON""")
             val defaultPointPattern2 = Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
             val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
-            for (line in generateSequence { source.readLine() }) {
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
                 addPoints { pointPattern findAllLatLonZ line }
                 setDefaultPointIfNull { defaultPointPattern1 findLatLonZ line }
                 setDefaultPointIfNull { defaultPointPattern2 findLatLonZ line }

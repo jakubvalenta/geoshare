@@ -133,19 +133,48 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun grant(doNotAsk: Boolean) {
-        viewModelScope.launch {
-            (stateContext.currentState as? PermissionState)?.let { currentState ->
-                stateContext.currentState = currentState.grant(doNotAsk)
-                transition()
+        transitionJob?.cancel()
+        transitionJob = viewModelScope.launch {
+            try {
+                stateContext.currentState = (stateContext.currentState as PermissionState).grant(doNotAsk)
+                stateContext.transition()
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while transitioning state", tr)
+                stateContext.currentState = ConversionFailed(
+                    R.string.conversion_failed_parse_url_error,
+                    inputUriString,
+                )
             }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        viewModelScope.launch {
-            (stateContext.currentState as? PermissionState)?.let { currentState ->
-                stateContext.currentState = currentState.deny(doNotAsk)
-                transition()
+        transitionJob?.cancel()
+        transitionJob = viewModelScope.launch {
+            try {
+                stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
+                stateContext.transition()
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while transitioning state", tr)
+                stateContext.currentState = ConversionFailed(
+                    R.string.conversion_failed_parse_url_error,
+                    inputUriString,
+                )
+            }
+        }
+    }
+
+    private fun transition() {
+        transitionJob?.cancel()
+        transitionJob = viewModelScope.launch {
+            try {
+                stateContext.transition()
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while transitioning state", tr)
+                stateContext.currentState = ConversionFailed(
+                    R.string.conversion_failed_parse_url_error,
+                    inputUriString,
+                )
             }
         }
     }
@@ -166,21 +195,6 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    private fun transition() {
-        transitionJob?.cancel()
-        transitionJob = viewModelScope.launch(Dispatchers.IO) {
-            try {
-                stateContext.transition()
-            } catch (tr: Exception) {
-                stateContext.log.e(null, "Exception while transitioning state", tr)
-                stateContext.currentState = ConversionFailed(
-                    R.string.conversion_failed_parse_url_error,
-                    inputUriString,
-                )
-            }
-        }
-    }
-
     fun cancel() {
         transitionJob?.cancel()
     }
@@ -197,25 +211,29 @@ class ConversionViewModel @Inject constructor(
 
     fun runAction(runContext: ConversionRunContext, action: Action) {
         viewModelScope.launch {
-            val success = action.run(intentTools, runContext)
-            if (!success) {
-                if (action is Action.OpenApp) {
-                    Toast.makeText(
-                        runContext.context,
-                        runContext.context.resources.getString(
-                            R.string.conversion_automation_open_app_failed,
-                            intentTools.queryApp(runContext.context.packageManager, action.packageName)?.label
-                                ?: action.packageName,
-                        ),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else if (action is Action.OpenChooser) {
-                    Toast.makeText(
-                        runContext.context,
-                        R.string.conversion_succeeded_apps_not_found,
-                        Toast.LENGTH_SHORT,
-                    ).show()
+            try {
+                val success = action.run(intentTools, runContext)
+                if (!success) {
+                    if (action is Action.OpenApp) {
+                        Toast.makeText(
+                            runContext.context,
+                            runContext.context.resources.getString(
+                                R.string.conversion_automation_open_app_failed,
+                                intentTools.queryApp(runContext.context.packageManager, action.packageName)?.label
+                                    ?: action.packageName,
+                            ),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (action is Action.OpenChooser) {
+                        Toast.makeText(
+                            runContext.context,
+                            R.string.conversion_succeeded_apps_not_found,
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
                 }
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while running action action", tr)
             }
         }
     }
