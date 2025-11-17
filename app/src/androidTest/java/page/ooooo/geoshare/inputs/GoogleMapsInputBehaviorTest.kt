@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.inputs
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
+import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
@@ -45,7 +47,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Map view
         testUri(
-            Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0),
+            Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
             "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
 
@@ -57,7 +59,18 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place list
         testUri(
-            Position(Srs.WGS84, 59.147731699999994, 11.550661199999999),
+            Position(
+                points = persistentListOf(
+                    Point(Srs.GCJ02, 59.1293656, 11.4585672),
+                    Point(Srs.GCJ02, 59.4154007, 11.659710599999999),
+                    Point(Srs.GCJ02, 59.3443991, 11.672637),
+                    Point(Srs.GCJ02, 59.2557409, 11.5857853),
+                    Point(Srs.GCJ02, 59.1579458, 11.7337507),
+                    Point(Srs.GCJ02, 59.229344899999994, 11.6892173),
+                    Point(Srs.GCJ02, 59.2999243, 11.6587237),
+                    Point(Srs.GCJ02, 59.147731699999994, 11.550661199999999),
+                ),
+            ),
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
         )
 

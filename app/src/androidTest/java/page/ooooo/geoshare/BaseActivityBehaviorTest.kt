@@ -101,10 +101,10 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
-        val expectedPositionName = expectedPosition.mainPoint?.name
+        val expectedPositionName = expectedPosition.mainPoint?.name?.replace('+', ' ')
+            ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
         if (expectedPositionName != null) {
-            val expectedName = expectedPositionName.replace('+', ' ')
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedPositionName }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionName" })
         }
