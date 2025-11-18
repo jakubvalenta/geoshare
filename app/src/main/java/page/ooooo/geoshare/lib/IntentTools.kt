@@ -196,13 +196,8 @@ open class IntentTools {
         }
     }
 
-    suspend fun copyToClipboard(context: Context, clipboard: Clipboard, text: String) {
+    suspend fun copyToClipboard(clipboard: Clipboard, text: String) =
         clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
-        val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-        if (!systemHasClipboardEditor) {
-            Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     suspend fun pasteFromClipboard(clipboard: Clipboard): String =
         clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""

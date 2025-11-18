@@ -15,7 +15,7 @@ sealed interface Action {
     @Immutable
     data class Copy(val text: String) : Action {
         override suspend fun run(intentTools: IntentTools, runContext: ConversionRunContext) =
-            intentTools.copyToClipboard(runContext.context, runContext.clipboard, text).let { true }
+            intentTools.copyToClipboard(runContext.clipboard, text).let { true }
     }
 
     @Immutable

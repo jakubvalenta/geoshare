@@ -3,6 +3,8 @@ package page.ooooo.geoshare
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
@@ -136,8 +138,10 @@ class ConversionViewModel @Inject constructor(
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
             try {
-                stateContext.currentState = (stateContext.currentState as PermissionState).grant(doNotAsk)
-                stateContext.transition()
+                (stateContext.currentState as? PermissionState)?.let { permissionState ->
+                    stateContext.currentState = permissionState.grant(doNotAsk)
+                    stateContext.transition()
+                }
             } catch (tr: Exception) {
                 stateContext.log.e(null, "Exception while transitioning state", tr)
                 stateContext.currentState = ConversionFailed(
@@ -152,8 +156,10 @@ class ConversionViewModel @Inject constructor(
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
             try {
-                stateContext.currentState = (stateContext.currentState as PermissionState).deny(doNotAsk)
-                stateContext.transition()
+                (stateContext.currentState as? PermissionState)?.let { permissionState ->
+                    stateContext.currentState = permissionState.deny(doNotAsk)
+                    stateContext.transition()
+                }
             } catch (tr: Exception) {
                 stateContext.log.e(null, "Exception while transitioning state", tr)
                 stateContext.currentState = ConversionFailed(
@@ -213,7 +219,18 @@ class ConversionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val success = action.run(intentTools, runContext)
-                if (!success) {
+                if (success) {
+                    if (action is Action.Copy) {
+                        val systemHasClipboardEditor = VERSION.SDK_INT >= VERSION_CODES.TIRAMISU
+                        if (!systemHasClipboardEditor) {
+                            Toast.makeText(
+                                runContext.context,
+                                R.string.copying_finished,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    }
+                } else {
                     if (action is Action.OpenApp) {
                         Toast.makeText(
                             runContext.context,
