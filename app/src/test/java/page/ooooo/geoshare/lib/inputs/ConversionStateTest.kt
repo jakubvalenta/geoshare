@@ -4,6 +4,7 @@ import android.content.Intent
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -37,6 +38,7 @@ class ConversionStateTest {
         override suspend fun requestLocationHeader(
             url: URL,
             retry: Retry?,
+            dispatcher: CoroutineDispatcher,
         ): String? = onRequestLocationHeader(url)
 
         open fun onRequestLocationHeader(url: URL): String? {
@@ -46,6 +48,7 @@ class ConversionStateTest {
         override suspend fun getRedirectUrlString(
             url: URL,
             retry: Retry?,
+            dispatcher: CoroutineDispatcher,
         ): String = onGetRedirectUrlString(url)
 
         open fun onGetRedirectUrlString(url: URL): String {
@@ -55,6 +58,7 @@ class ConversionStateTest {
         override suspend fun <T> getSource(
             url: URL,
             retry: Retry?,
+            dispatcher: CoroutineDispatcher,
             block: suspend (source: ByteReadChannel) -> T,
         ): T = block(onGetSource(url).byteInputStream().toByteReadChannel())
 
@@ -1892,10 +1896,9 @@ class ConversionStateTest {
         val automationValue = CoordinatesOutputGroup.CopyDecAutomation
         val runContext = mockRunContext()
         val mockIntentTools: IntentTools = mock {
-            onBlocking { copyToClipboard(any(), any(), any()) } doThrow NotImplementedError()
+            onBlocking { copyToClipboard(any(), any()) } doThrow NotImplementedError()
             onBlocking {
                 copyToClipboard(
-                    eq(runContext.context),
                     eq(runContext.clipboard),
                     argThat { toString() == automationValue.getAction(position, uriQuote).text },
                 )

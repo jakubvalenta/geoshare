@@ -13,7 +13,10 @@ import io.ktor.http.*
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.util.network.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.math.pow
@@ -41,7 +44,11 @@ open class NetworkTools(
     data class Retry(val count: Int, val tr: NetworkException)
 
     @Throws(NetworkException::class)
-    open suspend fun requestLocationHeader(url: URL, retry: Retry? = null): String? =
+    open suspend fun requestLocationHeader(
+        url: URL,
+        retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String? = withContext(Dispatchers.IO) {
         connect(
             engine,
             url,
@@ -52,26 +59,31 @@ open class NetworkTools(
         ) { response ->
             response.headers[HttpHeaders.Location]
         }
+    }
 
     @Throws(NetworkException::class)
     open suspend fun <T> getSource(
         url: URL,
         retry: Retry? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.Main,
         block: suspend (channel: ByteReadChannel) -> T,
-    ): T =
+    ): T = withContext(Dispatchers.IO) {
         connect(engine, url, retry = retry) { response ->
             val channel: ByteReadChannel = response.body()
             block(channel)
         }
+    }
 
     @Throws(NetworkException::class)
     open suspend fun getRedirectUrlString(
         url: URL,
         retry: Retry? = null,
-    ): String =
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): String = withContext(Dispatchers.IO) {
         connect(engine, url, retry = retry) { response ->
             response.request.url.toString()
         }
+    }
 
     @Throws(NetworkException::class)
     open suspend fun <T> connect(

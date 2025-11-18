@@ -83,7 +83,7 @@ object WazeInput : Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
@@ -94,7 +94,6 @@ object WazeInput : Input.HasHtml {
                 }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title

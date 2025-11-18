@@ -8,9 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
@@ -165,11 +163,9 @@ data class GrantedUnshortenPermission(
             return ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString)
         }
         return try {
-            val locationHeader = withContext(Dispatchers.IO) {
-                when (input.shortUriMethod) {
-                    Input.ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
-                    Input.ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
-                }
+            val locationHeader = when (input.shortUriMethod) {
+                Input.ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
+                Input.ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
             }
             if (locationHeader != null) {
                 val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
@@ -309,10 +305,8 @@ data class GrantedParseHtmlPermission(
         }
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
-            val (positionFromHtml, redirectUriString) = withContext(Dispatchers.IO) {
-                stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
-                    input.parseHtml(channel)
-                }
+            val (positionFromHtml, redirectUriString) = stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
+                input.parseHtml(channel)
             }
             if (!positionFromHtml.points.isNullOrEmpty()) {
                 stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")

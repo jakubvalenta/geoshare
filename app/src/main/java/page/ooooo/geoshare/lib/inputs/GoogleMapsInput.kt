@@ -75,7 +75,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val pointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
             val defaultPointPattern1 = Pattern.compile("""/@$LAT,$LON""")
@@ -89,7 +89,6 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 setUriStringIfNull { uriPattern findUriString line }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title

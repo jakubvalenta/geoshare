@@ -53,7 +53,7 @@ object AppleMapsInput : Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
@@ -73,7 +73,6 @@ object AppleMapsInput : Input.HasHtml {
                 }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title

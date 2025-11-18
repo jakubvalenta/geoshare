@@ -50,7 +50,7 @@ object OpenStreetMapInput : Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) = channel.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
@@ -58,7 +58,6 @@ object OpenStreetMapInput : Input.HasHtml {
                 addPoints { pattern findAllLatLonZ line }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title

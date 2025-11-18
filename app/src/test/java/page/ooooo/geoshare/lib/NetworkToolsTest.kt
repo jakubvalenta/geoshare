@@ -9,6 +9,7 @@ import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.util.network.*
 import io.ktor.utils.io.asSource
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.buffered
 import kotlinx.io.readString
@@ -35,7 +36,7 @@ class NetworkToolsTest {
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
         assertEquals(
             "https://example.com/redirect",
-            mockNetworkTools.requestLocationHeader(url)
+            mockNetworkTools.requestLocationHeader(url, dispatcher = StandardTestDispatcher(testScheduler))
         )
         verify(mockNetworkTools).connect(
             engine = eq(mockEngine),
@@ -53,7 +54,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("", HttpStatusCode.MovedPermanently) }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
-        assertNull(mockNetworkTools.requestLocationHeader(url))
+        assertNull(mockNetworkTools.requestLocationHeader(url, dispatcher = StandardTestDispatcher(testScheduler)))
         verify(mockNetworkTools).connect(
             engine = eq(mockEngine),
             url = eq(url),
@@ -72,7 +73,7 @@ class NetworkToolsTest {
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
         assertEquals(
             "https://example.com/",
-            mockNetworkTools.getRedirectUrlString(url),
+            mockNetworkTools.getRedirectUrlString(url, dispatcher = StandardTestDispatcher(testScheduler)),
         )
         verify(mockNetworkTools).connect(
             engine = eq(mockEngine),
@@ -90,7 +91,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = spy(NetworkTools(mockEngine, log))
-        val text = mockNetworkTools.getSource(url) { source ->
+        val text = mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)) { source ->
             source.asSource().buffered().readString()
         }
         assertEquals("test content", text)
@@ -115,7 +116,7 @@ class NetworkToolsTest {
             )
         }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        val text = mockNetworkTools.getSource(url) { source ->
+        val text = mockNetworkTools.getSource(url, dispatcher = StandardTestDispatcher(testScheduler)) { source ->
             source.asSource().buffered().readString()
         }
         assertEquals("test content", text)
