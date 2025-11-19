@@ -8,6 +8,7 @@ import android.os.Build.VERSION_CODES
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
+import androidx.compose.ui.platform.Clipboard
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -219,6 +220,12 @@ class ConversionViewModel @Inject constructor(
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
             transition()
+        }
+    }
+
+    fun pasteInput(clipboard: Clipboard) {
+        viewModelScope.launch {
+            updateInput(intentTools.pasteFromClipboard(clipboard))
         }
     }
 

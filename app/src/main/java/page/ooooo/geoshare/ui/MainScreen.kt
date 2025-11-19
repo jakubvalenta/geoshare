@@ -30,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.conversion.ConversionRunContext
@@ -51,7 +50,6 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
     val saveGpxLauncher =
@@ -65,11 +63,7 @@ fun MainScreen(
     MainScreen(
         inputUriString = viewModel.inputUriString,
         changelogShown = recentInputsShown,
-        onPaste = { block ->
-            coroutineScope.launch {
-                block(viewModel.intentTools.pasteFromClipboard(runContext.clipboard))
-            }
-        },
+        onPasteInput = { viewModel.pasteInput(clipboard) },
         onSubmit = {
             viewModel.start(runContext)
             onNavigateToConversionScreen()
@@ -88,7 +82,7 @@ fun MainScreen(
 fun MainScreen(
     inputUriString: String,
     changelogShown: Boolean,
-    onPaste: (block: (text: String) -> Unit) -> Unit,
+    onPasteInput: () -> Unit,
     onSubmit: () -> Unit,
     onUpdateInput: (uriString: String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -169,10 +163,8 @@ fun MainScreen(
                             }
                         } else {
                             IconButton({
-                                onPaste { text ->
-                                    onUpdateInput(text)
-                                    setErrorMessageResId(null)
-                                }
+                                onPasteInput()
+                                setErrorMessageResId(null)
                             }) {
                                 Icon(
                                     painterResource(R.drawable.content_paste_24px),
@@ -271,7 +263,7 @@ private fun DefaultPreview() {
         MainScreen(
             inputUriString = "",
             changelogShown = true,
-            onPaste = {},
+            onPasteInput = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
@@ -290,7 +282,7 @@ private fun DarkPreview() {
         MainScreen(
             inputUriString = "",
             changelogShown = true,
-            onPaste = {},
+            onPasteInput = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
@@ -309,7 +301,7 @@ private fun TabletPreview() {
         MainScreen(
             inputUriString = "",
             changelogShown = true,
-            onPaste = {},
+            onPasteInput = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
@@ -328,7 +320,7 @@ private fun FilledAndChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
-            onPaste = {},
+            onPasteInput = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
@@ -347,7 +339,7 @@ private fun DarkFilledAndChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
-            onPaste = {},
+            onPasteInput = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
@@ -366,7 +358,7 @@ private fun TabletFilledAndChangelogBadgedPreview() {
         MainScreen(
             inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             changelogShown = false,
-            onPaste = {},
+            onPasteInput = {},
             onSubmit = {},
             onUpdateInput = {},
             onNavigateToAboutScreen = {},
