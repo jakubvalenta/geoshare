@@ -10,20 +10,20 @@
     </queries>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-            android:name=".Application"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:localeConfig="@xml/locales_config"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/MainTheme"
-            tools:targetApi="35">
+        android:name=".Application"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/MainTheme"
+        tools:targetApi="35">
         <activity
-                android:name="page.ooooo.geoshare.ConversionActivity"
-                android:excludeFromRecents="true"
-                android:exported="true"
-                android:theme="@style/TranslucentTheme">
+            android:name="page.ooooo.geoshare.ConversionActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:theme="@style/TranslucentTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
 
@@ -40,8 +40,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="surl.amap.com"
-                        android:scheme="https"/>
+                    android:host="surl.amap.com"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -50,8 +50,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="wb.amap.com"
-                        android:scheme="https"/>
+                    android:host="wb.amap.com"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- Apple Maps -->
             <intent-filter android:autoVerify="false">
@@ -61,8 +61,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="maps.apple.com"
-                        android:scheme="https"/>
+                    android:host="maps.apple.com"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -71,51 +71,10 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="maps.apple"
-                        android:scheme="https"/>
+                    android:host="maps.apple"
+                    android:scheme="https"/>
             </intent-filter>
-            <!-- Ge0 -->
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="comaps.at"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="ge0.me"
-                        android:scheme="http"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="ge0.me"
-                        android:scheme="https"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="false">
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                        android:host="omaps.app"
-                        android:scheme="https"/>
-            </intent-filter>
-            <!-- Geo -->
+            <!-- Geo URI -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -132,8 +91,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="maps.app.goo.gl"
-                        android:scheme="https"/>
+                    android:host="maps.app.goo.gl"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -142,8 +101,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="maps.google.com"
-                        android:scheme="https"/>
+                    android:host="maps.google.com"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -152,9 +111,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="app.goo.gl"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="app.goo.gl"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -163,9 +122,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="goo.gl"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="goo.gl"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -174,9 +133,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="google.com"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="google.com"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -185,9 +144,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.google.com"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="www.google.com"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -196,9 +155,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="g.co"
-                        android:pathPrefix="/kgs"
-                        android:scheme="https"/>
+                    android:host="g.co"
+                    android:pathPrefix="/kgs"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- Here WeGo -->
             <intent-filter android:autoVerify="false">
@@ -208,9 +167,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="share.here.com"
-                        android:pathPrefix="/l/"
-                        android:scheme="https"/>
+                    android:host="share.here.com"
+                    android:pathPrefix="/l/"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -219,9 +178,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="share.here.com"
-                        android:pathPrefix="/p/"
-                        android:scheme="https"/>
+                    android:host="share.here.com"
+                    android:pathPrefix="/p/"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -230,9 +189,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="wego.here.com"
-                        android:path="/"
-                        android:scheme="https"/>
+                    android:host="wego.here.com"
+                    android:path="/"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -241,9 +200,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="wego.here.com"
-                        android:pathPrefix="/p/"
-                        android:scheme="https"/>
+                    android:host="wego.here.com"
+                    android:pathPrefix="/p/"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- Magic Earth -->
             <intent-filter android:autoVerify="false">
@@ -253,9 +212,50 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="magicearth.com"
-                        android:path="/"
-                        android:scheme="https"/>
+                    android:host="magicearth.com"
+                    android:path="/"
+                    android:scheme="https"/>
+            </intent-filter>
+            <!-- Maps.me, Organic Maps, CoMaps -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="comaps.at"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="ge0.me"
+                    android:scheme="http"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="ge0.me"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="omaps.app"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- Mapy.com -->
             <intent-filter android:autoVerify="false">
@@ -265,8 +265,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="mapy.com"
-                        android:scheme="https"/>
+                    android:host="mapy.com"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -275,8 +275,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="mapy.cz"
-                        android:scheme="https"/>
+                    android:host="mapy.cz"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -285,8 +285,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.mapy.com"
-                        android:scheme="https"/>
+                    android:host="www.mapy.com"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -295,8 +295,8 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.mapy.cz"
-                        android:scheme="https"/>
+                    android:host="www.mapy.cz"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- OpenStreetMap -->
             <intent-filter android:autoVerify="false">
@@ -306,9 +306,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.openstreetmap.org"
-                        android:path="/"
-                        android:scheme="https"/>
+                    android:host="www.openstreetmap.org"
+                    android:path="/"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -317,9 +317,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.openstreetmap.org"
-                        android:pathPrefix="/node"
-                        android:scheme="https"/>
+                    android:host="www.openstreetmap.org"
+                    android:pathPrefix="/node"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -328,9 +328,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.openstreetmap.org"
-                        android:pathPrefix="/relation"
-                        android:scheme="https"/>
+                    android:host="www.openstreetmap.org"
+                    android:pathPrefix="/relation"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -339,9 +339,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.openstreetmap.org"
-                        android:pathPrefix="/way"
-                        android:scheme="https"/>
+                    android:host="www.openstreetmap.org"
+                    android:pathPrefix="/way"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -350,9 +350,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="osm.org"
-                        android:path="/"
-                        android:scheme="https"/>
+                    android:host="osm.org"
+                    android:path="/"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -361,9 +361,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="osm.org"
-                        android:pathPrefix="/go/"
-                        android:scheme="https"/>
+                    android:host="osm.org"
+                    android:pathPrefix="/go/"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- OsmAnd -->
             <intent-filter android:autoVerify="false">
@@ -373,9 +373,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="osmand.net"
-                        android:path="/map"
-                        android:scheme="https"/>
+                    android:host="osmand.net"
+                    android:path="/map"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- Waze -->
             <intent-filter android:autoVerify="false">
@@ -385,9 +385,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="waze.com"
-                        android:pathPrefix="/live-map"
-                        android:scheme="https"/>
+                    android:host="waze.com"
+                    android:pathPrefix="/live-map"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -396,9 +396,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="waze.com"
-                        android:pathPrefix="/ul"
-                        android:scheme="https"/>
+                    android:host="waze.com"
+                    android:pathPrefix="/ul"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -407,9 +407,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.waze.com"
-                        android:pathPrefix="/live-map"
-                        android:scheme="https"/>
+                    android:host="www.waze.com"
+                    android:pathPrefix="/live-map"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -418,9 +418,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="www.waze.com"
-                        android:pathPrefix="/ul"
-                        android:scheme="https"/>
+                    android:host="www.waze.com"
+                    android:pathPrefix="/ul"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -429,9 +429,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="ul.waze.com"
-                        android:pathPrefix="/ul"
-                        android:scheme="https"/>
+                    android:host="ul.waze.com"
+                    android:pathPrefix="/ul"
+                    android:scheme="https"/>
             </intent-filter>
             <!-- Yandex -->
             <intent-filter android:autoVerify="false">
@@ -441,9 +441,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="ya.ru"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="ya.ru"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -452,9 +452,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.az"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.az"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -463,9 +463,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.by"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.by"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -474,9 +474,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.co.il"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.co.il"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -485,9 +485,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.com"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.com"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -496,9 +496,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.com.am"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.com.am"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -507,9 +507,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.com.ge"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.com.ge"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -518,9 +518,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.com.tr"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.com.tr"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -529,9 +529,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.ee"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.ee"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -540,9 +540,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.eu"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.eu"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -551,9 +551,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.fr"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.fr"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -562,9 +562,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.kg"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.kg"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -573,9 +573,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.kz"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.kz"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -584,9 +584,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.lt"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.lt"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -595,9 +595,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.lv"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.lv"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -606,9 +606,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.md"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.md"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -617,9 +617,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.ru"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.ru"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -628,9 +628,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.tj"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.tj"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -639,9 +639,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.tm"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.tm"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -650,9 +650,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.ua"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.ua"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
@@ -661,16 +661,16 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="yandex.uz"
-                        android:pathPrefix="/maps"
-                        android:scheme="https"/>
+                    android:host="yandex.uz"
+                    android:pathPrefix="/maps"
+                    android:scheme="https"/>
             </intent-filter>
         </activity>
         <activity
-                android:name="page.ooooo.geoshare.MainActivity"
-                android:exported="true"
-                android:theme="@style/MainTheme"
-                android:windowSoftInputMode="adjustResize">
+            android:name="page.ooooo.geoshare.MainActivity"
+            android:exported="true"
+            android:theme="@style/MainTheme"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
