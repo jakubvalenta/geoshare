@@ -48,7 +48,7 @@ open class NetworkTools(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): String? = withContext(Dispatchers.IO) {
+    ): String? = withContext(dispatcher) {
         connect(
             engine,
             url,
@@ -65,9 +65,9 @@ open class NetworkTools(
     open suspend fun <T> getSource(
         url: URL,
         retry: Retry? = null,
-        dispatcher: CoroutineDispatcher = Dispatchers.Main,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
         block: suspend (channel: ByteReadChannel) -> T,
-    ): T = withContext(Dispatchers.IO) {
+    ): T = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             val channel: ByteReadChannel = response.body()
             block(channel)
@@ -79,7 +79,7 @@ open class NetworkTools(
         url: URL,
         retry: Retry? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): String = withContext(Dispatchers.IO) {
+    ): String = withContext(dispatcher) {
         connect(engine, url, retry = retry) { response ->
             response.request.url.toString()
         }
