@@ -23,14 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                val context = LocalContext.current
-                val clipboard = LocalClipboard.current
-                val saveGpxLauncher =
-                    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                        viewModel.saveGpx(context, it)
-                    }
-                val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
-                MainNavigation(runContext, viewModel)
+                MainNavigation(viewModel)
             }
         }
     }

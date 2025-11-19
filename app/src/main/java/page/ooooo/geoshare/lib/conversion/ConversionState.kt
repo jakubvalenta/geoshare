@@ -21,25 +21,27 @@ import page.ooooo.geoshare.lib.position.Position
 import java.io.IOException
 import kotlin.time.Duration.Companion.seconds
 
-open class ConversionState : State {
+interface ConversionState : State {
     override suspend fun transition(): State? = null
-}
 
-interface HasLoadingIndicator {
-    val loadingIndicatorTitleResId: Int
+    interface HasPermission : ConversionState, State.PermissionState
 
-    @Composable
-    fun loadingIndicatorDescription(): String?
-}
+    interface HasLoadingIndicator : ConversionState {
+        val loadingIndicatorTitleResId: Int
 
-interface HasResult {
-    val inputUriString: String
-    val position: Position
-}
+        @Composable
+        fun loadingIndicatorDescription(): String?
+    }
 
-interface HasError {
-    val errorMessageResId: Int
-    val inputUriString: String
+    interface HasResult : ConversionState {
+        val inputUriString: String
+        val position: Position
+    }
+
+    interface HasError : ConversionState {
+        val errorMessageResId: Int
+        val inputUriString: String
+    }
 }
 
 data class ConversionRunContext(
@@ -48,13 +50,13 @@ data class ConversionRunContext(
     val saveGpxLauncher: ActivityResultLauncher<Intent>,
 )
 
-class Initial : ConversionState()
+class Initial : ConversionState
 
 data class ReceivedIntent(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     val intent: Intent,
-) : ConversionState() {
+) : ConversionState {
     override suspend fun transition(): State {
         val inputUriString = stateContext.intentTools.getIntentUriString(intent)
             ?: return ConversionFailed(R.string.conversion_failed_missing_url, "")
@@ -66,7 +68,7 @@ data class ReceivedUriString(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     val inputUriString: String,
-) : ConversionState() {
+) : ConversionState {
     override suspend fun transition(): State {
         for (input in stateContext.inputs) {
             val m = input.uriPattern.matcher(inputUriString)
@@ -86,7 +88,7 @@ data class ReceivedUri(
     val input: Input,
     val uri: Uri,
     val permission: Permission?,
-) : ConversionState() {
+) : ConversionState {
     override suspend fun transition(): State {
         if (input is Input.HasShortUri) {
             val m = input.shortUriPattern.matcher(uri.toString())
@@ -128,7 +130,7 @@ data class RequestedUnshortenPermission(
     val inputUriString: String,
     val input: Input.HasShortUri,
     val uri: Uri,
-) : ConversionState(), PermissionState {
+) : ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
 
     override suspend fun grant(doNotAsk: Boolean): State {
@@ -153,7 +155,7 @@ data class GrantedUnshortenPermission(
     val input: Input.HasShortUri,
     val uri: Uri,
     val retry: NetworkTools.Retry? = null,
-) : ConversionState(), HasLoadingIndicator {
+) : ConversionState.HasLoadingIndicator {
     override val loadingIndicatorTitleResId: Int = input.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
@@ -211,7 +213,7 @@ data class DeniedConnectionPermission(
     val runContext: ConversionRunContext,
     val inputUriString: String,
     val input: Input,
-) : ConversionState() {
+) : ConversionState {
     override suspend fun transition(): State =
         ConversionFailed(R.string.conversion_failed_connection_permission_denied, inputUriString)
 }
@@ -223,7 +225,7 @@ data class UnshortenedUrl(
     val input: Input,
     val uri: Uri,
     val permission: Permission?,
-) : ConversionState() {
+) : ConversionState {
     override suspend fun transition(): State {
         val (positionFromUri, htmlUriString) = input.parseUri(uri)
         stateContext.log.i(null, "URI Pattern: Converted $uri to $positionFromUri")
@@ -259,7 +261,7 @@ data class RequestedParseHtmlPermission(
     val uri: Uri,
     val positionFromUri: Position,
     val htmlUriString: String,
-) : ConversionState(), PermissionState {
+) : ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
 
     override suspend fun grant(doNotAsk: Boolean): State {
@@ -294,7 +296,7 @@ data class GrantedParseHtmlPermission(
     val positionFromUri: Position,
     val htmlUriString: String,
     val retry: NetworkTools.Retry? = null,
-) : ConversionState(), HasLoadingIndicator {
+) : ConversionState.HasLoadingIndicator {
     override val loadingIndicatorTitleResId: Int = input.loadingIndicatorTitleResId
 
     override suspend fun transition(): State {
@@ -366,7 +368,7 @@ data class ParseHtmlFailed(
     val runContext: ConversionRunContext,
     val inputUriString: String,
     val position: Position,
-) : ConversionState() {
+) : ConversionState {
     override suspend fun transition() =
         if (!position.points.isNullOrEmpty() || !position.q.isNullOrEmpty()) {
             ConversionSucceeded(stateContext, runContext, inputUriString, position)
@@ -380,7 +382,7 @@ data class ConversionSucceeded(
     val runContext: ConversionRunContext,
     override val inputUriString: String,
     override val position: Position,
-) : ConversionState(), HasResult {
+) : ConversionState.HasResult {
     override suspend fun transition(): State =
         stateContext.userPreferencesRepository.getValue(AutomationUserPreference).let { automation ->
             when (automation) {
@@ -400,7 +402,7 @@ data class ConversionSucceeded(
 data class ConversionFailed(
     @param:StringRes override val errorMessageResId: Int,
     override val inputUriString: String,
-) : ConversionState(), HasError
+) : ConversionState.HasError
 
 data class AutomationWaiting(
     val stateContext: ConversionStateContext,
@@ -408,7 +410,7 @@ data class AutomationWaiting(
     override val inputUriString: String,
     override val position: Position,
     val automation: Automation.HasDelay,
-) : ConversionState(), HasResult {
+) : ConversionState.HasResult {
     override suspend fun transition(): State =
         try {
             if (automation.delay.isPositive()) {
@@ -426,7 +428,7 @@ data class AutomationReady(
     override val inputUriString: String,
     override val position: Position,
     val automation: Automation,
-) : ConversionState(), HasResult {
+) : ConversionState.HasResult {
     override suspend fun transition(): State =
         automation.getAction(position, stateContext.uriQuote).let { outputAction ->
             when (outputAction?.run(stateContext.intentTools, runContext)) {
@@ -445,7 +447,7 @@ data class AutomationSucceeded(
     override val inputUriString: String,
     override val position: Position,
     val automation: Automation.HasSuccessMessage,
-) : ConversionState(), HasResult {
+) : ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
@@ -460,7 +462,7 @@ data class AutomationFailed(
     override val inputUriString: String,
     override val position: Position,
     val automation: Automation.HasErrorMessage,
-) : ConversionState(), HasResult {
+) : ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
@@ -475,4 +477,4 @@ data class AutomationFinished(
     override val inputUriString: String,
     override val position: Position,
     val automation: Automation,
-) : ConversionState(), HasResult
+) : ConversionState.HasResult

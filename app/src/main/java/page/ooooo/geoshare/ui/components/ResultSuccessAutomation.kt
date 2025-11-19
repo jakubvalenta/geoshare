@@ -24,13 +24,7 @@ import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.conversion.AutomationFailed
-import page.ooooo.geoshare.lib.conversion.AutomationFinished
-import page.ooooo.geoshare.lib.conversion.AutomationSucceeded
-import page.ooooo.geoshare.lib.conversion.AutomationWaiting
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
-import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.HasResult
+import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -40,7 +34,7 @@ import kotlin.time.DurationUnit
 
 @Composable
 fun ResultSuccessAutomation(
-    currentState: HasResult,
+    currentState: ConversionState.HasResult,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,

@@ -39,7 +39,7 @@ class ConversionViewModel @Inject constructor(
     ) { newState ->
         _currentState.value = newState
         when (newState) {
-            is HasLoadingIndicator -> {
+            is ConversionState.HasLoadingIndicator -> {
                 loadingIndicatorJob?.cancel()
                 loadingIndicatorJob = viewModelScope.launch {
                     // Show loading indicator only if the state lasts longer than 200ms.
@@ -61,6 +61,9 @@ class ConversionViewModel @Inject constructor(
 
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
+
+    private val _intent = MutableStateFlow<Intent?>(null)
+    val intent: StateFlow<Intent?> = _intent
 
     var inputUriString by SavableDelegate(
         savedStateHandle,
@@ -135,37 +138,37 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun grant(doNotAsk: Boolean) {
-        transitionJob?.cancel()
-        transitionJob = viewModelScope.launch {
-            try {
-                (stateContext.currentState as? PermissionState)?.let { permissionState ->
-                    stateContext.currentState = permissionState.grant(doNotAsk)
+        (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
+            transitionJob?.cancel()
+            transitionJob = viewModelScope.launch {
+                try {
+                    stateContext.currentState = currentState.grant(doNotAsk)
                     stateContext.transition()
+                } catch (tr: Exception) {
+                    stateContext.log.e(null, "Exception while transitioning state", tr)
+                    stateContext.currentState = ConversionFailed(
+                        R.string.conversion_failed_parse_url_error,
+                        inputUriString,
+                    )
                 }
-            } catch (tr: Exception) {
-                stateContext.log.e(null, "Exception while transitioning state", tr)
-                stateContext.currentState = ConversionFailed(
-                    R.string.conversion_failed_parse_url_error,
-                    inputUriString,
-                )
             }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        transitionJob?.cancel()
-        transitionJob = viewModelScope.launch {
-            try {
-                (stateContext.currentState as? PermissionState)?.let { permissionState ->
-                    stateContext.currentState = permissionState.deny(doNotAsk)
+        (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
+            transitionJob?.cancel()
+            transitionJob = viewModelScope.launch {
+                try {
+                    stateContext.currentState = currentState.deny(doNotAsk)
                     stateContext.transition()
+                } catch (tr: Exception) {
+                    stateContext.log.e(null, "Exception while transitioning state", tr)
+                    stateContext.currentState = ConversionFailed(
+                        R.string.conversion_failed_parse_url_error,
+                        inputUriString,
+                    )
                 }
-            } catch (tr: Exception) {
-                stateContext.log.e(null, "Exception while transitioning state", tr)
-                stateContext.currentState = ConversionFailed(
-                    R.string.conversion_failed_parse_url_error,
-                    inputUriString,
-                )
             }
         }
     }
@@ -186,23 +189,27 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun saveGpx(context: Context, result: ActivityResult) {
-        result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-            context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                val writer = outputStream.writer()
-                (stateContext.currentState as? HasResult)?.let { currentState ->
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    val writer = outputStream.writer()
                     val saveGpxAction = allOutputGroups.firstNotNullOfOrNull { outputGroup ->
                         outputGroup.getActionOutputs()
                             .firstNotNullOfOrNull { it.getAction(currentState.position) as? Action.SaveGpx }
                     }
                     saveGpxAction?.write(writer)
+                    writer.close()
                 }
-                writer.close()
             }
         }
     }
 
     fun cancel() {
         transitionJob?.cancel()
+    }
+
+    fun setIntent(value: Intent) {
+        _intent.value = value
     }
 
     fun updateInput(value: String) {
@@ -233,13 +240,11 @@ class ConversionViewModel @Inject constructor(
                 } else {
                     if (action is Action.OpenApp) {
                         Toast.makeText(
-                            runContext.context,
-                            runContext.context.resources.getString(
+                            runContext.context, runContext.context.resources.getString(
                                 R.string.conversion_automation_open_app_failed,
                                 intentTools.queryApp(runContext.context.packageManager, action.packageName)?.label
                                     ?: action.packageName,
-                            ),
-                            Toast.LENGTH_SHORT
+                            ), Toast.LENGTH_SHORT
                         ).show()
                     } else if (action is Action.OpenChooser) {
                         Toast.makeText(

@@ -11,7 +11,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 
 @Serializable
 object AboutRoute
@@ -36,7 +35,7 @@ data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MainNavigation(runContext: ConversionRunContext, viewModel: ConversionViewModel) {
+fun MainNavigation(viewModel: ConversionViewModel) {
     val navController = rememberNavController()
     val introShown by viewModel.introShown.collectAsState()
 
@@ -56,7 +55,6 @@ fun MainNavigation(runContext: ConversionRunContext, viewModel: ConversionViewMo
         }
         composable<ConversionRoute> {
             ConversionScreen(
-                runContext = runContext,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onFinish = {},
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
@@ -83,7 +81,6 @@ fun MainNavigation(runContext: ConversionRunContext, viewModel: ConversionViewMo
         }
         composable<MainRoute> {
             MainScreen(
-                runContext = runContext,
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToConversionScreen = { navController.navigate(ConversionRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },

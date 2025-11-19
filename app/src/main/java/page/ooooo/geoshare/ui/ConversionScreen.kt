@@ -44,11 +44,9 @@ import page.ooooo.geoshare.lib.conversion.AutomationFinished
 import page.ooooo.geoshare.lib.conversion.AutomationWaiting
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionRunContext
+import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.GrantedUnshortenPermission
-import page.ooooo.geoshare.lib.conversion.HasError
-import page.ooooo.geoshare.lib.conversion.HasLoadingIndicator
-import page.ooooo.geoshare.lib.conversion.HasResult
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
 import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
@@ -64,7 +62,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ConversionScreen(
-    runContext: ConversionRunContext,
     onBack: () -> Unit,
     onFinish: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -75,9 +72,22 @@ fun ConversionScreen(
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
 ) {
+    val context = LocalContext.current
+    val clipboard = LocalClipboard.current
+    val saveGpxLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            viewModel.saveGpx(context, it)
+        }
+    val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
+
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+    val intent by viewModel.intent.collectAsState()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
+
+    LaunchedEffect(intent) {
+        intent?.let { viewModel.start(runContext, it) }
+    }
 
     ConversionScreen(
         currentState = currentState,
@@ -209,7 +219,7 @@ fun ConversionScreen(
                         ) {
                             Text(stringResource(R.string.conversion_loading_indicator_cancel))
                         }
-                        if (currentState is HasLoadingIndicator) {
+                        if (currentState is ConversionState.HasLoadingIndicator) {
                             currentState.loadingIndicatorDescription()?.let { text ->
                                 Text(
                                     text,
@@ -223,7 +233,7 @@ fun ConversionScreen(
                 }
             }
 
-            currentState is HasError -> {
+            currentState is ConversionState.HasError -> {
                 {
                     Headline(stringResource(R.string.conversion_error_title))
                     ResultError(
@@ -244,7 +254,7 @@ fun ConversionScreen(
                 }
             }
 
-            currentState is HasResult -> {
+            currentState is ConversionState.HasResult -> {
                 {
                     Headline(stringResource(R.string.conversion_succeeded_title))
                     ResultSuccessCoordinates(
@@ -257,7 +267,7 @@ fun ConversionScreen(
             else -> null
         },
         secondPane = when {
-            (loadingIndicatorTitleResId == null && currentState is HasResult) -> {
+            (loadingIndicatorTitleResId == null && currentState is ConversionState.HasResult) -> {
                 {
                     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                         ResultSuccessAutomation(
@@ -277,7 +287,7 @@ fun ConversionScreen(
             else -> null
         },
         bottomPane = when {
-            (loadingIndicatorTitleResId == null && currentState is HasError) -> {
+            (loadingIndicatorTitleResId == null && currentState is ConversionState.HasError) -> {
                 {
                     TextButton({ onRun(Action.Copy(currentState.inputUriString)) }) {
                         Text(
@@ -289,7 +299,7 @@ fun ConversionScreen(
                 }
             }
 
-            (loadingIndicatorTitleResId == null && currentState is HasResult) -> {
+            (loadingIndicatorTitleResId == null && currentState is ConversionState.HasResult) -> {
                 {
                     TextButton({ onRun(Action.Copy(currentState.inputUriString)) }) {
                         Text(
@@ -360,14 +370,14 @@ fun ConversionScreen(
         },
         containerColor = when {
             loadingIndicatorTitleResId != null -> MaterialTheme.colorScheme.surfaceContainer
-            currentState is HasError -> MaterialTheme.colorScheme.errorContainer
-            currentState is HasResult -> MaterialTheme.colorScheme.secondaryContainer
+            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
             else -> Color.Unspecified
         },
         contentColor = when {
             loadingIndicatorTitleResId != null -> Color.Unspecified
-            currentState is HasError -> MaterialTheme.colorScheme.onErrorContainer
-            currentState is HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> Color.Unspecified
         },
         windowSizeClass = windowSizeClass,

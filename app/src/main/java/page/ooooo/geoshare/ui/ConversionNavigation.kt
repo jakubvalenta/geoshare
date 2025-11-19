@@ -6,10 +6,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 
 @Composable
-fun ConversionNavigation(runContext: ConversionRunContext, viewModel: ConversionViewModel, onFinish: () -> Unit) {
+fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = ConversionRoute) {
@@ -20,7 +19,6 @@ fun ConversionNavigation(runContext: ConversionRunContext, viewModel: Conversion
         }
         composable<ConversionRoute> {
             ConversionScreen(
-                runContext = runContext,
                 onBack = onFinish,
                 onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },

@@ -1,17 +1,12 @@
 package page.ooooo.geoshare
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import dagger.hilt.android.AndroidEntryPoint
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 import page.ooooo.geoshare.ui.ConversionNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -21,21 +16,17 @@ class ConversionActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.setIntent(intent)
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                val context = LocalContext.current
-                val clipboard = LocalClipboard.current
-                val saveGpxLauncher =
-                    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                        viewModel.saveGpx(context, it)
-                    }
-                val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
-                LaunchedEffect(intent) {
-                    viewModel.start(runContext, intent)
-                }
-                ConversionNavigation(runContext, viewModel, onFinish = { finish() })
+                ConversionNavigation(viewModel, onFinish = { finish() })
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        viewModel.setIntent(intent)
     }
 }
