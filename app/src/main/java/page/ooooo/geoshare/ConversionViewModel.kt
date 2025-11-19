@@ -63,9 +63,6 @@ class ConversionViewModel @Inject constructor(
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
 
-    private val _intent = MutableStateFlow<Intent?>(null)
-    val intent: StateFlow<Intent?> = _intent
-
     var inputUriString by SavableDelegate(
         savedStateHandle,
         "inputUriString",
@@ -130,11 +127,6 @@ class ConversionViewModel @Inject constructor(
 
     fun start(runContext: ConversionRunContext) {
         stateContext.currentState = ReceivedUriString(stateContext, runContext, inputUriString)
-        transition()
-    }
-
-    fun start(runContext: ConversionRunContext, intent: Intent) {
-        stateContext.currentState = ReceivedIntent(stateContext, runContext, intent)
         transition()
     }
 
@@ -209,10 +201,6 @@ class ConversionViewModel @Inject constructor(
         transitionJob?.cancel()
     }
 
-    fun setIntent(value: Intent) {
-        _intent.value = value
-    }
-
     fun updateInput(value: String) {
         withMutableSnapshot {
             inputUriString = value
@@ -221,6 +209,10 @@ class ConversionViewModel @Inject constructor(
             stateContext.currentState = Initial()
             transition()
         }
+    }
+
+    fun updateInput(value: Intent) {
+        updateInput(intentTools.getIntentUriString(value) ?: "")
     }
 
     fun pasteInput(clipboard: Clipboard) {

@@ -2,8 +2,6 @@ package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
 import android.view.KeyEvent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -32,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu
@@ -50,24 +46,14 @@ fun MainScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val clipboard = LocalClipboard.current
-    val saveGpxLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            viewModel.saveGpx(context, it)
-        }
-    val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
-
     val recentInputsShown by viewModel.changelogShown.collectAsState()
 
     MainScreen(
         inputUriString = viewModel.inputUriString,
         changelogShown = recentInputsShown,
         onPasteInput = { viewModel.pasteInput(clipboard) },
-        onSubmit = {
-            viewModel.start(runContext)
-            onNavigateToConversionScreen()
-        },
+        onSubmit = { onNavigateToConversionScreen() },
         onUpdateInput = { viewModel.updateInput(it) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,

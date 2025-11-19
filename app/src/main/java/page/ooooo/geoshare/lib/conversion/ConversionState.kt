@@ -52,24 +52,16 @@ data class ConversionRunContext(
 
 class Initial : ConversionState
 
-data class ReceivedIntent(
-    val stateContext: ConversionStateContext,
-    val runContext: ConversionRunContext,
-    val intent: Intent,
-) : ConversionState {
-    override suspend fun transition(): State {
-        val inputUriString = stateContext.intentTools.getIntentUriString(intent)
-            ?: return ConversionFailed(R.string.conversion_failed_missing_url, "")
-        return ReceivedUriString(stateContext, runContext, inputUriString)
-    }
-}
-
 data class ReceivedUriString(
     val stateContext: ConversionStateContext,
     val runContext: ConversionRunContext,
     val inputUriString: String,
 ) : ConversionState {
     override suspend fun transition(): State {
+        if (inputUriString.isEmpty()) {
+            // TODO Test
+            return ConversionFailed(R.string.conversion_failed_missing_url, "")
+        }
         for (input in stateContext.inputs) {
             val m = input.uriPattern.matcher(inputUriString)
             if (m.find()) {

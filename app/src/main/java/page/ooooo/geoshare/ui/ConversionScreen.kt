@@ -81,12 +81,11 @@ fun ConversionScreen(
     val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
 
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-    val intent by viewModel.intent.collectAsState()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
 
-    LaunchedEffect(intent) {
-        intent?.let { viewModel.start(runContext, it) }
+    LaunchedEffect(viewModel.inputUriString) {
+        viewModel.start(runContext)
     }
 
     ConversionScreen(

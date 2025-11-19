@@ -16,7 +16,7 @@ class ConversionActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.setIntent(intent)
+        viewModel.updateInput(intent)
         enableEdgeToEdge()
         setContent {
             AppTheme {
@@ -27,6 +27,6 @@ class ConversionActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        viewModel.setIntent(intent)
+        viewModel.updateInput(intent)
     }
 }
