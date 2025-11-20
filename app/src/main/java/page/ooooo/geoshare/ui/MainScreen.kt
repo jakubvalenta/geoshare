@@ -30,8 +30,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultIntentTools
-import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu
@@ -47,7 +46,6 @@ fun MainScreen(
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
-    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val clipboard = LocalClipboard.current
@@ -59,7 +57,7 @@ fun MainScreen(
         changelogShown = recentInputsShown,
         onPasteInput = {
             coroutineScope.launch {
-                val text = intentTools.pasteFromClipboard(clipboard)
+                val text = AndroidTools.pasteFromClipboard(clipboard)
                 viewModel.updateInput(text)
             }
         },

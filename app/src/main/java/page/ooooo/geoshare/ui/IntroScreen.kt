@@ -23,9 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultIntentTools
-import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -34,7 +33,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun IntroScreen(
     onBack: () -> Unit,
-    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
@@ -50,10 +48,10 @@ fun IntroScreen(
             onBack()
         },
         onShowOpenByDefaultSettings = {
-            intentTools.showOpenByDefaultSettings(context, settingsLauncher)
+            AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
         },
         onShowOpenByDefaultSettingsForPackage = { packageName ->
-            intentTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
+            AndroidTools.showOpenByDefaultSettingsForPackage(context, settingsLauncher, packageName)
         }
     )
 }

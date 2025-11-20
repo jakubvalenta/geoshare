@@ -14,42 +14,16 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.core.net.toUri
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 import java.util.*
 
-interface IntentTools {
+object AndroidTools {
 
-    companion object {
-        const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
-    }
+    const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
-
-    fun getIntentUriString(intent: Intent): String?
-
-    fun queryApp(packageManager: PackageManager, packageName: String): App?
-
-    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String>
-
-    fun openApp(context: Context, packageName: String, uriString: String): Boolean
-
-    fun openChooser(context: Context, uriString: String): Boolean
-
-    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean
-
-    fun showOpenByDefaultSettings(context: Context, launcher: ActivityResultLauncher<Intent>)
-
-    fun showOpenByDefaultSettingsForPackage(
-        context: Context,
-        launcher: ActivityResultLauncher<Intent>,
-        packageName: String,
-    )
-
-    suspend fun copyToClipboard(clipboard: Clipboard, text: String)
-
-    suspend fun pasteFromClipboard(clipboard: Clipboard): String
-}
-
-object DefaultIntentTools : IntentTools {
 
     private fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
         setPackage(packageName)
@@ -62,14 +36,14 @@ object DefaultIntentTools : IntentTools {
         putExtra(
             Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
                 @Suppress("SpellCheckingInspection")
-                ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity"),
+                (ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity")),
                 @Suppress("SpellCheckingInspection")
-                ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity"),
+                (ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity")),
             )
         )
     }
 
-    override fun getIntentUriString(intent: Intent): String? {
+    fun getIntentUriString(intent: Intent): String? {
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
                 val intentData: String? = intent.data?.toString()
@@ -96,7 +70,7 @@ object DefaultIntentTools : IntentTools {
         }
     }
 
-    override fun queryApp(packageManager: PackageManager, packageName: String): IntentTools.App? {
+    fun queryApp(packageManager: PackageManager, packageName: String): App? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
@@ -104,7 +78,7 @@ object DefaultIntentTools : IntentTools {
             return null
         }
         return try {
-            IntentTools.App(
+            App(
                 applicationInfo.packageName,
                 applicationInfo.loadLabel(packageManager).toString(),
                 applicationInfo.loadIcon(packageManager),
@@ -115,7 +89,7 @@ object DefaultIntentTools : IntentTools {
         }
     }
 
-    override fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
+    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
@@ -143,13 +117,13 @@ object DefaultIntentTools : IntentTools {
         false
     }
 
-    override fun openApp(context: Context, packageName: String, uriString: String): Boolean =
+    fun openApp(context: Context, packageName: String, uriString: String): Boolean =
         startActivity(context, createViewIntent(packageName, uriString.toUri()))
 
-    override fun openChooser(context: Context, uriString: String): Boolean =
+    fun openChooser(context: Context, uriString: String): Boolean =
         startActivity(context, createChooserIntent(uriString.toUri()))
 
-    override fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
+    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
         val resolveInfo = try {
             packageManager.resolveActivity(
                 Intent(Intent.ACTION_VIEW, uriString.toUri()),
@@ -168,11 +142,11 @@ object DefaultIntentTools : IntentTools {
         return packageName == BuildConfig.APPLICATION_ID
     }
 
-    override fun showOpenByDefaultSettings(context: Context, launcher: ActivityResultLauncher<Intent>) {
+    fun showOpenByDefaultSettings(context: Context, launcher: ActivityResultLauncher<Intent>) {
         showOpenByDefaultSettingsForPackage(context, launcher, BuildConfig.APPLICATION_ID)
     }
 
-    override fun showOpenByDefaultSettingsForPackage(
+    fun showOpenByDefaultSettingsForPackage(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
         packageName: String,
@@ -197,9 +171,26 @@ object DefaultIntentTools : IntentTools {
         }
     }
 
-    override suspend fun copyToClipboard(clipboard: Clipboard, text: String) =
+    suspend fun copyToClipboard(clipboard: Clipboard, text: String) =
         clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
 
-    override suspend fun pasteFromClipboard(clipboard: Clipboard): String =
+    suspend fun pasteFromClipboard(clipboard: Clipboard): String =
         clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
+
+    /**
+     * See [GitHub Gist](https://gist.github.com/starry-shivam/901267c26eb030eb3faf1ccd4d2bdd32)
+     */
+    fun isMiuiDevice(): Boolean =
+        setOf("xiaomi", "redmi", "poco").contains(Build.BRAND.lowercase()) &&
+            (!getRuntimeProperty("ro.miui.ui.version.name").isNullOrBlank() ||
+                !getRuntimeProperty("ro.mi.os.version.name").isNullOrBlank())
+
+    private fun getRuntimeProperty(property: String): String? = try {
+        @Suppress("SpellCheckingInspection")
+        Runtime.getRuntime().exec("getprop $property").inputStream.use { input ->
+            BufferedReader(InputStreamReader(input), 1024).readLine()
+        }
+    } catch (_: IOException) {
+        null
+    }
 }

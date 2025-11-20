@@ -43,7 +43,7 @@ import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
@@ -68,7 +68,6 @@ fun ConversionScreen(
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
@@ -91,15 +90,15 @@ fun ConversionScreen(
 
     suspend fun runAction(action: Action): Boolean = when (action) {
         is Action.Copy -> {
-            intentTools.copyToClipboard(clipboard, action.text).let { true }
+            AndroidTools.copyToClipboard(clipboard, action.text).let { true }
         }
 
         is Action.OpenApp -> {
-            intentTools.openApp(context, action.packageName, action.uriString)
+            AndroidTools.openApp(context, action.packageName, action.uriString)
         }
 
         is Action.OpenChooser -> {
-            intentTools.openChooser(context, action.uriString)
+            AndroidTools.openChooser(context, action.uriString)
         }
 
         is Action.SaveGpx -> {
@@ -194,7 +193,7 @@ fun ConversionScreen(
                                 context,
                                 context.resources.getString(
                                     R.string.conversion_automation_open_app_failed,
-                                    intentTools.queryApp(context.packageManager, action.packageName)?.label
+                                    AndroidTools.queryApp(context.packageManager, action.packageName)?.label
                                         ?: action.packageName,
                                 ),
                                 Toast.LENGTH_SHORT,

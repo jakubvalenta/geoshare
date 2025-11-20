@@ -14,9 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultIntentTools
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
@@ -65,7 +64,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             )
 
         @Composable
-        override fun label(app: IntentTools.App) = stringResource(R.string.conversion_succeeded_open_app, app.label)
+        override fun label(app: AndroidTools.App) = stringResource(R.string.conversion_succeeded_open_app, app.label)
 
         override fun isEnabled(value: Position) = true
     }
@@ -185,11 +184,11 @@ object GeoUriOutputGroup : OutputGroup<Position> {
                 counterSec,
             )
 
-        private var appCache: IntentTools.App? = null
+        private var appCache: AndroidTools.App? = null
 
         @Composable
-        private fun queryApp(): IntentTools.App? =
-            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+        private fun queryApp(): AndroidTools.App? =
+            appCache ?: AndroidTools.queryApp(LocalContext.current.packageManager, packageName)
                 ?.also { appCache = it }
     }
 

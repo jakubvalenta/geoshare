@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.outputs.Action as Action_
 
@@ -23,7 +23,7 @@ sealed interface Output<T> {
         fun getAction(value: T, uriQuote: UriQuote = DefaultUriQuote()): Action_.OpenApp
 
         @Composable
-        fun label(app: IntentTools.App): String
+        fun label(app: AndroidTools.App): String
 
         fun isEnabled(value: T): Boolean
     }

@@ -14,8 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultIntentTools
-import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
@@ -72,7 +71,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatDisplayUriString(value, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
+        override fun label(app: AndroidTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_display, app.label)
 
         override fun isEnabled(value: Position) = true
@@ -84,7 +83,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatNavigateToUriString(value, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
+        override fun label(app: AndroidTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_to, app.label)
 
         override fun isEnabled(value: Position) = true
@@ -96,7 +95,7 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatNavigateViaUriString(value, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
+        override fun label(app: AndroidTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_via, app.label)
 
         override fun isEnabled(value: Position) = true
@@ -207,11 +206,11 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
                 counterSec,
             )
 
-        private var appCache: IntentTools.App? = null
+        private var appCache: AndroidTools.App? = null
 
         @Composable
-        private fun queryApp(): IntentTools.App? =
-            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+        private fun queryApp(): AndroidTools.App? =
+            appCache ?: AndroidTools.queryApp(LocalContext.current.packageManager, packageName)
                 ?.also { appCache = it }
     }
 
@@ -269,11 +268,11 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
                 counterSec,
             )
 
-        private var appCache: IntentTools.App? = null
+        private var appCache: AndroidTools.App? = null
 
         @Composable
-        private fun queryApp(): IntentTools.App? =
-            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+        private fun queryApp(): AndroidTools.App? =
+            appCache ?: AndroidTools.queryApp(LocalContext.current.packageManager, packageName)
                 ?.also { appCache = it }
     }
 

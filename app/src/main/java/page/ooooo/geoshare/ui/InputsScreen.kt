@@ -28,8 +28,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultIntentTools
-import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.inputs.*
 import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -52,7 +51,6 @@ private fun getDocumentations(
     filter: Filter,
     changelogShownForVersionCode: Int?,
     packageManager: PackageManager,
-    intentTools: IntentTools,
 ): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
     var newChangelogShownForVersionCode = 1
@@ -66,7 +64,7 @@ private fun getDocumentations(
             }
             if (documentationInput is Input.DocumentationInput.Url) {
                 val defaultHandlerEnabled =
-                    intentTools.isDefaultHandlerEnabled(packageManager, documentationInput.urlString)
+                    AndroidTools.isDefaultHandlerEnabled(packageManager, documentationInput.urlString)
                 if (filter is Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
@@ -102,7 +100,6 @@ private fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRe
 @Composable
 fun InputsScreen(
     onBack: () -> Unit = {},
-    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
@@ -118,10 +115,10 @@ fun InputsScreen(
     }
     var filter by remember { mutableStateOf(if (!changelogShown) Recent() else All()) }
     var documentations by remember(filter, changelogShownForVersionCode) {
-        mutableStateOf(getDocumentations(filter, changelogShownForVersionCode, context.packageManager, intentTools))
+        mutableStateOf(getDocumentations(filter, changelogShownForVersionCode, context.packageManager))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        documentations = getDocumentations(filter, changelogShownForVersionCode, context.packageManager, intentTools)
+        documentations = getDocumentations(filter, changelogShownForVersionCode, context.packageManager)
     }
 
     InputsScreen(
@@ -133,7 +130,7 @@ fun InputsScreen(
             onBack()
         },
         onChangeFilter = { filter = it },
-        onShowOpenByDefaultSettings = { intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
+        onShowOpenByDefaultSettings = { AndroidTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 
