@@ -18,6 +18,7 @@ class ConversionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.updateInput(DefaultIntentTools.getIntentUriString(intent) ?: "")
+        viewModel.start()
         enableEdgeToEdge()
         setContent {
             AppTheme {

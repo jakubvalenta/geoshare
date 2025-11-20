@@ -198,7 +198,6 @@ class ConversionViewModel @Inject constructor(
         }
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
-            transition()
         }
     }
 
