@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -42,8 +43,10 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.*
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
@@ -72,6 +75,7 @@ fun ConversionScreen(
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
+    val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
     val saveGpxLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -88,9 +92,12 @@ fun ConversionScreen(
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
 
-    suspend fun runAction(action: Action): Boolean = when (action) {
+    fun runAction(action: Action): Boolean = when (action) {
         is Action.Copy -> {
-            AndroidTools.copyToClipboard(clipboard, action.text).let { true }
+            coroutineScope.launch {
+                AndroidTools.copyToClipboard(clipboard, action.text)
+            }
+            true
         }
 
         is Action.OpenApp -> {
@@ -104,9 +111,9 @@ fun ConversionScreen(
         is Action.SaveGpx -> {
             @Suppress("SpellCheckingInspection") val timestamp =
                 SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
-            val filename = context.resources.getString(
+            val filename = resources.getString(
                 R.string.conversion_succeeded_save_gpx_filename,
-                context.resources.getString(R.string.app_name),
+                resources.getString(R.string.app_name),
                 timestamp,
             )
             try {
@@ -115,7 +122,8 @@ fun ConversionScreen(
                         addCategory(Intent.CATEGORY_OPENABLE)
                         type = "text/xml"
                         putExtra(Intent.EXTRA_TITLE, filename)
-                    })
+                    },
+                )
                 true
             } catch (e: Exception) {
                 Log.e(null, "Error when saving GPX file", e)
@@ -124,11 +132,45 @@ fun ConversionScreen(
         }
     }
 
+    fun showActionMessage(action: Action, success: Boolean) {
+        if (success) {
+            if (action is Action.Copy) {
+                val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                if (!systemHasClipboardEditor) {
+                    Toast.makeText(
+                        context,
+                        R.string.copying_finished,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        } else {
+            if (action is Action.OpenApp) {
+                Toast.makeText(
+                    context,
+                    resources.getString(
+                        R.string.conversion_automation_open_app_failed,
+                        AndroidTools.queryApp(context.packageManager, action.packageName)?.label ?: action.packageName,
+                    ),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            } else if (action is Action.OpenChooser) {
+                Toast.makeText(
+                    context,
+                    R.string.conversion_succeeded_apps_not_found,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        }
+    }
+
     LaunchedEffect(currentState) {
         (currentState as? AutomationReady)?.let { currentState ->
             val action = currentState.automation.getAction(currentState.position, currentState.stateContext.uriQuote)
-            val success = action?.let { runAction(it) }
-            viewModel.finishAutomation(success)
+            if (action != null) {
+                val success = runAction(action)
+                viewModel.finishAutomation(success)
+            }
         }
     }
 
@@ -174,40 +216,8 @@ fun ConversionScreen(
         },
         onRun = { action ->
             viewModel.cancel()
-            coroutineScope.launch {
-                runAction(action).let { success ->
-                    if (success) {
-                        if (action is Action.Copy) {
-                            val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                            if (!systemHasClipboardEditor) {
-                                Toast.makeText(
-                                    context,
-                                    R.string.copying_finished,
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                            }
-                        }
-                    } else {
-                        if (action is Action.OpenApp) {
-                            Toast.makeText(
-                                context,
-                                context.resources.getString(
-                                    R.string.conversion_automation_open_app_failed,
-                                    AndroidTools.queryApp(context.packageManager, action.packageName)?.label
-                                        ?: action.packageName,
-                                ),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        } else if (action is Action.OpenChooser) {
-                            Toast.makeText(
-                                context,
-                                R.string.conversion_succeeded_apps_not_found,
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                    }
-                }
-            }
+            val success = runAction(action)
+            showActionMessage(action, success)
         },
     )
 }

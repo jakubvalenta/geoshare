@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -203,6 +204,7 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
@@ -239,6 +241,7 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
@@ -275,6 +278,7 @@ private fun OneAppPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
@@ -311,6 +315,7 @@ private fun DarkOneAppPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
