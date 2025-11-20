@@ -14,21 +14,48 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.core.net.toUri
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import java.text.SimpleDateFormat
 import java.util.*
 
-open class IntentTools {
+interface IntentTools {
+
     companion object {
         const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
     }
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
-    fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
+    fun getIntentUriString(intent: Intent): String?
+
+    fun queryApp(packageManager: PackageManager, packageName: String): App?
+
+    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String>
+
+    fun openApp(context: Context, packageName: String, uriString: String): Boolean
+
+    fun openChooser(context: Context, uriString: String): Boolean
+
+    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean
+
+    fun showOpenByDefaultSettings(context: Context, launcher: ActivityResultLauncher<Intent>)
+
+    fun showOpenByDefaultSettingsForPackage(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        packageName: String,
+    )
+
+    suspend fun copyToClipboard(clipboard: Clipboard, text: String)
+
+    suspend fun pasteFromClipboard(clipboard: Clipboard): String
+}
+
+object DefaultIntentTools : IntentTools {
+
+    private fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
         setPackage(packageName)
     }
 
-    fun createChooserIntent(data: Uri): Intent = Intent.createChooser(
+    private fun createChooserIntent(data: Uri): Intent = Intent.createChooser(
         Intent(Intent.ACTION_VIEW, data),
         "Choose an app",
     ).apply {
@@ -42,7 +69,7 @@ open class IntentTools {
         )
     }
 
-    fun getIntentUriString(intent: Intent): String? {
+    override fun getIntentUriString(intent: Intent): String? {
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
                 val intentData: String? = intent.data?.toString()
@@ -69,7 +96,7 @@ open class IntentTools {
         }
     }
 
-    open fun queryApp(packageManager: PackageManager, packageName: String): App? {
+    override fun queryApp(packageManager: PackageManager, packageName: String): IntentTools.App? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
@@ -77,7 +104,7 @@ open class IntentTools {
             return null
         }
         return try {
-            App(
+            IntentTools.App(
                 applicationInfo.packageName,
                 applicationInfo.loadLabel(packageManager).toString(),
                 applicationInfo.loadIcon(packageManager),
@@ -88,7 +115,7 @@ open class IntentTools {
         }
     }
 
-    open fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
+    override fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
@@ -109,43 +136,20 @@ open class IntentTools {
         }
     }
 
-    fun startActivity(context: Context, intent: Intent): Boolean = try {
+    private fun startActivity(context: Context, intent: Intent): Boolean = try {
         context.startActivity(intent)
         true
     } catch (_: ActivityNotFoundException) {
         false
     }
 
-    fun openApp(context: Context, packageName: String, uriString: String): Boolean =
+    override fun openApp(context: Context, packageName: String, uriString: String): Boolean =
         startActivity(context, createViewIntent(packageName, uriString.toUri()))
 
-    fun openChooser(context: Context, uriString: String): Boolean =
+    override fun openChooser(context: Context, uriString: String): Boolean =
         startActivity(context, createChooserIntent(uriString.toUri()))
 
-    fun launchSaveGpx(context: Context, saveGpxLauncher: ActivityResultLauncher<Intent>): Boolean {
-        @Suppress("SpellCheckingInspection")
-        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
-        val filename = context.resources.getString(
-            R.string.conversion_succeeded_save_gpx_filename,
-            context.resources.getString(R.string.app_name),
-            timestamp,
-        )
-        return try {
-            saveGpxLauncher.launch(
-                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "text/xml"
-                    putExtra(Intent.EXTRA_TITLE, filename)
-                }
-            )
-            true
-        } catch (e: Exception) {
-            Log.e(null, "Error when saving GPX file", e)
-            false
-        }
-    }
-
-    fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
+    override fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
         val resolveInfo = try {
             packageManager.resolveActivity(
                 Intent(Intent.ACTION_VIEW, uriString.toUri()),
@@ -164,14 +168,11 @@ open class IntentTools {
         return packageName == BuildConfig.APPLICATION_ID
     }
 
-    fun showOpenByDefaultSettings(
-        context: Context,
-        launcher: ActivityResultLauncher<Intent>,
-    ) {
+    override fun showOpenByDefaultSettings(context: Context, launcher: ActivityResultLauncher<Intent>) {
         showOpenByDefaultSettingsForPackage(context, launcher, BuildConfig.APPLICATION_ID)
     }
 
-    fun showOpenByDefaultSettingsForPackage(
+    override fun showOpenByDefaultSettingsForPackage(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
         packageName: String,
@@ -196,9 +197,9 @@ open class IntentTools {
         }
     }
 
-    suspend fun copyToClipboard(clipboard: Clipboard, text: String) =
+    override suspend fun copyToClipboard(clipboard: Clipboard, text: String) =
         clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
 
-    suspend fun pasteFromClipboard(clipboard: Clipboard): String =
+    override suspend fun pasteFromClipboard(clipboard: Clipboard): String =
         clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
 }

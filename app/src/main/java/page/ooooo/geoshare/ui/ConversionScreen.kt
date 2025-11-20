@@ -1,6 +1,11 @@
 package page.ooooo.geoshare.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,19 +44,10 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.conversion.State
-import page.ooooo.geoshare.lib.conversion.AutomationFinished
-import page.ooooo.geoshare.lib.conversion.AutomationWaiting
-import page.ooooo.geoshare.lib.conversion.ConversionFailed
-import page.ooooo.geoshare.lib.conversion.ConversionRunContext
-import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.GrantedUnshortenPermission
-import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
-import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
-import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
+import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
@@ -59,6 +55,8 @@ import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun ConversionScreen(
@@ -70,22 +68,69 @@ fun ConversionScreen(
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
+    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     val saveGpxLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            viewModel.saveGpx(context, it)
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.writer().use { writer ->
+                        viewModel.writeGpx(writer)
+                    }
+                }
+            }
         }
-    val runContext = ConversionRunContext(context, clipboard, saveGpxLauncher)
 
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
 
-    LaunchedEffect(viewModel.inputUriString) {
-        viewModel.start(runContext)
+    suspend fun runAction(action: Action): Boolean = when (action) {
+        is Action.Copy -> {
+            intentTools.copyToClipboard(clipboard, action.text).let { true }
+        }
+
+        is Action.OpenApp -> {
+            intentTools.openApp(context, action.packageName, action.uriString)
+        }
+
+        is Action.OpenChooser -> {
+            intentTools.openChooser(context, action.uriString)
+        }
+
+        is Action.SaveGpx -> {
+            @Suppress("SpellCheckingInspection") val timestamp =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
+            val filename = context.resources.getString(
+                R.string.conversion_succeeded_save_gpx_filename,
+                context.resources.getString(R.string.app_name),
+                timestamp,
+            )
+            try {
+                saveGpxLauncher.launch(
+                    Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "text/xml"
+                        putExtra(Intent.EXTRA_TITLE, filename)
+                    })
+                true
+            } catch (e: Exception) {
+                Log.e(null, "Error when saving GPX file", e)
+                false
+            }
+        }
+    }
+
+    LaunchedEffect(currentState) {
+        (currentState as? AutomationReady)?.let { currentState ->
+            val action = currentState.automation.getAction(currentState.position, currentState.stateContext.uriQuote)
+            val success = action?.let { runAction(it) }
+            viewModel.finishAutomation(success)
+        }
     }
 
     ConversionScreen(
@@ -126,16 +171,51 @@ fun ConversionScreen(
         },
         onRetry = { newUriString ->
             viewModel.updateInput(newUriString)
-            viewModel.start(runContext)
+            viewModel.start()
         },
         onRun = { action ->
             viewModel.cancel()
-            viewModel.runAction(runContext, action)
+            coroutineScope.launch {
+                runAction(action).let { success ->
+                    if (success) {
+                        if (action is Action.Copy) {
+                            val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            if (!systemHasClipboardEditor) {
+                                Toast.makeText(
+                                    context,
+                                    R.string.copying_finished,
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            }
+                        }
+                    } else {
+                        if (action is Action.OpenApp) {
+                            Toast.makeText(
+                                context,
+                                context.resources.getString(
+                                    R.string.conversion_automation_open_app_failed,
+                                    intentTools.queryApp(context.packageManager, action.packageName)?.label
+                                        ?: action.packageName,
+                                ),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        } else if (action is Action.OpenChooser) {
+                            Toast.makeText(
+                                context,
+                                R.string.conversion_succeeded_apps_not_found,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    }
+                }
+            }
         },
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun ConversionScreen(
     currentState: State,
@@ -476,13 +556,9 @@ private fun TabletPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
-        val context = LocalContext.current
-        val clipboard = LocalClipboard.current
-        val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         ConversionScreen(
             currentState = AutomationWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
                 automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
@@ -510,13 +586,9 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
-        val context = LocalContext.current
-        val clipboard = LocalClipboard.current
-        val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         ConversionScreen(
             currentState = AutomationWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
                 automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
@@ -544,13 +616,9 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
-        val context = LocalContext.current
-        val clipboard = LocalClipboard.current
-        val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         ConversionScreen(
             currentState = AutomationWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
                 automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
@@ -662,18 +730,13 @@ private fun TabletErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        val context = LocalContext.current
-        val clipboard = LocalClipboard.current
-        val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         ConversionScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
-                    IntentTools(),
                     NetworkTools(),
                     FakeUserPreferencesRepository(),
                 ),
-                ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
@@ -705,18 +768,13 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        val context = LocalContext.current
-        val clipboard = LocalClipboard.current
-        val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         ConversionScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
-                    IntentTools(),
                     NetworkTools(),
                     FakeUserPreferencesRepository(),
                 ),
-                ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
@@ -748,18 +806,13 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
-        val context = LocalContext.current
-        val clipboard = LocalClipboard.current
-        val saveGpxLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         ConversionScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
-                    IntentTools(),
                     NetworkTools(),
                     FakeUserPreferencesRepository(),
                 ),
-                ConversionRunContext(context, clipboard, saveGpxLauncher),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),

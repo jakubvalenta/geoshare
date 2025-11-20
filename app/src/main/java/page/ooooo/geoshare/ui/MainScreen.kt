@@ -27,8 +27,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultIntentTools
+import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu
@@ -44,16 +47,26 @@ fun MainScreen(
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
+    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     val recentInputsShown by viewModel.changelogShown.collectAsState()
 
     MainScreen(
         inputUriString = viewModel.inputUriString,
         changelogShown = recentInputsShown,
-        onPasteInput = { viewModel.pasteInput(clipboard) },
-        onSubmit = { onNavigateToConversionScreen() },
+        onPasteInput = {
+            coroutineScope.launch {
+                val text = intentTools.pasteFromClipboard(clipboard)
+                viewModel.updateInput(text)
+            }
+        },
+        onSubmit = {
+            viewModel.start()
+            onNavigateToConversionScreen()
+        },
         onUpdateInput = { viewModel.updateInput(it) },
         onNavigateToAboutScreen = onNavigateToAboutScreen,
         onNavigateToFaqScreen = onNavigateToFaqScreen,

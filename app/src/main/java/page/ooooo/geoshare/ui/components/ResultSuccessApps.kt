@@ -1,8 +1,11 @@
 package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +16,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -23,8 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultIntentTools
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -44,7 +50,7 @@ private val dropdownButtonOffset = 20.dp
 fun ResultSuccessApps(
     position: Position,
     onRun: (action: Action) -> Unit,
-    intentTools: IntentTools = IntentTools(),
+    intentTools: IntentTools = DefaultIntentTools,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val context = LocalContext.current
@@ -202,9 +208,13 @@ private fun DefaultPreview() {
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
+                    intentTools = object : IntentTools {
+                        override fun getIntentUriString(intent: Intent): String {
+                            throw NotImplementedError()
+                        }
+
                         @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = IntentTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -221,6 +231,44 @@ private fun DefaultPreview() {
                             "net.osmand.plus",
                             "us.spotco.maps",
                         )
+
+                        override fun openApp(context: Context, packageName: String, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun openChooser(context: Context, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun isDefaultHandlerEnabled(
+                            packageManager: PackageManager,
+                            uriString: String,
+                        ): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettings(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettingsForPackage(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                            packageName: String,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun copyToClipboard(clipboard: Clipboard, text: String) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun pasteFromClipboard(clipboard: Clipboard): String {
+                            throw NotImplementedError()
+                        }
                     }
                 )
             }
@@ -238,9 +286,13 @@ private fun DarkPreview() {
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
+                    intentTools = object : IntentTools {
+                        override fun getIntentUriString(intent: Intent): String {
+                            throw NotImplementedError()
+                        }
+
                         @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = IntentTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -257,6 +309,44 @@ private fun DarkPreview() {
                             "net.osmand.plus",
                             "us.spotco.maps",
                         )
+
+                        override fun openApp(context: Context, packageName: String, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun openChooser(context: Context, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun isDefaultHandlerEnabled(
+                            packageManager: PackageManager,
+                            uriString: String,
+                        ): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettings(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettingsForPackage(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                            packageName: String,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun copyToClipboard(clipboard: Clipboard, text: String) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun pasteFromClipboard(clipboard: Clipboard): String {
+                            throw NotImplementedError()
+                        }
                     }
                 )
             }
@@ -274,9 +364,13 @@ private fun OneAppPreview() {
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
+                    intentTools = object : IntentTools {
+                        override fun getIntentUriString(intent: Intent): String {
+                            throw NotImplementedError()
+                        }
+
                         @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = IntentTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -285,6 +379,44 @@ private fun OneAppPreview() {
                         override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
                         )
+
+                        override fun openApp(context: Context, packageName: String, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun openChooser(context: Context, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun isDefaultHandlerEnabled(
+                            packageManager: PackageManager,
+                            uriString: String,
+                        ): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettings(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettingsForPackage(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                            packageName: String,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun copyToClipboard(clipboard: Clipboard, text: String) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun pasteFromClipboard(clipboard: Clipboard): String {
+                            throw NotImplementedError()
+                        }
                     }
                 )
             }
@@ -302,9 +434,13 @@ private fun DarkOneAppPreview() {
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
+                    intentTools = object : IntentTools {
+                        override fun getIntentUriString(intent: Intent): String {
+                            throw NotImplementedError()
+                        }
+
                         @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                        override fun queryApp(packageManager: PackageManager, packageName: String) = IntentTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -313,6 +449,44 @@ private fun DarkOneAppPreview() {
                         override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
                         )
+
+                        override fun openApp(context: Context, packageName: String, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun openChooser(context: Context, uriString: String): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun isDefaultHandlerEnabled(
+                            packageManager: PackageManager,
+                            uriString: String,
+                        ): Boolean {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettings(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override fun showOpenByDefaultSettingsForPackage(
+                            context: Context,
+                            launcher: ActivityResultLauncher<Intent>,
+                            packageName: String,
+                        ) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun copyToClipboard(clipboard: Clipboard, text: String) {
+                            throw NotImplementedError()
+                        }
+
+                        override suspend fun pasteFromClipboard(clipboard: Clipboard): String {
+                            throw NotImplementedError()
+                        }
                     }
                 )
             }

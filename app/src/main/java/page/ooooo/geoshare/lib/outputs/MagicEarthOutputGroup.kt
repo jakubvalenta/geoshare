@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultIntentTools
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
@@ -210,7 +211,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         private fun queryApp(): IntentTools.App? =
-            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+                ?.also { appCache = it }
     }
 
     @Immutable
@@ -271,7 +273,8 @@ object MagicEarthOutputGroup : OutputGroup<Position> {
 
         @Composable
         private fun queryApp(): IntentTools.App? =
-            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+                ?.also { appCache = it }
     }
 
     override fun getTextOutput() = null

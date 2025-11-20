@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultIntentTools
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.inputs.*
 import page.ooooo.geoshare.ui.Filter.*
@@ -51,8 +51,8 @@ private sealed class Filter(val titleResId: Int) {
 private fun getDocumentations(
     filter: Filter,
     changelogShownForVersionCode: Int?,
-    intentTools: IntentTools,
     packageManager: PackageManager,
+    intentTools: IntentTools,
 ): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
     var newChangelogShownForVersionCode = 1
@@ -94,18 +94,6 @@ private fun getDocumentations(
     )
 }
 
-private fun getDocumentations(
-    context: Context,
-    filter: Filter,
-    changelogShownForVersionCode: Int?,
-    viewModel: ConversionViewModel,
-) = getDocumentations(
-    filter,
-    changelogShownForVersionCode,
-    intentTools = viewModel.intentTools,
-    packageManager = context.packageManager,
-)
-
 private val trimHttpsRegex = """^https://""".toRegex()
 
 private fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
@@ -114,6 +102,7 @@ private fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRe
 @Composable
 fun InputsScreen(
     onBack: () -> Unit = {},
+    intentTools: IntentTools = DefaultIntentTools,
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
@@ -129,10 +118,10 @@ fun InputsScreen(
     }
     var filter by remember { mutableStateOf(if (!changelogShown) Recent() else All()) }
     var documentations by remember(filter, changelogShownForVersionCode) {
-        mutableStateOf(getDocumentations(context, filter, changelogShownForVersionCode, viewModel))
+        mutableStateOf(getDocumentations(filter, changelogShownForVersionCode, context.packageManager, intentTools))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        documentations = getDocumentations(context, filter, changelogShownForVersionCode, viewModel)
+        documentations = getDocumentations(filter, changelogShownForVersionCode, context.packageManager, intentTools)
     }
 
     InputsScreen(
@@ -144,7 +133,7 @@ fun InputsScreen(
             onBack()
         },
         onChangeFilter = { filter = it },
-        onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
+        onShowOpenByDefaultSettings = { intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 

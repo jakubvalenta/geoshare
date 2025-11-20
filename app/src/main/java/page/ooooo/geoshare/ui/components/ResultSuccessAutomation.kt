@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,8 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -228,14 +224,9 @@ private fun DarkPreview() {
 private fun WaitingPreview() {
     AppTheme {
         Surface {
-            val context = LocalContext.current
-            val clipboard = LocalClipboard.current
-            val saveGpxLauncher =
-                rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
             ResultSuccessAutomation(
                 currentState = AutomationWaiting(
                     stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                    runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
@@ -253,14 +244,9 @@ private fun WaitingPreview() {
 private fun DarkWaitingPreview() {
     AppTheme {
         Surface {
-            val context = LocalContext.current
-            val clipboard = LocalClipboard.current
-            val saveGpxLauncher =
-                rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
             ResultSuccessAutomation(
                 currentState = AutomationWaiting(
                     stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
-                    runContext = ConversionRunContext(context, clipboard, saveGpxLauncher),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),

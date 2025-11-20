@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.DefaultIntentTools
 import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.Uri
@@ -213,7 +214,8 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
         @Composable
         private fun queryApp(): IntentTools.App? =
-            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+                ?.also { appCache = it }
     }
 
     @Immutable
@@ -274,7 +276,8 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
         @Composable
         private fun queryApp(): IntentTools.App? =
-            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+            appCache ?: DefaultIntentTools.queryApp(LocalContext.current.packageManager, packageName)
+                ?.also { appCache = it }
     }
 
     override fun getTextOutput() = null

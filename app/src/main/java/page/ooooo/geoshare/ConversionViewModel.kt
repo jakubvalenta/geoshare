@@ -1,30 +1,22 @@
 package page.ooooo.geoshare
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
-import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
-import androidx.compose.ui.platform.Clipboard
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.*
-import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.SavableDelegate
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.inputs.allInputs
-import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
-import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,10 +24,8 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    val intentTools = IntentTools()
     val stateContext = ConversionStateContext(
         inputs = allInputs,
-        intentTools = intentTools,
         userPreferencesRepository = userPreferencesRepository,
     ) { newState ->
         _currentState.value = newState
@@ -125,8 +115,8 @@ class ConversionViewModel @Inject constructor(
         userPreferencesValues.value.introShownForVersionCodeValue != IntroShowForVersionCode.default,
     )
 
-    fun start(runContext: ConversionRunContext) {
-        stateContext.currentState = ReceivedUriString(stateContext, runContext, inputUriString)
+    fun start() {
+        stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
         transition()
     }
 
@@ -166,6 +156,23 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun finishAutomation(success: Boolean?) {
+        (stateContext.currentState as? AutomationReady)?.let { currentState ->
+            stateContext.currentState = AutomationRan(
+                stateContext,
+                currentState.inputUriString,
+                currentState.position,
+                currentState.automation,
+                success
+            )
+            transition()
+        }
+    }
+
+    fun writeGpx(writer: Appendable) {
+        (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpx(writer)
+    }
+
     private fun transition() {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
@@ -181,22 +188,6 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun saveGpx(context: Context, result: ActivityResult) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    val writer = outputStream.writer()
-                    val saveGpxAction = allOutputGroups.firstNotNullOfOrNull { outputGroup ->
-                        outputGroup.getActionOutputs()
-                            .firstNotNullOfOrNull { it.getAction(currentState.position) as? Action.SaveGpx }
-                    }
-                    saveGpxAction?.write(writer)
-                    writer.close()
-                }
-            }
-        }
-    }
-
     fun cancel() {
         transitionJob?.cancel()
     }
@@ -208,54 +199,6 @@ class ConversionViewModel @Inject constructor(
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
             transition()
-        }
-    }
-
-    fun updateInput(value: Intent) {
-        updateInput(intentTools.getIntentUriString(value) ?: "")
-    }
-
-    fun pasteInput(clipboard: Clipboard) {
-        viewModelScope.launch {
-            updateInput(intentTools.pasteFromClipboard(clipboard))
-        }
-    }
-
-    fun runAction(runContext: ConversionRunContext, action: Action) {
-        viewModelScope.launch {
-            try {
-                val success = action.run(intentTools, runContext)
-                if (success) {
-                    if (action is Action.Copy) {
-                        val systemHasClipboardEditor = VERSION.SDK_INT >= VERSION_CODES.TIRAMISU
-                        if (!systemHasClipboardEditor) {
-                            Toast.makeText(
-                                runContext.context,
-                                R.string.copying_finished,
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                    }
-                } else {
-                    if (action is Action.OpenApp) {
-                        Toast.makeText(
-                            runContext.context, runContext.context.resources.getString(
-                                R.string.conversion_automation_open_app_failed,
-                                intentTools.queryApp(runContext.context.packageManager, action.packageName)?.label
-                                    ?: action.packageName,
-                            ), Toast.LENGTH_SHORT
-                        ).show()
-                    } else if (action is Action.OpenChooser) {
-                        Toast.makeText(
-                            runContext.context,
-                            R.string.conversion_succeeded_apps_not_found,
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                    }
-                }
-            } catch (tr: Exception) {
-                stateContext.log.e(null, "Exception while running action action", tr)
-            }
         }
     }
 

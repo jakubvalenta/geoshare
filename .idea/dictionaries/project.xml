@@ -1,18 +1,3 @@
 <component name="ProjectDictionaryState">
-  <dictionary name="project">
-    <words>
-      <w>amap</w>
-      <w>coord</w>
-      <w>coords</w>
-      <w>magicearth</w>
-      <w>mapy</w>
-      <w>osmand</w>
-      <w>placelist</w>
-      <w>placelists</w>
-      <w>streetview</w>
-      <w>threema</w>
-      <w>weblate</w>
-      <w>wego</w>
-    </words>
-  </dictionary>
+  <dictionary name="project" />
 </component>
