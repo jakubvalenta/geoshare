@@ -25,6 +25,7 @@ class MapsMeInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Organic Maps short URI
         testUri(
+            @Suppress("SpellCheckingInspection")
             Position(Srs.WGS84, 40.7127405, -74.005997, z = 9.0, name = "Nova Iorque"),
             "https://omaps.app/Umse5f0H8a/Nova_Iorque",
         )

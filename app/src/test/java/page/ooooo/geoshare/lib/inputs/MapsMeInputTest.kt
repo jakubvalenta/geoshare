@@ -87,6 +87,7 @@ class MapsMeInputTest : BaseInputTest() {
             parseUri("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
+            @Suppress("SpellCheckingInspection")
             Position(Srs.WGS84, 40.7127405, -74.005997, z = 9.0, name = "Nova Iorque") to null,
             parseUri("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
         )
