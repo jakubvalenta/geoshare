@@ -1,5 +1,5 @@
 - Added Amap (AutoNavi) support.
-- Added support for location name in input Google Maps, Apple Maps, Magic Earth and geo: links.
+- Added support for reading the name of the input location (landmark, shop etc.).
 - Added "navigate to" and "street view" to Google Maps app menu.
 - Improved connection speed.
 - Improved Yandex Maps organization link precision.
