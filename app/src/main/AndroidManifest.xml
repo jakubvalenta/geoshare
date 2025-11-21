@@ -23,6 +23,7 @@
             android:name="page.ooooo.geoshare.ConversionActivity"
             android:excludeFromRecents="true"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/TranslucentTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
