@@ -23,15 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed interface GridItem {
-    data class App(val app: IntentTools.App, val outputs: List<Output.App<Position>>) : GridItem
+    data class App(val app: AndroidTools.App, val outputs: List<Output.App<Position>>) : GridItem
     class ShareButton : GridItem
     class Empty : GridItem
 }
@@ -44,7 +44,12 @@ private val dropdownButtonOffset = 20.dp
 fun ResultSuccessApps(
     position: Position,
     onRun: (action: Action) -> Unit,
-    intentTools: IntentTools = IntentTools(),
+    onQueryApp: (packageManager: PackageManager, packageName: String) -> AndroidTools.App? = { packageManager, packageName ->
+        AndroidTools.queryApp(packageManager, packageName)
+    },
+    onQueryGeoUriPackageNames: (packageManager: PackageManager) -> List<String> = { packageManager ->
+        AndroidTools.queryGeoUriPackageNames(packageManager)
+    },
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val context = LocalContext.current
@@ -55,12 +60,12 @@ fun ResultSuccessApps(
         4
     }
     val appOutputs = allOutputGroups.getAppOutputs(
-        packageNames = intentTools.queryGeoUriPackageNames(context.packageManager),
+        packageNames = onQueryGeoUriPackageNames(context.packageManager),
     )
-    val apps: Map<IntentTools.App, List<Output.App<Position>>> = appOutputs
+    val apps: Map<AndroidTools.App, List<Output.App<Position>>> = appOutputs
         .groupBy { it.packageName }
         .mapNotNull { (packageName, items) ->
-            intentTools.queryApp(context.packageManager, packageName)?.let { app -> app to items }
+            onQueryApp(context.packageManager, packageName)?.let { app -> app to items }
         }
         .sortedBy { (app) -> app.label }
         .toMap()
@@ -100,7 +105,7 @@ fun ResultSuccessApps(
 @Composable
 fun RowScope.ResultSuccessApp(
     position: Position,
-    app: IntentTools.App,
+    app: AndroidTools.App,
     outputs: List<Output.App<Position>>,
     onRun: (action: Action) -> Unit,
 ) {
@@ -199,19 +204,20 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
-                        @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                    onQueryApp = { _, packageName ->
+                        AndroidTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
-
+                    },
+                    onQueryGeoUriPackageNames = {
                         @Suppress("SpellCheckingInspection")
-                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                        listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
                             MagicEarthOutputGroup.PACKAGE_NAME,
                             "app.comaps.fdroid",
@@ -221,7 +227,7 @@ private fun DefaultPreview() {
                             "net.osmand.plus",
                             "us.spotco.maps",
                         )
-                    }
+                    },
                 )
             }
         }
@@ -235,19 +241,20 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
-                        @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                    onQueryApp = { _, packageName ->
+                        AndroidTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
-
+                    },
+                    onQueryGeoUriPackageNames = {
                         @Suppress("SpellCheckingInspection")
-                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                        listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
                             MagicEarthOutputGroup.PACKAGE_NAME,
                             "app.comaps.fdroid",
@@ -257,7 +264,7 @@ private fun DarkPreview() {
                             "net.osmand.plus",
                             "us.spotco.maps",
                         )
-                    }
+                    },
                 )
             }
         }
@@ -271,21 +278,30 @@ private fun OneAppPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
-                        @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                    onQueryApp = { _, packageName ->
+                        AndroidTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
-
-                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                    },
+                    onQueryGeoUriPackageNames = {
+                        @Suppress("SpellCheckingInspection")
+                        listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
+                            MagicEarthOutputGroup.PACKAGE_NAME,
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.here.app.maps",
+                            "cz.seznam.mapy",
+                            "net.osmand.plus",
+                            "us.spotco.maps",
                         )
-                    }
+                    },
                 )
             }
         }
@@ -299,21 +315,30 @@ private fun DarkOneAppPreview() {
         Surface {
             Column {
                 val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
                     position = Position.example,
                     onRun = {},
-                    intentTools = object : IntentTools() {
-                        @SuppressLint("LocalContextGetResourceValueCall")
-                        override fun queryApp(packageManager: PackageManager, packageName: String) = App(
+                    onQueryApp = { _, packageName ->
+                        AndroidTools.App(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
-
-                        override fun queryGeoUriPackageNames(packageManager: PackageManager) = listOf(
+                    },
+                    onQueryGeoUriPackageNames = {
+                        @Suppress("SpellCheckingInspection")
+                        listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
+                            MagicEarthOutputGroup.PACKAGE_NAME,
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.here.app.maps",
+                            "cz.seznam.mapy",
+                            "net.osmand.plus",
+                            "us.spotco.maps",
                         )
-                    }
+                    },
                 )
             }
         }

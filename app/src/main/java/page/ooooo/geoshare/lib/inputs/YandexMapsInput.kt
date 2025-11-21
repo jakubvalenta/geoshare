@@ -2,13 +2,16 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import kotlinx.io.Source
-import kotlinx.io.readLine
+import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.findLatLonZ
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.matchLatLonZ
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     private val srs = Srs.WGS84
@@ -47,26 +50,26 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             @Suppress("SpellCheckingInspection")
-            setPointFromMatcher { LON_LAT_PATTERN match queryParams["whatshere%5Bpoint%5D"] }
-            setPointFromMatcher { LON_LAT_PATTERN match queryParams["ll"] }
+            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["whatshere%5Bpoint%5D"] }
+            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["ll"] }
             @Suppress("SpellCheckingInspection")
-            setZoomFromMatcher { Z_PATTERN match queryParams["whatshere%5Bzoom%5D"] }
-            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-            setUriString { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
+            setZIfNull { Z_PATTERN matchZ queryParams["whatshere%5Bzoom%5D"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+            setUriStringIfNull { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
-            for (line in generateSequence { source.readLine() }) {
-                (pattern find line)?.toPoint(srs)?.let { point ->
-                    points.add(point)
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
+                (pattern findLatLonZ line)?.let { (lat, lon, z) ->
+                    addPoint { LatLonZ(lat, lon, z) }
                     break
                 }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

@@ -13,13 +13,14 @@ class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates
         testUri(
-            Position(Srs.WGS84, 52.4804611, 13.4250923),
+            Position(Srs.WGS84, 52.4804611, 13.4250923, name = "Marked Location"),
             "https://maps.apple.com/place?address=Boddinstra%C3%9Fe%2C+Hermannstra%C3%9Fe+36%E2%80%9337%2C+12049+Berlin%2C+Germany&coordinate=52.4804611%2C13.4250923&name=Marked+Location",
         )
 
         // Coordinates and query
         testUri(
-            Position(Srs.WGS84, 52.4890246, 13.4295963),
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, 52.4890246, 13.4295963, name = "Reuterplatz"),
             "https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902",
         )
 

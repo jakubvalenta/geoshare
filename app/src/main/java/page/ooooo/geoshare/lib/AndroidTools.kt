@@ -14,30 +14,31 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.core.net.toUri
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import java.text.SimpleDateFormat
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 import java.util.*
 
-open class IntentTools {
-    companion object {
-        const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
-    }
+object AndroidTools {
+
+    const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
 
     data class App(val packageName: String, val label: String, val icon: Drawable)
 
-    fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
+    private fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
         setPackage(packageName)
     }
 
-    fun createChooserIntent(data: Uri): Intent = Intent.createChooser(
+    private fun createChooserIntent(data: Uri): Intent = Intent.createChooser(
         Intent(Intent.ACTION_VIEW, data),
         "Choose an app",
     ).apply {
         putExtra(
             Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
                 @Suppress("SpellCheckingInspection")
-                ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity"),
+                (ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity")),
                 @Suppress("SpellCheckingInspection")
-                ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity"),
+                (ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity")),
             )
         )
     }
@@ -69,7 +70,7 @@ open class IntentTools {
         }
     }
 
-    open fun queryApp(packageManager: PackageManager, packageName: String): App? {
+    fun queryApp(packageManager: PackageManager, packageName: String): App? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
@@ -88,7 +89,7 @@ open class IntentTools {
         }
     }
 
-    open fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
+    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(
                 Intent(Intent.ACTION_VIEW, "geo:".toUri()),
@@ -109,7 +110,7 @@ open class IntentTools {
         }
     }
 
-    fun startActivity(context: Context, intent: Intent): Boolean = try {
+    private fun startActivity(context: Context, intent: Intent): Boolean = try {
         context.startActivity(intent)
         true
     } catch (_: ActivityNotFoundException) {
@@ -121,29 +122,6 @@ open class IntentTools {
 
     fun openChooser(context: Context, uriString: String): Boolean =
         startActivity(context, createChooserIntent(uriString.toUri()))
-
-    fun launchSaveGpx(context: Context, saveGpxLauncher: ActivityResultLauncher<Intent>): Boolean {
-        @Suppress("SpellCheckingInspection")
-        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
-        val filename = context.resources.getString(
-            R.string.conversion_succeeded_save_gpx_filename,
-            context.resources.getString(R.string.app_name),
-            timestamp,
-        )
-        return try {
-            saveGpxLauncher.launch(
-                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "text/xml"
-                    putExtra(Intent.EXTRA_TITLE, filename)
-                }
-            )
-            true
-        } catch (e: Exception) {
-            Log.e(null, "Error when saving GPX file", e)
-            false
-        }
-    }
 
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
         val resolveInfo = try {
@@ -164,10 +142,7 @@ open class IntentTools {
         return packageName == BuildConfig.APPLICATION_ID
     }
 
-    fun showOpenByDefaultSettings(
-        context: Context,
-        launcher: ActivityResultLauncher<Intent>,
-    ) {
+    fun showOpenByDefaultSettings(context: Context, launcher: ActivityResultLauncher<Intent>) {
         showOpenByDefaultSettingsForPackage(context, launcher, BuildConfig.APPLICATION_ID)
     }
 
@@ -196,14 +171,26 @@ open class IntentTools {
         }
     }
 
-    suspend fun copyToClipboard(context: Context, clipboard: Clipboard, text: String) {
+    suspend fun copyToClipboard(clipboard: Clipboard, text: String) =
         clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("Geographic coordinates", text)))
-        val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-        if (!systemHasClipboardEditor) {
-            Toast.makeText(context, R.string.copying_finished, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     suspend fun pasteFromClipboard(clipboard: Clipboard): String =
         clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
+
+    /**
+     * See [GitHub Gist](https://gist.github.com/starry-shivam/901267c26eb030eb3faf1ccd4d2bdd32)
+     */
+    fun isMiuiDevice(): Boolean =
+        setOf("xiaomi", "redmi", "poco").contains(Build.BRAND.lowercase()) &&
+            (!getRuntimeProperty("ro.miui.ui.version.name").isNullOrBlank() ||
+                !getRuntimeProperty("ro.mi.os.version.name").isNullOrBlank())
+
+    private fun getRuntimeProperty(property: String): String? = try {
+        @Suppress("SpellCheckingInspection")
+        Runtime.getRuntime().exec("getprop $property").inputStream.use { input ->
+            BufferedReader(InputStreamReader(input), 1024).readLine()
+        }
+    } catch (_: IOException) {
+        null
+    }
 }

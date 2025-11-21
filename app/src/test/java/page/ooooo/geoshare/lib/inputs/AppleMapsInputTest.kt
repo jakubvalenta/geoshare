@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -66,7 +67,8 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_place() {
         assertEquals(
-            Position(Srs.WGS84, 52.4890246, 13.4295963) to null,
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, 52.4890246, 13.4295963, name = "Reuterplatz") to null,
             parseUri("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
         )
     }
@@ -187,7 +189,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_success() {
+    fun parseHtml_success() = runTest {
         assertEquals(
             Position(Srs.WGS84, 52.4735927, 13.4050798) to null,
             @Suppress("SpellCheckingInspection")
@@ -206,7 +208,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_failure() {
+    fun parseHtml_failure() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("spam"),

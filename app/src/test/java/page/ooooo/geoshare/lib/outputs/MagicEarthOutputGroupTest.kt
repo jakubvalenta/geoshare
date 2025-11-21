@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
 
-class MagicEarthOutputTest {
+class MagicEarthOutputGroupTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val outputGroup = MagicEarthOutputGroup
 
@@ -17,6 +17,15 @@ class MagicEarthOutputTest {
             Action.Copy("magicearth://?show_on_map&lat=50.123456&lon=-11.123456"),
             outputGroup.getActionOutputs().first()
                 .getAction(Position(Srs.WGS84, 50.123456, -11.123456, z = 5.0), uriQuote),
+        )
+    }
+
+    @Test
+    fun copyOutput_whenPositionHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
+        assertEquals(
+            Action.Copy("magicearth://?show_on_map&lat=50.123456&lon=-11.123456&name=foo%20bar"),
+            outputGroup.getActionOutputs().first()
+                .getAction(Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar"), uriQuote),
         )
     }
 

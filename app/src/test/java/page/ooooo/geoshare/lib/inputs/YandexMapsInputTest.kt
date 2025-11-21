@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -108,7 +109,7 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_containsCoordinates_returnsPosition() {
+    fun parseHtml_containsCoordinates_returnsPosition() = runTest {
         assertEquals(
             Position(Srs.WGS84, 50.107130, 8.660903) to null,
             @Suppress("SpellCheckingInspection")
@@ -117,7 +118,7 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_doesNotContainCoordinates_returnsNull() {
+    fun parseHtml_doesNotContainCoordinates_returnsNull() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("""<html></html>""")

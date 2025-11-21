@@ -6,17 +6,17 @@ import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.*
 import org.junit.Before
-import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.XiaomiTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
-import page.ooooo.geoshare.lib.outputs.getSupportingTextOutput
+import page.ooooo.geoshare.lib.outputs.getDescriptionOutput
 import page.ooooo.geoshare.lib.outputs.getTextOutput
+import page.ooooo.geoshare.lib.position.Position
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -93,7 +93,7 @@ abstract class BaseActivityBehaviorTest {
     protected fun assertNotXiaomi() = uiAutomator {
         assertFalse(
             "We cannot close the app on Xiaomi MIUI, because it stops the tests",
-            XiaomiTools.isMiuiDevice(),
+            AndroidTools.isMiuiDevice(),
         )
     }
 
@@ -101,11 +101,15 @@ abstract class BaseActivityBehaviorTest {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
+        val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
+            ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
+            ?: "Coordinates"
+        onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
-            val expectedSupportingText = allOutputGroups.getSupportingTextOutput()?.getText(expectedPosition)
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionParams" && textAsString() == expectedSupportingText }
+            val expectedDescription = allOutputGroups.getDescriptionOutput()?.getText(expectedPosition)
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" && textAsString() == expectedDescription }
         } else {
-            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionParams" })
+            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })
         }
     }
 

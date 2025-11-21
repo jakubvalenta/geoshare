@@ -4,10 +4,10 @@ import android.os.Build
 import androidx.test.filters.AbstractFilter
 import androidx.test.filters.CustomFilter
 import org.junit.runner.Description
-import page.ooooo.geoshare.lib.XiaomiTools
+import page.ooooo.geoshare.lib.AndroidTools
 
 class NotXiaomiFilter : AbstractFilter() {
-    override fun evaluateTest(description: Description?) = !XiaomiTools.isMiuiDevice()
+    override fun evaluateTest(description: Description?) = !AndroidTools.isMiuiDevice()
 
     override fun describe() = "Run if the device is not a Xiaomi MIUI device"
 }

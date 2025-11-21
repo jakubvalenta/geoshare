@@ -1,10 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,10 +15,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+
+private val iconSize = 16.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,32 +29,38 @@ fun ResultSuccessPoint(
     point: Point,
     pointCount: Int,
     textPointOutput: Output.Text<Point>?,
-    labelTextPointOutput: Output.PointLabel<Point>?,
+    namePointOutput: Output.PointLabel<Point>?,
     menuPointOutputs: List<Output.Action<Point, Action>>,
     onRun: (action: Action) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
-    val label = labelTextPointOutput?.getText(point, i, pointCount)
+    val name = namePointOutput?.getText(point, i, pointCount)
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(spacing.small),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        label?.let { text ->
-            Text(
-                text,
-                fontStyle = FontStyle.Italic,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-        SelectionContainer(Modifier.weight(1f)) {
-            textPointOutput?.getText(point)?.let { text ->
-                Text(text, style = MaterialTheme.typography.bodySmall)
+    Box {
+        FlowRow(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = iconSize + spacing.tiny),
+            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            itemVerticalAlignment = Alignment.CenterVertically,
+        ) {
+            name?.let { text ->
+                Text(
+                    text,
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            SelectionContainer {
+                textPointOutput?.getText(point)?.let { text ->
+                    Text(text, style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
-        Box {
-            IconButton({ setSheetVisible(true) }, Modifier.size(16.dp)) {
+        Box(Modifier.align(Alignment.TopEnd)) {
+            IconButton({ setSheetVisible(true) }, Modifier.size(iconSize)) {
                 Icon(
                     painterResource(R.drawable.more_horiz_24px),
                     contentDescription = stringResource(R.string.nav_menu_content_description),
@@ -74,7 +79,7 @@ fun ResultSuccessPoint(
         ResultSuccessSheetContent(
             copyActionsAndLabels = copyActionsAndLabels,
             otherActionsAndLabels = otherActionsAndLabels,
-            headline = label,
+            headline = name,
             onHide = onHide,
             onRun = onRun,
         )
@@ -91,7 +96,7 @@ private fun DefaultPreview() {
                 point = Point.example,
                 pointCount = 5,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -109,7 +114,7 @@ private fun DarkPreview() {
                 point = Point.example,
                 pointCount = 5,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -119,15 +124,16 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun OnePointPreview() {
+private fun LongNamePreview() {
     AppTheme {
         Surface {
+            @Suppress("SpellCheckingInspection")
             ResultSuccessPoint(
                 i = 3,
-                point = Point.example,
+                point = Point.example.copy(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 pointCount = 1,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )
@@ -137,15 +143,16 @@ private fun OnePointPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkOnePointPreview() {
+private fun DarkLongNamePreview() {
     AppTheme {
         Surface {
+            @Suppress("SpellCheckingInspection")
             ResultSuccessPoint(
-                i = 0,
-                point = Point.example,
+                i = 3,
+                point = Point.example.copy(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 pointCount = 1,
                 textPointOutput = allPointOutputGroups.getTextOutput(),
-                labelTextPointOutput = allPointOutputGroups.getLabelTextOutput(),
+                namePointOutput = allPointOutputGroups.getNameOutput(),
                 menuPointOutputs = allPointOutputGroups.getActionOutputs(),
                 onRun = {},
             )

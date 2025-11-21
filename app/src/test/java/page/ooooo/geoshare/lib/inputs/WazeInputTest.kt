@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -166,7 +167,7 @@ class WazeInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_containsLatLngJSON_returnsPosition() {
+    fun parseHtml_containsLatLngJSON_returnsPosition() = runTest {
         assertEquals(
             Position(Srs.WGS84, 43.64265563, -79.387202798) to null,
             parseHtml(
@@ -192,7 +193,7 @@ class WazeInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_containsInvalidDataCoordinates_returnsNull() {
+    fun parseHtml_containsInvalidDataCoordinates_returnsNull() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("""<html><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>""")
@@ -200,7 +201,7 @@ class WazeInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_doesNotContainCoordinates_returnsNull() {
+    fun parseHtml_doesNotContainCoordinates_returnsNull() = runTest {
         assertEquals(
             Position() to null,
             parseHtml("""<html></html>""")

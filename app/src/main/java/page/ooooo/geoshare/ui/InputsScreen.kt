@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -29,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.IntentTools
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.inputs.*
 import page.ooooo.geoshare.ui.Filter.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -51,7 +50,6 @@ private sealed class Filter(val titleResId: Int) {
 private fun getDocumentations(
     filter: Filter,
     changelogShownForVersionCode: Int?,
-    intentTools: IntentTools,
     packageManager: PackageManager,
 ): Documentations {
     val defaultHandlersEnabled = mutableMapOf<String, Boolean>()
@@ -66,7 +64,7 @@ private fun getDocumentations(
             }
             if (documentationInput is Input.DocumentationInput.Url) {
                 val defaultHandlerEnabled =
-                    intentTools.isDefaultHandlerEnabled(packageManager, documentationInput.urlString)
+                    AndroidTools.isDefaultHandlerEnabled(packageManager, documentationInput.urlString)
                 if (filter is Enabled) {
                     if (!defaultHandlerEnabled) {
                         return@filter false
@@ -94,18 +92,6 @@ private fun getDocumentations(
     )
 }
 
-private fun getDocumentations(
-    context: Context,
-    filter: Filter,
-    changelogShownForVersionCode: Int?,
-    viewModel: ConversionViewModel,
-) = getDocumentations(
-    filter,
-    changelogShownForVersionCode,
-    intentTools = viewModel.intentTools,
-    packageManager = context.packageManager,
-)
-
 private val trimHttpsRegex = """^https://""".toRegex()
 
 private fun trimHttps(urlString: String): String = urlString.replace(trimHttpsRegex, "")
@@ -129,10 +115,10 @@ fun InputsScreen(
     }
     var filter by remember { mutableStateOf(if (!changelogShown) Recent() else All()) }
     var documentations by remember(filter, changelogShownForVersionCode) {
-        mutableStateOf(getDocumentations(context, filter, changelogShownForVersionCode, viewModel))
+        mutableStateOf(getDocumentations(filter, changelogShownForVersionCode, context.packageManager))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        documentations = getDocumentations(context, filter, changelogShownForVersionCode, viewModel)
+        documentations = getDocumentations(filter, changelogShownForVersionCode, context.packageManager)
     }
 
     InputsScreen(
@@ -144,7 +130,7 @@ fun InputsScreen(
             onBack()
         },
         onChangeFilter = { filter = it },
-        onShowOpenByDefaultSettings = { viewModel.intentTools.showOpenByDefaultSettings(context, settingsLauncher) },
+        onShowOpenByDefaultSettings = { AndroidTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
 }
 
@@ -342,7 +328,7 @@ private fun DefaultPreview() {
             filters = listOf(Recent(), All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
@@ -369,7 +355,7 @@ private fun DarkPreview() {
             filters = listOf(Recent(), All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
@@ -396,7 +382,7 @@ private fun AllPreview() {
             filters = listOf(All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,
@@ -423,7 +409,7 @@ private fun DarkAllPreview() {
             filters = listOf(All(), Enabled(), Disabled()),
             documentations = Documentations(
                 documentations = listOf(
-                    GeoInput,
+                    GeoUriInput,
                     GoogleMapsInput,
                     OpenStreetMapInput,
                     CoordinatesInput,

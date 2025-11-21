@@ -72,7 +72,7 @@ class MagicEarthInputTest : BaseInputTest() {
     @Test
     fun parseUri_parametersLatAndLonTakePrecedenceOverQ() {
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
+            Position(Srs.WGS84, -17.2165721, -149.9470294, name = "Central Park") to null,
             parseUri("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park")
         )
     }
@@ -98,7 +98,7 @@ class MagicEarthInputTest : BaseInputTest() {
     @Test
     fun parseUri_customScheme() {
         assertEquals(
-            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4) to null,
+            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4, name = "foo bar") to null,
             parseUri("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4")
         )
     }

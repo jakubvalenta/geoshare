@@ -16,9 +16,9 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
         override fun getText(value: Point, uriQuote: UriQuote) = formatDegMinSecString(value)
     }
 
-    object LabelTextOutput : Output.PointLabel<Point> {
+    object NameOutput : Output.PointLabel<Point> {
         @Composable
-        override fun getText(value: Point, i: Int, pointCount: Int, uriQuote: UriQuote) = label(value, i, pointCount)
+        override fun getText(value: Point, i: Int, pointCount: Int, uriQuote: UriQuote) = name(value, i, pointCount)
     }
 
     object CopyDegMinSecOutput : Output.Action<Point, Action> {
@@ -43,9 +43,9 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
 
     override fun getTextOutput() = TextOutput
 
-    override fun getLabelTextOutput() = LabelTextOutput
+    override fun getNameOutput() = NameOutput
 
-    override fun getSupportingTextOutput() = null
+    override fun getDescriptionOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDegMinSecOutput,
@@ -77,9 +77,9 @@ object CoordinatesPointOutputGroup : OutputGroup<Point> {
     }
 
     @Composable
-    fun label(value: Point, i: Int, pointCount: Int): String? =
-        if (!value.desc.isNullOrEmpty()) {
-            value.desc
+    fun name(value: Point, i: Int, pointCount: Int): String? =
+        if (!value.name.isNullOrEmpty()) {
+            value.name.replace('+', ' ')
         } else if (pointCount > 1) {
             stringResource(R.string.conversion_succeeded_point_number, i + 1)
         } else {

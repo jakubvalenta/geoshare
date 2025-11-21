@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Srs
 
 object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
@@ -69,9 +69,9 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
 
     override fun getTextOutput() = null
 
-    override fun getLabelTextOutput() = null
+    override fun getNameOutput() = null
 
-    override fun getSupportingTextOutput() = null
+    override fun getDescriptionOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
@@ -102,7 +102,6 @@ object GoogleMapsPointOutputGroup : OutputGroup<Point> {
         },
         uriQuote = uriQuote,
     ).toString()
-
 
     private fun formatNavigateToUriString(value: Point, uriQuote: UriQuote): String = Uri(
         scheme = "google.navigation",

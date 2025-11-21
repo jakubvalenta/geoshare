@@ -12,8 +12,8 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.outputs.Automation
-import page.ooooo.geoshare.lib.IntentTools
 import page.ooooo.geoshare.lib.outputs.allOutputGroups
 import page.ooooo.geoshare.lib.outputs.findAutomation
 import page.ooooo.geoshare.lib.outputs.getAutomations
@@ -177,7 +177,7 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
     @Composable
     override fun options(): List<UserPreferenceOption<Automation>> {
         val context = LocalContext.current
-        val packageNames = IntentTools().queryGeoUriPackageNames(context.packageManager)
+        val packageNames = AndroidTools.queryGeoUriPackageNames(context.packageManager)
         return buildList {
             add(Automation.Noop)
             addAll(allOutputGroups.getAutomations(packageNames))

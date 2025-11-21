@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.IntentTools
-import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
@@ -32,7 +32,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
 
     @Suppress("SpellCheckingInspection")
     const val GMAPS_WV_PACKAGE_NAME = "us.spotco.maps"
-    val PACKAGE_NAMES = listOf(
+    val PACKAGE_NAMES = setOf(
         GOOGLE_MAPS_PACKAGE_NAME,
         GMAPS_WV_PACKAGE_NAME,
     )
@@ -86,7 +86,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatNavigateToUriString(value, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
+        override fun label(app: AndroidTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_navigate_to, app.label)
 
         override fun isEnabled(value: Position) = true
@@ -98,7 +98,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
             Action.OpenApp(packageName, formatStreetViewUriString(value, uriQuote))
 
         @Composable
-        override fun label(app: IntentTools.App) =
+        override fun label(app: AndroidTools.App) =
             stringResource(R.string.conversion_succeeded_open_app_street_view, app.label)
 
         override fun isEnabled(value: Position) = value.mainPoint != null
@@ -209,11 +209,12 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
                 counterSec,
             )
 
-        private var appCache: IntentTools.App? = null
+        private var appCache: AndroidTools.App? = null
 
         @Composable
-        private fun queryApp(): IntentTools.App? =
-            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+        private fun queryApp(): AndroidTools.App? =
+            appCache ?: AndroidTools.queryApp(LocalContext.current.packageManager, packageName)
+                ?.also { appCache = it }
     }
 
     @Immutable
@@ -270,18 +271,19 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
                 counterSec,
             )
 
-        private var appCache: IntentTools.App? = null
+        private var appCache: AndroidTools.App? = null
 
         @Composable
-        private fun queryApp(): IntentTools.App? =
-            appCache ?: IntentTools().queryApp(LocalContext.current.packageManager, packageName)?.also { appCache = it }
+        private fun queryApp(): AndroidTools.App? =
+            appCache ?: AndroidTools.queryApp(LocalContext.current.packageManager, packageName)
+                ?.also { appCache = it }
     }
 
     override fun getTextOutput() = null
 
-    override fun getLabelTextOutput() = null
+    override fun getNameOutput() = null
 
-    override fun getSupportingTextOutput() = null
+    override fun getDescriptionOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
@@ -290,7 +292,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
     )
 
     override fun getAppOutputs(packageNames: List<String>) = buildList {
-        PACKAGE_NAMES.filter { it != GMAPS_WV_PACKAGE_NAME && it in packageNames }.forEach { packageName ->
+        packageNames.filter { it in PACKAGE_NAMES && it != GMAPS_WV_PACKAGE_NAME }.forEach { packageName ->
             add(AppNavigateToOutput(packageName))
             add(AppStreetViewOutput(packageName))
         }
@@ -308,7 +310,7 @@ object GoogleMapsOutputGroup : OutputGroup<Position> {
         add(CopyDisplayAutomation)
         add(CopyNavigateToAutomation)
         add(CopyStreetViewAutomation)
-        PACKAGE_NAMES.filter { it != GMAPS_WV_PACKAGE_NAME && it in packageNames }.forEach { packageName ->
+        packageNames.filter { it in PACKAGE_NAMES && it != GMAPS_WV_PACKAGE_NAME }.forEach { packageName ->
             add(AppNavigateToAutomation(packageName))
             add(AppStreetViewAutomation(packageName))
         }

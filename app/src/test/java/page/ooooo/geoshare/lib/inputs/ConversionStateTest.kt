@@ -1,14 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
-import android.content.Intent
 import com.google.re2j.Pattern
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import kotlinx.io.RawSource
-import kotlinx.io.Source
-import kotlinx.io.asSource
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -19,7 +17,7 @@ import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.*
-import page.ooooo.geoshare.lib.IntentTools.Companion.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
@@ -60,8 +58,8 @@ class ConversionStateTest {
             url: URL,
             retry: Retry?,
             dispatcher: CoroutineDispatcher,
-            block: (source: RawSource) -> T,
-        ): T = block(onGetSource(url).byteInputStream().asSource())
+            block: suspend (source: ByteReadChannel) -> T,
+        ): T = block(onGetSource(url).byteInputStream().toByteReadChannel())
 
         open fun onGetSource(url: URL): String {
             throw NotImplementedError()
@@ -71,35 +69,19 @@ class ConversionStateTest {
     private val fakeLog = FakeLog()
     private val uriQuote = FakeUriQuote()
     private val fakeUserPreferencesRepository: UserPreferencesRepository = FakeUserPreferencesRepository()
-    private val mockIntentTools: IntentTools = mock {
-        on { getIntentUriString(any()) } doThrow NotImplementedError()
-        on { createChooserIntent(any()) } doThrow NotImplementedError()
-        on { queryApp(any(), any()) } doThrow NotImplementedError()
-        on { queryGeoUriPackageNames(any()) } doReturn emptyList()
-    }
 
     private fun mockStateContext(
-        inputs: List<Input> = listOf(GeoInput, GoogleMapsInput),
-        intentTools: IntentTools = mockIntentTools,
+        inputs: List<Input> = listOf(GeoUriInput, GoogleMapsInput),
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
         log: ILog = fakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
         inputs = inputs,
-        intentTools = intentTools,
         networkTools = networkTools,
         userPreferencesRepository = userPreferencesRepository,
         log = log,
         uriQuote = uriQuote,
-    )
-
-    private fun mockRunContext() = ConversionRunContext(
-        context = mock {
-            on { packageManager } doReturn mock()
-        },
-        clipboard = mock(),
-        saveGpxLauncher = mock(),
     )
 
     @Test
@@ -109,82 +91,58 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedIntent_intentDoesNotContainUrl_returnsConversionFailed() = runTest {
-        val intent = Intent()
-        val mockIntentTools: IntentTools = mock {
-            on { getIntentUriString(intent) } doReturn null
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val runContext = mockRunContext()
-        val state = ReceivedIntent(stateContext, runContext, intent)
+    fun receivedUriString_inputUriStringIsEmpty_returnsConversionFailed() = runTest {
+        val inputUriString = ""
+        val stateContext = mockStateContext()
+        val state = ReceivedUriString(stateContext, "")
         assertEquals(
-            ConversionFailed(R.string.conversion_failed_missing_url, ""),
+            ConversionFailed(R.string.conversion_failed_missing_url, inputUriString),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedIntent_intentContainsUrl_returnsReceivedUriString() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
-        val intent = Intent()
-        val mockIntentTools: IntentTools = mock {
-            on { getIntentUriString(intent) } doReturn inputUriString
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val runContext = mockRunContext()
-        val state = ReceivedIntent(stateContext, runContext, intent)
-        assertEquals(
-            ReceivedUriString(stateContext, runContext, inputUriString),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun receivedUriString_isGeoUri_returnsReceivedUriWithPermissionNull() = runTest {
+    fun receivedUriString_inputUriStringIsGeoUri_returnsReceivedUriWithPermissionNull() = runTest {
         val inputUriString = "geo:1,2?q="
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
-            ReceivedUri(stateContext, runContext, inputUriString, GeoInput, uri, null),
+            ReceivedUri(stateContext, inputUriString, GeoUriInput, uri, null),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_isUriInTheMiddleOfTheInputString_returnsReceivedUriWithPermissionNull() = runTest {
+    fun receivedUriString_inputUriStringHasUriInTheMiddle_returnsReceivedUriWithPermissionNull() = runTest {
         val inputUriString = "FOO https://maps.google.com/foo BAR"
         val matchedInputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(matchedInputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
-            ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, null),
+            ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, null),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_isValidUrl_returnsReceivedUriWithPermissionNull() = runTest {
+    fun receivedUriString_inputUriStringIsValidUrl_returnsReceivedUriWithPermissionNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
-            ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, null),
+            ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, null),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUriString_isNotValidUrl_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringIsNotValidUrl_returnsConversionFailed() = runTest {
         val inputUriString = "https://[invalid:ipv6]/"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString),
             state.transition(),
@@ -192,23 +150,10 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isEmpty_returnsConversionFailed() = runTest {
-        val inputUriString = ""
-        val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
-        assertEquals(
-            ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString),
-            state.transition(),
-        )
-    }
-
-    @Test
-    fun receivedUriString_isMissingScheme_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringDoesNotHaveScheme_returnsConversionFailed() = runTest {
         val inputUriString = "maps.google.com/"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString),
             state.transition(),
@@ -216,11 +161,10 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isRelativeScheme_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringHasRelativeScheme_returnsConversionFailed() = runTest {
         val inputUriString = "//maps.google.com/"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString),
             state.transition(),
@@ -228,11 +172,10 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isNotHttpsScheme_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringDoesNotHaveHttpsScheme_returnsConversionFailed() = runTest {
         val inputUriString = "ftp://maps.google.com/"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString),
             state.transition(),
@@ -240,11 +183,10 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_uriIsUnsupportedMapService_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.example.com/foo"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUriString(stateContext, runContext, inputUriString)
+        val state = ReceivedUriString(stateContext, inputUriString)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString),
             state.transition(),
@@ -252,21 +194,20 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUri_uriIsFullUrl_returnsUnshortenedUrlAndPassesPermission() = runTest {
+    fun receivedUri_inputSupportsShortUriAndItDoesNotMatchTheUri_returnsUnshortenedUrlAndPassesPermission() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER)
+        val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER)
         assertEquals(
-            UnshortenedUrl(stateContext, runContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER),
+            UnshortenedUrl(stateContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER),
             state.transition(),
         )
     }
 
     @Test
     fun receivedUri_inputDoesNotSupportShortUri_returnsUnshortenedUrlAndPassesPermission() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+        val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockInput = object : Input {
             override val uriPattern: Pattern = Pattern.compile(".")
@@ -274,66 +215,65 @@ class ConversionStateTest {
             override fun parseUri(uri: Uri) = Pair(Position(), null)
         }
         val stateContext = mockStateContext(inputs = listOf(mockInput))
-        val runContext = mockRunContext()
-        val state = ReceivedUri(stateContext, runContext, inputUriString, mockInput, uri, Permission.NEVER)
+        val state = ReceivedUri(stateContext, inputUriString, mockInput, uri, Permission.NEVER)
         assertEquals(
-            UnshortenedUrl(stateContext, runContext, inputUriString, mockInput, uri, Permission.NEVER),
+            UnshortenedUrl(stateContext, inputUriString, mockInput, uri, Permission.NEVER),
             state.transition(),
         )
     }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsAlways_returnsGrantedUnshortenPermission() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsAlways_returnsGrantedUnshortenPermission() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = ReceivedUri(
+                stateContext, inputUriString, GoogleMapsInput, uri, Permission.ALWAYS
+            )
+            assertEquals(
+                GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
+                state.transition(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ReceivedUri(
-            stateContext, runContext, inputUriString, GoogleMapsInput, uri, Permission.ALWAYS
-        )
-        assertEquals(
-            GrantedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri),
-            state.transition(),
-        )
-    }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsAsk_returnsRequestedUnshortenPermission() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsAsk_returnsRequestedUnshortenPermission() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.ASK)
+            assertEquals(
+                RequestedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
+                state.transition(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, Permission.ASK)
-        assertEquals(
-            RequestedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri),
-            state.transition(),
-        )
-    }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNever_returnsDeniedUnshortenPermission() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsNever_returnsDeniedUnshortenPermission() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER)
+            assertEquals(
+                DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput),
+                state.transition(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER)
-        assertEquals(
-            DeniedConnectionPermission(stateContext, runContext, inputUriString, GoogleMapsInput),
-            state.transition(),
-        )
-    }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedUnshortenPermission() =
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -341,16 +281,15 @@ class ConversionStateTest {
                 onBlocking { getValue(eq(ConnectionPermission)) } doReturn Permission.ALWAYS
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
-            val state = ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, null)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, null)
             assertEquals(
-                GrantedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri),
+                GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
                 state.transition(),
             )
         }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedUnshortenPermission() =
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -358,16 +297,15 @@ class ConversionStateTest {
                 onBlocking { getValue(eq(ConnectionPermission)) } doReturn Permission.ASK
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
-            val state = ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, null)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, null)
             assertEquals(
-                RequestedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri),
+                RequestedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
                 state.transition(),
             )
         }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedUnshortenPermission() =
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -375,10 +313,9 @@ class ConversionStateTest {
                 onBlocking { getValue(eq(ConnectionPermission)) } doReturn Permission.NEVER
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
-            val state = ReceivedUri(stateContext, runContext, inputUriString, GoogleMapsInput, uri, null)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, null)
             assertEquals(
-                DeniedConnectionPermission(stateContext, runContext, inputUriString, GoogleMapsInput),
+                DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput),
                 state.transition(),
             )
         }
@@ -388,8 +325,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = RequestedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri)
+        val state = RequestedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri)
         assertNull(state.transition())
     }
 
@@ -402,12 +338,11 @@ class ConversionStateTest {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
             val state = RequestedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
-                GrantedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri),
+                GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
                 state.grant(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
@@ -425,12 +360,11 @@ class ConversionStateTest {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
             val state = RequestedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
-                GrantedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri),
+                GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
                 state.grant(true),
             )
             verify(mockUserPreferencesRepository).setValue(
@@ -448,12 +382,11 @@ class ConversionStateTest {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
             val state = RequestedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
-                DeniedConnectionPermission(stateContext, runContext, inputUriString, GoogleMapsInput),
+                DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput),
                 state.deny(false),
             )
             verify(mockUserPreferencesRepository, never()).setValue(
@@ -470,10 +403,9 @@ class ConversionStateTest {
             onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = RequestedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri)
+        val state = RequestedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri)
         assertEquals(
-            DeniedConnectionPermission(stateContext, runContext, inputUriString, GoogleMapsInput),
+            DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput),
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -493,9 +425,8 @@ class ConversionStateTest {
                     override fun onRequestLocationHeader(url: URL): String = redirectUriString
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString),
@@ -510,17 +441,15 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            throw CancellationException()
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
+                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                        throw CancellationException()
+                    } else {
+                        super.onRequestLocationHeader(url)
+                    }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_cancelled, inputUriString),
@@ -538,21 +467,19 @@ class ConversionStateTest {
             )
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            throw tr
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
+                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                        throw tr
+                    } else {
+                        super.onRequestLocationHeader(url)
+                    }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, runContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Retry(1, tr),
+                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Retry(1, tr),
                 ),
                 state.transition(),
             )
@@ -568,18 +495,16 @@ class ConversionStateTest {
             )
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            throw tr
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
+                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                        throw tr
+                    } else {
+                        super.onRequestLocationHeader(url)
+                    }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -587,7 +512,7 @@ class ConversionStateTest {
             )
             assertEquals(
                 GrantedUnshortenPermission(
-                    stateContext, runContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Retry(2, tr),
+                    stateContext, inputUriString, GoogleMapsInput, uri, NetworkTools.Retry(2, tr),
                 ),
                 state.transition(),
             )
@@ -600,20 +525,18 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            throw UnrecoverableException(
-                                R.string.network_exception_server_response_error,
-                                Exception(),
-                            )
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
+                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                        throw UnrecoverableException(
+                            R.string.network_exception_server_response_error,
+                            Exception(),
+                        )
+                    } else {
+                        super.onRequestLocationHeader(url)
+                    }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString),
@@ -628,20 +551,18 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            throw UnrecoverableException(
-                                R.string.network_exception_server_response_error,
-                                SocketTimeoutException(),
-                            )
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
+                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                        throw UnrecoverableException(
+                            R.string.network_exception_server_response_error,
+                            SocketTimeoutException(),
+                        )
+                    } else {
+                        super.onRequestLocationHeader(url)
+                    }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_unshorten_connection_error, inputUriString),
@@ -656,17 +577,15 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? =
-                        if (url.toString() == inputUriString) {
-                            null
-                        } else {
-                            super.onRequestLocationHeader(url)
-                        }
+                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                        null
+                    } else {
+                        super.onRequestLocationHeader(url)
+                    }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 ConversionFailed(R.string.conversion_failed_unshorten_error, inputUriString),
@@ -691,18 +610,12 @@ class ConversionStateTest {
                         }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedUnshortenPermission(
-                stateContext, runContext, inputUriString, GoogleMapsInput, uri
+                stateContext, inputUriString, GoogleMapsInput, uri
             )
             assertEquals(
                 UnshortenedUrl(
-                    stateContext,
-                    runContext,
-                    inputUriString,
-                    GoogleMapsInput,
-                    redirectUri,
-                    Permission.ALWAYS
+                    stateContext, inputUriString, GoogleMapsInput, redirectUri, Permission.ALWAYS
                 ),
                 state.transition(),
             )
@@ -716,24 +629,17 @@ class ConversionStateTest {
         val redirectUri = Uri.parse(redirectUriString, uriQuote)
         val stateContext = mockStateContext(
             networkTools = object : MockNetworkTools() {
-                override fun onRequestLocationHeader(url: URL): String? =
-                    if (url.toString() == inputUriString) {
-                        redirectUriString
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                    redirectUriString
+                } else {
+                    super.onRequestLocationHeader(url)
+                }
             },
         )
-        val runContext = mockRunContext()
-        val state = GrantedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri)
+        val state = GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri)
         assertEquals(
             UnshortenedUrl(
-                stateContext,
-                runContext,
-                inputUriString,
-                GoogleMapsInput,
-                redirectUri,
-                Permission.ALWAYS
+                stateContext, inputUriString, GoogleMapsInput, redirectUri, Permission.ALWAYS
             ),
             state.transition(),
         )
@@ -747,24 +653,17 @@ class ConversionStateTest {
         val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
         val stateContext = mockStateContext(
             networkTools = object : MockNetworkTools() {
-                override fun onRequestLocationHeader(url: URL): String? =
-                    if (url.toString() == inputUriString) {
-                        redirectUriString
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
+                    redirectUriString
+                } else {
+                    super.onRequestLocationHeader(url)
+                }
             },
         )
-        val runContext = mockRunContext()
-        val state = GrantedUnshortenPermission(stateContext, runContext, inputUriString, GoogleMapsInput, uri)
+        val state = GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri)
         assertEquals(
             UnshortenedUrl(
-                stateContext,
-                runContext,
-                inputUriString,
-                GoogleMapsInput,
-                redirectUri,
-                Permission.ALWAYS
+                stateContext, inputUriString, GoogleMapsInput, redirectUri, Permission.ALWAYS
             ),
             state.transition(),
         )
@@ -795,10 +694,9 @@ class ConversionStateTest {
                 }
             },
         )
-        val runContext = mockRunContext()
-        val state = GrantedUnshortenPermission(stateContext, runContext, inputUriString, mockInput, uri)
+        val state = GrantedUnshortenPermission(stateContext, inputUriString, mockInput, uri)
         assertEquals(
-            UnshortenedUrl(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
+            UnshortenedUrl(stateContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
             state.transition(),
         )
     }
@@ -807,8 +705,7 @@ class ConversionStateTest {
     fun deniedConnectionPermission_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = DeniedConnectionPermission(stateContext, runContext, inputUriString, GoogleMapsInput)
+        val state = DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_connection_permission_denied, inputUriString),
             state.transition(),
@@ -830,10 +727,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             inputs = listOf(mockGoogleMapsInput),
         )
-        val runContext = mockRunContext()
-        val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
+        val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromUri),
+            ConversionSucceeded(stateContext, inputUriString, positionFromUri),
             state.transition(),
         )
     }
@@ -846,9 +742,8 @@ class ConversionStateTest {
             on { parseUri(any()) } doReturn Pair(Position(Srs.WGS84), null)
         }
         val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
-        val runContext = mockRunContext()
         val state = UnshortenedUrl(
-            stateContext, runContext, inputUriString, GoogleMapsInput, uri, Permission.ALWAYS
+            stateContext, inputUriString, GoogleMapsInput, uri, Permission.ALWAYS
         )
         assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString),
@@ -857,29 +752,22 @@ class ConversionStateTest {
     }
 
     @Test
-    fun unshortenedUrl_parseUriReturnsPositionWithQueryAndNoUrl_returnsParseHtmlFailed() =
-        runTest {
-            val inputUriString = "https://maps.google.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn Pair(positionFromUri, null)
-            }
-            val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
-            val runContext = mockRunContext()
-            val state = UnshortenedUrl(
-                stateContext,
-                runContext,
-                inputUriString,
-                mockGoogleMapsInput,
-                uri,
-                Permission.ALWAYS
-            )
-            assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
-                state.transition(),
-            )
+    fun unshortenedUrl_parseUriReturnsPositionWithQueryAndNoUrl_returnsParseHtmlFailed() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val uri = Uri.parse(inputUriString, uriQuote)
+        val positionFromUri = Position(q = "bar")
+        val mockGoogleMapsInput: GoogleMapsInput = mock {
+            on { parseUri(any()) } doReturn Pair(positionFromUri, null)
         }
+        val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
+        val state = UnshortenedUrl(
+            stateContext, inputUriString, mockGoogleMapsInput, uri, Permission.ALWAYS
+        )
+        assertEquals(
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
+            state.transition(),
+        )
+    }
 
     @Test
     fun unshortenedUrl_parseUriReturnsEmptyPositionAndUrlAndInputDoesNotSupportHtmlParsing_returnsParseHtmlFailed() =
@@ -894,12 +782,11 @@ class ConversionStateTest {
                 override fun parseUri(uri: Uri) = Pair(positionFromUri, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockInput))
-            val runContext = mockRunContext()
             val state = UnshortenedUrl(
-                stateContext, runContext, inputUriString, mockInput, uri, Permission.ALWAYS
+                stateContext, inputUriString, mockInput, uri, Permission.ALWAYS
             )
             assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+                ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
                 state.transition(),
             )
         }
@@ -915,19 +802,13 @@ class ConversionStateTest {
                 on { parseUri(any()) } doReturn Pair(positionFromUri, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
-            val runContext = mockRunContext()
             val state = UnshortenedUrl(
-                stateContext,
-                runContext,
-                inputUriString,
-                mockGoogleMapsInput,
-                uri,
-                Permission.ALWAYS
+                stateContext, inputUriString, mockGoogleMapsInput, uri, Permission.ALWAYS
             )
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
@@ -949,19 +830,13 @@ class ConversionStateTest {
                 on { parseUri(any()) } doReturn Pair(positionFromUri, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
-            val runContext = mockRunContext()
             val state = UnshortenedUrl(
-                stateContext,
-                runContext,
-                inputUriString,
-                mockGoogleMapsInput,
-                uri,
-                Permission.ASK
+                stateContext, inputUriString, mockGoogleMapsInput, uri, Permission.ASK
             )
             assertEquals(
                 RequestedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
@@ -973,30 +848,23 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parseUriReturnsPositionWithQueryAndUrlAndPermissionIsNever_returnsParseHtmlFailed() =
-        runTest {
-            val inputUriString = "https://maps.google.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
-            val htmlUriString = "$inputUriString/foo.html"
-            val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn Pair(positionFromUri, htmlUriString)
-            }
-            val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
-            val runContext = mockRunContext()
-            val state = UnshortenedUrl(
-                stateContext,
-                runContext,
-                inputUriString,
-                mockGoogleMapsInput,
-                uri,
-                Permission.NEVER
-            )
-            assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
-                state.transition(),
-            )
+    fun unshortenedUrl_parseUriReturnsPositionWithQueryAndUrlAndPermissionIsNever_returnsParseHtmlFailed() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val uri = Uri.parse(inputUriString, uriQuote)
+        val positionFromUri = Position(q = "bar")
+        val htmlUriString = "$inputUriString/foo.html"
+        val mockGoogleMapsInput: GoogleMapsInput = mock {
+            on { parseUri(any()) } doReturn Pair(positionFromUri, htmlUriString)
         }
+        val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
+        val state = UnshortenedUrl(
+            stateContext, inputUriString, mockGoogleMapsInput, uri, Permission.NEVER
+        )
+        assertEquals(
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
+            state.transition(),
+        )
+    }
 
     @Test
     fun unshortenedUrl_parseUriReturnsPositionWithQueryAndUrlAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedParseHtmlPermission() =
@@ -1015,12 +883,11 @@ class ConversionStateTest {
                 userPreferencesRepository = mockUserPreferencesRepository,
                 inputs = listOf(mockGoogleMapsInput),
             )
-            val runContext = mockRunContext()
-            val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
@@ -1048,12 +915,11 @@ class ConversionStateTest {
                 userPreferencesRepository = mockUserPreferencesRepository,
                 inputs = listOf(mockGoogleMapsInput),
             )
-            val runContext = mockRunContext()
-            val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
             assertEquals(
                 RequestedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
@@ -1081,10 +947,9 @@ class ConversionStateTest {
                 userPreferencesRepository = mockUserPreferencesRepository,
                 inputs = listOf(mockGoogleMapsInput),
             )
-            val runContext = mockRunContext()
-            val state = UnshortenedUrl(stateContext, runContext, inputUriString, mockGoogleMapsInput, uri, null)
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
             assertEquals(
-                ParseHtmlFailed(stateContext, runContext, inputUriString, position),
+                ParseHtmlFailed(stateContext, inputUriString, position),
                 state.transition(),
             )
         }
@@ -1096,10 +961,9 @@ class ConversionStateTest {
         val position = Position(q = "bar")
         val htmlUriString = "$inputUriString/foo.html"
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
         val state = RequestedParseHtmlPermission(
             stateContext,
-            runContext,
+
             inputUriString,
             GoogleMapsInput,
             uri,
@@ -1120,10 +984,9 @@ class ConversionStateTest {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
             val state = RequestedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1133,7 +996,7 @@ class ConversionStateTest {
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     GoogleMapsInput,
                     uri,
@@ -1159,10 +1022,9 @@ class ConversionStateTest {
                 onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
             }
             val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-            val runContext = mockRunContext()
             val state = RequestedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1172,7 +1034,7 @@ class ConversionStateTest {
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     GoogleMapsInput,
                     uri,
@@ -1197,10 +1059,9 @@ class ConversionStateTest {
             onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
         val state = RequestedParseHtmlPermission(
             stateContext,
-            runContext,
+
             inputUriString,
             GoogleMapsInput,
             uri,
@@ -1208,7 +1069,7 @@ class ConversionStateTest {
             htmlUriString,
         )
         assertEquals(
-            ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
             state.deny(false),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
@@ -1227,10 +1088,9 @@ class ConversionStateTest {
             onBlocking { setValue(eq(ConnectionPermission), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
         val state = RequestedParseHtmlPermission(
             stateContext,
-            runContext,
+
             inputUriString,
             GoogleMapsInput,
             uri,
@@ -1238,7 +1098,7 @@ class ConversionStateTest {
             htmlUriString,
         )
         assertEquals(
-            ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -1263,7 +1123,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override fun parseHtml(source: Source): Pair<Position, String?> = Pair(Position(), null)
+            override suspend fun parseHtml(channel: ByteReadChannel): Pair<Position, String?> = Pair(Position(), null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1275,10 +1135,9 @@ class ConversionStateTest {
                 }
             },
         )
-        val runContext = mockRunContext()
         val state = GrantedParseHtmlPermission(
             stateContext,
-            runContext,
+
             inputUriString,
             mockInput,
             uri,
@@ -1286,7 +1145,7 @@ class ConversionStateTest {
             htmlUriString,
         )
         assertEquals(
-            ParseHtmlFailed(stateContext, runContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
             state.transition(),
         )
     }
@@ -1306,10 +1165,9 @@ class ConversionStateTest {
                     super.onGetSource(url)
                 }
             })
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1338,10 +1196,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1373,10 +1230,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1386,7 +1242,7 @@ class ConversionStateTest {
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     GoogleMapsInput,
                     uri,
@@ -1417,10 +1273,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1431,7 +1286,7 @@ class ConversionStateTest {
             assertEquals(
                 GrantedParseHtmlPermission(
                     stateContext,
-                    runContext,
+
                     inputUriString,
                     GoogleMapsInput,
                     uri,
@@ -1462,10 +1317,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1497,10 +1351,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 GoogleMapsInput,
                 uri,
@@ -1530,7 +1383,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override fun parseHtml(source: Source) = Pair(positionFromHtml, null)
+            override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1542,10 +1395,9 @@ class ConversionStateTest {
                 }
             },
         )
-        val runContext = mockRunContext()
         val state = GrantedParseHtmlPermission(
             stateContext,
-            runContext,
+
             inputUriString,
             mockInput,
             uri,
@@ -1553,7 +1405,7 @@ class ConversionStateTest {
             htmlUriString,
         )
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml),
+            ConversionSucceeded(stateContext, inputUriString, positionFromHtml),
             state.transition(),
         )
     }
@@ -1575,7 +1427,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override fun parseHtml(source: Source) = Pair(positionFromHtml, null)
+            override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1587,10 +1439,9 @@ class ConversionStateTest {
                 }
             },
         )
-        val runContext = mockRunContext()
         val state = GrantedParseHtmlPermission(
             stateContext,
-            runContext,
+
             inputUriString,
             mockInput,
             uri,
@@ -1598,7 +1449,7 @@ class ConversionStateTest {
             htmlUriString,
         )
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, positionFromHtml),
+            ConversionSucceeded(stateContext, inputUriString, positionFromHtml),
             state.transition(),
         )
     }
@@ -1621,7 +1472,7 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override fun parseHtml(source: Source) = Pair(Position(), redirectUriString)
+                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(Position(), redirectUriString)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),
@@ -1639,10 +1490,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 mockInput,
                 uri,
@@ -1650,7 +1500,7 @@ class ConversionStateTest {
                 htmlUriString,
             )
             assertEquals(
-                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
+                ReceivedUri(stateContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
                 state.transition(),
             )
         }
@@ -1674,7 +1524,7 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override fun parseHtml(source: Source) = Pair(Position(), redirectUriString)
+                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(Position(), redirectUriString)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),
@@ -1686,10 +1536,9 @@ class ConversionStateTest {
                     }
                 },
             )
-            val runContext = mockRunContext()
             val state = GrantedParseHtmlPermission(
                 stateContext,
-                runContext,
+
                 inputUriString,
                 mockInput,
                 uri,
@@ -1697,7 +1546,7 @@ class ConversionStateTest {
                 htmlUriString,
             )
             assertEquals(
-                ReceivedUri(stateContext, runContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
+                ReceivedUri(stateContext, inputUriString, mockInput, redirectUri, Permission.ALWAYS),
                 state.transition(),
             )
         }
@@ -1707,10 +1556,9 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, position)
+        val state = ParseHtmlFailed(stateContext, inputUriString, position)
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, position),
             state.transition(),
         )
     }
@@ -1720,10 +1568,9 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val position = Position(q = "bar")
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, position)
+        val state = ParseHtmlFailed(stateContext, inputUriString, position)
         assertEquals(
-            ConversionSucceeded(stateContext, runContext, inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, position),
             state.transition(),
         )
     }
@@ -1733,8 +1580,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val position = Position()
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = ParseHtmlFailed(stateContext, runContext, inputUriString, position)
+        val state = ParseHtmlFailed(stateContext, inputUriString, position)
         assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),
@@ -1750,10 +1596,9 @@ class ConversionStateTest {
             onBlocking { getValue(AutomationUserPreference) } doReturn Automation.Noop
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
         assertEquals(
-            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationReady(stateContext, inputUriString, position, automationValue),
             state.transition(),
         )
     }
@@ -1767,10 +1612,9 @@ class ConversionStateTest {
             onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
         assertEquals(
-            AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationReady(stateContext, inputUriString, position, automationValue),
             state.transition(),
         )
     }
@@ -1784,10 +1628,9 @@ class ConversionStateTest {
             onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
         assertEquals(
-            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, inputUriString, position, automationValue),
             state.transition(),
         )
     }
@@ -1801,10 +1644,9 @@ class ConversionStateTest {
             onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
         assertEquals(
-            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, inputUriString, position, automationValue),
             state.transition(),
         )
     }
@@ -1818,10 +1660,9 @@ class ConversionStateTest {
             onBlocking { getValue(AutomationUserPreference) } doReturn automationValue
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val runContext = mockRunContext()
-        val state = ConversionSucceeded(stateContext, runContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
         assertEquals(
-            AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue),
+            AutomationWaiting(stateContext, inputUriString, position, automationValue),
             state.transition(),
         )
     }
@@ -1839,11 +1680,10 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GpxOutputGroup.SaveAutomation
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationWaiting(stateContext, inputUriString, position, automationValue)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                AutomationReady(stateContext, runContext, inputUriString, position, automationValue),
+                AutomationReady(stateContext, inputUriString, position, automationValue),
                 state.transition(),
             )
         }
@@ -1857,8 +1697,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GpxOutputGroup.SaveAutomation
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = AutomationWaiting(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationWaiting(stateContext, inputUriString, position, automationValue)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -1877,13 +1716,22 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsNoop_returnsAutomationFinished() = runTest {
+    fun automationWaiting_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val automationValue = GpxOutputGroup.SaveAutomation
+        val stateContext = mockStateContext()
+        val state = AutomationReady(stateContext, inputUriString, position, automationValue)
+        assertNull(state.transition())
+    }
+
+    @Test
+    fun automationRan_automationIsNoop_returnsAutomationFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = Automation.Noop
         val stateContext = mockStateContext()
-        val runContext = mockRunContext()
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, null)
         assertEquals(
             AutomationFinished(inputUriString, position, automationValue),
             state.transition(),
@@ -1891,23 +1739,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsCopyCoords_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+    fun automationRan_automationIsCopyCoordsAndSuccessIsTrue_returnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = CoordinatesOutputGroup.CopyDecAutomation
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock {
-            onBlocking { copyToClipboard(any(), any(), any()) } doThrow NotImplementedError()
-            onBlocking {
-                copyToClipboard(
-                    eq(runContext.context),
-                    eq(runContext.clipboard),
-                    argThat { toString() == automationValue.getAction(position, uriQuote).text },
-                )
-            } doReturn Unit
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, true)
         assertEquals(
             AutomationSucceeded(inputUriString, position, automationValue),
             state.transition(),
@@ -1915,23 +1752,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsOpenApp_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+    fun automationRan_automationIsOpenAppAndSuccessIsTrue_returnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock {
-            on { openApp(any(), any(), any()) } doThrow NotImplementedError()
-            on {
-                openApp(
-                    eq(runContext.context),
-                    eq(automationValue.packageName),
-                    argThat { toString() == automationValue.getAction(position, uriQuote).uriString },
-                )
-            } doReturn true
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, true)
         assertEquals(
             AutomationSucceeded(inputUriString, position, automationValue),
             state.transition(),
@@ -1939,23 +1765,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsOpenAppAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
+    fun automationRan_automationIsOpenAppAndSuccessIsFalse_returnsAutomationFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock {
-            on { openApp(any(), any(), any()) } doThrow NotImplementedError()
-            on {
-                openApp(
-                    eq(runContext.context),
-                    eq(automationValue.packageName),
-                    argThat { toString() == automationValue.getAction(position, uriQuote).uriString },
-                )
-            } doReturn false
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, false)
         assertEquals(
             AutomationFailed(inputUriString, position, automationValue),
             state.transition(),
@@ -1963,22 +1778,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsSaveGpx_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+    fun automationRan_automationIsSaveGpxAndSuccessIsTrue_returnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GpxOutputGroup.SaveAutomation
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock()
-        doThrow(NotImplementedError::class).whenever(mockIntentTools).launchSaveGpx(
-            any(),
-            any(),
-        )
-        doReturn(true).whenever(mockIntentTools).launchSaveGpx(
-            eq(runContext.context),
-            eq(runContext.saveGpxLauncher),
-        )
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, true)
         assertEquals(
             AutomationSucceeded(inputUriString, position, automationValue),
             state.transition(),
@@ -1986,22 +1791,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsSaveGpxAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
+    fun automationRan_automationIsSaveGpxAndSuccessIsFalse_returnsAutomationFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GpxOutputGroup.SaveAutomation
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock()
-        doThrow(NotImplementedError::class).whenever(mockIntentTools).launchSaveGpx(
-            any(),
-            any(),
-        )
-        doReturn(false).whenever(mockIntentTools).launchSaveGpx(
-            eq(runContext.context),
-            eq(runContext.saveGpxLauncher),
-        )
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, false)
         assertEquals(
             AutomationFailed(inputUriString, position, automationValue),
             state.transition(),
@@ -2009,22 +1804,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsShare_callsIntentToolsAndReturnsAutomationSucceeded() = runTest {
+    fun automationRan_automationIsShareAndSuccessIsTrue_returnsAutomationSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GeoUriOutputGroup.ChooserAutomation
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock {
-            on { openChooser(any(), any()) } doThrow NotImplementedError()
-            on {
-                openChooser(
-                    eq(runContext.context),
-                    argThat { toString() == automationValue.getAction(position, uriQuote).uriString },
-                )
-            } doReturn true
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, true)
         assertEquals(
             AutomationSucceeded(inputUriString, position, automationValue),
             state.transition(),
@@ -2032,22 +1817,12 @@ class ConversionStateTest {
     }
 
     @Test
-    fun automationReady_automationIsShareAndIntentToolsReturnFalse_returnsAutomationFailed() = runTest {
+    fun automationRan_automationIsShareAndSuccessIsFalse_returnsAutomationFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val automationValue = GeoUriOutputGroup.ChooserAutomation
-        val runContext = mockRunContext()
-        val mockIntentTools: IntentTools = mock {
-            on { openChooser(any(), any()) } doThrow NotImplementedError()
-            on {
-                openChooser(
-                    eq(runContext.context),
-                    argThat { toString() == automationValue.getAction(position, uriQuote).uriString },
-                )
-            } doReturn false
-        }
-        val stateContext = mockStateContext(intentTools = mockIntentTools)
-        val state = AutomationReady(stateContext, runContext, inputUriString, position, automationValue)
+        val stateContext = mockStateContext()
+        val state = AutomationRan(stateContext, inputUriString, position, automationValue, false)
         assertEquals(
             AutomationFailed(inputUriString, position, automationValue),
             state.transition(),

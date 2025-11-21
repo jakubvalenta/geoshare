@@ -80,9 +80,9 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
 
     override fun getTextOutput() = null
 
-    override fun getLabelTextOutput() = null
+    override fun getNameOutput() = null
 
-    override fun getSupportingTextOutput() = null
+    override fun getDescriptionOutput() = null
 
     override fun getActionOutputs() = listOf(
         CopyDisplayOutput,
@@ -115,6 +115,9 @@ object MagicEarthPointOutputGroup : OutputGroup<Point> {
                         set("show_on_map", "")
                         set("lat", latStr)
                         set("lon", lonStr)
+                        value.name?.let { name ->
+                            set("name", name)
+                        }
                     } else {
                         if (value.lat == 0.0 && value.lon == 0.0) {
                             set("open_search", "")

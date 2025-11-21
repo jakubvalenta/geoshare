@@ -2,17 +2,15 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
+import io.ktor.utils.io.*
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.io.Source
-import kotlinx.io.readLine
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeWazeGeoHash
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -38,18 +36,18 @@ object WazeInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setLatLonZoom {
-                (("""/ul/h$HASH""" match path) ?: (HASH match queryParams["h"]))?.groupOrNull("hash")
+            setPointIfNull {
+                (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
                     ?.let { hash -> decodeWazeGeoHash(hash) }
-                    ?.let { (lat, lon, z) -> Triple(lat.toScale(6), lon.toScale(6), z) }
+                    ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(6), lon.toScale(6), z) }
             }
-            setPointFromMatcher { """ll\.$LAT,$LON""" match queryParams["to"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["ll"] }
+            setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZ queryParams["to"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
             @Suppress("SpellCheckingInspection")
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["latlng"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
-            setZoomFromMatcher { Z_PATTERN match queryParams["z"] }
-            setUriString {
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["latlng"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+            setUriStringIfNull {
                 queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
                     // To skip some redirects when downloading HTML, replace this URL:
                     // https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
@@ -66,7 +64,7 @@ object WazeInput : Input.HasHtml {
                     ).toString()
                 }
             }
-            setUriString {
+            setUriStringIfNull {
                 queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
                     // To skip some redirects when downloading HTML, replace this URL:
                     // https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
@@ -81,21 +79,21 @@ object WazeInput : Input.HasHtml {
                     ).toString()
                 }
             }
-            setUriString { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
+            setUriStringIfNull { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
-            for (line in generateSequence { source.readLine() }) {
-                (pattern find line)?.toPoint(srs)?.let { point ->
-                    points.add(point)
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
+                (pattern findLatLonZ line)?.let { (lat, lon, z) ->
+                    addPoint { LatLonZ(lat, lon, z) }
                     break
                 }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title

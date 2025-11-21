@@ -2,15 +2,14 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import kotlinx.io.Source
-import kotlinx.io.readLine
+import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
-import page.ooooo.geoshare.lib.extensions.findAll
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object OpenStreetMapInput : Input.HasHtml {
     private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
@@ -33,12 +32,13 @@ object OpenStreetMapInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setLatLonZoom {
-                ("""/go/$HASH""" match path)?.groupOrNull("hash")
+            setPointIfNull {
+                ("""/go/$HASH""" matchHash path)
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                    ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
             }
-            setPointAndZoomFromMatcher { """map=$Z/$LAT/$LON.*""" match fragment }
-            setUriString {
+            setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+            setUriStringIfNull {
                 (ELEMENT_PATH match path)?.let { m ->
                     m.groupOrNull("type")?.let { type ->
                         m.groupOrNull("id")?.let { id ->
@@ -50,14 +50,14 @@ object OpenStreetMapInput : Input.HasHtml {
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
-            for (line in generateSequence { source.readLine() }) {
-                addPointsFromSequenceOfMatchers { pattern findAll line }
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
+                addPoints { pattern findAllLatLonZ line }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title

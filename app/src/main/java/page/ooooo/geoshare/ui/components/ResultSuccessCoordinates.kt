@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -36,96 +34,91 @@ fun ResultSuccessCoordinates(
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
-    ResultCard(
-        main = {
-            Row {
-                allOutputGroups.getLabelTextOutput()?.getText(position, position.pointCount - 1, position.pointCount)
-                    ?.let { text ->
-                        Text(
-                            text,
-                            Modifier.padding(end = 12.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                    }
+    Column {
+        (allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
+            ?: stringResource(R.string.conversion_succeeded_title)).let { text ->
+            Headline(text, Modifier.testTag("geoShareConversionSuccessPositionName"))
+        }
+        ResultCard(
+            main = {
                 allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
                     SelectionContainer {
                         Text(
                             text,
-                            Modifier
-                                .testTag("geoShareConversionSuccessPositionCoordinates")
-                                .weight(1f),
+                            Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }
-            }
-            allOutputGroups.getSupportingTextOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
-                SelectionContainer {
-                    Text(
-                        text,
-                        Modifier
-                            .testTag("geoShareConversionSuccessPositionParams")
-                            .fillMaxWidth(),
-                        fontStyle = FontStyle.Italic,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
-        },
-        after = {
-            IconButton(
-                { setSheetVisible(true) },
-                Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
-            ) {
-                Icon(
-                    painterResource(R.drawable.content_copy_24px),
-                    contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
-                )
-            }
-        },
-        bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
-            {
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-                    val menuPointOutputs = allPointOutputGroups.getActionOutputs()
-                    val textPointOutput = allPointOutputGroups.getTextOutput()
-                    val labelTextPointOutput = allPointOutputGroups.getLabelTextOutput()
-                    points.forEachIndexed { i, point ->
-                        ResultSuccessPoint(
-                            i = i,
-                            point = point,
-                            pointCount = position.pointCount,
-                            textPointOutput = textPointOutput,
-                            labelTextPointOutput = labelTextPointOutput,
-                            menuPointOutputs = menuPointOutputs,
-                            onRun = onRun,
+                allOutputGroups.getDescriptionOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
+                    SelectionContainer {
+                        Text(
+                            text,
+                            Modifier
+                                .testTag("geoShareConversionSuccessPositionDescription")
+                                .fillMaxWidth()
+                                .padding(top = spacing.tiny, bottom = spacing.small),
+                            fontStyle = FontStyle.Italic,
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
                 }
-            }
-        },
-        chips = {
-            allOutputGroups.getChipOutputs()
-                .filter { it.isEnabled(position) }
-                .forEach {
-                    ResultCardChip(it.label()) { onRun(it.getAction(position)) }
+            },
+            end = {
+                IconButton(
+                    { setSheetVisible(true) },
+                    Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
+                ) {
+                    Icon(
+                        painterResource(R.drawable.content_copy_24px),
+                        contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                    )
                 }
-        },
-    )
-    ResultSuccessSheet(
-        sheetVisible = sheetVisible,
-        onSetSheetVisible = setSheetVisible,
-    ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
-            .getActionOutputs()
-            .filter { it.isEnabled(position) }
-            .map { it.getAction(position) to it.label() }
-            .partition { (action) -> action is Action.Copy }
-        ResultSuccessSheetContent(
-            copyActionsAndLabels = copyActionsAndLabels,
-            otherActionsAndLabels = otherActionsAndLabels,
-            onHide = onHide,
-            onRun = onRun,
+            },
+            bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
+                {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                        val menuPointOutputs = allPointOutputGroups.getActionOutputs()
+                        val textPointOutput = allPointOutputGroups.getTextOutput()
+                        val namePointOutput = allPointOutputGroups.getNameOutput()
+                        points.forEachIndexed { i, point ->
+                            ResultSuccessPoint(
+                                i = i,
+                                point = point,
+                                pointCount = position.pointCount,
+                                textPointOutput = textPointOutput,
+                                namePointOutput = namePointOutput,
+                                menuPointOutputs = menuPointOutputs,
+                                onRun = onRun,
+                            )
+                        }
+                    }
+                }
+            },
+            chips = {
+                allOutputGroups.getChipOutputs()
+                    .filter { it.isEnabled(position) }
+                    .forEach {
+                        ResultCardChip(it.label()) { onRun(it.getAction(position)) }
+                    }
+            },
         )
+        ResultSuccessSheet(
+            sheetVisible = sheetVisible,
+            onSetSheetVisible = setSheetVisible,
+        ) { onHide ->
+            val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
+                .getActionOutputs()
+                .filter { it.isEnabled(position) }
+                .map { it.getAction(position) to it.label() }
+                .partition { (action) -> action is Action.Copy }
+            ResultSuccessSheetContent(
+                copyActionsAndLabels = copyActionsAndLabels,
+                otherActionsAndLabels = otherActionsAndLabels,
+                onHide = onHide,
+                onRun = onRun,
+            )
+        }
     }
 }
 
@@ -165,7 +158,7 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ParamsPreview() {
+private fun DescriptionPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -181,7 +174,7 @@ private fun ParamsPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkParamsPreview() {
+private fun DarkDescriptionPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -197,14 +190,14 @@ private fun DarkParamsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun DescPreview() {
+private fun LabelPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, desc = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "my point"),
                 onRun = {},
             )
         }
@@ -213,14 +206,14 @@ private fun DescPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkDescPreview() {
+private fun DarkLabelPreview() {
     AppTheme {
         Surface(
             color = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, desc = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "my point"),
                 onRun = {},
             )
         }
@@ -264,6 +257,54 @@ private fun DarkPointsPreview() {
                         Point.genRandomPoint(),
                         Point.genRandomPoint(),
                     ),
+                ),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PointsAndDescriptionPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultSuccessCoordinates(
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                    ),
+                    q = "Berlin, Germany",
+                    z = 13.0,
+                ),
+                onRun = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPointsAndDescriptionPreview() {
+    AppTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+            ResultSuccessCoordinates(
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                    ),
+                    q = "Berlin, Germany",
+                    z = 13.0,
                 ),
                 onRun = {},
             )

@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
-import page.ooooo.geoshare.lib.position.MAX_COORD_PRECISION
+import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
@@ -42,9 +42,9 @@ object CoordinatesInput : Input {
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
             // Decimal, e.g. `N 41.40338, E 2.17403`
-            setLatLon {
+            setPointIfNull {
                 ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
-                    Pair(
+                    LatLonZ(
                         degToDec(
                             m.groupOrNull()?.contains('S') == true,
                             m.groupOrNull("latSig"),
@@ -55,14 +55,15 @@ object CoordinatesInput : Input {
                             m.groupOrNull("lonSig"),
                             m.groupOrNull("lonDeg"),
                         ),
+                        null,
                     )
                 }
             }
 
             // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-            setLatLon {
+            setPointIfNull {
                 ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
-                    Pair(
+                    LatLonZ(
                         degToDec(
                             m.groupOrNull()?.contains('S') == true,
                             m.groupOrNull("latSig"),
@@ -77,14 +78,15 @@ object CoordinatesInput : Input {
                             m.groupOrNull("lonMin"),
                             m.groupOrNull("lonSec"),
                         ),
+                        null,
                     )
                 }
             }
 
             // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-            setLatLon {
+            setPointIfNull {
                 ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
-                    Pair(
+                    LatLonZ(
                         degToDec(
                             m.groupOrNull()?.contains('S') == true,
                             m.groupOrNull("latSig"),
@@ -97,6 +99,7 @@ object CoordinatesInput : Input {
                             m.groupOrNull("lonDeg"),
                             m.groupOrNull("lonMin"),
                         ),
+                        null,
                     )
                 }
             }

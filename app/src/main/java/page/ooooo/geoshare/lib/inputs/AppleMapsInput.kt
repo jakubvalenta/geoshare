@@ -2,14 +2,13 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import kotlinx.io.Source
-import kotlinx.io.readLine
+import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Srs
 
 object AppleMapsInput : Input.HasHtml {
     const val NAME = "Apple Maps"
@@ -27,50 +26,53 @@ object AppleMapsInput : Input.HasHtml {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["ll"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["coordinate"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["q"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["address"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["name"] }
-            if (points.isEmpty()) {
-                (Q_PARAM_PATTERN match queryParams["q"])?.toQ()?.let { newQ ->
-                    (LAT_LON_PATTERN match queryParams["sll"])?.toPoint(srs)?.let { point ->
-                        points.add(point)
-                        q = newQ
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
+            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+            setQWithCenterIfNull {
+                (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
+                    (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
+                        Triple(newQ, lat, lon)
                     }
                 }
             }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["sll"] }
-            setPointFromMatcher { LAT_LON_PATTERN match queryParams["center"] }
-            setQueryFromMatcher { Q_PARAM_PATTERN match queryParams["q"] }
-            setZoomFromMatcher { (Z_PATTERN match queryParams["z"]) }
-            setUriString { if (host == "maps.apple" && path.startsWith("/p/")) uri.toString() else null }
-            @Suppress("SpellCheckingInspection")
-            setUriString { if (!queryParams["auid"].isNullOrEmpty()) uri.toString() else null }
-            setUriString { if (!queryParams["place-id"].isNullOrEmpty()) uri.toString() else null }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+            setZIfNull { (Z_PATTERN matchZ queryParams["z"]) }
+            setUriStringIfNull {
+                uri.takeIf {
+                    host == "maps.apple" && path.startsWith("/p/") ||
+                        @Suppress("SpellCheckingInspection")
+                        !queryParams["auid"].isNullOrEmpty() ||
+                        !queryParams["place-id"].isNullOrEmpty()
+                }?.toString()
+            }
         }.toPair()
     }
 
-    override fun parseHtml(source: Source) = source.run {
+    override suspend fun parseHtml(channel: ByteReadChannel) =
         PositionBuilder(srs).apply {
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
             var lat: Double? = null
             var lon: Double? = null
-            for (line in generateSequence { source.readLine() }) {
+            while (true) {
+                val line = channel.readUTF8Line() ?: break
                 if (lat == null) {
-                    (latPattern find line)?.groupOrNull("lat")?.toDoubleOrNull()?.let { lat = it }
+                    (latPattern find line)?.toLat()?.let { lat = it }
                 }
                 if (lon == null) {
-                    (lonPattern find line)?.groupOrNull("lon")?.toDoubleOrNull()?.let { lon = it }
+                    (lonPattern find line)?.toLon()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
-                    setLatLon { lat to lon }
+                    addPoint { LatLonZ(lat, lon, null) }
                     break
                 }
             }
         }.toPair()
-    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title
