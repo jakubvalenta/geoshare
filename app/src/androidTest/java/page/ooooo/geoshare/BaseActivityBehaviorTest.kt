@@ -51,19 +51,14 @@ abstract class BaseActivityBehaviorTest {
         device.pressRecentApps()
         waitForStableInActiveWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val clearAll = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Clear all" }
-            if (clearAll != null) {
-                clearAll.click()
+            val menu = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Geo Share" }
+            if (menu != null) {
+                // On Android API >= 36.1, use the dropdown menu
+                menu.click()
+                onElement { textAsString() == "Clear" }.click()
             } else {
-                val menu = onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "Geo Share" }
-                if (menu != null) {
-                    // On Android API >= 36.1, use the dropdown menu
-                    menu.click()
-                    onElement { textAsString() == "Clear" }.click()
-                } else {
-                    // On Android API >= 28, swipe from the center of the screen towards the upper edge
-                    device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
-                }
+                // On Android API >= 28, swipe from the center of the screen towards the upper edge
+                device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
