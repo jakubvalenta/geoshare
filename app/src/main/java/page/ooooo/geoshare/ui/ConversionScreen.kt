@@ -344,7 +344,6 @@ fun ConversionScreen(
 
             currentState is ConversionState.HasResult -> {
                 {
-                    Headline(stringResource(R.string.conversion_succeeded_title))
                     ResultSuccessCoordinates(
                         position = currentState.position,
                         onRun = onRun,

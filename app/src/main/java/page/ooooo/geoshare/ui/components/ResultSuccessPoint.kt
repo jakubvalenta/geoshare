@@ -38,6 +38,7 @@ fun ResultSuccessPoint(
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
     val name = namePointOutput?.getText(point, i, pointCount)
 
+    // TODO Improve line break
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
         verticalAlignment = Alignment.CenterVertically,

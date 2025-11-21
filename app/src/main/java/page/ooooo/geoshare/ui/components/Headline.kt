@@ -13,11 +13,11 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun Headline(text: String) {
+fun Headline(text: String, modifier: Modifier = Modifier) {
     val spacing = LocalSpacing.current
     Text(
         text,
-        Modifier
+        modifier
             .fillMaxWidth()
             .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.large, bottom = spacing.medium),

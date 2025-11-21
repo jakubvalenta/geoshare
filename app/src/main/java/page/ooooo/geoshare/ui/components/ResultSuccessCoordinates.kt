@@ -34,95 +34,91 @@ fun ResultSuccessCoordinates(
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
-    ResultCard(
-        main = {
-            allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
-                SelectionContainer {
-                    Text(
-                        text,
-                        Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-            }
-            allOutputGroups.getDescriptionOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
-                SelectionContainer {
-                    Text(
-                        text,
-                        Modifier
-                            .testTag("geoShareConversionSuccessPositionDescription")
-                            .fillMaxWidth()
-                            .padding(top = spacing.tiny, bottom = spacing.small),
-                        fontStyle = FontStyle.Italic,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
-        },
-        end = {
-            IconButton(
-                { setSheetVisible(true) },
-                Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
-            ) {
-                Icon(
-                    painterResource(R.drawable.content_copy_24px),
-                    contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
-                )
-            }
-        },
-        top = allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
-            ?.let { text ->
-                {
-                    Text(
-                        text,
-                        Modifier.testTag("geoShareConversionSuccessPositionName"),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-            },
-        bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
-            {
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-                    val menuPointOutputs = allPointOutputGroups.getActionOutputs()
-                    val textPointOutput = allPointOutputGroups.getTextOutput()
-                    val namePointOutput = allPointOutputGroups.getNameOutput()
-                    points.forEachIndexed { i, point ->
-                        ResultSuccessPoint(
-                            i = i,
-                            point = point,
-                            pointCount = position.pointCount,
-                            textPointOutput = textPointOutput,
-                            namePointOutput = namePointOutput,
-                            menuPointOutputs = menuPointOutputs,
-                            onRun = onRun,
+    Column {
+        (allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
+            ?: stringResource(R.string.conversion_succeeded_title)).let { text ->
+            Headline(text, Modifier.testTag("geoShareConversionSuccessPositionName"))
+        }
+        ResultCard(
+            main = {
+                allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
+                    SelectionContainer {
+                        Text(
+                            text,
+                            Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }
-            }
-        },
-        chips = {
-            allOutputGroups.getChipOutputs()
-                .filter { it.isEnabled(position) }
-                .forEach {
-                    ResultCardChip(it.label()) { onRun(it.getAction(position)) }
+                allOutputGroups.getDescriptionOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
+                    SelectionContainer {
+                        Text(
+                            text,
+                            Modifier
+                                .testTag("geoShareConversionSuccessPositionDescription")
+                                .fillMaxWidth()
+                                .padding(top = spacing.tiny, bottom = spacing.small),
+                            fontStyle = FontStyle.Italic,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 }
-        },
-    )
-    ResultSuccessSheet(
-        sheetVisible = sheetVisible,
-        onSetSheetVisible = setSheetVisible,
-    ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
-            .getActionOutputs()
-            .filter { it.isEnabled(position) }
-            .map { it.getAction(position) to it.label() }
-            .partition { (action) -> action is Action.Copy }
-        ResultSuccessSheetContent(
-            copyActionsAndLabels = copyActionsAndLabels,
-            otherActionsAndLabels = otherActionsAndLabels,
-            onHide = onHide,
-            onRun = onRun,
+            },
+            end = {
+                IconButton(
+                    { setSheetVisible(true) },
+                    Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
+                ) {
+                    Icon(
+                        painterResource(R.drawable.content_copy_24px),
+                        contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
+                    )
+                }
+            },
+            bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
+                {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                        val menuPointOutputs = allPointOutputGroups.getActionOutputs()
+                        val textPointOutput = allPointOutputGroups.getTextOutput()
+                        val namePointOutput = allPointOutputGroups.getNameOutput()
+                        points.forEachIndexed { i, point ->
+                            ResultSuccessPoint(
+                                i = i,
+                                point = point,
+                                pointCount = position.pointCount,
+                                textPointOutput = textPointOutput,
+                                namePointOutput = namePointOutput,
+                                menuPointOutputs = menuPointOutputs,
+                                onRun = onRun,
+                            )
+                        }
+                    }
+                }
+            },
+            chips = {
+                allOutputGroups.getChipOutputs()
+                    .filter { it.isEnabled(position) }
+                    .forEach {
+                        ResultCardChip(it.label()) { onRun(it.getAction(position)) }
+                    }
+            },
         )
+        ResultSuccessSheet(
+            sheetVisible = sheetVisible,
+            onSetSheetVisible = setSheetVisible,
+        ) { onHide ->
+            val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
+                .getActionOutputs()
+                .filter { it.isEnabled(position) }
+                .map { it.getAction(position) to it.label() }
+                .partition { (action) -> action is Action.Copy }
+            ResultSuccessSheetContent(
+                copyActionsAndLabels = copyActionsAndLabels,
+                otherActionsAndLabels = otherActionsAndLabels,
+                onHide = onHide,
+                onRun = onRun,
+            )
+        }
     }
 }
 

@@ -23,7 +23,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultCard(
     modifier: Modifier = Modifier,
     end: (@Composable () -> Unit)? = null,
-    top: (@Composable () -> Unit)? = null,
     bottom: (@Composable () -> Unit)? = null,
     chips: @Composable () -> Unit,
     main: @Composable ColumnScope.() -> Unit,
@@ -31,14 +30,6 @@ fun ResultCard(
     val spacing = LocalSpacing.current
 
     Column(modifier) {
-        top?.let {
-            Column(
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-            ) {
-                top()
-            }
-        }
         Row(
             Modifier.padding(
                 start = spacing.windowPadding,
@@ -227,14 +218,6 @@ private fun DefaultTopAndBottomPreview() {
                                 contentDescription = stringResource(R.string.conversion_succeeded_copy_content_description)
                             )
                         }
-                    }
-                },
-                top = {
-                    Row {
-                        Text(
-                            "My point",
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
                     }
                 },
                 bottom = {
