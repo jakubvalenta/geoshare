@@ -108,11 +108,8 @@ abstract class BaseActivityBehaviorTest {
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
         val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
             ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
-        if (expectedName != null) {
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
-        } else {
-            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionName" })
-        }
+            ?: "Coordinates"
+        onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
             val expectedDescription = allOutputGroups.getDescriptionOutput()?.getText(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" && textAsString() == expectedDescription }
