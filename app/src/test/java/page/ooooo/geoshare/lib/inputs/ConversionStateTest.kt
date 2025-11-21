@@ -91,7 +91,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isEmpty_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringIsEmpty_returnsConversionFailed() = runTest {
         val inputUriString = ""
         val stateContext = mockStateContext()
         val state = ReceivedUriString(stateContext, "")
@@ -102,7 +102,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isGeoUri_returnsReceivedUriWithPermissionNull() = runTest {
+    fun receivedUriString_inputUriStringIsGeoUri_returnsReceivedUriWithPermissionNull() = runTest {
         val inputUriString = "geo:1,2?q="
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
@@ -114,7 +114,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isUriInTheMiddleOfTheInputString_returnsReceivedUriWithPermissionNull() = runTest {
+    fun receivedUriString_inputUriStringHasUriInTheMiddle_returnsReceivedUriWithPermissionNull() = runTest {
         val inputUriString = "FOO https://maps.google.com/foo BAR"
         val matchedInputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(matchedInputUriString, uriQuote)
@@ -127,7 +127,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isValidUrl_returnsReceivedUriWithPermissionNull() = runTest {
+    fun receivedUriString_inputUriStringIsValidUrl_returnsReceivedUriWithPermissionNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
@@ -139,7 +139,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isNotValidUrl_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringIsNotValidUrl_returnsConversionFailed() = runTest {
         val inputUriString = "https://[invalid:ipv6]/"
         val stateContext = mockStateContext()
         val state = ReceivedUriString(stateContext, inputUriString)
@@ -150,7 +150,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isMissingScheme_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringDoesNotHaveScheme_returnsConversionFailed() = runTest {
         val inputUriString = "maps.google.com/"
         val stateContext = mockStateContext()
         val state = ReceivedUriString(stateContext, inputUriString)
@@ -161,7 +161,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isRelativeScheme_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringHasRelativeScheme_returnsConversionFailed() = runTest {
         val inputUriString = "//maps.google.com/"
         val stateContext = mockStateContext()
         val state = ReceivedUriString(stateContext, inputUriString)
@@ -172,7 +172,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_isNotHttpsScheme_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringDoesNotHaveHttpsScheme_returnsConversionFailed() = runTest {
         val inputUriString = "ftp://maps.google.com/"
         val stateContext = mockStateContext()
         val state = ReceivedUriString(stateContext, inputUriString)
@@ -183,7 +183,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUriString_uriIsUnsupportedMapService_returnsConversionFailed() = runTest {
+    fun receivedUriString_inputUriStringDoesNotMatchAnyInput_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.example.com/foo"
         val stateContext = mockStateContext()
         val state = ReceivedUriString(stateContext, inputUriString)
@@ -194,7 +194,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUri_uriIsFullUrl_returnsUnshortenedUrlAndPassesPermission() = runTest {
+    fun receivedUri_inputSupportsShortUriAndItDoesNotMatchTheUri_returnsUnshortenedUrlAndPassesPermission() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val stateContext = mockStateContext()
@@ -207,7 +207,7 @@ class ConversionStateTest {
 
     @Test
     fun receivedUri_inputDoesNotSupportShortUri_returnsUnshortenedUrlAndPassesPermission() = runTest {
-        val inputUriString = "https://maps.google.com/foo"
+        val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockInput = object : Input {
             override val uriPattern: Pattern = Pattern.compile(".")
@@ -223,54 +223,57 @@ class ConversionStateTest {
     }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsAlways_returnsGrantedUnshortenPermission() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsAlways_returnsGrantedUnshortenPermission() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = ReceivedUri(
+                stateContext, inputUriString, GoogleMapsInput, uri, Permission.ALWAYS
+            )
+            assertEquals(
+                GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
+                state.transition(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val state = ReceivedUri(
-            stateContext, inputUriString, GoogleMapsInput, uri, Permission.ALWAYS
-        )
-        assertEquals(
-            GrantedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
-            state.transition(),
-        )
-    }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsAsk_returnsRequestedUnshortenPermission() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsAsk_returnsRequestedUnshortenPermission() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.ASK)
+            assertEquals(
+                RequestedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
+                state.transition(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.ASK)
-        assertEquals(
-            RequestedUnshortenPermission(stateContext, inputUriString, GoogleMapsInput, uri),
-            state.transition(),
-        )
-    }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNever_returnsDeniedUnshortenPermission() = runTest {
-        val inputUriString = "https://maps.app.goo.gl/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsNever_returnsDeniedUnshortenPermission() =
+        runTest {
+            val inputUriString = "https://maps.app.goo.gl/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                onBlocking { getValue(eq(ConnectionPermission)) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER)
+            assertEquals(
+                DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput),
+                state.transition(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val state = ReceivedUri(stateContext, inputUriString, GoogleMapsInput, uri, Permission.NEVER)
-        assertEquals(
-            DeniedConnectionPermission(stateContext, inputUriString, GoogleMapsInput),
-            state.transition(),
-        )
-    }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedUnshortenPermission() =
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriPermissionIsNullAndPreferencePermissionIsAlways_returnsGrantedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -286,7 +289,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedUnshortenPermission() =
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsNullAndPreferencePermissionIsAsk_returnsRequestedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -302,7 +305,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun receivedUri_uriIsShortUrlAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedUnshortenPermission() =
+    fun receivedUri_inputSupportsShortUriAndItMatchesTheUriAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedUnshortenPermission() =
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -1710,6 +1713,16 @@ class ConversionStateTest {
             res,
             AutomationFinished(inputUriString, position, automationValue),
         )
+    }
+
+    @Test
+    fun automationWaiting_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val automationValue = GpxOutputGroup.SaveAutomation
+        val stateContext = mockStateContext()
+        val state = AutomationReady(stateContext, inputUriString, position, automationValue)
+        assertNull(state.transition())
     }
 
     @Test

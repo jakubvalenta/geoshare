@@ -48,7 +48,6 @@ data class ReceivedUriString(
 ) : ConversionState {
     override suspend fun transition(): State {
         if (inputUriString.isEmpty()) {
-            // TODO Test
             return ConversionFailed(R.string.conversion_failed_missing_url, "")
         }
         for (input in stateContext.inputs) {
