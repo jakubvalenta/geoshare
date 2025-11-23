@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -90,6 +91,7 @@ fun MainScreen(
 ) {
     val density = LocalDensity.current
     val spacing = LocalSpacing.current
+    val resources = LocalResources.current
     val appName = stringResource(R.string.app_name)
     val (errorMessageResId, setErrorMessageResId) = remember { mutableStateOf<Int?>(null) }
 
@@ -233,7 +235,9 @@ fun MainScreen(
                     Text(stringResource(R.string.main_navigate_to_intro))
                 }
                 TextButton({
-                    allOutputGroups.genRandomUriString()?.let { uriString ->
+                    allOutputGroups.genRandomUriString(
+                        resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
+                    )?.let { uriString ->
                         onUpdateInput(uriString)
                     }
                     setErrorMessageResId(null)

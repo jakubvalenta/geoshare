@@ -31,7 +31,7 @@ fun <T> List<OutputGroup<T>>.getAutomations(packageNames: List<String>) =
 fun <T> List<OutputGroup<T>>.findAutomation(type: Automation.Type, packageName: String?) =
     this.firstNotNullOfOrNull { it.findAutomation(type, packageName) }
 
-fun List<OutputGroup<Position>>.genRandomUriString(uriQuote: UriQuote = DefaultUriQuote()): String? =
-    Position.genRandomPosition().let { value ->
+fun List<OutputGroup<Position>>.genRandomUriString(name: String, uriQuote: UriQuote = DefaultUriQuote()): String? =
+    Position.genRandomPosition(name = name).let { value ->
         this.mapNotNull { it.getRandomOutput()?.getAction(value, uriQuote) as? Action.Copy }.randomOrNull()?.text
     }
