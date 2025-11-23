@@ -89,7 +89,7 @@ object WazeInput : Input.HasHtml {
             while (true) {
                 val line = channel.readUTF8Line() ?: break
                 (pattern findLatLonZ line)?.let { (lat, lon, z) ->
-                    addPoint { LatLonZ(lat, lon, z) }
+                    setPointIfNull { LatLonZ(lat, lon, z) }
                     break
                 }
             }

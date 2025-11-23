@@ -68,7 +68,7 @@ object AppleMapsInput : Input.HasHtml {
                     (lonPattern find line)?.toLon()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
-                    addPoint { LatLonZ(lat, lon, null) }
+                    setPointIfNull { LatLonZ(lat, lon, null) }
                     break
                 }
             }
