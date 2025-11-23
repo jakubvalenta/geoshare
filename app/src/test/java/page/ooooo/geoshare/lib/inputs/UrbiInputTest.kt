@@ -13,13 +13,34 @@ class UrbiInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        // TODO Test all Urbi domains
         assertTrue(doesUriPatternMatch("https://2gis.uz/tashkent/firm/70000001060803297"))
+        assertTrue(doesUriPatternMatch("https://2gis.ae/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.am/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.az/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.cl/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.com.cy/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.cz/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.it/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.kg/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.kz/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.ru/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://2gis.uz/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi-bh.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi-eg.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi-kw.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi-om.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi-qa.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi-sa.com/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi.bh/dubai/geo/55.171971%2C25.289452"))
+        assertTrue(doesUriPatternMatch("https://urbi.qa/dubai/geo/55.171971%2C25.289452"))
     }
 
     @Test
     fun uriPattern_shortUrl() {
         assertTrue(doesUriPatternMatch("https://go.2gis.com/WSTdK"))
+        assertTrue(doesUriPatternMatch("https://go.urbi.ae/3JtpM"))
     }
 
     @Test
@@ -33,10 +54,50 @@ class UrbiInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_fullUrl() {
+    fun parseUri_point() {
+        assertEquals(
+            Position(Srs.WGS84, 25.284889, 55.172173) to null,
+            parseUri("https://maps.urbi.ae/dubai/geo/55.172173%2C25.284889"),
+        )
+    }
+
+    @Test
+    fun parseUri_pointWithMarker() {
+        assertEquals(
+            Position(Srs.WGS84, 25.25915, 55.225263, z = 12.77) to null,
+            parseUri("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452?m=55.225263%2C25.25915%2F12.77"),
+        )
+    }
+
+    @Test
+    fun parseUri_geo() {
+        assertEquals(
+            Position(Srs.WGS84) to "https://maps.urbi.ae/dubai/geo/13933621232533580",
+            parseUri("https://maps.urbi.ae/dubai/geo/13933621232533580"),
+        )
+    }
+
+    @Test
+    fun parseUri_firm() {
         assertEquals(
             Position(Srs.WGS84) to "https://2gis.uz/tashkent/firm/70000001060803297",
             parseUri("https://2gis.uz/tashkent/firm/70000001060803297"),
+        )
+    }
+
+    @Test
+    fun parseUri_firmWithCoordinates() {
+        assertEquals(
+            Position(Srs.WGS84, 25.19925, 55.332211) to null,
+            parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925"),
+        )
+    }
+
+    @Test
+    fun parseUri_firmWithMarker() {
+        assertEquals(
+            Position(Srs.WGS84, 25.196707, 55.320748, z = 14.82) to null,
+            parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925?m=55.320748%2C25.196707%2F14.82"),
         )
     }
 
@@ -45,6 +106,10 @@ class UrbiInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.WGS84) to "https://go.2gis.com/WSTdK",
             parseUri("https://go.2gis.com/WSTdK"),
+        )
+        assertEquals(
+            Position(Srs.WGS84) to "https://go.urbi.ae/3JtpM",
+            parseUri("https://go.urbi.ae/3JtpM"),
         )
     }
 

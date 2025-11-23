@@ -161,7 +161,7 @@
     <string name="network_exception_server_response_error" translatable="false">server response error</string>
     <string name="network_exception_response_error" translatable="false">response error</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
-    <string name="converter_urbi_name">2GIS (Urbi)</string>
-    <string name="converter_urbi_permission_title">Connect to 2GIS (Urbi)?</string>
-    <string name="converter_urbi_loading_indicator_title">Connecting to 2GIS (Urbi)…</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_urbi_permission_title">Connect to 2GIS / Urbi?</string>
+    <string name="converter_urbi_loading_indicator_title">Connecting to 2GIS / Urbi…</string>
 </resources>
