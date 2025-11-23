@@ -47,10 +47,6 @@ class PositionBuilder(val srs: Srs) {
         }
     }
 
-    fun addPoint(block: () -> LatLonZ?) {
-        block()?.let { (lat, lon) -> points.add(Point(srs, lat, lon)) }
-    }
-
     fun addPoints(block: () -> Sequence<LatLonZ>) {
         points.addAll(block().map { (lat, lon) -> Point(srs, lat, lon) })
     }
