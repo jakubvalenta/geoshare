@@ -87,6 +87,9 @@
     <string name="converter_open_street_map_name" translatable="false">OpenStreetMap</string>
     <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
     <string name="converter_osm_and_name" translatable="false">OsmAnd</string>
+    <string name="converter_urbi_name" translatable="false">2GIS / Urbi</string>
+    <string name="converter_urbi_permission_title">Connect to 2GIS / Urbi?</string>
+    <string name="converter_urbi_loading_indicator_title">Connecting to 2GIS / Urbi…</string>
     <string name="converter_waze_loading_indicator_title">Connecting to Waze…</string>
     <string name="converter_waze_name" translatable="false">Waze</string>
     <string name="converter_waze_permission_title">Connect to Waze?</string>

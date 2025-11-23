@@ -11,6 +11,7 @@ val allInputs: List<Input> = listOf(
     OpenStreetMapInput,
     MapsMeInput,
     OsmAndInput,
+    UrbiInput,
     WazeInput,
     YandexMapsInput,
     CoordinatesInput,
