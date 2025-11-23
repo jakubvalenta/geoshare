@@ -197,7 +197,7 @@ private fun LabelPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
                 onRun = {},
             )
         }
@@ -213,7 +213,7 @@ private fun DarkLabelPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "my point"),
+                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
                 onRun = {},
             )
         }

@@ -18,7 +18,7 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
-            name: String = "My point",
+            name: String? = null,
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
             val lon = Random.nextDouble(minLon, maxLon).toScale(6)
