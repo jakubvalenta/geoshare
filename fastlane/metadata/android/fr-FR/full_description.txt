@@ -4,6 +4,7 @@ Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une aut
 
 - Google Maps
 - Apple Maps
+- 2GIS
 - Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
@@ -13,6 +14,7 @@ Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une aut
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Urbi
 - Waze
 - Yandex Maps
 - coordonnées

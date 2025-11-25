@@ -4,6 +4,7 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 
 - Google Mapy
 - Apple Mapy
+- 2GIS
 - Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
@@ -13,6 +14,7 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Urbi
 - Waze
 - Yandex Maps
 - souřadnice

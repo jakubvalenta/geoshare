@@ -3,14 +3,20 @@
 <b>linkuri de hărți implementate<b>
 
 - Google Maps
-- Apple Maps (beta)
-- HERE WeGo (beta)
-- Magic Earth (beta)
-- Mapy.com (beta)
-- OpenStreetMap (beta)
-- OsmAnd (beta)
-- Waze (beta)
-- Yandex Maps (beta)
+- Apple Maps
+- 2GIS
+- Amap (AutoNavi)
+- CoMaps
+- HERE WeGo
+- Magic Earth
+- Maps.me
+- Mapy.com
+- OpenStreetMap
+- Organic Maps
+- OsmAnd
+- Urbi
+- Waze
+- Yandex Maps
 - coordonate
 
 <b>Exemple de utilizare<b>

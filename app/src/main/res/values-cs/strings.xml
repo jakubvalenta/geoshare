@@ -136,4 +136,8 @@
     <string name="conversion_succeeded_open_app_navigate_via">Přidat bod trasy v %1$s</string>
     <string name="converter_amap_loading_indicator_title">Spojování s Amap…</string>
     <string name="converter_amap_permission_title">Spojit se s Amap?</string>
+    <string name="conversion_succeeded_copy_link_street_view">Kopírovat odkaz na street view v %1$s</string>
+    <string name="conversion_succeeded_open_app_street_view">Zobrazit street view v %1$s</string>
+    <string name="converter_urbi_permission_title">Spojit se s 2GIS / Urbi?</string>
+    <string name="converter_urbi_loading_indicator_title">Spojování s 2GIS / Urbi…</string>
 </resources>
