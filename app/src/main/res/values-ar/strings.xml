@@ -141,4 +141,6 @@
     <string name="conversion_succeeded_open_app_street_view">أظهر عرض الشارع في %1$s</string>
     <string name="converter_amap_loading_indicator_title">يتصل ب Amap…</string>
     <string name="converter_amap_permission_title">اتصل ب Amap؟</string>
+    <string name="converter_urbi_permission_title">الاتصال بـ 2GIS / Urbi؟</string>
+    <string name="converter_urbi_loading_indicator_title">جارٍ الاتصال بـ 2GIS / Urbi…</string>
 </resources>

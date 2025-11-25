@@ -4,6 +4,7 @@
 
 - خرائط جوجل (Google Maps)
 - خرائط أبل (Apple Maps)
+- 2GIS
 - أماب (Amap - AutoNavi)
 - كو مابس (CoMaps)
 - هير ويغو (HERE WeGo)
@@ -13,6 +14,7 @@
 - أوبن ستريت ماب (OpenStreetMap)
 - أورجانيك مابس (Organic Maps)
 - أوزماند (OsmAnd)
+- Urbi
 - وايز (Waze)
 - ياندكس مابس (Yandex Maps)
 - الإحداثيات
