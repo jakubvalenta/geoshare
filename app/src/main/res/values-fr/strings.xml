@@ -136,4 +136,8 @@
     <string name="conversion_succeeded_open_app_navigate_via">Ajouter un point de passage dans %1$s</string>
     <string name="converter_amap_loading_indicator_title">Connexion à Amap…</string>
     <string name="converter_amap_permission_title">Se connecter à Amap ?</string>
+    <string name="conversion_succeeded_copy_link_street_view">Copier le lien vers Street View dans %1$s</string>
+    <string name="conversion_succeeded_open_app_street_view">Afficher street view en %1$s</string>
+    <string name="converter_urbi_permission_title">Se connecter à 2GIS / Urbi ?</string>
+    <string name="converter_urbi_loading_indicator_title">Connexion à 2GIS / Urbi…</string>
 </resources>
