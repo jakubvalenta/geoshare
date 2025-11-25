@@ -135,4 +135,8 @@
     <string name="conversion_succeeded_open_app_navigate_via">Добавяне на точка от пътя в %1$s</string>
     <string name="converter_amap_loading_indicator_title">Свързване с Amap…</string>
     <string name="converter_amap_permission_title">Свързване с Amap?</string>
+    <string name="conversion_succeeded_copy_link_street_view">Копиране на връзка към уличен изглед в %1$s</string>
+    <string name="conversion_succeeded_open_app_street_view">Показване на уличен изглед в %1$s</string>
+    <string name="converter_urbi_permission_title">Свързване с 2GIS / Urbi?</string>
+    <string name="converter_urbi_loading_indicator_title">Свързване с 2GIS / Urbi…</string>
 </resources>
