@@ -4,6 +4,7 @@
 
 - Google 地图
 - Apple 地图
+- 2GIS
 - 高德地图
 - CoMaps
 - HERE WeGo
@@ -13,6 +14,7 @@
 - OpenStreetMap
 - Organic 地图
 - OsmAnd
+- Urbi
 - Waze
 - Yandex 地图
 - 坐标

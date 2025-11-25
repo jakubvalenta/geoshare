@@ -134,4 +134,8 @@
     <string name="conversion_succeeded_open_app_navigate_via">在 %1$s 中添加途经点</string>
     <string name="converter_amap_loading_indicator_title">正在连接到高德地图…</string>
     <string name="converter_amap_permission_title">连接到高德地图？</string>
+    <string name="conversion_succeeded_copy_link_street_view">复制 %1$s 的街景链接</string>
+    <string name="conversion_succeeded_open_app_street_view">在 %1$s 显示街景</string>
+    <string name="converter_urbi_permission_title">连接到 2GIS / Urbi？</string>
+    <string name="converter_urbi_loading_indicator_title">正在连接到 2GIS / Urbi…</string>
 </resources>
