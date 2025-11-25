@@ -12,9 +12,11 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import java.io.IOException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 interface ConversionState : State {
@@ -348,17 +350,17 @@ data class ConversionSucceeded(
     override val inputUriString: String,
     override val position: Position,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
+    override suspend fun transition(): State? =
         stateContext.userPreferencesRepository.getValue(AutomationUserPreference).let { automation ->
             when (automation) {
-                is Automation.HasDelay -> AutomationWaiting(
-                    stateContext,
-                    inputUriString,
-                    position,
-                    automation,
-                )
+                is NoopAutomation ->
+                    null
 
-                else -> AutomationReady(stateContext, inputUriString, position, automation)
+                is Automation.HasDelay ->
+                    ActionWaiting(stateContext, inputUriString, position, null, automation, automation.delay)
+
+                else ->
+                    ActionReady(inputUriString, position, null, automation)
             }
         }
 }
@@ -368,53 +370,75 @@ data class ConversionFailed(
     override val inputUriString: String,
 ) : ConversionState.HasError
 
-data class AutomationWaiting(
+data class ActionWaiting(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation.HasDelay,
+    val i: Int?,
+    val action: Action,
+    val delay: Duration,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State =
         try {
-            if (automation.delay.isPositive()) {
-                delay(automation.delay)
+            if (delay.isPositive()) {
+                delay(delay)
             }
-            AutomationReady(stateContext, inputUriString, position, automation)
+            ActionReady(inputUriString, position, i, action)
         } catch (_: CancellationException) {
-            AutomationFinished(inputUriString, position, automation)
+            ActionFinished(inputUriString, position, action)
         }
 }
 
-data class AutomationReady(
-    val stateContext: ConversionStateContext,
+data class ActionReady(
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation,
+    val i: Int?,
+    val action: Action,
+) : ConversionState.HasResult {
+    override suspend fun transition(): State =
+        when (action) {
+            is BasicAutomation -> BasicActionReady(inputUriString, position, i, action)
+            is BasicAction -> BasicActionReady(inputUriString, position, i, action)
+            is LocationAutomation -> LocationRationaleRequested(inputUriString, position, i, action)
+            is LocationAction -> LocationRationaleRequested(inputUriString, position, i, action)
+        }
+}
+
+data class BasicActionReady(
+    override val inputUriString: String,
+    override val position: Position,
+    val i: Int?,
+    val action: BasicAction,
 ) : ConversionState.HasResult
 
-data class AutomationRan(
-    val stateContext: ConversionStateContext,
+data class LocationActionReady(
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation,
+    val i: Int?,
+    val action: LocationAction,
+    val location: Point?,
+) : ConversionState.HasResult
+
+data class ActionRan(
+    override val inputUriString: String,
+    override val position: Position,
+    val action: Action,
     val success: Boolean?,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State =
         when (success) {
-            true if automation is Automation.HasSuccessMessage ->
-                AutomationSucceeded(inputUriString, position, automation)
+            true -> ActionSucceeded(inputUriString, position, action)
 
-            false if automation is Automation.HasErrorMessage ->
-                AutomationFailed(inputUriString, position, automation)
+            false -> ActionFailed(inputUriString, position, action)
 
-            else -> AutomationFinished(inputUriString, position, automation)
+            else -> ActionFinished(inputUriString, position, action)
         }
 }
 
-data class AutomationSucceeded(
+data class ActionSucceeded(
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation.HasSuccessMessage,
+    val action: Action,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
@@ -422,14 +446,14 @@ data class AutomationSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return AutomationFinished(inputUriString, position, automation)
+        return ActionFinished(inputUriString, position, action)
     }
 }
 
-data class AutomationFailed(
+data class ActionFailed(
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation.HasErrorMessage,
+    val action: Action,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
@@ -437,12 +461,49 @@ data class AutomationFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return AutomationFinished(inputUriString, position, automation)
+        return ActionFinished(inputUriString, position, action)
     }
 }
 
-data class AutomationFinished(
+data class ActionFinished(
     override val inputUriString: String,
     override val position: Position,
-    val automation: Automation,
+    val action: Action,
+) : ConversionState.HasResult
+
+data class LocationRationaleRequested(
+    override val inputUriString: String,
+    override val position: Position,
+    val i: Int?,
+    val action: LocationAction,
+) : ConversionState.HasResult
+
+data class LocationRationaleShown(
+    override val inputUriString: String,
+    override val position: Position,
+    val i: Int?,
+    val action: LocationAction,
+) : ConversionState.HasPermission, ConversionState.HasResult {
+    @StringRes
+    override val permissionTitleResId = R.string.conversion_location_permission_dialog_title
+
+    override suspend fun grant(doNotAsk: Boolean): State =
+        LocationRationaleConfirmed(inputUriString, position, i, action)
+
+    override suspend fun deny(doNotAsk: Boolean): State =
+        ActionFailed(inputUriString, position, action)
+}
+
+data class LocationRationaleConfirmed(
+    override val inputUriString: String,
+    override val position: Position,
+    val i: Int?,
+    val action: LocationAction,
+) : ConversionState.HasResult
+
+data class LocationPermissionReceived(
+    override val inputUriString: String,
+    override val position: Position,
+    val i: Int?,
+    val action: LocationAction,
 ) : ConversionState.HasResult

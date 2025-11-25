@@ -1,39 +1,31 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.outputs.Action as Action_
+import page.ooooo.geoshare.lib.position.Position
 
-sealed interface Output<T> {
+interface Output {
+    fun getText(position: Position, i: Int?, uriQuote: UriQuote): String? = null
 
-    interface Action<T, U : Action_> {
-        fun getAction(value: T, uriQuote: UriQuote = DefaultUriQuote()): U
+    @Composable
+    fun getName(position: Position, i: Int?, uriQuote: UriQuote): String? = null
 
-        @Composable
-        fun label(): String
+    fun getDescription(position: Position, uriQuote: UriQuote): String? = null
 
-        fun isEnabled(value: T): Boolean
-    }
+    fun getPositionActions(): List<Action> = emptyList()
 
-    interface App<T> : Output<T> {
-        val packageName: String
+    fun getPointActions(): List<Action> = emptyList()
 
-        fun getAction(value: T, uriQuote: UriQuote = DefaultUriQuote()): Action_.OpenApp
+    fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = emptyList()
 
-        @Composable
-        fun label(app: AndroidTools.App): String
+    fun getChipActions(): List<Action> = emptyList()
 
-        fun isEnabled(value: T): Boolean
-    }
+    fun getChooserAction(): OpenChooserAction? = null
 
-    interface Text<T> : Output<T> {
-        fun getText(value: T, uriQuote: UriQuote = DefaultUriQuote()): String
-    }
+    fun getRandomAction(): CopyAction? = null
 
-    interface PointLabel<T> : Output<T> {
-        @Composable
-        fun getText(value: T, i: Int, pointCount: Int, uriQuote: UriQuote = DefaultUriQuote()): String?
-    }
+    fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = emptyList()
+
+    fun findAutomation(type: Automation.Type, packageName: String?): Automation? = null
 }

@@ -16,7 +16,10 @@ import page.ooooo.geoshare.data.local.preferences.*
 import page.ooooo.geoshare.lib.SavableDelegate
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.inputs.allInputs
+import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.position.Point
 import javax.inject.Inject
 
 @HiltViewModel
@@ -156,21 +159,73 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun finishAutomation(success: Boolean?) {
-        (stateContext.currentState as? AutomationReady)?.let { currentState ->
-            stateContext.currentState = AutomationRan(
-                stateContext,
-                currentState.inputUriString,
-                currentState.position,
-                currentState.automation,
-                success
+    fun showLocationRationale(action: LocationAction, i: Int?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationRationaleShown(
+                currentState.inputUriString, currentState.position, i, action
             )
             transition()
         }
     }
 
+    fun skipLocationRationale(action: LocationAction, i: Int?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationPermissionReceived(
+                currentState.inputUriString, currentState.position, i, action,
+            )
+            transition()
+        }
+    }
+
+    fun receiveLocationPermission() {
+        (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
+            stateContext.currentState = LocationPermissionReceived(
+                currentState.inputUriString, currentState.position, currentState.i, currentState.action,
+            )
+            transition()
+        }
+    }
+
+    fun runAction(action: Action, i: Int?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = ActionReady(
+                currentState.inputUriString, currentState.position, i, action
+            )
+            transition()
+        }
+    }
+
+    fun runLocationAction(action: LocationAction, i: Int?, location: Point?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationActionReady(
+                currentState.inputUriString, currentState.position, i, action, location
+            )
+            transition()
+        }
+    }
+
+    fun finishAction(success: Boolean?) {
+        stateContext.currentState.let { currentState ->
+            when (currentState) {
+                is BasicActionReady -> {
+                    stateContext.currentState = ActionRan(
+                        currentState.inputUriString, currentState.position, currentState.action, success
+                    )
+                    transition()
+                }
+
+                is LocationActionReady -> {
+                    stateContext.currentState = ActionRan(
+                        currentState.inputUriString, currentState.position, currentState.action, success
+                    )
+                    transition()
+                }
+            }
+        }
+    }
+
     fun writeGpx(writer: Appendable) {
-        (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpx(writer)
+        (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpxPoints(writer)
     }
 
     private fun transition() {

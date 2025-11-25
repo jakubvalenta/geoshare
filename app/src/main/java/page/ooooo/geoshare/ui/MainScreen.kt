@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.outputs.allOutputGroups
+import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.genRandomUriString
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.TwoPaneScaffold
@@ -235,7 +235,7 @@ fun MainScreen(
                     Text(stringResource(R.string.main_navigate_to_intro))
                 }
                 TextButton({
-                    allOutputGroups.genRandomUriString(
+                    allOutputs.genRandomUriString(
                         resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
                     )?.let { uriString ->
                         onUpdateInput(uriString)

@@ -6,7 +6,7 @@ import org.junit.Test
 
 class PositionTest {
     @Test
-    fun saveGpx_write() {
+    fun writeGpxPoints() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
@@ -22,13 +22,13 @@ class PositionTest {
                         Point(Srs.WGS84, 50.123456, -11.123456),
                         Point(Srs.WGS84, 52.5067296, 13.2599309),
                     ),
-                ).writeGpx(this)
+                ).writeGpxPoints(this)
             }.toString(),
         )
     }
 
     @Test
-    fun toGpx_escapesName() {
+    fun writeGpxPoints_escapesName() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
@@ -44,13 +44,13 @@ class PositionTest {
                     points = persistentListOf(
                         Point(Srs.WGS84, 50.123456, -11.123456, name = "<script>alert()</script>"),
                     ),
-                ).writeGpx(this)
+                ).writeGpxPoints(this)
             }.toString(),
         )
     }
 
     @Test
-    fun toGpx_noPoints() {
+    fun writeGpxPoints_noPoints() {
         assertEquals(
             """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
@@ -59,7 +59,7 @@ class PositionTest {
 </gpx>
 """,
             StringBuilder().apply {
-                Position().writeGpx(this)
+                Position().writeGpxPoints(this)
             }.toString(),
         )
     }

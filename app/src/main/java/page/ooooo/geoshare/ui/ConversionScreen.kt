@@ -1,11 +1,8 @@
 package page.ooooo.geoshare.ui
 
+import android.Manifest
 import android.app.Activity
-import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,13 +35,14 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.conversion.*
@@ -52,14 +50,13 @@ import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.Automation
-import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.outputs.GeoUriOutput
+import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ConversionScreen(
@@ -77,6 +74,16 @@ fun ConversionScreen(
     val clipboard = LocalClipboard.current
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
+
+    val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+    val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
+    val changelogShown by viewModel.changelogShown.collectAsState()
+
+    var locationJob: Job? = null
+    val locationPermissionRequest =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            viewModel.receiveLocationPermission()
+        }
     val saveGpxLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
@@ -88,88 +95,57 @@ fun ConversionScreen(
             }
         }
 
-    val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-    val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
-    val changelogShown by viewModel.changelogShown.collectAsState()
-
-    fun runAction(action: Action): Boolean = when (action) {
-        is Action.Copy -> {
-            coroutineScope.launch {
-                AndroidTools.copyToClipboard(clipboard, action.text)
-            }
-            true
-        }
-
-        is Action.OpenApp -> {
-            AndroidTools.openApp(context, action.packageName, action.uriString)
-        }
-
-        is Action.OpenChooser -> {
-            AndroidTools.openChooser(context, action.uriString)
-        }
-
-        is Action.SaveGpx -> {
-            @Suppress("SpellCheckingInspection") val timestamp =
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(System.currentTimeMillis())
-            val filename = resources.getString(
-                R.string.conversion_succeeded_save_gpx_filename,
-                resources.getString(R.string.app_name),
-                timestamp,
-            )
-            try {
-                saveGpxLauncher.launch(
-                    Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "text/xml"
-                        putExtra(Intent.EXTRA_TITLE, filename)
-                    },
-                )
-                true
-            } catch (e: Exception) {
-                Log.e(null, "Error when saving GPX file", e)
-                false
-            }
-        }
-    }
-
-    fun showActionMessage(action: Action, success: Boolean) {
-        if (success) {
-            if (action is Action.Copy) {
-                val systemHasClipboardEditor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                if (!systemHasClipboardEditor) {
-                    Toast.makeText(
-                        context,
-                        R.string.copying_finished,
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-            }
-        } else {
-            if (action is Action.OpenApp) {
-                Toast.makeText(
-                    context,
-                    resources.getString(
-                        R.string.conversion_automation_open_app_failed,
-                        AndroidTools.queryApp(context.packageManager, action.packageName)?.label ?: action.packageName,
-                    ),
-                    Toast.LENGTH_SHORT,
-                ).show()
-            } else if (action is Action.OpenChooser) {
-                Toast.makeText(
-                    context,
-                    R.string.conversion_succeeded_apps_not_found,
-                    Toast.LENGTH_SHORT,
-                ).show()
-            }
-        }
-    }
-
     LaunchedEffect(currentState) {
-        (currentState as? AutomationReady)?.let { currentState ->
-            val action = currentState.automation.getAction(currentState.position, currentState.stateContext.uriQuote)
-            if (action != null) {
-                val success = runAction(action)
-                viewModel.finishAutomation(success)
+        currentState.let { currentState ->
+            when (currentState) {
+                is BasicActionReady -> {
+                    val success = currentState.action.runAction(
+                        position = currentState.position,
+                        i = currentState.i,
+                        context = context,
+                        clipboard = clipboard,
+                        resources = resources,
+                        saveGpxLauncher = saveGpxLauncher,
+                    )
+                    viewModel.finishAction(success)
+                }
+
+                is LocationActionReady -> {
+                    val success = currentState.action.runAction(
+                        position = currentState.position,
+                        i = currentState.i,
+                        location = currentState.location,
+                        context = context,
+                        clipboard = clipboard,
+                        resources = resources,
+                        saveGpxLauncher = saveGpxLauncher,
+                    )
+                    viewModel.finishAction(success)
+                }
+
+                is LocationRationaleRequested -> {
+                    if (AndroidTools.hasLocationPermission(context)) {
+                        viewModel.skipLocationRationale(currentState.action, currentState.i)
+                    } else {
+                        viewModel.showLocationRationale(currentState.action, currentState.i)
+                    }
+                }
+
+                is LocationRationaleConfirmed -> {
+                    locationPermissionRequest.launch(
+                        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+                    )
+                }
+
+                is LocationPermissionReceived -> {
+                    locationJob?.cancel()
+                    locationJob = coroutineScope.launch(Dispatchers.IO) {
+                        // TODO Fix the system permission dialog requiring two taps sometimes
+                        // TODO Fix loading indicator not visible while getting location
+                        val location = AndroidTools.getLocation(context)
+                        viewModel.runLocationAction(currentState.action, currentState.i, location)
+                    }
+                }
             }
         }
     }
@@ -182,7 +158,10 @@ fun ConversionScreen(
             viewModel.cancel()
             onBack()
         },
-        onCancel = { viewModel.cancel() },
+        onCancel = {
+            locationJob?.cancel()
+            viewModel.cancel()
+        },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
         onFinish = onFinish,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
@@ -214,10 +193,9 @@ fun ConversionScreen(
             viewModel.updateInput(newUriString)
             viewModel.start()
         },
-        onRun = { action ->
+        onRun = { action, i ->
             viewModel.cancel()
-            val success = runAction(action)
-            showActionMessage(action, success)
+            viewModel.runAction(action, i)
         },
     )
 }
@@ -242,9 +220,10 @@ fun ConversionScreen(
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onRetry: (newUriString: String) -> Unit,
-    onRun: (action: Action) -> Unit,
+    onRun: (action: Action, i: Int?) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
+    val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -357,13 +336,12 @@ fun ConversionScreen(
             (loadingIndicatorTitleResId == null && currentState is ConversionState.HasResult) -> {
                 {
                     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                        ResultSuccessAutomation(
+                        ResultSuccessMessage(
                             currentState,
                             onCancel = onCancel,
                             onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                         )
                         ResultSuccessApps(
-                            position = currentState.position,
                             onRun = onRun,
                             windowSizeClass = windowSizeClass,
                         )
@@ -376,7 +354,11 @@ fun ConversionScreen(
         bottomPane = when {
             (loadingIndicatorTitleResId == null && currentState is ConversionState.HasError) -> {
                 {
-                    TextButton({ onRun(Action.Copy(currentState.inputUriString)) }) {
+                    TextButton({
+                        coroutineScope.launch {
+                            AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
+                        }
+                    }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
                                 start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
@@ -388,7 +370,11 @@ fun ConversionScreen(
 
             (loadingIndicatorTitleResId == null && currentState is ConversionState.HasResult) -> {
                 {
-                    TextButton({ onRun(Action.Copy(currentState.inputUriString)) }) {
+                    TextButton({
+                        coroutineScope.launch {
+                            AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
+                        }
+                    }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
                                 start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
@@ -453,6 +439,26 @@ fun ConversionScreen(
                 }
             }
 
+            (currentState is LocationRationaleShown) -> {
+                {
+                    ConfirmationDialog(
+                        title = stringResource(currentState.permissionTitleResId),
+                        confirmText = stringResource(R.string.conversion_permission_common_grant),
+                        dismissText = stringResource(R.string.conversion_permission_common_deny),
+                        onConfirmation = { onGrant(false) },
+                        onDismissRequest = { onDeny(false) },
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("geoShareLocationRationale"),
+                    ) {
+                        Text(
+                            AnnotatedString.fromHtml(currentState.action.permissionText()),
+                            style = TextStyle(lineBreak = LineBreak.Paragraph),
+                        )
+                    }
+                }
+            }
+
             else -> null
         },
         containerColor = when {
@@ -478,10 +484,10 @@ fun ConversionScreen(
 private fun DefaultPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = AutomationFinished(
+            currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                automation = Automation.Noop,
+                action = NoopAutomation,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -497,7 +503,7 @@ private fun DefaultPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -507,10 +513,10 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = AutomationFinished(
+            currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                automation = Automation.Noop,
+                action = NoopAutomation,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -526,7 +532,7 @@ private fun DarkPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -536,10 +542,10 @@ private fun DarkPreview() {
 private fun TabletPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = AutomationFinished(
+            currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                automation = Automation.Noop,
+                action = NoopAutomation,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -555,7 +561,7 @@ private fun TabletPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -565,11 +571,13 @@ private fun TabletPreview() {
 private fun AutomationPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = AutomationWaiting(
+            currentState = ActionWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                i = null,
+                action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                delay = 3.seconds,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -585,7 +593,7 @@ private fun AutomationPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -595,11 +603,13 @@ private fun AutomationPreview() {
 private fun DarkAutomationPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = AutomationWaiting(
+            currentState = ActionWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                i = null,
+                action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                delay = 3.seconds,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -615,7 +625,7 @@ private fun DarkAutomationPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -625,11 +635,13 @@ private fun DarkAutomationPreview() {
 private fun TabletAutomationPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = AutomationWaiting(
+            currentState = ActionWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
-                automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                i = null,
+                action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                delay = 3.seconds,
             ),
             changelogShown = true,
             loadingIndicatorTitleResId = null,
@@ -645,7 +657,7 @@ private fun TabletAutomationPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -673,7 +685,7 @@ private fun ErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -701,7 +713,7 @@ private fun DarkErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -729,7 +741,7 @@ private fun TabletErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -767,7 +779,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -805,7 +817,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -843,7 +855,7 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -868,7 +880,7 @@ private fun InitialPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -893,7 +905,7 @@ private fun DarkInitialPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }
@@ -918,7 +930,7 @@ private fun TabletInitialPreview() {
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onRetry = {},
-            onRun = {},
+            onRun = { _, _ -> },
         )
     }
 }

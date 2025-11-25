@@ -155,11 +155,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4842015, 13.4167277))
 
-            // Return to the home screen
-            pressHome()
-
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+            waitForStableInActiveWindow()
 
             // Unshorten permission dialog is visible again
             onElement { viewIdResourceName == "geoShareUnshortenPermissionDialog" }
@@ -177,11 +175,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4842015, 13.4167277))
 
-            // Return to the home screen
-            pressHome()
-
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+            waitForStableInActiveWindow()
 
             // Shows precise location again
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 44.4490541, 26.0888398))
@@ -256,11 +252,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4697882, 13.4257989))
 
-            // Return to the home screen
-            pressHome()
-
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
+            waitForStableInActiveWindow()
 
             // Parse HTML permission dialog is visible again
             onElement { viewIdResourceName == "geoShareParseHtmlPermissionDialog" }
@@ -278,11 +272,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4778665, 13.426398))
 
-            // Return to the home screen
-            pressHome()
-
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
+            waitForStableInActiveWindow()
 
             // Shows precise location again
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4820815, 13.4338421))
@@ -344,11 +336,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4848232, 13.4240791))
 
-            // Return to the home screen
-            pressHome()
-
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+11,+Berlin/")
+            waitForStableInActiveWindow()
 
             // Parse HTML permission dialog is visible again
             onElement { viewIdResourceName == "geoShareParseHtmlPermissionDialog" }
@@ -366,11 +356,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4834254, 13.4245399))
 
-            // Return to the home screen
-            pressHome()
-
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
+            waitForStableInActiveWindow()
 
             // Shows precise location again
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4832988, 13.4245179))
@@ -429,4 +417,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 51.1982447, 6.4389493))
         }
+
+    // TODO Test ShareGpxRoute
 }

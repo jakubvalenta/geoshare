@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
+import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.PositionBuilder
@@ -34,7 +34,7 @@ object CoordinatesInput : Input {
         nameResId = R.string.converter_coordinates_name,
         inputs = listOf(
             Input.DocumentationInput.Text(20) {
-                stringResource(R.string.example, CoordinatesOutputGroup.formatDegMinSecString(Position.example))
+                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Position.example, null))
             },
         ),
     )

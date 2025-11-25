@@ -1,5 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
+    <string name="conversion_location_loading_indicator_title">Getting location…</string>
+    <string name="conversion_location_permission_dialog_title">Allow location access?</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
@@ -11,6 +13,7 @@
     <string name="conversion_succeeded_copy_link_street_view">Copy link to street view in %1$s</string>
     <string name="conversion_succeeded_open_app">Open %1$s</string>
     <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
+    <string name="conversion_succeeded_open_app_failed">Failed to open %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navigate in %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_via">Add waypoint in %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Show street view in %1$s</string>
@@ -65,6 +68,10 @@
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_random">Random link</string>
+    <string name="output_gpx_location_permission">To open %1$s, %2$s needs to create a route starting at your current location.</string>
+    <string name="output_gpx_route_share">Share GPX route</string>
+    <string name="output_gpx_route_share_failed">Failed to share GPX route</string>
+    <string name="output_gpx_route_share_permission_text">To create a GPX route, %1$s requires location access.</string>
     <string name="converter_amap_name" translatable="false">Amap (AutoNavi)</string>
     <string name="converter_amap_loading_indicator_title">Connecting to Amap…</string>
     <string name="converter_amap_permission_title">Connect to Amap?</string>
@@ -142,7 +149,7 @@
     <string name="conversion_failed_unshorten_connection_error">Connection error when resolving short link</string>
     <string name="conversion_failed_parse_url_error">Failed to process map link</string>
     <string name="conversion_succeeded_apps_not_found">No map app is installed</string>
-    <string name="copying_finished">Copied coordinates to clipboard</string>
+    <string name="copying_finished">Copied to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
     <string name="conversion_failed_parse_html_error">Failed to fetch web page from the map service</string>
     <string name="conversion_failed_parse_html_connection_error">Connection error when fetching web page from the map service</string>

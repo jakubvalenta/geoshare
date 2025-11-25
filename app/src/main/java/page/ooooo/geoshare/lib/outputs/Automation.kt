@@ -1,17 +1,10 @@
 package page.ooooo.geoshare.lib.outputs
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.res.stringResource
-import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.UriQuote
 import kotlin.time.Duration
 
-sealed interface Automation {
-
+sealed interface Automation : Action {
     @Suppress("SpellCheckingInspection")
     @Immutable
     enum class Type {
@@ -29,48 +22,26 @@ sealed interface Automation {
         OPEN_APP,
         OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO,
         OPEN_APP_GOOGLE_MAPS_STREET_VIEW,
+        OPEN_APP_GPX_ROUTE,
         OPEN_APP_MAGIC_EARTH_NAVIGATE_TO,
         OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA,
         SAVE_GPX,
         SHARE,
+        SHARE_GPX_ROUTE,
     }
 
     val type: Type
     val packageName: String
     val testTag: String?
 
-    fun getAction(position: Position, uriQuote: UriQuote = DefaultUriQuote()): Action?
-
-    @Composable
-    fun Label()
-
-    object Noop : Automation {
-        override val type = Type.NOOP
-        override val packageName = ""
-        override val testTag = null
-
-        override fun getAction(position: Position, uriQuote: UriQuote) = null
-
-        @Composable
-        override fun Label() {
-            Text(stringResource(R.string.user_preferences_automation_nothing))
-        }
-    }
-
-    interface HasDelay : Automation {
+    interface HasDelay {
         val delay: Duration
 
         @Composable
         fun waitingText(counterSec: Int): String
     }
-
-    interface HasSuccessMessage : Automation {
-        @Composable
-        fun successText(): String
-    }
-
-    interface HasErrorMessage : Automation {
-        @Composable
-        fun errorText(): String
-    }
 }
+
+interface BasicAutomation : BasicAction, Automation
+
+interface LocationAutomation : LocationAction, Automation

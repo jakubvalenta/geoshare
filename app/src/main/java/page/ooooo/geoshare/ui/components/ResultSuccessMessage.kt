@@ -19,9 +19,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.conversion.*
-import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.GeoUriOutput
+import page.ooooo.geoshare.lib.outputs.GpxOutput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -29,22 +32,23 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
-fun ResultSuccessAutomation(
+fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
 ) {
+    fun isMessageShown(state: ConversionState.HasResult?): Boolean =
+        state is ActionWaiting && state.action is Automation.HasDelay ||
+            state is ActionSucceeded && state.action is Action.HasSuccessMessage ||
+            state is ActionFailed && state.action is Action.HasErrorMessage ||
+            state is LocationPermissionReceived
+
     val spacing = LocalSpacing.current
     var counterSec by remember { mutableIntStateOf(0) }
     var targetState by remember {
         mutableStateOf(
-            if (
-                animationsEnabled &&
-                (currentState is AutomationWaiting ||
-                    currentState is AutomationSucceeded ||
-                    currentState is AutomationFailed)
-            ) {
+            if (animationsEnabled && isMessageShown(currentState)) {
                 // To make the message appear with an animation, first start with null state and only later change it to
                 // the current state (using LaunchedEffect).
                 null
@@ -58,6 +62,7 @@ fun ResultSuccessAutomation(
         targetState = currentState
     }
 
+    // TODO Fix slight blinking when rendering ResultSuccessMessage component without a message.
     AnimatedContent(
         targetState,
         modifier = Modifier
@@ -67,11 +72,7 @@ fun ResultSuccessAutomation(
         transitionSpec = {
             if (!animationsEnabled) {
                 EnterTransition.None togetherWith ExitTransition.None
-            } else if (
-                this.targetState is AutomationWaiting ||
-                this.targetState is AutomationSucceeded ||
-                this.targetState is AutomationFailed
-            ) {
+            } else if (isMessageShown(this.targetState)) {
                 slideInHorizontally { fullWidth -> -fullWidth } togetherWith fadeOut()
             } else {
                 fadeIn() togetherWith fadeOut()
@@ -79,17 +80,17 @@ fun ResultSuccessAutomation(
         }
     ) { targetState ->
         when (targetState) {
-            is AutomationWaiting ->
-                ResultAutomationRow {
-                    ResultAutomationMessage(Modifier.testTag("geoShareConversionSuccessAutomationCounter")) {
-                        LaunchedEffect(targetState.automation) {
-                            counterSec = targetState.automation.delay.toInt(DurationUnit.SECONDS)
+            is ActionWaiting if targetState.action is Automation.HasDelay ->
+                ResultMessageRow {
+                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationCounter")) {
+                        LaunchedEffect(targetState.action) {
+                            counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
                             while (counterSec > 0) {
                                 delay(1.seconds)
                                 counterSec--
                             }
                         }
-                        targetState.automation.waitingText(counterSec)
+                        targetState.action.waitingText(counterSec)
                     }
                     FilledIconButton(
                         onCancel,
@@ -105,25 +106,44 @@ fun ResultSuccessAutomation(
                     }
                 }
 
-            is AutomationSucceeded ->
-                ResultAutomationRow {
-                    ResultAutomationMessage(Modifier.testTag("geoShareConversionSuccessAutomationSuccess")) {
-                        targetState.automation.successText()
+            is ActionSucceeded if targetState.action is Action.HasSuccessMessage ->
+                ResultMessageRow {
+                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationSuccess")) {
+                        targetState.action.successText()
                     }
                 }
 
-            is AutomationFailed ->
-                ResultAutomationRow {
-                    ResultAutomationMessage(
+            is ActionFailed if targetState.action is Action.HasErrorMessage ->
+                ResultMessageRow {
+                    ResultMessageText(
                         containerColor = MaterialTheme.colorScheme.errorContainer,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     ) {
-                        targetState.automation.errorText()
+                        targetState.action.errorText()
+                    }
+                }
+
+            is LocationPermissionReceived ->
+                ResultMessageRow {
+                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessLocationLoader")) {
+                        stringResource(R.string.conversion_location_loading_indicator_title)
+                    }
+                    FilledIconButton(
+                        onCancel,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            contentColor = MaterialTheme.colorScheme.onTertiary,
+                        ),
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            stringResource(R.string.conversion_loading_indicator_cancel),
+                        )
                     }
                 }
 
             else ->
-                ResultAutomationRow {
+                ResultMessageRow {
                     Text(
                         stringResource(R.string.conversion_succeeded_apps_headline),
                         style = MaterialTheme.typography.headlineSmall,
@@ -144,7 +164,7 @@ fun ResultSuccessAutomation(
 }
 
 @Composable
-private fun ResultAutomationRow(content: @Composable RowScope.() -> Unit) {
+private fun ResultMessageRow(content: @Composable RowScope.() -> Unit) {
     Row(
         Modifier.fillMaxHeight(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -154,7 +174,7 @@ private fun ResultAutomationRow(content: @Composable RowScope.() -> Unit) {
 }
 
 @Composable
-private fun RowScope.ResultAutomationMessage(
+private fun RowScope.ResultMessageText(
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -183,14 +203,14 @@ private fun RowScope.ResultAutomationMessage(
 
 @Preview(showBackground = true)
 @Composable
-private fun DefaultPreview() {
+private fun ActionFinishedPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationFinished(
+            ResultSuccessMessage(
+                currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -202,14 +222,14 @@ private fun DefaultPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkPreview() {
+private fun DarkActionFinishedPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationFinished(
+            ResultSuccessMessage(
+                currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -221,15 +241,17 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun WaitingPreview() {
+private fun ActionWaitingPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationWaiting(
+            ResultSuccessMessage(
+                currentState = ActionWaiting(
                     stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    i = null,
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    delay = 3.seconds,
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -241,15 +263,57 @@ private fun WaitingPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkWaitingPreview() {
+private fun DarkActionWaitingPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationWaiting(
+            ResultSuccessMessage(
+                currentState = ActionWaiting(
                     stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    i = null,
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    delay = 3.seconds,
+                ),
+                animationsEnabled = false,
+                onCancel = {},
+                onNavigateToUserPreferencesAutomationScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LocationPermissionReceivedPreview() {
+    AppTheme {
+        Surface {
+            ResultSuccessMessage(
+                currentState = LocationPermissionReceived(
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    i = null,
+                    action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                ),
+                animationsEnabled = false,
+                onCancel = {},
+                onNavigateToUserPreferencesAutomationScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkLocationPermissionReceivedPreview() {
+    AppTheme {
+        Surface {
+            ResultSuccessMessage(
+                currentState = LocationPermissionReceived(
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    i = null,
+                    action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -264,11 +328,11 @@ private fun DarkWaitingPreview() {
 private fun SucceededPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationSucceeded(
+            ResultSuccessMessage(
+                currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -283,11 +347,11 @@ private fun SucceededPreview() {
 private fun DarSucceededPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationSucceeded(
+            ResultSuccessMessage(
+                currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -302,11 +366,11 @@ private fun DarSucceededPreview() {
 private fun FailedPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationFailed(
+            ResultSuccessMessage(
+                currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -321,11 +385,11 @@ private fun FailedPreview() {
 private fun DarkFailedPreview() {
     AppTheme {
         Surface {
-            ResultSuccessAutomation(
-                currentState = AutomationFailed(
+            ResultSuccessMessage(
+                currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    automation = GeoUriOutputGroup.AppAutomation(GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 animationsEnabled = false,
                 onCancel = {},

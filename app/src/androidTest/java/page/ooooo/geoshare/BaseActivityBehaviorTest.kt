@@ -13,9 +13,9 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
-import page.ooooo.geoshare.lib.outputs.allOutputGroups
-import page.ooooo.geoshare.lib.outputs.getDescriptionOutput
-import page.ooooo.geoshare.lib.outputs.getTextOutput
+import page.ooooo.geoshare.lib.outputs.allOutputs
+import page.ooooo.geoshare.lib.outputs.getDescription
+import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.lib.position.Position
 import kotlin.math.pow
 import kotlin.math.roundToLong
@@ -55,15 +55,19 @@ abstract class BaseActivityBehaviorTest {
             if (menu != null) {
                 // On Android API >= 36.1, use the dropdown menu
                 menu.click()
-                onElement { textAsString() == "Clear" }.click()
+                onElement { textAsString() in listOf("Clear", "Effacer") }.click()
             } else {
                 // On Android API >= 28, swipe from the center of the screen towards the upper edge
                 device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
-            @Suppress("SpellCheckingInspection")
-            if (onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "No recent items" || textAsString() == "Aucun élément récent" } != null) {
+            if (
+                @Suppress("SpellCheckingInspection")
+                onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
+                    textAsString() in listOf("No recent items", "Aucun élément récent")
+                } != null
+            ) {
                 // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
                 device.pressRecentApps()
                 waitForStableInActiveWindow()
@@ -71,8 +75,7 @@ abstract class BaseActivityBehaviorTest {
                 waitForStableInActiveWindow()
             }
             device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, displayHeight, 10) }
-            // waitForStableInActiveWindow()
-            onElement { textAsString() == "CLEAR ALL" || textAsString() == "TOUT EFFACER" }.click()
+            onElement { textAsString() in listOf("CLEAR ALL", "TOUT EFFACER") }.click()
         }
         waitForStableInActiveWindow()
     }
@@ -99,14 +102,23 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
+        val expectedText = allOutputs.getText(expectedPosition, null)
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
         val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
             ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
-            ?: "Coordinates"
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
+        if (expectedName != null) {
+            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
+        } else {
+            onElement {
+                viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() in listOf(
+                    "Coordinates",
+                    @Suppress("SpellCheckingInspection")
+                    "Coordonnées",
+                )
+            }
+        }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
-            val expectedDescription = allOutputGroups.getDescriptionOutput()?.getText(expectedPosition)
+            val expectedDescription = allOutputs.getDescription(expectedPosition)
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" && textAsString() == expectedDescription }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })

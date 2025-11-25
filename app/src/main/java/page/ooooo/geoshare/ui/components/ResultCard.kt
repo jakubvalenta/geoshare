@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.outputs.CoordinatesOutputGroup
+import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -68,14 +68,14 @@ fun ResultCard(
 
 @Composable
 fun ResultCardChip(
-    text: String,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     SuggestionChip(
         onClick = onClick,
-        label = { Text(text) },
+        label = label,
         modifier = modifier,
         icon = icon,
         colors = SuggestionChipDefaults.suggestionChipColors(
@@ -103,18 +103,18 @@ private fun DefaultPreview() {
             ResultCard(
                 chips = {
                     ResultCardChip(
-                        "My first chip",
+                        { Text("My first chip") },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My second chip",
+                        { Text("My second chip") },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My third chip",
+                        { Text("My third chip") },
                         onClick = {},
                     )
                 },
@@ -130,7 +130,7 @@ private fun DefaultPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -149,18 +149,18 @@ private fun DarkPreview() {
             ResultCard(
                 chips = {
                     ResultCardChip(
-                        "My first chip",
+                        { Text("My first chip") },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My second chip",
+                        { Text("My second chip") },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My third chip",
+                        { Text("My third chip") },
                         onClick = {},
                     )
                 },
@@ -176,7 +176,7 @@ private fun DarkPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -195,18 +195,18 @@ private fun DefaultTopAndBottomPreview() {
             ResultCard(
                 chips = {
                     ResultCardChip(
-                        "My first chip",
+                        { Text("My first chip") },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My second chip",
+                        { Text("My second chip") },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My third chip",
+                        { Text("My third chip") },
                         onClick = {},
                     )
                 },
@@ -237,7 +237,7 @@ private fun DefaultTopAndBottomPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -256,18 +256,18 @@ private fun DarkTopAndBottomPreview() {
             ResultCard(
                 chips = {
                     ResultCardChip(
-                        "My first chip",
+                        { Text("My first chip") },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My second chip",
+                        { Text("My second chip") },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My third chip",
+                        { Text("My third chip") },
                         onClick = {},
                     )
                 },
@@ -298,7 +298,7 @@ private fun DarkTopAndBottomPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -317,24 +317,24 @@ private fun ErrorPreview() {
             ResultCard(
                 chips = {
                     ResultCardChip(
-                        "My first chip",
+                        { Text("My first chip") },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My second chip",
+                        { Text("My second chip") },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My third chip",
+                        { Text("My third chip") },
                         onClick = {},
                     )
                 },
             ) {
                 Text(
-                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -353,24 +353,24 @@ private fun DarkErrorPreview() {
             ResultCard(
                 chips = {
                     ResultCardChip(
-                        "My first chip",
+                        { Text("My first chip") },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My second chip",
+                        { Text("My second chip") },
                         onClick = {},
                     )
                     ResultCardChip(
-                        "My third chip",
+                        { Text("My third chip") },
                         onClick = {},
                     )
                 },
             ) {
                 Text(
-                    CoordinatesOutputGroup.formatDegMinSecString(Position.example),
+                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

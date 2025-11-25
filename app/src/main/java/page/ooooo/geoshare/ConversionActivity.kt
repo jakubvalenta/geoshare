@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,6 +30,7 @@ class ConversionActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Log.i(null, "New intent: ${intent.data}")
         viewModel.updateInput(AndroidTools.getIntentUriString(intent) ?: "")
         viewModel.start()
     }

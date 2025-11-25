@@ -4,7 +4,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
-class GeoInputBehaviorTest : BaseInputBehaviorTest() {
+class GeoUriInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
     fun test() {
         // Launch app and close intro
