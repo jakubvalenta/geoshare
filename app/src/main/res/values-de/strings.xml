@@ -135,4 +135,8 @@
     <string name="user_preferences_automation_description">Wähle eine Aktion aus, die automatisch ausgeführt werden soll, wenn ein Kartenlink in Koordinaten umgewandelt wird.</string>
     <string name="user_preferences_automation_nothing">Nichts</string>
     <string name="user_preferences_automation_title">Automatisierung</string>
+    <string name="conversion_succeeded_copy_link_street_view">Link zum %1$s Street View kopieren</string>
+    <string name="conversion_succeeded_open_app_street_view">Street View in %1$s anzeigen</string>
+    <string name="converter_urbi_permission_title">Mit 2GIS / Urbi Verbinden?</string>
+    <string name="converter_urbi_loading_indicator_title">Verbindung mit 2GIS / Urbi…</string>
 </resources>

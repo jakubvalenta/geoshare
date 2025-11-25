@@ -4,6 +4,7 @@ Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen insta
 
 - Google Maps
 - Apple Maps
+- 2GIS
 - Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
@@ -13,6 +14,7 @@ Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen insta
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Urbi
 - Waze
 - Yandex Maps
 - Koordinaten

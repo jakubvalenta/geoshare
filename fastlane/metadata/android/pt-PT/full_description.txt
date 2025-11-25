@@ -4,6 +4,7 @@ Partilhe um ligação de mapa com o Geo Share e a app abrirá ele em outra app d
 
 - Google Maps
 - Apple Maps
+- 2GIS
 - Amap (AutoNavi)
 - CoMaps
 - HERE WeGo
@@ -13,6 +14,7 @@ Partilhe um ligação de mapa com o Geo Share e a app abrirá ele em outra app d
 - OpenStreetMap
 - Organic Maps
 - OsmAnd
+- Urbi
 - Waze
 - Yandex Maps
 - Coordenadas
