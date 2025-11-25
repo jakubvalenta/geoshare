@@ -1,6 +1,6 @@
 Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une autre application de cartographie installée.
 
-<b>Liens de cartes compatibles</b>
+<b>Liens cartographiques pris en charge</b>
 
 - Google Maps
 - Apple Maps
@@ -19,18 +19,23 @@ Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une aut
 
 <b>Exemples d'utilisation</b>
 
-Si quelqu'un vous envoie un lien Google Maps, mais que vous préférez utiliser OpenStreetMap, vous pouvez rapidement ouvrir le même lieu dans OsmAnd ou Organic Maps.
+Lorsque quelqu'un vous envoie un lien Google Maps, mais que vous préférez utiliser OpenStreetMap, vous pouvez rapidement <b>ouvrir le même emplacement</b> dans OsmAnd ou Organic Maps.
 
-Si vous utilisez Google Maps pour trouver des lieux, mais une autre application pour la navigation, vous pouvez facilement basculer entre Google Maps et votre application de navigation préférée.
+Lorsque vous appréciez Google Maps pour trouver des lieux, mais que vous préférez une autre application pour la navigation, vous pouvez facilement passer de Google Maps à votre application de navigation préférée.
 
-<b>Autres fonctionnalités</b>
+ <b>Autres fonctionnalités</b>
 
-- Afficher les coordonnées géographiques d'un lien de carte et les copier dans le presse-papiers sous forme de lien geo:.
+- Affiche les <b>coordonnées géographiques</b> d'un lien de carte et permet de les copier dans le presse-papiers dans différents formats, par exemple sous forme de lien geo:.
+- Affiche tous les points d'un lien de liste de lieux.
+- Permet d'exécuter une action <b>automatiquement</b> lors du traitement d'un lien de carte.
+- Permet de <b>lancer la navigation</b> dans les applications sélectionnées.
+- Permet d'enregistrer un emplacement au format <b>GPX</b>.
+- Gestion des <b>connexions instables</b>.
+- Permet de <b>coller</b> les liens de carte directement dans l'application, sans passer par le partage.
+- Interface adaptée aux <b>tablettes</b>.
 
- Collez directement les liens de cartes dans l'application, au lieu de les partager.
+<b>Fonctionnement et considérations relatives à la confidentialité</b>
 
-<b>Fonctionnement et confidentialité</b>
+Geo Share convertit les liens de cartes (par exemple, https://maps.app.goo.gl/...) en liens geo: pouvant être ouverts par d'autres applications de cartographie. La création d'un lien geo: nécessite des coordonnées géographiques. Geo Share les extrait de l'URL de la carte.
 
-Geo Share convertit les liens de cartes (par exemple : https://maps.app.goo.gl/...) en liens geo: compatibles avec d'autres applications de cartographie. La création d'un lien geo: nécessite des coordonnées géographiques. Geo Share les extrait de l'URL de la carte.
-
-Cependant, certaines URL de cartes ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous demandera l'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.) et de récupérer les coordonnées à partir des en-têtes HTTP ou du code HTML du lien. Pour plus d'informations, consultez la FAQ de l'application.
+Cependant, toutes les URL de cartes ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous demandera l'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.) et de récupérer les coordonnées à partir des en-têtes HTTP ou du document HTML du lien. Pour plus d'informations, consultez la FAQ de l'application.
