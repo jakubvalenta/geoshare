@@ -14,6 +14,18 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         launchApplication()
         closeIntro()
 
+        // Short URI in Japan
+        testUri(
+            Position(Srs.WGS84, 34.5945482, 133.7583428),
+            "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
+        )
+
+        // Short URI in China
+        testUri(
+            Position(Srs.GCJ02, 39.920439, 116.331538),
+            "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
+        )
+
         // Coordinates in data
         testUri(
             Position(Srs.WGS84, 52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
@@ -49,12 +61,6 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         testUri(
             Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
             "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
-        )
-
-        // Short URI
-        testUri(
-            Position(Srs.WGS84, 52.4842015, 13.4167277),
-            "https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6",
         )
 
         // Place list
