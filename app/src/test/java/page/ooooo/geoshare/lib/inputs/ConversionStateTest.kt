@@ -23,6 +23,7 @@ import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.GpxOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
+import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import java.net.SocketTimeoutException
@@ -1684,8 +1685,23 @@ class ConversionStateTest {
                 state.transition(),
             )
         }
-        assertTrue(action.delay.isPositive())
         assertEquals(action.delay, workDuration)
+    }
+
+    @Test
+    fun actionWaiting_delayIsNotPositive_doesNotWaitAndReturnsActionReady() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.SaveGpxPointsAutomation
+        val stateContext = mockStateContext()
+        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, (-1).seconds)
+        val workDuration = testScheduler.timeSource.measureTime {
+            assertEquals(
+                ActionReady(inputUriString, position, 2, action),
+                state.transition(),
+            )
+        }
+        assertEquals(0.seconds, workDuration)
     }
 
     @Test
@@ -1758,6 +1774,24 @@ class ConversionStateTest {
             LocationRationaleRequested(inputUriString, position, 2, action),
             state.transition(),
         )
+    }
+
+    @Test
+    fun basicActionReady_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.SaveGpxPointsAutomation
+        val state = BasicActionReady(inputUriString, position, 2, action)
+        assertNull(state.transition())
+    }
+
+    @Test
+    fun locationActionReady_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationActionReady(inputUriString, position, 2, action, Point(Srs.WGS84, 3.0, 4.0))
+        assertNull(state.transition())
     }
 
     @Test
@@ -1938,6 +1972,57 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GOOGLE_MAPS_PACKAGE_NAME)
         val state = ActionFinished(inputUriString, position, action)
+        assertNull(state.transition())
+    }
+
+    @Test
+    fun locationRationaleRequested_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationRationaleRequested(inputUriString, position, 2, action)
+        assertNull(state.transition())
+    }
+
+    @Test
+    fun locationRationaleShown_grant_returnsLocationRationaleConfirmed() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationRationaleShown(inputUriString, position, 2, action)
+        assertEquals(
+            LocationRationaleConfirmed(inputUriString, position, 2, action),
+            state.grant(false),
+        )
+    }
+
+    @Test
+    fun locationRationaleShown_deny_returnsActionFailed() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationRationaleShown(inputUriString, position, 2, action)
+        assertEquals(
+            ActionFailed(inputUriString, position, action),
+            state.deny(false),
+        )
+    }
+
+    @Test
+    fun locationRationaleConfirmed_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationRationaleConfirmed(inputUriString, position, 2, action)
+        assertNull(state.transition())
+    }
+
+    @Test
+    fun locationPermissionReceived_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationPermissionReceived(inputUriString, position, 2, action)
         assertNull(state.transition())
     }
 }
