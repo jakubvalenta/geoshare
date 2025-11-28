@@ -93,6 +93,28 @@ class GeoUriInputTest : BaseInputTest() {
     }
 
     @Test
+    fun parseUri_coordsAndNameInSeparateQueryParam() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, 40.7127400, -74.0059965, name = "Nova Iorque") to null,
+            @Suppress("SpellCheckingInspection")
+            parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque") to null,
+            @Suppress("SpellCheckingInspection")
+            parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&z=9.0&(Nova%20Iorque)"),
+        )
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque") to null,
+            @Suppress("SpellCheckingInspection")
+            parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)&z=9.0"),
+        )
+    }
+
+    @Test
     fun parseUri_qOnly() {
         assertEquals(
             Position(q = "foo bar") to null,

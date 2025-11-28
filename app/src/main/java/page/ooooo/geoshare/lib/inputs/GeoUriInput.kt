@@ -17,6 +17,8 @@ import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
 
 object GeoUriInput : Input {
+    private const val NAME_REGEX = """(\((?P<name>.+)\))"""
+
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
@@ -33,9 +35,18 @@ object GeoUriInput : Input {
 
     override fun parseUri(uri: Uri) = uri.run {
         PositionBuilder(srs).apply {
-            ("""$LAT,$LON(\((?P<name>.+)\))?""" match queryParams["q"])?.let { m ->
+            ("""$LAT,$LON$NAME_REGEX?""" match queryParams["q"])?.let { m ->
                 setPointIfNull { m.toLatLon()?.let { (lat, lon) -> LatLonZ(lat, lon, null) } }
                 setQOrNameIfEmpty { m.groupOrNull("name") }
+            }
+            setQOrNameIfEmpty {
+                queryParams.firstNotNullOfOrNull { (key, value) ->
+                    if (key != "q" && key != "z" && value.isEmpty()) {
+                        (NAME_REGEX match key)?.groupOrNull("name")
+                    } else {
+                        null
+                    }
+                }
             }
             setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
             setPointIfNull { LAT_LON_PATTERN matchLatLonZ path }
