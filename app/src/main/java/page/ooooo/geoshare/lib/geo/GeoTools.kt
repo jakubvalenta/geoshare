@@ -26,8 +26,11 @@ private fun isPointInGeometry(
     return geometry.contains(point)
 }
 
-fun isPointInChina(x: Double, y: Double, log: ILog = DefaultLog()) =
+fun exactIsPointInChina(x: Double, y: Double, log: ILog = DefaultLog()): Boolean =
     isPointInGeometry(x, y, CHINA_WELL_KNOWN_TEXT, log)
 
-fun quickIsPointInChina(x: Double, y: Double) =
+fun quickIsPointInChina(x: Double, y: Double): Boolean =
     !outOfChina(y, x)
+
+fun isPointInChina(x: Double, y: Double, log: ILog = DefaultLog()): Boolean =
+    quickIsPointInChina(x, y) && exactIsPointInChina(x, y, log)
