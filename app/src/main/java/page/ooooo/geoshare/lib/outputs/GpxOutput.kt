@@ -255,7 +255,10 @@ object GpxOutput : Output {
             stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
     }
 
-    override fun getPositionActions() = listOf(SaveGpxPointsAction())
+    override fun getPositionActions(): List<Action> = listOf(
+        SaveGpxPointsAction(),
+        ShareGpxRouteAction(),
+    )
 
     override fun getPointActions(): List<Action> = listOf(
         SaveGpxPointsAction(),
