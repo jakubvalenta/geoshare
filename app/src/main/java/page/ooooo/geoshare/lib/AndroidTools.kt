@@ -158,11 +158,12 @@ object AndroidTools {
             },
         )
 
-    fun openAppFile(context: Context, packageName: String, uri: Uri, type: String): Boolean =
+    fun openAppFile(context: Context, packageName: String, uri: Uri): Boolean =
         startActivity(
             context,
             Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(uri, type)
+                setDataAndType(uri, context.contentResolver.getType(uri))
+                setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 setPackage(packageName)
             },
         )
@@ -175,12 +176,12 @@ object AndroidTools {
             ),
         )
 
-    fun openChooserFile(context: Context, uri: Uri, type: String): Boolean {
+    fun openChooserFile(context: Context, uri: Uri): Boolean {
         return startActivity(
             context,
             createChooser(
                 Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, type)
+                    setDataAndType(uri, context.contentResolver.getType(uri))
                     setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 },
             ),

@@ -27,6 +27,7 @@ import page.ooooo.geoshare.lib.AndroidTools.queryAppDetails
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import java.io.File
 import java.text.SimpleDateFormat
@@ -51,7 +52,7 @@ object GpxOutput : Output {
             uriQuote: UriQuote,
         ): Boolean {
             val uri = writeGpxRoute(position, i, location, context) ?: return false
-            return AndroidTools.openAppFile(context, packageName, uri, "application/gpx+xml")
+            return AndroidTools.openAppFile(context, packageName, uri)
         }
 
         @Composable
@@ -94,7 +95,7 @@ object GpxOutput : Output {
             uriQuote: UriQuote,
         ): Boolean {
             val uri = writeGpxRoute(position, i, location, context) ?: return false
-            return AndroidTools.openChooserFile(context, uri, "application/gpx+xml")
+            return AndroidTools.openChooserFile(context, uri)
         }
 
         @Composable
@@ -285,13 +286,15 @@ object GpxOutput : Output {
         else -> null
     }
 
+    // TODO Test writeGpxRoute()
     private fun writeGpxRoute(position: Position, i: Int?, location: Point?, context: Context): Uri? {
-        // TODO Fix TomTom GPX import
         if (location == null) {
             return null
         }
         val point = position.getPoint(i) ?: return null
+        // TODO Check if TomTom waypoints work
         val route = Position(persistentListOf(location, point))
+        // TODO Remove old files
         val dir = File(context.filesDir, "routes")
         try {
             dir.mkdirs()
@@ -303,7 +306,6 @@ object GpxOutput : Output {
         file.printWriter().use { writer ->
             route.writeGpxRoute(writer)
         }
-        Log.i(null, "File:\n${file.readText()}") // TODO Remove
         val uri = try {
             @Suppress("SpellCheckingInspection")
             FileProvider.getUriForFile(context, "page.ooooo.geoshare.RouteFileProvider", file)
@@ -311,7 +313,6 @@ object GpxOutput : Output {
             Log.e(null, "Error when getting URI for file", e)
             return null
         }
-        Log.i(null, "Uri: $uri") // TODO Remove
         return uri
     }
 }

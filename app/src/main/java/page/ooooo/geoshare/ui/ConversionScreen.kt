@@ -142,6 +142,7 @@ fun ConversionScreen(
                     locationJob = coroutineScope.launch(Dispatchers.IO) {
                         // TODO Fix the system permission dialog requiring two taps sometimes
                         // TODO Fix loading indicator not visible while getting location
+                        // TODO Check if TomTom requires location fix because accepting a GPX route
                         val location = AndroidTools.getLocation(context)
                         viewModel.runLocationAction(currentState.action, currentState.i, location)
                     }
