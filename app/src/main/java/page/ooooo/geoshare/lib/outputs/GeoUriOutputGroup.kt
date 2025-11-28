@@ -18,7 +18,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.outputs.GeoUriPointOutputGroup.formatUriString
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
