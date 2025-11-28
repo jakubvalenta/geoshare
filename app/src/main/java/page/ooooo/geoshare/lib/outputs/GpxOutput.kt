@@ -27,7 +27,6 @@ import page.ooooo.geoshare.lib.AndroidTools.queryAppDetails
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import java.io.File
 import java.text.SimpleDateFormat
