@@ -115,7 +115,7 @@ object GeoUriOutput : Output {
         Automation.HasDelay {
 
         override val type = Automation.Type.OPEN_APP
-        override val testTag = "geoShareUserPreferenceActionOpenApp_${packageName}"
+        override val testTag = "geoShareUserPreferenceAutomationOpenApp_${packageName}"
 
         override val delay = 5.seconds
 
