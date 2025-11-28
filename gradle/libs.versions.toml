@@ -15,6 +15,7 @@ androidxTestRunner = "1.7.0"
 androidxTestUiAutomator = "2.4.0-alpha06"
 hilt = "2.57.2"
 junit = "4.13.2"
+jts = "1.20.0"
 kotlin = "2.2.21"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
@@ -46,6 +47,7 @@ androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+jts-core = { module = "org.locationtech.jts:jts-core", version.ref = "jts" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }

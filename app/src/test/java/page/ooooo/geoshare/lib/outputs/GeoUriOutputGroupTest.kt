@@ -92,4 +92,34 @@ class GeoUriOutputGroupTest {
             },
         )
     }
+
+    @Test
+    fun appOutput_whenPositionIsInGCJ02AndIsInJapan_returnsUriWithCoordinatesUnchanged() {
+        assertEquals(
+            "geo:34.5945482,133.7583428?q=34.5945482,133.7583428",
+            Position(Srs.GCJ02, 34.5945482, 133.7583428).let { position ->
+                outputGroup.getAppOutputs(
+                    listOf("com.example.test")
+                )
+                    .firstOrNull { it.isEnabled(position) }
+                    ?.getAction(position, uriQuote)
+                    ?.uriString
+            }
+        )
+    }
+
+    @Test
+    fun appOutput_whenPositionIsInGCJ02AndIsInChina_returnsUriWithCoordinatesConvertedToWGS84() {
+        assertEquals(
+            "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
+            Position(Srs.GCJ02, 39.920439, 116.331538).let { position ->
+                outputGroup.getAppOutputs(
+                    listOf("com.example.test")
+                )
+                    .firstOrNull { it.isEnabled(position) }
+                    ?.getAction(position, uriQuote)
+                    ?.uriString
+            }
+        )
+    }
 }
