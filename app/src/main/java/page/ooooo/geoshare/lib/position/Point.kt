@@ -5,7 +5,6 @@ import com.lbt05.evil_transform.GCJPointer
 import com.lbt05.evil_transform.WGSPointer
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
-import page.ooooo.geoshare.lib.geo.exactIsPointInChina
 import page.ooooo.geoshare.lib.geo.isPointInChina
 import kotlin.random.Random
 
@@ -23,7 +22,7 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
             val lon = Random.nextDouble(minLon, maxLon).toScale(6)
-            val srs = if (exactIsPointInChina(lon, lat)) Srs.GCJ02 else Srs.WGS84
+            val srs = if (isPointInChina(lon, lat)) Srs.GCJ02 else Srs.WGS84
             return Point(srs, lat, lon, name)
         }
     }
