@@ -17,4 +17,14 @@ class GeoToolsTest {
     fun isPointInChina_pointIsInJapan_returnsFalse() {
         assertFalse(isPointInChina(133.7583428, 34.5945482, log))
     }
+
+    @Test
+    fun quickIsPointInChina_pointIsInChina_returnsTrue() {
+        assertTrue(quickIsPointInChina(116.331538, 39.920439))
+    }
+
+    @Test
+    fun quickIsPointInChina_pointIsInJapan_returnsTrue() {
+        assertTrue(quickIsPointInChina(133.7583428, 34.5945482))
+    }
 }

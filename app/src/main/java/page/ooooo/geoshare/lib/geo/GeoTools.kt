@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.geo
 
+import com.lbt05.evil_transform.TransformUtil.outOfChina
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.io.ParseException
@@ -27,3 +28,6 @@ private fun isPointInGeometry(
 
 fun isPointInChina(x: Double, y: Double, log: ILog = DefaultLog()) =
     isPointInGeometry(x, y, CHINA_WELL_KNOWN_TEXT, log)
+
+fun quickIsPointInChina(x: Double, y: Double) =
+    !outOfChina(y, x)
