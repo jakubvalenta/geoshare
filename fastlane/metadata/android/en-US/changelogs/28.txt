@@ -1,0 +1,2 @@
+- Fixed coordinates of Google Maps links in Japan.
+- Fixed compatibility of output geo: URIs with map apps.

@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.DefaultUriQuote
@@ -26,14 +27,22 @@ import kotlin.time.Duration.Companion.seconds
 object GeoUriOutputGroup : OutputGroup<Position> {
 
     private val GCJ_PACKAGE_NAMES = GoogleMapsOutputGroup.PACKAGE_NAMES
-    private val NAME_DISABLED_PACKAGE_NAMES = setOf(
-        @Suppress("SpellCheckingInspection")
-        "de.schildbach.oeffi",
-    )
+
+    @Suppress("SpellCheckingInspection")
+    private val NAME_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""de\.schildbach\.oeffi""")
+    private val ZOOM_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""com\.garmin\..+""")
 
     object CopyOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.Copy(
+                formatUriString(
+                    value,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote,
+                )
+            )
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
@@ -43,7 +52,15 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     object ChooserOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.OpenChooser(
+                formatUriString(
+                    value,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote,
+                )
+            )
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_share)
@@ -58,7 +75,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
                 packageName, formatUriString(
                     value,
                     srs = if (packageName in GCJ_PACKAGE_NAMES) Srs.GCJ02 else Srs.WGS84,
-                    nameDisabled = packageName in NAME_DISABLED_PACKAGE_NAMES,
+                    nameDisabled = NAME_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
+                    zoomDisabled = ZOOM_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
                     uriQuote = uriQuote,
                 )
             )
@@ -71,7 +89,15 @@ object GeoUriOutputGroup : OutputGroup<Position> {
 
     object ChipOutput : Output.Action<Position, Action> {
         override fun getAction(value: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.Copy(
+                formatUriString(
+                    value,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote,
+                )
+            )
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
@@ -85,7 +111,15 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val testTag = null
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(position, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.Copy(
+                formatUriString(
+                    position,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote,
+                )
+            )
 
         @Composable
         override fun Label() {
@@ -104,7 +138,15 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         override val delay = 5.seconds
 
         override fun getAction(position: Position, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(position, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.OpenChooser(
+                formatUriString(
+                    position,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote,
+                )
+            )
 
         @Composable
         override fun Label() {
@@ -139,7 +181,8 @@ object GeoUriOutputGroup : OutputGroup<Position> {
                 formatUriString(
                     position,
                     srs = if (packageName in GCJ_PACKAGE_NAMES) Srs.GCJ02 else Srs.WGS84,
-                    nameDisabled = packageName in NAME_DISABLED_PACKAGE_NAMES,
+                    nameDisabled = NAME_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
+                    zoomDisabled = ZOOM_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
                     uriQuote = uriQuote,
                 )
             )
@@ -231,6 +274,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
         value: Position,
         srs: Srs,
         nameDisabled: Boolean,
+        zoomDisabled: Boolean,
         uriQuote: UriQuote = DefaultUriQuote(),
     ): String = value.run {
         GeoUriPointOutputGroup.formatUriString(
@@ -239,6 +283,7 @@ object GeoUriOutputGroup : OutputGroup<Position> {
             q = q,
             zStr = zStr,
             nameDisabled = nameDisabled,
+            zoomDisabled = zoomDisabled,
             uriQuote = uriQuote,
         )
     }

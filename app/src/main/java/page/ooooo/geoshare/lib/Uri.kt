@@ -87,8 +87,9 @@ data class Uri(
             } else {
                 query.split('&').associate { rawParam ->
                     val paramParts = rawParam.split('=')
-                    val paramName = paramParts.firstOrNull() ?: ""
+                    val rawParamName = paramParts.firstOrNull() ?: ""
                     val rawParamValue = paramParts.drop(1).firstOrNull() ?: ""
+                    val paramName = uriQuote.decode(rawParamName)
                     val paramValue = uriQuote.decode(rawParamValue)
                     paramName to paramValue
                 }.toImmutableMap()
@@ -102,7 +103,7 @@ data class Uri(
             val plusAllowed = '+' in allow
             return queryParams.map {
                 buildString {
-                    append(it.key)
+                    append(uriQuote.encode(it.key, allow = allow))
                     if (it.value.isNotEmpty()) {
                         append("=")
                         val cleanValue = if (plusAllowed) {

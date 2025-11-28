@@ -224,6 +224,11 @@ class GoogleMapsInputTest : BaseInputTest() {
             Position(q = "Poznań Old Town, 61-001 Poznań, Poland") to "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd",
             parseUri("https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd")
         )
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            Position(q = "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten") to "https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b%3A0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1",
+            parseUri("https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b:0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1")
+        )
     }
 
     @Test
