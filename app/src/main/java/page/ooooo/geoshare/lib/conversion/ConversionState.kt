@@ -280,6 +280,7 @@ data class GrantedParseHtmlPermission(
             }
             if (!positionFromHtml.points.isNullOrEmpty()) {
                 stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")
+                // TODO Copy main point name from `positionFromUri` to `positionFromHtml`
                 ConversionSucceeded(stateContext, inputUriString, positionFromHtml)
             } else if (redirectUriString != null) {
                 stateContext.log.i(
