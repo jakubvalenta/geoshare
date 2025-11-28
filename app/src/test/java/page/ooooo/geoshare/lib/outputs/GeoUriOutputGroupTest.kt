@@ -87,6 +87,26 @@ class GeoUriOutputGroupTest {
     }
 
     @Test
+    fun copyOutput_whenPositionHasZoom_returnsUriWithZParamUnlessThePackageNameHasZoomDisabled() {
+        assertEquals(
+            listOf(
+                Action.OpenApp("com.example.test", "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456"),
+                Action.OpenApp("com.garmin.android.apps.explore", "geo:50.123456,-11.123456?q=50.123456,-11.123456"),
+            ),
+            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4).let { position ->
+                outputGroup.getAppOutputs(
+                    listOf(
+                        "com.example.test",
+                        "com.garmin.android.apps.explore",
+                    )
+                )
+                    .filter { it.isEnabled(position) }
+                    .map { it.getAction(position, uriQuote) }
+            },
+        )
+    }
+
+    @Test
     fun appOutput_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameUnlessThePackageNameHasNameDisabled() {
         assertEquals(
             listOf(

@@ -13,7 +13,15 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object CopyOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.Copy(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.Copy(
+                formatUriString(
+                    value,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote,
+                )
+            )
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_copy_geo)
@@ -23,7 +31,15 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
 
     object ChooserOutput : Output.Action<Point, Action> {
         override fun getAction(value: Point, uriQuote: UriQuote) =
-            Action.OpenChooser(formatUriString(value, Srs.WGS84, nameDisabled = false, uriQuote = uriQuote))
+            Action.OpenChooser(
+                formatUriString(
+                    value,
+                    Srs.WGS84,
+                    nameDisabled = false,
+                    zoomDisabled = false,
+                    uriQuote = uriQuote
+                )
+            )
 
         @Composable
         override fun label() = stringResource(R.string.conversion_succeeded_share)
@@ -59,6 +75,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
         value: Point,
         srs: Srs,
         nameDisabled: Boolean,
+        zoomDisabled: Boolean,
         uriQuote: UriQuote,
         q: String? = null,
         zStr: String? = null,
@@ -70,8 +87,7 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
             buildMap {
                 // It's important that the z parameter comes before q, because some map apps require the name (which is
                 // part of the q parameter) to be at the very end of the URI.
-                if (zStr != null) {
-                    // TODO Disable zoom in Garmin Explore
+                if (!zoomDisabled && zStr != null) {
                     set("z", zStr)
                 }
                 if (q != null) {

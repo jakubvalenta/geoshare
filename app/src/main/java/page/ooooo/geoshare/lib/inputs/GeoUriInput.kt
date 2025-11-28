@@ -27,7 +27,12 @@ object GeoUriInput : Input {
             Input.DocumentationInput.Text(3) {
                 stringResource(
                     R.string.example,
-                    GeoUriOutputGroup.formatUriString(Position.example, Srs.WGS84, nameDisabled = false),
+                    GeoUriOutputGroup.formatUriString(
+                        Position.example,
+                        Srs.WGS84,
+                        nameDisabled = false,
+                        zoomDisabled = false,
+                    ),
                 )
             },
         )
