@@ -219,13 +219,11 @@ object GpxOutput : Output {
         override val delay = 5.seconds
 
         @Composable
-        override fun successText() = stringResource(R.string.conversion_automation_share_succeeded)
+        override fun successText() = stringResource(R.string.output_gpx_route_share_automation_succeeded)
 
         @Composable
-        override fun waitingText(counterSec: Int) = stringResource(
-            R.string.conversion_automation_share_waiting,
-            counterSec,
-        )
+        override fun waitingText(counterSec: Int) =
+            stringResource(R.string.output_gpx_route_share_automation_waiting, counterSec)
     }
 
     object SaveGpxPointsAutomation :
