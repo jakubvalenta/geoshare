@@ -16,7 +16,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Short URI in Japan
         testUri(
-            Position(Srs.WGS84, 34.5945482, 133.7583428),
+            Position(Srs.WGS84, 34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
