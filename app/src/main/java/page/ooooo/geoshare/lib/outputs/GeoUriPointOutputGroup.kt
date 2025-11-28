@@ -68,6 +68,12 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
             append("geo:")
             append(Uri.formatPath(coordsStr, uriQuote = uriQuote))
             buildMap {
+                // It's important that the z parameter comes before q, because some map apps require the name (which is
+                // part of the q parameter) to be at the very end of the URI.
+                if (zStr != null) {
+                    // TODO Disable zoom in Garmin Explore
+                    set("z", zStr)
+                }
                 if (q != null) {
                     set("q", q)
                 } else if (value.lat != 0.0 && value.lon != 0.0) {
@@ -76,9 +82,6 @@ object GeoUriPointOutputGroup : OutputGroup<Point> {
                     } else {
                         set("q", coordsStr)
                     }
-                }
-                if (zStr != null) {
-                    set("z", zStr)
                 }
             }
                 .takeIf { it.isNotEmpty() }
