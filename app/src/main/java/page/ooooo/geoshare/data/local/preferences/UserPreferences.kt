@@ -154,7 +154,13 @@ object ConnectionPermission : OptionsUserPreference<Permission>(
 
     override fun getValue(values: UserPreferencesValues) = values.connectionPermissionValue
 
-    override fun getValue(preferences: Preferences) = preferences[key]?.let(Permission::valueOf) ?: default
+    override fun getValue(preferences: Preferences) = preferences[key]?.let {
+        try {
+            Permission.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
 
     override fun setValue(preferences: MutablePreferences, value: Permission) {
         preferences[key] = value.name
@@ -215,7 +221,13 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
     override fun getValue(values: UserPreferencesValues) = values.automationValue
 
     override fun getValue(preferences: Preferences): Automation =
-        preferences[typeKey]?.let(Automation.Type::valueOf)?.let { type ->
+        preferences[typeKey]?.let {
+            try {
+                Automation.Type.valueOf(it)
+            } catch (_: IllegalArgumentException) {
+                null
+            }
+        }?.let { type ->
             preferences[packageNameKey]?.ifEmpty { null }.let { packageName ->
                 allOutputGroups.findAutomation(type, packageName)
             }
