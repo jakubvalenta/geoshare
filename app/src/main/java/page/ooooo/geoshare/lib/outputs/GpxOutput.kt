@@ -293,8 +293,8 @@ object GpxOutput : Output {
         val point = position.getPoint(i) ?: return null
         // TODO Check if TomTom waypoints work
         val route = Position(persistentListOf(location, point))
-        // TODO Remove old files
         val dir = File(context.filesDir, "routes")
+        dir.deleteRecursively()
         try {
             dir.mkdirs()
         } catch (_: SecurityException) {
