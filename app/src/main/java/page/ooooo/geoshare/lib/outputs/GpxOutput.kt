@@ -188,7 +188,6 @@ object GpxOutput : Output {
 
         @Composable
         override fun successText() = stringResource(
-            // TODO Fix the GPX route success message appearing to be empty
             R.string.conversion_automation_open_app_succeeded,
             queryAppDetails()?.label ?: packageName,
         )

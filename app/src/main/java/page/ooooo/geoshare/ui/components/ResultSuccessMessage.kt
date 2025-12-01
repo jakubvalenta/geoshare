@@ -72,10 +72,19 @@ fun ResultSuccessMessage(
         transitionSpec = {
             if (!animationsEnabled) {
                 EnterTransition.None togetherWith ExitTransition.None
-            } else if (isMessageShown(this.targetState)) {
-                slideInHorizontally { fullWidth -> -fullWidth } togetherWith fadeOut()
             } else {
-                fadeIn() togetherWith fadeOut()
+                val initialStateMessageShown = isMessageShown(this.initialState)
+                val targetStateMessageShown = isMessageShown(this.targetState)
+                if (!initialStateMessageShown && !targetStateMessageShown) {
+                    // Message stays hidden
+                    EnterTransition.None togetherWith ExitTransition.None
+                } else if (targetStateMessageShown) {
+                    // Showing message or changing shown message
+                    slideInHorizontally { fullWidth -> -fullWidth } togetherWith fadeOut()
+                } else {
+                    // Hiding message
+                    fadeIn() togetherWith fadeOut()
+                }
             }
         }
     ) { targetState ->
@@ -123,7 +132,6 @@ fun ResultSuccessMessage(
                     }
                 }
 
-            // TODO Fix LocationPermissionReceived blinking, maybe show it with a small delay
             loadingIndicator is LoadingIndicator.Small ->
                 ResultMessageRow {
                     ResultMessageText(Modifier.testTag("geoShareConversionSuccessLocationLoadingIndicator")) {
