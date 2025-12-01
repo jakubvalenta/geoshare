@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.AndroidTools.queryAppDetails
@@ -34,6 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object GpxOutput : Output {
 
+    // TODO Notify user that TomTom doesn't support waypoints
     open class ShareGpxRouteWithAppAction(override val packageName: String) :
         LocationAction,
         Action.HasErrorMessage,
@@ -285,9 +287,12 @@ object GpxOutput : Output {
         if (location == null) {
             return null
         }
-        val point = position.getPoint(i) ?: return null
-        // TODO Check if TomTom waypoints work
-        val route = Position(persistentListOf(location, point))
+        val route = if (i == null && position.pointCount > 1) {
+            Position(position.points?.toMutableList()?.apply { add(0, location) }?.toImmutableList())
+        } else {
+            val point = position.getPoint(i) ?: return null
+            Position(persistentListOf(location, point))
+        }
         val dir = File(parentDir, "routes")
         dir.deleteRecursively()
         try {

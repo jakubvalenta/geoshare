@@ -136,7 +136,6 @@ fun ConversionScreen(
                 is LocationPermissionReceived -> {
                     locationJob?.cancel()
                     locationJob = coroutineScope.launch(Dispatchers.IO) {
-                        // TODO Check if TomTom requires location fix because accepting a GPX route
                         val location = try {
                             AndroidTools.getLocation(context)
                         } catch (_: CancellationException) {
