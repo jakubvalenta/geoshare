@@ -187,6 +187,15 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun cancelGettingLocation() {
+        (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
+            stateContext.currentState = ActionRan(
+                currentState.inputUriString, currentState.position, currentState.action, null,
+            )
+            transition()
+        }
+    }
+
     fun runAction(action: Action, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = ActionReady(

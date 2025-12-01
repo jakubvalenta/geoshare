@@ -33,6 +33,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
@@ -246,18 +247,25 @@ object AndroidTools {
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun getLastKnownLocation(locationManager: LocationManager, maxAge: Duration = 1.minutes): Point? =
         locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            ?.takeIf { (SystemClock.elapsedRealtime() - it.elapsedRealtimeNanos).nanoseconds <= maxAge }
+            ?.takeIf { (SystemClock.elapsedRealtimeNanos() - it.elapsedRealtimeNanos).nanoseconds <= maxAge }
             ?.let { Point(Srs.WGS84, it.latitude, it.longitude) }
 
     suspend fun getLocation(context: Context): Point? {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return try {
-            getLastKnownLocation(locationManager)
-                ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val lastKnownLocation = getLastKnownLocation(locationManager)
+            if (lastKnownLocation != null) {
+                lastKnownLocation
+            } else {
+                // Use a small delay to prevent Android from asking for location permission twice, once for
+                // getLastKnownLocation() and once for getCurrentLocation()
+                delay(100.milliseconds)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     getCurrentLocation(locationManager)
                 } else {
                     getCurrentLocationPreS(locationManager)
                 }
+            }
         } catch (e: SecurityException) {
             Log.e(null, "Security error when getting location", e)
             null

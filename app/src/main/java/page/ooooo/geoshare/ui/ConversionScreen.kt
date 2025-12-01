@@ -34,10 +34,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
@@ -78,7 +75,7 @@ fun ConversionScreen(
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
 
-    var locationJob: Job? = null
+    var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             viewModel.receiveLocationPermission()
@@ -139,10 +136,13 @@ fun ConversionScreen(
                 is LocationPermissionReceived -> {
                     locationJob?.cancel()
                     locationJob = coroutineScope.launch(Dispatchers.IO) {
-                        // TODO Fix the system permission dialog requiring two taps sometimes
-                        // TODO Fix loading indicator not visible while getting location
                         // TODO Check if TomTom requires location fix because accepting a GPX route
-                        val location = AndroidTools.getLocation(context)
+                        val location = try {
+                            AndroidTools.getLocation(context)
+                        } catch (_: CancellationException) {
+                            viewModel.cancelGettingLocation()
+                            return@launch
+                        }
                         viewModel.runLocationAction(currentState.action, currentState.i, location)
                     }
                 }
@@ -461,13 +461,13 @@ fun ConversionScreen(
             else -> null
         },
         containerColor = when {
-            loadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
+            loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
             currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
             else -> Color.Unspecified
         },
         contentColor = when {
-            loadingIndicator != null -> Color.Unspecified
+            loadingIndicator is LoadingIndicator.Large -> Color.Unspecified
             currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> Color.Unspecified
