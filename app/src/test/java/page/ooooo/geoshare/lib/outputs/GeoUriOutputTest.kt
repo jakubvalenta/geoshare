@@ -10,13 +10,13 @@ import page.ooooo.geoshare.lib.position.Srs
 
 class GeoUriOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
-    private val outputGroup = GeoUriOutput
+    private val output = GeoUriOutput
 
     @Test
     fun copyAction_whenPositionDoesNotHaveCoordinates_returnsUriWithZeroCoordinatesInPath() {
         assertEquals(
             "geo:0,0",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84), null, uriQuote),
         )
     }
@@ -25,7 +25,7 @@ class GeoUriOutputTest {
     fun copyAction_whenPositionHasCoordinates_returnsUriWithCoordinatesInTheQParam() {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456), null, uriQuote),
         )
     }
@@ -34,7 +34,7 @@ class GeoUriOutputTest {
     fun copyAction_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameInTheQParam() {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar"), null, uriQuote),
         )
     }
@@ -43,7 +43,7 @@ class GeoUriOutputTest {
     fun copyOutput_whenPositionHasCoordinatesAndNameAndZoom_returnsUriWithCoordinatesAndNameInTheQParamAndTheZParam() {
         assertEquals(
             "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456(foo%20bar)",
-            outputGroup
+            output
                 .getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4, name = "foo bar"), null, uriQuote),
         )
@@ -53,7 +53,7 @@ class GeoUriOutputTest {
     fun copyAction_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithTheQAndZParams() {
         assertEquals(
             "geo:50.123456,-11.123456?z=3.4&q=foo%20bar",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4), null, uriQuote),
         )
     }
@@ -66,7 +66,7 @@ class GeoUriOutputTest {
                 "com.garmin.android.apps.explore" to "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             ),
             Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4).let { position ->
-                outputGroup.getAppActions(
+                output.getAppActions(
                     listOf(
                         "com.example.test",
                         "com.garmin.android.apps.explore",
@@ -89,7 +89,7 @@ class GeoUriOutputTest {
                 "de.schildbach.oeffi" to "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             ),
             Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar").let { position ->
-                outputGroup.getAppActions(
+                output.getAppActions(
                     listOf(
                         "com.example.test",
                         @Suppress("SpellCheckingInspection")
@@ -109,7 +109,7 @@ class GeoUriOutputTest {
         assertEquals(
             "geo:34.5945482,133.7583428?q=34.5945482,133.7583428",
             Position(Srs.GCJ02, 34.5945482, 133.7583428).let { position ->
-                outputGroup.getAppActions(
+                output.getAppActions(
                     listOf(
                         "com.example.test",
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
@@ -126,7 +126,7 @@ class GeoUriOutputTest {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
             Position(Srs.GCJ02, 39.920439, 116.331538).let { position ->
-                outputGroup.getAppActions(
+                output.getAppActions(
                     listOf(
                         "com.example.test",
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }

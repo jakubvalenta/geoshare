@@ -63,4 +63,73 @@ class PositionTest {
             }.toString(),
         )
     }
+
+    @Test
+    fun writeGpxRoute() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<rte>
+<rtept lat="50.123456" lon="-11.123456" />
+<rtept lat="52.5067296" lon="13.2599309" />
+<rtept lat="53" lon="14" />
+</rte>
+</gpx>
+""",
+            StringBuilder().apply {
+                Position(
+                    points = persistentListOf(
+                        Point(Srs.WGS84, 50.123456, -11.123456),
+                        Point(Srs.WGS84, 52.5067296, 13.2599309),
+                        Point(Srs.WGS84, 53.0, 14.0),
+                    ),
+                ).writeGpxRoute(this)
+            }.toString(),
+        )
+    }
+
+    @Test
+    fun writeGpxRoute_escapesName() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<rte>
+<rtept lat="50.123456" lon="-11.123456">
+    <name>&lt;script&gt;alert()&lt;/script&gt;</name>
+</rtept>
+</rte>
+</gpx>
+""",
+            StringBuilder().apply {
+                Position(
+                    points = persistentListOf(
+                        Point(Srs.WGS84, 50.123456, -11.123456, name = "<script>alert()</script>"),
+                    ),
+                ).writeGpxRoute(this)
+            }.toString(),
+        )
+    }
+
+    @Test
+    fun writeGpxRoute_noPoints() {
+        assertEquals(
+            """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<rte>
+</rte>
+</gpx>
+""",
+            StringBuilder().apply {
+                Position().writeGpxRoute(this)
+            }.toString(),
+        )
+    }
 }

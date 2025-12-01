@@ -9,13 +9,13 @@ import page.ooooo.geoshare.lib.UriQuote
 
 class MagicEarthOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
-    private val outputGroup = MagicEarthOutput
+    private val output = MagicEarthOutput
 
     @Test
     fun copyAction_whenPositionHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456",
-            outputGroup.getPositionActions().first()
+            output.getPositionActions().first()
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456, z = 5.0), null, uriQuote),
         )
     }
@@ -24,7 +24,7 @@ class MagicEarthOutputTest {
     fun copyAction_whenPositionHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456&name=foo%20bar",
-            outputGroup.getPositionActions().first()
+            output.getPositionActions().first()
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar"), null, uriQuote),
         )
     }
@@ -33,7 +33,7 @@ class MagicEarthOutputTest {
     fun copyAction_whenPositionHasCoordinatesAndQueryAndZoom_returnsSearchAroundUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?search_around&lat=50.123456&lon=-11.123456&q=foo%20bar",
-            outputGroup.getPositionActions().first()
+            output.getPositionActions().first()
                 .getText(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 5.0), null, uriQuote),
         )
     }
@@ -42,7 +42,7 @@ class MagicEarthOutputTest {
     fun copyAction_whenPositionHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?open_search&q=foo%20bar",
-            outputGroup.getPositionActions().first()
+            output.getPositionActions().first()
                 .getText(Position(q = "foo bar", z = 5.0), null, uriQuote),
         )
     }
@@ -54,7 +54,7 @@ class MagicEarthOutputTest {
                 "magicearth://?navigate_to&lat=50.123456&lon=-11.123456",
                 "magicearth://?navigate_via&lat=50.123456&lon=-11.123456",
             ),
-            outputGroup.getPositionActions().slice(1..2).map {
+            output.getPositionActions().slice(1..2).map {
                 it.getText(Position(Srs.WGS84, 50.123456, -11.123456), null, uriQuote)
             },
         )

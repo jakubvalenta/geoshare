@@ -11,13 +11,13 @@ import page.ooooo.geoshare.lib.UriQuote
 
 class CoordinatesOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
-    private val outputGroup = CoordinatesOutput
+    private val output = CoordinatesOutput
 
     @Test
     fun descriptionOutput_returnsQueryAndZoomButNotPoints() {
         assertEquals(
             "foo bar\t\tz3.4",
-            outputGroup.getDescription(
+            output.getDescription(
                 Position(
                     q = "foo bar",
                     z = 3.4,
@@ -36,7 +36,7 @@ class CoordinatesOutputTest {
     fun copyAction_returnsSouthWestForNegativeCoordinates() {
         assertEquals(
             "17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, -17.2165721, -149.9470294), null, uriQuote),
         )
     }
@@ -45,7 +45,7 @@ class CoordinatesOutputTest {
     fun copyAction_returnsNorthEastForPositiveCoordinates() {
         assertEquals(
             "52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 52.5067296, 13.2599309), null, uriQuote),
         )
     }
@@ -54,7 +54,7 @@ class CoordinatesOutputTest {
     fun copyAction_returnsZerosForZeroCoordinates() {
         assertEquals(
             "0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 0.0, 0.0), null, uriQuote),
         )
     }
@@ -63,7 +63,7 @@ class CoordinatesOutputTest {
     fun copyAction_returnsZeroDegForZeroDegCoordinates() {
         assertEquals(
             "0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, 0.5, 0.5), null, uriQuote),
         )
     }
@@ -72,7 +72,7 @@ class CoordinatesOutputTest {
     fun copyAction_returnsZeroMinForZeroMinCoordinates() {
         assertEquals(
             "10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, -10.0, -20.0), null, uriQuote)
         )
     }
@@ -81,7 +81,7 @@ class CoordinatesOutputTest {
     fun copyAction_returnsZerosSecForZeroSecCoordinates() {
         assertEquals(
             "10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W",
-            outputGroup.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
                 .getText(Position(Srs.WGS84, -10.5, -20.5), null, uriQuote)
         )
     }

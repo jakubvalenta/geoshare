@@ -3,7 +3,6 @@ package page.ooooo.geoshare.lib.outputs
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.net.Uri
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.Image
@@ -18,7 +17,6 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -29,6 +27,7 @@ import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import java.io.File
+import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
@@ -50,8 +49,8 @@ object GpxOutput : Output {
             saveGpxLauncher: ActivityResultLauncher<Intent>,
             uriQuote: UriQuote,
         ): Boolean {
-            val uri = writeGpxRoute(position, i, location, context) ?: return false
-            return AndroidTools.openAppFile(context, packageName, uri)
+            val file = writeGpxRoute(position, i, location, context.filesDir) ?: return false
+            return AndroidTools.openAppFile(context, packageName, file)
         }
 
         @Composable
@@ -93,8 +92,8 @@ object GpxOutput : Output {
             saveGpxLauncher: ActivityResultLauncher<Intent>,
             uriQuote: UriQuote,
         ): Boolean {
-            val uri = writeGpxRoute(position, i, location, context) ?: return false
-            return AndroidTools.openChooserFile(context, uri)
+            val file = writeGpxRoute(position, i, location, context.filesDir) ?: return false
+            return AndroidTools.openChooserFile(context, file)
         }
 
         @Composable
@@ -282,15 +281,14 @@ object GpxOutput : Output {
         else -> null
     }
 
-    // TODO Test writeGpxRoute()
-    private fun writeGpxRoute(position: Position, i: Int?, location: Point?, context: Context): Uri? {
+    fun writeGpxRoute(position: Position, i: Int?, location: Point?, parentDir: File): File? {
         if (location == null) {
             return null
         }
         val point = position.getPoint(i) ?: return null
         // TODO Check if TomTom waypoints work
         val route = Position(persistentListOf(location, point))
-        val dir = File(context.filesDir, "routes")
+        val dir = File(parentDir, "routes")
         dir.deleteRecursively()
         try {
             dir.mkdirs()
@@ -299,16 +297,13 @@ object GpxOutput : Output {
         }
         val timestamp = System.currentTimeMillis()
         val file = File(dir, "$timestamp.xml")
-        file.printWriter().use { writer ->
-            route.writeGpxRoute(writer)
-        }
-        val uri = try {
-            @Suppress("SpellCheckingInspection")
-            FileProvider.getUriForFile(context, "page.ooooo.geoshare.RouteFileProvider", file)
-        } catch (e: IllegalArgumentException) {
-            Log.e(null, "Error when getting URI for file", e)
+        try {
+            file.printWriter().use { writer ->
+                route.writeGpxRoute(writer)
+            }
+        } catch (_: FileNotFoundException) {
             return null
         }
-        return uri
+        return file
     }
 }

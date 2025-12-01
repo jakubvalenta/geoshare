@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.os.CancellationSignal
 import android.os.Looper
@@ -19,6 +18,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import kotlinx.coroutines.*
 import page.ooooo.geoshare.BuildConfig
@@ -26,6 +26,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Srs
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.*
@@ -159,8 +160,15 @@ object AndroidTools {
             },
         )
 
-    fun openAppFile(context: Context, packageName: String, uri: Uri): Boolean =
-        startActivity(
+    fun openAppFile(context: Context, packageName: String, file: File): Boolean {
+        val uri = try {
+            @Suppress("SpellCheckingInspection")
+            FileProvider.getUriForFile(context, "page.ooooo.geoshare.FileProvider", file)
+        } catch (e: IllegalArgumentException) {
+            Log.e(null, "Error when getting URI for file", e)
+            return false
+        }
+        return startActivity(
             context,
             Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, context.contentResolver.getType(uri))
@@ -168,6 +176,7 @@ object AndroidTools {
                 setPackage(packageName)
             },
         )
+    }
 
     fun openChooser(context: Context, uriString: String): Boolean =
         startActivity(
@@ -177,7 +186,14 @@ object AndroidTools {
             ),
         )
 
-    fun openChooserFile(context: Context, uri: Uri): Boolean {
+    fun openChooserFile(context: Context, file: File): Boolean {
+        val uri = try {
+            @Suppress("SpellCheckingInspection")
+            FileProvider.getUriForFile(context, "page.ooooo.geoshare.FileProvider", file)
+        } catch (e: IllegalArgumentException) {
+            Log.e(null, "Error when getting URI for file", e)
+            return false
+        }
         return startActivity(
             context,
             createChooser(

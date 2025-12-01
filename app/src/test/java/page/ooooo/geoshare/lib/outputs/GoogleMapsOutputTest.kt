@@ -11,7 +11,7 @@ import page.ooooo.geoshare.lib.position.Point
 
 class GoogleMapsOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
-    private val outputGroup = GoogleMapsOutput
+    private val output = GoogleMapsOutput
 
     @Test
     fun copyAction_whenPositionHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
@@ -23,7 +23,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
             Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4).let { position ->
-                outputGroup.getPositionActions()
+                output.getPositionActions()
                     .filter { it.isEnabled(position, null) }
                     .map { it.getText(position, null, uriQuote) }
             },
@@ -38,7 +38,7 @@ class GoogleMapsOutputTest {
                 "google.navigation:q=foo+bar",
             ),
             Position(q = "foo bar", z = 3.4).let { position ->
-                outputGroup.getPositionActions()
+                output.getPositionActions()
                     .filter { it.isEnabled(position, null) }
                     .map { it.getText(position, null, uriQuote) }
             },
@@ -55,7 +55,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
             Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4).let { position ->
-                outputGroup.getPositionActions()
+                output.getPositionActions()
                     .filter { it.isEnabled(position, null) }
                     .map { it.getText(position, null, uriQuote) }
             },
@@ -72,7 +72,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=31.2285067,121.475524",
             ),
             Position(Srs.WGS84, 31.23044166868017, 121.47099209401793).let { position ->
-                outputGroup.getPositionActions()
+                output.getPositionActions()
                     .filter { it.isEnabled(position, null) }
                     .map { it.getText(position, null, uriQuote) }
             },
@@ -89,7 +89,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=31.2285069,121.4755246",
             ),
             Position(Srs.GCJ02, 31.22850685422705, 121.47552456472106).let { position ->
-                outputGroup.getPositionActions()
+                output.getPositionActions()
                     .filter { it.isEnabled(position, null) }
                     .map { it.getText(position, null, uriQuote) }
             },
@@ -104,7 +104,7 @@ class GoogleMapsOutputTest {
                 "google.navigation:q=0,0",
             ),
             Position().let { position ->
-                outputGroup.getPositionActions()
+                output.getPositionActions()
                     .filter { it.isEnabled(position, null) }
                     .map { it.getText(position, null, uriQuote) }
             },
@@ -130,7 +130,7 @@ class GoogleMapsOutputTest {
                     Point(Srs.WGS84, 50.12, -11.12),
                 )
             ).let { position ->
-                outputGroup.getPointActions()
+                output.getPointActions()
                     .filter { it.isEnabled(position, 1) }
                     .map {
                         when (it) {
@@ -162,7 +162,7 @@ class GoogleMapsOutputTest {
                     Point(Srs.WGS84, 31.23, 121.47),
                 )
             ).let { position ->
-                outputGroup.getPointActions()
+                output.getPointActions()
                     .filter { it.isEnabled(position, 1) }
                     .map {
                         when (it) {
@@ -194,7 +194,7 @@ class GoogleMapsOutputTest {
                     Point(Srs.GCJ02, 31.22, 121.47),
                 )
             ).let { position ->
-                outputGroup.getPointActions()
+                output.getPointActions()
                     .filter { it.isEnabled(position, 1) }
                     .map {
                         when (it) {
