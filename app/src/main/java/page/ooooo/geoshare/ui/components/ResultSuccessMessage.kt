@@ -34,6 +34,7 @@ import kotlin.time.DurationUnit
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
+    loadingIndicator: LoadingIndicator?,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
@@ -42,7 +43,7 @@ fun ResultSuccessMessage(
         state is ActionWaiting && state.action is Automation.HasDelay ||
             state is ActionSucceeded && state.action is Action.HasSuccessMessage ||
             state is ActionFailed && state.action is Action.HasErrorMessage ||
-            state is LocationPermissionReceived
+            loadingIndicator is LoadingIndicator.Small
 
     val spacing = LocalSpacing.current
     var counterSec by remember { mutableIntStateOf(0) }
@@ -62,7 +63,6 @@ fun ResultSuccessMessage(
         targetState = currentState
     }
 
-    // TODO Fix slight blinking when rendering ResultSuccessMessage component without a message.
     AnimatedContent(
         targetState,
         modifier = Modifier
@@ -79,8 +79,8 @@ fun ResultSuccessMessage(
             }
         }
     ) { targetState ->
-        when (targetState) {
-            is ActionWaiting if targetState.action is Automation.HasDelay ->
+        when {
+            targetState is ActionWaiting && targetState.action is Automation.HasDelay ->
                 ResultMessageRow {
                     ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationCounter")) {
                         LaunchedEffect(targetState.action) {
@@ -106,14 +106,14 @@ fun ResultSuccessMessage(
                     }
                 }
 
-            is ActionSucceeded if targetState.action is Action.HasSuccessMessage ->
+            targetState is ActionSucceeded && targetState.action is Action.HasSuccessMessage ->
                 ResultMessageRow {
                     ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationSuccess")) {
                         targetState.action.successText()
                     }
                 }
 
-            is ActionFailed if targetState.action is Action.HasErrorMessage ->
+            targetState is ActionFailed && targetState.action is Action.HasErrorMessage ->
                 ResultMessageRow {
                     ResultMessageText(
                         containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -123,10 +123,11 @@ fun ResultSuccessMessage(
                     }
                 }
 
-            is LocationPermissionReceived ->
+            // TODO Fix LocationPermissionReceived blinking, maybe show it with a small delay
+            loadingIndicator is LoadingIndicator.Small ->
                 ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessLocationLoader")) {
-                        stringResource(R.string.conversion_location_loading_indicator_title)
+                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessLocationLoadingIndicator")) {
+                        stringResource(loadingIndicator.messageResId)
                     }
                     FilledIconButton(
                         onCancel,
@@ -212,6 +213,7 @@ private fun ActionFinishedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -231,6 +233,7 @@ private fun DarkActionFinishedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -253,6 +256,7 @@ private fun ActionWaitingPreview() {
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                     delay = 3.seconds,
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -275,6 +279,7 @@ private fun DarkActionWaitingPreview() {
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                     delay = 3.seconds,
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -294,6 +299,9 @@ private fun LocationPermissionReceivedPreview() {
                     position = Position.example,
                     i = null,
                     action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                ),
+                loadingIndicator = LoadingIndicator.Small(
+                    messageResId = R.string.conversion_location_loading_indicator_title,
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -315,6 +323,9 @@ private fun DarkLocationPermissionReceivedPreview() {
                     i = null,
                     action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = LoadingIndicator.Small(
+                    messageResId = R.string.conversion_location_loading_indicator_title,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -334,6 +345,7 @@ private fun SucceededPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -353,6 +365,7 @@ private fun DarSucceededPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -372,6 +385,7 @@ private fun FailedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -391,6 +405,7 @@ private fun DarkFailedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},

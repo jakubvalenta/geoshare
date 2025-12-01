@@ -27,6 +27,7 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         userPreferencesRepository = userPreferencesRepository,
@@ -38,7 +39,7 @@ class ConversionViewModel @Inject constructor(
                 loadingIndicatorJob = viewModelScope.launch {
                     // Show loading indicator only if the state lasts longer than 200ms.
                     delay(200L)
-                    _loadingIndicatorTitleResId.value = newState.loadingIndicatorTitleResId
+                    _loadingIndicator.value = newState.loadingIndicator
                 }
             }
 
@@ -47,7 +48,7 @@ class ConversionViewModel @Inject constructor(
                 loadingIndicatorJob = viewModelScope.launch {
                     // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
                     delay(200L)
-                    _loadingIndicatorTitleResId.value = null
+                    _loadingIndicator.value = null
                 }
             }
         }
@@ -62,8 +63,8 @@ class ConversionViewModel @Inject constructor(
         "",
     )
 
-    private val _loadingIndicatorTitleResId = MutableStateFlow<Int?>(null)
-    val loadingIndicatorTitleResId: StateFlow<Int?> = _loadingIndicatorTitleResId
+    private val _loadingIndicator = MutableStateFlow<LoadingIndicator?>(null)
+    val loadingIndicator: StateFlow<LoadingIndicator?> = _loadingIndicator
 
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null

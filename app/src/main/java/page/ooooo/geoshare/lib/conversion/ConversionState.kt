@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -25,10 +24,7 @@ interface ConversionState : State {
     interface HasPermission : ConversionState, State.PermissionState
 
     interface HasLoadingIndicator : ConversionState {
-        val loadingIndicatorTitleResId: Int
-
-        @Composable
-        fun loadingIndicatorDescription(): String?
+        val loadingIndicator: LoadingIndicator
     }
 
     interface HasResult : ConversionState {
@@ -132,8 +128,6 @@ data class GrantedUnshortenPermission(
     val uri: Uri,
     val retry: NetworkTools.Retry? = null,
 ) : ConversionState.HasLoadingIndicator {
-    override val loadingIndicatorTitleResId: Int = input.loadingIndicatorTitleResId
-
     override suspend fun transition(): State {
         val url = uri.toUrl()
         if (url == null) {
@@ -172,15 +166,19 @@ data class GrantedUnshortenPermission(
         }
     }
 
-    @Composable
-    override fun loadingIndicatorDescription(): String? = retry?.let { retry ->
-        stringResource(
-            R.string.conversion_loading_indicator_description,
-            retry.count + 1,
-            NetworkTools.MAX_RETRIES + 1,
-            stringResource(retry.tr.messageResId),
-        )
-    }
+    override val loadingIndicator = LoadingIndicator.Large(
+        titleResId = input.loadingIndicatorTitleResId,
+        description = {
+            retry?.let { retry ->
+                stringResource(
+                    R.string.conversion_loading_indicator_description,
+                    retry.count + 1,
+                    NetworkTools.MAX_RETRIES + 1,
+                    stringResource(retry.tr.messageResId),
+                )
+            }
+        },
+    )
 }
 
 data class DeniedConnectionPermission(
@@ -267,8 +265,6 @@ data class GrantedParseHtmlPermission(
     val htmlUriString: String,
     val retry: NetworkTools.Retry? = null,
 ) : ConversionState.HasLoadingIndicator {
-    override val loadingIndicatorTitleResId: Int = input.loadingIndicatorTitleResId
-
     override suspend fun transition(): State {
         val htmlUrl = Uri.parse(htmlUriString, stateContext.uriQuote).toUrl()
         if (htmlUrl == null) {
@@ -321,15 +317,19 @@ data class GrantedParseHtmlPermission(
         }
     }
 
-    @Composable
-    override fun loadingIndicatorDescription(): String? = retry?.let { retry ->
-        stringResource(
-            R.string.conversion_loading_indicator_description,
-            retry.count + 1,
-            NetworkTools.MAX_RETRIES + 1,
-            stringResource(retry.tr.messageResId),
-        )
-    }
+    override val loadingIndicator = LoadingIndicator.Large(
+        titleResId = input.loadingIndicatorTitleResId,
+        description = {
+            retry?.let { retry ->
+                stringResource(
+                    R.string.conversion_loading_indicator_description,
+                    retry.count + 1,
+                    NetworkTools.MAX_RETRIES + 1,
+                    stringResource(retry.tr.messageResId),
+                )
+            }
+        },
+    )
 }
 
 data class ParseHtmlFailed(
@@ -506,4 +506,8 @@ data class LocationPermissionReceived(
     override val position: Position,
     val i: Int?,
     val action: LocationAction,
-) : ConversionState.HasResult
+) : ConversionState.HasResult, ConversionState.HasLoadingIndicator {
+    override val loadingIndicator = LoadingIndicator.Small(
+        messageResId = R.string.conversion_location_loading_indicator_title,
+    )
+}

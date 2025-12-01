@@ -6,7 +6,6 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -76,7 +75,7 @@ fun ConversionScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-    val loadingIndicatorTitleResId by viewModel.loadingIndicatorTitleResId.collectAsStateWithLifecycle()
+    val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsState()
 
     var locationJob: Job? = null
@@ -154,7 +153,7 @@ fun ConversionScreen(
     ConversionScreen(
         currentState = currentState,
         changelogShown = changelogShown,
-        loadingIndicatorTitleResId = loadingIndicatorTitleResId,
+        loadingIndicator = loadingIndicator,
         onBack = {
             viewModel.cancel()
             onBack()
@@ -208,7 +207,7 @@ fun ConversionScreen(
 fun ConversionScreen(
     currentState: State,
     changelogShown: Boolean,
-    @StringRes loadingIndicatorTitleResId: Int?,
+    loadingIndicator: LoadingIndicator?,
     onBack: () -> Unit,
     onCancel: () -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
@@ -257,9 +256,9 @@ fun ConversionScreen(
             )
         },
         firstPane = when {
-            (loadingIndicatorTitleResId != null) -> {
+            (loadingIndicator is LoadingIndicator.Large) -> {
                 {
-                    Headline(stringResource(loadingIndicatorTitleResId))
+                    Headline(stringResource(loadingIndicator.titleResId))
                     Column(
                         Modifier
                             .fillMaxWidth()
@@ -287,15 +286,13 @@ fun ConversionScreen(
                         ) {
                             Text(stringResource(R.string.conversion_loading_indicator_cancel))
                         }
-                        if (currentState is ConversionState.HasLoadingIndicator) {
-                            currentState.loadingIndicatorDescription()?.let { text ->
-                                Text(
-                                    text,
-                                    Modifier.padding(bottom = spacing.medium),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                            }
+                        loadingIndicator.description()?.let { text ->
+                            Text(
+                                text,
+                                Modifier.padding(bottom = spacing.medium),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
                         }
                     }
                 }
@@ -334,11 +331,12 @@ fun ConversionScreen(
             else -> null
         },
         secondPane = when {
-            (loadingIndicatorTitleResId == null && currentState is ConversionState.HasResult) -> {
+            (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasResult) -> {
                 {
                     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                         ResultSuccessMessage(
                             currentState,
+                            loadingIndicator,
                             onCancel = onCancel,
                             onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                         )
@@ -353,7 +351,7 @@ fun ConversionScreen(
             else -> null
         },
         bottomPane = when {
-            (loadingIndicatorTitleResId == null && currentState is ConversionState.HasError) -> {
+            (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasError) -> {
                 {
                     TextButton({
                         coroutineScope.launch {
@@ -369,7 +367,7 @@ fun ConversionScreen(
                 }
             }
 
-            (loadingIndicatorTitleResId == null && currentState is ConversionState.HasResult) -> {
+            (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasResult) -> {
                 {
                     TextButton({
                         coroutineScope.launch {
@@ -388,7 +386,7 @@ fun ConversionScreen(
             else -> null
         },
         dialog = when {
-            (loadingIndicatorTitleResId == null && currentState is RequestedUnshortenPermission) -> {
+            (loadingIndicator !is LoadingIndicator.Large && currentState is RequestedUnshortenPermission) -> {
                 {
                     PermissionDialog(
                         title = stringResource(currentState.permissionTitleResId),
@@ -414,7 +412,7 @@ fun ConversionScreen(
                 }
             }
 
-            (loadingIndicatorTitleResId == null && currentState is RequestedParseHtmlPermission) -> {
+            (loadingIndicator !is LoadingIndicator.Large && currentState is RequestedParseHtmlPermission) -> {
                 {
                     PermissionDialog(
                         title = stringResource(currentState.permissionTitleResId),
@@ -463,13 +461,13 @@ fun ConversionScreen(
             else -> null
         },
         containerColor = when {
-            loadingIndicatorTitleResId != null -> MaterialTheme.colorScheme.surfaceContainer
+            loadingIndicator != null -> MaterialTheme.colorScheme.surfaceContainer
             currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
             else -> Color.Unspecified
         },
         contentColor = when {
-            loadingIndicatorTitleResId != null -> Color.Unspecified
+            loadingIndicator != null -> Color.Unspecified
             currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> Color.Unspecified
@@ -491,7 +489,7 @@ private fun DefaultPreview() {
                 action = NoopAutomation,
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -520,7 +518,7 @@ private fun DarkPreview() {
                 action = NoopAutomation,
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -549,7 +547,7 @@ private fun TabletPreview() {
                 action = NoopAutomation,
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -581,7 +579,7 @@ private fun AutomationPreview() {
                 delay = 3.seconds,
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -613,7 +611,7 @@ private fun DarkAutomationPreview() {
                 delay = 3.seconds,
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -645,7 +643,7 @@ private fun TabletAutomationPreview() {
                 delay = 3.seconds,
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -673,7 +671,7 @@ private fun ErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -701,7 +699,7 @@ private fun DarkErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -729,7 +727,7 @@ private fun TabletErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -767,7 +765,10 @@ private fun LoadingIndicatorPreview() {
                 )
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
+            loadingIndicator = LoadingIndicator.Large(
+                titleResId = R.string.converter_google_maps_loading_indicator_title,
+                description = { null },
+            ),
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -805,7 +806,10 @@ private fun DarkLoadingIndicatorPreview() {
                 )
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
+            loadingIndicator = LoadingIndicator.Large(
+                titleResId = R.string.converter_google_maps_loading_indicator_title,
+                description = { null },
+            ),
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -843,7 +847,10 @@ private fun TabletLoadingIndicatorPreview() {
                 )
             ),
             changelogShown = true,
-            loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title,
+            loadingIndicator = LoadingIndicator.Large(
+                titleResId = R.string.converter_google_maps_loading_indicator_title,
+                description = { null },
+            ),
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -868,7 +875,7 @@ private fun InitialPreview() {
         ConversionScreen(
             currentState = Initial(),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -893,7 +900,7 @@ private fun DarkInitialPreview() {
         ConversionScreen(
             currentState = Initial(),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
@@ -918,7 +925,7 @@ private fun TabletInitialPreview() {
         ConversionScreen(
             currentState = Initial(),
             changelogShown = true,
-            loadingIndicatorTitleResId = null,
+            loadingIndicator = null,
             onBack = {},
             onCancel = {},
             onDeny = {},
