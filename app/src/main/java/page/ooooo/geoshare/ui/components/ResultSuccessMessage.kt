@@ -134,7 +134,7 @@ fun ResultSuccessMessage(
 
             loadingIndicator is LoadingIndicator.Small ->
                 ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessLocationLoadingIndicator")) {
+                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessSmallLoadingIndicatorMessage")) {
                         stringResource(loadingIndicator.messageResId)
                     }
                     FilledIconButton(

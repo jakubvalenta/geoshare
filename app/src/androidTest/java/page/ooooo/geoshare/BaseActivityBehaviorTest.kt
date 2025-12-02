@@ -24,8 +24,6 @@ abstract class BaseActivityBehaviorTest {
     companion object {
         @Suppress("SpellCheckingInspection")
         const val PACKAGE_NAME = "page.ooooo.geoshare.debug"
-        const val LAUNCH_TIMEOUT = 10_000L
-        const val TIMEOUT = 10_000L
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
         val NETWORK_TIMEOUT = (1..MAX_RETRIES).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
             acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
@@ -43,11 +41,14 @@ abstract class BaseActivityBehaviorTest {
         device.executeShellCommand("monkey -p $PACKAGE_NAME 1")
 
         // Wait for the app to appear
-        waitForAppToBeVisible(PACKAGE_NAME, LAUNCH_TIMEOUT)
+        waitForAppToBeVisible(PACKAGE_NAME)
     }
 
     protected fun closeApplication() = uiAutomator {
-        assertNotXiaomi()
+        assertFalse(
+            "We cannot close the app on Xiaomi MIUI, because it stops the tests",
+            AndroidTools.isMiuiDevice(),
+        )
         device.pressRecentApps()
         waitForStableInActiveWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -85,18 +86,10 @@ abstract class BaseActivityBehaviorTest {
         onElement { viewIdResourceName == "geoShareIntroScreenCloseButton" }.click()
     }
 
-
-    protected fun assertGoogleMapsInstalled() = uiAutomator {
+    protected fun assertAppInstalled(packageName: String) = uiAutomator {
         assertTrue(
-            "This test only works when Google Maps is installed on the device",
-            device.executeShellCommand("pm path $GOOGLE_MAPS_PACKAGE_NAME").isNotEmpty(),
-        )
-    }
-
-    protected fun assertNotXiaomi() = uiAutomator {
-        assertFalse(
-            "We cannot close the app on Xiaomi MIUI, because it stops the tests",
-            AndroidTools.isMiuiDevice(),
+            "This test only works when $packageName is installed on the device",
+            device.executeShellCommand("pm path $packageName").isNotEmpty(),
         )
     }
 

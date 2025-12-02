@@ -35,6 +35,9 @@ import kotlin.time.Duration.Companion.seconds
 
 object GpxOutput : Output {
 
+    @Suppress("SpellCheckingInspection")
+    const val TOMTOM_PACKAGE_NAME = "com.tomtom.speedcams.android.map"
+
     open class ShareGpxRouteWithAppAction(override val packageName: String) :
         LocationAction,
         Action.HasErrorMessage,

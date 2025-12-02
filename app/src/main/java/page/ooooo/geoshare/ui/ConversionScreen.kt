@@ -449,7 +449,7 @@ fun ConversionScreen(
                         onDismissRequest = { onDeny(false) },
                         modifier = Modifier
                             .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareLocationRationale"),
+                            .testTag("geoShareLocationRationaleDialog"),
                     ) {
                         Text(
                             AnnotatedString.fromHtml(currentState.action.permissionText()),
