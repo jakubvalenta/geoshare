@@ -35,7 +35,6 @@ import kotlin.time.Duration.Companion.seconds
 
 object GpxOutput : Output {
 
-    // TODO Notify user that TomTom doesn't support waypoints
     open class ShareGpxRouteWithAppAction(override val packageName: String) :
         LocationAction,
         Action.HasErrorMessage,

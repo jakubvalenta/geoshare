@@ -385,7 +385,9 @@ fun ConversionScreen(
             else -> null
         },
         dialog = when {
-            (loadingIndicator !is LoadingIndicator.Large && currentState is RequestedUnshortenPermission) -> {
+            loadingIndicator is LoadingIndicator.Large -> null
+
+            currentState is RequestedUnshortenPermission -> {
                 {
                     PermissionDialog(
                         title = stringResource(currentState.permissionTitleResId),
@@ -411,7 +413,7 @@ fun ConversionScreen(
                 }
             }
 
-            (loadingIndicator !is LoadingIndicator.Large && currentState is RequestedParseHtmlPermission) -> {
+            currentState is RequestedParseHtmlPermission -> {
                 {
                     PermissionDialog(
                         title = stringResource(currentState.permissionTitleResId),
@@ -437,7 +439,7 @@ fun ConversionScreen(
                 }
             }
 
-            (currentState is LocationRationaleShown) -> {
+            currentState is LocationRationaleShown -> {
                 {
                     ConfirmationDialog(
                         title = stringResource(currentState.permissionTitleResId),
