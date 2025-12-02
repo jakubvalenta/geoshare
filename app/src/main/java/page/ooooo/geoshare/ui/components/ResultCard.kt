@@ -61,7 +61,7 @@ fun ResultCard(
             horizontalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
             chips()
-            Spacer(Modifier.width(spacing.windowPadding))
+            Spacer(Modifier.width(spacing.windowPadding - spacing.small))
         }
     }
 }
