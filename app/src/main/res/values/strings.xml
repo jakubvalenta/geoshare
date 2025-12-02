@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
-    <string name="conversion_location_loading_indicator_title">Getting location…</string>
+    <string name="conversion_location_loading_indicator_title">Finding your location…</string>
     <string name="conversion_location_permission_dialog_title">Allow location access?</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
