@@ -491,7 +491,7 @@ data class LocationRationaleShown(
         LocationRationaleConfirmed(inputUriString, position, i, action)
 
     override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFailed(inputUriString, position, action)
+        ActionFinished(inputUriString, position, action)
 }
 
 data class LocationRationaleConfirmed(

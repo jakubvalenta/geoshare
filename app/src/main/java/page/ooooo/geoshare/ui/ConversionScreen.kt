@@ -103,7 +103,7 @@ fun ConversionScreen(
                         resources = resources,
                         saveGpxLauncher = saveGpxLauncher,
                     )
-                    viewModel.finishAction(success)
+                    viewModel.finishBasicAction(success)
                 }
 
                 is LocationActionReady -> {
@@ -116,7 +116,7 @@ fun ConversionScreen(
                         resources = resources,
                         saveGpxLauncher = saveGpxLauncher,
                     )
-                    viewModel.finishAction(success)
+                    viewModel.finishLocationAction(success)
                 }
 
                 is LocationRationaleRequested -> {
@@ -139,7 +139,7 @@ fun ConversionScreen(
                         val location = try {
                             AndroidTools.getLocation(context)
                         } catch (_: CancellationException) {
-                            viewModel.cancelGettingLocation()
+                            viewModel.cancelLocationFinding()
                             return@launch
                         }
                         viewModel.runLocationAction(currentState.action, currentState.i, location)

@@ -172,7 +172,7 @@ class ConversionViewModel @Inject constructor(
     fun skipLocationRationale(action: LocationAction, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = LocationPermissionReceived(
-                currentState.inputUriString, currentState.position, i, action,
+                currentState.inputUriString, currentState.position, i, action
             )
             transition()
         }
@@ -181,16 +181,16 @@ class ConversionViewModel @Inject constructor(
     fun receiveLocationPermission() {
         (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
             stateContext.currentState = LocationPermissionReceived(
-                currentState.inputUriString, currentState.position, currentState.i, currentState.action,
+                currentState.inputUriString, currentState.position, currentState.i, currentState.action
             )
             transition()
         }
     }
 
-    fun cancelGettingLocation() {
+    fun cancelLocationFinding() {
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
             stateContext.currentState = ActionRan(
-                currentState.inputUriString, currentState.position, currentState.action, null,
+                currentState.inputUriString, currentState.position, currentState.action, null
             )
             transition()
         }
@@ -214,23 +214,21 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun finishAction(success: Boolean?) {
-        stateContext.currentState.let { currentState ->
-            when (currentState) {
-                is BasicActionReady -> {
-                    stateContext.currentState = ActionRan(
-                        currentState.inputUriString, currentState.position, currentState.action, success
-                    )
-                    transition()
-                }
+    fun finishBasicAction(success: Boolean?) {
+        (stateContext.currentState as? BasicActionReady)?.let { currentState ->
+            stateContext.currentState = ActionRan(
+                currentState.inputUriString, currentState.position, currentState.action, success
+            )
+            transition()
+        }
+    }
 
-                is LocationActionReady -> {
-                    stateContext.currentState = ActionRan(
-                        currentState.inputUriString, currentState.position, currentState.action, success
-                    )
-                    transition()
-                }
-            }
+    fun finishLocationAction(success: Boolean?) {
+        (stateContext.currentState as? LocationActionReady)?.let { currentState ->
+            stateContext.currentState = ActionRan(
+                currentState.inputUriString, currentState.position, currentState.action, success
+            )
+            transition()
         }
     }
 

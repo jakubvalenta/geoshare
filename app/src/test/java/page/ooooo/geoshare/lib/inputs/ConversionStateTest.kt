@@ -1997,13 +1997,13 @@ class ConversionStateTest {
     }
 
     @Test
-    fun locationRationaleShown_deny_returnsActionFailed() = runTest {
+    fun locationRationaleShown_deny_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GpxOutput.ShareGpxRouteAction()
         val state = LocationRationaleShown(inputUriString, position, 2, action)
         assertEquals(
-            ActionFailed(inputUriString, position, action),
+            ActionFinished(inputUriString, position, action),
             state.deny(false),
         )
     }
