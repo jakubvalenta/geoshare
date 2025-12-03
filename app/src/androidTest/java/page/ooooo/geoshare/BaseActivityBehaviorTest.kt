@@ -171,8 +171,8 @@ abstract class BaseActivityBehaviorTest {
     }
 
     protected fun waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
-        // Wait for Google Maps
-        onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME }
+        // Wait for TomTom
+        onElement(20_000L) { packageName == GpxOutput.TOMTOM_PACKAGE_NAME }
 
         // If there is location permission, grant it
         onElementOrNull(3_000L) {

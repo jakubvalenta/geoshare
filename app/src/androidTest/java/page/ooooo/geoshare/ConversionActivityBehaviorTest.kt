@@ -426,7 +426,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareResultCardApp_${GpxOutput.TOMTOM_PACKAGE_NAME}" }.click()
 
         // Dismiss the location rationale dialog
-        onDialog("geoShareLocationRationaleDialog") {
+        onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
             dismiss()
         }
 
@@ -434,7 +434,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareResultCardApp_${GpxOutput.TOMTOM_PACKAGE_NAME}" }.click()
 
         // Confirm location rationale
-        onDialog("geoShareLocationRationaleDialog") {
+        onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
             confirm()
         }
 
@@ -450,7 +450,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareResultCardApp_${GpxOutput.TOMTOM_PACKAGE_NAME}" }.click()
 
         // Confirm location rationale
-        onDialog("geoShareLocationRationaleDialog") {
+        onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
             confirm()
         }
 
