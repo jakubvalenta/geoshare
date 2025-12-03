@@ -5,8 +5,10 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.Looper
 import android.os.SystemClock
@@ -19,6 +21,7 @@ import androidx.annotation.RequiresPermission
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
 import androidx.core.content.FileProvider
+import androidx.core.location.LocationListenerCompat
 import androidx.core.net.toUri
 import kotlinx.coroutines.*
 import page.ooooo.geoshare.BuildConfig
@@ -242,18 +245,25 @@ object AndroidTools {
         locationManager: LocationManager,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): Point? = withContext(dispatcher) {
+        // FIXME Never stops despite timeout
         withTimeoutOrNull(30.seconds) {
+            // FIXME Cannot be cancelled
             suspendCoroutine { cont ->
                 try {
                     @Suppress("DEPRECATION")
                     locationManager.requestSingleUpdate(
                         LocationManager.GPS_PROVIDER,
-                        { location: Location? ->
-                            cont.resume(location?.let { Point(Srs.WGS84, it.latitude, it.longitude) })
+                        object : LocationListenerCompat {
+                            // Use LocationListenerCompat instead of LocationListener or lambda, so that we don't have
+                            // to override onStatusChanged on Android Q and older.
+                            override fun onLocationChanged(location: Location) {
+                                cont.resume(location.let { Point(Srs.WGS84, it.latitude, it.longitude) })
+                            }
                         },
                         Looper.getMainLooper(),
                     )
                 } catch (e: Exception) {
+                    Log.e(null, "Error when getting location", e)
                     cont.resumeWithException(e)
                 }
             }
