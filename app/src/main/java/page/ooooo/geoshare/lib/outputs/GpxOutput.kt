@@ -46,7 +46,7 @@ object GpxOutput : Output {
         override suspend fun runAction(
             position: Position,
             i: Int?,
-            location: Point?,
+            location: Point,
             context: Context,
             clipboard: Clipboard,
             resources: Resources,
@@ -74,7 +74,10 @@ object GpxOutput : Output {
         )
 
         @Composable
-        override fun errorText(): String = stringResource(R.string.output_gpx_route_share_failed)
+        override fun errorText(): String = stringResource(
+            R.string.conversion_succeeded_open_app_failed,
+            queryAppDetails()?.label ?: packageName,
+        )
 
         private var appDetailsCache: AndroidTools.AppDetails? = null
 
@@ -88,7 +91,7 @@ object GpxOutput : Output {
         override suspend fun runAction(
             position: Position,
             i: Int?,
-            location: Point?,
+            location: Point,
             context: Context,
             clipboard: Clipboard,
             resources: Resources,

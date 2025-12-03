@@ -1,7 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
-    <string name="conversion_location_loading_indicator_title">Finding your location…</string>
-    <string name="conversion_location_permission_dialog_title">Allow location access?</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
@@ -11,6 +9,9 @@
     <string name="conversion_succeeded_copy_link_drive_to">Copy link to navigate in %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_via">Copy link to add waypoint in %1$s</string>
     <string name="conversion_succeeded_copy_link_street_view">Copy link to street view in %1$s</string>
+    <string name="conversion_succeeded_location_failed">Failed to find location</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">Finding your location…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">Allow location access?</string>
     <string name="conversion_succeeded_open_app">Open %1$s</string>
     <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
     <string name="conversion_succeeded_open_app_failed">Failed to open %1$s</string>

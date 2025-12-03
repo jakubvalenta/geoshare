@@ -43,6 +43,7 @@ fun ResultSuccessMessage(
         state is ActionWaiting && state.action is Automation.HasDelay ||
             state is ActionSucceeded && state.action is Action.HasSuccessMessage ||
             state is ActionFailed && state.action is Action.HasErrorMessage ||
+            state is LocationFindingFailed ||
             loadingIndicator is LoadingIndicator.Small
 
     val spacing = LocalSpacing.current
@@ -128,7 +129,18 @@ fun ResultSuccessMessage(
                         containerColor = MaterialTheme.colorScheme.errorContainer,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     ) {
+                        targetState.action
                         targetState.action.errorText()
+                    }
+                }
+
+            targetState is LocationFindingFailed ->
+                ResultMessageRow {
+                    ResultMessageText(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ) {
+                        stringResource(R.string.conversion_succeeded_location_failed)
                     }
                 }
 
@@ -309,7 +321,7 @@ private fun LocationPermissionReceivedPreview() {
                     action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 loadingIndicator = LoadingIndicator.Small(
-                    messageResId = R.string.conversion_location_loading_indicator_title,
+                    messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
                 ),
                 animationsEnabled = false,
                 onCancel = {},
@@ -332,7 +344,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                     action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
                 loadingIndicator = LoadingIndicator.Small(
-                    messageResId = R.string.conversion_location_loading_indicator_title,
+                    messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
                 ),
                 animationsEnabled = false,
                 onCancel = {},

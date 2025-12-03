@@ -416,7 +416,7 @@ data class LocationActionReady(
     override val position: Position,
     val i: Int?,
     val action: LocationAction,
-    val location: Point?,
+    val location: Point,
 ) : ConversionState.HasResult
 
 data class ActionRan(
@@ -485,7 +485,7 @@ data class LocationRationaleShown(
     val action: LocationAction,
 ) : ConversionState.HasPermission, ConversionState.HasResult {
     @StringRes
-    override val permissionTitleResId = R.string.conversion_location_permission_dialog_title
+    override val permissionTitleResId = R.string.conversion_succeeded_location_rationale_dialog_title
 
     override suspend fun grant(doNotAsk: Boolean): State =
         LocationRationaleConfirmed(inputUriString, position, i, action)
@@ -508,6 +508,36 @@ data class LocationPermissionReceived(
     val action: LocationAction,
 ) : ConversionState.HasResult, ConversionState.HasLoadingIndicator {
     override val loadingIndicator = LoadingIndicator.Small(
-        messageResId = R.string.conversion_location_loading_indicator_title,
+        messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
     )
+}
+
+data class LocationReceived(
+    override val inputUriString: String,
+    override val position: Position,
+    val i: Int?,
+    val action: LocationAction,
+    val location: Point?,
+) : ConversionState.HasResult {
+    override suspend fun transition(): State =
+        if (location == null) {
+            LocationFindingFailed(inputUriString, position, action)
+        } else {
+            LocationActionReady(inputUriString, position, i, action, location)
+        }
+}
+
+data class LocationFindingFailed(
+    override val inputUriString: String,
+    override val position: Position,
+    val action: LocationAction,
+) : ConversionState.HasResult {
+    override suspend fun transition(): State {
+        try {
+            delay(3.seconds)
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        return ActionFinished(inputUriString, position, action)
+    }
 }

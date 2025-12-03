@@ -187,10 +187,19 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun receiveLocation(action: LocationAction, i: Int?, location: Point?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationReceived(
+                currentState.inputUriString, currentState.position, i, action, location
+            )
+            transition()
+        }
+    }
+
     fun cancelLocationFinding() {
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
-            stateContext.currentState = ActionRan(
-                currentState.inputUriString, currentState.position, currentState.action, null
+            stateContext.currentState = ActionFinished(
+                currentState.inputUriString, currentState.position, currentState.action
             )
             transition()
         }
@@ -200,15 +209,6 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = ActionReady(
                 currentState.inputUriString, currentState.position, i, action
-            )
-            transition()
-        }
-    }
-
-    fun runLocationAction(action: LocationAction, i: Int?, location: Point?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            stateContext.currentState = LocationActionReady(
-                currentState.inputUriString, currentState.position, i, action, location
             )
             transition()
         }

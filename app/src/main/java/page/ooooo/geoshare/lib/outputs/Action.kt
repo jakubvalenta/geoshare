@@ -48,7 +48,7 @@ interface LocationAction : Action {
     suspend fun runAction(
         position: Position,
         i: Int?,
-        location: Point?,
+        location: Point,
         context: Context,
         clipboard: Clipboard,
         resources: Resources,

@@ -2025,4 +2025,68 @@ class ConversionStateTest {
         val state = LocationPermissionReceived(inputUriString, position, 2, action)
         assertNull(state.transition())
     }
+
+    @Test
+    fun locationReceived_locationIsNull_returnsLocationFindingFailed() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationReceived(inputUriString, position, 2, action, null)
+        assertEquals(
+            LocationFindingFailed(inputUriString, position, action),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun locationReceived_locationIsNotNull_returnsLocationActionReady() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val location = Point(Srs.WGS84, 3.0, 4.0)
+        val state = LocationReceived(inputUriString, position, 2, action, location)
+        assertEquals(
+            LocationActionReady(inputUriString, position, 2, action, location),
+            state.transition(),
+        )
+    }
+
+    @Test
+    fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationFindingFailed(inputUriString, position, action)
+        val workDuration = testScheduler.timeSource.measureTime {
+            assertEquals(
+                ActionFinished(inputUriString, position, action),
+                state.transition(),
+            )
+        }
+        assertEquals(3.seconds, workDuration)
+    }
+
+    @Test
+    fun locationFindingFailed_executionIsCancelled_returnsActionFinished() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = GpxOutput.ShareGpxRouteAction()
+        val state = LocationFindingFailed(inputUriString, position, action)
+        var res: State? = null
+        val job = launch {
+            res = state.transition()
+        }
+        testScheduler.runCurrent()
+        testScheduler.advanceTimeBy(1.seconds)
+        try {
+            job.cancelAndJoin()
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        assertEquals(
+            res,
+            ActionFinished(inputUriString, position, action),
+        )
+    }
+
 }

@@ -142,7 +142,7 @@ fun ConversionScreen(
                             viewModel.cancelLocationFinding()
                             return@launch
                         }
-                        viewModel.runLocationAction(currentState.action, currentState.i, location)
+                        viewModel.receiveLocation(currentState.action, currentState.i, location)
                     }
                 }
             }
