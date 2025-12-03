@@ -276,7 +276,7 @@ object AndroidTools {
                 // Use a small delay to prevent Android from asking for location permission twice, once for
                 // getLastKnownLocation() and once for getCurrentLocation()
                 delay(500.milliseconds)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
                     getCurrentLocation(locationManager)
                 } else {
                     getCurrentLocationPreS(locationManager)
