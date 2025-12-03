@@ -5,10 +5,8 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.Looper
 import android.os.SystemClock
@@ -35,7 +33,6 @@ import java.io.InputStreamReader
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -245,10 +242,8 @@ object AndroidTools {
         locationManager: LocationManager,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): Point? = withContext(dispatcher) {
-        // FIXME Never stops despite timeout
         withTimeoutOrNull(30.seconds) {
-            // FIXME Cannot be cancelled
-            suspendCoroutine { cont ->
+            suspendCancellableCoroutine { cont ->
                 try {
                     @Suppress("DEPRECATION")
                     locationManager.requestSingleUpdate(
