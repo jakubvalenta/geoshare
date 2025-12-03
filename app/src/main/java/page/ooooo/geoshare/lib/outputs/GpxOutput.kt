@@ -163,7 +163,7 @@ object GpxOutput : Output {
         Automation.HasDelay {
 
         override val type = Automation.Type.OPEN_APP_GPX_ROUTE
-        override val testTag = null
+        override val testTag = "geoShareUserPreferenceAutomationShareGpxWithApp"
         override val delay = 5.seconds
 
         @Composable

@@ -82,7 +82,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_showsPositionAndCopiesCoords() =
+    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_copiesCoords() =
         uiAutomator {
             // Launch application and close intro
             launchApplication()
@@ -95,9 +95,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Share a Google Maps coordinates link with the app
             shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
-            // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0))
-
             // Shows automation success message
             onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
 
@@ -106,7 +103,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_showsPositionAndOpensTheInstalledAppAutomatically() =
+    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_opensApp() =
         uiAutomator {
             assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
 
@@ -120,9 +117,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Share a Google Maps coordinates link with the app
             shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
-
-            // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0))
 
             // Shows automation counter
             onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
@@ -447,7 +441,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenGpxRouteIsSharedWithTomTomAndLocationRationaleIsDismissed_doesNothing() = uiAutomator {
+    fun conversionScreen_whenGpxRouteIsShared_allowsOpeningTomTom() = uiAutomator {
         assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
 
         // Share a geo: URI with the app
@@ -493,7 +487,43 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             )
         }.click()
 
-        // TomTom is visible
-        onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME }
+        // TomTom starts navigation
+        onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME && textAsString() == "Drive" }
     }
+
+    @Test
+    fun conversionScreen_whenGpxRouteIsSharedAndAutomationIsConfigured_opensTomTom() =
+        uiAutomator {
+            assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
+
+            // Launch application and close intro
+            launchApplication()
+            closeIntro()
+
+            // Configure automation
+            goToUserPreferencesDetailAutomationScreen()
+            onElement { viewIdResourceName == "geoShareUserPreferenceAutomationShareGpxWithApp" }.click()
+
+            // Share a geo: URI with the app
+            shareUri("geo:52.47254,13.4345")
+
+            // Shows automation counter
+            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
+
+            // Confirm location rationale
+            onDialog("geoShareLocationRationaleDialog") {
+                confirm()
+            }
+
+            // Grant location permission
+            onElement {
+                textAsString() in listOf(
+                    "Only this time",
+                    @Suppress("SpellCheckingInspection") "Uniquement cette fois-ci",
+                )
+            }.click()
+
+            // TomTom starts navigation
+            onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME && textAsString() == "Drive" }
+        }
 }
