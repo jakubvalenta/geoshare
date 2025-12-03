@@ -1,8 +1,6 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.uiautomator.UiObject2
-import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
@@ -15,29 +13,6 @@ import page.ooooo.geoshare.lib.position.Srs
 
 @RunWith(AndroidJUnit4::class)
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
-
-    class DialogElement(val dialog: UiObject2) {
-        fun confirm() {
-            dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }.click()
-        }
-
-        fun dismiss() {
-            dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDismissButton" }.click()
-        }
-
-        fun toggleDoNotAsk() {
-            dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
-        }
-    }
-
-    private fun onDialog(
-        resourceName: String,
-        block: DialogElement.() -> Unit,
-    ) = uiAutomator {
-        val dialog = onElement { viewIdResourceName == resourceName }
-        DialogElement(dialog).block()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == resourceName })
-    }
 
     @Test
     fun conversionScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
@@ -53,7 +28,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareResultCardApp_${AndroidTools.GOOGLE_MAPS_PACKAGE_NAME}" }.click()
 
         // Google Maps shows precise location
-        waitAndAssertGoogleMapsShowsText("Westend")
+        waitAndAssertGoogleMapsContainsElement {
+            textAsString() in listOf("Westend", "Berlin-Westend")
+        }
     }
 
     @Test
@@ -78,61 +55,59 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             onElement { viewIdResourceName == "geoShareResultCardApp_${AndroidTools.GOOGLE_MAPS_PACKAGE_NAME}" }.click()
 
             // Google Maps shows precise location
-            waitAndAssertGoogleMapsShowsText("Ming&Qing Dynasties Furniture Hall")
+            waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
         }
 
     @Test
-    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_copiesCoords() =
-        uiAutomator {
-            // Launch application and close intro
-            launchApplication()
-            closeIntro()
+    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_copiesCoords() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
 
-            // Configure automation
-            goToUserPreferencesDetailAutomationScreen()
-            onElement { viewIdResourceName == "geoShareUserPreferenceAutomationCopyCoordsDec" }.click()
+        // Configure automation
+        goToUserPreferencesDetailAutomationScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationCopyCoordsDec" }.click()
 
-            // Share a Google Maps coordinates link with the app
-            shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+        // Share a Google Maps coordinates link with the app
+        shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
-            // Shows automation success message
-            onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
+        // Shows automation success message
+        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
 
-            // Shows automation preferences button
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
-        }
+        // Shows automation preferences button
+        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
+    }
 
     @Test
-    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_opensApp() =
-        uiAutomator {
-            assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
+    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_opensApp() = uiAutomator {
+        assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
 
-            // Launch application and close intro
-            launchApplication()
-            closeIntro()
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
 
-            // Configure automation
-            goToUserPreferencesDetailAutomationScreen()
-            onElement { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${AndroidTools.GOOGLE_MAPS_PACKAGE_NAME}" }.click()
+        // Configure automation
+        goToUserPreferencesDetailAutomationScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${AndroidTools.GOOGLE_MAPS_PACKAGE_NAME}" }.click()
 
-            // Share a Google Maps coordinates link with the app
-            shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+        // Share a Google Maps coordinates link with the app
+        shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
-            // Shows automation counter
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
+        // Shows automation counter
+        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
 
-            // Google Maps doesn't open while the counter is running
-            assertNull(onElementOrNull(3_000L) { packageName == AndroidTools.GOOGLE_MAPS_PACKAGE_NAME })
+        // Google Maps doesn't open while the counter is running
+        assertNull(onElementOrNull(3_000L) { packageName == AndroidTools.GOOGLE_MAPS_PACKAGE_NAME })
 
-            // Google Maps opens
-            onElement { packageName == AndroidTools.GOOGLE_MAPS_PACKAGE_NAME }
+        // Google Maps opens
+        onElement { packageName == AndroidTools.GOOGLE_MAPS_PACKAGE_NAME }
 
-            // Go back to Geo Share
-            launchApplication()
+        // Go back to Geo Share
+        launchApplication()
 
-            // Shows automation preferences button
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
-        }
+        // Shows automation preferences button
+        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
+    }
 
     @Test
     fun conversionScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
@@ -488,42 +463,41 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }.click()
 
         // TomTom starts navigation
-        onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME && textAsString() == "Drive" }
+        waitAndAssertTomTomContainsElement { textAsString() in listOf("Drive", "Aller") }
     }
 
     @Test
-    fun conversionScreen_whenGpxRouteIsSharedAndAutomationIsConfigured_opensTomTom() =
-        uiAutomator {
-            assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
+    fun conversionScreen_whenGpxRouteIsSharedAndAutomationIsConfigured_opensTomTom() = uiAutomator {
+        assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
 
-            // Launch application and close intro
-            launchApplication()
-            closeIntro()
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
 
-            // Configure automation
-            goToUserPreferencesDetailAutomationScreen()
-            onElement { viewIdResourceName == "geoShareUserPreferenceAutomationShareGpxWithApp" }.click()
+        // Configure automation
+        goToUserPreferencesDetailAutomationScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationShareGpxWithApp" }.click()
 
-            // Share a geo: URI with the app
-            shareUri("geo:52.47254,13.4345")
+        // Share a geo: URI with the app
+        shareUri("geo:52.47254,13.4345")
 
-            // Shows automation counter
-            onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
+        // Shows automation counter
+        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
 
-            // Confirm location rationale
-            onDialog("geoShareLocationRationaleDialog") {
-                confirm()
-            }
-
-            // Grant location permission
-            onElement {
-                textAsString() in listOf(
-                    "Only this time",
-                    @Suppress("SpellCheckingInspection") "Uniquement cette fois-ci",
-                )
-            }.click()
-
-            // TomTom starts navigation
-            onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME && textAsString() == "Drive" }
+        // Confirm location rationale
+        onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
+            confirm()
         }
+
+        // Grant location permission
+        onElement {
+            textAsString() in listOf(
+                "Only this time",
+                @Suppress("SpellCheckingInspection") "Uniquement cette fois-ci",
+            )
+        }.click()
+
+        // TomTom starts navigation
+        waitAndAssertTomTomContainsElement { textAsString() in listOf("Drive", "Aller") }
+    }
 }
