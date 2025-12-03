@@ -70,7 +70,6 @@ object GpxOutput : Output {
         @Composable
         override fun permissionText() = stringResource(
             R.string.output_gpx_location_permission,
-            queryAppDetails()?.label ?: packageName,
             stringResource(R.string.app_name),
         )
 
@@ -107,7 +106,7 @@ object GpxOutput : Output {
 
         @Composable
         override fun permissionText() = stringResource(
-            R.string.output_gpx_route_share_permission_text,
+            R.string.output_gpx_location_permission,
             stringResource(R.string.app_name),
         )
 

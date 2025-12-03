@@ -68,10 +68,9 @@
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_navigate_to_intro">Discover more app features</string>
     <string name="main_random">Random link</string>
-    <string name="output_gpx_location_permission">To open %1$s, %2$s needs to create a route starting at your current location.</string>
+    <string name="output_gpx_location_permission">%1$s will create a route that starts at your current location.</string>
     <string name="output_gpx_route_share">Share GPX route</string>
     <string name="output_gpx_route_share_failed">Failed to share GPX route</string>
-    <string name="output_gpx_route_share_permission_text">To create a GPX route, %1$s requires location access.</string>
     <string name="output_gpx_route_share_automation_succeeded">Automatically shared GPX route</string>
     <string name="output_gpx_route_share_automation_waiting">Automatically sharing GPX route in %1$ds</string>
     <string name="converter_amap_name" translatable="false">Amap (AutoNavi)</string>
