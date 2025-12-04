@@ -48,16 +48,6 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun onDialog(
-        resourceName: String,
-        timeoutMs: Long = 10_000L,
-        block: DialogElement.() -> Unit,
-    ) = uiAutomator {
-        val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
-        DialogElement(dialog).block()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == resourceName })
-    }
-
     @Before
     fun goToLauncher() = uiAutomator {
         // Start from the home screen
@@ -84,7 +74,12 @@ abstract class BaseActivityBehaviorTest {
             if (menu != null) {
                 // On Android API >= 36.1, use the dropdown menu
                 menu.click()
-                onElement { textAsString() in listOf("Clear", "Effacer") }.click()
+                onElement {
+                    when (textAsString()) {
+                        "Clear", "Effacer" -> true
+                        else -> false
+                    }
+                }.click()
             } else {
                 // On Android API >= 28, swipe from the center of the screen towards the upper edge
                 device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
@@ -92,9 +87,12 @@ abstract class BaseActivityBehaviorTest {
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
             if (
-                @Suppress("SpellCheckingInspection")
                 onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                    textAsString() in listOf("No recent items", "Aucun élément récent")
+                    @Suppress("SpellCheckingInspection")
+                    when (textAsString()) {
+                        "No recent items", "Aucun élément récent" -> true
+                        else -> false
+                    }
                 } != null
             ) {
                 // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
@@ -104,7 +102,12 @@ abstract class BaseActivityBehaviorTest {
                 waitForStableInActiveWindow()
             }
             device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, displayHeight, 10) }
-            onElement { textAsString() in listOf("CLEAR ALL", "TOUT EFFACER") }.click()
+            onElement {
+                when (textAsString()) {
+                    "CLEAR ALL", "TOUT EFFACER" -> true
+                    else -> false
+                }
+            }.click()
         }
         waitForStableInActiveWindow()
     }
@@ -112,6 +115,41 @@ abstract class BaseActivityBehaviorTest {
     protected fun closeIntro() = uiAutomator {
         waitForStableInActiveWindow()
         onElement { viewIdResourceName == "geoShareIntroScreenCloseButton" }.click()
+    }
+
+    protected fun onDialog(
+        resourceName: String,
+        timeoutMs: Long = 10_000L,
+        block: DialogElement.() -> Unit,
+    ) = uiAutomator {
+        val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
+        DialogElement(dialog).block()
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == resourceName })
+    }
+
+    private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =
+        @Suppress("SpellCheckingInspection")
+        when (element.textAsString()?.lowercase()) {
+            "only this time", "uniquement cette fois-ci" -> true
+            else -> false
+        }
+
+    protected fun grantLocationPermission() = uiAutomator {
+        onElement { isLocationGrantButton(this) }.click()
+    }
+
+    protected fun grantLocationPermissionIfNecessary() = uiAutomator {
+        onElementOrNull(3_000L) { isLocationGrantButton(this) }?.click()
+    }
+
+    protected fun denyLocationPermission() = uiAutomator {
+        onElement {
+            @Suppress("SpellCheckingInspection")
+            when (textAsString()?.lowercase()) {
+                "don't allow", "don’t allow", "ne pas autoriser" -> true
+                else -> false
+            }
+        }.click()
     }
 
     protected fun assertAppInstalled(packageName: String) = uiAutomator {
@@ -124,23 +162,26 @@ abstract class BaseActivityBehaviorTest {
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputs.getText(expectedPosition, null)
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
+        val coordinatesElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" }
+        assertEquals(expectedText, coordinatesElement.text)
         val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
             ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
+        val nameElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" }
         if (expectedName != null) {
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
+            assertEquals(expectedName, nameElement.text)
         } else {
-            onElement {
-                viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() in listOf(
-                    "Coordinates",
-                    @Suppress("SpellCheckingInspection")
-                    "Coordonnées",
-                )
-            }
+            assertTrue(
+                @Suppress("SpellCheckingInspection")
+                when (nameElement.text) {
+                    "Coordinates", "Coordonnées" -> true
+                    else -> false
+                }
+            )
         }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
             val expectedDescription = allOutputs.getDescription(expectedPosition)
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" && textAsString() == expectedDescription }
+            val descriptionElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" }
+            assertEquals(expectedDescription, descriptionElement.text)
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })
         }
@@ -152,17 +193,19 @@ abstract class BaseActivityBehaviorTest {
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
-            packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() in listOf(
-                "Make it your map",
+            packageName == GOOGLE_MAPS_PACKAGE_NAME &&
                 @Suppress("SpellCheckingInspection")
-                "Profitez d'une carte personnalisée",
-            )
+                when (textAsString()) {
+                    "Make it your map", "Profitez d'une carte personnalisée" -> true
+                    else -> false
+                }
         }?.also {
             onElement {
-                packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() in listOf(
-                    "skip",
-                    "ignorer",
-                )
+                packageName == GOOGLE_MAPS_PACKAGE_NAME &&
+                    when (textAsString()?.lowercase()) {
+                        "skip", "ignorer" -> true
+                        else -> false
+                    }
             }.click()
         }
 
@@ -175,19 +218,15 @@ abstract class BaseActivityBehaviorTest {
         onElement(20_000L) { packageName == GpxOutput.TOMTOM_PACKAGE_NAME }
 
         // If there is location permission, grant it
-        onElementOrNull(3_000L) {
-            textAsString() in listOf(
-                "Only this time",
-                @Suppress("SpellCheckingInspection") "Uniquement cette fois-ci",
-            )
-        }?.click()
+        grantLocationPermissionIfNecessary()
 
         // If there is Importing GPX tracks dialog, confirm it
         onElementOrNull(3_000L) {
-            textAsString() in listOf(
-                "Got it",
-                @Suppress("SpellCheckingInspection") "J'ai compris",
-            )
+            @Suppress("SpellCheckingInspection")
+            when (textAsString()) {
+                "Got it", "J'ai compris" -> true
+                else -> false
+            }
         }?.click()
 
         // Verify TomTom content

@@ -29,7 +29,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement {
-            textAsString() in listOf("Westend", "Berlin-Westend")
+            when (textAsString()) {
+                "Westend", "Berlin-Westend" -> true
+                else -> false
+            }
         }
     }
 
@@ -439,12 +442,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
         // Deny location permission
-        onElement {
-            textAsString() in listOf(
-                "Don't allow",
-                @Suppress("SpellCheckingInspection") "Ne pas autoriser",
-            )
-        }.click()
+        denyLocationPermission()
 
         // Tap the TomTom icon again
         onElement { viewIdResourceName == "geoShareResultCardApp_${GpxOutput.TOMTOM_PACKAGE_NAME}" }.click()
@@ -455,15 +453,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
         // Grant location permission
-        onElement {
-            textAsString() in listOf(
-                "Only this time",
-                @Suppress("SpellCheckingInspection") "Uniquement cette fois-ci",
-            )
-        }.click()
+        grantLocationPermission()
 
         // TomTom starts navigation
-        waitAndAssertTomTomContainsElement { textAsString() in listOf("Drive", "Aller") }
+        waitAndAssertTomTomContainsElement {
+            when (textAsString()) {
+                "Drive", "Aller" -> true
+                else -> false
+            }
+        }
     }
 
     @Test
@@ -490,14 +488,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
         // Grant location permission
-        onElement {
-            textAsString() in listOf(
-                "Only this time",
-                @Suppress("SpellCheckingInspection") "Uniquement cette fois-ci",
-            )
-        }.click()
+        grantLocationPermission()
 
         // TomTom starts navigation
-        waitAndAssertTomTomContainsElement { textAsString() in listOf("Drive", "Aller") }
+        waitAndAssertTomTomContainsElement {
+            when (textAsString()) {
+                "Drive", "Aller" -> true
+                else -> false
+            }
+        }
     }
 }
