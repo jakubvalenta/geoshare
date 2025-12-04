@@ -14,28 +14,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.collections.filter
 
 private val iconSize = 16.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessPoint(
+    position: Position,
     i: Int,
-    point: Point,
-    pointCount: Int,
-    textPointOutput: Output.Text<Point>?,
-    namePointOutput: Output.PointLabel<Point>?,
-    menuPointOutputs: List<Output.Action<Point, Action>>,
-    onRun: (action: Action) -> Unit,
+    onRun: (action: Action, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
-    val name = namePointOutput?.getText(point, i, pointCount)
+    val name = allOutputs.getName(position, i)
 
     Box {
         FlowRow(
@@ -54,7 +53,7 @@ fun ResultSuccessPoint(
                 )
             }
             SelectionContainer {
-                textPointOutput?.getText(point)?.let { text ->
+                allOutputs.getText(position, i)?.let { text ->
                     Text(text, style = MaterialTheme.typography.bodySmall)
                 }
             }
@@ -72,13 +71,14 @@ fun ResultSuccessPoint(
         sheetVisible = sheetVisible,
         onSetSheetVisible = setSheetVisible,
     ) { onHide ->
-        val (copyActionsAndLabels, otherActionsAndLabels) = menuPointOutputs
-            .filter { it.isEnabled(point) }
-            .map { it.getAction(point) to it.label() }
-            .partition { (action) -> action is Action.Copy }
+        val (copyActions, otherActions) = allOutputs.getPointActions()
+            .filter { it.isEnabled(position, i) }
+            .partition { it is CopyAction }
         ResultSuccessSheetContent(
-            copyActionsAndLabels = copyActionsAndLabels,
-            otherActionsAndLabels = otherActionsAndLabels,
+            position = position,
+            i = i,
+            copyActions = copyActions,
+            otherActions = otherActions,
             headline = name,
             onHide = onHide,
             onRun = onRun,
@@ -92,13 +92,16 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             ResultSuccessPoint(
-                i = 3,
-                point = Point.example,
-                pointCount = 5,
-                textPointOutput = allPointOutputGroups.getTextOutput(),
-                namePointOutput = allPointOutputGroups.getNameOutput(),
-                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
-                onRun = {},
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                    ),
+                ),
+                i = 2,
+                onRun = { _, _ -> },
             )
         }
     }
@@ -110,13 +113,16 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             ResultSuccessPoint(
-                i = 3,
-                point = Point.example,
-                pointCount = 5,
-                textPointOutput = allPointOutputGroups.getTextOutput(),
-                namePointOutput = allPointOutputGroups.getNameOutput(),
-                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
-                onRun = {},
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                    ),
+                ),
+                i = 2,
+                onRun = { _, _ -> },
             )
         }
     }
@@ -129,13 +135,16 @@ private fun LongNamePreview() {
         Surface {
             @Suppress("SpellCheckingInspection")
             ResultSuccessPoint(
-                i = 3,
-                point = Point.example.copy(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
-                pointCount = 1,
-                textPointOutput = allPointOutputGroups.getTextOutput(),
-                namePointOutput = allPointOutputGroups.getNameOutput(),
-                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
-                onRun = {},
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                        Point.genRandomPoint(),
+                    ),
+                ),
+                i = 2,
+                onRun = { _, _ -> },
             )
         }
     }
@@ -148,13 +157,16 @@ private fun DarkLongNamePreview() {
         Surface {
             @Suppress("SpellCheckingInspection")
             ResultSuccessPoint(
-                i = 3,
-                point = Point.example.copy(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
-                pointCount = 1,
-                textPointOutput = allPointOutputGroups.getTextOutput(),
-                namePointOutput = allPointOutputGroups.getNameOutput(),
-                menuPointOutputs = allPointOutputGroups.getActionOutputs(),
-                onRun = {},
+                position = Position(
+                    points = persistentListOf(
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(),
+                        Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                        Point.genRandomPoint(),
+                    ),
+                ),
+                i = 2,
+                onRun = { _, _ -> },
             )
         }
     }

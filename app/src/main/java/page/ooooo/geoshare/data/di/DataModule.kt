@@ -12,7 +12,7 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,7 +47,7 @@ class FakeUserPreferencesRepository @Inject constructor() :
 }
 
 val defaultFakeUserPreferences = UserPreferencesValues(
-    automationValue = Automation.Noop,
+    automationValue = NoopAutomation,
     changelogShownForVersionCodeValue = 22,
     connectionPermissionValue = Permission.ALWAYS,
     introShownForVersionCodeValue = 0,

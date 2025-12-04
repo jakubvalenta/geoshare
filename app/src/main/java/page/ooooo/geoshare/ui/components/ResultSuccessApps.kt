@@ -24,14 +24,15 @@ import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.AndroidTools.AppType
 import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.extensions.group
 import page.ooooo.geoshare.lib.outputs.*
-import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed interface GridItem {
-    data class App(val app: AndroidTools.App, val outputs: List<Output.App<Position>>) : GridItem
+    data class App(val appDetails: AndroidTools.AppDetails, val actions: List<Action>) : GridItem
     class ShareButton : GridItem
     class Empty : GridItem
 }
@@ -42,13 +43,12 @@ private val dropdownButtonOffset = 20.dp
 
 @Composable
 fun ResultSuccessApps(
-    position: Position,
-    onRun: (action: Action) -> Unit,
-    onQueryApp: (packageManager: PackageManager, packageName: String) -> AndroidTools.App? = { packageManager, packageName ->
-        AndroidTools.queryApp(packageManager, packageName)
+    onRun: (action: Action, i: Int?) -> Unit,
+    onQueryAppDetails: (packageManager: PackageManager, packageName: String) -> AndroidTools.AppDetails? = { packageManager, packageName ->
+        AndroidTools.queryAppDetails(packageManager, packageName)
     },
-    onQueryGeoUriPackageNames: (packageManager: PackageManager) -> List<String> = { packageManager ->
-        AndroidTools.queryGeoUriPackageNames(packageManager)
+    onQueryApps: (packageManager: PackageManager) -> List<AndroidTools.App> = { packageManager ->
+        AndroidTools.queryApps(packageManager)
     },
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
@@ -59,20 +59,18 @@ fun ResultSuccessApps(
     } else {
         4
     }
-    val appOutputs = allOutputGroups.getAppOutputs(
-        packageNames = onQueryGeoUriPackageNames(context.packageManager),
-    )
-    val apps: Map<AndroidTools.App, List<Output.App<Position>>> = appOutputs
-        .groupBy { it.packageName }
-        .mapNotNull { (packageName, items) ->
-            onQueryApp(context.packageManager, packageName)?.let { app -> app to items }
+    val apps = onQueryApps(context.packageManager)
+    val actionsByAppDetails: Map<AndroidTools.AppDetails, List<Action>> = allOutputs.getAppActions(apps)
+        .group()
+        .mapNotNull { (packageName, actions) ->
+            onQueryAppDetails(context.packageManager, packageName)?.let { app -> app to actions }
         }
-        .sortedBy { (app) -> app.label }
+        .sortedBy { (appDetails) -> appDetails.label }
         .toMap()
     val grid = buildList {
-        apps.forEach { (app, items) -> add(GridItem.App(app, items)) }
+        actionsByAppDetails.forEach { (appDetails, actions) -> add(GridItem.App(appDetails, actions)) }
         add(GridItem.ShareButton())
-        repeat(columnCount - (apps.size + 1) % columnCount) { add(GridItem.Empty()) }
+        repeat(columnCount - (actionsByAppDetails.size + 1) % columnCount) { add(GridItem.Empty()) }
     }
 
     Column(
@@ -85,12 +83,12 @@ fun ResultSuccessApps(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
-                        is GridItem.App -> gridItem.let { (app, outputs) ->
-                            ResultSuccessApp(position, app, outputs, onRun)
+                        is GridItem.App -> gridItem.let { (app, actions) ->
+                            ResultSuccessApp(app, actions, onRun)
                         }
 
                         is GridItem.ShareButton -> ResultSuccessAppShare {
-                            allOutputGroups.getChooserOutput()?.getAction(position)?.let(onRun)
+                            allOutputs.getChooserAction()?.let { action -> onRun(action, null) }
                         }
 
                         is GridItem.Empty -> ResultSuccessAppEmpty()
@@ -104,10 +102,9 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
-    position: Position,
-    app: AndroidTools.App,
-    outputs: List<Output.App<Position>>,
-    onRun: (action: Action) -> Unit,
+    appDetails: AndroidTools.AppDetails,
+    actions: List<Action>,
+    onRun: (action: Action, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     var menuExpanded by remember { mutableStateOf(false) }
@@ -117,10 +114,10 @@ fun RowScope.ResultSuccessApp(
             .combinedClickable(onLongClick = {
                 menuExpanded = true
             }) {
-                outputs.firstOrNull()?.getAction(position)?.let(onRun)
+                actions.firstOrNull()?.let { action -> onRun(action, null) }
             }
             .weight(1f)
-            .testTag("geoShareResultCardApp_${app.packageName}"),
+            .testTag("geoShareResultCardApp_${appDetails.packageName}"),
         verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
         Box(
             Modifier
@@ -128,10 +125,10 @@ fun RowScope.ResultSuccessApp(
                 .size(iconSize),
         ) {
             Image(
-                rememberDrawablePainter(app.icon),
-                app.label,
+                rememberDrawablePainter(appDetails.icon),
+                appDetails.label,
             )
-            outputs.takeIf { it.size > 1 }?.let { outputs ->
+            actions.takeIf { it.size > 1 }?.let { actions ->
                 Box(
                     Modifier
                         .align(Alignment.TopEnd)
@@ -151,12 +148,12 @@ fun RowScope.ResultSuccessApp(
                         )
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        outputs.forEach {
+                        actions.forEach { action ->
                             DropdownMenuItem(
-                                text = { Text(it.label(app)) },
+                                text = { action.Label() },
                                 onClick = {
                                     menuExpanded = false
-                                    onRun(it.getAction(position))
+                                    onRun(action, null)
                                 },
                             )
                         }
@@ -165,7 +162,7 @@ fun RowScope.ResultSuccessApp(
             }
         }
         Text(
-            app.label,
+            appDetails.label,
             Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall,
@@ -206,27 +203,26 @@ private fun DefaultPreview() {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    position = Position.example,
-                    onRun = {},
-                    onQueryApp = { _, packageName ->
-                        AndroidTools.App(
+                    onRun = { _, _ -> },
+                    onQueryAppDetails = { _, packageName ->
+                        AndroidTools.AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
                     },
-                    onQueryGeoUriPackageNames = {
+                    onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutputGroup.PACKAGE_NAME,
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.here.app.maps",
+                            MagicEarthOutput.PACKAGE_NAME,
+                            "appDetails.comaps.fdroid",
+                            "appDetails.organicmaps",
+                            "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
                             "us.spotco.maps",
-                        )
+                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
                     },
                 )
             }
@@ -243,27 +239,26 @@ private fun DarkPreview() {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    position = Position.example,
-                    onRun = {},
-                    onQueryApp = { _, packageName ->
-                        AndroidTools.App(
+                    onRun = { _, _ -> },
+                    onQueryAppDetails = { _, packageName ->
+                        AndroidTools.AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
                     },
-                    onQueryGeoUriPackageNames = {
+                    onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutputGroup.PACKAGE_NAME,
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.here.app.maps",
+                            MagicEarthOutput.PACKAGE_NAME,
+                            "appDetails.comaps.fdroid",
+                            "appDetails.organicmaps",
+                            "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
                             "us.spotco.maps",
-                        )
+                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
                     },
                 )
             }
@@ -280,27 +275,26 @@ private fun OneAppPreview() {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    position = Position.example,
-                    onRun = {},
-                    onQueryApp = { _, packageName ->
-                        AndroidTools.App(
+                    onRun = { _, _ -> },
+                    onQueryAppDetails = { _, packageName ->
+                        AndroidTools.AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
                     },
-                    onQueryGeoUriPackageNames = {
+                    onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutputGroup.PACKAGE_NAME,
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.here.app.maps",
+                            MagicEarthOutput.PACKAGE_NAME,
+                            "appDetails.comaps.fdroid",
+                            "appDetails.organicmaps",
+                            "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
                             "us.spotco.maps",
-                        )
+                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
                     },
                 )
             }
@@ -317,27 +311,26 @@ private fun DarkOneAppPreview() {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    position = Position.example,
-                    onRun = {},
-                    onQueryApp = { _, packageName ->
-                        AndroidTools.App(
+                    onRun = { _, _ -> },
+                    onQueryAppDetails = { _, packageName ->
+                        AndroidTools.AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
                         )
                     },
-                    onQueryGeoUriPackageNames = {
+                    onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutputGroup.PACKAGE_NAME,
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.here.app.maps",
+                            MagicEarthOutput.PACKAGE_NAME,
+                            "appDetails.comaps.fdroid",
+                            "appDetails.organicmaps",
+                            "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
                             "us.spotco.maps",
-                        )
+                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
                     },
                 )
             }
@@ -352,8 +345,7 @@ private fun NoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
-                    position = Position.example,
-                    onRun = {},
+                    onRun = { _, _ -> },
                 )
             }
         }
@@ -367,8 +359,7 @@ private fun DarkNoAppsPreview() {
         Surface {
             Column {
                 ResultSuccessApps(
-                    position = Position.example,
-                    onRun = {},
+                    onRun = { _, _ -> },
                 )
             }
         }

@@ -52,7 +52,7 @@ navigation, you can easily switch from Google Maps to your favorite
   clipboard in various formats, for example as a geo: link.
 - Shows all points of a **place list** link.
 - Allows performing an action **automatically** when a map link is processed.
-- Allows **launching navigation** in selected apps.
+- Allows **launching navigation** in TomTom, Google Maps, Magic Earth...
 - Allows saving a location as a **GPX file**.
 - Retries on **patchy internet connection**.
 - Allows **pasting map links** directly into the app, instead of sharing them
@@ -142,6 +142,13 @@ asking (the default), go to the app’s Preferences.
 Note that even with the need for Geo Share to connect to the internet in such
 situations, it may be considered a more private and secure approach as it
 wouldn’t allow JavaScript-based fingerprinting or code execution.
+
+## Location permission
+
+Geo Share asks for location permission when launching the TomTom navigation and
+when sharing a GPX route, because in these cases the app needs to create a GPX
+route that starts at your current location. The location information is
+discarded immediately after the creation of the route.
 
 ## Reporting issues
 

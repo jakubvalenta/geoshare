@@ -14,20 +14,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.allOutputGroups
-import page.ooooo.geoshare.lib.outputs.getActionOutputs
+import page.ooooo.geoshare.lib.outputs.CopyAction
+import page.ooooo.geoshare.lib.outputs.allOutputs
+import page.ooooo.geoshare.lib.outputs.getPositionActions
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultSuccessSheetContent(
-    copyActionsAndLabels: List<Pair<Action, String>>,
-    otherActionsAndLabels: List<Pair<Action, String>>,
+    position: Position,
+    i: Int?,
+    copyActions: List<Action>,
+    otherActions: List<Action>,
     headline: String? = null,
     onHide: () -> Unit,
-    onRun: (action: Action) -> Unit,
+    onRun: (action: Action, i: Int?) -> Unit,
 ) {
     headline?.let { headline ->
         val spacing = LocalSpacing.current
@@ -37,18 +40,18 @@ fun ResultSuccessSheetContent(
             style = MaterialTheme.typography.headlineSmall,
         )
     }
-    copyActionsAndLabels.forEach { (action, label) ->
-        ResultSuccessSheetItem(label, description = (action as? Action.Copy)?.text) {
-            onRun(action)
+    copyActions.mapNotNull { it as? CopyAction }.forEach { action ->
+        ResultSuccessSheetItem({ action.Label() }, description = action.getText(position, i)) {
+            onRun(action, i)
             onHide()
         }
     }
-    if (copyActionsAndLabels.isNotEmpty() && otherActionsAndLabels.isNotEmpty()) {
+    if (copyActions.isNotEmpty() && otherActions.isNotEmpty()) {
         HorizontalDivider()
     }
-    otherActionsAndLabels.forEach { (action, label) ->
-        ResultSuccessSheetItem(label) {
-            onRun(action)
+    otherActions.forEach { action ->
+        ResultSuccessSheetItem({ action.Label() }) {
+            onRun(action, i)
             onHide()
         }
     }
@@ -56,12 +59,12 @@ fun ResultSuccessSheetContent(
 
 @Composable
 private fun ResultSuccessSheetItem(
-    label: String,
+    label: @Composable () -> Unit,
     description: String? = null,
     onClick: () -> Unit,
 ) {
     ListItem(
-        headlineContent = { Text(label) },
+        headlineContent = label,
         modifier = Modifier.clickable(onClick = onClick),
         supportingContent = description?.let { text ->
             {
@@ -84,15 +87,18 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 val position = Position.example
-                val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(position) to it.label() }
-                    .partition { (action) -> action is Action.Copy }
+                val (copyActions, otherActions) = allOutputs
+                    .getPositionActions()
+                    .filter { it.isEnabled(position, null) }
+                    .partition { it is CopyAction }
                 ResultSuccessSheetContent(
-                    copyActionsAndLabels = copyActionsAndLabels,
-                    otherActionsAndLabels = otherActionsAndLabels,
+                    position = position,
+                    i = null,
+                    copyActions = copyActions,
+                    otherActions = otherActions,
                     headline = stringResource(R.string.conversion_succeeded_point_number, 3),
                     onHide = {},
-                    onRun = {},
+                    onRun = { _, _ -> },
                 )
             }
         }
@@ -106,15 +112,18 @@ private fun DarkPreview() {
         Surface {
             Column {
                 val position = Position.example
-                val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups.getActionOutputs()
-                    .map { it.getAction(position) to it.label() }
-                    .partition { (action) -> action is Action.Copy }
+                val (copyActions, otherActions) = allOutputs
+                    .getPositionActions()
+                    .filter { it.isEnabled(position, null) }
+                    .partition { it is CopyAction }
                 ResultSuccessSheetContent(
-                    copyActionsAndLabels = copyActionsAndLabels,
-                    otherActionsAndLabels = otherActionsAndLabels,
+                    position = position,
+                    i = null,
+                    copyActions = copyActions,
+                    otherActions = otherActions,
                     headline = stringResource(R.string.conversion_succeeded_point_number, 3),
                     onHide = {},
-                    onRun = {},
+                    onRun = { _, _ -> },
                 )
             }
         }

@@ -42,19 +42,19 @@ fun ResultError(
         chips = {
             if (!retryLoadingIndicatorVisible) {
                 ResultCardChip(
-                    stringResource(R.string.conversion_error_retry),
+                    { Text(stringResource(R.string.conversion_error_retry)) },
                     icon = {
                         Icon(Icons.Default.Refresh, null)
                     },
                     onClick = onRetry,
                 )
                 ResultCardChip(
-                    stringResource(R.string.conversion_error_report),
+                    { Text(stringResource(R.string.conversion_error_report)) },
                 ) {
                     uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
                 ResultCardChip(
-                    stringResource(R.string.url_converters_title),
+                    { Text(stringResource(R.string.url_converters_title)) },
                     icon = {
                         Icon(Icons.Outlined.Info, null)
                     },

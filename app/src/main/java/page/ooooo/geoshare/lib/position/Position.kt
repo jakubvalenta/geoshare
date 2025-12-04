@@ -46,11 +46,9 @@ data class Position(
 
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
 
-    fun writeGpx(writer: Appendable) = writer.apply {
-        append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
-        append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
-        append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
-        append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
+    fun getPoint(i: Int?): Point? = if (i == null) mainPoint else points?.getOrNull(i)
+
+    fun writeGpxPoints(writer: Appendable) = writeGpx(writer) {
         points?.map { point ->
             point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                 append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
@@ -63,6 +61,33 @@ data class Position(
                 append(" />\n")
             }
         }
+    }
+
+    fun writeGpxRoute(writer: Appendable) = writeGpx(writer) {
+        append("<rte>\n")
+        points?.map { point ->
+            point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                @Suppress("SpellCheckingInspection")
+                append("<rtept lat=\"$latStr\" lon=\"$lonStr\"")
+            }
+            if (point.name != null) {
+                append(">\n")
+                append("    <name>${point.name.escapeHTML()}</name>\n")
+                @Suppress("SpellCheckingInspection")
+                append("</rtept>\n")
+            } else {
+                append(" />\n")
+            }
+        }
+        append("</rte>\n")
+    }
+
+    private fun writeGpx(writer: Appendable, block: Appendable.() -> Unit) = writer.apply {
+        append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n")
+        append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\"\n")
+        append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
+        append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
+        writer.block()
         append("</gpx>\n")
     }
 }

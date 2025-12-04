@@ -1,76 +1,83 @@
 package page.ooooo.geoshare.lib
 
+import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.net.Uri
+import android.location.Location
+import android.location.LocationManager
 import android.os.Build
+import android.os.CancellationSignal
+import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
+import androidx.core.content.FileProvider
+import androidx.core.location.LocationListenerCompat
 import androidx.core.net.toUri
+import kotlinx.coroutines.*
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.position.Srs
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 
 object AndroidTools {
 
     const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
 
-    data class App(val packageName: String, val label: String, val icon: Drawable)
+    enum class AppType { GEO_URI, GPX }
 
-    private fun createViewIntent(packageName: String, data: Uri): Intent = Intent(Intent.ACTION_VIEW, data).apply {
-        setPackage(packageName)
-    }
+    data class App(val packageName: String, val type: AppType)
 
-    private fun createChooserIntent(data: Uri): Intent = Intent.createChooser(
-        Intent(Intent.ACTION_VIEW, data),
-        "Choose an app",
-    ).apply {
-        putExtra(
-            Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
-                @Suppress("SpellCheckingInspection")
-                (ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity")),
-                @Suppress("SpellCheckingInspection")
-                (ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity")),
-            )
-        )
-    }
+    data class AppDetails(val packageName: String, val label: String, val icon: Drawable)
 
-    fun getIntentUriString(intent: Intent): String? {
+    fun getIntentUriString(intent: Intent): String? =
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
                 val intentData: String? = intent.data?.toString()
                 if (intentData == null) {
                     Log.w(null, "Missing intent data")
-                    return null
+                    null
+                } else {
+                    intentData
                 }
-                return intentData
             }
 
             Intent.ACTION_SEND -> {
                 val intentText = intent.getStringExtra("android.intent.extra.TEXT")
                 if (intentText == null) {
                     Log.w(null, "Missing intent extra text")
-                    return null
+                    null
+                } else {
+                    intentText
                 }
-                return intentText
             }
 
             else -> {
                 Log.w(null, "Unsupported intent action $intentAction")
-                return null
+                null
             }
         }
-    }
 
-    fun queryApp(packageManager: PackageManager, packageName: String): App? {
+    fun queryAppDetails(packageManager: PackageManager, packageName: String): AppDetails? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
@@ -78,7 +85,7 @@ object AndroidTools {
             return null
         }
         return try {
-            App(
+            AppDetails(
                 applicationInfo.packageName,
                 applicationInfo.loadLabel(packageManager).toString(),
                 applicationInfo.loadIcon(packageManager),
@@ -89,39 +96,202 @@ object AndroidTools {
         }
     }
 
-    fun queryGeoUriPackageNames(packageManager: PackageManager): List<String> {
+    private fun queryPackageNames(packageManager: PackageManager, intent: Intent): List<String> {
         val resolveInfos = try {
-            packageManager.queryIntentActivities(
-                Intent(Intent.ACTION_VIEW, "geo:".toUri()),
-                PackageManager.MATCH_DEFAULT_ONLY,
-            )
+            packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
         } catch (e: Exception) {
-            Log.e(null, "Error when querying apps that support geo: URIs", e)
+            Log.e(null, "Error when querying installed apps", e)
             return emptyList()
         }
         return resolveInfos.mapNotNull { resolveInfo ->
             val packageName = try {
                 resolveInfo.activityInfo.packageName
             } catch (e: Exception) {
-                Log.e(null, "Error when loading info about an app that supports geo: URIs", e)
+                Log.e(null, "Error when loading info about an installed app", e)
                 null
             }
             packageName?.takeUnless { it == BuildConfig.APPLICATION_ID }
         }
     }
 
-    private fun startActivity(context: Context, intent: Intent): Boolean = try {
-        context.startActivity(intent)
-        true
-    } catch (_: ActivityNotFoundException) {
-        false
+    fun queryApps(packageManager: PackageManager): List<App> = buildList {
+        val geoUriPackageNames = queryPackageNames(
+            packageManager,
+            Intent(Intent.ACTION_VIEW, "geo:".toUri()),
+        )
+        addAll(geoUriPackageNames.map { App(it, AppType.GEO_URI) })
+        val gpxPackageNames = queryPackageNames(
+            packageManager,
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType("content:".toUri(), "application/gpx+xml")
+            },
+        )
+        addAll(gpxPackageNames.filter { it !in geoUriPackageNames }.map { App(it, AppType.GPX) })
     }
 
+    private fun startActivity(context: Context, intent: Intent): Boolean =
+        try {
+            context.startActivity(intent)
+            true
+        } catch (_: ActivityNotFoundException) {
+            false
+        }
+
+    private fun createChooser(intent: Intent): Intent =
+        Intent.createChooser(
+            intent,
+            "Choose an app",
+        ).apply {
+            putExtra(
+                Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
+                    @Suppress("SpellCheckingInspection")
+                    (ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity")),
+                    @Suppress("SpellCheckingInspection")
+                    (ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity")),
+                )
+            )
+        }
+
     fun openApp(context: Context, packageName: String, uriString: String): Boolean =
-        startActivity(context, createViewIntent(packageName, uriString.toUri()))
+        startActivity(
+            context,
+            Intent(Intent.ACTION_VIEW, uriString.toUri()).apply {
+                setPackage(packageName)
+            },
+        )
+
+    fun openAppFile(context: Context, packageName: String, file: File): Boolean {
+        val uri = try {
+            @Suppress("SpellCheckingInspection")
+            FileProvider.getUriForFile(context, "page.ooooo.geoshare.FileProvider", file)
+        } catch (e: IllegalArgumentException) {
+            Log.e(null, "Error when getting URI for file", e)
+            return false
+        }
+        return startActivity(
+            context,
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, context.contentResolver.getType(uri))
+                setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                setPackage(packageName)
+            },
+        )
+    }
 
     fun openChooser(context: Context, uriString: String): Boolean =
-        startActivity(context, createChooserIntent(uriString.toUri()))
+        startActivity(
+            context,
+            createChooser(
+                Intent(Intent.ACTION_VIEW, uriString.toUri()),
+            ),
+        )
+
+    fun openChooserFile(context: Context, file: File): Boolean {
+        val uri = try {
+            @Suppress("SpellCheckingInspection")
+            FileProvider.getUriForFile(context, "page.ooooo.geoshare.FileProvider", file)
+        } catch (e: IllegalArgumentException) {
+            Log.e(null, "Error when getting URI for file", e)
+            return false
+        }
+        return startActivity(
+            context,
+            createChooser(
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, context.contentResolver.getType(uri))
+                    setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                },
+            ),
+        )
+    }
+
+    fun hasLocationPermission(context: Context): Boolean =
+        context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private suspend fun getCurrentLocation(
+        locationManager: LocationManager,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): Point? = withContext(dispatcher) {
+        suspendCancellableCoroutine { cont ->
+            val cancellationSignal = CancellationSignal()
+            try {
+                locationManager.getCurrentLocation(
+                    LocationManager.GPS_PROVIDER,
+                    cancellationSignal,
+                    dispatcher.asExecutor(),
+                ) { location: Location? ->
+                    cont.resume(location?.let { Point(Srs.WGS84, it.latitude, it.longitude) })
+                }
+            } catch (e: Exception) {
+                cont.resumeWithException(e)
+            }
+            cont.invokeOnCancellation {
+                cancellationSignal.cancel()
+            }
+        }
+    }
+
+    /**
+     * See https://stackoverflow.com/a/71710276
+     */
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private suspend fun getCurrentLocationPreS(
+        locationManager: LocationManager,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    ): Point? = withContext(dispatcher) {
+        withTimeoutOrNull(30.seconds) {
+            suspendCancellableCoroutine { cont ->
+                try {
+                    @Suppress("DEPRECATION")
+                    locationManager.requestSingleUpdate(
+                        LocationManager.GPS_PROVIDER,
+                        object : LocationListenerCompat {
+                            // Use LocationListenerCompat instead of LocationListener or lambda, so that we don't have
+                            // to override onStatusChanged on Android Q and older.
+                            override fun onLocationChanged(location: Location) {
+                                cont.resume(location.let { Point(Srs.WGS84, it.latitude, it.longitude) })
+                            }
+                        },
+                        Looper.getMainLooper(),
+                    )
+                } catch (e: Exception) {
+                    Log.e(null, "Error when getting location", e)
+                    cont.resumeWithException(e)
+                }
+            }
+        }
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun getLastKnownLocation(locationManager: LocationManager, maxAge: Duration = 1.minutes): Point? =
+        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            ?.takeIf { (SystemClock.elapsedRealtimeNanos() - it.elapsedRealtimeNanos).nanoseconds <= maxAge }
+            ?.let { Point(Srs.WGS84, it.latitude, it.longitude) }
+
+    suspend fun getLocation(context: Context): Point? {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return try {
+            val lastKnownLocation = getLastKnownLocation(locationManager)
+            if (lastKnownLocation != null) {
+                lastKnownLocation
+            } else {
+                // Use a small delay to prevent Android from asking for location permission twice, once for
+                // getLastKnownLocation() and once for getCurrentLocation()
+                delay(500.milliseconds)
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+                    getCurrentLocation(locationManager)
+                } else {
+                    getCurrentLocationPreS(locationManager)
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e(null, "Security error when getting location", e)
+            null
+        }
+    }
 
     fun isDefaultHandlerEnabled(packageManager: PackageManager, uriString: String): Boolean {
         val resolveInfo = try {

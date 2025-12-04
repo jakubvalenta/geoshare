@@ -16,7 +16,10 @@ import page.ooooo.geoshare.data.local.preferences.*
 import page.ooooo.geoshare.lib.SavableDelegate
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.inputs.allInputs
+import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.position.Point
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +27,7 @@ class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         userPreferencesRepository = userPreferencesRepository,
@@ -35,7 +39,7 @@ class ConversionViewModel @Inject constructor(
                 loadingIndicatorJob = viewModelScope.launch {
                     // Show loading indicator only if the state lasts longer than 200ms.
                     delay(200L)
-                    _loadingIndicatorTitleResId.value = newState.loadingIndicatorTitleResId
+                    _loadingIndicator.value = newState.loadingIndicator
                 }
             }
 
@@ -44,7 +48,7 @@ class ConversionViewModel @Inject constructor(
                 loadingIndicatorJob = viewModelScope.launch {
                     // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
                     delay(200L)
-                    _loadingIndicatorTitleResId.value = null
+                    _loadingIndicator.value = null
                 }
             }
         }
@@ -59,8 +63,8 @@ class ConversionViewModel @Inject constructor(
         "",
     )
 
-    private val _loadingIndicatorTitleResId = MutableStateFlow<Int?>(null)
-    val loadingIndicatorTitleResId: StateFlow<Int?> = _loadingIndicatorTitleResId
+    private val _loadingIndicator = MutableStateFlow<LoadingIndicator?>(null)
+    val loadingIndicator: StateFlow<LoadingIndicator?> = _loadingIndicator
 
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
@@ -156,21 +160,80 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun finishAutomation(success: Boolean?) {
-        (stateContext.currentState as? AutomationReady)?.let { currentState ->
-            stateContext.currentState = AutomationRan(
-                stateContext,
-                currentState.inputUriString,
-                currentState.position,
-                currentState.automation,
-                success
+    fun showLocationRationale(action: LocationAction, i: Int?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationRationaleShown(
+                currentState.inputUriString, currentState.position, i, action
+            )
+            transition()
+        }
+    }
+
+    fun skipLocationRationale(action: LocationAction, i: Int?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationPermissionReceived(
+                currentState.inputUriString, currentState.position, i, action
+            )
+            transition()
+        }
+    }
+
+    fun receiveLocationPermission() {
+        (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
+            stateContext.currentState = LocationPermissionReceived(
+                currentState.inputUriString, currentState.position, currentState.i, currentState.action
+            )
+            transition()
+        }
+    }
+
+    fun receiveLocation(action: LocationAction, i: Int?, location: Point?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = LocationReceived(
+                currentState.inputUriString, currentState.position, i, action, location
+            )
+            transition()
+        }
+    }
+
+    fun cancelLocationFinding() {
+        (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
+            stateContext.currentState = ActionFinished(
+                currentState.inputUriString, currentState.position, currentState.action
+            )
+            transition()
+        }
+    }
+
+    fun runAction(action: Action, i: Int?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            stateContext.currentState = ActionReady(
+                currentState.inputUriString, currentState.position, i, action
+            )
+            transition()
+        }
+    }
+
+    fun finishBasicAction(success: Boolean?) {
+        (stateContext.currentState as? BasicActionReady)?.let { currentState ->
+            stateContext.currentState = ActionRan(
+                currentState.inputUriString, currentState.position, currentState.action, success
+            )
+            transition()
+        }
+    }
+
+    fun finishLocationAction(success: Boolean?) {
+        (stateContext.currentState as? LocationActionReady)?.let { currentState ->
+            stateContext.currentState = ActionRan(
+                currentState.inputUriString, currentState.position, currentState.action, success
             )
             transition()
         }
     }
 
     fun writeGpx(writer: Appendable) {
-        (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpx(writer)
+        (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpxPoints(writer)
     }
 
     private fun transition() {

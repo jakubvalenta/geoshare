@@ -29,19 +29,19 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ResultSuccessCoordinates(
     position: Position,
-    onRun: (action: Action) -> Unit,
+    onRun: (action: Action, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     Column {
-        (allOutputGroups.getNameOutput()?.getText(position, position.pointCount - 1, position.pointCount)
+        (allOutputs.getName(position, null)
             ?: stringResource(R.string.conversion_succeeded_title)).let { text ->
             Headline(text, Modifier.testTag("geoShareConversionSuccessPositionName"))
         }
         ResultCard(
             main = {
-                allOutputGroups.getTextOutput()?.getText(position)?.let { text ->
+                allOutputs.getText(position, null)?.let { text ->
                     SelectionContainer {
                         Text(
                             text,
@@ -50,7 +50,7 @@ fun ResultSuccessCoordinates(
                         )
                     }
                 }
-                allOutputGroups.getDescriptionOutput()?.getText(position)?.takeIf { it.isNotEmpty() }?.let { text ->
+                allOutputs.getDescription(position)?.takeIf { it.isNotEmpty() }?.let { text ->
                     SelectionContainer {
                         Text(
                             text,
@@ -78,17 +78,10 @@ fun ResultSuccessCoordinates(
             bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
                 {
                     Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
-                        val menuPointOutputs = allPointOutputGroups.getActionOutputs()
-                        val textPointOutput = allPointOutputGroups.getTextOutput()
-                        val namePointOutput = allPointOutputGroups.getNameOutput()
-                        points.forEachIndexed { i, point ->
+                        points.indices.forEach { i ->
                             ResultSuccessPoint(
+                                position = position,
                                 i = i,
-                                point = point,
-                                pointCount = position.pointCount,
-                                textPointOutput = textPointOutput,
-                                namePointOutput = namePointOutput,
-                                menuPointOutputs = menuPointOutputs,
                                 onRun = onRun,
                             )
                         }
@@ -96,10 +89,10 @@ fun ResultSuccessCoordinates(
                 }
             },
             chips = {
-                allOutputGroups.getChipOutputs()
-                    .filter { it.isEnabled(position) }
-                    .forEach {
-                        ResultCardChip(it.label()) { onRun(it.getAction(position)) }
+                allOutputs.getChipActions()
+                    .filter { it.isEnabled(position, null) }
+                    .forEach { action ->
+                        ResultCardChip({ action.Label() }) { onRun(action, null) }
                     }
             },
         )
@@ -107,14 +100,15 @@ fun ResultSuccessCoordinates(
             sheetVisible = sheetVisible,
             onSetSheetVisible = setSheetVisible,
         ) { onHide ->
-            val (copyActionsAndLabels, otherActionsAndLabels) = allOutputGroups
-                .getActionOutputs()
-                .filter { it.isEnabled(position) }
-                .map { it.getAction(position) to it.label() }
-                .partition { (action) -> action is Action.Copy }
+            val (copyActions, otherActions) = allOutputs
+                .getPositionActions()
+                .filter { it.isEnabled(position, null) }
+                .partition { it is CopyAction }
             ResultSuccessSheetContent(
-                copyActionsAndLabels = copyActionsAndLabels,
-                otherActionsAndLabels = otherActionsAndLabels,
+                position = position,
+                i = null,
+                copyActions = copyActions,
+                otherActions = otherActions,
                 onHide = onHide,
                 onRun = onRun,
             )
@@ -134,7 +128,7 @@ private fun DefaultPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example,
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -150,7 +144,7 @@ private fun DarkPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example,
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -166,7 +160,7 @@ private fun DescriptionPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -182,7 +176,7 @@ private fun DarkDescriptionPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -198,7 +192,7 @@ private fun LabelPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -214,7 +208,7 @@ private fun DarkLabelPreview() {
         ) {
             ResultSuccessCoordinates(
                 position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -236,7 +230,7 @@ private fun PointsPreview() {
                         Point.genRandomPoint(),
                     ),
                 ),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -258,7 +252,7 @@ private fun DarkPointsPreview() {
                         Point.genRandomPoint(),
                     ),
                 ),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -282,7 +276,7 @@ private fun PointsAndDescriptionPreview() {
                     q = "Berlin, Germany",
                     z = 13.0,
                 ),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }
@@ -306,7 +300,7 @@ private fun DarkPointsAndDescriptionPreview() {
                     q = "Berlin, Germany",
                     z = 13.0,
                 ),
-                onRun = {},
+                onRun = { _, _ -> },
             )
         }
     }

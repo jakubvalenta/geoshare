@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.extensions.matchLatLonZ
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.extensions.toLatLon
-import page.ooooo.geoshare.lib.outputs.GeoUriOutputGroup
+import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.PositionBuilder
@@ -27,8 +27,9 @@ object GeoUriInput : Input {
             Input.DocumentationInput.Text(3) {
                 stringResource(
                     R.string.example,
-                    GeoUriOutputGroup.formatUriString(
+                    GeoUriOutput.formatUriString(
                         Position.example,
+                        null,
                         Srs.WGS84,
                         nameDisabled = false,
                         zoomDisabled = false,

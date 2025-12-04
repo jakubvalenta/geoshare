@@ -2,6 +2,8 @@ package page.ooooo.geoshare
 
 import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.test.uiautomator.UiObject2
+import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.*
@@ -13,22 +15,36 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
-import page.ooooo.geoshare.lib.outputs.allOutputGroups
-import page.ooooo.geoshare.lib.outputs.getDescriptionOutput
-import page.ooooo.geoshare.lib.outputs.getTextOutput
+import page.ooooo.geoshare.lib.outputs.GpxOutput
+import page.ooooo.geoshare.lib.outputs.allOutputs
+import page.ooooo.geoshare.lib.outputs.getDescription
+import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.lib.position.Position
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
 abstract class BaseActivityBehaviorTest {
+
     companion object {
         @Suppress("SpellCheckingInspection")
         const val PACKAGE_NAME = "page.ooooo.geoshare.debug"
-        const val LAUNCH_TIMEOUT = 10_000L
-        const val TIMEOUT = 10_000L
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
         val NETWORK_TIMEOUT = (1..MAX_RETRIES).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
             acc + (EXPONENTIAL_DELAY_BASE.pow(curr - 1) * EXPONENTIAL_DELAY_BASE_DELAY).roundToLong() + CONNECT_TIMEOUT + REQUEST_TIMEOUT
+        }
+    }
+
+    class DialogElement(val dialog: UiObject2) {
+        fun confirm() {
+            dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }.click()
+        }
+
+        fun dismiss() {
+            dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDismissButton" }.click()
+        }
+
+        fun toggleDoNotAsk() {
+            dialog.onElement { viewIdResourceName == "geoShareConfirmationDialogDoNotAskSwitch" }.click()
         }
     }
 
@@ -43,11 +59,14 @@ abstract class BaseActivityBehaviorTest {
         device.executeShellCommand("monkey -p $PACKAGE_NAME 1")
 
         // Wait for the app to appear
-        waitForAppToBeVisible(PACKAGE_NAME, LAUNCH_TIMEOUT)
+        waitForAppToBeVisible(PACKAGE_NAME)
     }
 
     protected fun closeApplication() = uiAutomator {
-        assertNotXiaomi()
+        assertFalse(
+            "We cannot close the app on Xiaomi MIUI, because it stops the tests",
+            AndroidTools.isMiuiDevice(),
+        )
         device.pressRecentApps()
         waitForStableInActiveWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -55,15 +74,27 @@ abstract class BaseActivityBehaviorTest {
             if (menu != null) {
                 // On Android API >= 36.1, use the dropdown menu
                 menu.click()
-                onElement { textAsString() == "Clear" }.click()
+                onElement {
+                    when (textAsString()) {
+                        "Clear", "Effacer" -> true
+                        else -> false
+                    }
+                }.click()
             } else {
                 // On Android API >= 28, swipe from the center of the screen towards the upper edge
                 device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
-            @Suppress("SpellCheckingInspection")
-            if (onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { textAsString() == "No recent items" || textAsString() == "Aucun élément récent" } != null) {
+            if (
+                onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
+                    @Suppress("SpellCheckingInspection")
+                    when (textAsString()) {
+                        "No recent items", "Aucun élément récent" -> true
+                        else -> false
+                    }
+                } != null
+            ) {
                 // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
                 device.pressRecentApps()
                 waitForStableInActiveWindow()
@@ -71,8 +102,12 @@ abstract class BaseActivityBehaviorTest {
                 waitForStableInActiveWindow()
             }
             device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, displayHeight, 10) }
-            // waitForStableInActiveWindow()
-            onElement { textAsString() == "CLEAR ALL" || textAsString() == "TOUT EFFACER" }.click()
+            onElement {
+                when (textAsString()) {
+                    "CLEAR ALL", "TOUT EFFACER" -> true
+                    else -> false
+                }
+            }.click()
         }
         waitForStableInActiveWindow()
     }
@@ -82,48 +117,120 @@ abstract class BaseActivityBehaviorTest {
         onElement { viewIdResourceName == "geoShareIntroScreenCloseButton" }.click()
     }
 
-
-    protected fun assertGoogleMapsInstalled() = uiAutomator {
-        assertTrue(
-            "This test only works when Google Maps is installed on the device",
-            device.executeShellCommand("pm path $GOOGLE_MAPS_PACKAGE_NAME").isNotEmpty(),
-        )
+    protected fun onDialog(
+        resourceName: String,
+        timeoutMs: Long = 10_000L,
+        block: DialogElement.() -> Unit,
+    ) = uiAutomator {
+        val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
+        DialogElement(dialog).block()
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == resourceName })
     }
 
-    protected fun assertNotXiaomi() = uiAutomator {
-        assertFalse(
-            "We cannot close the app on Xiaomi MIUI, because it stops the tests",
-            AndroidTools.isMiuiDevice(),
+    private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =
+        @Suppress("SpellCheckingInspection")
+        when (element.textAsString()?.lowercase()) {
+            "only this time", "uniquement cette fois-ci" -> true
+            else -> false
+        }
+
+    protected fun grantLocationPermission() = uiAutomator {
+        onElement { isLocationGrantButton(this) }.click()
+    }
+
+    protected fun grantLocationPermissionIfNecessary() = uiAutomator {
+        onElementOrNull(3_000L) { isLocationGrantButton(this) }?.click()
+    }
+
+    protected fun denyLocationPermission() = uiAutomator {
+        onElement {
+            @Suppress("SpellCheckingInspection")
+            when (textAsString()?.lowercase()) {
+                "don't allow", "don’t allow", "ne pas autoriser" -> true
+                else -> false
+            }
+        }.click()
+    }
+
+    protected fun assertAppInstalled(packageName: String) = uiAutomator {
+        assertTrue(
+            "This test only works when $packageName is installed on the device",
+            device.executeShellCommand("pm path $packageName").isNotEmpty(),
         )
     }
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val expectedText = allOutputGroups.getTextOutput()?.getText(expectedPosition)
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" && textAsString() == expectedText }
+        val expectedText = allOutputs.getText(expectedPosition, null)
+        val coordinatesElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" }
+        assertEquals(expectedText, coordinatesElement.text)
         val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
             ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
-            ?: "Coordinates"
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" && textAsString() == expectedName }
+        val nameElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" }
+        if (expectedName != null) {
+            assertEquals(expectedName, nameElement.text)
+        } else {
+            assertTrue(
+                @Suppress("SpellCheckingInspection")
+                when (nameElement.text) {
+                    "Coordinates", "Coordonnées" -> true
+                    else -> false
+                }
+            )
+        }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
-            val expectedDescription = allOutputGroups.getDescriptionOutput()?.getText(expectedPosition)
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" && textAsString() == expectedDescription }
+            val expectedDescription = allOutputs.getDescription(expectedPosition)
+            val descriptionElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" }
+            assertEquals(expectedDescription, descriptionElement.text)
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })
         }
     }
 
-    protected fun waitAndAssertGoogleMapsShowsText(expectedText: String) = uiAutomator {
+    protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps
         onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME }
 
         // If there is a Google Maps sign in screen, skip it
-        onElementOrNull(3_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == "Make it your map" }?.also {
-            onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString()?.lowercase() == "skip" }.click()
+        onElementOrNull(3_000L) {
+            packageName == GOOGLE_MAPS_PACKAGE_NAME &&
+                @Suppress("SpellCheckingInspection")
+                when (textAsString()) {
+                    "Make it your map", "Profitez d'une carte personnalisée" -> true
+                    else -> false
+                }
+        }?.also {
+            onElement {
+                packageName == GOOGLE_MAPS_PACKAGE_NAME &&
+                    when (textAsString()?.lowercase()) {
+                        "skip", "ignorer" -> true
+                        else -> false
+                    }
+            }.click()
         }
 
         // Verify Google Maps content
-        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && textAsString() == expectedText }
+        onElement { packageName == GOOGLE_MAPS_PACKAGE_NAME && this.block() }
+    }
+
+    protected fun waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
+        // Wait for TomTom
+        onElement(20_000L) { packageName == GpxOutput.TOMTOM_PACKAGE_NAME }
+
+        // If there is location permission, grant it
+        grantLocationPermissionIfNecessary()
+
+        // If there is Importing GPX tracks dialog, confirm it
+        onElementOrNull(3_000L) {
+            @Suppress("SpellCheckingInspection")
+            when (textAsString()) {
+                "Got it", "J'ai compris" -> true
+                else -> false
+            }
+        }?.click()
+
+        // Verify TomTom content
+        onElement { packageName == GpxOutput.TOMTOM_PACKAGE_NAME && this.block() }
     }
 
     protected fun shareUri(unsafeUriString: String) = uiAutomator {
