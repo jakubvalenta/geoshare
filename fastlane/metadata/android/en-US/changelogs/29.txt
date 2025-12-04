@@ -1,1 +1,1 @@
-- Added support for starting TomTom navigation.
+- Added support for launching TomTom navigation (asks for location permission).
