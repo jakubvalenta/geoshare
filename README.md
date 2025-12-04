@@ -127,7 +127,7 @@ a geo: URI:
 
    If you allow connecting to the map service, then Geo Share makes an **HTTP
    HEAD request** to the short link and reads the full link from the response
-   headers. You can imagine it as `curl -I
+   headers. You can imagine it as `curl --head
    https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:`. Then Geo Share
    continues with scenario 1 or 2, depending on whether the full link contains
    coordinates or not. In case of scenario 2, another connection to the map
