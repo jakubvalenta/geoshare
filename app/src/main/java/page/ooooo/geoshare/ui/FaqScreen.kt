@@ -23,15 +23,17 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 enum class FaqItemId {
     HOW_IT_WORKS,
+    LOCATION_PERMISSION,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(
+    initialExpandedItemId: FaqItemId? = null,
     onBack: () -> Unit = {},
 ) {
     val spacing = LocalSpacing.current
-    var expandedItemId by remember { mutableStateOf<FaqItemId?>(FaqItemId.HOW_IT_WORKS) }
+    var expandedItemId by remember { mutableStateOf(initialExpandedItemId) }
 
     Scaffold(
         topBar = {
@@ -66,6 +68,16 @@ fun FaqScreen(
             ) {
                 ParagraphHtml(
                     stringResource(R.string.faq_how_it_works_text, appName)
+                )
+            }
+            FaqItem(
+                itemId = FaqItemId.LOCATION_PERMISSION,
+                expandedItemId = expandedItemId,
+                onSetExpandedItemId = { expandedItemId = it },
+                stringResource(R.string.faq_location_permission_headline),
+            ) {
+                ParagraphHtml(
+                    stringResource(R.string.faq_location_permission_text, appName)
                 )
             }
         }
@@ -128,5 +140,37 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         FaqScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HowItWorksPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkHowItWorksPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LocationPermissionPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.LOCATION_PERMISSION)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkLocationPermissionPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.LOCATION_PERMISSION)
     }
 }

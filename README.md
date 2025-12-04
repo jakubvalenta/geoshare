@@ -143,6 +143,13 @@ Note that even with the need for Geo Share to connect to the internet in such
 situations, it may be considered a more private and secure approach as it
 wouldn’t allow JavaScript-based fingerprinting or code execution.
 
+## Location permission
+
+Geo Share asks for location permission when launching the TomTom navigation and
+when sharing a GPX route, because in these cases the app needs to create a GPX
+route that starts at your current location. The location information is
+discarded immediately after the creation of the route.
+
 ## Reporting issues
 
 Geo Share supports many types of map links. If you still find a link that
