@@ -49,7 +49,6 @@ data class Position(
 
     fun getPoint(i: Int?): Point? = if (i == null) mainPoint else points?.getOrNull(i)
 
-    // TODO Test setMainPointName
     fun setMainPointName(name: String): Position = if (points?.isNotEmpty() == true && points.last().name == null) {
         this.copy(points = (points.dropLast(1) + points.last().copy(name = name)).toImmutableList())
     } else {
