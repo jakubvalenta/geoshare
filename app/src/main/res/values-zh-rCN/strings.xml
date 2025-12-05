@@ -40,7 +40,7 @@
     <string name="conversion_failed_unshorten_error">无法解析短链接</string>
     <string name="conversion_failed_parse_url_error">无法处理地图链接</string>
     <string name="conversion_succeeded_apps_not_found">未安装地图应用</string>
-    <string name="copying_finished">已将坐标复制到剪贴板</string>
+    <string name="copying_finished">已复制到剪贴板</string>
     <string name="conversion_failed_connection_permission_denied">如果不连接到地图服务，则不支持此链接</string>
     <string name="conversion_failed_parse_html_error">无法从地图服务获取网页</string>
     <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
