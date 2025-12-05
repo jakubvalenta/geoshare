@@ -164,10 +164,9 @@
     <string name="url_converters_text">You can share the following map links with %1$s or paste them in the app.</string>
     <string name="url_converters_filter_all">All map services</string>
     <string name="url_converters_filter_recent">Recently added</string>
-    <string name="url_converters_default_handler_header">Opens by default in %1$s</string>
-    <string name="url_converters_default_handler_disabled">Doesn’t open by default in %1$s</string>
-    <string name="url_converters_recent_info">%1$s recently got support for new map services.</string>
+    <string name="url_converters_default_handler">Opens by default in %1$s</string>
     <string name="url_converters_settings_button">Configure opening by default</string>
+    <string name="url_converters_url">URL</string>
     <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
     <string name="network_exception_request_timeout" translatable="false">request timeout</string>
     <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
@@ -175,5 +174,4 @@
     <string name="network_exception_server_response_error" translatable="false">server response error</string>
     <string name="network_exception_response_error" translatable="false">response error</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
-    <string name="url_converters_url_header">URL</string>
 </resources>

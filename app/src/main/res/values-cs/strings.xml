@@ -106,9 +106,7 @@
     <string name="converter_open_street_map_loading_indicator_title">Spojování s OpenStreetMap…</string>
     <string name="url_converters_filter_all">Všechny mapové služby</string>
     <string name="url_converters_filter_recent">Nedávno přidané</string>
-    <string name="url_converters_default_handler_header">Otevírá se v %1$s</string>
-    <string name="url_converters_default_handler_disabled">Neotevírá se v %1$s</string>
-    <string name="url_converters_recent_info">Do %1$s byla nedávno přidaná podpora pro nové mapové služby.</string>
+    <string name="url_converters_default_handler">Otevírá se v %1$s</string>
     <string name="url_converters_settings_button">Otevřít nastavení Androidu</string>
     <string name="conversion_loading_indicator_description">Pokus %1$d z %2$d kvůli %3$s.</string>
     <string name="conversion_automation_copy_link_succeeded">Odkaz byl automaticky zkopírován</string>

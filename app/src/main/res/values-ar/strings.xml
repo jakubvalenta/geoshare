@@ -107,9 +107,7 @@
     <string name="converter_open_street_map_loading_indicator_title">يتصل ب OpenStreetMap…</string>
     <string name="url_converters_filter_all">جميع خدمات الخرائط</string>
     <string name="url_converters_filter_recent">مضافة مؤخرًا</string>
-    <string name="url_converters_default_handler_header">يُفتح افتراضيًا في %1$s</string>
-    <string name="url_converters_default_handler_disabled">لا يُفتح افتراضيًا في %1$s</string>
-    <string name="url_converters_recent_info">حصل %1$s مؤخرًا على دعم لخدمات خرائط جديدة.</string>
+    <string name="url_converters_default_handler">يُفتح افتراضيًا في %1$s</string>
     <string name="url_converters_settings_button">افتح إعدادات Android</string>
     <string name="conversion_loading_indicator_description">المحاولة %1$d من أصل %2$d بسبب %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">فشل حفظ GPX</string>

@@ -102,9 +102,7 @@
     <string name="converter_open_street_map_loading_indicator_title">正在连接到 OpenStreetMap…</string>
     <string name="url_converters_filter_all">所有地图服务</string>
     <string name="url_converters_filter_recent">最近添加的</string>
-    <string name="url_converters_default_handler_header">在 %1$s 中默认打开</string>
-    <string name="url_converters_default_handler_disabled">在 %1$s 中不默认打开</string>
-    <string name="url_converters_recent_info">%1$s 最近支持了新的地图服务。</string>
+    <string name="url_converters_default_handler">在 %1$s 中默认打开</string>
     <string name="url_converters_settings_button">打开 Android 设置</string>
     <string name="conversion_loading_indicator_description">由于 %3$s， 第 %1$d 次尝试，共 %2$d 次。</string>
     <string name="conversion_succeeded_save_gpx_failed">无法保存 GPX</string>

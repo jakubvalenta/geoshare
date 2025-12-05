@@ -105,9 +105,7 @@
     <string name="converter_open_street_map_loading_indicator_title">Підключення до OpenStreetMap…</string>
     <string name="url_converters_filter_all">Усі картографічні сервіси</string>
     <string name="url_converters_filter_recent">Нещодавно додано</string>
-    <string name="url_converters_default_handler_header">Відкривається за замовчуванням у %1$s</string>
-    <string name="url_converters_default_handler_disabled">Не відкривається за замовчуванням у %1$s</string>
-    <string name="url_converters_recent_info">%1$s нещодавно отримав підтримку нових картографічних сервісів.</string>
+    <string name="url_converters_default_handler">Відкривається за замовчуванням у %1$s</string>
     <string name="url_converters_settings_button">Відкрийте налаштування Android</string>
     <string name="conversion_loading_indicator_description">Спроба %1$d з %2$d через %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Не вдалося зберегти GPX</string>

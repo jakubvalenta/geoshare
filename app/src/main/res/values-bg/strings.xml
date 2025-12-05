@@ -103,9 +103,7 @@
     <string name="converter_open_street_map_loading_indicator_title">Свързване с OpenStreetMap…</string>
     <string name="url_converters_filter_all">Всички картографски услуги</string>
     <string name="url_converters_filter_recent">Наскоро добавени</string>
-    <string name="url_converters_default_handler_header">Отваря се по подразбиране в %1$s</string>
-    <string name="url_converters_default_handler_disabled">Не се отваря по подразбиране в %1$s</string>
-    <string name="url_converters_recent_info">%1$s наскоро получи поддръжка за нови картографски услуги.</string>
+    <string name="url_converters_default_handler">Отваря се по подразбиране в %1$s</string>
     <string name="url_converters_settings_button">Отворете настройките на Android</string>
     <string name="conversion_loading_indicator_description">Опит %1$d от %2$d до %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Неуспешно запазване на GPX</string>

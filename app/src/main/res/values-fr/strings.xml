@@ -104,9 +104,7 @@
     <string name="converter_open_street_map_loading_indicator_title">Connexion à OpenStreetMap…</string>
     <string name="url_converters_filter_all">Tous les services de cartographie</string>
     <string name="url_converters_filter_recent">Récemment ajoutés</string>
-    <string name="url_converters_default_handler_header">S’ouvre par défaut dans %1$s</string>
-    <string name="url_converters_default_handler_disabled">Ne s’ouvre pas par défaut dans %1$s</string>
-    <string name="url_converters_recent_info">La prise en charge de nouveaux services de cartographie a récemment été ajoutée à %1$s.</string>
+    <string name="url_converters_default_handler">S’ouvre par défaut dans %1$s</string>
     <string name="url_converters_settings_button">Ouvrir les paramètres Android</string>
     <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
     <string name="main_input_uri_paste_content_description">Coller</string>

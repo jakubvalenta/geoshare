@@ -102,9 +102,7 @@
     <string name="conversion_succeeded_point_number">%1$d項</string>
     <string name="url_converters_filter_all">所有的地圖服務</string>
     <string name="url_converters_filter_recent">最近添加</string>
-    <string name="url_converters_default_handler_header">預設用%1$s打開</string>
-    <string name="url_converters_default_handler_disabled">不要打開預設%1$s</string>
-    <string name="url_converters_recent_info">%1$s最近支援了新的地圖服務。</string>
+    <string name="url_converters_default_handler">預設用%1$s打開</string>
     <string name="url_converters_settings_button">開啟安卓設定</string>
     <string name="conversion_succeeded_save_gpx_failed">儲存GPX檔時發生錯誤</string>
     <string name="main_input_uri_paste_content_description">貼上</string>

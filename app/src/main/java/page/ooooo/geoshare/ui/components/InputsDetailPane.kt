@@ -110,11 +110,11 @@ private fun InputsDetailPane(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                stringResource(R.string.url_converters_url_header),
+                stringResource(R.string.url_converters_url),
                 style = MaterialTheme.typography.labelLarge,
             )
             Text(
-                stringResource(R.string.url_converters_default_handler_header, appName),
+                stringResource(R.string.url_converters_default_handler, appName),
                 style = MaterialTheme.typography.labelLarge,
             )
         }
