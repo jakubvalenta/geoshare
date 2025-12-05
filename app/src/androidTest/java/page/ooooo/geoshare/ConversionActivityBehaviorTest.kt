@@ -50,7 +50,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows copy link in GCJ-02
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
             onElement {
-                viewIdResourceName == "geoShareConversionSuccessSheetItemDescription" && textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
+                viewIdResourceName == "geoShareConversionSuccessSheetItemDescription" &&
+                    textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
             }
             pressBack()
 
@@ -124,7 +125,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4842015, 13.4167277))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    52.4842015,
+                    13.4167277,
+                    name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                )
+            )
 
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
@@ -147,14 +156,30 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4842015, 13.4167277))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    52.4842015,
+                    13.4167277,
+                    name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                )
+            )
 
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 44.4490541, 26.0888398))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    44.4490541,
+                    26.0888398,
+                    name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                )
+            )
         }
 
     @Test
@@ -327,7 +352,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4848232, 13.4240791))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    52.4848232,
+                    13.4240791,
+                    name = "Hermannstr. 10, Berlin",
+                )
+            )
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+11,+Berlin/")
@@ -350,14 +383,30 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4834254, 13.4245399))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    52.4834254,
+                    13.4245399,
+                    name = "Hermannstr. 20, Berlin",
+                )
+            )
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4832988, 13.4245179))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    52.4832988,
+                    13.4245179,
+                    name = "Hermannstr. 21, Berlin",
+                )
+            )
         }
 
     @Test
@@ -372,7 +421,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows location search
-            @Suppress("SpellCheckingInspection") waitAndAssertPositionIsVisible(Position(q = "Hermannstr. 30, Berlin"))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(q = "Hermannstr. 30, Berlin")
+            )
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+31,+Berlin/")
@@ -394,13 +446,19 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows location search
-            @Suppress("SpellCheckingInspection") waitAndAssertPositionIsVisible(Position(q = "Hermannstr. 40, Berlin"))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(q = "Hermannstr. 40, Berlin")
+            )
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+41,+Berlin/")
 
             // Shows location search
-            @Suppress("SpellCheckingInspection") waitAndAssertPositionIsVisible(Position(q = "Hermannstr. 41, Berlin"))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(q = "Hermannstr. 41, Berlin")
+            )
         }
 
     @Test
@@ -415,7 +473,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 51.1982447, 6.4389493))
+            waitAndAssertPositionIsVisible(
+                @Suppress("SpellCheckingInspection")
+                Position(
+                    Srs.WGS84,
+                    51.1982447,
+                    6.4389493,
+                    name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                )
+            )
         }
 
     @Test
