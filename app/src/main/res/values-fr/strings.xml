@@ -140,15 +140,15 @@
     <string name="conversion_succeeded_open_app_street_view">Afficher street view en %1$s</string>
     <string name="converter_urbi_permission_title">Se connecter à 2GIS / Urbi ?</string>
     <string name="converter_urbi_loading_indicator_title">Connexion à 2GIS / Urbi…</string>
-    <string name="conversion_succeeded_location_failed">Impossible de trouver l\'emplacement</string>
+    <string name="conversion_succeeded_location_failed">Impossible de trouver l’emplacement</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Recherche de votre emplacement…</string>
-    <string name="conversion_succeeded_location_rationale_dialog_title">Autoriser l\'accès à la localisation ?</string>
-    <string name="conversion_succeeded_open_app_failed">Impossible d\'ouvrir %1$s</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">Autoriser l’accès à la localisation ?</string>
+    <string name="conversion_succeeded_open_app_failed">Impossible d’ouvrir %1$s</string>
     <string name="output_gpx_location_permission">%1$s créera un itinéraire qui commence à votre emplacement actuel.</string>
-    <string name="output_gpx_route_share">Partager l\'itinéraire GPX</string>
-    <string name="output_gpx_route_share_failed">Impossible de partager l\'itinéraire GPX</string>
+    <string name="output_gpx_route_share">Partager l’itinéraire GPX</string>
+    <string name="output_gpx_route_share_failed">Impossible de partager l’itinéraire GPX</string>
     <string name="output_gpx_route_share_automation_succeeded">Itinéraire GPX partagé automatiquement</string>
-    <string name="output_gpx_route_share_automation_waiting">Partage automatique de l\'itinéraire GPX dans %1$ds</string>
+    <string name="output_gpx_route_share_automation_waiting">Partage automatique de l’itinéraire GPX dans %1$ds</string>
     <string name="faq_location_permission_headline">Autorisation de localisation</string>
-    <string name="faq_location_permission_text">%1$s demande l\'autorisation d\'accéder à votre position lors du lancement de la navigation TomTom et lors du partage d\'un itinéraire GPX, car l\'application doit alors créer un itinéraire GPX commençant à votre position actuelle. Les informations de localisation sont supprimées immédiatement après la création de l\'itinéraire.</string>
+    <string name="faq_location_permission_text">%1$s demande l’autorisation d’accéder à votre position lors du lancement de la navigation TomTom et lors du partage d’un itinéraire GPX, car l’application doit alors créer un itinéraire GPX commençant à votre position actuelle. Les informations de localisation sont supprimées immédiatement après la création de l’itinéraire.</string>
 </resources>
