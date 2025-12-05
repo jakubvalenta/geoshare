@@ -278,7 +278,7 @@ data class GrantedParseHtmlPermission(
             }
             if (!positionFromHtml.points.isNullOrEmpty()) {
                 val positionMerged = positionFromUri.q?.let { q ->
-                    positionFromHtml.setMainPointName(q)
+                    positionFromHtml.setLastPointName(q)
                 } ?: positionFromHtml
                 stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionMerged")
                 ConversionSucceeded(stateContext, inputUriString, positionMerged)

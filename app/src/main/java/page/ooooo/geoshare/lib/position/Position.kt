@@ -41,15 +41,11 @@ data class Position(
         z: Double? = null,
     ) : this(null, q, z)
 
-    val mainPoint: Point? get() = points?.lastOrNull()
-
-    val pointCount: Int get() = points?.size ?: 0
-
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
 
-    fun getPoint(i: Int?): Point? = if (i == null) mainPoint else points?.getOrNull(i)
+    fun getPoint(i: Int?): Point? = if (i == null) points?.lastOrNull() else points?.getOrNull(i)
 
-    fun setMainPointName(name: String): Position = if (points?.isNotEmpty() == true && points.last().name == null) {
+    fun setLastPointName(name: String): Position = if (points?.isNotEmpty() == true && points.last().name == null) {
         this.copy(points = (points.dropLast(1) + points.last().copy(name = name)).toImmutableList())
     } else {
         this

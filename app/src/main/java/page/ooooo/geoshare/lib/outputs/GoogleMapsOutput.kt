@@ -64,7 +64,7 @@ object GoogleMapsOutput : Output {
             Text(stringResource(R.string.conversion_succeeded_copy_link_street_view, GoogleMapsInput.NAME))
         }
 
-        override fun isEnabled(position: Position, i: Int?) = position.mainPoint != null
+        override fun isEnabled(position: Position, i: Int?) = position.getPoint(i) != null
     }
 
     object CopyLinkChipAction : CopyLinkAction() {
@@ -103,7 +103,7 @@ object GoogleMapsOutput : Output {
             )
         }
 
-        override fun isEnabled(position: Position, i: Int?) = position.mainPoint != null
+        override fun isEnabled(position: Position, i: Int?) = position.getPoint(i) != null
     }
 
     object CopyLinkAutomation : CopyLinkAction(), BasicAutomation {

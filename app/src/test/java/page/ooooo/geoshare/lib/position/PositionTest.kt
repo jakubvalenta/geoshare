@@ -7,29 +7,29 @@ import org.junit.Test
 class PositionTest {
 
     @Test
-    fun setMainPointName_pointsAreNull_returnsPositionUnchanged() {
+    fun setLastPointName_pointsAreNull_returnsPositionUnchanged() {
         val position = Position()
         assertEquals(
             position,
-            position.setMainPointName("foo"),
+            position.setLastPointName("foo"),
         )
     }
 
     @Test
-    fun setMainPointName_pointsAreEmpty_returnsPositionUnchanged() {
+    fun setLastPointName_pointsAreEmpty_returnsPositionUnchanged() {
         val position = Position(points = persistentListOf())
         assertEquals(
             position,
-            position.setMainPointName("foo"),
+            position.setLastPointName("foo"),
         )
     }
 
     @Test
-    fun setMainPointName_pointsSizeIsOneAndLastPointHasName_returnsPositionUnchanged() {
+    fun setLastPointName_pointsSizeIsOneAndLastPointHasName_returnsPositionUnchanged() {
         val position = Position(points = persistentListOf(Point(Srs.WGS84, 1.0, 2.0, "bar")))
         assertEquals(
             position,
-            position.setMainPointName("foo"),
+            position.setLastPointName("foo"),
         )
     }
 
@@ -38,7 +38,7 @@ class PositionTest {
         val position = Position(points = persistentListOf(Point(Srs.WGS84, 1.0, 2.0)))
         assertEquals(
             Position(points = persistentListOf(Point(Srs.WGS84, 1.0, 2.0, "foo"))),
-            position.setMainPointName("foo"),
+            position.setLastPointName("foo"),
         )
     }
 
@@ -59,7 +59,7 @@ class PositionTest {
                     Point(Srs.WGS84, 5.0, 6.0, "foo"),
                 )
             ),
-            position.setMainPointName("foo"),
+            position.setLastPointName("foo"),
         )
     }
 
