@@ -100,28 +100,32 @@ private fun InputsDetailPane(
     }
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
-        verticalArrangement = Arrangement.spacedBy(spacing.medium),
     ) {
         Button({ onShowOpenByDefaultSettings() }) {
             Text(stringResource(R.string.url_converters_settings_button))
         }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = spacing.medium, bottom = spacing.small),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                stringResource(R.string.url_converters_url_header),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Text(
+                stringResource(R.string.url_converters_default_handler_header, appName),
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+        HorizontalDivider()
         Column(
             Modifier.verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    stringResource(R.string.url_converters_url_header),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                Text(
-                    stringResource(R.string.url_converters_default_handler_header, appName),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-            HorizontalDivider()
             documentationInputDetails.forEach { documentationInputDetails ->
                 Row(
+                    Modifier.padding(vertical = spacing.small),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

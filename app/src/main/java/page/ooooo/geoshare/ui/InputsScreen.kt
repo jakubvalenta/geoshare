@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -73,6 +75,10 @@ private fun InputsScreen(
         navigator.currentDestination?.contentKey?.let { id -> documentations.find { it.id == id } }
     val listExpanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden
     val detailExpanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden
+
+    BackHandler {
+        onBack()
+    }
 
     Scaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
