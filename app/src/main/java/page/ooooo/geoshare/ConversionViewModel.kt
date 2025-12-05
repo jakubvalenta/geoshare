@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.*
-import page.ooooo.geoshare.lib.SavableDelegate
+import page.ooooo.geoshare.ui.SavableDelegate
 import page.ooooo.geoshare.lib.conversion.*
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action

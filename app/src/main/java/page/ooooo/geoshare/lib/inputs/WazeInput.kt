@@ -6,7 +6,7 @@ import io.ktor.utils.io.*
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.decodeWazeGeoHash
+import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.PositionBuilder

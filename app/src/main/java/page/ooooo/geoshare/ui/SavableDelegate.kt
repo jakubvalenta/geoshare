@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.ui
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle

@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.decodeGe0Hash
+import page.ooooo.geoshare.lib.geo.decodeGe0Hash
 import page.ooooo.geoshare.lib.extensions.matchHash
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.toScale

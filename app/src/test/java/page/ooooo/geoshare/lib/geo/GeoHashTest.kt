@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.geo
 
 import org.junit.Assert
 import org.junit.Test
@@ -48,7 +48,7 @@ class GeoHashTest {
         Assert.assertEquals(
             Triple(52.77714014053345, 11.951086521148682, 16.0),
             @Suppress("SpellCheckingInspection")
-            decodeWazeGeoHash("u32kpzy90")
+            (decodeWazeGeoHash("u32kpzy90"))
         )
         Assert.assertEquals(
             Triple(-12.58159875869751, 15.74390172958374, 16.0),
@@ -57,12 +57,12 @@ class GeoHashTest {
         Assert.assertEquals(
             Triple(22.65310049057007, 88.34357500076294, 16.0),
             @Suppress("SpellCheckingInspection")
-            decodeWazeGeoHash("tunbf7cgf")
+            (decodeWazeGeoHash("tunbf7cgf"))
         )
         Assert.assertEquals(
             Triple(19.40256357192993, -99.16566610336304, 16.0),
             @Suppress("SpellCheckingInspection")
-            decodeWazeGeoHash("9g3qrkju0")
+            (decodeWazeGeoHash("9g3qrkju0"))
         )
     }
 
@@ -122,12 +122,12 @@ class GeoHashTest {
         Assert.assertEquals(
             Triple(40.712740468525084, -74.00599703192711, 9.0),
             @Suppress("SpellCheckingInspection")
-            decodeGe0Hash("Umse5f0H8a"),
+            (decodeGe0Hash("Umse5f0H8a")),
         )
         Assert.assertEquals(
             Triple(40.712740468525084, -74.00599703192711, 5.0),
             @Suppress("SpellCheckingInspection")
-            decodeGe0Hash("Emse5f0H8a"),
+            (decodeGe0Hash("Emse5f0H8a")),
         )
     }
 }

@@ -5,7 +5,7 @@ import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.decodeOpenStreetMapQuadTileHash
+import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.PositionBuilder
