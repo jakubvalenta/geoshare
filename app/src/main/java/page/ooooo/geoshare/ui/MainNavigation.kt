@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.inputs.DocumentationId
+import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 
 @Serializable
 object AboutRoute
@@ -23,7 +23,7 @@ object ConversionRoute
 object FaqRoute
 
 @Serializable
-data class InputsRoute(val id: DocumentationId? = null)
+data class InputsRoute(val id: InputDocumentationId? = null)
 
 @Serializable
 object IntroRoute

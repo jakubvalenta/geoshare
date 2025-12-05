@@ -18,7 +18,7 @@ object MagicEarthInput : Input {
 
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.MAGIC_EARTH,
+        id = InputDocumentationId.MAGIC_EARTH,
         nameResId = R.string.converter_magic_earth_name,
         items = listOf(
             InputDocumentationItem.Url(20, "https://magicearth.com/"),

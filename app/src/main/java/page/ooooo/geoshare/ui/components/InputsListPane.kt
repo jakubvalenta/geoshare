@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.inputs.DocumentationId
+import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -40,7 +40,7 @@ fun InputsListPane(
     expanded: Boolean,
     changelogShownForVersionCode: Int?,
     onBack: () -> Unit,
-    onNavigateToDocumentation: (id: DocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
 ) {
     val context = LocalContext.current
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -66,7 +66,7 @@ private fun InputsListPane(
     expanded: Boolean,
     changelogShownForVersionCode: Int?,
     onBack: () -> Unit,
-    onNavigateToDocumentation: (id: DocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -134,6 +134,7 @@ private fun InputsListPane(
                 documentations = recentDocumentations,
                 containerColor = containerColor,
                 onNavigateToDocumentation = onNavigateToDocumentation,
+                testTagPrefix = "geoShareInputsDocumentationRecent_",
             )
             LabelLarge(stringResource(R.string.url_converters_filter_all))
         } else {
@@ -144,6 +145,7 @@ private fun InputsListPane(
             documentations = documentations,
             containerColor = containerColor,
             onNavigateToDocumentation = onNavigateToDocumentation,
+            testTagPrefix = "geoShareInputsDocumentationAll_",
         )
     }
 }
@@ -153,29 +155,33 @@ private fun InputsListDocumentations(
     currentDocumentation: InputDocumentation?,
     documentations: List<InputDocumentation>,
     containerColor: Color,
-    onNavigateToDocumentation: (id: DocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
+    testTagPrefix: String,
 ) {
     val spacing = LocalSpacing.current
     ElevatedCard(Modifier.padding(horizontal = spacing.windowPadding)) {
-        documentations.forEachIndexed { i, documentation ->
-            ListItem(
-                headlineContent = {
-                    Text(
-                        stringResource(documentation.nameResId),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                },
-                modifier = Modifier
-                    .clickable(onClick = { onNavigateToDocumentation(documentation.id) })
-                    .testTag("geoShareInputsDocumentation_${documentation.id}"),
-                colors = ListItemDefaults.colors(
-                    containerColor = if (currentDocumentation == documentation) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh
-                ),
-            )
-            if (i != documentations.size - 1) {
-                HorizontalDivider(color = containerColor)
+        documentations
+            .map { documentation -> Pair(documentation, stringResource(documentation.nameResId)) }
+            .sortedBy { (_, name) -> name }
+            .forEachIndexed { i, (documentation, name) ->
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            name,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    modifier = Modifier
+                        .clickable(onClick = { onNavigateToDocumentation(documentation.id) })
+                        .testTag("${testTagPrefix}${documentation.id}"),
+                    colors = ListItemDefaults.colors(
+                        containerColor = if (currentDocumentation == documentation) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh
+                    ),
+                )
+                if (i != documentations.size - 1) {
+                    HorizontalDivider(color = containerColor)
+                }
             }
-        }
     }
 }
 

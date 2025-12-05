@@ -24,7 +24,7 @@ object WazeInput : Input.HasHtml {
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
 
     override val documentation = InputDocumentation(
-        id = DocumentationId.WAZE,
+        id = InputDocumentationId.WAZE,
         nameResId = R.string.converter_waze_name,
         items = listOf(
             InputDocumentationItem.Url(21, "https://waze.com/live-map"),

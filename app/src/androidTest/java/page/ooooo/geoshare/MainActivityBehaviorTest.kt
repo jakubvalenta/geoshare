@@ -1,11 +1,11 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 
 @RunWith(AndroidJUnit4::class)
 open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -53,12 +53,8 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the inputs screen
         goToInputsScreen()
 
-        // Shows only those inputs that have been added since version 22
-        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Mapy.com" }
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") })
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Google Maps" })
+        // Shows recently added documentations
+        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" }
 
         // Go to main screen
         pressBack()
@@ -70,9 +66,12 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the inputs screen
         goToInputsScreen()
 
-        // Shows all inputs
-        onElement { viewIdResourceName == "geoShareInputsHeadline" && (textAsString() == "geo: URI" || textAsString() == "geo: URIs") }
-        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Google Maps" }
+        // Does not show recently added documentations
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" })
+
+        // Shows all documentations
+        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationId.AMAP}" }
+        onElement { viewIdResourceName == "geoShareInputsDocumentationAll_${InputDocumentationId.APPLE_MAPS}" }
 
         // Go to main screen
         pressBack()
@@ -92,10 +91,8 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Go to the inputs screen
         goToInputsScreen()
 
-        // Shows only inputs added since version 19
-        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "HERE WeGo" }
-        onElement { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Magic Earth" }
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsHeadline" && textAsString() == "Google Maps" })
+        // Shows documentations added since version 19
+        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.HERE_WEGO}" }
+        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAGIC_EARTH}" }
     }
 }

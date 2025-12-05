@@ -18,7 +18,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?((www|maps)\.)?(google(\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.GOOGLE_MAPS,
+        id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,
         items = listOf(
             InputDocumentationItem.Url(5, "https://maps.app.goo.gl"),

@@ -19,7 +19,7 @@ object MapsMeInput : Input {
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?(comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.MAPS_ME,
+        id = InputDocumentationId.MAPS_ME,
         nameResId = R.string.converter_ge0_name,
         items = listOf(
             InputDocumentationItem.Url(25, "http://ge0.me/"),

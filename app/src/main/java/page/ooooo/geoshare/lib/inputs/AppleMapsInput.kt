@@ -17,7 +17,7 @@ object AppleMapsInput : Input.HasHtml {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.APPLE_MAPS,
+        id = InputDocumentationId.APPLE_MAPS,
         nameResId = R.string.converter_apple_maps_name,
         items = listOf(
             InputDocumentationItem.Url(18, "https://maps.apple"),

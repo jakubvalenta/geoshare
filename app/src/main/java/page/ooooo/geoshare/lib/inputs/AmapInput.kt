@@ -14,7 +14,7 @@ object AmapInput : Input.HasShortUri {
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(surl|wb)\.amap\.com/\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.AMAP,
+        id = InputDocumentationId.AMAP,
         nameResId = R.string.converter_amap_name,
         items = listOf(
             InputDocumentationItem.Url(27, "https://surl.amap.com/"),

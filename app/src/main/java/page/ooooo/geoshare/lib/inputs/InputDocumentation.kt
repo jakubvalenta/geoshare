@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import androidx.compose.runtime.Composable
 
 @Keep
-enum class DocumentationId {
+enum class InputDocumentationId {
     AMAP,
     APPLE_MAPS,
     COORDINATES,
@@ -21,7 +21,7 @@ enum class DocumentationId {
     YANDEX_MAPS,
 }
 
-data class InputDocumentation(val id: DocumentationId, val nameResId: Int, val items: List<InputDocumentationItem>)
+data class InputDocumentation(val id: InputDocumentationId, val nameResId: Int, val items: List<InputDocumentationItem>)
 
 sealed class InputDocumentationItem(val addedInVersionCode: Int) {
     class Text(addedInVersionCode: Int, val text: @Composable () -> String) : InputDocumentationItem(addedInVersionCode)

@@ -19,7 +19,7 @@ object OpenStreetMapInput : Input.HasHtml {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.OPEN_STREET_MAP,
+        id = InputDocumentationId.OPEN_STREET_MAP,
         nameResId = R.string.converter_open_street_map_name,
         items = listOf(
             InputDocumentationItem.Url(20, "https://www.openstreetmap.org/"),

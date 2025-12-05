@@ -23,7 +23,7 @@ object GeoUriInput : Input {
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.GEO_URI,
+        id = InputDocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {

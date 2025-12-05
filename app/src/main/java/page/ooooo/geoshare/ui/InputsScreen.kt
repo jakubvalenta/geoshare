@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -27,8 +26,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.inputs.DocumentationId
-import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.ui.components.InputsDetailPane
 import page.ooooo.geoshare.ui.components.InputsListPane
@@ -37,7 +35,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsScreen(
-    initialDocumentationId: DocumentationId?,
+    initialDocumentationId: InputDocumentationId?,
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
@@ -57,7 +55,7 @@ fun InputsScreen(
 @Composable
 private fun InputsScreen(
     changelogShownForVersionCode: Int?,
-    initialDocumentationId: DocumentationId?,
+    initialDocumentationId: InputDocumentationId?,
     onBack: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -144,7 +142,7 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialDocumentationId = GoogleMapsInput.documentation.id,
+                    initialDocumentationId = InputDocumentationId.GOOGLE_MAPS,
                     changelogShownForVersionCode = 25,
                     onBack = {},
                 )
@@ -160,7 +158,7 @@ private fun DarkPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialDocumentationId = GoogleMapsInput.documentation.id,
+                    initialDocumentationId = InputDocumentationId.GOOGLE_MAPS,
                     changelogShownForVersionCode = 25,
                     onBack = {},
                 )
@@ -176,7 +174,7 @@ private fun TabletPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialDocumentationId = GoogleMapsInput.documentation.id,
+                    initialDocumentationId = InputDocumentationId.GOOGLE_MAPS,
                     changelogShownForVersionCode = 25,
                     onBack = {},
                 )

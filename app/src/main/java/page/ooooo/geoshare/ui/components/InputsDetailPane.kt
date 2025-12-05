@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
@@ -86,7 +85,7 @@ private fun InputsDetailPane(
         title = {},
         navigationIcon = {
             if (expanded) {
-                IconButton(onBack, Modifier.testTag("geoShareInputsBack")) {
+                IconButton(onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = stringResource(R.string.nav_back_content_description)

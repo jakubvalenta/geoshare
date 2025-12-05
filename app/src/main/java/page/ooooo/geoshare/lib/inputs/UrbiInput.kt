@@ -18,7 +18,7 @@ object UrbiInput : Input.HasHtml {
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?(www\.)?((go|maps)\.)?(2gis|urbi|urbi-[a-z]{2})(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = InputDocumentation(
-        id = DocumentationId.URBI,
+        id = InputDocumentationId.URBI,
         nameResId = R.string.converter_urbi_name,
         items = listOf(
             InputDocumentationItem.Url(27, "https://2gis.ae/"),
