@@ -54,7 +54,7 @@
     <string name="conversion_failed_unshorten_error">Nepodařilo se analyzovat krátký odkaz</string>
     <string name="conversion_failed_parse_url_error">Nepodařilo se zpracovat odkaz na mapu</string>
     <string name="conversion_succeeded_apps_not_found">Není nainstalovaná žádná mapová aplikace</string>
-    <string name="copying_finished">Souřadnice byly zkopírovány do schránky</string>
+    <string name="copying_finished">Zkopírováno do schránky</string>
     <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
     <string name="conversion_failed_parse_html_error">Nepodařilo se stáhnout webovou stránku mapové služky</string>
     <string name="nav_back_content_description">Zpět na hlavní obrazovku</string>
@@ -140,4 +140,15 @@
     <string name="conversion_succeeded_open_app_street_view">Zobrazit street view v %1$s</string>
     <string name="converter_urbi_permission_title">Spojit se s 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Spojování s 2GIS / Urbi…</string>
+    <string name="conversion_succeeded_location_failed">Nepodařilo se najít vaši polohu</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">Hledá se vaše poloha…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">Povolit přístup k poloze?</string>
+    <string name="conversion_succeeded_open_app_failed">Nepodařilo se otevřít %1$s</string>
+    <string name="output_gpx_location_permission">%1$s vytvoří trasu, která začíná v místě, kde se právě nacházíte.</string>
+    <string name="output_gpx_route_share">Sdílet trasu GPX</string>
+    <string name="output_gpx_route_share_failed">Nepodařilo se sdílet trasu GPX</string>
+    <string name="output_gpx_route_share_automation_succeeded">Trasa GPX byla automaticky nasdílena</string>
+    <string name="output_gpx_route_share_automation_waiting">Trasa GPX bude automaticky nasdílena za %1$d s</string>
+    <string name="faq_location_permission_headline">Oprávnění pro přístup k poloze</string>
+    <string name="faq_location_permission_text">%1$s požádá o přístupu k poloze při spuštění navigace TomTom a při sdílení trasy GPX, protože v těchto případech aplikace potřebuje vytvořit trasu GPX, která začíná v místě, kde se právě nacházíte. Informace o poloze se hned po vytvoření trasy smaže.</string>
 </resources>
