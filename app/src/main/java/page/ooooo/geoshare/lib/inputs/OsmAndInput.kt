@@ -13,6 +13,7 @@ object OsmAndInput : Input {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
     override val documentation = Input.Documentation(
+        id = Input.DocumentationId.OSM_AND,
         nameResId = R.string.converter_osm_and_name,
         inputs = listOf(
             Input.DocumentationInput.Url(20, "https://osmand.net/map"),

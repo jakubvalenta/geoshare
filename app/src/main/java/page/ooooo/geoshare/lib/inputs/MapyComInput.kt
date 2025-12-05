@@ -18,6 +18,7 @@ object MapyComInput : Input.HasShortUri {
     override val uriPattern: Pattern =
         Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
     override val documentation = Input.Documentation(
+        id = Input.DocumentationId.MAPY_COM,
         nameResId = R.string.converter_mapy_com_name,
         inputs = listOf(
             Input.DocumentationInput.Url(23, "https://mapy.com"),

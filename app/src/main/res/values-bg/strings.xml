@@ -34,9 +34,9 @@
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.]]></string>
     <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Да се разреши ли свързване с картографска услуга (Google, Apple и др.)?</string>
-    <string name="user_preferences_connection_option_always">Да</string>
+    <string name="yes">Да</string>
     <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>
-    <string name="user_preferences_connection_option_never">Не</string>
+    <string name="no">Не</string>
     <string name="conversion_failed_missing_url">Липсващ URL адрес</string>
     <string name="conversion_failed_unshorten_error">Неуспешно разрешаване на кратка връзка</string>
     <string name="conversion_succeeded_apps_not_found">Не е инсталирано приложение за карти</string>
@@ -103,10 +103,10 @@
     <string name="converter_open_street_map_loading_indicator_title">Свързване с OpenStreetMap…</string>
     <string name="url_converters_filter_all">Всички картографски услуги</string>
     <string name="url_converters_filter_recent">Наскоро добавени</string>
-    <string name="url_converters_default_handler_enabled">Отваря се по подразбиране в %1$s</string>
+    <string name="url_converters_default_handler_header">Отваря се по подразбиране в %1$s</string>
     <string name="url_converters_default_handler_disabled">Не се отваря по подразбиране в %1$s</string>
     <string name="url_converters_recent_info">%1$s наскоро получи поддръжка за нови картографски услуги.</string>
-    <string name="url_converters_settings_button_content_description">Отворете настройките на Android</string>
+    <string name="url_converters_settings_button">Отворете настройките на Android</string>
     <string name="conversion_loading_indicator_description">Опит %1$d от %2$d до %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Неуспешно запазване на GPX</string>
     <string name="main_input_uri_paste_content_description">Поставяне</string>

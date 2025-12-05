@@ -45,9 +45,9 @@
     <string name="user_preferences_title">Параметри</string>
     <string name="user_preferences_connection_title">Дозволити підключення до картографічного сервісу (Google, Apple тощо)?</string>
     <string name="user_preferences_connection_description">Для підтримки коротких посилань на карти та отримання координат з веб-сторінки картографічного сервісу, якщо посилання їх не містить, %1$s може підключитися до картографічного сервісу. Більш детальну інформацію можна знайти на екрані FAQ.</string>
-    <string name="user_preferences_connection_option_always">Так</string>
+    <string name="yes">Так</string>
     <string name="user_preferences_connection_option_ask">Запитувати перед з’єднанням</string>
-    <string name="user_preferences_connection_option_never">Ні</string>
+    <string name="no">Ні</string>
     <string name="conversion_failed_missing_url">Помилкова адреса</string>
     <string name="conversion_failed_unshorten_error">Не вдалося вирішити проблему з коротким посиланням</string>
     <string name="conversion_failed_parse_url_error">Не вдалося обробити посилання на мапу</string>
@@ -105,10 +105,10 @@
     <string name="converter_open_street_map_loading_indicator_title">Підключення до OpenStreetMap…</string>
     <string name="url_converters_filter_all">Усі картографічні сервіси</string>
     <string name="url_converters_filter_recent">Нещодавно додано</string>
-    <string name="url_converters_default_handler_enabled">Відкривається за замовчуванням у %1$s</string>
+    <string name="url_converters_default_handler_header">Відкривається за замовчуванням у %1$s</string>
     <string name="url_converters_default_handler_disabled">Не відкривається за замовчуванням у %1$s</string>
     <string name="url_converters_recent_info">%1$s нещодавно отримав підтримку нових картографічних сервісів.</string>
-    <string name="url_converters_settings_button_content_description">Відкрийте налаштування Android</string>
+    <string name="url_converters_settings_button">Відкрийте налаштування Android</string>
     <string name="conversion_loading_indicator_description">Спроба %1$d з %2$d через %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Не вдалося зберегти GPX</string>
     <string name="main_input_uri_paste_content_description">Вставити</string>

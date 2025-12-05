@@ -34,9 +34,9 @@
     <string name="faq_item_collapse">Contraer sección</string>
     <string name="faq_item_expand">Expandir sección</string>
     <string name="user_preferences_title">Ajustes</string>
-    <string name="user_preferences_connection_option_always">Sí</string>
+    <string name="yes">Sí</string>
     <string name="user_preferences_connection_option_ask">Preguntar antes de conectar</string>
-    <string name="user_preferences_connection_option_never">No</string>
+    <string name="no">No</string>
     <string name="conversion_failed_missing_url">URL ausente</string>
     <string name="conversion_failed_unshorten_error">Error al resolver el enlace corto</string>
     <string name="conversion_failed_unshorten_connection_error">Error de conexión al resolver el enlace corto</string>
@@ -104,10 +104,10 @@
     <string name="converter_open_street_map_loading_indicator_title">Conectándose a OpenStreetMap…</string>
     <string name="url_converters_filter_all">Todos los servicios de mapas</string>
     <string name="url_converters_filter_recent">Recientemente agregado</string>
-    <string name="url_converters_default_handler_enabled">Abre por defecto en %1$s</string>
+    <string name="url_converters_default_handler_header">Abre por defecto en %1$s</string>
     <string name="url_converters_default_handler_disabled">No abre por defecto en %1$s</string>
     <string name="url_converters_recent_info">%1$s recientemente obtuvo soporte para nuevos servicios de mapa.</string>
-    <string name="url_converters_settings_button_content_description">Abrir ajustes de Android</string>
+    <string name="url_converters_settings_button">Abrir ajustes de Android</string>
     <string name="conversion_succeeded_save_gpx_failed">No fue posible guardar GPX</string>
     <string name="main_input_uri_paste_content_description">Pegar</string>
     <string name="main_random">Enlace aleatorio</string>

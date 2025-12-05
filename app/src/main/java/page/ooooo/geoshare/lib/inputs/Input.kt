@@ -8,7 +8,24 @@ import page.ooooo.geoshare.lib.position.Position
 
 interface Input {
 
-    data class Documentation(val nameResId: Int, val inputs: List<DocumentationInput>)
+    enum class DocumentationId {
+        AMAP,
+        APPLE_MAPS,
+        COORDINATES,
+        GEO_URI,
+        GOOGLE_MAPS,
+        HERE_WEGO,
+        MAGIC_EARTH,
+        MAPS_ME,
+        MAPY_COM,
+        OPEN_STREET_MAP,
+        OSM_AND,
+        URBI,
+        WAZE,
+        YANDEX_MAPS,
+    }
+
+    data class Documentation(val id: DocumentationId, val nameResId: Int, val inputs: List<DocumentationInput>)
 
     sealed class DocumentationInput(val addedInVersionCode: Int) {
         class Text(addedInVersionCode: Int, val text: @Composable () -> String) : DocumentationInput(addedInVersionCode)

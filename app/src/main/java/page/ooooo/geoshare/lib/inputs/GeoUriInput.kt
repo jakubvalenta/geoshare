@@ -23,7 +23,9 @@ object GeoUriInput : Input {
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
     override val documentation = Input.Documentation(
-        nameResId = R.string.converter_geo_name, inputs = listOf(
+        id = Input.DocumentationId.GEO_URI,
+        nameResId = R.string.converter_geo_name,
+        inputs = listOf(
             Input.DocumentationInput.Text(3) {
                 stringResource(
                     R.string.example,
@@ -36,7 +38,7 @@ object GeoUriInput : Input {
                     ),
                 )
             },
-        )
+        ),
     )
 
     override fun parseUri(uri: Uri) = uri.run {

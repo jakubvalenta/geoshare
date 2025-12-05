@@ -75,9 +75,9 @@
     <string name="faq_item_collapse">Abschnitt zuklappen</string>
     <string name="faq_item_expand">Abschnitt ausklappen</string>
     <string name="user_preferences_title">Einstellungen</string>
-    <string name="user_preferences_connection_option_always">Ja</string>
+    <string name="yes">Ja</string>
     <string name="user_preferences_connection_option_ask">Vor dem Verbinden fragen</string>
-    <string name="user_preferences_connection_option_never">Nein</string>
+    <string name="no">Nein</string>
     <string name="conversion_failed_missing_url">Fehlende URL</string>
     <string name="conversion_failed_unshorten_error">Kurzlink konnte nicht aufgelöst werden</string>
     <string name="conversion_failed_unshorten_connection_error">Verbindungsfehler beim Auflösen eines Kurzlinks</string>
@@ -103,10 +103,10 @@
     <string name="converter_open_street_map_loading_indicator_title">Verbindung mit OpenStreetMap…</string>
     <string name="url_converters_filter_all">Alle Kartendienste</string>
     <string name="url_converters_filter_recent">Kürzlich hinzugefügt</string>
-    <string name="url_converters_default_handler_enabled">Öffnet standardmäßig in %1$s</string>
+    <string name="url_converters_default_handler_header">Öffnet standardmäßig in %1$s</string>
     <string name="url_converters_default_handler_disabled">Öffnet standardmäßig nicht in %1$s</string>
     <string name="url_converters_recent_info">%1$s hat kürzlich Unterstützung für neue Kartendienste erhalten.</string>
-    <string name="url_converters_settings_button_content_description">Android-Einstellungen öffnen</string>
+    <string name="url_converters_settings_button">Android-Einstellungen öffnen</string>
     <string name="main_input_uri_paste_content_description">Einfügen</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
     <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>

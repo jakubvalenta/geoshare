@@ -28,9 +28,9 @@
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Anuluj</string>
     <string name="user_preferences_connection_title">Zezwalasz na połączenie z Google?</string>
-    <string name="user_preferences_connection_option_always">Tak</string>
+    <string name="yes">Tak</string>
     <string name="user_preferences_connection_option_ask">Zapytaj przed połączeniem</string>
-    <string name="user_preferences_connection_option_never">Nie</string>
+    <string name="no">Nie</string>
     <string name="faq_title">FAQ</string>
     <string name="faq_how_it_works_headline">Jak to działa i kwestie prywatności</string>
     <string name="about_title">O aplikacji</string>

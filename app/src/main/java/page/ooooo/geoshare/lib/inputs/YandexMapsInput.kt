@@ -18,6 +18,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = Input.Documentation(
+        id = Input.DocumentationId.YANDEX_MAPS,
         nameResId = R.string.converter_yandex_maps_name,
         inputs = listOf(
             Input.DocumentationInput.Url(20, "https://ya.ru/maps"),

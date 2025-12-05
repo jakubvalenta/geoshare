@@ -90,9 +90,9 @@
     <string name="faq_item_collapse">收起部分</string>
     <string name="faq_item_expand">展開部分</string>
     <string name="user_preferences_title">偏好設定</string>
-    <string name="user_preferences_connection_option_always">總是</string>
+    <string name="yes">總是</string>
     <string name="user_preferences_connection_option_ask">在連接前詢問</string>
-    <string name="user_preferences_connection_option_never">一律不要</string>
+    <string name="no">一律不要</string>
     <string name="conversion_failed_unshorten_connection_error">擷取短網頁內容時連接失敗</string>
     <string name="conversion_failed_parse_url_error">無法處理地圖連結</string>
     <string name="conversion_succeeded_apps_not_found">沒有安裝任何的地圖應用程式</string>
@@ -102,10 +102,10 @@
     <string name="conversion_succeeded_point_number">%1$d項</string>
     <string name="url_converters_filter_all">所有的地圖服務</string>
     <string name="url_converters_filter_recent">最近添加</string>
-    <string name="url_converters_default_handler_enabled">預設用%1$s打開</string>
+    <string name="url_converters_default_handler_header">預設用%1$s打開</string>
     <string name="url_converters_default_handler_disabled">不要打開預設%1$s</string>
     <string name="url_converters_recent_info">%1$s最近支援了新的地圖服務。</string>
-    <string name="url_converters_settings_button_content_description">開啟安卓設定</string>
+    <string name="url_converters_settings_button">開啟安卓設定</string>
     <string name="conversion_succeeded_save_gpx_failed">儲存GPX檔時發生錯誤</string>
     <string name="main_input_uri_paste_content_description">貼上</string>
     <string name="conversion_automation_copy_link_succeeded">自動複製連結</string>

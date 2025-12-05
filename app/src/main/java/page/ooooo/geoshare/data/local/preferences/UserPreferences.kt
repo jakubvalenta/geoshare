@@ -139,13 +139,13 @@ object ConnectionPermission : OptionsUserPreference<Permission>(
             Permission.ALWAYS,
             Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
         ) {
-            Text(stringResource(R.string.user_preferences_connection_option_always))
+            Text(stringResource(R.string.yes))
         },
         UserPreferenceOption(Permission.ASK) {
             Text(stringResource(R.string.user_preferences_connection_option_ask))
         },
         UserPreferenceOption(Permission.NEVER) {
-            Text(stringResource(R.string.user_preferences_connection_option_never))
+            Text(stringResource(R.string.no))
         },
     )
 

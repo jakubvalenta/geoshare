@@ -33,9 +33,9 @@
     <string name="user_preferences_title">偏好设置</string>
     <string name="user_preferences_connection_title">是否允许连接到地图服务（Google、Apple 等）？</string>
     <string name="user_preferences_connection_description">为了支持短地图链接，并在链接不包含坐标时从地图服务的网页获取坐标，%1$s 可以连接到地图服务。您可以在常见问题屏幕上找到更多信息。</string>
-    <string name="user_preferences_connection_option_always">是</string>
+    <string name="yes">是</string>
     <string name="user_preferences_connection_option_ask">连接前询问</string>
-    <string name="user_preferences_connection_option_never">否</string>
+    <string name="no">否</string>
     <string name="conversion_failed_missing_url">缺少 URL</string>
     <string name="conversion_failed_unshorten_error">无法解析短链接</string>
     <string name="conversion_failed_parse_url_error">无法处理地图链接</string>
@@ -102,10 +102,10 @@
     <string name="converter_open_street_map_loading_indicator_title">正在连接到 OpenStreetMap…</string>
     <string name="url_converters_filter_all">所有地图服务</string>
     <string name="url_converters_filter_recent">最近添加的</string>
-    <string name="url_converters_default_handler_enabled">在 %1$s 中默认打开</string>
+    <string name="url_converters_default_handler_header">在 %1$s 中默认打开</string>
     <string name="url_converters_default_handler_disabled">在 %1$s 中不默认打开</string>
     <string name="url_converters_recent_info">%1$s 最近支持了新的地图服务。</string>
-    <string name="url_converters_settings_button_content_description">打开 Android 设置</string>
+    <string name="url_converters_settings_button">打开 Android 设置</string>
     <string name="conversion_loading_indicator_description">由于 %3$s， 第 %1$d 次尝试，共 %2$d 次。</string>
     <string name="conversion_succeeded_save_gpx_failed">无法保存 GPX</string>
     <string name="main_input_uri_paste_content_description">粘贴</string>

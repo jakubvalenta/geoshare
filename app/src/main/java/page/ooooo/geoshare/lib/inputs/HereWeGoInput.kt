@@ -17,6 +17,7 @@ object HereWeGoInput : Input {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
     override val documentation = Input.Documentation(
+        id = Input.DocumentationId.HERE_WEGO,
         nameResId = R.string.converter_here_wego_name,
         inputs = listOf(
             Input.DocumentationInput.Url(20, "https://share.here.com/l/"),

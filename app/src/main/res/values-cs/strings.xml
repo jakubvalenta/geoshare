@@ -47,9 +47,9 @@
     <string name="user_preferences_connection_title">Povolit spojení s mapovou službou (Google, Apple atd.)?</string>
     <string name="user_preferences_automation_title">Automatizace</string>
     <string name="user_preferences_connection_description">Pro podporu krátkých odkazů a pro získání souřadnic z webové stránky mapové služby, když odkaz souřadnice neobsahuje, se %1$s může spojit s danou mapovou službou. Více informací najdete na obrazovce Nejčastější dotazy.</string>
-    <string name="user_preferences_connection_option_always">Ano</string>
+    <string name="yes">Ano</string>
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
-    <string name="user_preferences_connection_option_never">Ne</string>
+    <string name="no">Ne</string>
     <string name="conversion_failed_missing_url">Chybí URL</string>
     <string name="conversion_failed_unshorten_error">Nepodařilo se analyzovat krátký odkaz</string>
     <string name="conversion_failed_parse_url_error">Nepodařilo se zpracovat odkaz na mapu</string>
@@ -106,10 +106,10 @@
     <string name="converter_open_street_map_loading_indicator_title">Spojování s OpenStreetMap…</string>
     <string name="url_converters_filter_all">Všechny mapové služby</string>
     <string name="url_converters_filter_recent">Nedávno přidané</string>
-    <string name="url_converters_default_handler_enabled">Otevírá se v %1$s</string>
+    <string name="url_converters_default_handler_header">Otevírá se v %1$s</string>
     <string name="url_converters_default_handler_disabled">Neotevírá se v %1$s</string>
     <string name="url_converters_recent_info">Do %1$s byla nedávno přidaná podpora pro nové mapové služby.</string>
-    <string name="url_converters_settings_button_content_description">Otevřít nastavení Androidu</string>
+    <string name="url_converters_settings_button">Otevřít nastavení Androidu</string>
     <string name="conversion_loading_indicator_description">Pokus %1$d z %2$d kvůli %3$s.</string>
     <string name="conversion_automation_copy_link_succeeded">Odkaz byl automaticky zkopírován</string>
     <string name="conversion_automation_copy_succeeded">Souřadnice byly automaticky zkopírovány</string>

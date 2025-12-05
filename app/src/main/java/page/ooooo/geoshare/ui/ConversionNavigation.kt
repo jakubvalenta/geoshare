@@ -37,8 +37,10 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
             )
         }
-        composable<InputsRoute> {
+        composable<InputsRoute> { backStackEntry ->
+            val route: InputsRoute = backStackEntry.toRoute()
             InputsScreen(
+                initialDocumentationId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )
