@@ -29,6 +29,6 @@ fun ParagraphHtml(
         modifier,
         style = MaterialTheme.typography.bodyMedium.copy(
             lineBreak = LineBreak.Paragraph,
-        )
+        ),
     )
 }
