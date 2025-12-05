@@ -53,7 +53,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Query
         testUri(
-            Position(Srs.WGS84, 52.5068441, 13.42473175),
+            Position(Srs.WGS84, 52.5068441, 13.42473175, name = "Berlin, Germany"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
         )
 
