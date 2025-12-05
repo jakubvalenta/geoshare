@@ -24,7 +24,8 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.DocumentationId
+import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -32,12 +33,12 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsListPane(
-    currentDocumentation: Input.Documentation?,
-    documentations: List<Input.Documentation>,
+    currentDocumentation: InputDocumentation?,
+    documentations: List<InputDocumentation>,
     expanded: Boolean,
     changelogShownForVersionCode: Int?,
     onBack: () -> Unit,
-    onNavigateToDocumentation: (id: Input.DocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: DocumentationId) -> Unit,
 ) {
     val context = LocalContext.current
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -58,12 +59,12 @@ fun InputsListPane(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InputsListPane(
-    currentDocumentation: Input.Documentation?,
-    documentations: List<Input.Documentation>,
+    currentDocumentation: InputDocumentation?,
+    documentations: List<InputDocumentation>,
     expanded: Boolean,
     changelogShownForVersionCode: Int?,
     onBack: () -> Unit,
-    onNavigateToDocumentation: (id: Input.DocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: DocumentationId) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -77,7 +78,7 @@ private fun InputsListPane(
 
     val recentDocumentations = changelogShownForVersionCode?.let { changelogShownForVersionCode ->
         documentations.filter { documentation ->
-            documentation.inputs.any { it.addedInVersionCode > changelogShownForVersionCode }
+            documentation.items.any { it.addedInVersionCode > changelogShownForVersionCode }
         }.takeIf { it.isNotEmpty() }
     }
 
@@ -145,10 +146,10 @@ private fun InputsListPane(
 
 @Composable
 private fun InputsListDocumentations(
-    currentDocumentation: Input.Documentation?,
-    documentations: List<Input.Documentation>,
+    currentDocumentation: InputDocumentation?,
+    documentations: List<InputDocumentation>,
     containerColor: Color,
-    onNavigateToDocumentation: (id: Input.DocumentationId) -> Unit,
+    onNavigateToDocumentation: (id: DocumentationId) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     ElevatedCard(Modifier.padding(horizontal = spacing.windowPadding)) {

@@ -22,24 +22,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
-import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.InputDocumentation
+import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
 import page.ooooo.geoshare.lib.inputs.OpenStreetMapInput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private data class DocumentationInputDetails(
-    val documentationInput: Input.DocumentationInput,
+    val documentationInput: InputDocumentationItem,
     val defaultHandlerEnabled: Boolean?,
 )
 
 private fun getDocumentationInputDetails(
-    documentation: Input.Documentation,
+    documentation: InputDocumentation,
     packageManager: PackageManager,
 ): List<DocumentationInputDetails> =
-    documentation.inputs.map { documentationInput ->
+    documentation.items.map { documentationInput ->
         DocumentationInputDetails(
             documentationInput,
-            if (documentationInput is Input.DocumentationInput.Url) {
+            if (documentationInput is InputDocumentationItem.Url) {
                 AndroidTools.isDefaultHandlerEnabled(packageManager, documentationInput.urlString)
             } else {
                 null
@@ -50,7 +51,7 @@ private fun getDocumentationInputDetails(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsDetailPane(
-    currentDocumentation: Input.Documentation,
+    currentDocumentation: InputDocumentation,
     expanded: Boolean,
     onBack: () -> Unit,
 ) {
@@ -127,10 +128,10 @@ private fun InputsDetailPane(
                     SelectionContainer(Modifier.weight(1f)) {
                         Text(
                             when (documentationInputDetails.documentationInput) {
-                                is Input.DocumentationInput.Text ->
+                                is InputDocumentationItem.Text ->
                                     documentationInputDetails.documentationInput.text()
 
-                                is Input.DocumentationInput.Url ->
+                                is InputDocumentationItem.Url ->
                                     documentationInputDetails.documentationInput.urlString
                                         .removePrefix("https://")
                                         .trimEnd('/')
@@ -168,7 +169,7 @@ private fun DefaultPreview() {
             Column {
                 InputsDetailPane(
                     nameResId = OpenStreetMapInput.documentation.nameResId,
-                    documentationInputDetails = OpenStreetMapInput.documentation.inputs.mapIndexed { i, documentationInput ->
+                    documentationInputDetails = OpenStreetMapInput.documentation.items.mapIndexed { i, documentationInput ->
                         DocumentationInputDetails(
                             documentationInput,
                             i and 1 == 0,
@@ -191,7 +192,7 @@ private fun DarkPreview() {
             Column {
                 InputsDetailPane(
                     nameResId = OpenStreetMapInput.documentation.nameResId,
-                    documentationInputDetails = OpenStreetMapInput.documentation.inputs.mapIndexed { i, documentationInput ->
+                    documentationInputDetails = OpenStreetMapInput.documentation.items.mapIndexed { i, documentationInput ->
                         DocumentationInputDetails(
                             documentationInput,
                             i and 1 == 0,
@@ -214,7 +215,7 @@ private fun TextInputPreview() {
             Column {
                 InputsDetailPane(
                     nameResId = GeoUriInput.documentation.nameResId,
-                    documentationInputDetails = GeoUriInput.documentation.inputs.mapIndexed { i, documentationInput ->
+                    documentationInputDetails = GeoUriInput.documentation.items.mapIndexed { i, documentationInput ->
                         DocumentationInputDetails(
                             documentationInput,
                             i and 1 == 0,
@@ -237,7 +238,7 @@ private fun DarkTextInputPreview() {
             Column {
                 InputsDetailPane(
                     nameResId = GeoUriInput.documentation.nameResId,
-                    documentationInputDetails = GeoUriInput.documentation.inputs.mapIndexed { i, documentationInput ->
+                    documentationInputDetails = GeoUriInput.documentation.items.mapIndexed { i, documentationInput ->
                         DocumentationInputDetails(
                             documentationInput,
                             i and 1 == 0,

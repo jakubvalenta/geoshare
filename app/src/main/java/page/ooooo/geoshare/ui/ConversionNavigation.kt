@@ -23,7 +23,7 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
-                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {

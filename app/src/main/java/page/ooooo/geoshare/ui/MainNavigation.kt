@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.ConversionViewModel
-import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.DocumentationId
 
 @Serializable
 object AboutRoute
@@ -23,7 +23,7 @@ object ConversionRoute
 object FaqRoute
 
 @Serializable
-data class InputsRoute(val id: Input.DocumentationId? = null)
+data class InputsRoute(val id: DocumentationId? = null)
 
 @Serializable
 object IntroRoute
@@ -61,7 +61,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
@@ -85,7 +85,7 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToConversionScreen = { navController.navigate(ConversionRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
-                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 viewModel = viewModel,

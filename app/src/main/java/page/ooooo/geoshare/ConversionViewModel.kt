@@ -90,7 +90,7 @@ class ConversionViewModel @Inject constructor(
     val changelogShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
         it.changelogShownForVersionCodeValue?.let { changelogShownForVersionCodeValue ->
             stateContext.inputs.all { input ->
-                input.documentation.inputs.all { input ->
+                input.documentation.items.all { input ->
                     input.addedInVersionCode <= changelogShownForVersionCodeValue
                 }
             }
@@ -266,7 +266,7 @@ class ConversionViewModel @Inject constructor(
 
     fun setChangelogShown() {
         val newestInputAddedInVersionCode = allInputs.maxOf { input ->
-            input.documentation.inputs.maxOf { it.addedInVersionCode }
+            input.documentation.items.maxOf { it.addedInVersionCode }
         }
         setUserPreferenceValue(ChangelogShownForVersionCode, newestInputAddedInVersionCode)
     }

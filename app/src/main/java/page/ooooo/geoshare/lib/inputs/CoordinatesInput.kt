@@ -30,11 +30,11 @@ object CoordinatesInput : Input {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
-    override val documentation = Input.Documentation(
-        id = Input.DocumentationId.COORDINATES,
+    override val documentation = InputDocumentation(
+        id = DocumentationId.COORDINATES,
         nameResId = R.string.converter_coordinates_name,
-        inputs = listOf(
-            Input.DocumentationInput.Text(20) {
+        items = listOf(
+            InputDocumentationItem.Text(20) {
                 stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Position.example, null))
             },
         ),

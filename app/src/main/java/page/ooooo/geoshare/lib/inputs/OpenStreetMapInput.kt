@@ -18,16 +18,16 @@ object OpenStreetMapInput : Input.HasHtml {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
-    override val documentation = Input.Documentation(
-        id = Input.DocumentationId.OPEN_STREET_MAP,
+    override val documentation = InputDocumentation(
+        id = DocumentationId.OPEN_STREET_MAP,
         nameResId = R.string.converter_open_street_map_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(20, "https://www.openstreetmap.org/"),
-            Input.DocumentationInput.Url(23, "https://www.openstreetmap.org/node"),
-            Input.DocumentationInput.Url(23, "https://www.openstreetmap.org/relation"),
-            Input.DocumentationInput.Url(23, "https://www.openstreetmap.org/way"),
-            Input.DocumentationInput.Url(23, "https://osm.org/"),
-            Input.DocumentationInput.Url(23, "https://osm.org/go/"),
+        items = listOf(
+            InputDocumentationItem.Url(20, "https://www.openstreetmap.org/"),
+            InputDocumentationItem.Url(23, "https://www.openstreetmap.org/node"),
+            InputDocumentationItem.Url(23, "https://www.openstreetmap.org/relation"),
+            InputDocumentationItem.Url(23, "https://www.openstreetmap.org/way"),
+            InputDocumentationItem.Url(23, "https://osm.org/"),
+            InputDocumentationItem.Url(23, "https://osm.org/go/"),
         ),
     )
 

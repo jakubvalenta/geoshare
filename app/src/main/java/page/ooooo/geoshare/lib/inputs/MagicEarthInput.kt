@@ -17,11 +17,11 @@ object MagicEarthInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
-    override val documentation = Input.Documentation(
-        id = Input.DocumentationId.MAGIC_EARTH,
+    override val documentation = InputDocumentation(
+        id = DocumentationId.MAGIC_EARTH,
         nameResId = R.string.converter_magic_earth_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(20, "https://magicearth.com/"),
+        items = listOf(
+            InputDocumentationItem.Url(20, "https://magicearth.com/"),
         ),
     )
 

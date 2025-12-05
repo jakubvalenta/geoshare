@@ -16,14 +16,14 @@ object HereWeGoInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
-    override val documentation = Input.Documentation(
-        id = Input.DocumentationId.HERE_WEGO,
+    override val documentation = InputDocumentation(
+        id = DocumentationId.HERE_WEGO,
         nameResId = R.string.converter_here_wego_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(20, "https://share.here.com/l/"),
-            Input.DocumentationInput.Url(20, "https://share.here.com/p/"),
-            Input.DocumentationInput.Url(20, "https://wego.here.com/"),
-            Input.DocumentationInput.Url(20, "https://wego.here.com/p/"),
+        items = listOf(
+            InputDocumentationItem.Url(20, "https://share.here.com/l/"),
+            InputDocumentationItem.Url(20, "https://share.here.com/p/"),
+            InputDocumentationItem.Url(20, "https://wego.here.com/"),
+            InputDocumentationItem.Url(20, "https://wego.here.com/p/"),
         ),
     )
 

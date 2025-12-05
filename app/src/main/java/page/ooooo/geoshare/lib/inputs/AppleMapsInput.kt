@@ -16,12 +16,12 @@ object AppleMapsInput : Input.HasHtml {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
-    override val documentation = Input.Documentation(
-        id = Input.DocumentationId.APPLE_MAPS,
+    override val documentation = InputDocumentation(
+        id = DocumentationId.APPLE_MAPS,
         nameResId = R.string.converter_apple_maps_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(18, "https://maps.apple"),
-            Input.DocumentationInput.Url(18, "https://maps.apple.com"),
+        items = listOf(
+            InputDocumentationItem.Url(18, "https://maps.apple"),
+            InputDocumentationItem.Url(18, "https://maps.apple.com"),
         ),
     )
 

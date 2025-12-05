@@ -32,6 +32,7 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.GpxOutput
@@ -226,7 +227,7 @@ class ConversionStateTest {
         val mockInput = object : Input {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
-                Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
             override fun parseUri(uri: Uri) = Pair(Position(), null)
         }
@@ -693,7 +694,7 @@ class ConversionStateTest {
         val mockInput = object : Input.HasShortUri {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
-                Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val shortUriPattern: Pattern = Pattern.compile(".")
             override val shortUriMethod = Input.ShortUriMethod.GET
             override val permissionTitleResId = -1
@@ -795,7 +796,7 @@ class ConversionStateTest {
             val mockInput = object : Input {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation =
-                    Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
                 override fun parseUri(uri: Uri) = Pair(positionFromUri, htmlUriString)
             }
@@ -1130,7 +1131,7 @@ class ConversionStateTest {
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
-                Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
             override fun parseUri(uri: Uri): Pair<Position, String?> {
@@ -1384,7 +1385,7 @@ class ConversionStateTest {
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
-                Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
             override fun parseUri(uri: Uri): Pair<Position, String?> {
@@ -1428,7 +1429,7 @@ class ConversionStateTest {
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
-                Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
             override fun parseUri(uri: Uri): Pair<Position, String?> {
@@ -1473,7 +1474,7 @@ class ConversionStateTest {
             val mockInput = object : Input.HasHtml {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation =
-                    Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
                 override fun parseUri(uri: Uri): Pair<Position, String?> {
@@ -1518,7 +1519,7 @@ class ConversionStateTest {
             val mockInput = object : Input.HasHtml {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation =
-                    Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
                 override fun parseUri(uri: Uri): Pair<Position, String?> {
@@ -1563,7 +1564,7 @@ class ConversionStateTest {
             val mockInput = object : Input.HasHtml {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation =
-                    Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
                 override fun parseUri(uri: Uri): Pair<Position, String?> {
@@ -1615,7 +1616,7 @@ class ConversionStateTest {
             val mockInput = object : Input.HasHtml {
                 override val uriPattern: Pattern = Pattern.compile(".")
                 override val documentation =
-                    Input.Documentation(id = GeoUriInput.documentation.id, nameResId = -1, inputs = emptyList())
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
                 override fun parseUri(uri: Uri): Pair<Position, String?> {

@@ -22,11 +22,11 @@ object GeoUriInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
-    override val documentation = Input.Documentation(
-        id = Input.DocumentationId.GEO_URI,
+    override val documentation = InputDocumentation(
+        id = DocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
-        inputs = listOf(
-            Input.DocumentationInput.Text(3) {
+        items = listOf(
+            InputDocumentationItem.Text(3) {
                 stringResource(
                     R.string.example,
                     GeoUriOutput.formatUriString(
