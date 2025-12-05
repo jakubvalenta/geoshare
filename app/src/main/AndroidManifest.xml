@@ -9,6 +9,10 @@
         </intent>
         <intent>
             <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="magicearth"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
             <data android:mimeType="application/gpx+xml"/>
         </intent>
     </queries>

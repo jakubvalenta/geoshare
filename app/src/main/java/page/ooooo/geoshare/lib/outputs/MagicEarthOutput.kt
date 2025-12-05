@@ -29,9 +29,6 @@ import kotlin.time.Duration.Companion.seconds
  */
 object MagicEarthOutput : Output {
 
-    @Suppress("SpellCheckingInspection")
-    const val PACKAGE_NAME = "com.generalmagic.magicearth"
-
     open class CopyDisplayUriAction : CopyAction() {
         override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
             formatDisplayUriString(position, i, uriQuote)
@@ -302,7 +299,7 @@ object MagicEarthOutput : Output {
     )
 
     override fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = buildList {
-        apps.filter { it.packageName == PACKAGE_NAME }.forEach { app ->
+        apps.filter { it.type == AndroidTools.AppType.MAGIC_EARTH }.forEach { app ->
             add(app.packageName to ShareDisplayUriWithAppAction(app.packageName))
             add(app.packageName to ShareNavigateToUriWithAppAction(app.packageName))
             add(app.packageName to ShareNavigateViaUriWithAppAction(app.packageName))
@@ -315,7 +312,7 @@ object MagicEarthOutput : Output {
         add(CopyDisplayUriAutomation)
         add(CopyNavigateToUriAutomation)
         add(CopyNavigateViaUriAutomation)
-        apps.filter { it.packageName == PACKAGE_NAME }.forEach { app ->
+        apps.filter { it.type == AndroidTools.AppType.MAGIC_EARTH }.forEach { app ->
             add(ShareNavigateToUriWithAppAutomation(app.packageName))
             add(ShareNavigateViaUriWithAppAutomation(app.packageName))
         }
