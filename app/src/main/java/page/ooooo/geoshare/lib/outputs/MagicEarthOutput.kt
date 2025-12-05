@@ -24,13 +24,13 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated, for
- * example the drive_via parameter doesn't work anymore but trial and error showed that navigate_via works.
+ * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated:
+ * - drive_via doesn't work
+ * - navigate_to doesn't work; use get_directions
+ * - navigate_via doesn't work; it was an undocumented parameter that used to work for a while
+ * - search_around seems to do the same as open_search
  */
 object MagicEarthOutput : Output {
-
-    @Suppress("SpellCheckingInspection")
-    const val PACKAGE_NAME = "com.generalmagic.magicearth"
 
     open class CopyDisplayUriAction : CopyAction() {
         override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
@@ -52,16 +52,6 @@ object MagicEarthOutput : Output {
         }
     }
 
-    open class CopyNavigateViaUriAction : CopyAction() {
-        override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatNavigateViaUriString(position, i, uriQuote)
-
-        @Composable
-        override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link_drive_via, MagicEarthInput.NAME))
-        }
-    }
-
     object ShareDisplayUriAction : OpenChooserAction() {
         override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
             formatDisplayUriString(position, i, uriQuote)
@@ -79,16 +69,6 @@ object MagicEarthOutput : Output {
         @Composable
         override fun Label() {
             Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthInput.NAME))
-        }
-    }
-
-    object ShareNavigateViaUriAction : OpenChooserAction() {
-        override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatNavigateViaUriString(position, i, uriQuote)
-
-        @Composable
-        override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_open_app_navigate_via, MagicEarthInput.NAME))
         }
     }
 
@@ -122,21 +102,6 @@ object MagicEarthOutput : Output {
         }
     }
 
-    open class ShareNavigateViaUriWithAppAction(override val packageName: String) : OpenAppAction(packageName) {
-        override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatNavigateViaUriString(position, i, uriQuote)
-
-        @Composable
-        override fun Label() {
-            Text(
-                stringResource(
-                    R.string.conversion_succeeded_open_app_navigate_via,
-                    queryAppDetails()?.label ?: packageName,
-                ),
-            )
-        }
-    }
-
     object CopyDisplayUriAutomation : CopyDisplayUriAction(), BasicAutomation {
         override val type = Automation.Type.COPY_MAGIC_EARTH_URI
         override val packageName = ""
@@ -148,15 +113,6 @@ object MagicEarthOutput : Output {
 
     object CopyNavigateToUriAutomation : CopyNavigateToUriAction(), BasicAutomation {
         override val type = Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI
-        override val packageName = ""
-        override val testTag = null
-
-        @Composable
-        override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
-    }
-
-    object CopyNavigateViaUriAutomation : CopyNavigateViaUriAction(), BasicAutomation {
-        override val type = Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_VIA_URI
         override val packageName = ""
         override val testTag = null
 
@@ -225,87 +181,22 @@ object MagicEarthOutput : Output {
             )
     }
 
-    data class ShareNavigateViaUriWithAppAutomation(override val packageName: String) :
-        ShareNavigateViaUriWithAppAction(packageName),
-        Action.HasSuccessMessage,
-        BasicAutomation,
-        Automation.HasDelay {
-
-        override val type = Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA
-        override val testTag = null
-        override val delay = 5.seconds
-
-        @Composable
-        override fun Label() {
-            val spacing = LocalSpacing.current
-            queryAppDetails()?.let { appDetails ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        rememberDrawablePainter(appDetails.icon),
-                        appDetails.label,
-                        Modifier.widthIn(max = 24.dp),
-                    )
-                    Text(
-                        stringResource(
-                            R.string.conversion_succeeded_open_app_navigate_via,
-                            appDetails.label
-                        )
-                    )
-                }
-            } ?: Text(
-                stringResource(
-                    R.string.conversion_succeeded_open_app_navigate_via,
-                    packageName
-                )
-            )
-        }
-
-        @Composable
-        override fun successText() =
-            stringResource(
-                R.string.conversion_automation_open_app_succeeded,
-                queryAppDetails()?.label ?: packageName,
-            )
-
-        @Composable
-        override fun errorText() =
-            stringResource(
-                R.string.conversion_automation_open_app_failed,
-                queryAppDetails()?.label ?: packageName,
-            )
-
-        @Composable
-        override fun waitingText(counterSec: Int) =
-            stringResource(
-                R.string.conversion_automation_open_app_waiting,
-                queryAppDetails()?.label ?: packageName,
-                counterSec,
-            )
-    }
-
     override fun getPositionActions() = listOf(
         CopyDisplayUriAction(),
         CopyNavigateToUriAction(),
-        CopyNavigateViaUriAction(),
     )
 
     override fun getPointActions(): List<BasicAction> = listOf(
         CopyDisplayUriAction(),
         CopyNavigateToUriAction(),
-        CopyNavigateViaUriAction(),
         ShareDisplayUriAction,
         ShareNavigateToUriAction,
-        ShareNavigateViaUriAction,
     )
 
     override fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = buildList {
-        apps.filter { it.packageName == PACKAGE_NAME }.forEach { app ->
+        apps.filter { it.type == AndroidTools.AppType.MAGIC_EARTH }.forEach { app ->
             add(app.packageName to ShareDisplayUriWithAppAction(app.packageName))
             add(app.packageName to ShareNavigateToUriWithAppAction(app.packageName))
-            add(app.packageName to ShareNavigateViaUriWithAppAction(app.packageName))
         }
     }
 
@@ -314,10 +205,8 @@ object MagicEarthOutput : Output {
     override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
         add(CopyDisplayUriAutomation)
         add(CopyNavigateToUriAutomation)
-        add(CopyNavigateViaUriAutomation)
-        apps.filter { it.packageName == PACKAGE_NAME }.forEach { app ->
+        apps.filter { it.type == AndroidTools.AppType.MAGIC_EARTH }.forEach { app ->
             add(ShareNavigateToUriWithAppAutomation(app.packageName))
-            add(ShareNavigateViaUriWithAppAutomation(app.packageName))
         }
     }
 
@@ -328,14 +217,8 @@ object MagicEarthOutput : Output {
         Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI ->
             CopyNavigateToUriAutomation
 
-        Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_VIA_URI ->
-            CopyNavigateViaUriAutomation
-
         Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO if packageName != null ->
             ShareNavigateToUriWithAppAutomation(packageName)
-
-        Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_VIA if packageName != null ->
-            ShareNavigateViaUriWithAppAutomation(packageName)
 
         else -> null
     }
@@ -375,22 +258,7 @@ object MagicEarthOutput : Output {
             scheme = "magicearth",
             path = "//",
             queryParams = buildMap {
-                set("navigate_to", "")
-                (position.getPoint(i) ?: Point(Srs.WGS84))
-                    .toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
-                        set("lat", latStr)
-                        set("lon", lonStr)
-                    }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
-
-    private fun formatNavigateViaUriString(position: Position, i: Int?, uriQuote: UriQuote): String =
-        Uri(
-            scheme = "magicearth",
-            path = "//",
-            queryParams = buildMap {
-                set("navigate_via", "")
+                set("get_directions", "")
                 (position.getPoint(i) ?: Point(Srs.WGS84))
                     .toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                         set("lat", latStr)

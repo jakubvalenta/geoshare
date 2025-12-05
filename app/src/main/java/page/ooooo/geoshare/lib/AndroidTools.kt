@@ -43,7 +43,7 @@ object AndroidTools {
 
     const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
 
-    enum class AppType { GEO_URI, GPX }
+    enum class AppType { GEO_URI, GPX, MAGIC_EARTH }
 
     data class App(val packageName: String, val type: AppType)
 
@@ -115,18 +115,36 @@ object AndroidTools {
     }
 
     fun queryApps(packageManager: PackageManager): List<App> = buildList {
-        val geoUriPackageNames = queryPackageNames(
+        val seenPackageNames = mutableSetOf<String>()
+        for (packageName in queryPackageNames(
+            packageManager,
+            Intent(Intent.ACTION_VIEW, "magicearth:".toUri()),
+        )) {
+            if (packageName !in seenPackageNames) {
+                seenPackageNames.add(packageName)
+                add(App(packageName, AppType.MAGIC_EARTH))
+            }
+        }
+        for (packageName in queryPackageNames(
             packageManager,
             Intent(Intent.ACTION_VIEW, "geo:".toUri()),
-        )
-        addAll(geoUriPackageNames.map { App(it, AppType.GEO_URI) })
-        val gpxPackageNames = queryPackageNames(
+        )) {
+            if (packageName !in seenPackageNames) {
+                seenPackageNames.add(packageName)
+                add(App(packageName, AppType.GEO_URI))
+            }
+        }
+        for (packageName in queryPackageNames(
             packageManager,
             Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType("content:".toUri(), "application/gpx+xml")
             },
-        )
-        addAll(gpxPackageNames.filter { it !in geoUriPackageNames }.map { App(it, AppType.GPX) })
+        )) {
+            if (packageName !in seenPackageNames) {
+                seenPackageNames.add(packageName)
+                add(App(packageName, AppType.GPX))
+            }
+        }
     }
 
     private fun startActivity(context: Context, intent: Intent): Boolean =

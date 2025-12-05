@@ -215,9 +215,9 @@ private fun DefaultPreview() {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutput.PACKAGE_NAME,
-                            "appDetails.comaps.fdroid",
-                            "appDetails.organicmaps",
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.generalmagic.magicearth",
                             "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
@@ -251,9 +251,9 @@ private fun DarkPreview() {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutput.PACKAGE_NAME,
-                            "appDetails.comaps.fdroid",
-                            "appDetails.organicmaps",
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.generalmagic.magicearth",
                             "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
@@ -287,9 +287,9 @@ private fun OneAppPreview() {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutput.PACKAGE_NAME,
-                            "appDetails.comaps.fdroid",
-                            "appDetails.organicmaps",
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.generalmagic.magicearth",
                             "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",
@@ -323,9 +323,9 @@ private fun DarkOneAppPreview() {
                         @Suppress("SpellCheckingInspection")
                         listOf(
                             GOOGLE_MAPS_PACKAGE_NAME,
-                            MagicEarthOutput.PACKAGE_NAME,
-                            "appDetails.comaps.fdroid",
-                            "appDetails.organicmaps",
+                            "app.comaps.fdroid",
+                            "app.organicmaps",
+                            "com.generalmagic.magicearth",
                             "com.here.appDetails.maps",
                             "cz.seznam.mapy",
                             "net.osmand.plus",

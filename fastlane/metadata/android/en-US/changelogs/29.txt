@@ -1,2 +1,3 @@
 - Added support for launching TomTom navigation (asks for location permission).
 - Improved extraction of place labels from Google Maps links.
+- Fixed opening the latest Magic Earth version and removed the now incompatible "Add waypoint" feature.

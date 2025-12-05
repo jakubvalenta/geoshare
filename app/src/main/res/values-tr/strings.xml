@@ -6,7 +6,6 @@
     <string name="conversion_succeeded_copy_link">%1$s bağlantısını kopyala</string>
     <string name="conversion_succeeded_copy_link_display">Haritayı %1$s’de göstermek için bağlantıyı kopyala</string>
     <string name="conversion_succeeded_copy_link_drive_to">%1$s’de gezinmek için bağlantıyı kopyalayın</string>
-    <string name="conversion_succeeded_copy_link_drive_via">%1$s’de geçiş noktası eklemek için bağlantıyı kopyalayın</string>
     <string name="conversion_succeeded_copy_link_street_view">%1$s’deki sokak görünümüne bağlantıyı kopyala</string>
     <string name="conversion_succeeded_open_app">%1$s’yi Aç</string>
     <string name="conversion_succeeded_open_app_display">Haritayı %1$s’de göster</string>

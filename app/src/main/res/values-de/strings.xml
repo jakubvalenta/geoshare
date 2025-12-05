@@ -112,11 +112,9 @@
     <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>
     <string name="conversion_succeeded_copy_link_display">Link zum Anzeigen der Karte in %1$s kopieren</string>
     <string name="conversion_succeeded_copy_link_drive_to">Link zum Navigieren in %1$s kopieren</string>
-    <string name="conversion_succeeded_copy_link_drive_via">Link zum Hinzufügen eines Wegpunkts in %1$s kopieren</string>
     <string name="conversion_succeeded_open_app">%1$s öffnen</string>
     <string name="conversion_succeeded_open_app_display">Karte in %1$s anzeigen</string>
     <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
-    <string name="conversion_succeeded_open_app_navigate_via">Wegpunkt in %1$s hinzufügen</string>
     <string name="conversion_succeeded_save_gpx_failed">Das Speichern der GPX-Datei ist fehlgeschlagen</string>
     <string name="main_random">Zufälliger Link</string>
     <string name="converter_amap_loading_indicator_title">Verbindung mit Amap…</string>

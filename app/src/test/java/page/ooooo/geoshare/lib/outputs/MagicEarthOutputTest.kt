@@ -12,7 +12,7 @@ class MagicEarthOutputTest {
     private val output = MagicEarthOutput
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
+    fun getPositionActions_positionHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456",
             output.getPositionActions().first()
@@ -21,7 +21,7 @@ class MagicEarthOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
+    fun getPositionActions_positionHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456&name=foo%20bar",
             output.getPositionActions().first()
@@ -30,7 +30,7 @@ class MagicEarthOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndQueryAndZoom_returnsSearchAroundUriAndIgnoresZoom() {
+    fun getPositionActions_positionHasCoordinatesAndQueryAndZoom_returnsSearchAroundUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?search_around&lat=50.123456&lon=-11.123456&q=foo%20bar",
             output.getPositionActions().first()
@@ -39,7 +39,7 @@ class MagicEarthOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
+    fun getPositionActions_positionHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?open_search&q=foo%20bar",
             output.getPositionActions().first()
@@ -48,14 +48,13 @@ class MagicEarthOutputTest {
     }
 
     @Test
-    fun copyAction_returnsDriveToAndDriveViaUriStrings() {
+    fun getPositionActions_returnsNavigateToUri() {
         assertEquals(
             listOf(
-                "magicearth://?navigate_to&lat=50.123456&lon=-11.123456",
-                "magicearth://?navigate_via&lat=50.123456&lon=-11.123456",
+                "magicearth://?get_directions&lat=50.123456&lon=-11.123456",
             ),
-            output.getPositionActions().slice(1..2).map {
-                it.getText(Position(Srs.WGS84, 50.123456, -11.123456), null, uriQuote)
+            Position(Srs.WGS84, 50.123456, -11.123456).let { position ->
+                output.getPositionActions().drop(1).map { it.getText(position, null, uriQuote) }
             },
         )
     }

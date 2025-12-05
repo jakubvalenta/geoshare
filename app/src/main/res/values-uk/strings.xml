@@ -131,10 +131,8 @@
     <string name="main_random">Випадкове посилання</string>
     <string name="conversion_succeeded_copy_link_display">Скопіювати посилання, щоб показати карту в %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_to">Скопіюйте посилання для навігації в %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_via">Скопіювати посилання, щоб додати точку маршруту в %1$s</string>
     <string name="conversion_succeeded_open_app_display">Показати карту в %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навігація в %1$s</string>
-    <string name="conversion_succeeded_open_app_navigate_via">Додати точку маршруту в %1$s</string>
     <string name="converter_amap_loading_indicator_title">Підключення до Amap…</string>
     <string name="converter_amap_permission_title">Підключитися до Amap?</string>
     <string name="conversion_succeeded_copy_link_street_view">Копіювати посилання на перегляд вулиць у %1$s</string>

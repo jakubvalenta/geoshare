@@ -7,7 +7,6 @@
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
     <string name="conversion_succeeded_copy_link_display">Copy link to show map in %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_to">Copy link to navigate in %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_via">Copy link to add waypoint in %1$s</string>
     <string name="conversion_succeeded_copy_link_street_view">Copy link to street view in %1$s</string>
     <string name="conversion_succeeded_location_failed">Failed to find location</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Finding your location…</string>
@@ -16,7 +15,6 @@
     <string name="conversion_succeeded_open_app_display">Show map in %1$s</string>
     <string name="conversion_succeeded_open_app_failed">Failed to open %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navigate in %1$s</string>
-    <string name="conversion_succeeded_open_app_navigate_via">Add waypoint in %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Show street view in %1$s</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
     <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
