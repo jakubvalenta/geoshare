@@ -136,4 +136,8 @@
     <string name="conversion_succeeded_open_app_street_view">在 %1$s 显示街景</string>
     <string name="converter_urbi_permission_title">连接到 2GIS / Urbi？</string>
     <string name="converter_urbi_loading_indicator_title">正在连接到 2GIS / Urbi…</string>
+    <string name="conversion_succeeded_location_failed">找不到位置</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">正在寻找你的位置…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">允许访问位置吗？</string>
+    <string name="conversion_succeeded_open_app_failed">打开 %1$s 失败</string>
 </resources>
