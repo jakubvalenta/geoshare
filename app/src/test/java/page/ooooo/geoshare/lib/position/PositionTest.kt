@@ -5,6 +5,64 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class PositionTest {
+
+    @Test
+    fun setLastPointName_pointsAreNull_returnsPositionUnchanged() {
+        val position = Position()
+        assertEquals(
+            position,
+            position.setLastPointName("foo"),
+        )
+    }
+
+    @Test
+    fun setLastPointName_pointsAreEmpty_returnsPositionUnchanged() {
+        val position = Position(points = persistentListOf())
+        assertEquals(
+            position,
+            position.setLastPointName("foo"),
+        )
+    }
+
+    @Test
+    fun setLastPointName_pointsSizeIsOneAndLastPointHasName_returnsPositionUnchanged() {
+        val position = Position(points = persistentListOf(Point(Srs.WGS84, 1.0, 2.0, "bar")))
+        assertEquals(
+            position,
+            position.setLastPointName("foo"),
+        )
+    }
+
+    @Test
+    fun setMainPointName_pointsSizeIsOneAndLastPointDoesNotHaveName_returnsNewPositionWithLastPointNameSet() {
+        val position = Position(points = persistentListOf(Point(Srs.WGS84, 1.0, 2.0)))
+        assertEquals(
+            Position(points = persistentListOf(Point(Srs.WGS84, 1.0, 2.0, "foo"))),
+            position.setLastPointName("foo"),
+        )
+    }
+
+    @Test
+    fun setMainPointName_pointsSizeIsThreeAndLastPointDoesNotHaveName_returnsNewPositionWithLastPointNameSet() {
+        val position = Position(
+            points = persistentListOf(
+                Point(Srs.WGS84, 1.0, 2.0),
+                Point(Srs.WGS84, 3.0, 4.0),
+                Point(Srs.WGS84, 5.0, 6.0),
+            )
+        )
+        assertEquals(
+            Position(
+                points = persistentListOf(
+                    Point(Srs.WGS84, 1.0, 2.0),
+                    Point(Srs.WGS84, 3.0, 4.0),
+                    Point(Srs.WGS84, 5.0, 6.0, "foo"),
+                )
+            ),
+            position.setLastPointName("foo"),
+        )
+    }
+
     @Test
     fun writeGpxPoints() {
         assertEquals(

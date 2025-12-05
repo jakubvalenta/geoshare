@@ -131,7 +131,7 @@ object CoordinatesOutput : Output {
     private fun formatDescriptionString(position: Position): String = position.run {
         buildList {
             q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (mainPoint ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                (points?.lastOrNull() ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
                     if (q != "$latStr,$lonStr") {
                         add(q.replace('+', ' '))
                     }
@@ -146,15 +146,9 @@ object CoordinatesOutput : Output {
     @Composable
     private fun name(position: Position, i: Int?): String? =
         position.getPoint(i)?.let { point ->
-            if (!point.name.isNullOrEmpty()) {
-                point.name.replace('+', ' ')
-            } else if (position.pointCount > 1) {
-                stringResource(
-                    R.string.conversion_succeeded_point_number,
-                    if (i == null) position.pointCount else i + 1,
-                )
-            } else {
-                null
-            }
+            point.name.takeUnless { it.isNullOrEmpty() }?.replace('+', ' ')
+                ?: position.points?.size?.takeIf { it > 1 }?.let { size ->
+                    stringResource(R.string.conversion_succeeded_point_number, if (i == null) size else i + 1)
+                }
         }
 }

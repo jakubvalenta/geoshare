@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import io.ktor.util.*
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
 
@@ -40,13 +41,15 @@ data class Position(
         z: Double? = null,
     ) : this(null, q, z)
 
-    val mainPoint: Point? get() = points?.lastOrNull()
-
-    val pointCount: Int get() = points?.size ?: 0
-
     val zStr: String? get() = z?.toScale(7)?.toTrimmedString()
 
-    fun getPoint(i: Int?): Point? = if (i == null) mainPoint else points?.getOrNull(i)
+    fun getPoint(i: Int?): Point? = if (i == null) points?.lastOrNull() else points?.getOrNull(i)
+
+    fun setLastPointName(name: String): Position = if (points?.isNotEmpty() == true && points.last().name == null) {
+        this.copy(points = (points.dropLast(1) + points.last().copy(name = name)).toImmutableList())
+    } else {
+        this
+    }
 
     fun writeGpxPoints(writer: Appendable) = writeGpx(writer) {
         points?.map { point ->

@@ -164,8 +164,8 @@ abstract class BaseActivityBehaviorTest {
         val expectedText = allOutputs.getText(expectedPosition, null)
         val coordinatesElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" }
         assertEquals(expectedText, coordinatesElement.text)
-        val expectedName = expectedPosition.mainPoint?.name?.replace('+', ' ')
-            ?: expectedPosition.pointCount.takeIf { it > 1 }?.let { "point $it" }
+        val expectedName = expectedPosition.points?.lastOrNull()?.name?.replace('+', ' ')
+            ?: expectedPosition.points?.size?.takeIf { it > 1 }?.let { "point $it" }
         val nameElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" }
         if (expectedName != null) {
             assertEquals(expectedName, nameElement.text)

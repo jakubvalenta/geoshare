@@ -277,9 +277,11 @@ data class GrantedParseHtmlPermission(
                 input.parseHtml(channel)
             }
             if (!positionFromHtml.points.isNullOrEmpty()) {
-                stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionFromHtml")
-                // TODO Copy main point name from `positionFromUri` to `positionFromHtml`
-                ConversionSucceeded(stateContext, inputUriString, positionFromHtml)
+                val positionMerged = positionFromUri.q?.let { q ->
+                    positionFromHtml.setLastPointName(q)
+                } ?: positionFromHtml
+                stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $positionMerged")
+                ConversionSucceeded(stateContext, inputUriString, positionMerged)
             } else if (redirectUriString != null) {
                 stateContext.log.i(
                     null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI $redirectUriString"

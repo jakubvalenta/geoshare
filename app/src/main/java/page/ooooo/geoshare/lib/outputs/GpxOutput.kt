@@ -291,8 +291,8 @@ object GpxOutput : Output {
         if (location == null) {
             return null
         }
-        val route = if (i == null && position.pointCount > 1) {
-            Position(position.points?.toMutableList()?.apply { add(0, location) }?.toImmutableList())
+        val route = if (i == null && position.points?.size != null && position.points.size > 1) {
+            Position(position.points.toMutableList().apply { add(0, location) }.toImmutableList())
         } else {
             val point = position.getPoint(i) ?: return null
             Position(persistentListOf(location, point))
