@@ -126,6 +126,7 @@
     <string name="about_app_icon_content_description">Application icon</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="about_text"><![CDATA[<p>%1$s is a free and open-source app distributed under the <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> or later license.</p><br><p>You can find the code at <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, where you can also <a href="https://github.com/jakubvalenta/geoshare/issues">report issues</a>.</p><br><p>Your feedback is welcome. You can reach me at <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
+    <string name="about_text_google_play" translatable="false">If you’d like to help getting the app published on Google Play, write me an email to the above address, and I’ll invite you to the testing program.</string>
     <string name="permission_do_not_ask">Don’t ask me again</string>
     <string name="faq_title">FAQ</string>
     <string name="faq_how_it_works_headline">How it works and privacy considerations</string>

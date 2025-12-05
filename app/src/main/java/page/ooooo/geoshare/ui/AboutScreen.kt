@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.BuildConfig
@@ -71,6 +72,22 @@ fun AboutScreen(
                 style = MaterialTheme.typography.headlineSmall,
             )
             ParagraphHtml(stringResource(R.string.about_text, appName))
+
+            // TODO Remove Google Play testing info once the app is published there
+            ElevatedCard(
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                ),
+            ) {
+                Text(
+                    stringResource(R.string.about_text_google_play),
+                    Modifier.padding(spacing.medium),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        lineBreak = LineBreak.Paragraph,
+                    ),
+                )
+            }
         }
     }
 }
