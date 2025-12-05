@@ -130,10 +130,8 @@
     <string name="user_preferences_automation_title">Automatización</string>
     <string name="conversion_succeeded_copy_link_display">Copiar enlace para mostrar el mapa en %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_to">Copiar enlace para navegar en %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_via">Copiar enlace para agregar un punto de ruta en %1$s</string>
     <string name="conversion_succeeded_open_app_display">Mostrar mapa en %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navegar en %1$s</string>
-    <string name="conversion_succeeded_open_app_navigate_via">Agregar un punto de ruta en %1$s</string>
     <string name="converter_amap_loading_indicator_title">Conectándose a Amap…</string>
     <string name="converter_amap_permission_title">¿Conectarse a Amap?</string>
     <string name="conversion_succeeded_copy_link_street_view">Copiar enlace para vista de calle en %1$s</string>

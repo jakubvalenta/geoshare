@@ -133,11 +133,9 @@
     <string name="user_preferences_automation_title">أتمتة</string>
     <string name="conversion_succeeded_copy_link_display">انسخ الرابط لإظهار الخريطة في %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_to">انسخ الرابط للتنقل في %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_via">انسخ الرابط لإضافة نقطة طريق في %1$s</string>
     <string name="conversion_succeeded_copy_link_street_view">انسخ رابط عرض الشارع في %1$s</string>
     <string name="conversion_succeeded_open_app_display">أظهر الخريطة في %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">التنقل في %1$s</string>
-    <string name="conversion_succeeded_open_app_navigate_via">أضف نقطة طريق في %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">أظهر عرض الشارع في %1$s</string>
     <string name="converter_amap_loading_indicator_title">يتصل ب Amap…</string>
     <string name="converter_amap_permission_title">اتصل ب Amap؟</string>
