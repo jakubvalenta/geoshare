@@ -13,6 +13,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,9 +61,10 @@ fun InputsDetailPane(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    var documentationInputInfos = getDocumentationInputDetails(currentDocumentation, context.packageManager)
+    var documentationInputInfos by remember {
+        mutableStateOf(getDocumentationInputDetails(currentDocumentation, context.packageManager))
+    }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        // FIXME Refresh screen after settings change
         documentationInputInfos = getDocumentationInputDetails(currentDocumentation, context.packageManager)
     }
 
