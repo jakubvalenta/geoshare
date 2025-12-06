@@ -5,12 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,12 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
+import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -70,7 +64,6 @@ private fun InputsListPane(
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val appName = stringResource(R.string.app_name)
 
     val containerColor = if (expanded) {
         Color.Unspecified
@@ -111,21 +104,8 @@ private fun InputsListPane(
             .verticalScroll(rememberScrollState()),
     ) {
         Headline(stringResource(R.string.url_converters_title))
-        Column(
-            Modifier.padding(horizontal = spacing.windowPadding),
-            verticalArrangement = Arrangement.spacedBy(spacing.medium),
-        ) {
-            Text(
-                stringResource(R.string.url_converters_text, appName),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    lineBreak = LineBreak.Paragraph,
-                ),
-            )
-            if (expanded) {
-                Button({ onShowOpenByDefaultSettings() }) {
-                    Text(stringResource(R.string.url_converters_settings_button))
-                }
-            }
+        if (expanded) {
+            InputsText(onShowOpenByDefaultSettings)
         }
         if (recentDocumentations != null) {
             LabelLarge(stringResource(R.string.url_converters_filter_recent))
@@ -138,7 +118,7 @@ private fun InputsListPane(
             )
             LabelLarge(stringResource(R.string.url_converters_filter_all))
         } else {
-            Spacer(Modifier.height(spacing.medium))
+            Spacer(Modifier.height(spacing.large))
         }
         InputsListDocumentations(
             currentDocumentation = currentDocumentation,
@@ -166,16 +146,17 @@ private fun InputsListDocumentations(
             .forEachIndexed { i, (documentation, name) ->
                 ListItem(
                     headlineContent = {
-                        Text(
-                            name,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        Text(name, style = MaterialTheme.typography.bodyLarge)
                     },
                     modifier = Modifier
                         .clickable(onClick = { onNavigateToDocumentation(documentation.id) })
                         .testTag("${testTagPrefix}${documentation.id}"),
                     colors = ListItemDefaults.colors(
-                        containerColor = if (currentDocumentation == documentation) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = if (currentDocumentation == documentation) {
+                            MaterialTheme.colorScheme.surfaceContainerHighest
+                        } else {
+                            MaterialTheme.colorScheme.surfaceContainerHigh
+                        }
                     ),
                 )
                 if (i != documentations.size - 1) {
@@ -196,46 +177,6 @@ private fun DefaultPreview() {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = false,
-                    changelogShownForVersionCode = 25,
-                    onBack = {},
-                    onNavigateToDocumentation = {},
-                    onShowOpenByDefaultSettings = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                InputsListPane(
-                    currentDocumentation = null,
-                    documentations = allInputs.map { it.documentation },
-                    expanded = false,
-                    changelogShownForVersionCode = 25,
-                    onBack = {},
-                    onNavigateToDocumentation = {},
-                    onShowOpenByDefaultSettings = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ExpandedPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                InputsListPane(
-                    currentDocumentation = null,
-                    documentations = allInputs.map { it.documentation },
                     expanded = true,
                     changelogShownForVersionCode = 25,
                     onBack = {},
@@ -249,7 +190,7 @@ private fun ExpandedPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkExpandedPreview() {
+private fun DarkPreview() {
     AppTheme {
         Surface {
             Column {
@@ -276,7 +217,7 @@ private fun NoRecentPreview() {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = false,
+                    expanded = true,
                     changelogShownForVersionCode = 999,
                     onBack = {},
                     onNavigateToDocumentation = {},
@@ -290,6 +231,86 @@ private fun NoRecentPreview() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkNoRecentPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsListPane(
+                    currentDocumentation = null,
+                    documentations = allInputs.map { it.documentation },
+                    expanded = true,
+                    changelogShownForVersionCode = 999,
+                    onBack = {},
+                    onNavigateToDocumentation = {},
+                    onShowOpenByDefaultSettings = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NotExpandedPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsListPane(
+                    currentDocumentation = null,
+                    documentations = allInputs.map { it.documentation },
+                    expanded = false,
+                    changelogShownForVersionCode = 25,
+                    onBack = {},
+                    onNavigateToDocumentation = {},
+                    onShowOpenByDefaultSettings = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNotExpandedPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsListPane(
+                    currentDocumentation = null,
+                    documentations = allInputs.map { it.documentation },
+                    expanded = false,
+                    changelogShownForVersionCode = 25,
+                    onBack = {},
+                    onNavigateToDocumentation = {},
+                    onShowOpenByDefaultSettings = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NotExpandedNoRecentPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsListPane(
+                    currentDocumentation = null,
+                    documentations = allInputs.map { it.documentation },
+                    expanded = false,
+                    changelogShownForVersionCode = 999,
+                    onBack = {},
+                    onNavigateToDocumentation = {},
+                    onShowOpenByDefaultSettings = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNotExpandedNoRecentPreview() {
     AppTheme {
         Surface {
             Column {

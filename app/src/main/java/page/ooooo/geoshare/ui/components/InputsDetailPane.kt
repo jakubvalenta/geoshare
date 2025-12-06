@@ -17,7 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
@@ -57,6 +59,7 @@ fun InputsDetailPane(
     val context = LocalContext.current
     var documentationInputInfos = getDocumentationInputDetails(currentDocumentation, context.packageManager)
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        // FIXME Refresh screen after settings change
         documentationInputInfos = getDocumentationInputDetails(currentDocumentation, context.packageManager)
     }
 
@@ -94,69 +97,67 @@ private fun InputsDetailPane(
             }
         },
     )
-    SelectionContainer {
-        Headline(stringResource(nameResId))
-    }
-    Column(
-        Modifier.padding(horizontal = spacing.windowPadding),
-    ) {
-        Button({ onShowOpenByDefaultSettings() }) {
-            Text(stringResource(R.string.url_converters_settings_button))
+    Column(Modifier.widthIn(max = 600.dp)) {
+        SelectionContainer {
+            Headline(stringResource(nameResId))
         }
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = spacing.medium, bottom = spacing.small),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                stringResource(R.string.url_converters_url),
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                stringResource(R.string.url_converters_default_handler, appName),
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
-        HorizontalDivider()
-        Column(
-            Modifier.verticalScroll(rememberScrollState()),
-        ) {
-            documentationInputDetails.forEach { documentationInputDetails ->
-                Row(
-                    Modifier.padding(vertical = spacing.small),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SelectionContainer(Modifier.weight(1f)) {
-                        Text(
-                            when (documentationInputDetails.documentationInput) {
-                                is InputDocumentationItem.Text ->
-                                    documentationInputDetails.documentationInput.text()
+        InputsText(onShowOpenByDefaultSettings)
+        Column(Modifier.padding(start = spacing.windowPadding, top = spacing.small, end = spacing.windowPadding)) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = spacing.medium, bottom = spacing.small),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    stringResource(R.string.url_converters_url),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Text(
+                    stringResource(R.string.url_converters_default_handler, appName),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+            HorizontalDivider()
+            Column(
+                Modifier.verticalScroll(rememberScrollState()),
+            ) {
+                documentationInputDetails.forEach { documentationInputDetails ->
+                    Row(
+                        Modifier.padding(vertical = spacing.small),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        SelectionContainer(Modifier.weight(1f)) {
+                            Text(
+                                when (documentationInputDetails.documentationInput) {
+                                    is InputDocumentationItem.Text ->
+                                        documentationInputDetails.documentationInput.text()
 
-                                is InputDocumentationItem.Url ->
-                                    documentationInputDetails.documentationInput.urlString
-                                        .removePrefix("https://")
-                                        .trimEnd('/')
-                            },
-                            Modifier.padding(end = spacing.tiny),
-                            style = MaterialTheme.typography.bodyMedium,
+                                    is InputDocumentationItem.Url ->
+                                        documentationInputDetails.documentationInput.urlString
+                                            .removePrefix("https://")
+                                            .trimEnd('/')
+                                },
+                                Modifier.padding(end = spacing.tiny),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                        Text(
+                            stringResource(
+                                when (documentationInputDetails.defaultHandlerEnabled) {
+                                    true -> R.string.yes
+                                    false -> R.string.no
+                                    null -> R.string.not_available
+                                },
+                                appName,
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
-                    Text(
-                        stringResource(
-                            when (documentationInputDetails.defaultHandlerEnabled) {
-                                true -> R.string.yes
-                                false -> R.string.no
-                                null -> R.string.not_available
-                            },
-                            appName,
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+                    HorizontalDivider()
                 }
-                HorizontalDivider()
             }
         }
     }
@@ -242,6 +243,29 @@ private fun DarkTextInputPreview() {
                 InputsDetailPane(
                     nameResId = GeoUriInput.documentation.nameResId,
                     documentationInputDetails = GeoUriInput.documentation.items.mapIndexed { i, documentationInput ->
+                        DocumentationInputDetails(
+                            documentationInput,
+                            i and 1 == 0,
+                        )
+                    },
+                    expanded = true,
+                    onBack = {},
+                    onShowOpenByDefaultSettings = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsDetailPane(
+                    nameResId = OpenStreetMapInput.documentation.nameResId,
+                    documentationInputDetails = OpenStreetMapInput.documentation.items.mapIndexed { i, documentationInput ->
                         DocumentationInputDetails(
                             documentationInput,
                             i and 1 == 0,
