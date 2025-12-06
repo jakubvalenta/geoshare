@@ -108,7 +108,10 @@ private fun InputsListPane(
             InputsText(onShowOpenByDefaultSettings)
         }
         if (recentDocumentations != null) {
-            LabelLarge(stringResource(R.string.url_converters_filter_recent))
+            LabelLarge(
+                stringResource(R.string.url_converters_filter_recent),
+                color = MaterialTheme.colorScheme.error,
+            )
             InputsListDocumentations(
                 currentDocumentation = currentDocumentation,
                 documentations = recentDocumentations,

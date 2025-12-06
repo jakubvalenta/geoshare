@@ -5,10 +5,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun LabelLarge(text: String) {
+fun LabelLarge(text: String, color: Color = MaterialTheme.colorScheme.primary) {
     val spacing = LocalSpacing.current
     Text(
         text,
@@ -18,7 +19,7 @@ fun LabelLarge(text: String) {
             end = spacing.windowPadding,
             bottom = spacing.small,
         ),
-        color = MaterialTheme.colorScheme.primary,
+        color = color,
         style = MaterialTheme.typography.labelLarge,
     )
 }
