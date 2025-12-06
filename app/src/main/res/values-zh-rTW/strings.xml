@@ -29,7 +29,7 @@
     <string name="main_input_uri_supporting_text">例如 https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="conversion_succeeded_copy_content_description">複製</string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s 將地圖連結轉換為其他地圖應用可以打開的 geo: 連結。要創建 geo: 連結，需要地理座標。%1$s 從地圖 URL 中提取它們。</p><br><p>然而，並非所有地圖 URL 都包含座標。在這種情況下，%1$s 將<b>提示您獲得連接至地圖服務（Google 地圖、Apple 地圖等）的許可權</b>並從 HTTP 標頭或連結的 HTML 文檔中檢索座標。</p><br><p>更準確地說，%1$s 將地圖 URL 轉換為 geo: URI 有三種場景：</p><br><p><b>1.</b></p><br><p>如果地圖 URL 已經包含地理座標（例如 <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>），然後對其進行解析，不會向地圖服務的伺服器發出任何請求。</p><br><p><b>2.</b></p><br><p>如果地圖 URL 不包含地理座標（例如 <tt>https://www.google.com/maps/place/Central+Park/</tt>），則 %1$s 會詢問您是否可以連接到地圖服務。</p><br><p>如果您允許連接至地圖服務，則 %1$s 會向 Google 地圖（或 Apple 地圖等）發出 <b>HTTP GET 請求</b>並從 HTML 回應中解析座標。您可以將其想像為 <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>。</p><br><p>如果您不允許連接到地圖服務，則 %1$s 會創建帶有地點搜索詞的 geo: 連結（例如 <tt>geo:0,0?q=Central%%20Park</tt>）。</p><br><p><b>3.</b></p><br><p>如果地圖 URL 是短連結（例如 <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>），則 %1$s 會詢問您是否可以連接至地圖服務。</p><br><p>如果您允許連接到地圖服務，則 %1$s 會向短連結發出 <b>HTTP HEAD 請求</b>並從回應標頭中讀取完整連結。您可以將其想像為 <tt>curl --head https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>。然後 %1$s 繼續場景 1 或 2，具體取決於完整連結是否包含座標。在場景 2 的情況下，將與地圖服務建立另一個連接，但這次沒有詢問。</p><br><p>如果您不允許連接到地圖服務，則 %1$s 會取消 geo: 連結的創建。</p><br><br><p>要永久允許或拒絕連接至地圖服務，而不是始終詢問（默認設置），請轉到應用的偏好設置。</p>]]></string>
-    <string name="url_converters_title">支援的地圖服務</string>
+    <string name="inputs_title">支援的地圖服務</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">簡訊</string>
     <string name="converter_google_maps_permission_title">連接至Google？</string>
     <string name="converter_google_maps_loading_indicator_title">正在連接至 Google…</string>
@@ -75,7 +75,7 @@
     <string name="intro_open_by_default_app_content_description">%1$s 的「預設開啟」設定頁面螢幕截圖</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Select at least <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。若有部分連結呈現灰色無法選取，表示其他 Google 應用程式已設定為預設開啟這些連結。您可以像先前對 Google 地圖那樣，找到那些應用程式並關閉它們的「開啟連結」功能。]]></string>
     <string name="intro_open_by_default_app_screenshot_title">使用預設開啟方式</string>
-    <string name="url_converters_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中。</string>
+    <string name="inputs_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中。</string>
     <string name="converter_coordinates_name">座標</string>
     <string name="example">例如：%1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -100,10 +100,10 @@
     <string name="conversion_failed_parse_html_connection_error">從地圖服務擷取網頁時發生連線錯誤</string>
     <string name="conversion_failed_unsupported_service">不支援的地圖服務</string>
     <string name="conversion_succeeded_point_number">%1$d項</string>
-    <string name="url_converters_filter_all">所有的地圖服務</string>
-    <string name="url_converters_filter_recent">最近添加</string>
-    <string name="url_converters_default_handler">預設用%1$s打開</string>
-    <string name="url_converters_settings_button">開啟安卓設定</string>
+    <string name="inputs_all">所有的地圖服務</string>
+    <string name="inputs_recent">最近添加</string>
+    <string name="inputs_default_handler">預設用%1$s打開</string>
+    <string name="inputs_settings">開啟安卓設定</string>
     <string name="conversion_succeeded_save_gpx_failed">儲存GPX檔時發生錯誤</string>
     <string name="main_input_uri_paste_content_description">貼上</string>
     <string name="conversion_automation_copy_link_succeeded">自動複製連結</string>

@@ -67,8 +67,8 @@
     <string name="intro_open_by_default_app_screenshot_add">Hinzufügen</string>
     <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
-    <string name="url_converters_title">Unterstützte Kartendienste</string>
-    <string name="url_converters_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
+    <string name="inputs_title">Unterstützte Kartendienste</string>
+    <string name="inputs_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
     <string name="converter_coordinates_name">Koordinaten</string>
     <string name="example">z.B. %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -101,10 +101,10 @@
     <string name="converter_mapy_com_loading_indicator_title">Verbindung mit Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Mit OpenStreetMap Verbinden?</string>
     <string name="converter_open_street_map_loading_indicator_title">Verbindung mit OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Alle Kartendienste</string>
-    <string name="url_converters_filter_recent">Kürzlich hinzugefügt</string>
-    <string name="url_converters_default_handler">Öffnet standardmäßig in %1$s</string>
-    <string name="url_converters_settings_button">Android-Einstellungen öffnen</string>
+    <string name="inputs_all">Alle Kartendienste</string>
+    <string name="inputs_recent">Kürzlich hinzugefügt</string>
+    <string name="inputs_default_handler">Öffnet standardmäßig in %1$s</string>
+    <string name="inputs_settings">Android-Einstellungen öffnen</string>
     <string name="main_input_uri_paste_content_description">Einfügen</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
     <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>

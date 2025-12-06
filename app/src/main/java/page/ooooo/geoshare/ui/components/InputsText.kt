@@ -15,9 +15,9 @@ fun InputsText(onShowOpenByDefaultSettings: () -> Unit) {
     val appName = stringResource(R.string.app_name)
     val spacing = LocalSpacing.current
     Column(Modifier.padding(start = spacing.windowPadding, top = spacing.tiny, end = spacing.windowPadding)) {
-        ParagraphHtml(stringResource(R.string.url_converters_text, appName))
+        ParagraphHtml(stringResource(R.string.inputs_text, appName))
         Button({ onShowOpenByDefaultSettings() }) {
-            Text(stringResource(R.string.url_converters_settings_button))
+            Text(stringResource(R.string.inputs_settings))
         }
     }
 }

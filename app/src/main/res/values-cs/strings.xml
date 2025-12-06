@@ -87,8 +87,8 @@
     <string name="conversion_error_title">Chyba</string>
     <string name="converter_yandex_maps_permission_title">Spojit se s Yandexem?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Spojování s Yandexem…</string>
-    <string name="url_converters_title">Podporované mapové služby</string>
-    <string name="url_converters_text">S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit.</string>
+    <string name="inputs_title">Podporované mapové služby</string>
+    <string name="inputs_text">S %1$s můžete sdílet následující odkazy na mapy nebo je můžete do aplikace vložit.</string>
     <string name="converter_coordinates_name">souřadnice</string>
     <string name="example">např. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -104,10 +104,10 @@
     <string name="converter_mapy_com_loading_indicator_title">Spojování s Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Spojit se s OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Spojování s OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Všechny mapové služby</string>
-    <string name="url_converters_filter_recent">Nedávno přidané</string>
-    <string name="url_converters_default_handler">Otevírá se v %1$s</string>
-    <string name="url_converters_settings_button">Otevřít nastavení Androidu</string>
+    <string name="inputs_all">Všechny mapové služby</string>
+    <string name="inputs_recent">Nedávno přidané</string>
+    <string name="inputs_default_handler">Otevírá se v %1$s</string>
+    <string name="inputs_settings">Otevřít nastavení Androidu</string>
     <string name="conversion_loading_indicator_description">Pokus %1$d z %2$d kvůli %3$s.</string>
     <string name="conversion_automation_copy_link_succeeded">Odkaz byl automaticky zkopírován</string>
     <string name="conversion_automation_copy_succeeded">Souřadnice byly automaticky zkopírovány</string>

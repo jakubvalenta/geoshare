@@ -85,8 +85,8 @@
     <string name="conversion_failed_cancelled">Cancelado</string>
     <string name="converter_yandex_maps_permission_title">¿Conectarse a Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Conectándose a Yandex…</string>
-    <string name="url_converters_title">Servicios de mapa soportados</string>
-    <string name="url_converters_text">Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación.</string>
+    <string name="inputs_title">Servicios de mapa soportados</string>
+    <string name="inputs_text">Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación.</string>
     <string name="converter_coordinates_name">coordenadas</string>
     <string name="example">p.e. %1$s</string>
     <string name="converter_geo_name">URIs de geo:</string>
@@ -102,10 +102,10 @@
     <string name="converter_mapy_com_loading_indicator_title">Conectándose a Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">¿Conectarse a OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Conectándose a OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Todos los servicios de mapas</string>
-    <string name="url_converters_filter_recent">Recientemente agregado</string>
-    <string name="url_converters_default_handler">Abre por defecto en %1$s</string>
-    <string name="url_converters_settings_button">Abrir ajustes de Android</string>
+    <string name="inputs_all">Todos los servicios de mapas</string>
+    <string name="inputs_recent">Recientemente agregado</string>
+    <string name="inputs_default_handler">Abre por defecto en %1$s</string>
+    <string name="inputs_settings">Abrir ajustes de Android</string>
     <string name="conversion_succeeded_save_gpx_failed">No fue posible guardar GPX</string>
     <string name="main_input_uri_paste_content_description">Pegar</string>
     <string name="main_random">Enlace aleatorio</string>

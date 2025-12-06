@@ -103,13 +103,13 @@ private fun InputsListPane(
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
     ) {
-        Headline(stringResource(R.string.url_converters_title))
+        Headline(stringResource(R.string.inputs_title))
         if (expanded) {
             InputsText(onShowOpenByDefaultSettings)
         }
         if (recentDocumentations != null) {
             LabelLarge(
-                stringResource(R.string.url_converters_filter_recent),
+                stringResource(R.string.inputs_recent),
                 color = MaterialTheme.colorScheme.error,
             )
             InputsListDocumentations(
@@ -119,7 +119,7 @@ private fun InputsListPane(
                 onNavigateToDocumentation = onNavigateToDocumentation,
                 testTagPrefix = "geoShareInputsDocumentationRecent_",
             )
-            LabelLarge(stringResource(R.string.url_converters_filter_all))
+            LabelLarge(stringResource(R.string.inputs_all))
         } else {
             Spacer(Modifier.height(spacing.large))
         }

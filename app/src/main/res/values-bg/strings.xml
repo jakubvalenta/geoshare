@@ -84,8 +84,8 @@
     <string name="conversion_error_title">Грешка</string>
     <string name="converter_yandex_maps_permission_title">Свържете се с Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Свързване с Yandex…</string>
-    <string name="url_converters_title">Поддържани картографски услуги</string>
-    <string name="url_converters_text">Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението.</string>
+    <string name="inputs_title">Поддържани картографски услуги</string>
+    <string name="inputs_text">Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението.</string>
     <string name="converter_coordinates_name">координати</string>
     <string name="example">напр. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -101,10 +101,10 @@
     <string name="converter_mapy_com_loading_indicator_title">Свързване с Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Свързване с OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Свързване с OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Всички картографски услуги</string>
-    <string name="url_converters_filter_recent">Наскоро добавени</string>
-    <string name="url_converters_default_handler">Отваря се по подразбиране в %1$s</string>
-    <string name="url_converters_settings_button">Отворете настройките на Android</string>
+    <string name="inputs_all">Всички картографски услуги</string>
+    <string name="inputs_recent">Наскоро добавени</string>
+    <string name="inputs_default_handler">Отваря се по подразбиране в %1$s</string>
+    <string name="inputs_settings">Отворете настройките на Android</string>
     <string name="conversion_loading_indicator_description">Опит %1$d от %2$d до %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Неуспешно запазване на GPX</string>
     <string name="main_input_uri_paste_content_description">Поставяне</string>

@@ -86,8 +86,8 @@
     <string name="conversion_error_title">Помилка</string>
     <string name="converter_yandex_maps_permission_title">Підключитися до Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Підключення до Yandex…</string>
-    <string name="url_converters_title">Підтримувані картографічні сервіси</string>
-    <string name="url_converters_text">Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток.</string>
+    <string name="inputs_title">Підтримувані картографічні сервіси</string>
+    <string name="inputs_text">Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток.</string>
     <string name="converter_coordinates_name">координати</string>
     <string name="example">наприклад, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -103,10 +103,10 @@
     <string name="converter_mapy_com_loading_indicator_title">Підключення до Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Підключитися до OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Підключення до OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Усі картографічні сервіси</string>
-    <string name="url_converters_filter_recent">Нещодавно додано</string>
-    <string name="url_converters_default_handler">Відкривається за замовчуванням у %1$s</string>
-    <string name="url_converters_settings_button">Відкрийте налаштування Android</string>
+    <string name="inputs_all">Усі картографічні сервіси</string>
+    <string name="inputs_recent">Нещодавно додано</string>
+    <string name="inputs_default_handler">Відкривається за замовчуванням у %1$s</string>
+    <string name="inputs_settings">Відкрийте налаштування Android</string>
     <string name="conversion_loading_indicator_description">Спроба %1$d з %2$d через %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Не вдалося зберегти GPX</string>
     <string name="main_input_uri_paste_content_description">Вставити</string>

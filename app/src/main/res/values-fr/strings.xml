@@ -86,8 +86,8 @@
     <string name="conversion_error_title">Erreur</string>
     <string name="converter_yandex_maps_permission_title">Se connecter à Yandex ?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connexion à Yandex…</string>
-    <string name="url_converters_title">Services de cartographie pris en charge</string>
-    <string name="url_converters_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
+    <string name="inputs_title">Services de cartographie pris en charge</string>
+    <string name="inputs_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
     <string name="converter_coordinates_name">coordonnées</string>
     <string name="example">par exemple, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -102,10 +102,10 @@
     <string name="converter_mapy_com_loading_indicator_title">Connexion à Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Se connecter à OpenStreetMap ?</string>
     <string name="converter_open_street_map_loading_indicator_title">Connexion à OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Tous les services de cartographie</string>
-    <string name="url_converters_filter_recent">Récemment ajoutés</string>
-    <string name="url_converters_default_handler">S’ouvre par défaut dans %1$s</string>
-    <string name="url_converters_settings_button">Ouvrir les paramètres Android</string>
+    <string name="inputs_all">Tous les services de cartographie</string>
+    <string name="inputs_recent">Récemment ajoutés</string>
+    <string name="inputs_default_handler">S’ouvre par défaut dans %1$s</string>
+    <string name="inputs_settings">Ouvrir les paramètres Android</string>
     <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
     <string name="main_input_uri_paste_content_description">Coller</string>
     <string name="conversion_succeeded_save_gpx_failed">Échec de l’enregistrement du GPX</string>
