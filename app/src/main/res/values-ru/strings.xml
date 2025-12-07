@@ -23,7 +23,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">В этом приложении</string>
     <string name="intro_open_by_default_app_button">Открыть настройки %1$s</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">В вашем веб-обозревателе</string>
-    <string name="intro_open_by_default_app_screenshot_title">Открывать по умолчанию</string>
+    <string name="open_by_default">Открывать по умолчанию</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d поддерживаемая ссылка</item>
         <item quantity="few">%1$d поддерживаемые ссылки</item>
@@ -97,7 +97,7 @@
     <string name="converter_waze_loading_indicator_title">Подключение к Waze…</string>
     <string name="conversion_error_retry">Попробуйте снова</string>
     <string name="inputs_title">Поддерживаемые карты</string>
-    <string name="inputs_text">Вы можете поделиться следующими ссылками на карту с %1$s или вставить их в приложение.</string>
+    <string name="inputs_detail_text">Вы можете поделиться следующими ссылками на карту с %1$s или вставить их в приложение.</string>
     <string name="converter_coordinates_name">координаты</string>
     <string name="example">например, %1$s</string>
     <string name="converter_geo_name">geo: URI-адресы</string>

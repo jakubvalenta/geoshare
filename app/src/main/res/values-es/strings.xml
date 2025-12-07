@@ -67,7 +67,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Elije cómo abrir enlaces web para esta aplicación</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">En la aplicación</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">En tu navegador</string>
-    <string name="intro_open_by_default_app_screenshot_title">Abrir por defecto</string>
+    <string name="open_by_default">Abrir por defecto</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d enlace soportado</item>
         <item quantity="many">%1$d enlaces soportados</item>
@@ -86,7 +86,7 @@
     <string name="converter_yandex_maps_permission_title">¿Conectarse a Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Conectándose a Yandex…</string>
     <string name="inputs_title">Servicios de mapa soportados</string>
-    <string name="inputs_text">Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación.</string>
+    <string name="inputs_detail_text">Puedes compartir los siguientes enlaces de mapa con %1$s o pegarlos en la aplicación.</string>
     <string name="converter_coordinates_name">coordenadas</string>
     <string name="example">p.e. %1$s</string>
     <string name="converter_geo_name">URIs de geo:</string>
@@ -105,7 +105,6 @@
     <string name="inputs_all">Todos los servicios de mapas</string>
     <string name="inputs_recent">Recientemente agregado</string>
     <string name="inputs_default_handler">Abre por defecto en %1$s</string>
-    <string name="inputs_settings">Abrir ajustes de Android</string>
     <string name="conversion_succeeded_save_gpx_failed">No fue posible guardar GPX</string>
     <string name="main_input_uri_paste_content_description">Pegar</string>
     <string name="main_random">Enlace aleatorio</string>

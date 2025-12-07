@@ -66,7 +66,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">选择如何打开此应用的网络链接</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">在应用中</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">在浏览器中</string>
-    <string name="intro_open_by_default_app_screenshot_title">默认打开</string>
+    <string name="open_by_default">默认打开</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="other">%1$d 个支持的链接</item>
     </plurals>
@@ -84,7 +84,7 @@
     <string name="converter_yandex_maps_permission_title">连接到 Yandex？</string>
     <string name="converter_yandex_maps_loading_indicator_title">正在连接到 Yandex…</string>
     <string name="inputs_title">支持的地图服务</string>
-    <string name="inputs_text">您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中。</string>
+    <string name="inputs_detail_text">您可以将以下地图链接分享给 %1$s 或将其粘贴到应用中。</string>
     <string name="converter_coordinates_name">坐标</string>
     <string name="example">例如：%1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -103,7 +103,6 @@
     <string name="inputs_all">所有地图服务</string>
     <string name="inputs_recent">最近添加的</string>
     <string name="inputs_default_handler">在 %1$s 中默认打开</string>
-    <string name="inputs_settings">打开 Android 设置</string>
     <string name="conversion_loading_indicator_description">由于 %3$s， 第 %1$d 次尝试，共 %2$d 次。</string>
     <string name="conversion_succeeded_save_gpx_failed">无法保存 GPX</string>
     <string name="main_input_uri_paste_content_description">粘贴</string>

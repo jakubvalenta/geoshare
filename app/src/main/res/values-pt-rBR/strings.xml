@@ -64,7 +64,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mensagens</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="conversion_succeeded_apps_headline">Abrir com…</string>
-    <string name="intro_open_by_default_app_screenshot_title">Abrir por padrão</string>
+    <string name="open_by_default">Abrir por padrão</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d link suportado</item>
         <item quantity="many">%1$d de links suportados</item>
@@ -86,7 +86,7 @@
     <string name="converter_yandex_maps_permission_title">Conectar ao Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Conectando ao Yandex…</string>
     <string name="inputs_title">Mapas suportados</string>
-    <string name="inputs_text">Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app.</string>
+    <string name="inputs_detail_text">Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app.</string>
     <string name="converter_coordinates_name">coordenadas</string>
     <string name="example">por exemplo, %1$s</string>
     <string name="converter_geo_name">URIs geo:</string>
@@ -105,7 +105,6 @@
     <string name="inputs_all">Todos os mapas</string>
     <string name="inputs_recent">Adicionados recentemente</string>
     <string name="inputs_default_handler">Abre no %1$s por padrão</string>
-    <string name="inputs_settings">Abrir configurações do Android</string>
     <string name="conversion_loading_indicator_description">Tentativa %1$d de %2$d devido a %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Falha ao salvar GPX</string>
     <string name="conversion_automation_copy_link_succeeded">Link copiado automaticamente</string>

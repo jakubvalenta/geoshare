@@ -71,7 +71,7 @@
         <item quantity="other">%1$d поддържани връзки</item>
     </plurals>
     <string name="converter_apple_maps_permission_title">Свързване с Apple?</string>
-    <string name="intro_open_by_default_app_screenshot_title">Отваряне по подразбиране</string>
+    <string name="open_by_default">Отваряне по подразбиране</string>
     <string name="conversion_failed_unsupported_service">Неподдържана услуга за карти</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Карти</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставен маркер</string>
@@ -85,7 +85,7 @@
     <string name="converter_yandex_maps_permission_title">Свържете се с Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Свързване с Yandex…</string>
     <string name="inputs_title">Поддържани картографски услуги</string>
-    <string name="inputs_text">Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението.</string>
+    <string name="inputs_detail_text">Можете да споделите следните връзки към карти с %1$s или да ги поставите в приложението.</string>
     <string name="converter_coordinates_name">координати</string>
     <string name="example">напр. %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -104,7 +104,6 @@
     <string name="inputs_all">Всички картографски услуги</string>
     <string name="inputs_recent">Наскоро добавени</string>
     <string name="inputs_default_handler">Отваря се по подразбиране в %1$s</string>
-    <string name="inputs_settings">Отворете настройките на Android</string>
     <string name="conversion_loading_indicator_description">Опит %1$d от %2$d до %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Неуспешно запазване на GPX</string>
     <string name="main_input_uri_paste_content_description">Поставяне</string>

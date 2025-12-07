@@ -74,8 +74,8 @@
     <string name="intro_open_by_default_app_caption"><![CDATA[然後去設定 &#8594; Apps &#8594; %1$s &#8594; <i>預設開啟</i>，開啟「在此應用程式中開啟連結」功能，並點選，然後按 <i>新增連結</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">%1$s 的「預設開啟」設定頁面螢幕截圖</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Select at least <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。若有部分連結呈現灰色無法選取，表示其他 Google 應用程式已設定為預設開啟這些連結。您可以像先前對 Google 地圖那樣，找到那些應用程式並關閉它們的「開啟連結」功能。]]></string>
-    <string name="intro_open_by_default_app_screenshot_title">使用預設開啟方式</string>
-    <string name="inputs_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中。</string>
+    <string name="open_by_default">使用預設開啟方式</string>
+    <string name="inputs_detail_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中。</string>
     <string name="converter_coordinates_name">座標</string>
     <string name="example">例如：%1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -103,7 +103,6 @@
     <string name="inputs_all">所有的地圖服務</string>
     <string name="inputs_recent">最近添加</string>
     <string name="inputs_default_handler">預設用%1$s打開</string>
-    <string name="inputs_settings">開啟安卓設定</string>
     <string name="conversion_succeeded_save_gpx_failed">儲存GPX檔時發生錯誤</string>
     <string name="main_input_uri_paste_content_description">貼上</string>
     <string name="conversion_automation_copy_link_succeeded">自動複製連結</string>

@@ -64,7 +64,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">اختر كيفية فتح روابط الويب لهذا التطبيق</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">في التطبيق</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">في متصفحك</string>
-    <string name="intro_open_by_default_app_screenshot_title">افتح افتراضيًا</string>
+    <string name="open_by_default">افتح افتراضيًا</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="zero">%1$d رابط مدعوم</item>
         <item quantity="one">رابط مدعوم</item>
@@ -89,7 +89,7 @@
     <string name="converter_yandex_maps_permission_title">اتصل ب Yandex؟</string>
     <string name="converter_yandex_maps_loading_indicator_title">يتصل ب Yandex…</string>
     <string name="inputs_title">خدمات الخرائط المدعومة</string>
-    <string name="inputs_text">يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق.</string>
+    <string name="inputs_detail_text">يمكنك مشاركة روابط الخرائط التالية مع %1$s أو لصقها في التطبيق.</string>
     <string name="converter_coordinates_name">الإحداثيات</string>
     <string name="example">مثال: %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
@@ -108,7 +108,6 @@
     <string name="inputs_all">جميع خدمات الخرائط</string>
     <string name="inputs_recent">مضافة مؤخرًا</string>
     <string name="inputs_default_handler">يُفتح افتراضيًا في %1$s</string>
-    <string name="inputs_settings">افتح إعدادات Android</string>
     <string name="conversion_loading_indicator_description">المحاولة %1$d من أصل %2$d بسبب %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">فشل حفظ GPX</string>
     <string name="main_input_uri_paste_content_description">ألصق</string>

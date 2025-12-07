@@ -64,6 +64,7 @@ private fun InputsListPane(
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
+    val appName = stringResource(R.string.app_name)
 
     val containerColor = if (expanded) {
         Color.Unspecified
@@ -105,7 +106,10 @@ private fun InputsListPane(
     ) {
         Headline(stringResource(R.string.inputs_title))
         if (expanded) {
-            InputsText(onShowOpenByDefaultSettings)
+            InputsHeader(
+                text = stringResource(R.string.inputs_list_text, appName),
+                onShowOpenByDefaultSettings = onShowOpenByDefaultSettings,
+            )
         }
         if (recentDocumentations != null) {
             LabelLarge(
@@ -121,7 +125,7 @@ private fun InputsListPane(
             )
             LabelLarge(stringResource(R.string.inputs_all))
         } else {
-            Spacer(Modifier.height(spacing.large))
+            Spacer(Modifier.height(spacing.medium))
         }
         InputsListDocumentations(
             currentDocumentation = currentDocumentation,

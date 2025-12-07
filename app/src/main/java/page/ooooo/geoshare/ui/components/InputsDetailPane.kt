@@ -106,7 +106,10 @@ private fun InputsDetailPane(
         SelectionContainer {
             Headline(stringResource(nameResId))
         }
-        InputsText(onShowOpenByDefaultSettings)
+        InputsHeader(
+            text = stringResource(R.string.inputs_detail_text, appName),
+            onShowOpenByDefaultSettings = onShowOpenByDefaultSettings,
+        )
         Column(Modifier.padding(start = spacing.windowPadding, top = spacing.small, end = spacing.windowPadding)) {
             Row(
                 Modifier
@@ -116,10 +119,12 @@ private fun InputsDetailPane(
             ) {
                 Text(
                     stringResource(R.string.inputs_link),
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
                     stringResource(R.string.inputs_default_handler, appName),
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
@@ -157,7 +162,6 @@ private fun InputsDetailPane(
                                 },
                                 appName,
                             ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }

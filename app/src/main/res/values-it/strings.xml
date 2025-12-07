@@ -82,5 +82,5 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s risultato %2$s.gpx</string>
     <string name="conversion_succeeded_share">Condividi</string>
     <string name="conversion_succeeded_skip">Copia link originale</string>
-    <string name="intro_open_by_default_app_screenshot_title">Apri come predefinito</string>
+    <string name="open_by_default">Apri come predefinito</string>
 </resources>

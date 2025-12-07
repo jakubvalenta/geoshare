@@ -68,7 +68,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Choisir comment ouvrir les liens Web pour cette appli</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">Dans l’application</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Dans votre navigateur</string>
-    <string name="intro_open_by_default_app_screenshot_title">Ouvrir par défaut</string>
+    <string name="open_by_default">Ouvrir par défaut</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d lien compatible</item>
         <item quantity="many">%1$d liens compatibles</item>
@@ -87,7 +87,7 @@
     <string name="converter_yandex_maps_permission_title">Se connecter à Yandex ?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connexion à Yandex…</string>
     <string name="inputs_title">Services de cartographie pris en charge</string>
-    <string name="inputs_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
+    <string name="inputs_detail_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
     <string name="converter_coordinates_name">coordonnées</string>
     <string name="example">par exemple, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -105,7 +105,6 @@
     <string name="inputs_all">Tous les services de cartographie</string>
     <string name="inputs_recent">Récemment ajoutés</string>
     <string name="inputs_default_handler">S’ouvre par défaut dans %1$s</string>
-    <string name="inputs_settings">Ouvrir les paramètres Android</string>
     <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
     <string name="main_input_uri_paste_content_description">Coller</string>
     <string name="conversion_succeeded_save_gpx_failed">Échec de l’enregistrement du GPX</string>

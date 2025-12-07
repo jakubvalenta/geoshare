@@ -66,7 +66,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_app">Мапи</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Оберіть спосіб відкриття вебпосилань для цього застосунку</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">У застосунку</string>
-    <string name="intro_open_by_default_app_screenshot_title">Відкрити по стандарту</string>
+    <string name="open_by_default">Відкрити по стандарту</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d підтримуване посилання</item>
         <item quantity="few">%1$d підтримувані посилання</item>
@@ -87,7 +87,7 @@
     <string name="converter_yandex_maps_permission_title">Підключитися до Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Підключення до Yandex…</string>
     <string name="inputs_title">Підтримувані картографічні сервіси</string>
-    <string name="inputs_text">Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток.</string>
+    <string name="inputs_detail_text">Ви можете поділитися наступними посиланнями на карту з %1$s або вставити їх у додаток.</string>
     <string name="converter_coordinates_name">координати</string>
     <string name="example">наприклад, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -106,7 +106,6 @@
     <string name="inputs_all">Усі картографічні сервіси</string>
     <string name="inputs_recent">Нещодавно додано</string>
     <string name="inputs_default_handler">Відкривається за замовчуванням у %1$s</string>
-    <string name="inputs_settings">Відкрийте налаштування Android</string>
     <string name="conversion_loading_indicator_description">Спроба %1$d з %2$d через %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Не вдалося зберегти GPX</string>
     <string name="main_input_uri_paste_content_description">Вставити</string>

@@ -31,7 +31,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Tarayıcınızda</string>
     <string name="intro_open_by_default_app_content_description">%1$s’in Varsayılan olarak aç ayarlarının ekran görüntüsü</string>
     <string name="intro_open_by_default_app_button">%1$s ayarlarını aç</string>
-    <string name="intro_open_by_default_app_screenshot_title">Varsayılan olarak aç</string>
+    <string name="open_by_default">Varsayılan olarak aç</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d desteklenen bağlantı</item>
         <item quantity="other">%1$d desteklenen bağlantı</item>
@@ -109,7 +109,7 @@
     <string name="conversion_failed_cancelled">İptal edildi</string>
     <string name="conversion_succeeded_point_number">%1$d nokta</string>
     <string name="inputs_title">Desteklenen harita servisleri</string>
-    <string name="inputs_text">Aşağıdaki harita bağlantılarını %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
+    <string name="inputs_detail_text">Aşağıdaki harita bağlantılarını %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
     <string name="inputs_all">Tüm harita servisleri</string>
     <string name="inputs_recent">Son zamanlarda eklenenler</string>
     <string name="inputs_default_handler">Varsayılan olarak %1$s’de açılır</string>

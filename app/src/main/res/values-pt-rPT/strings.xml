@@ -26,7 +26,7 @@
     <string name="intro_open_by_default_app_content_description">Captura de ecrã das configurações de Abrir por padrão do %1$s</string>
     <string name="intro_open_by_default_app_button">Abrir configurações do %1$s</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Selecione pelo menos <tt>maps.google.com</tt> e <tt>maps.app.goo.gl</tt>. Se algumas ligações não podem ser selecionados, significa que outras apps do Google estão configuradas para abri-los por padrão. Pode desativar a abertura de ligações nelas, como fizemos para o Google Maps.]]></string>
-    <string name="intro_open_by_default_app_screenshot_title">Abrir por padrão</string>
+    <string name="open_by_default">Abrir por padrão</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d ligação suportada</item>
         <item quantity="many">%1$d de ligações suportadas</item>

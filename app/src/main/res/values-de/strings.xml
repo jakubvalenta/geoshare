@@ -59,7 +59,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Wähle wie diese App Weblinks öffnet</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">In der App</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">In deinem Browser</string>
-    <string name="intro_open_by_default_app_screenshot_title">Standardmäßig öffnen</string>
+    <string name="open_by_default">Standardmäßig öffnen</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d unterstützter Link</item>
         <item quantity="other">%1$d unterstützte Links</item>
@@ -68,7 +68,7 @@
     <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
     <string name="inputs_title">Unterstützte Kartendienste</string>
-    <string name="inputs_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
+    <string name="inputs_detail_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
     <string name="converter_coordinates_name">Koordinaten</string>
     <string name="example">z.B. %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -104,7 +104,6 @@
     <string name="inputs_all">Alle Kartendienste</string>
     <string name="inputs_recent">Kürzlich hinzugefügt</string>
     <string name="inputs_default_handler">Öffnet standardmäßig in %1$s</string>
-    <string name="inputs_settings">Android-Einstellungen öffnen</string>
     <string name="main_input_uri_paste_content_description">Einfügen</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
     <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>
