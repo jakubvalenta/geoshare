@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.local.preferences
 
+import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -11,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.outputs.*
@@ -257,7 +259,7 @@ object IntroShowForVersionCode : NullableIntUserPreference(
 
 object ChangelogShownForVersionCode : NullableIntUserPreference(
     key = stringPreferencesKey("changelog_shown_for_version_code"),
-    default = 22,
+    default = BuildConfig.VERSION_CODE,
     modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
 ) {
     override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCodeValue
