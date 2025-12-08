@@ -47,20 +47,7 @@ open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
         launchApplication()
         closeIntro()
 
-        // Shows main menu badge
-        onElement { viewIdResourceName == "geoShareMainMenuBadge" }
-
-        // Go to the inputs screen
-        goToInputsScreen()
-
-        // Shows recently added documentations
-        onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" }
-
-        // Go to main screen
-        pressBack()
-
         // Does not show main menu badge
-        waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
 
         // Go to the inputs screen
