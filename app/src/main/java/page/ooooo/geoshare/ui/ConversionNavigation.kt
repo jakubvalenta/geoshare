@@ -23,7 +23,7 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onFinish = onFinish,
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
-                onNavigateToInputsScreen = { navController.navigate(InputsRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {
@@ -37,8 +37,10 @@ fun ConversionNavigation(viewModel: ConversionViewModel, onFinish: () -> Unit) {
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
             )
         }
-        composable<InputsRoute> {
+        composable<InputsRoute> { backStackEntry ->
+            val route: InputsRoute = backStackEntry.toRoute()
             InputsScreen(
+                initialDocumentationId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
                 viewModel = viewModel,
             )

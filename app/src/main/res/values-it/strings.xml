@@ -25,8 +25,8 @@
     <string name="faq_how_it_works_headline">Come funziona e considerazioni sulla privacy</string>
     <string name="conversion_succeeded_copy_content_description">Copia</string>
     <string name="user_preferences_connection_title">Consenti la connessione a Google?</string>
-    <string name="user_preferences_connection_option_always">Si</string>
-    <string name="user_preferences_connection_option_never">No</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
     <string name="conversion_failed_missing_url">URL mancante</string>
     <string name="conversion_failed_parse_url_error">Errore nella creazione del link geo:</string>
     <string name="conversion_failed_unshorten_error">Impossibile risolvere il collegamento abbreviato</string>
@@ -82,5 +82,5 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s risultato %2$s.gpx</string>
     <string name="conversion_succeeded_share">Condividi</string>
     <string name="conversion_succeeded_skip">Copia link originale</string>
-    <string name="intro_open_by_default_app_screenshot_title">Apri come predefinito</string>
+    <string name="open_by_default">Apri come predefinito</string>
 </resources>

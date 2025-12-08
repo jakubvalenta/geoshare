@@ -22,9 +22,11 @@ object GeoUriInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
-    override val documentation = Input.Documentation(
-        nameResId = R.string.converter_geo_name, inputs = listOf(
-            Input.DocumentationInput.Text(3) {
+    override val documentation = InputDocumentation(
+        id = InputDocumentationId.GEO_URI,
+        nameResId = R.string.converter_geo_name,
+        items = listOf(
+            InputDocumentationItem.Text(3) {
                 stringResource(
                     R.string.example,
                     GeoUriOutput.formatUriString(
@@ -36,7 +38,7 @@ object GeoUriInput : Input {
                     ),
                 )
             },
-        )
+        ),
     )
 
     override fun parseUri(uri: Uri) = uri.run {

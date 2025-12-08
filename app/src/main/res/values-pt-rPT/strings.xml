@@ -26,7 +26,7 @@
     <string name="intro_open_by_default_app_content_description">Captura de ecrã das configurações de Abrir por padrão do %1$s</string>
     <string name="intro_open_by_default_app_button">Abrir configurações do %1$s</string>
     <string name="intro_open_by_default_app_note"><![CDATA[Selecione pelo menos <tt>maps.google.com</tt> e <tt>maps.app.goo.gl</tt>. Se algumas ligações não podem ser selecionados, significa que outras apps do Google estão configuradas para abri-los por padrão. Pode desativar a abertura de ligações nelas, como fizemos para o Google Maps.]]></string>
-    <string name="intro_open_by_default_app_screenshot_title">Abrir por padrão</string>
+    <string name="open_by_default">Abrir por padrão</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d ligação suportada</item>
         <item quantity="many">%1$d de ligações suportadas</item>
@@ -65,9 +65,9 @@
     <string name="user_preferences_title">Preferências</string>
     <string name="user_preferences_connection_title">Permitir conectar ao Google?</string>
     <string name="user_preferences_connection_description">Para suportar ligações curtas do Google Maps, e obter coordenadas da página web do Google Maps quando a ligação não as contém, o %1$s pode conectar ao Google. Pode encontrar mais informações no ecrã de perguntas frequentes.</string>
-    <string name="user_preferences_connection_option_always">Sim</string>
+    <string name="yes">Sim</string>
     <string name="user_preferences_connection_option_ask">Perguntar antes de conectar</string>
-    <string name="user_preferences_connection_option_never">Não</string>
+    <string name="no">Não</string>
     <string name="conversion_failed_missing_url">URL faltando</string>
     <string name="conversion_failed_unshorten_error">Falha ao traduzir uma ligação curta</string>
     <string name="conversion_failed_unshorten_connection_error">Erro de conexão ao traduzir uma ligação curta</string>

@@ -31,7 +31,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Tarayıcınızda</string>
     <string name="intro_open_by_default_app_content_description">%1$s’in Varsayılan olarak aç ayarlarının ekran görüntüsü</string>
     <string name="intro_open_by_default_app_button">%1$s ayarlarını aç</string>
-    <string name="intro_open_by_default_app_screenshot_title">Varsayılan olarak aç</string>
+    <string name="open_by_default">Varsayılan olarak aç</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d desteklenen bağlantı</item>
         <item quantity="other">%1$d desteklenen bağlantı</item>
@@ -94,9 +94,9 @@
     <string name="user_preferences_automation_description">Bir harita bağlantısı koordinatlara dönüştürüldüğünde otomatik olarak gerçekleştirilecek eylemi seçin.</string>
     <string name="user_preferences_automation_nothing">Hiçbiri</string>
     <string name="user_preferences_automation_title">Otomasyon</string>
-    <string name="user_preferences_connection_option_always">Evet</string>
+    <string name="yes">Evet</string>
     <string name="user_preferences_connection_option_ask">Bağlanmadan önce sor</string>
-    <string name="user_preferences_connection_option_never">Hayır</string>
+    <string name="no">Hayır</string>
     <string name="user_preferences_connection_title">Harita servislerine (Google, Apple vb.) bağlanmaya izin verilsin mi?</string>
     <string name="conversion_failed_missing_url">Eksik URL</string>
     <string name="conversion_failed_unshorten_connection_error">Kısa link çözülürken bağlantı hatası oluştu</string>
@@ -108,11 +108,9 @@
     <string name="conversion_failed_unsupported_service">Desteklenmeyen harita servisi</string>
     <string name="conversion_failed_cancelled">İptal edildi</string>
     <string name="conversion_succeeded_point_number">%1$d nokta</string>
-    <string name="url_converters_title">Desteklenen harita servisleri</string>
-    <string name="url_converters_text">Aşağıdaki harita bağlantılarını %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
-    <string name="url_converters_filter_all">Tüm harita servisleri</string>
-    <string name="url_converters_filter_recent">Son zamanlarda eklenenler</string>
-    <string name="url_converters_default_handler_enabled">Varsayılan olarak %1$s’de açılır</string>
-    <string name="url_converters_default_handler_disabled">%1$s’de varsayılan olarak açılmaz</string>
-    <string name="url_converters_recent_info">%1$s yakın zamanda desteklenen harita servislerine eklendi.</string>
+    <string name="inputs_title">Desteklenen harita servisleri</string>
+    <string name="inputs_detail_text">Aşağıdaki harita bağlantılarını %1$s ile paylaşabilir veya uygulamaya yapıştırabilirsiniz.</string>
+    <string name="inputs_all">Tüm harita servisleri</string>
+    <string name="inputs_recent">Son zamanlarda eklenenler</string>
+    <string name="inputs_default_handler">Varsayılan olarak %1$s’de açılır</string>
 </resources>

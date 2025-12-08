@@ -89,7 +89,7 @@ fun MainMenu(
                 },
             )
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.url_converters_title)) },
+                text = { Text(stringResource(R.string.inputs_title)) },
                 modifier = Modifier.testTag("geoShareMainMenuInputs"),
                 onClick = {
                     menuExpanded = false

@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.outputs.*
@@ -139,13 +140,13 @@ object ConnectionPermission : OptionsUserPreference<Permission>(
             Permission.ALWAYS,
             Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
         ) {
-            Text(stringResource(R.string.user_preferences_connection_option_always))
+            Text(stringResource(R.string.yes))
         },
         UserPreferenceOption(Permission.ASK) {
             Text(stringResource(R.string.user_preferences_connection_option_ask))
         },
         UserPreferenceOption(Permission.NEVER) {
-            Text(stringResource(R.string.user_preferences_connection_option_never))
+            Text(stringResource(R.string.no))
         },
     )
 
@@ -257,7 +258,7 @@ object IntroShowForVersionCode : NullableIntUserPreference(
 
 object ChangelogShownForVersionCode : NullableIntUserPreference(
     key = stringPreferencesKey("changelog_shown_for_version_code"),
-    default = 22,
+    default = BuildConfig.VERSION_CODE,
     modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
 ) {
     override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCodeValue

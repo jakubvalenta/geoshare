@@ -17,16 +17,17 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?((www|maps)\.)?(google(\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
-    override val documentation = Input.Documentation(
+    override val documentation = InputDocumentation(
+        id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(5, "https://maps.app.goo.gl"),
-            Input.DocumentationInput.Url(5, "https://app.goo.gl/maps"),
-            Input.DocumentationInput.Url(5, "https://maps.google.com"),
-            Input.DocumentationInput.Url(5, "https://goo.gl/maps"),
-            Input.DocumentationInput.Url(5, "https://google.com/maps"),
-            Input.DocumentationInput.Url(5, "https://www.google.com/maps"),
-            Input.DocumentationInput.Url(10, "https://g.co/kgs"),
+        items = listOf(
+            InputDocumentationItem.Url(5, "https://maps.app.goo.gl"),
+            InputDocumentationItem.Url(5, "https://app.goo.gl/maps"),
+            InputDocumentationItem.Url(5, "https://maps.google.com"),
+            InputDocumentationItem.Url(5, "https://goo.gl/maps"),
+            InputDocumentationItem.Url(5, "https://google.com/maps"),
+            InputDocumentationItem.Url(5, "https://www.google.com/maps"),
+            InputDocumentationItem.Url(10, "https://g.co/kgs"),
         ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")

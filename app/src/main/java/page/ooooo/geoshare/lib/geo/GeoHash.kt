@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.geo
 
 import page.ooooo.geoshare.lib.extensions.toScale
 import kotlin.math.max
@@ -50,8 +50,8 @@ private fun decodeGeoHash(
     // E.g. base32 hash "ezs" splits longitude into 256 cells, because its max value is "zzz" (0b11111_11111_11111)
     val xCellCount = 1 shl xBitCount
     val yCellCount = (1 shl yBitCount) +  // Do the same for latitude
-            // Adjust latitude cell count, if required by the particular Geohash algorithm
-            yCellCountAdjustment(yBitCount)
+        // Adjust latitude cell count, if required by the particular Geohash algorithm
+        yCellCountAdjustment(yBitCount)
 
     // Split the longitude range (-180 to 180) into the calculated number of cells and read the value of cell number x
     // E.g. base32 hash "ezs" splits longitude into 256 cells and reads the value of the cell number 124

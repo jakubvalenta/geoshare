@@ -17,13 +17,14 @@ object MapyComInput : Input.HasShortUri {
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern =
         Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
-    override val documentation = Input.Documentation(
+    override val documentation = InputDocumentation(
+        id = InputDocumentationId.MAPY_COM,
         nameResId = R.string.converter_mapy_com_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(23, "https://mapy.com"),
-            Input.DocumentationInput.Url(23, "https://mapy.cz"),
-            Input.DocumentationInput.Url(23, "https://www.mapy.com"),
-            Input.DocumentationInput.Url(23, "https://www.mapy.cz"),
+        items = listOf(
+            InputDocumentationItem.Url(23, "https://mapy.com"),
+            InputDocumentationItem.Url(23, "https://mapy.cz"),
+            InputDocumentationItem.Url(23, "https://www.mapy.com"),
+            InputDocumentationItem.Url(23, "https://www.mapy.cz"),
         ),
     )
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")

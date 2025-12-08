@@ -41,9 +41,9 @@
     <string name="user_preferences_title">Préférences</string>
     <string name="user_preferences_connection_title">Autoriser la connexion au service de cartographie (Google, Apple, etc.) ?</string>
     <string name="user_preferences_connection_description">Pour prendre en charge les liens cartographiques courts et obtenir les coordonnées depuis la page web du service de cartographie lorsque le lien ne les contient pas, %1$s peut se connecter au service de cartographie. Vous trouverez plus d’informations dans la FAQ.</string>
-    <string name="user_preferences_connection_option_always">Oui</string>
+    <string name="yes">Oui</string>
     <string name="user_preferences_connection_option_ask">Demandez avant de vous connecter</string>
-    <string name="user_preferences_connection_option_never">Non</string>
+    <string name="no">Non</string>
     <string name="conversion_failed_missing_url">URL manquante</string>
     <string name="conversion_failed_unshorten_error">Impossible de résoudre le lien court</string>
     <string name="conversion_failed_unshorten_connection_error">Erreur de connexion lors de la résolution du lien court</string>
@@ -68,7 +68,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Choisir comment ouvrir les liens Web pour cette appli</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">Dans l’application</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Dans votre navigateur</string>
-    <string name="intro_open_by_default_app_screenshot_title">Ouvrir par défaut</string>
+    <string name="open_by_default">Ouvrir par défaut</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d lien compatible</item>
         <item quantity="many">%1$d liens compatibles</item>
@@ -86,8 +86,8 @@
     <string name="conversion_error_title">Erreur</string>
     <string name="converter_yandex_maps_permission_title">Se connecter à Yandex ?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connexion à Yandex…</string>
-    <string name="url_converters_title">Services de cartographie pris en charge</string>
-    <string name="url_converters_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
+    <string name="inputs_title">Services de cartographie pris en charge</string>
+    <string name="inputs_detail_text">Vous pouvez partager les liens cartographiques suivants avec %1$s ou les coller dans l’application.</string>
     <string name="converter_coordinates_name">coordonnées</string>
     <string name="example">par exemple, %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
@@ -102,12 +102,9 @@
     <string name="converter_mapy_com_loading_indicator_title">Connexion à Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Se connecter à OpenStreetMap ?</string>
     <string name="converter_open_street_map_loading_indicator_title">Connexion à OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Tous les services de cartographie</string>
-    <string name="url_converters_filter_recent">Récemment ajoutés</string>
-    <string name="url_converters_default_handler_enabled">S’ouvre par défaut dans %1$s</string>
-    <string name="url_converters_default_handler_disabled">Ne s’ouvre pas par défaut dans %1$s</string>
-    <string name="url_converters_recent_info">La prise en charge de nouveaux services de cartographie a récemment été ajoutée à %1$s.</string>
-    <string name="url_converters_settings_button_content_description">Ouvrir les paramètres Android</string>
+    <string name="inputs_all">Tous les services de cartographie</string>
+    <string name="inputs_recent">Récemment ajoutés</string>
+    <string name="inputs_default_handler">S’ouvre par défaut dans %1$s</string>
     <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
     <string name="main_input_uri_paste_content_description">Coller</string>
     <string name="conversion_succeeded_save_gpx_failed">Échec de l’enregistrement du GPX</string>

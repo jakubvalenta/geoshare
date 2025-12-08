@@ -224,7 +224,7 @@ fun MainScreen(
                         null,
                         Modifier.padding(end = spacing.tiny),
                     )
-                    Text(stringResource(R.string.url_converters_title))
+                    Text(stringResource(R.string.inputs_title))
                 }
                 TextButton(onNavigateToIntroScreen) {
                     Icon(

@@ -6,7 +6,7 @@ import io.ktor.utils.io.*
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.decodeWazeGeoHash
+import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
 import page.ooooo.geoshare.lib.position.PositionBuilder
@@ -23,14 +23,15 @@ object WazeInput : Input.HasHtml {
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
 
-    override val documentation = Input.Documentation(
+    override val documentation = InputDocumentation(
+        id = InputDocumentationId.WAZE,
         nameResId = R.string.converter_waze_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(21, "https://waze.com/live-map"),
-            Input.DocumentationInput.Url(21, "https://waze.com/ul"),
-            Input.DocumentationInput.Url(21, "https://www.waze.com/live-map"),
-            Input.DocumentationInput.Url(21, "https://www.waze.com/ul"),
-            Input.DocumentationInput.Url(21, "https://ul.waze.com/ul"),
+        items = listOf(
+            InputDocumentationItem.Url(21, "https://waze.com/live-map"),
+            InputDocumentationItem.Url(21, "https://waze.com/ul"),
+            InputDocumentationItem.Url(21, "https://www.waze.com/live-map"),
+            InputDocumentationItem.Url(21, "https://www.waze.com/ul"),
+            InputDocumentationItem.Url(21, "https://ul.waze.com/ul"),
         ),
     )
 

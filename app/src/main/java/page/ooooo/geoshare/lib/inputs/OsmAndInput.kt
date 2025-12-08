@@ -12,10 +12,11 @@ object OsmAndInput : Input {
     private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
-    override val documentation = Input.Documentation(
+    override val documentation = InputDocumentation(
+        id = InputDocumentationId.OSM_AND,
         nameResId = R.string.converter_osm_and_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(20, "https://osmand.net/map"),
+        items = listOf(
+            InputDocumentationItem.Url(20, "https://osmand.net/map"),
         ),
     )
 

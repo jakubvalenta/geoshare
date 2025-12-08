@@ -30,7 +30,7 @@ fun ScreenshotOpenByDefaultMapApp() {
             y = 28,
         ) {
             ScreenshotText(
-                stringResource(R.string.intro_open_by_default_app_screenshot_title),
+                stringResource(R.string.open_by_default),
                 scale,
                 style = ScreenshotTheme.typography.textExtraExtraExtraLarge,
             )

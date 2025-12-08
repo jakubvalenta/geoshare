@@ -54,7 +54,7 @@ fun ResultError(
                     uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
                 ResultCardChip(
-                    { Text(stringResource(R.string.url_converters_title)) },
+                    { Text(stringResource(R.string.inputs_title)) },
                     icon = {
                         Icon(Icons.Outlined.Info, null)
                     },

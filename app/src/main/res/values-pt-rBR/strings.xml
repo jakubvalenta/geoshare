@@ -40,9 +40,9 @@
     <string name="user_preferences_title">Preferências</string>
     <string name="user_preferences_connection_title">Permitir conectar ao mapa (Google, Apple, etc.)?</string>
     <string name="user_preferences_connection_description">Para suportar links curtos, e obter coordenadas da página web do mapa quando o link não tem elas, o %1$s pode conectar ao serviço de mapas. Você pode encontrar mais informações na tela de perguntas frequentes.</string>
-    <string name="user_preferences_connection_option_always">Sim</string>
+    <string name="yes">Sim</string>
     <string name="user_preferences_connection_option_ask">Perguntar antes de conectar</string>
-    <string name="user_preferences_connection_option_never">Não</string>
+    <string name="no">Não</string>
     <string name="conversion_failed_missing_url">URL faltando</string>
     <string name="conversion_failed_unshorten_error">Falha ao traduzir link curto</string>
     <string name="conversion_failed_parse_url_error">Falha ao processar o link de mapa</string>
@@ -64,7 +64,7 @@
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">Mensagens</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="conversion_succeeded_apps_headline">Abrir com…</string>
-    <string name="intro_open_by_default_app_screenshot_title">Abrir por padrão</string>
+    <string name="open_by_default">Abrir por padrão</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d link suportado</item>
         <item quantity="many">%1$d de links suportados</item>
@@ -85,8 +85,8 @@
     <string name="conversion_error_title">Erro</string>
     <string name="converter_yandex_maps_permission_title">Conectar ao Yandex?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Conectando ao Yandex…</string>
-    <string name="url_converters_title">Mapas suportados</string>
-    <string name="url_converters_text">Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app.</string>
+    <string name="inputs_title">Mapas suportados</string>
+    <string name="inputs_detail_text">Você pode compartilhar os seguintes links de mapa com o %1$s ou colá-los no app.</string>
     <string name="converter_coordinates_name">coordenadas</string>
     <string name="example">por exemplo, %1$s</string>
     <string name="converter_geo_name">URIs geo:</string>
@@ -102,12 +102,9 @@
     <string name="converter_mapy_com_loading_indicator_title">Conectando ao Mapy.com…</string>
     <string name="converter_open_street_map_permission_title">Conectar ao OpenStreetMap?</string>
     <string name="converter_open_street_map_loading_indicator_title">Conectando ao OpenStreetMap…</string>
-    <string name="url_converters_filter_all">Todos os mapas</string>
-    <string name="url_converters_filter_recent">Adicionados recentemente</string>
-    <string name="url_converters_default_handler_enabled">Abre no %1$s por padrão</string>
-    <string name="url_converters_default_handler_disabled">Não abre no %1$s por padrão</string>
-    <string name="url_converters_recent_info">O %1$s recebeu suporte para novos mapas recentemente.</string>
-    <string name="url_converters_settings_button_content_description">Abrir configurações do Android</string>
+    <string name="inputs_all">Todos os mapas</string>
+    <string name="inputs_recent">Adicionados recentemente</string>
+    <string name="inputs_default_handler">Abre no %1$s por padrão</string>
     <string name="conversion_loading_indicator_description">Tentativa %1$d de %2$d devido a %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">Falha ao salvar GPX</string>
     <string name="conversion_automation_copy_link_succeeded">Link copiado automaticamente</string>

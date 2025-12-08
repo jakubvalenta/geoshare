@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.decodeGe0Hash
+import page.ooooo.geoshare.lib.geo.decodeGe0Hash
 import page.ooooo.geoshare.lib.extensions.matchHash
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.toScale
@@ -18,12 +18,13 @@ object MapsMeInput : Input {
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?(comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
-    override val documentation = Input.Documentation(
+    override val documentation = InputDocumentation(
+        id = InputDocumentationId.MAPS_ME,
         nameResId = R.string.converter_ge0_name,
-        inputs = listOf(
-            Input.DocumentationInput.Url(25, "http://ge0.me/"),
-            Input.DocumentationInput.Url(25, "https://omaps.app/"),
-            Input.DocumentationInput.Url(25, "https://comaps.at/"),
+        items = listOf(
+            InputDocumentationItem.Url(25, "http://ge0.me/"),
+            InputDocumentationItem.Url(25, "https://omaps.app/"),
+            InputDocumentationItem.Url(25, "https://comaps.at/"),
         ),
     )
 
