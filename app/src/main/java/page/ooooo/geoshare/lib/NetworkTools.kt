@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.io.EOFException
 import page.ooooo.geoshare.R
 import java.net.URL
 import kotlin.math.pow
@@ -162,6 +163,9 @@ open class NetworkTools(
             } catch (tr: ConnectTimeoutException) {
                 log.w(null, "Connect timeout for $url", tr)
                 throw RecoverableException(R.string.network_exception_connect_timeout, tr)
+            } catch (tr: EOFException) {
+                log.w(null, "EOF exception for $url", tr)
+                throw RecoverableException(R.string.network_exception_eof, tr)
             } catch (tr: ServerResponseException) {
                 log.w(null, "Server error ${tr.response.status} for $url", tr)
                 throw RecoverableException(R.string.network_exception_server_response_error, tr)

@@ -168,11 +168,12 @@
     <string name="inputs_recent">Recently added</string>
     <string name="inputs_settings">Go to Android settings to choose links that should always open in %1$s</string>
     <string name="inputs_title">Supported maps</string>
-    <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
-    <string name="network_exception_request_timeout" translatable="false">request timeout</string>
-    <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
     <string name="network_exception_connect_timeout" translatable="false">connect timeout</string>
-    <string name="network_exception_server_response_error" translatable="false">server response error</string>
+    <string name="network_exception_eof" translatable="false">connection closed</string>
+    <string name="network_exception_request_timeout" translatable="false">request timeout</string>
     <string name="network_exception_response_error" translatable="false">response error</string>
+    <string name="network_exception_server_response_error" translatable="false">server response error</string>
+    <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
+    <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
 </resources>
