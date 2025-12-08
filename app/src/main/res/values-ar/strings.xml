@@ -7,7 +7,7 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">لا تسألني مرة أخرى</string>
     <string name="faq_item_expand">توسيع القسم</string>
-    <string name="copying_finished">نُسخ الإحداثيات إلى الحافظة</string>
+    <string name="copying_finished">نُسخ إلى الحافظة</string>
     <string name="conversion_failed_connection_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بخدمة الخرائط</string>
     <string name="conversion_succeeded_copy_geo">انسخ geo:</string>
     <string name="nav_menu_content_description">القائمة</string>
@@ -141,4 +141,15 @@
     <string name="converter_amap_permission_title">اتصل ب Amap؟</string>
     <string name="converter_urbi_permission_title">الاتصال بـ 2GIS / Urbi؟</string>
     <string name="converter_urbi_loading_indicator_title">جارٍ الاتصال بـ 2GIS / Urbi…</string>
+    <string name="conversion_succeeded_location_failed">فشل في العثور على الموقع</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">جارِ تحديد موقعك…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">السماح بالوصول إلى الموقع؟</string>
+    <string name="conversion_succeeded_open_app_failed">فشل في فتح %1$s</string>
+    <string name="output_gpx_location_permission">%1$s سيقوم بإنشاء مسار يبدأ من موقعك الحالي.</string>
+    <string name="output_gpx_route_share">شارك مسار GPX</string>
+    <string name="output_gpx_route_share_failed">فشل في مشاركة مسار GPX</string>
+    <string name="output_gpx_route_share_automation_succeeded">مسار GPX مشترك تلقائيًا</string>
+    <string name="output_gpx_route_share_automation_waiting">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</string>
+    <string name="faq_location_permission_headline">إذن الموقع</string>
+    <string name="faq_location_permission_text">يطلب %1$s إذنًا للوصول إلى الموقع عند تشغيل ملاحة TomTom وعند مشاركة مسار GPX، لأنه في هذه الحالات تحتاج التطبيق إلى إنشاء مسار GPX يبدأ من موقعك الحالي. يتم التخلص من معلومات الموقع فورًا بعد إنشاء المسار.</string>
 </resources>
