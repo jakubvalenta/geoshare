@@ -11,6 +11,7 @@ import io.ktor.util.network.*
 import io.ktor.utils.io.asSource
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.EOFException
 import kotlinx.io.buffered
 import kotlinx.io.readString
 import org.junit.Assert.*
@@ -577,6 +578,21 @@ class NetworkToolsTest {
         }
         assertEquals(R.string.network_exception_connect_timeout, threw?.messageResId)
         assertTrue(threw?.cause is ConnectTimeoutException)
+    }
+
+    @Test
+    fun connect_requestThrowsEOFException_throwsRecoverableException() = runTest {
+        val url = URL("https://example.com/")
+        val mockEngine = MockEngine { throw EOFException() }
+        val mockNetworkTools = NetworkTools(mockEngine, log)
+        var threw: NetworkTools.NetworkException? = null
+        try {
+            mockNetworkTools.connect(mockEngine, url) { response -> response.body<String>() }
+        } catch (tr: NetworkTools.RecoverableException) {
+            threw = tr
+        }
+        assertEquals(R.string.network_exception_eof, threw?.messageResId)
+        assertTrue(threw?.cause is EOFException)
     }
 
     @Test
