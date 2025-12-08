@@ -1,1 +1,1 @@
-Otwieraj linki z Map Google w innych aplikacjach mapowych i utwórz geo: linki
+Otwórz linki do map w innych aplikacjach mapowych i skopiuj współrzędne.
