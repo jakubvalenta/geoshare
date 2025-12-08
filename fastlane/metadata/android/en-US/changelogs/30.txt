@@ -1,1 +1,2 @@
 - Improved the Supported Maps screen.
+- Fixed retrying connection when connection gets closed.
