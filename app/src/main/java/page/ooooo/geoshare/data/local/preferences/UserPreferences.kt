@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.data.local.preferences
 
-import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
