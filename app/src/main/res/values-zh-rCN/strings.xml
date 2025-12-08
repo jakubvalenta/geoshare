@@ -136,8 +136,15 @@
     <string name="conversion_succeeded_open_app_street_view">在 %1$s 显示街景</string>
     <string name="converter_urbi_permission_title">连接到 2GIS / Urbi？</string>
     <string name="converter_urbi_loading_indicator_title">正在连接到 2GIS / Urbi…</string>
-    <string name="conversion_succeeded_location_failed">找不到位置</string>
-    <string name="conversion_succeeded_location_loading_indicator_title">正在寻找你的位置…</string>
-    <string name="conversion_succeeded_location_rationale_dialog_title">允许访问位置吗？</string>
-    <string name="conversion_succeeded_open_app_failed">打开 %1$s 失败</string>
+    <string name="conversion_succeeded_location_failed">无法查找位置</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">正在查找您的位置…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">允许访问位置？</string>
+    <string name="conversion_succeeded_open_app_failed">无法打开 %1$s</string>
+    <string name="output_gpx_location_permission">%1$s 将创建一条从您当前位置出发的路线。</string>
+    <string name="output_gpx_route_share">分享 GPX 路线</string>
+    <string name="output_gpx_route_share_failed">无法分享 GPX 路线</string>
+    <string name="output_gpx_route_share_automation_succeeded">已自动分享 GPX 路线</string>
+    <string name="output_gpx_route_share_automation_waiting">%1$d 秒后将自动分享 GPX 路线</string>
+    <string name="faq_location_permission_headline">位置权限</string>
+    <string name="faq_location_permission_text">%1$s 在启动 TomTom 导航和分享 GPX 路线时会请求位置权限。因为在这些情况下，应用需要创建一条从您当前位置出发的 GPX 路线。路线创建完成后将立即舍弃位置信息。</string>
 </resources>
