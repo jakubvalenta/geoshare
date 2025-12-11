@@ -149,4 +149,8 @@
     <string name="output_gpx_route_share_automation_waiting">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</string>
     <string name="faq_location_permission_headline">إذن الموقع</string>
     <string name="faq_location_permission_text">يطلب %1$s إذنًا للوصول إلى الموقع عند تشغيل ملاحة TomTom وعند مشاركة مسار GPX، لأنه في هذه الحالات تحتاج التطبيق إلى إنشاء مسار GPX يبدأ من موقعك الحالي. يتم التخلص من معلومات الموقع فورًا بعد إنشاء المسار.</string>
+    <string name="not_available">غير متوفر</string>
+    <string name="inputs_link">الرابط</string>
+    <string name="inputs_list_text">يمكنك مشاركة روابط خدمات الخرائط التالية مع %1$s أو لصقها في التطبيق.</string>
+    <string name="inputs_settings">انتقل إلى إعدادات أندرويد لاختيار الروابط التي يجب أن تفتح دائمًا في %1$s</string>
 </resources>
