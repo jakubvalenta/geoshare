@@ -83,7 +83,7 @@
     <string name="conversion_failed_unshorten_connection_error">Verbindungsfehler beim Auflösen eines Kurzlinks</string>
     <string name="conversion_failed_parse_url_error">Kartenlink konnte nicht verarbeitet werden</string>
     <string name="conversion_succeeded_apps_not_found">Es ist keine Karten-App installiert</string>
-    <string name="copying_finished">Koordinaten wurden in die Zwischenablage kopiert</string>
+    <string name="copying_finished">In die Zwischenablage kopiert</string>
     <string name="conversion_failed_connection_permission_denied">Dieser Link wird ohne Verbindung zum Kartendienst nicht unterstützt</string>
     <string name="conversion_failed_parse_html_error">Das Herunterladen der Webseite vom Kartendienst ist fehlgeschlagen</string>
     <string name="conversion_failed_parse_html_connection_error">Verbindungsfehler beim Herunterladen der Webseite des Kartendienstes</string>
@@ -112,18 +112,18 @@
     <string name="conversion_succeeded_open_app">%1$s öffnen</string>
     <string name="conversion_succeeded_open_app_display">Karte in %1$s anzeigen</string>
     <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
-    <string name="conversion_succeeded_save_gpx_failed">Das Speichern der GPX-Datei ist fehlgeschlagen</string>
+    <string name="conversion_succeeded_save_gpx_failed">Fehler beim Speichern der GPX-Datei</string>
     <string name="main_random">Zufälliger Link</string>
     <string name="converter_amap_loading_indicator_title">Verbindung mit Amap…</string>
     <string name="converter_amap_permission_title">Mit Amap Verbinden?</string>
     <string name="conversion_automation_copy_link_succeeded">Link wurde automatisch kopiert</string>
     <string name="conversion_automation_copy_succeeded">Koordinaten wurden automatisch kopiert</string>
-    <string name="conversion_automation_open_app_failed">Das automatische Öffnen von %1$s ist fehlgeschlagen</string>
+    <string name="conversion_automation_open_app_failed">Fehler beim automatischen Öffnen von %1$s</string>
     <string name="conversion_automation_open_app_succeeded">%1$s wurde automatisch geöffnet</string>
     <string name="conversion_automation_open_app_waiting">%1$s wird in %2$d s automatisch geöffnet</string>
     <string name="conversion_automation_save_gpx_succeeded">GPX-Datei wurde automatisch gespeichert</string>
     <string name="conversion_automation_save_gpx_waiting">GPX-Datei wird automatisch in %1$d s gespeichert</string>
-    <string name="conversion_automation_share_failed">Automatisches Teilen des Links ist fehlgeschlagen</string>
+    <string name="conversion_automation_share_failed">Fehler beim automatischen Teilen des Links</string>
     <string name="conversion_automation_share_succeeded">Link wurde automatisch geteilt</string>
     <string name="conversion_automation_share_waiting">Link wird in %1$d s automatisch geteilt</string>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Versuch %1$d aus %2$d wegen %3$s.</string>
@@ -134,4 +134,19 @@
     <string name="conversion_succeeded_open_app_street_view">Street View in %1$s anzeigen</string>
     <string name="converter_urbi_permission_title">Mit 2GIS / Urbi Verbinden?</string>
     <string name="converter_urbi_loading_indicator_title">Verbindung mit 2GIS / Urbi…</string>
+    <string name="not_available">Nicht verfügbar</string>
+    <string name="conversion_succeeded_location_failed">Standort konnte nicht ermittelt werden</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">Ermittlung deines Standorts…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">Zugriff auf den Standort zulassen?</string>
+    <string name="conversion_succeeded_open_app_failed">Fehler beim Öffnen der App %1$s</string>
+    <string name="output_gpx_location_permission">%1$s erstellt eine Route, die an Ihrem aktuellen Standort beginnt.</string>
+    <string name="output_gpx_route_share">GPX-Route teilen</string>
+    <string name="output_gpx_route_share_failed">Fehler beim Teilen der GPX-Route</string>
+    <string name="output_gpx_route_share_automation_succeeded">GPX-Route wurde automatisch geteilt</string>
+    <string name="output_gpx_route_share_automation_waiting">GPX-Route wird in %1$d s automatisch geteilt</string>
+    <string name="faq_location_permission_headline">Standort-Zugriff</string>
+    <string name="faq_location_permission_text">%1$s fragt beim Öffnen der TomTom-Navigation und beim Teilen einer GPX-Route nach der Standortberechtigung, da die App in diesen Fällen eine GPX-Route erstellen muss, die an deinem aktuellen Standort beginnt. Die Standortinformationen werden unmittelbar nach der Erstellung der Route gelöscht.</string>
+    <string name="inputs_link">Link</string>
+    <string name="inputs_list_text">Du kannst Links zu den folgenden Kartendiensten mit %1$s teilen oder in die App einfügen.</string>
+    <string name="inputs_settings">Geh zu Android-Einstellungen, um Links auszuwählen, die immer in %1$s geöffnet werden sollen</string>
 </resources>

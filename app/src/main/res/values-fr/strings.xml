@@ -148,6 +148,6 @@
     <string name="faq_location_permission_text">%1$s demande l’autorisation d’accéder à votre position lors du lancement de la navigation TomTom et lors du partage d’un itinéraire GPX, car l’application doit alors créer un itinéraire GPX commençant à votre position actuelle. Les informations de localisation sont supprimées immédiatement après la création de l’itinéraire.</string>
     <string name="not_available">Non disponible</string>
     <string name="inputs_link">Lien</string>
-    <string name="inputs_list_text">Vous pouvez partager des liens vers les services de cartographie suivants avec %1$s ou les coller dans l\'application.</string>
-    <string name="inputs_settings">Accédez aux paramètres Android pour choisir les liens qui doivent toujours s\'ouvrir dans %1$s</string>
+    <string name="inputs_list_text">Vous pouvez partager des liens vers les services de cartographie suivants avec %1$s ou les coller dans l’application.</string>
+    <string name="inputs_settings">Accédez aux paramètres Android pour choisir les liens qui doivent toujours s’ouvrir dans %1$s</string>
 </resources>
