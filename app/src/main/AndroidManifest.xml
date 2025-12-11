@@ -924,7 +924,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="page.ooooo.geoshare.FileProvider"
+            android:authorities="${applicationId}.FileProvider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data
