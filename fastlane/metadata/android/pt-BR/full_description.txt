@@ -30,7 +30,7 @@ Se você gosta do Google Maps para encontrar lugares, mas prefere usar outro app
 - Mostra as <b>coordenadas geográficas</b> de um link de mapa e copia elas em vários formatos, como um link geo:.
 - Mostra todos os pontos de um link de uma <b>lista de lugares</b>.
 - Permite realizar uma ação <b>automaticamente</b> quando um link de mapa é processado
-- Permite <b>abrir a navegação</b> em TomTom, Google Maps, Magic Earth...
+- Permite <b>abrir a navegação</b> em TomTom, Waze, Magic Earth...
 - Permite salavar uma localização como um <b>arquivo GPX</b>.
 - Tenta novamente em <b>conexões instáveis à internet</b>.
 - Permite <b>colar links de mapa</b> diretamente no app, em vez de compartilhá-los com ele.
