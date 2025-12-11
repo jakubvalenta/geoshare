@@ -180,8 +180,7 @@ object AndroidTools {
 
     fun openAppFile(context: Context, packageName: String, file: File): Boolean {
         val uri = try {
-            @Suppress("SpellCheckingInspection")
-            FileProvider.getUriForFile(context, "page.ooooo.geoshare.FileProvider", file)
+            FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.FileProvider", file)
         } catch (e: IllegalArgumentException) {
             Log.e(null, "Error when getting URI for file", e)
             return false
@@ -206,8 +205,7 @@ object AndroidTools {
 
     fun openChooserFile(context: Context, file: File): Boolean {
         val uri = try {
-            @Suppress("SpellCheckingInspection")
-            FileProvider.getUriForFile(context, "page.ooooo.geoshare.FileProvider", file)
+            FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.FileProvider", file)
         } catch (e: IllegalArgumentException) {
             Log.e(null, "Error when getting URI for file", e)
             return false
