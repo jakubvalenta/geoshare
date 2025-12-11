@@ -147,4 +147,8 @@
     <string name="output_gpx_route_share_automation_waiting">Автоматичне поширення GPX-маршруту через %1$ds</string>
     <string name="faq_location_permission_headline">Дозвіл на доступ до геоданих</string>
     <string name="faq_location_permission_text">%1$s запитує дозвіл на визначення місцезнаходження під час запуску навігації TomTom та під час обміну маршрутом GPX, оскільки в цих випадках програмі потрібно створити маршрут GPX, який починається у вашому поточному місці розташування. Інформація про місцезнаходження видаляється одразу після створення маршруту.</string>
+    <string name="not_available">Недоступно</string>
+    <string name="inputs_link">Посилання</string>
+    <string name="inputs_list_text">Ви можете поділитися посиланнями на наступні картографічні сервіси з %1$s або вставити їх у програму.</string>
+    <string name="inputs_settings">Перейдіть до налаштувань Android, щоб вибрати посилання, які завжди мають відкриватися в %1$s</string>
 </resources>
