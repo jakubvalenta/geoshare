@@ -1,15 +1,41 @@
 package page.ooooo.geoshare.ui.theme
 
+import android.os.Build
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.unit.sp
+import page.ooooo.geoshare.R
 
-val defaultTypography = Typography()
+val defaultTypography = Typography().run {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        copy(
+            headlineLarge = headlineLarge.copy(
+                fontFamily = FontFamily(
+                    @OptIn(ExperimentalTextApi::class)
+                    Font(
+                        R.font.robotoflex_variable,
+                        variationSettings = FontVariation.Settings(
+                            FontVariation.weight(400),
+                            FontVariation.width(125f),
+                            FontVariation.slant(-10f),
+                        )
+                    )
+                ),
+            ),
+        )
+    } else {
+        this
+    }
+}
 
 val smallWindowTypography = defaultTypography.run {
     copy(
-        headlineLarge = headlineMedium,
+        headlineLarge = headlineMedium.copy(fontFamily = headlineLarge.fontFamily),
         headlineMedium = headlineSmall,
     )
 }
