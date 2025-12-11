@@ -119,11 +119,11 @@ fun MainScreen(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = stringResource(R.string.about_app_icon_content_description),
                     modifier = Modifier.size(
-                        with(density) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2.25f }
+                        with(density) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2f }
                     ),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                 )
-                Text(appName, style = MaterialTheme.typography.headlineLarge)
+                Text(appName, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineLarge)
             }
             Column(
                 Modifier.padding(horizontal = spacing.windowPadding),
