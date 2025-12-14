@@ -25,26 +25,19 @@ Si quelqu'un vous envoie un lien Google Maps, mais que vous préférez utiliser 
 
 Si vous utilisez Google Maps pour trouver des lieux, mais que vous préférez une autre application pour la navigation, vous pouvez facilement passer de Google Maps à votre <b>application de navigation</b> préférée.
 
- <b>Autres fonctionnalités</b>
+<b>Autres fonctionnalités</b>
 
 - Affiche les <b>coordonnées géographiques</b> d'un lien de carte et permet de les copier dans le presse-papiers dans différents formats, par exemple sous forme de lien geo:.
-
-- Affiche tous les points d'un lien de liste de lieux.
-
+- Affiche tous les points d'un lien de <b>liste de lieux</b>.
 - Permet d'exécuter une action <b>automatiquement</b> lors du traitement d'un lien de carte.
-
 - Permet de <b>lancer la navigation</b> dans TomTom, Waze, Magic Earth…
-
 - Permet d'enregistrer une position au format <b>GPX</b>.
-
-- Gestion des <b>tentatives de connexion</b> en cas de <b>connexion Internet instable</b>.
-
+- Gestion des tentatives de connexion en cas de <b>connexion Internet instable</b>.
 - Permet de <b>coller</b> les liens de carte directement dans l'application, sans avoir à les partager.
-
 - Interface adaptée aux <b>tablettes</b>.
 
- Fonctionnement et confidentialité
+<b>Fonctionnement et confidentialité</b>
 
 Geo Share convertit les liens de cartes (par exemple, https://maps.app.goo.gl/...) en liens geo: compatibles avec d'autres applications de cartographie. La création d'un lien geo: nécessite des coordonnées géographiques. Geo Share les extrait de l'URL de la carte.
 
-Cependant, certaines URL de cartes ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous demandera l'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.) et récupérera les coordonnées à partir des en-têtes HTTP ou du code HTML du lien. Pour plus d'informations, consultez la FAQ de l'application.
+Cependant, certaines URL de cartes ne contiennent pas de coordonnées. Dans ce cas, Geo Share vous <b>demandera l'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.)</b> et récupérera les coordonnées à partir des en-têtes HTTP ou du code HTML du lien. Pour plus d'informations, consultez la FAQ de l'application.
