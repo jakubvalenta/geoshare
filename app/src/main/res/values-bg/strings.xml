@@ -145,4 +145,8 @@
     <string name="output_gpx_route_share_automation_waiting">Автоматично споделяне на GPX маршрут след %1$ds</string>
     <string name="faq_location_permission_headline">Разрешение за местоположение</string>
     <string name="faq_location_permission_text">%1$s иска разрешение за местоположение при стартиране на навигацията TomTom и при споделяне на GPX маршрут, защото в тези случаи приложението трябва да създаде GPX маршрут, който започва от текущото ви местоположение. Информацията за местоположението се изтрива веднага след създаването на маршрута.</string>
+    <string name="not_available">Не е налично</string>
+    <string name="inputs_link">Връзка</string>
+    <string name="inputs_list_text">Можете да споделите връзки към следните картографски услуги с %1$s или да ги поставите в приложението.</string>
+    <string name="inputs_settings">Отидете в настройките на Android, за да изберете връзки, които винаги да се отварят в %1$s</string>
 </resources>
