@@ -135,4 +135,15 @@
     <string name="conversion_succeeded_open_app_street_view">Mostrar vista de calle en %1$s</string>
     <string name="converter_urbi_permission_title">¿Conectarse a 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Conectándose a 2GIS / Urbi…</string>
+    <string name="not_available">No disponible</string>
+    <string name="conversion_succeeded_location_failed">No fue posible encontrar la ubicación</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">Encontrando tu ubicación…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">¿Permitir acceso a la ubicación?</string>
+    <string name="conversion_succeeded_open_app_failed">No fue posible abrir %1$s</string>
+    <string name="output_gpx_location_permission">%1$s creará una ruta que empieza desde tu ubicación actual.</string>
+    <string name="output_gpx_route_share">Compartir ruta GPX</string>
+    <string name="output_gpx_route_share_failed">No fue posible compartir la ruta GPX</string>
+    <string name="output_gpx_route_share_automation_succeeded">Compartir automáticamente la ruta GPX</string>
+    <string name="output_gpx_route_share_automation_waiting">Compartir automáticamente la ruta GPX en %1$ds</string>
+    <string name="faq_location_permission_headline">Permiso de ubicación</string>
 </resources>
