@@ -30,7 +30,7 @@ Cuando te gusta Google Maps para encontrar lugares, pero prefieres una aplicaci�
 - Muestra las <b>coordenadas geográficas</b> de un enlace de mapa y permite copiarlas a el portapapeles en diferente formatos, como por ejemplo en un enlace geo:.
 - Muestra todos los puntos de un enlace de <b>lista de lugares</b>.
 - Permite ejecutar una acción <b>automáticamente</b> cuando el enlace de mapa es procesado.
-- Permite <b>iniciar la navegación</b> en aplicaciones seleccionadas.
+- Permite <b>iniciar la navegación</b> en TomTom, Waze, Magic Earth...
 - Permite guardar una localización como un <b>archivo GPX</b>.
 - Vuelve a intentar en <b>conexiones de internet inestables</b>.
 - Permite <b>pegar enlaces de mapa</b> directamente a la aplicación, en lugar de compartirlos con ella.
