@@ -122,4 +122,5 @@
     <string name="user_preferences_automation_nothing">什麼也沒有</string>
     <string name="conversion_succeeded_open_app">開啟%1$s</string>
     <string name="user_preferences_automation_title">自動地</string>
+    <string name="not_available">無法使用</string>
 </resources>
