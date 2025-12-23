@@ -142,6 +142,7 @@
     <string name="user_preferences_automation_title">Automation</string>
     <string name="user_preferences_automation_delay_sec_title">Automation delay</string>
     <string name="user_preferences_automation_delay_sec_description">Set how long the app waits before launching an automated action (e.g. before automatically opening a map app).</string>
+    <string name="user_preferences_automation_feature_validated_at_title" translatable="false">When was the automation feature last validated?</string>
     <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
     <string name="yes">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
@@ -179,6 +180,7 @@
     <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
     <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
+    <string name="premium_feature">Premium feature</string>
     <string name="seconds_unit">seconds</string>
     <string name="reset">reset</string>
     <plurals name="seconds">

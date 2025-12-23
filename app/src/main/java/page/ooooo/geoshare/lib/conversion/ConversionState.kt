@@ -6,15 +6,23 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationDelay
+import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.features.AutomationFeature
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
-import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.BasicAction
+import page.ooooo.geoshare.lib.outputs.BasicAutomation
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.LocationAutomation
+import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import java.io.IOException
@@ -76,23 +84,15 @@ data class ReceivedUri(
                 val uri = Uri.parse(m.group(), stateContext.uriQuote)
                 return when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
                     Permission.ALWAYS -> GrantedUnshortenPermission(
-                        stateContext,
-                        inputUriString,
-                        input,
-                        uri
+                        stateContext, inputUriString, input, uri
                     )
 
                     Permission.ASK -> RequestedUnshortenPermission(
-                        stateContext,
-                        inputUriString,
-                        input,
-                        uri
+                        stateContext, inputUriString, input, uri
                     )
 
                     Permission.NEVER -> DeniedConnectionPermission(
-                        stateContext,
-                        inputUriString,
-                        input
+                        stateContext, inputUriString, input
                     )
                 }
             }
@@ -337,12 +337,11 @@ data class ParseHtmlFailed(
     val inputUriString: String,
     val position: Position,
 ) : ConversionState {
-    override suspend fun transition() =
-        if (!position.points.isNullOrEmpty() || !position.q.isNullOrEmpty()) {
-            ConversionSucceeded(stateContext, inputUriString, position)
-        } else {
-            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-        }
+    override suspend fun transition() = if (!position.points.isNullOrEmpty() || !position.q.isNullOrEmpty()) {
+        ConversionSucceeded(stateContext, inputUriString, position)
+    } else {
+        ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+    }
 }
 
 data class ConversionSucceeded(
@@ -350,21 +349,21 @@ data class ConversionSucceeded(
     override val inputUriString: String,
     override val position: Position,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State? =
-        stateContext.userPreferencesRepository.getValue(AutomationUserPreference).let { automation ->
-            when (automation) {
-                is NoopAutomation ->
-                    null
-
-                is Automation.HasDelay ->
-                    stateContext.userPreferencesRepository.getValue(AutomationDelay).let { delay ->
-                        ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
-                    }
-
-                else ->
-                    ActionReady(inputUriString, position, null, automation)
-            }
+    override suspend fun transition(): State? {
+        val automation = stateContext.userPreferencesRepository.getValue(AutomationUserPreference)
+        if (automation is NoopAutomation) {
+            return null
         }
+        val valid = stateContext.features.validate(AutomationFeature, AutomationFeatureValidatedAt)
+        if (!valid) {
+            return null
+        }
+        if (automation is Automation.HasDelay) {
+            val delay = stateContext.userPreferencesRepository.getValue(AutomationDelay)
+            return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
+        }
+        return ActionReady(inputUriString, position, null, automation)
+    }
 }
 
 data class ConversionFailed(
@@ -380,15 +379,14 @@ data class ActionWaiting(
     val action: Action,
     val delay: Duration,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        try {
-            if (delay.isPositive()) {
-                delay(delay)
-            }
-            ActionReady(inputUriString, position, i, action)
-        } catch (_: CancellationException) {
-            ActionFinished(inputUriString, position, action)
+    override suspend fun transition(): State = try {
+        if (delay.isPositive()) {
+            delay(delay)
         }
+        ActionReady(inputUriString, position, i, action)
+    } catch (_: CancellationException) {
+        ActionFinished(inputUriString, position, action)
+    }
 }
 
 data class ActionReady(
@@ -397,13 +395,12 @@ data class ActionReady(
     val i: Int?,
     val action: Action,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        when (action) {
-            is BasicAutomation -> BasicActionReady(inputUriString, position, i, action)
-            is BasicAction -> BasicActionReady(inputUriString, position, i, action)
-            is LocationAutomation -> LocationRationaleRequested(inputUriString, position, i, action)
-            is LocationAction -> LocationRationaleRequested(inputUriString, position, i, action)
-        }
+    override suspend fun transition(): State = when (action) {
+        is BasicAutomation -> BasicActionReady(inputUriString, position, i, action)
+        is BasicAction -> BasicActionReady(inputUriString, position, i, action)
+        is LocationAutomation -> LocationRationaleRequested(inputUriString, position, i, action)
+        is LocationAction -> LocationRationaleRequested(inputUriString, position, i, action)
+    }
 }
 
 data class BasicActionReady(
@@ -427,14 +424,13 @@ data class ActionRan(
     val action: Action,
     val success: Boolean?,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        when (success) {
-            true -> ActionSucceeded(inputUriString, position, action)
+    override suspend fun transition(): State = when (success) {
+        true -> ActionSucceeded(inputUriString, position, action)
 
-            false -> ActionFailed(inputUriString, position, action)
+        false -> ActionFailed(inputUriString, position, action)
 
-            else -> ActionFinished(inputUriString, position, action)
-        }
+        else -> ActionFinished(inputUriString, position, action)
+    }
 }
 
 data class ActionSucceeded(
@@ -492,8 +488,7 @@ data class LocationRationaleShown(
     override suspend fun grant(doNotAsk: Boolean): State =
         LocationRationaleConfirmed(inputUriString, position, i, action)
 
-    override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(inputUriString, position, action)
+    override suspend fun deny(doNotAsk: Boolean): State = ActionFinished(inputUriString, position, action)
 }
 
 data class LocationRationaleConfirmed(
@@ -521,12 +516,11 @@ data class LocationReceived(
     val action: LocationAction,
     val location: Point?,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        if (location == null) {
-            LocationFindingFailed(inputUriString, position, action)
-        } else {
-            LocationActionReady(inputUriString, position, i, action, location)
-        }
+    override suspend fun transition(): State = if (location == null) {
+        LocationFindingFailed(inputUriString, position, action)
+    } else {
+        LocationActionReady(inputUriString, position, i, action, location)
+    }
 }
 
 data class LocationFindingFailed(

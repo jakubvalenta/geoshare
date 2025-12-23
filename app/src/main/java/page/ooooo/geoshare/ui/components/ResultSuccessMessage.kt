@@ -10,22 +10,27 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +60,7 @@ import page.ooooo.geoshare.lib.conversion.ConversionStateContext
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
+import page.ooooo.geoshare.lib.features.Features
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
@@ -64,9 +71,11 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
+    automationFeatureValid: Boolean,
     loadingIndicator: LoadingIndicator?,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
@@ -202,15 +211,41 @@ fun ResultSuccessMessage(
                         stringResource(R.string.conversion_succeeded_apps_headline),
                         style = MaterialTheme.typography.headlineSmall,
                     )
-                    Button(
-                        onNavigateToUserPreferencesAutomationScreen,
-                        Modifier.testTag("geoShareConversionSuccessAutomationPreferencesButton"),
-                        colors = ButtonDefaults.elevatedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        )
-                    ) {
-                        Text(stringResource(R.string.user_preferences_automation_title))
+                    Box(contentAlignment = Alignment.CenterEnd) {
+                        Button(
+                            onNavigateToUserPreferencesAutomationScreen,
+                            Modifier
+                                .testTag("geoShareConversionSuccessAutomationPreferencesButton")
+                                .run {
+                                    if (!automationFeatureValid) {
+                                        this.padding(end = 17.dp)
+                                    } else {
+                                        this
+                                    }
+                                },
+                            colors = ButtonDefaults.elevatedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                        ) {
+                            Text(stringResource(R.string.user_preferences_automation_title))
+                        }
+                        if (!automationFeatureValid) {
+                            FilledIconButton(
+                                onNavigateToUserPreferencesAutomationScreen,
+                                Modifier.offset(y = (-13).dp),
+                                shape = MaterialShapes.Sunny.toShape(),
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                ),
+                            ) {
+                                Icon(
+                                    painterResource(R.drawable.crown_24px),
+                                    stringResource(R.string.premium_feature)
+                                )
+                            }
+                        }
                     }
                 }
         }
@@ -266,6 +301,7 @@ private fun ActionFinishedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -286,6 +322,49 @@ private fun DarkActionFinishedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
+                loadingIndicator = null,
+                animationsEnabled = false,
+                onCancel = {},
+                onNavigateToUserPreferencesAutomationScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ActionFinishedFeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            ResultSuccessMessage(
+                currentState = ActionFinished(
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                ),
+                automationFeatureValid = false,
+                loadingIndicator = null,
+                animationsEnabled = false,
+                onCancel = {},
+                onNavigateToUserPreferencesAutomationScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkActionFinishedFeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            ResultSuccessMessage(
+                currentState = ActionFinished(
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    position = Position.example,
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                ),
+                automationFeatureValid = false,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -300,15 +379,20 @@ private fun DarkActionFinishedPreview() {
 private fun ActionWaitingPreview() {
     AppTheme {
         Surface {
+            val userPreferencesRepository = FakeUserPreferencesRepository()
             ResultSuccessMessage(
                 currentState = ActionWaiting(
-                    stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                    stateContext = ConversionStateContext(
+                        userPreferencesRepository = userPreferencesRepository,
+                        features = Features(userPreferencesRepository),
+                    ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     i = null,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                     delay = 3.seconds,
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -323,15 +407,20 @@ private fun ActionWaitingPreview() {
 private fun DarkActionWaitingPreview() {
     AppTheme {
         Surface {
+            val userPreferencesRepository = FakeUserPreferencesRepository()
             ResultSuccessMessage(
                 currentState = ActionWaiting(
-                    stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                    stateContext = ConversionStateContext(
+                        userPreferencesRepository = userPreferencesRepository,
+                        features = Features(userPreferencesRepository),
+                    ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     i = null,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                     delay = 3.seconds,
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -353,6 +442,7 @@ private fun LocationPermissionReceivedPreview() {
                     i = null,
                     action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = LoadingIndicator.Small(
                     messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
                 ),
@@ -376,6 +466,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                     i = null,
                     action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = LoadingIndicator.Small(
                     messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
                 ),
@@ -398,6 +489,7 @@ private fun SucceededPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -418,6 +510,7 @@ private fun DarSucceededPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -438,6 +531,7 @@ private fun FailedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
@@ -458,6 +552,7 @@ private fun DarkFailedPreview() {
                     position = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 ),
+                automationFeatureValid = true,
                 loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},

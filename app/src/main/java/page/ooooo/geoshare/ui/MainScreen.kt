@@ -85,6 +85,7 @@ import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
 import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
+import page.ooooo.geoshare.lib.features.Features
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
@@ -121,6 +122,7 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
+    val automationFeatureValid by viewModel.automationFeatureValid.collectAsState()
     val changelogShown by viewModel.changelogShown.collectAsState()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
@@ -201,6 +203,7 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
+        automationFeatureValid = automationFeatureValid,
         changelogShown = changelogShown,
         inputUriString = viewModel.inputUriString,
         loadingIndicator = loadingIndicator,
@@ -250,6 +253,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
+    automationFeatureValid: Boolean,
     changelogShown: Boolean,
     inputUriString: String,
     loadingIndicator: LoadingIndicator?,
@@ -401,6 +405,7 @@ private fun MainScreen(
                     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                         ResultSuccessMessage(
                             currentState,
+                            automationFeatureValid,
                             loadingIndicator,
                             onCancel = onCancel,
                             onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
@@ -591,6 +596,7 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
+            automationFeatureValid = true,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -617,6 +623,7 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
+            automationFeatureValid = true,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -643,6 +650,7 @@ private fun TabletPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
+            automationFeatureValid = true,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -673,6 +681,7 @@ private fun SucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -703,6 +712,7 @@ private fun DarkSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -733,6 +743,7 @@ private fun TabletSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -757,15 +768,20 @@ private fun TabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
+        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
-                stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                stateContext = ConversionStateContext(
+                    userPreferencesRepository = userPreferencesRepository,
+                    features = Features(userPreferencesRepository),
+                ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -790,15 +806,20 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
+        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
-                stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                stateContext = ConversionStateContext(
+                    userPreferencesRepository = userPreferencesRepository,
+                    features = Features(userPreferencesRepository),
+                ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -823,15 +844,20 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
+        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
-                stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
+                stateContext = ConversionStateContext(
+                    userPreferencesRepository = userPreferencesRepository,
+                    features = Features(userPreferencesRepository),
+                ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -861,6 +887,7 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -890,6 +917,7 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -919,6 +947,7 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -943,12 +972,14 @@ private fun TabletErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
+        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
                     NetworkTools(),
-                    FakeUserPreferencesRepository(),
+                    userPreferencesRepository = userPreferencesRepository,
+                    features = Features(userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -958,6 +989,7 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -985,12 +1017,14 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
+        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
                     NetworkTools(),
-                    FakeUserPreferencesRepository(),
+                    userPreferencesRepository = userPreferencesRepository,
+                    features = Features(userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1000,6 +1034,7 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1027,12 +1062,14 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
+        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
                     NetworkTools(),
-                    FakeUserPreferencesRepository(),
+                    userPreferencesRepository = userPreferencesRepository,
+                    features = Features(userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1042,6 +1079,7 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            automationFeatureValid = true,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(

@@ -32,6 +32,7 @@ import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.AutomationDelay
+import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
@@ -53,6 +54,7 @@ sealed class UserPreferencesGroup(
     val titleResId: Int,
     val userPreferences: List<UserPreference<*>>,
     val visible: Boolean = true,
+    open val featureValid: Boolean? = null,
 ) {
     open fun enabled(values: UserPreferencesValues): Boolean = true
 }
@@ -63,7 +65,7 @@ object ConnectionPermissionUserPreferencesGroup : UserPreferencesGroup(
     userPreferences = listOf(ConnectionPermission),
 )
 
-object AutomationUserPreferencesGroup : UserPreferencesGroup(
+class AutomationUserPreferencesGroup(override val featureValid: Boolean?) : UserPreferencesGroup(
     id = UserPreferencesGroupId.AUTOMATION,
     titleResId = R.string.user_preferences_automation_title,
     userPreferences = listOf(AutomationUserPreference),
@@ -83,6 +85,7 @@ object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup(
     userPreferences = listOf(
         ChangelogShownForVersionCode,
         IntroShowForVersionCode,
+        AutomationFeatureValidatedAt,
     ),
     visible = BuildConfig.DEBUG,
 )
@@ -93,12 +96,13 @@ fun UserPreferencesScreen(
     onBack: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
+    val automationFeatureValid by viewModel.automationFeatureValid.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
         groups = listOf(
             ConnectionPermissionUserPreferencesGroup,
-            AutomationUserPreferencesGroup,
+            AutomationUserPreferencesGroup(automationFeatureValid),
             AutomationDelayUserPreferencesGroup,
             DeveloperOptionsUserPreferencesGroup,
         ),
@@ -200,7 +204,7 @@ private fun DefaultPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -223,7 +227,7 @@ private fun DarkPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -246,7 +250,7 @@ private fun TabletPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -269,7 +273,7 @@ private fun EmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -292,7 +296,7 @@ private fun DarkEmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -315,7 +319,7 @@ private fun TabletEmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),

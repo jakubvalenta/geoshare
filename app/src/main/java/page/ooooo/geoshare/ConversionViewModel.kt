@@ -9,17 +9,44 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.*
-import page.ooooo.geoshare.ui.SavableDelegate
-import page.ooooo.geoshare.lib.conversion.*
+import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
+import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
+import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
+import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
+import page.ooooo.geoshare.data.local.preferences.UserPreference
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionRan
+import page.ooooo.geoshare.lib.conversion.ActionReady
+import page.ooooo.geoshare.lib.conversion.BasicActionReady
+import page.ooooo.geoshare.lib.conversion.ConversionFailed
+import page.ooooo.geoshare.lib.conversion.ConversionState
+import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.Initial
+import page.ooooo.geoshare.lib.conversion.LoadingIndicator
+import page.ooooo.geoshare.lib.conversion.LocationActionReady
+import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
+import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
+import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
+import page.ooooo.geoshare.lib.conversion.LocationReceived
+import page.ooooo.geoshare.lib.conversion.ReceivedUriString
+import page.ooooo.geoshare.lib.conversion.State
+import page.ooooo.geoshare.lib.features.AutomationFeature
+import page.ooooo.geoshare.lib.features.Features
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.ui.SavableDelegate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,9 +55,12 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
+    private val features = Features(userPreferencesRepository)
+
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         userPreferencesRepository = userPreferencesRepository,
+        features = features,
     ) { newState ->
         _currentState.value = newState
         when (newState) {
@@ -66,12 +96,13 @@ class ConversionViewModel @Inject constructor(
     private var transitionJob: Job? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val userPreferencesValues: StateFlow<UserPreferencesValues> =
-        userPreferencesRepository.values.mapLatest { it }.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            UserPreferencesValues(),
-        )
+    val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values.mapLatest {
+        it
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        UserPreferencesValues(),
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val automation: StateFlow<Automation> = userPreferencesValues.mapLatest {
@@ -80,6 +111,14 @@ class ConversionViewModel @Inject constructor(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         AutomationUserPreference.default,
+    )
+
+    val automationFeatureValid: StateFlow<Boolean> = flow<Boolean> {
+        features.validate(AutomationFeature, AutomationFeatureValidatedAt)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        true,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)

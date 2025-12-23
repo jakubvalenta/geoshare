@@ -2,7 +2,12 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalTextStyle
@@ -11,12 +16,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -28,6 +36,7 @@ import page.ooooo.geoshare.ui.UserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun UserPreferencesListPane(
     currentGroup: UserPreferencesGroup?,
@@ -74,6 +83,29 @@ fun UserPreferencesListPane(
                             }
                         }
                     },
+                trailingContent = if (group.featureValid == false) {
+                    {
+                        Surface(
+                            shape = MaterialTheme.shapes.extraLarge,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ) {
+                            Row(
+                                Modifier.padding(start = 10.dp, top = 6.dp, end = 12.dp, bottom = 6.dp),
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    painterResource(R.drawable.crown_24px),
+                                    stringResource(R.string.premium_feature),
+                                )
+                                Text("Buy premium", style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                    }
+                } else {
+                    null
+                },
                 colors = ListItemDefaults.colors(
                     containerColor = if (currentGroup == group) selectedContainerColor else containerColor
                 ),
@@ -94,7 +126,7 @@ private fun DefaultPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -118,7 +150,103 @@ private fun DarkPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
+                    expanded = false,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToGroup = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeatureValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesListPane(
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(true),
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
+                    expanded = false,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToGroup = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkFeatureValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesListPane(
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(true),
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
+                    expanded = false,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToGroup = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesListPane(
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(false),
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
+                    expanded = false,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToGroup = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkFeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesListPane(
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(false),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -142,7 +270,7 @@ private fun ExpandedPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),
@@ -166,7 +294,7 @@ private fun DarkExpandedPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(null),
                         AutomationDelayUserPreferencesGroup,
                         DeveloperOptionsUserPreferencesGroup,
                     ),

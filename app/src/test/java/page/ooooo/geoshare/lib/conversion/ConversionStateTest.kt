@@ -20,6 +20,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.AutomationDelay
+import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -30,6 +31,8 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.features.AutomationFeature
+import page.ooooo.geoshare.lib.features.Features
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -91,12 +94,14 @@ class ConversionStateTest {
         inputs: List<Input> = listOf(GeoUriInput, GoogleMapsInput),
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
+        features: Features = Features(fakeUserPreferencesRepository),
         log: ILog = FakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
         inputs = inputs,
         networkTools = networkTools,
         userPreferencesRepository = userPreferencesRepository,
+        features = features,
         log = log,
         uriQuote = uriQuote,
     )
@@ -1704,6 +1709,27 @@ class ConversionStateTest {
     }
 
     @Test
+    fun conversionSucceeded_automationFeatureIsNotValid_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockFeatures: Features = mock {
+            onBlocking {
+                validate(eq(AutomationFeature), eq(AutomationFeatureValidatedAt), any())
+            } doReturn false
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationUserPreference) } doReturn action
+        }
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            features = mockFeatures,
+        )
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        Assert.assertNull(state.transition())
+    }
+
+    @Test
     fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
@@ -1721,10 +1747,18 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockFeatures: Features = mock {
+            onBlocking {
+                validate(eq(AutomationFeature), eq(AutomationFeatureValidatedAt), any())
+            } doReturn true
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            features = mockFeatures,
+        )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
             ActionReady(inputUriString, position, null, action),
@@ -1738,11 +1772,19 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
         val delay = 2.seconds
+        val mockFeatures: Features = mock {
+            onBlocking {
+                validate(eq(AutomationFeature), eq(AutomationFeatureValidatedAt), any())
+            } doReturn true
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
             onBlocking { getValue(AutomationDelay) } doReturn delay
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            features = mockFeatures,
+        )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
             ActionWaiting(stateContext, inputUriString, position, null, action, delay),
@@ -1754,13 +1796,21 @@ class ConversionStateTest {
     fun conversionSucceeded_userPreferenceAutomationIsSaveGpx_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
+        val action = GpxOutput.SaveGpxPointsAutomation
         val delay = 2.seconds
+        val mockFeatures: Features = mock {
+            onBlocking {
+                validate(eq(AutomationFeature), eq(AutomationFeatureValidatedAt), any())
+            } doReturn true
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
             onBlocking { getValue(AutomationDelay) } doReturn delay
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            features = mockFeatures,
+        )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
             ActionWaiting(stateContext, inputUriString, position, null, action, delay),
@@ -1774,11 +1824,19 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GeoUriOutput.ShareGeoUriAutomation
         val delay = 2.seconds
+        val mockFeatures: Features = mock {
+            onBlocking {
+                validate(eq(AutomationFeature), eq(AutomationFeatureValidatedAt), any())
+            } doReturn true
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
             onBlocking { getValue(AutomationDelay) } doReturn delay
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            features = mockFeatures,
+        )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
             ActionWaiting(stateContext, inputUriString, position, null, action, delay),

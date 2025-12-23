@@ -135,19 +135,24 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
 
 abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
     override val loading = null
-    open val minValue = Int.MIN_VALUE
-    open val maxValue = Int.MAX_VALUE
 
     override fun serialize(value: Int?) = value.toString()
 
-    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
+    override fun deserialize(value: String?) = value?.toIntOrNull() ?: default
 
     @Composable
-    override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
-        null
-    } else {
-        stringResource(R.string.user_preferences_number_error_range, minValue, maxValue)
-    }
+    override fun getError(value: String?) = null
+}
+
+abstract class NullableLongUserPreference : NumberUserPreference<Long?>() {
+    override val loading = null
+
+    override fun serialize(value: Long?) = value.toString()
+
+    override fun deserialize(value: String?) = value?.toLongOrNull() ?: default
+
+    @Composable
+    override fun getError(value: String?) = null
 }
 
 abstract class DurationUserPreference : NumberUserPreference<Duration>() {
@@ -184,9 +189,8 @@ data class UserPreferenceOption<T>(
     val label: @Composable () -> Unit,
 )
 
-abstract class OptionsUserPreference<T>(
-    val default: T,
-) : UserPreference<T> {
+abstract class OptionsUserPreference<T> : UserPreference<T> {
+    abstract val default: T
     override val loading = default
 
     @Composable
@@ -221,9 +225,9 @@ abstract class OptionsUserPreference<T>(
     }
 }
 
-object ConnectionPermission : OptionsUserPreference<Permission>(
-    default = Permission.ASK,
-) {
+object ConnectionPermission : OptionsUserPreference<Permission>() {
+    override val default = Permission.ASK
+
     private val key = stringPreferencesKey("connect_to_google_permission")
 
     @Composable
@@ -264,9 +268,9 @@ object ConnectionPermission : OptionsUserPreference<Permission>(
         stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
 }
 
-object AutomationUserPreference : OptionsUserPreference<Automation>(
-    default = NoopAutomation,
-) {
+object AutomationUserPreference : OptionsUserPreference<Automation>() {
+    override val default = NoopAutomation
+
     private val typeKey = stringPreferencesKey("automation")
     private val packageNameKey = stringPreferencesKey("automation_package_name")
 
@@ -351,6 +355,20 @@ object AutomationDelay : DurationUserPreference() {
     override fun description() = stringResource(R.string.user_preferences_automation_delay_sec_description)
 }
 
+object AutomationFeatureValidatedAt : NullableLongUserPreference() {
+    override val key = stringPreferencesKey("automation_feature_validated_at")
+    override val default = null
+    override val modifier = Modifier
+
+    override fun getValue(values: UserPreferencesValues) = values.automationFeatureValidatedAtValue
+
+    @Composable
+    override fun title() = stringResource(R.string.user_preferences_automation_feature_validated_at_title)
+
+    @Composable
+    override fun description() = null
+}
+
 object IntroShowForVersionCode : NullableIntUserPreference() {
     override val key = stringPreferencesKey("intro_shown_for_version_code")
     override val default = 0
@@ -380,6 +398,7 @@ object ChangelogShownForVersionCode : NullableIntUserPreference() {
 }
 
 data class UserPreferencesValues(
+    val automationFeatureValidatedAtValue: Long? = AutomationFeatureValidatedAt.loading,
     val automationValue: Automation = AutomationUserPreference.loading,
     val automationDelayValue: Duration = AutomationDelay.loading,
     val changelogShownForVersionCodeValue: Int? = ChangelogShownForVersionCode.loading,

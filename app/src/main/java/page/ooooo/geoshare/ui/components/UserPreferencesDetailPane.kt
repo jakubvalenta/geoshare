@@ -100,7 +100,7 @@ private fun AutomationPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup,
+                    currentGroup = AutomationUserPreferencesGroup(null),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
                         automationValue = GpxOutput.SaveGpxPointsAutomation,
@@ -120,11 +120,27 @@ private fun DarkAutomationPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup,
+                    currentGroup = AutomationUserPreferencesGroup(null),
                     expanded = true,
-                    userPreferencesValues = UserPreferencesValues(
-                        automationValue = GpxOutput.SaveGpxPointsAutomation,
-                    ),
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AutomationFeatureValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationUserPreferencesGroup(true),
+                    expanded = true,
+                    userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onValueChange = {},
                 )
@@ -159,6 +175,60 @@ private fun DarkAutomationDelayPreview() {
             Column {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationDelayUserPreferencesGroup,
+                    expanded = true,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkAutomationFeatureValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationUserPreferencesGroup(true),
+                    expanded = true,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AutomationFeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationUserPreferencesGroup(false),
+                    expanded = true,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkAutomationFeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationUserPreferencesGroup(false),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
