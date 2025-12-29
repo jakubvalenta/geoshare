@@ -486,6 +486,7 @@ fun ConversionScreen(
             onDismissRequest = { setSelectedPositionAndIndex(null) },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
+                .testTag("geoShareConversionSheet")
                 // Set and consume insets to prevent unclickable items when the sheet is expanded (probably a bug in
                 // Compose Material 3)
                 .windowInsetsPadding(WindowInsets.safeDrawing),
