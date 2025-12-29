@@ -2,8 +2,8 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +17,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.CopyAction
 import page.ooooo.geoshare.lib.outputs.allOutputs
+import page.ooooo.geoshare.lib.outputs.getPointActions
 import page.ooooo.geoshare.lib.outputs.getPositionActions
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -26,33 +27,51 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessSheetContent(
     position: Position,
     i: Int?,
-    copyActions: List<Action>,
-    otherActions: List<Action>,
     headline: String? = null,
     onHide: () -> Unit,
     onRun: (action: Action, i: Int?) -> Unit,
 ) {
-    headline?.let { headline ->
-        val spacing = LocalSpacing.current
-        Text(
-            headline,
-            Modifier.padding(start = 16.dp, end = 16.dp, bottom = spacing.medium),
-            style = MaterialTheme.typography.headlineSmall,
-        )
-    }
-    copyActions.mapNotNull { it as? CopyAction }.forEach { action ->
-        ResultSuccessSheetItem({ action.Label() }, description = action.getText(position, i)) {
-            onRun(action, i)
-            onHide()
+    val spacing = LocalSpacing.current
+    val (copyActions, otherActions) = allOutputs
+        .run {
+            if (i == null) {
+                getPositionActions()
+            } else {
+                getPointActions()
+            }
         }
-    }
-    if (copyActions.isNotEmpty() && otherActions.isNotEmpty()) {
-        HorizontalDivider()
-    }
-    otherActions.forEach { action ->
-        ResultSuccessSheetItem({ action.Label() }) {
-            onRun(action, i)
-            onHide()
+        .filter { it.isEnabled(position, i) }
+        .partition { it is CopyAction }
+    LazyColumn {
+        headline?.let { headline ->
+            item {
+                Text(
+                    headline,
+                    Modifier.padding(start = 16.dp, end = 16.dp, bottom = spacing.medium),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+            }
+        }
+        copyActions.mapNotNull { it as? CopyAction }.forEach { action ->
+            item {
+                ResultSuccessSheetItem({ action.Label() }, description = action.getText(position, i)) {
+                    onHide()
+                    onRun(action, i)
+                }
+            }
+        }
+        if (copyActions.isNotEmpty() && otherActions.isNotEmpty()) {
+            item {
+                HorizontalDivider()
+            }
+        }
+        otherActions.forEach { action ->
+            item {
+                ResultSuccessSheetItem({ action.Label() }) {
+                    onHide()
+                    onRun(action, i)
+                }
+            }
         }
     }
 }
@@ -85,22 +104,13 @@ private fun ResultSuccessSheetItem(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            Column {
-                val position = Position.example
-                val (copyActions, otherActions) = allOutputs
-                    .getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .partition { it is CopyAction }
-                ResultSuccessSheetContent(
-                    position = position,
-                    i = null,
-                    copyActions = copyActions,
-                    otherActions = otherActions,
-                    headline = stringResource(R.string.conversion_succeeded_point_number, 3),
-                    onHide = {},
-                    onRun = { _, _ -> },
-                )
-            }
+            ResultSuccessSheetContent(
+                position = Position.example,
+                i = null,
+                headline = stringResource(R.string.conversion_succeeded_point_number, 3),
+                onHide = {},
+                onRun = { _, _ -> },
+            )
         }
     }
 }
@@ -110,22 +120,13 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            Column {
-                val position = Position.example
-                val (copyActions, otherActions) = allOutputs
-                    .getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .partition { it is CopyAction }
-                ResultSuccessSheetContent(
-                    position = position,
-                    i = null,
-                    copyActions = copyActions,
-                    otherActions = otherActions,
-                    headline = stringResource(R.string.conversion_succeeded_point_number, 3),
-                    onHide = {},
-                    onRun = { _, _ -> },
-                )
-            }
+            ResultSuccessSheetContent(
+                position = Position.example,
+                i = null,
+                headline = stringResource(R.string.conversion_succeeded_point_number, 3),
+                onHide = {},
+                onRun = { _, _ -> },
+            )
         }
     }
 }

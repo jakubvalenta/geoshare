@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -21,7 +19,6 @@ import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.collections.filter
 
 private val iconSize = 16.dp
 
@@ -30,10 +27,9 @@ private val iconSize = 16.dp
 fun ResultSuccessPoint(
     position: Position,
     i: Int,
-    onRun: (action: Action, i: Int?) -> Unit,
+    onSelect: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
     val name = allOutputs.getName(position, i)
 
     Box {
@@ -59,30 +55,13 @@ fun ResultSuccessPoint(
             }
         }
         Box(Modifier.align(Alignment.TopEnd)) {
-            IconButton({ setSheetVisible(true) }, Modifier.size(iconSize)) {
+            IconButton(onSelect, Modifier.size(iconSize)) {
                 Icon(
                     painterResource(R.drawable.more_horiz_24px),
                     contentDescription = stringResource(R.string.nav_menu_content_description),
                 )
             }
         }
-    }
-    ResultSuccessSheet(
-        sheetVisible = sheetVisible,
-        onSetSheetVisible = setSheetVisible,
-    ) { onHide ->
-        val (copyActions, otherActions) = allOutputs.getPointActions()
-            .filter { it.isEnabled(position, i) }
-            .partition { it is CopyAction }
-        ResultSuccessSheetContent(
-            position = position,
-            i = i,
-            copyActions = copyActions,
-            otherActions = otherActions,
-            headline = name,
-            onHide = onHide,
-            onRun = onRun,
-        )
     }
 }
 
@@ -101,7 +80,7 @@ private fun DefaultPreview() {
                     ),
                 ),
                 i = 2,
-                onRun = { _, _ -> },
+                onSelect = {},
             )
         }
     }
@@ -122,7 +101,7 @@ private fun DarkPreview() {
                     ),
                 ),
                 i = 2,
-                onRun = { _, _ -> },
+                onSelect = {},
             )
         }
     }
@@ -144,7 +123,7 @@ private fun LongNamePreview() {
                     ),
                 ),
                 i = 2,
-                onRun = { _, _ -> },
+                onSelect = {},
             )
         }
     }
@@ -166,7 +145,7 @@ private fun DarkLongNamePreview() {
                     ),
                 ),
                 i = 2,
-                onRun = { _, _ -> },
+                onSelect = {},
             )
         }
     }
