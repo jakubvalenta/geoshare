@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -30,9 +28,9 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessCoordinates(
     position: Position,
     onRun: (action: Action, i: Int?) -> Unit,
+    onSelect: (position: Position, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val (sheetVisible, setSheetVisible) = remember { mutableStateOf(false) }
 
     Column {
         (allOutputs.getName(position, null)
@@ -66,8 +64,8 @@ fun ResultSuccessCoordinates(
             },
             end = {
                 IconButton(
-                    { setSheetVisible(true) },
-                    Modifier.testTag("geoShareConversionSuccessPositionMenuButton"),
+                    { onSelect(position, null) },
+                    Modifier.testTag("geoShareConversionSuccessPositionMenuButton")
                 ) {
                     Icon(
                         painterResource(R.drawable.content_copy_24px),
@@ -82,7 +80,7 @@ fun ResultSuccessCoordinates(
                             ResultSuccessPoint(
                                 position = position,
                                 i = i,
-                                onRun = onRun,
+                                onSelect = { onSelect(position, i) },
                             )
                         }
                     }
@@ -96,23 +94,6 @@ fun ResultSuccessCoordinates(
                     }
             },
         )
-        ResultSuccessSheet(
-            sheetVisible = sheetVisible,
-            onSetSheetVisible = setSheetVisible,
-        ) { onHide ->
-            val (copyActions, otherActions) = allOutputs
-                .getPositionActions()
-                .filter { it.isEnabled(position, null) }
-                .partition { it is CopyAction }
-            ResultSuccessSheetContent(
-                position = position,
-                i = null,
-                copyActions = copyActions,
-                otherActions = otherActions,
-                onHide = onHide,
-                onRun = onRun,
-            )
-        }
     }
 }
 
@@ -129,6 +110,7 @@ private fun DefaultPreview() {
             ResultSuccessCoordinates(
                 position = Position.example,
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -145,6 +127,7 @@ private fun DarkPreview() {
             ResultSuccessCoordinates(
                 position = Position.example,
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -161,6 +144,7 @@ private fun DescriptionPreview() {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -177,6 +161,7 @@ private fun DarkDescriptionPreview() {
             ResultSuccessCoordinates(
                 position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -193,6 +178,7 @@ private fun LabelPreview() {
             ResultSuccessCoordinates(
                 position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -209,6 +195,7 @@ private fun DarkLabelPreview() {
             ResultSuccessCoordinates(
                 position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -231,6 +218,7 @@ private fun PointsPreview() {
                     ),
                 ),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -253,6 +241,7 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -277,6 +266,7 @@ private fun PointsAndDescriptionPreview() {
                     z = 13.0,
                 ),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }
@@ -301,6 +291,7 @@ private fun DarkPointsAndDescriptionPreview() {
                     z = 13.0,
                 ),
                 onRun = { _, _ -> },
+                onSelect = { _, _ -> },
             )
         }
     }

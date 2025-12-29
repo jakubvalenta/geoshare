@@ -6,15 +6,13 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -226,7 +224,10 @@ fun ConversionScreen(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
+    val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
     BackHandler {
         onBack()
@@ -323,6 +324,10 @@ fun ConversionScreen(
                     ResultSuccessCoordinates(
                         position = currentState.position,
                         onRun = onRun,
+                        onSelect = { position, i ->
+                            onCancel()
+                            setSelectedPositionAndIndex(position to i)
+                        },
                     )
                 }
             }
@@ -475,6 +480,34 @@ fun ConversionScreen(
         },
         windowSizeClass = windowSizeClass,
     )
+
+    selectedPositionAndIndex?.let { (position, i) ->
+        ModalBottomSheet(
+            onDismissRequest = { setSelectedPositionAndIndex(null) },
+            modifier = Modifier
+                .semantics { testTagsAsResourceId = true }
+                .testTag("geoShareConversionSheet")
+                // Set and consume insets to prevent unclickable items when the sheet is expanded (probably a bug in
+                // Compose Material 3)
+                .windowInsetsPadding(WindowInsets.safeDrawing),
+            sheetState = sheetState,
+        ) {
+            ResultSuccessSheetContent(
+                position = position,
+                i = i,
+                onHide = {
+                    coroutineScope
+                        .launch { sheetState.hide() }
+                        .invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                setSelectedPositionAndIndex(null)
+                            }
+                        }
+                },
+                onRun = onRun,
+            )
+        }
+    }
 }
 
 // Previews

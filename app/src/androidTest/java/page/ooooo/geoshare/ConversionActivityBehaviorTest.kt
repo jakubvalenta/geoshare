@@ -1,6 +1,7 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
@@ -47,8 +48,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location in WGS 84
             waitAndAssertPositionIsVisible(Position(Srs.WGS84, 31.23044166868017, 121.47099209401793, z = 11.0))
 
-            // Shows copy link in GCJ-02
+            // Open position menu
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+
+            // Shows copy link in GCJ-02
             onElement {
                 viewIdResourceName == "geoShareConversionSuccessSheetItemDescription" &&
                     textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
@@ -76,7 +79,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows automation success message
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessAutomationSuccess" }
+        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessMessage" }
 
         // Shows automation preferences button
         onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
@@ -563,5 +566,25 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 else -> false
             }
         }
+    }
+
+    @Test
+    fun conversionScreen_whenCopyButtonIsTapped_opensSheetAndAllowsCopyingMagicEarthUri() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Share a Google Maps coordinates link with the app
+        shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+        // Open position menu
+        onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+
+        // Swipe the sheet and tap the copy Magic Earth link button
+        onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 0.5f)
+        onElement { viewIdResourceName == "geoShareOutputMagicEarthCopyNavigateToUri" }.click()
+
+        // Shows success message
+        onElement { viewIdResourceName == "geoShareConversionSuccessMessage" }
     }
 }

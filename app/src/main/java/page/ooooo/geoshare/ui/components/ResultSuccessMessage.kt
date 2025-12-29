@@ -118,7 +118,7 @@ fun ResultSuccessMessage(
 
             targetState is ActionSucceeded && targetState.action is Action.HasSuccessMessage ->
                 ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationSuccess")) {
+                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessMessage")) {
                         targetState.action.successText()
                     }
                 }

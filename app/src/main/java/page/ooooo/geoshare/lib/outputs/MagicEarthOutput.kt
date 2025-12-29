@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -48,7 +49,10 @@ object MagicEarthOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME))
+            Text(
+                stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME),
+                Modifier.testTag("geoShareOutputMagicEarthCopyNavigateToUri"),
+            )
         }
     }
 
