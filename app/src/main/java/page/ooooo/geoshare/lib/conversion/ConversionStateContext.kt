@@ -8,7 +8,7 @@ data class ConversionStateContext(
     val inputs: List<Input> = emptyList(),
     val networkTools: NetworkTools = NetworkTools(),
     val userPreferencesRepository: UserPreferencesRepository,
-    val log: ILog = DefaultLog(),
+    val log: ILog = DefaultLog,
     val uriQuote: UriQuote = DefaultUriQuote(),
     val onStateChange: (State) -> Unit = {},
 ) : StateContext() {

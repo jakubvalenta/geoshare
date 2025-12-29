@@ -25,7 +25,7 @@ import kotlin.math.roundToLong
 
 open class NetworkTools(
     private val engine: HttpClientEngine = CIO.create(),
-    private val log: ILog = DefaultLog(),
+    private val log: ILog = DefaultLog,
 ) {
     companion object {
         const val MAX_RETRIES = 9

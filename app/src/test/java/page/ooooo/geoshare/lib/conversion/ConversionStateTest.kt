@@ -81,7 +81,6 @@ class ConversionStateTest {
         }
     }
 
-    private val fakeLog = FakeLog()
     private val uriQuote = FakeUriQuote()
     private val fakeUserPreferencesRepository: UserPreferencesRepository = FakeUserPreferencesRepository()
 
@@ -89,7 +88,7 @@ class ConversionStateTest {
         inputs: List<Input> = listOf(GeoUriInput, GoogleMapsInput),
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
-        log: ILog = fakeLog,
+        log: ILog = FakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
         inputs = inputs,
@@ -1138,7 +1137,8 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override suspend fun parseHtml(channel: ByteReadChannel): Pair<Position, String?> = Pair(Position(), null)
+            override suspend fun parseHtml(channel: ByteReadChannel, log: ILog): Pair<Position, String?> =
+                Pair(Position(), null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1392,7 +1392,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
+            override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) = Pair(positionFromHtml, null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1436,7 +1436,7 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
+            override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) = Pair(positionFromHtml, null)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1481,7 +1481,7 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
+                override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) = Pair(positionFromHtml, null)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),
@@ -1526,7 +1526,7 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(positionFromHtml, null)
+                override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) = Pair(positionFromHtml, null)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),
@@ -1571,7 +1571,8 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(Position(), redirectUriString)
+                override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
+                    Pair(Position(), redirectUriString)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),
@@ -1623,7 +1624,8 @@ class ConversionStateTest {
                     throw NotImplementedError()
                 }
 
-                override suspend fun parseHtml(channel: ByteReadChannel) = Pair(Position(), redirectUriString)
+                override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
+                    Pair(Position(), redirectUriString)
             }
             val stateContext = mockStateContext(
                 inputs = listOf(mockInput),

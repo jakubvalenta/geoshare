@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
@@ -54,7 +55,7 @@ object AppleMapsInput : Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) =
+    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
         PositionBuilder(srs).apply {
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")

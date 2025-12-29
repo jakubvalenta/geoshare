@@ -25,47 +25,61 @@ class PositionBuilder(val srs: Srs) {
 
     fun toPair(): Pair<Position, String?> = position to uriString
 
-    fun setPointIfNull(block: () -> LatLonZ?) {
+    fun setPointIfNull(block: () -> LatLonZ?): Boolean =
         if (points.isEmpty()) {
             block()?.let { (lat, lon, newZ) ->
                 points.add(Point(srs, lat, lon))
                 if (newZ != null) {
                     z = newZ
                 }
-            }
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 
-    fun setDefaultPointIfNull(block: () -> LatLonZ?) {
+    fun setDefaultPointIfNull(block: () -> LatLonZ?): Boolean =
         if (defaultPoint == null) {
             block()?.let { (lat, lon, newZ) ->
                 defaultPoint = Point(srs, lat, lon)
                 if (newZ != null) {
                     z = newZ
                 }
-            }
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 
-    fun addPoints(block: () -> Sequence<LatLonZ>) {
+    fun addPoints(block: () -> Sequence<LatLonZ>): Boolean =
         points.addAll(block().map { (lat, lon) -> Point(srs, lat, lon) })
-    }
 
-    fun setQIfNull(block: () -> String?) {
+    fun setQIfNull(block: () -> String?): Boolean =
         if (q == null && defaultPoint == null && points.isEmpty()) {
-            q = block()
+            block()?.let { newQ ->
+                q = newQ
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 
-    fun setQOrNameIfEmpty(block: () -> String?) {
+    fun setQOrNameIfEmpty(block: () -> String?): Boolean =
         if (q == null && defaultPoint == null && points.isEmpty()) {
-            q = block()
+            block()?.let { newQ ->
+                q = newQ
+                true
+            } ?: false
         } else if (name == null) {
-            name = block()
+            block()?.let { newName ->
+                name = newName
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 
-    fun setQWithCenterIfNull(block: () -> Triple<String, Double, Double>?) {
+    fun setQWithCenterIfNull(block: () -> Triple<String, Double, Double>?): Boolean =
         if (q == null) {
             block()?.let { (newQ, lat, lon) ->
                 if (defaultPoint == null && points.isEmpty()) {
@@ -74,19 +88,29 @@ class PositionBuilder(val srs: Srs) {
                 } else {
                     name = newQ
                 }
-            }
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 
-    fun setZIfNull(block: () -> Double?) {
+    fun setZIfNull(block: () -> Double?): Boolean =
         if (z == null) {
-            z = block()
+            block()?.let { newZ ->
+                z = newZ
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 
-    fun setUriStringIfNull(block: () -> String?) {
+    fun setUriStringIfNull(block: () -> String?): Boolean =
         if (uriString == null && defaultPoint == null && points.isEmpty()) {
-            uriString = block()
+            block()?.let { newUriString ->
+                uriString = newUriString
+                true
+            } ?: false
+        } else {
+            false
         }
-    }
 }

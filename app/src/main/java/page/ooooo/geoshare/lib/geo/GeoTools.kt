@@ -13,7 +13,7 @@ private fun isPointInGeometry(
     y: Double,
     @Suppress("SameParameterValue")
     wellKnownText: String,
-    log: ILog = DefaultLog(),
+    log: ILog = DefaultLog,
 ): Boolean {
     val geometryFactory = GeometryFactory()
     val geometry = try {
@@ -26,11 +26,11 @@ private fun isPointInGeometry(
     return geometry.contains(point)
 }
 
-fun exactIsPointInChina(x: Double, y: Double, log: ILog = DefaultLog()): Boolean =
+fun exactIsPointInChina(x: Double, y: Double, log: ILog = DefaultLog): Boolean =
     isPointInGeometry(x, y, CHINA_WELL_KNOWN_TEXT, log)
 
 fun quickIsPointInChina(x: Double, y: Double): Boolean =
     !outOfChina(y, x)
 
-fun isPointInChina(x: Double, y: Double, log: ILog = DefaultLog()): Boolean =
+fun isPointInChina(x: Double, y: Double, log: ILog = DefaultLog): Boolean =
     quickIsPointInChina(x, y) && exactIsPointInChina(x, y, log)

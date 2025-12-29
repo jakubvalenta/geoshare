@@ -5,6 +5,7 @@ import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.*
@@ -84,7 +85,7 @@ object WazeInput : Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) =
+    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {

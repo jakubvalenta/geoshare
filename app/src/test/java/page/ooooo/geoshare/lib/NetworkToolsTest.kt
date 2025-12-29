@@ -27,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 class NetworkToolsTest {
-    private val log = FakeLog()
+    private val log = FakeLog
 
     @Test
     fun requestLocationHeader_requestReturns301WithLocationHeader_callsConnectAndReturnsLocationHeader() = runTest {

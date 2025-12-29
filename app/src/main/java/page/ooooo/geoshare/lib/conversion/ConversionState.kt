@@ -274,7 +274,7 @@ data class GrantedParseHtmlPermission(
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
             val (positionFromHtml, redirectUriString) = stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
-                input.parseHtml(channel)
+                input.parseHtml(channel, stateContext.log)
             }
             if (!positionFromHtml.points.isNullOrEmpty()) {
                 val positionMerged = positionFromUri.q?.let { q ->

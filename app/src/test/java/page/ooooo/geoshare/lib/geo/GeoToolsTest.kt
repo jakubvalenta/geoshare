@@ -6,7 +6,7 @@ import org.junit.Test
 import page.ooooo.geoshare.lib.FakeLog
 
 class GeoToolsTest {
-    private val log = FakeLog()
+    private val log = FakeLog
 
     @Test
     fun exactIsPointInChina_pointIsInChina_returnsTrue() {

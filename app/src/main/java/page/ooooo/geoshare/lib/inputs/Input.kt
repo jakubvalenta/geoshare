@@ -2,6 +2,8 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
+import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.position.Position
 
@@ -25,6 +27,6 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
-        suspend fun parseHtml(channel: ByteReadChannel): Pair<Position, String?>
+        suspend fun parseHtml(channel: ByteReadChannel, log: ILog = DefaultLog): Pair<Position, String?>
     }
 }
