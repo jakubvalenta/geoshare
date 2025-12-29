@@ -85,10 +85,18 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                addPoints { pointPattern findAllLatLonZ line }
-                setDefaultPointIfNull { defaultPointPattern1 findLatLonZ line }
-                setDefaultPointIfNull { defaultPointPattern2 findLatLonZ line }
-                setUriStringIfNull { uriPattern findUriString line }
+                if (addPoints { (pointPattern findAllLatLonZ line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
+                }
+                if (setDefaultPointIfNull { (defaultPointPattern1 findLatLonZ line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
+                }
+                if (setDefaultPointIfNull { (defaultPointPattern2 findLatLonZ line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
+                }
+                if (setUriStringIfNull { (uriPattern findUriString line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
+                }
             }
         }.toPair()
 
