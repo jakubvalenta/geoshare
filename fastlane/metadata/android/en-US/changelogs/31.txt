@@ -1,0 +1,1 @@
+- Fixed scrolling in the copy menu.
