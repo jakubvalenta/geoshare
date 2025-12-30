@@ -1,2 +1,3 @@
+- Added OpenStreetMap directions link support.
 - Fixed scrolling in the copy menu.
 - Fixed Google Maps search links.

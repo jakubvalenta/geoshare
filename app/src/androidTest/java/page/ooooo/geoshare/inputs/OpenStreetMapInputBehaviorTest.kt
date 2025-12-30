@@ -19,6 +19,16 @@ class OpenStreetMapInputBehaviorTest : BaseInputBehaviorTest() {
             "https://www.openstreetmap.org/#map=16/51.49/-0.13",
         )
 
+        // Directions
+        testUri(
+            Position(
+                points = persistentListOf(
+                    Point(Srs.WGS84, 51.0528, 13.7364),
+                ),
+            ),
+            "https://www.openstreetmap.org/directions?to=51.0528,13.7364",
+        )
+
         // Node
         testUri(
             Position(

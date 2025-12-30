@@ -16,6 +16,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/#map=16/51.49/-0.13"))
         assertTrue(doesUriPatternMatch("www.openstreetmap.org/#map=16/51.49/-0.13"))
         assertTrue(doesUriPatternMatch("openstreetmap.org/#map=16/51.49/-0.13"))
+        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/directions?to=51.0528,13.7364"))
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/node/6284640534"))
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/relation/910699"))
         assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/way/596674456"))
@@ -51,6 +52,14 @@ class OpenStreetMapInputTest : BaseInputTest() {
         assertEquals(
             Position(Srs.WGS84, 51.49, -0.13, z = 16.0) to null,
             parseUri("https://www.openstreetmap.org/#map%3D16%2F51.49%2F-0.13"),
+        )
+    }
+
+    @Test
+    fun parseUri_directions() {
+        assertEquals(
+            Position(Srs.WGS84, 51.0528, 13.7364) to null,
+            parseUri("https://www.openstreetmap.org/directions?to=51.0528,13.7364"),
         )
     }
 
