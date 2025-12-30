@@ -29,10 +29,12 @@ sealed interface ParseHtmlResult {
             positionFromHtml: Position,
             redirectUriString: String? = null,
         ): ParseHtmlResult? = if (!positionFromHtml.points.isNullOrEmpty()) {
-            val positionMerged = positionFromUri.q?.let { q ->
+            val positionMerged = if (positionFromUri.q != null) {
                 // Use query from the position parsed from URI as the name of the position parsed from HTML
-                positionFromHtml.setLastPointName(q)
-            } ?: positionFromHtml
+                positionFromHtml.setLastPointName(positionFromUri.q)
+            } else {
+                positionFromHtml
+            }
             Succeeded(positionMerged)
         } else if (redirectUriString != null) {
             RequiresRedirect(redirectUriString)
