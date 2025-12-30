@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.findLatLonZ
 import page.ooooo.geoshare.lib.extensions.match
@@ -60,7 +61,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) =
+    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {

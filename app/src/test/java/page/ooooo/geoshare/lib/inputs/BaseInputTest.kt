@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.lib.inputs
 
 import io.ktor.utils.io.jvm.javaio.*
+import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
@@ -11,6 +13,7 @@ import page.ooooo.geoshare.lib.position.Position
 abstract class BaseInputTest() {
     protected abstract val input: Input
 
+    protected var log: ILog = FakeLog
     protected var uriQuote: UriQuote = FakeUriQuote()
 
     fun getUri(uriString: String): String? = (input.uriPattern find uriString)?.group()
@@ -26,5 +29,5 @@ abstract class BaseInputTest() {
         input.parseUri(Uri.parse(uriString, uriQuote))
 
     suspend fun parseHtml(html: String): Pair<Position, String?> =
-        (input as Input.HasHtml).parseHtml(html.byteInputStream().toByteReadChannel())
+        (input as Input.HasHtml).parseHtml(html.byteInputStream().toByteReadChannel(), log)
 }

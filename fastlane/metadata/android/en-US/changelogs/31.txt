@@ -1,1 +1,2 @@
 - Fixed scrolling in the copy menu.
+- Fixed Google Maps search links.

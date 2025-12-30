@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.extensions.*
@@ -51,7 +52,7 @@ object OpenStreetMapInput : Input.HasHtml {
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) =
+    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
         PositionBuilder(srs).apply {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {

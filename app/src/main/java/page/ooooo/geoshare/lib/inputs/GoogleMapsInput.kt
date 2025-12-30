@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.PositionBuilder
@@ -46,8 +47,9 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
             setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
 
-            val parseHtmlParts = setOf("", "@", "d", "placelists")
             val parseUriParts = setOf("dir", "place", "search")
+            val parseHtmlParts = setOf("", "@", "d", "placelists")
+            val parseHtmlExcludeParts = setOf("search")
             val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
             val firstPart = parts.firstOrNull()
             when {
@@ -70,13 +72,16 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                             setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
                         }
                     }
-                    setUriStringIfNull { uri.toString() }
+                    if (firstPart !in parseHtmlExcludeParts) {
+                        // Go to HTML parsing if needed
+                        setUriStringIfNull { uri.toString() }
+                    }
                 }
             }
         }.toPair()
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel) =
+    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
         PositionBuilder(srs).apply {
             val pointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
             val defaultPointPattern1 = Pattern.compile("""/@$LAT,$LON""")
@@ -84,10 +89,18 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                addPoints { pointPattern findAllLatLonZ line }
-                setDefaultPointIfNull { defaultPointPattern1 findLatLonZ line }
-                setDefaultPointIfNull { defaultPointPattern2 findLatLonZ line }
-                setUriStringIfNull { uriPattern findUriString line }
+                if (addPoints { (pointPattern findAllLatLonZ line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
+                }
+                if (setDefaultPointIfNull { (defaultPointPattern1 findLatLonZ line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
+                }
+                if (setDefaultPointIfNull { (defaultPointPattern2 findLatLonZ line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
+                }
+                if (setUriStringIfNull { (uriPattern findUriString line) }) {
+                    log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
+                }
             }
         }.toPair()
 
