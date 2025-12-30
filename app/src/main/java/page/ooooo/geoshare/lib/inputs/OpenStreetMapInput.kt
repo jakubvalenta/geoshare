@@ -24,6 +24,7 @@ object OpenStreetMapInput : Input.HasHtml {
         nameResId = R.string.converter_open_street_map_name,
         items = listOf(
             InputDocumentationItem.Url(20, "https://www.openstreetmap.org/"),
+            InputDocumentationItem.Url(31, "https://www.openstreetmap.org/directions"),
             InputDocumentationItem.Url(23, "https://www.openstreetmap.org/node"),
             InputDocumentationItem.Url(23, "https://www.openstreetmap.org/relation"),
             InputDocumentationItem.Url(23, "https://www.openstreetmap.org/way"),
@@ -40,6 +41,7 @@ object OpenStreetMapInput : Input.HasHtml {
                     ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
             }
             setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["to"] }
             setUriStringIfNull {
                 (ELEMENT_PATH match path)?.let { m ->
                     m.groupOrNull("type")?.let { type ->
