@@ -66,8 +66,7 @@ object UrbiInput : Input.HasHtml {
             val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findLatLonZ line)?.let { (lat, lon, z) ->
-                    setPointIfNull { LatLonZ(lat, lon, z) }
+                if (setPointIfNull { pattern findLatLonZ line }) {
                     break
                 }
             }
