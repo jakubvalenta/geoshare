@@ -34,11 +34,13 @@ object FakeLog : ILog {
     override fun w(tag: String?, msg: String) = log(msg)
     override fun w(tag: String?, msg: String, tr: Throwable) = log(msg, tr)
 
+    @Suppress("SameReturnValue")
     private fun log(msg: String): Int {
         println(msg)
         return 1
     }
 
+    @Suppress("SameReturnValue")
     private fun log(msg: String, tr: Throwable): Int {
         println("$msg, ${tr.stackTraceToString()}")
         return 1
