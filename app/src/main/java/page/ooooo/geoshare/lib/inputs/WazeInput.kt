@@ -55,11 +55,11 @@ object WazeInput : Input.HasHtml {
                 if (!hasPoint()) {
                     queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
                         // To skip some redirects when downloading HTML, replace this URL:
-                        // https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
+                        // https://ul.waze.com/ul?venue_id=2884104.28644432.6709020
                         // or this URL:
-                        // https://www.waze.com/ul?venue_id=183894452.1839010060.260192
+                        // https://www.waze.com/ul?venue_id=2884104.28644432.6709020
                         // with this one:
-                        // https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
+                        // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                         htmlUriString = Uri(
                             scheme = "https",
                             host = "www.waze.com",
@@ -69,9 +69,9 @@ object WazeInput : Input.HasHtml {
                         ).toString()
                     } ?: queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
                         // To skip some redirects when downloading HTML, replace this URL:
-                        // https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
+                        // https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020
                         // with this one:
-                        // https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
+                        // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
                         htmlUriString = Uri(
                             scheme = "https",
                             host = "www.waze.com",

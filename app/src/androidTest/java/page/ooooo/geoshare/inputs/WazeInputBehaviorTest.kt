@@ -25,8 +25,8 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place id
         testUri(
-            Position(Srs.WGS84, 43.64265563, -79.387202798),
-            "https://ul.waze.com/ul?venue_id=183894452.1839010060.260192",
+            Position(Srs.WGS84, 52.000425474, 4.372739102),
+            "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
         )
 
         // Map view

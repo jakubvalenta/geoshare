@@ -14,12 +14,12 @@ class WazeInputTest : BaseInputTest() {
         assertTrue(doesUriPatternMatch("https://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
         assertTrue(doesUriPatternMatch("waze.com/ul?ll=45.6906304,-120.810983&z=10"))
         assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.183894452.1839010060.260192"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"))
         assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"))
-        assertTrue(doesUriPatternMatch("https://ul.waze.com/ul?venue_id=183894452.1839010060.260192&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/ul?venue_id=183894452.1839010060.260192"))
+        assertTrue(doesUriPatternMatch("https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"))
+        assertTrue(doesUriPatternMatch("https://www.waze.com/ul?venue_id=2884104.28644432.6709020"))
     }
 
     @Test
@@ -86,22 +86,22 @@ class WazeInputTest : BaseInputTest() {
     fun parseUri_directionsPlace() = runTest {
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
-                Position(), "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"
+                Position(), "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
             ),
-            parseUri("https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192"),
+            parseUri("https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020"),
         )
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
-                Position(), "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"
+                Position(), "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
             ),
-            parseUri("https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"),
+            parseUri("https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"),
         )
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
                 Position(),
-                "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.183894452.1839010060.260192"
+                "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"
             ),
-            parseUri("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.183894452.1839010060.260192"),
+            parseUri("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"),
         )
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
@@ -116,15 +116,15 @@ class WazeInputTest : BaseInputTest() {
     fun parseUri_place() = runTest {
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
-                Position(), "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"
+                Position(), "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
             ),
-            parseUri("https://ul.waze.com/ul?venue_id=183894452.1839010060.260192&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"),
+            parseUri("https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"),
         )
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
-                Position(), "https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192"
+                Position(), "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"
             ),
-            parseUri("https://www.waze.com/ul?venue_id=183894452.1839010060.260192"),
+            parseUri("https://www.waze.com/ul?venue_id=2884104.28644432.6709020"),
         )
     }
 
