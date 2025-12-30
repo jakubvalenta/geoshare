@@ -41,157 +41,154 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() {
+    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+        assertNull(parseUri("https://maps.apple.com"))
+        assertNull(parseUri("https://maps.apple.com/"))
+        assertNull(parseUri("https://maps.apple.com/?spam=1"))
+    }
+
+    @Test
+    fun parseUri_coordinates() = runTest {
         assertEquals(
-            Position() to null,
-            parseUri("https://maps.apple.com")
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("https://maps.apple.com/")
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("https://maps.apple.com/?spam=1")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626)),
+            parseUri("https://maps.apple.com/?ll=50.894967,4.341626"),
         )
     }
 
     @Test
-    fun parseUri_coordinates() {
-        assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626) to null,
-            parseUri("https://maps.apple.com/?ll=50.894967,4.341626")
-        )
-    }
-
-    @Test
-    fun parseUri_place() {
+    fun parseUri_place() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 52.4890246, 13.4295963, name = "Reuterplatz") to null,
-            parseUri("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.4890246, 13.4295963, name = "Reuterplatz")),
+            parseUri("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902"),
         )
     }
 
     @Test
-    fun parseUri_view() {
+    fun parseUri_view() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 52.49115540927951, 13.42595574770533) to null,
-            parseUri("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.49115540927951, 13.42595574770533)),
+            parseUri("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533"),
         )
     }
 
     @Test
-    fun parseUri_searchQuery() {
+    fun parseUri_searchQuery() = runTest {
         assertEquals(
-            Position(Srs.WGS84, q = "Central Park") to null,
-            parseUri("https://maps.apple.com/?q=Central+Park")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, q = "Central Park")),
+            parseUri("https://maps.apple.com/?q=Central+Park"),
         )
     }
 
     @Test
-    fun parseUri_searchLocation() {
+    fun parseUri_searchLocation() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626) to null,
-            parseUri("https://maps.apple.com/?sll=50.894967,4.341626")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626)),
+            parseUri("https://maps.apple.com/?sll=50.894967,4.341626"),
         )
     }
 
     @Test
-    fun parseUri_searchLocationAndQueryAndZoom_returnsPointAndQueryAndZoom() {
+    fun parseUri_searchLocationAndQueryAndZoom_returnsPointAndQueryAndZoom() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0) to null,
-            parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0)),
+            parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s"),
         )
     }
 
     @Test
-    fun parseUri_searchLocationAndQueryAndInvalidZoom_returnsPointAndQuery() {
+    fun parseUri_searchLocationAndQueryAndInvalidZoom_returnsPointAndQuery() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park") to null,
-            parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park")),
+            parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s"),
         )
     }
 
     @Test
-    fun parseUri_parameterLlTakesPrecedence() {
+    fun parseUri_parameterLlTakesPrecedence() = runTest {
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
-            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
+            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533"),
         )
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
-            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
+            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&"),
         )
         assertEquals(
-            Position(Srs.WGS84, -17.2165721, -149.9470294) to null,
-            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
+            parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533"),
         )
     }
 
     @Test
-    fun parseUri_parameterAddressTakesPrecedence() {
+    fun parseUri_parameterAddressTakesPrecedence() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
-            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz")
+            ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz 3, 12047 Berlin, Germany") to null,
-            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz")
+            ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz"),
         )
     }
 
     @Test
-    fun parseUri_parameterNameTakesPrecedenceOverQ() {
+    fun parseUri_parameterNameTakesPrecedenceOverQ() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "Reuterplatz") to null,
-            parseUri("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park")
+            ParseUriResult.Succeeded(Position(q = "Reuterplatz")),
+            parseUri("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park"),
         )
     }
 
     @Suppress("SpellCheckingInspection")
     @Test
-    fun parseUri_AuidOnly() {
+    fun parseUri_AuidOnly() = runTest {
         assertEquals(
-            Position() to "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618",
-            parseUri("https://maps.apple.com/place?auid=17017496253231963769&lsp=7618")
+            ParseUriResult.SucceededAndSupportsHtmlParsing(
+                Position(),
+                "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"
+            ),
+            parseUri("https://maps.apple.com/place?auid=17017496253231963769&lsp=7618"),
         )
     }
 
     @Test
-    fun parseUri_placeIdOnly() {
+    fun parseUri_placeIdOnly() = runTest {
         assertEquals(
-            Position() to "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902",
-            parseUri("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902")
+            ParseUriResult.SucceededAndSupportsHtmlParsing(
+                Position(),
+                "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"
+            ),
+            parseUri("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902"),
         )
     }
 
     @Test
-    fun parseUri_placeIdAndQuery() {
+    fun parseUri_placeIdAndQuery() = runTest {
         assertEquals(
-            Pair(
+            ParseUriResult.SucceededAndSupportsHtmlParsing(
                 Position(q = "Central Park"),
                 "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central%20Park",
             ),
-            parseUri("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park")
+            parseUri("https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902&q=Central+Park"),
         )
     }
 
     @Test
-    fun parseUri_shortLink() {
+    fun parseUri_shortLink() = runTest {
         assertEquals(
-            Position() to "https://maps.apple/p/7E-Brjrk_THN14",
-            parseUri("https://maps.apple/p/7E-Brjrk_THN14")
+            ParseUriResult.SucceededAndSupportsHtmlParsing(Position(), "https://maps.apple/p/7E-Brjrk_THN14"),
+            parseUri("https://maps.apple/p/7E-Brjrk_THN14"),
         )
     }
 
     @Test
     fun parseHtml_success() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 52.4735927, 13.4050798) to null,
+            ParseHtmlResult.Succeeded(Position(Srs.WGS84, 52.4735927, 13.4050798)),
             @Suppress("SpellCheckingInspection")
             parseHtml(
                 """<html>
@@ -203,15 +200,12 @@ class AppleMapsInputTest : BaseInputTest() {
 <body></body>
 </html>
 """
-            )
+            ),
         )
     }
 
     @Test
     fun parseHtml_failure() = runTest {
-        assertEquals(
-            Position() to null,
-            parseHtml("spam"),
-        )
+        assertNull(parseHtml("spam"))
     }
 }

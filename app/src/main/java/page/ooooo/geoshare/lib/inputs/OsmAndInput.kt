@@ -5,8 +5,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.matchLatLonZ
 import page.ooooo.geoshare.lib.extensions.matchZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object OsmAndInput : Input {
     private val srs = Srs.WGS84
@@ -20,11 +20,14 @@ object OsmAndInput : Input {
         ),
     )
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["pin"] }
-            setPointIfNull { """$Z/$LAT/$LON.*""" matchLatLonZ fragment }
-            setZIfNull { """$Z/.*""" matchZ fragment }
-        }.toPair()
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["pin"] }
+                setPointIfNull { """$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+                setZIfNull { """$Z/.*""" matchZ fragment }
+            }
+        }
+        return ParseUriResult.from(position)
     }
 }

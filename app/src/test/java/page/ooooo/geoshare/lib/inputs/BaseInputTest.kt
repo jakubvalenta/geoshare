@@ -25,9 +25,11 @@ abstract class BaseInputTest() {
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
-    fun parseUri(uriString: String): Pair<Position, String?> =
-        input.parseUri(Uri.parse(uriString, uriQuote))
+    suspend fun parseUri(uriString: String) = input.parseUri(Uri.parse(uriString, uriQuote))
 
-    suspend fun parseHtml(html: String): Pair<Position, String?> =
-        (input as Input.HasHtml).parseHtml(html.byteInputStream().toByteReadChannel(), log)
+    suspend fun parseHtml(html: String) = (input as Input.HasHtml).parseHtml(
+        channel = html.byteInputStream().toByteReadChannel(),
+        positionFromUri = Position(),
+        log = log,
+    )
 }

@@ -11,8 +11,9 @@ import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.matchLatLonZ
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     private val srs = Srs.WGS84
@@ -49,29 +50,36 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            @Suppress("SpellCheckingInspection")
-            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["whatshere[point]"] }
-            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["ll"] }
-            @Suppress("SpellCheckingInspection")
-            setZIfNull { Z_PATTERN matchZ queryParams["whatshere[zoom]"] }
-            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-            setUriStringIfNull { if (("""/maps/org/\d+([/?#].*|$)""" match path) != null) uri.toString() else null }
-        }.toPair()
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        var htmlUriString: String? = null
+        val position = buildPosition(srs) {
+            uri.run {
+                @Suppress("SpellCheckingInspection")
+                setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["whatshere[point]"] }
+                setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["ll"] }
+                @Suppress("SpellCheckingInspection")
+                setZIfNull { Z_PATTERN matchZ queryParams["whatshere[zoom]"] }
+                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                if (!hasPoint() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
+                    htmlUriString = uri.toString()
+                }
+            }
+        }
+        return ParseUriResult.from(position, htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
-        PositionBuilder(srs).apply {
+    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+        val positionFromHtml = buildPosition(srs) {
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findLatLonZ line)?.let { (lat, lon, z) ->
-                    setPointIfNull { LatLonZ(lat, lon, z) }
+                if (setPointIfNull { pattern findLatLonZ line }) {
                     break
                 }
             }
-        }.toPair()
+        }
+        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

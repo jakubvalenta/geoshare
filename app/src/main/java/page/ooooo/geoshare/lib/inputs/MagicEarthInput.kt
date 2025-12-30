@@ -5,8 +5,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
@@ -25,22 +25,25 @@ object MagicEarthInput : Input {
         ),
     )
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull {
-                (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
-                    (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
-                        LatLonZ(lat, lon, null)
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull {
+                    (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
+                        (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
+                            LatLonZ(lat, lon, null)
+                        }
                     }
                 }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["name"] }
+                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+                @Suppress("SpellCheckingInspection")
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
+                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
             }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["name"] }
-            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
-            @Suppress("SpellCheckingInspection")
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
-            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-            setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
-        }.toPair()
+        }
+        return ParseUriResult.from(position)
     }
 }

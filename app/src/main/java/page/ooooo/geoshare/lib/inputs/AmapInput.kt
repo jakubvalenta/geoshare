@@ -5,8 +5,8 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.matchLatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object AmapInput : Input.HasShortUri {
     private val srs = Srs.GCJ02
@@ -26,11 +26,14 @@ object AmapInput : Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull { """\w+,$LAT,$LON.+""" matchLatLonZ queryParams["p"] }
-            setPointIfNull { """$LAT,$LON.+""" matchLatLonZ queryParams["q"] }
-        }.toPair()
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull { """\w+,$LAT,$LON.+""" matchLatLonZ queryParams["p"] }
+                setPointIfNull { """$LAT,$LON.+""" matchLatLonZ queryParams["q"] }
+            }
+        }
+        return ParseUriResult.from(position)
     }
 
     @StringRes

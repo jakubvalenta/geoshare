@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -25,26 +26,26 @@ class OsmAndInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_pin() {
+    fun parseUri_pin() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 52.51628, 13.37771) to null,
-            parseUri("https://osmand.net/map?pin=52.51628,13.37771")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.51628, 13.37771)),
+            parseUri("https://osmand.net/map?pin=52.51628,13.37771"),
         )
     }
 
     @Test
-    fun parseUri_fragment() {
+    fun parseUri_fragment() = runTest {
         assertEquals(
-            Position(Srs.WGS84, -53.347932, -13.2347, z = 12.5) to null,
-            parseUri("https://osmand.net/map#12.5/-53.347932/-13.2347")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, -53.347932, -13.2347, z = 12.5)),
+            parseUri("https://osmand.net/map#12.5/-53.347932/-13.2347"),
         )
     }
 
     @Test
-    fun parseUri_parameterPinTakesPrecedenceOverFragment() {
+    fun parseUri_parameterPinTakesPrecedenceOverFragment() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 52.51628, 13.37771, z = 12.5) to null,
-            parseUri("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.51628, 13.37771, z = 12.5)),
+            parseUri("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347"),
         )
     }
 }

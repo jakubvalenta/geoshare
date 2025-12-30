@@ -14,7 +14,7 @@ interface Input {
     val uriPattern: Pattern
     val documentation: InputDocumentation
 
-    fun parseUri(uri: Uri): Pair<Position, String?>
+    suspend fun parseUri(uri: Uri): ParseUriResult?
 
     interface HasShortUri : Input {
         val shortUriPattern: Pattern
@@ -27,6 +27,10 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
-        suspend fun parseHtml(channel: ByteReadChannel, log: ILog = DefaultLog): Pair<Position, String?>
+        suspend fun parseHtml(
+            channel: ByteReadChannel,
+            positionFromUri: Position,
+            log: ILog = DefaultLog,
+        ): ParseHtmlResult?
     }
 }

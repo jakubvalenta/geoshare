@@ -10,8 +10,9 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -36,66 +37,69 @@ object WazeInput : Input.HasHtml {
         ),
     )
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull {
-                (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
-                    ?.let { hash -> decodeWazeGeoHash(hash) }
-                    ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(6), lon.toScale(6), z) }
-            }
-            setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZ queryParams["to"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
-            @Suppress("SpellCheckingInspection")
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["latlng"] }
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-            setUriStringIfNull {
-                queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
-                    // To skip some redirects when downloading HTML, replace this URL:
-                    // https://ul.waze.com/ul?venue_id=183894452.1839010060.260192
-                    // or this URL:
-                    // https://www.waze.com/ul?venue_id=183894452.1839010060.260192
-                    // with this one:
-                    // https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
-                    Uri(
-                        scheme = "https",
-                        host = "www.waze.com",
-                        path = "/live-map/directions",
-                        queryParams = persistentMapOf("to" to "place.w.$venueId"),
-                        uriQuote = uri.uriQuote,
-                    ).toString()
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        var htmlUriString: String? = null
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull {
+                    (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
+                        ?.let { hash -> decodeWazeGeoHash(hash) }
+                        ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(6), lon.toScale(6), z) }
+                }
+                setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZ queryParams["to"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+                @Suppress("SpellCheckingInspection")
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["latlng"] }
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                if (!hasPoint()) {
+                    queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
+                        // To skip some redirects when downloading HTML, replace this URL:
+                        // https://ul.waze.com/ul?venue_id=2884104.28644432.6709020
+                        // or this URL:
+                        // https://www.waze.com/ul?venue_id=2884104.28644432.6709020
+                        // with this one:
+                        // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
+                        htmlUriString = Uri(
+                            scheme = "https",
+                            host = "www.waze.com",
+                            path = "/live-map/directions",
+                            queryParams = persistentMapOf("to" to "place.w.$venueId"),
+                            uriQuote = uri.uriQuote,
+                        ).toString()
+                    } ?: queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
+                        // To skip some redirects when downloading HTML, replace this URL:
+                        // https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020
+                        // with this one:
+                        // https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020
+                        htmlUriString = Uri(
+                            scheme = "https",
+                            host = "www.waze.com",
+                            path = "/live-map/directions",
+                            queryParams = persistentMapOf("to" to "place.$placeId"),
+                            uriQuote = uri.uriQuote,
+                        ).toString()
+                    } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
+                        htmlUriString = uri.toString()
+                    }
                 }
             }
-            setUriStringIfNull {
-                queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
-                    // To skip some redirects when downloading HTML, replace this URL:
-                    // https://www.waze.com/live-map/directions?place=w.183894452.1839010060.260192
-                    // with this one:
-                    // https://www.waze.com/live-map/directions?to=place.w.183894452.1839010060.260192
-                    Uri(
-                        scheme = "https",
-                        host = "www.waze.com",
-                        path = "/live-map/directions",
-                        queryParams = persistentMapOf("to" to "place.$placeId"),
-                        uriQuote = uri.uriQuote,
-                    ).toString()
-                }
-            }
-            setUriStringIfNull { if (queryParams["to"]?.startsWith("place.") == true) uri.toString() else null }
-        }.toPair()
+        }
+        return ParseUriResult.from(position, htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
-        PositionBuilder(srs).apply {
+    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+        val positionFromHtml = buildPosition(srs) {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findLatLonZ line)?.let { (lat, lon, z) ->
-                    setPointIfNull { LatLonZ(lat, lon, z) }
+                if (setPointIfNull { pattern findLatLonZ line }) {
                     break
                 }
             }
-        }.toPair()
+        }
+        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title

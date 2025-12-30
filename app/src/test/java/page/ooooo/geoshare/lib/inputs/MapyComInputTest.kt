@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -14,16 +15,14 @@ class MapyComInputTest : BaseInputTest() {
         assertTrue(doesUriPatternMatch("https://hapticke.mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
         assertTrue(doesUriPatternMatch("https://mapy.cz?x=14.0184810&y=50.0525078&z=9"))
         assertTrue(doesUriPatternMatch("https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9"))
-        @Suppress("SpellCheckingInspection")
-        assertTrue(doesUriPatternMatch("mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
+        @Suppress("SpellCheckingInspection") assertTrue(doesUriPatternMatch("mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
     }
 
     @Test
     fun uriPattern_shortUrl() {
         assertTrue(doesUriPatternMatch("https://mapy.com/s/jakuhelasu"))
         assertTrue(doesUriPatternMatch("https://mapy.cz/s/jakuhelasu"))
-        @Suppress("SpellCheckingInspection")
-        assertTrue(doesUriPatternMatch("mapy.com/s/jakuhelasu"))
+        @Suppress("SpellCheckingInspection") assertTrue(doesUriPatternMatch("mapy.com/s/jakuhelasu"))
     }
 
     @Test
@@ -40,92 +39,76 @@ class MapyComInputTest : BaseInputTest() {
     fun uriPattern_matchersCoordinatesInText() {
         assertEquals(
             "41.9966006N, 6.1223825W",
-            @Suppress("SpellCheckingInspection")
-            getUri(uriString = "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha")
+            @Suppress("SpellCheckingInspection") getUri(uriString = "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha"),
         )
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() {
+    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+        assertNull(parseUri("https://mapy.com"))
+        assertNull(parseUri("https://mapy.com/en"))
+        assertNull(parseUri("https://mapy.com/en/"))
+        assertNull(parseUri("https://mapy.com/en/zakladni"))
+        assertNull(parseUri("https://mapy.com/en/zakladni?spam=1"))
+    }
+
+    @Test
+    fun parseUri_coordinates() = runTest {
         assertEquals(
-            Position() to null,
-            parseUri("https://mapy.com")
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("https://mapy.com/en")
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("https://mapy.com/en/")
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("https://mapy.com/en/zakladni")
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("https://mapy.com/en/zakladni?spam=1")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0)),
+            parseUri("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
 
     @Test
-    fun parseUri_coordinates() {
+    fun parseUri_coordinatesCsLanguage() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0) to null,
-            parseUri("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0)),
+            parseUri("https://mapy.com/cs/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
 
     @Test
-    fun parseUri_coordinatesCsLanguage() {
+    fun parseUri_coordinatesCzDomain() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0) to null,
-            parseUri("https://mapy.com/cs/zakladni?x=14.0184810&y=50.0525078&z=9")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0)),
+            parseUri("https://mapy.cz/en/zakladni?x=14.0184810&y=50.0525078&z=9"),
         )
     }
 
     @Test
-    fun parseUri_coordinatesCzDomain() {
+    fun parseUri_coordinatesOutdoorType() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0) to null,
-            parseUri("https://mapy.cz/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0)),
+            parseUri("https://mapy.com/en/turisticka?x=14.0184810&y=50.0525078&z=9"),
         )
     }
 
     @Test
-    fun parseUri_coordinatesOutdoorType() {
+    fun parseUri_coordinatesMissingType() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0) to null,
-            parseUri("https://mapy.com/en/turisticka?x=14.0184810&y=50.0525078&z=9")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0)),
+            parseUri("https://mapy.com/?x=14.0184810&y=50.0525078&z=9"),
         )
     }
 
     @Test
-    fun parseUri_coordinatesMissingType() {
+    fun parseUri_place() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.0525078, 14.0184810, z = 9.0) to null,
-            parseUri("https://mapy.com/?x=14.0184810&y=50.0525078&z=9")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.0992553, 14.4336590, z = 19.0)),
+            parseUri("https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19"),
         )
     }
 
     @Test
-    fun parseUri_place() {
+    fun parseUri_textCoordinates() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.0992553, 14.4336590, z = 19.0) to null,
-            parseUri("https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19")
-        )
-    }
-
-    @Test
-    fun parseUri_textCoordinates() {
-        assertEquals(
-            Position(Srs.WGS84, 41.9966006, -6.1223825) to null,
-            parseUri(uriString = "41.9966006N, 6.1223825W")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 41.9966006, -6.1223825)),
+            parseUri(uriString = "41.9966006N, 6.1223825W"),
         )
         assertEquals(
-            Position(Srs.WGS84, -41.9966006, 6.1223825) to null,
-            parseUri(uriString = "41.9966006S, 6.1223825E")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, -41.9966006, 6.1223825)),
+            parseUri(uriString = "41.9966006S, 6.1223825E"),
         )
     }
 

@@ -6,8 +6,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object MapyComInput : Input.HasShortUri {
     private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
@@ -30,27 +30,30 @@ object MapyComInput : Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.GET
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull {
-                (COORDS match path)?.let { m ->
-                    m.toLatLon()?.let { (lat, lon) ->
-                        val wholeMatch = m.groupOrNull()
-                        val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
-                        val lonSig = if (wholeMatch?.contains('W') == true) -1 else 1
-                        LatLonZ(latSig * lat, lonSig * lon, null)
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull {
+                    (COORDS match path)?.let { m ->
+                        m.toLatLon()?.let { (lat, lon) ->
+                            val wholeMatch = m.groupOrNull()
+                            val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
+                            val lonSig = if (wholeMatch?.contains('W') == true) -1 else 1
+                            LatLonZ(latSig * lat, lonSig * lon, null)
+                        }
                     }
                 }
-            }
-            setPointIfNull {
-                (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
-                    (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
-                        LatLonZ(lat, lon, null)
+                setPointIfNull {
+                    (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
+                        (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
+                            LatLonZ(lat, lon, null)
+                        }
                     }
                 }
+                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
             }
-            setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-        }.toPair()
+        }
+        return ParseUriResult.from(position)
     }
 
     @StringRes
