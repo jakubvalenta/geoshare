@@ -8,8 +8,9 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object AppleMapsInput : Input.HasHtml {
     const val NAME = "Apple Maps"
@@ -26,37 +27,42 @@ object AppleMapsInput : Input.HasHtml {
         ),
     )
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
-            setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
-            setQWithCenterIfNull {
-                (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
-                    (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
-                        Triple(newQ, lat, lon)
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        var htmlUriString: String? = null
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
+                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+                setQWithCenterIfNull {
+                    (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
+                        (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
+                            Triple(newQ, lat, lon)
+                        }
                     }
                 }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setZIfNull { (Z_PATTERN matchZ queryParams["z"]) }
+                if (
+                    !hasPoint() && (
+                        host == "maps.apple" && path.startsWith("/p/") ||
+                            @Suppress("SpellCheckingInspection")
+                            !queryParams["auid"].isNullOrEmpty() ||
+                            !queryParams["place-id"].isNullOrEmpty())
+                ) {
+                    htmlUriString = uri.toString()
+                }
             }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setZIfNull { (Z_PATTERN matchZ queryParams["z"]) }
-            setUriStringIfNull {
-                uri.takeIf {
-                    host == "maps.apple" && path.startsWith("/p/") ||
-                        @Suppress("SpellCheckingInspection")
-                        !queryParams["auid"].isNullOrEmpty() ||
-                        !queryParams["place-id"].isNullOrEmpty()
-                }?.toString()
-            }
-        }.toPair()
+        }
+        return ParseUriResult.from(position, htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
-        PositionBuilder(srs).apply {
+    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+        val positionFromHtml = buildPosition(srs) {
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
             var lat: Double? = null
@@ -74,7 +80,9 @@ object AppleMapsInput : Input.HasHtml {
                     break
                 }
             }
-        }.toPair()
+        }
+        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title

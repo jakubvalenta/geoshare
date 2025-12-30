@@ -7,8 +7,9 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     const val NAME = "Google Maps"
@@ -34,55 +35,60 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?$SHORT_URL""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            // Try query parameters for all URLs
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["destination"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["query"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["viewpoint"] }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-            setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
-            setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        var htmlUriString: String? = null
+        val position = buildPosition(srs) {
+            uri.run {
+                // Try query parameters for all URLs
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["destination"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["query"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["viewpoint"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
+                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
 
-            val parseUriParts = setOf("dir", "place", "search")
-            val parseHtmlParts = setOf("", "@", "d", "placelists")
-            val parseHtmlExcludeParts = setOf("search")
-            val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
-            val firstPart = parts.firstOrNull()
-            when {
-                firstPart == null || firstPart in parseHtmlParts -> {
-                    // Skip URI parsing and go to HTML parsing
-                    setUriStringIfNull { uri.toString() }
-                }
-
-                firstPart in parseUriParts || firstPart.startsWith('@') -> {
-                    // Parse URI
-                    val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
-                    parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
-                        if (part.startsWith("data=")) {
-                            setPointIfNull { """!3d$LAT!4d$LON""" findLatLonZ part }
-                            addPoints { """!1d$LON!2d$LAT""" findAllLatLonZ part }
-                        } else if (part.startsWith('@')) {
-                            setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZ part }
-                        } else {
-                            setPointIfNull { pointPattern matchLatLonZ part }
-                            setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
-                        }
+                val parseUriParts = setOf("dir", "place", "search")
+                val parseHtmlParts = setOf("", "@", "d", "placelists")
+                val parseHtmlExcludeParts = setOf("search")
+                val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
+                val firstPart = parts.firstOrNull()
+                when {
+                    firstPart == null || firstPart in parseHtmlParts -> {
+                        // Skip URI parsing and go to HTML parsing
+                        htmlUriString = uri.toString()
                     }
-                    if (firstPart !in parseHtmlExcludeParts) {
-                        // Go to HTML parsing if needed
-                        setUriStringIfNull { uri.toString() }
+
+                    firstPart in parseUriParts || firstPart.startsWith('@') -> {
+                        // Parse URI
+                        val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
+                        parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
+                            if (part.startsWith("data=")) {
+                                setPointIfNull { """!3d$LAT!4d$LON""" findLatLonZ part }
+                                addPoints { """!1d$LON!2d$LAT""" findAllLatLonZ part }
+                            } else if (part.startsWith('@')) {
+                                setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZ part }
+                            } else {
+                                setPointIfNull { pointPattern matchLatLonZ part }
+                                setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
+                            }
+                        }
+                        if (!hasPoint() && firstPart !in parseHtmlExcludeParts) {
+                            // Go to HTML parsing if needed
+                            htmlUriString = uri.toString()
+                        }
                     }
                 }
             }
-        }.toPair()
+        }
+        return ParseUriResult.from(position, htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
-        PositionBuilder(srs).apply {
+    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+        var redirectUriString: String? = null
+        val positionFromHtml = buildPosition(srs) {
             val pointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
             val defaultPointPattern1 = Pattern.compile("""/@$LAT,$LON""")
             val defaultPointPattern2 = Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
@@ -98,11 +104,16 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 if (setDefaultPointIfNull { (defaultPointPattern2 findLatLonZ line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
                 }
-                if (setUriStringIfNull { (uriPattern findUriString line) }) {
-                    log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
+                if (redirectUriString == null) {
+                    (uriPattern findUriString line)?.let {
+                        redirectUriString = it
+                        log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
+                    }
                 }
             }
-        }.toPair()
+        }
+        return ParseHtmlResult.from(positionFromUri, positionFromHtml, redirectUriString)
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title

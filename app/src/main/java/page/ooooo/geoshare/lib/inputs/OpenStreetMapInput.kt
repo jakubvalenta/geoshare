@@ -6,11 +6,9 @@ import io.ktor.utils.io.*
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
+import page.ooooo.geoshare.lib.position.*
 
 object OpenStreetMapInput : Input.HasHtml {
     private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
@@ -33,35 +31,42 @@ object OpenStreetMapInput : Input.HasHtml {
         ),
     )
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull {
-                ("""/go/$HASH""" matchHash path)
-                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                    ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
-            }
-            setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
-            setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["to"] }
-            setUriStringIfNull {
-                (ELEMENT_PATH match path)?.let { m ->
-                    m.groupOrNull("type")?.let { type ->
-                        m.groupOrNull("id")?.let { id ->
-                            "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        var htmlUriString: String? = null
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull {
+                    ("""/go/$HASH""" matchHash path)
+                        ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                        ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
+                }
+                setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["to"] }
+                if (!hasPoint()) {
+                    (ELEMENT_PATH match path)?.let { m ->
+                        m.groupOrNull("type")?.let { type ->
+                            m.groupOrNull("id")?.let { id ->
+                                htmlUriString =
+                                    "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
+                            }
                         }
                     }
                 }
             }
-        }.toPair()
+        }
+        return ParseUriResult.from(position, htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
-        PositionBuilder(srs).apply {
+    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+        val positionFromHtml = buildPosition(srs) {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
                 addPoints { pattern findAllLatLonZ line }
             }
-        }.toPair()
+        }
+        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title

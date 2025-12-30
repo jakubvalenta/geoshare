@@ -54,77 +54,83 @@ class UrbiInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_point() {
+    fun parseUri_point() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 25.284889, 55.172173) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 25.284889, 55.172173)),
             parseUri("https://maps.urbi.ae/dubai/geo/55.172173%2C25.284889"),
         )
     }
 
     @Test
-    fun parseUri_pointWithMarker() {
+    fun parseUri_pointWithMarker() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 25.25915, 55.225263, z = 12.77) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 25.25915, 55.225263, z = 12.77)),
             parseUri("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452?m=55.225263%2C25.25915%2F12.77"),
         )
     }
 
     @Test
-    fun parseUri_geo() {
+    fun parseUri_geo() = runTest {
         assertEquals(
-            Position(Srs.WGS84) to "https://maps.urbi.ae/dubai/geo/13933621232533580",
+            ParseUriResult.SucceededAndSupportsHtmlParsing(
+                Position(Srs.WGS84),
+                "https://maps.urbi.ae/dubai/geo/13933621232533580",
+            ),
             parseUri("https://maps.urbi.ae/dubai/geo/13933621232533580"),
         )
     }
 
     @Test
-    fun parseUri_firm() {
+    fun parseUri_firm() = runTest {
         assertEquals(
-            Position(Srs.WGS84) to "https://2gis.uz/tashkent/firm/70000001060803297",
+            ParseUriResult.SucceededAndSupportsHtmlParsing(
+                Position(Srs.WGS84),
+                "https://2gis.uz/tashkent/firm/70000001060803297",
+            ),
             parseUri("https://2gis.uz/tashkent/firm/70000001060803297"),
         )
     }
 
     @Test
-    fun parseUri_firmWithCoordinates() {
+    fun parseUri_firmWithCoordinates() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 25.19925, 55.332211) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 25.19925, 55.332211)),
             parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925"),
         )
     }
 
     @Test
-    fun parseUri_firmWithMarker() {
+    fun parseUri_firmWithMarker() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 25.196707, 55.320748, z = 14.82) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 25.196707, 55.320748, z = 14.82)),
             parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925?m=55.320748%2C25.196707%2F14.82"),
         )
     }
 
     @Test
-    fun parseUri_shortLink() {
+    fun parseUri_shortLink() = runTest {
         assertEquals(
-            Position(Srs.WGS84) to "https://go.2gis.com/WSTdK",
+            ParseUriResult.SucceededAndSupportsHtmlParsing(Position(Srs.WGS84), "https://go.2gis.com/WSTdK"),
             parseUri("https://go.2gis.com/WSTdK"),
         )
         assertEquals(
-            Position(Srs.WGS84) to "https://go.urbi.ae/3JtpM",
+            ParseUriResult.SucceededAndSupportsHtmlParsing(Position(Srs.WGS84), "https://go.urbi.ae/3JtpM"),
             parseUri("https://go.urbi.ae/3JtpM"),
         )
     }
 
     @Test
-    fun parseUri_api() {
+    fun parseUri_api() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 41.285765, 69.234083, z = 17.0) to null,
-            parseUri("https://share.api.2gis.ru/getimage?city=tashkent&zoom=17&center=69.234083%2C41.285765&title=Music%20Store%2C%20%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%20%D0%BC%D1%83%D0%B7%D1%8B%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%B8%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%BE%D0%B2&desc=%D0%A3%D0%BB%D0%B8%D1%86%D0%B0%20%D0%9C%D1%83%D0%BA%D0%B8%D0%BC%D0%B8%2C%C2%A098%D0%B0%3Cbr%20%2F%3E%D0%A2%D0%B0%D1%88%D0%BA%D0%B5%D0%BD%D1%82")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 41.285765, 69.234083, z = 17.0)),
+            parseUri("https://share.api.2gis.ru/getimage?city=tashkent&zoom=17&center=69.234083%2C41.285765&title=Music%20Store%2C%20%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%20%D0%BC%D1%83%D0%B7%D1%8B%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%B8%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%BE%D0%B2&desc=%D0%A3%D0%BB%D0%B8%D1%86%D0%B0%20%D0%9C%D1%83%D0%BA%D0%B8%D0%BC%D0%B8%2C%C2%A098%D0%B0%3Cbr%20%2F%3E%D0%A2%D0%B0%D1%88%D0%BA%D0%B5%D0%BD%D1%82"),
         )
     }
 
     @Test
     fun parseHtml() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 41.285765, 69.234083, z = 17.0) to null,
+            ParseHtmlResult.Succeeded(Position(Srs.WGS84, 41.285765, 69.234083, z = 17.0)),
             parseHtml(
                 """<html>
 <head>

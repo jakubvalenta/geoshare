@@ -5,8 +5,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -28,22 +28,26 @@ object HereWeGoInput : Input {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull { """/l/$LAT,$LON""" matchLatLonZ path }
-            setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZ queryParams["map"]) else null }
-            setPointIfNull {
-                ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")?.let { encoded ->
-                    Base64.decode(encoded).decodeToString().let { decoded ->
-                        ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
-                            ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
-                                LatLonZ(lat, lon, null)
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull { """/l/$LAT,$LON""" matchLatLonZ path }
+                setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZ queryParams["map"]) else null }
+                setPointIfNull {
+                    ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
+                        ?.let { encoded ->
+                            Base64.decode(encoded).decodeToString().let { decoded ->
+                                ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
+                                    ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
+                                        LatLonZ(lat, lon, null)
+                                    }
+                                }
                             }
                         }
-                    }
                 }
+                setZIfNull { """.*,$Z""" matchZ queryParams["map"] }
             }
-            setZIfNull { """.*,$Z""" matchZ queryParams["map"] }
-        }.toPair()
+        }
+        return ParseUriResult.from(position)
     }
 }

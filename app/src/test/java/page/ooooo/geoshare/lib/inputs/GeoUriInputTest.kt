@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import page.ooooo.geoshare.lib.position.Position
@@ -42,82 +43,76 @@ class GeoUriInputTest : BaseInputTest() {
                 @Suppress("SpellCheckingInspection")
                 "geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
                     "https://omaps.app/Umse5f0H8a/Nova_Iorque"
-            )
+            ),
         )
     }
 
     @Test
-    fun parseUri_noPathOrKnownUrlQueryParams() {
-        assertEquals(
-            Position() to null,
-            parseUri("geo:"),
-        )
-        assertEquals(
-            Position() to null,
-            parseUri("geo:?spam=1"),
-        )
+    fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
+        assertNull(parseUri("geo:"))
+        assertNull(parseUri("geo:?spam=1"))
     }
 
     @Test
-    fun parseUri_coordsAndQAndZ() {
+    fun parseUri_coordsAndQAndZ() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4)),
             parseUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndQCoords() {
+    fun parseUri_coordsAndQCoords() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 50.123456, -11.123456) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.123456, -11.123456)),
             parseUri("geo:50.123456,-11.123456?q=50.123456,-11.123456"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndQCoordsDiffer_qCoordsTakePrecedence() {
+    fun parseUri_coordsAndQCoordsDiffer_qCoordsTakePrecedence() = runTest {
         assertEquals(
-            Position(Srs.WGS84, 40.7127400, -74.0059965) to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 40.7127400, -74.0059965)),
             parseUri("geo:50.123456,-11.123456?q=40.7127400,-74.0059965"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndName() {
+    fun parseUri_coordsAndName() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque") to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque")),
             @Suppress("SpellCheckingInspection")
             parseUri("geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)"),
         )
     }
 
     @Test
-    fun parseUri_coordsAndNameInSeparateQueryParam() {
+    fun parseUri_coordsAndNameInSeparateQueryParam() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 40.7127400, -74.0059965, name = "Nova Iorque") to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 40.7127400, -74.0059965, name = "Nova Iorque")),
             @Suppress("SpellCheckingInspection")
             parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque") to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque")),
             @Suppress("SpellCheckingInspection")
             parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&z=9.0&(Nova%20Iorque)"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque") to null,
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 40.7127400, -74.0059965, z = 9.0, name = "Nova Iorque")),
             @Suppress("SpellCheckingInspection")
             parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)&z=9.0"),
         )
     }
 
     @Test
-    fun parseUri_qOnly() {
+    fun parseUri_qOnly() = runTest {
         assertEquals(
-            Position(q = "foo bar") to null,
+            ParseUriResult.Succeeded(Position(q = "foo bar")),
             parseUri("geo:?q=foo%20bar"),
         )
     }

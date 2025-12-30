@@ -10,8 +10,9 @@ import page.ooooo.geoshare.lib.extensions.findLatLonZ
 import page.ooooo.geoshare.lib.extensions.matchLatLonZ
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.position.LatLonZ
-import page.ooooo.geoshare.lib.position.PositionBuilder
+import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.position.buildPosition
 
 object UrbiInput : Input.HasHtml {
     private val srs = Srs.WGS84
@@ -48,18 +49,20 @@ object UrbiInput : Input.HasHtml {
         ),
     )
 
-    override fun parseUri(uri: Uri) = uri.run {
-        PositionBuilder(srs).apply {
-            setPointIfNull { """$LON,$LAT/$Z""" matchLatLonZ queryParams["m"] }
-            setPointIfNull { """.*/$LON,$LAT/?$""" matchLatLonZ path }
-            setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["center"] }
-            setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
-            setUriStringIfNull { uri.toString() }
-        }.toPair()
+    override suspend fun parseUri(uri: Uri): ParseUriResult? {
+        val position = buildPosition(srs) {
+            uri.run {
+                setPointIfNull { """$LON,$LAT/$Z""" matchLatLonZ queryParams["m"] }
+                setPointIfNull { """.*/$LON,$LAT/?$""" matchLatLonZ path }
+                setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["center"] }
+                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
+            }
+        }
+        return ParseUriResult.from(position, uri.toString())
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, log: ILog) =
-        PositionBuilder(srs).apply {
+    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+        val positionFromHtml = buildPosition(srs) {
             val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
@@ -68,7 +71,9 @@ object UrbiInput : Input.HasHtml {
                     break
                 }
             }
-        }.toPair()
+        }
+        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_urbi_permission_title
