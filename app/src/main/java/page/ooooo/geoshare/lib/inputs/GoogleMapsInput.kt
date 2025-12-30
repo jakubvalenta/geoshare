@@ -47,8 +47,9 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
             setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
 
-            val parseHtmlParts = setOf("", "@", "d", "placelists")
             val parseUriParts = setOf("dir", "place", "search")
+            val parseHtmlParts = setOf("", "@", "d", "placelists")
+            val parseHtmlExcludeParts = setOf("search")
             val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
             val firstPart = parts.firstOrNull()
             when {
@@ -71,7 +72,10 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                             setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
                         }
                     }
-                    setUriStringIfNull { uri.toString() }
+                    if (firstPart !in parseHtmlExcludeParts) {
+                        // Go to HTML parsing if needed
+                        setUriStringIfNull { uri.toString() }
+                    }
                 }
             }
         }.toPair()

@@ -271,7 +271,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchPlace() {
         assertEquals(
-            Position(q = "restaurants near me") to "https://www.google.com/maps/search/restaurants+near+me",
+            Position(q = "restaurants near me") to null,
             parseUri("https://www.google.com/maps/search/restaurants+near+me")
         )
     }
@@ -288,7 +288,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     fun parseUri_searchQueryPlace() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            Position(q = "centurylink+field") to "https://www.google.com/maps/search/?api=1&query=centurylink%20field",
+            Position(q = "centurylink+field") to null,
             parseUri("https://www.google.com/maps/search/?api=1&query=centurylink%2Bfield")
         )
     }
@@ -507,7 +507,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_googleSearch() {
         assertEquals(
-            Position() to "https://www.google.com/search?sca_esv=123&hl=en",
+            Position() to null,
             parseUri("https://www.google.com/search?sca_esv=123&hl=en")
         )
     }

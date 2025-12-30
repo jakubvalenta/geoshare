@@ -14,6 +14,13 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         launchApplication()
         closeIntro()
 
+        // Search
+        testUri(
+            @Suppress("SpellCheckingInspection")
+            Position(Srs.WGS84, q = "Louisenstraße 60, 01099 Dresden"),
+            "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
+        )
+
         // Short URI in Japan
         testUri(
             Position(Srs.WGS84, 34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
