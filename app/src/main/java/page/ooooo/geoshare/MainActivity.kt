@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                MainNavigation(viewModel)
+                MainNavigation(viewModel, introEnabled = true)
             }
         }
     }

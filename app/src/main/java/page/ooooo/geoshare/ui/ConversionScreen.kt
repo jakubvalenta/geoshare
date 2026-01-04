@@ -6,13 +6,37 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.runtime.*
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,14 +56,33 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.conversion.*
+import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionWaiting
+import page.ooooo.geoshare.lib.conversion.BasicActionReady
+import page.ooooo.geoshare.lib.conversion.ConversionFailed
+import page.ooooo.geoshare.lib.conversion.ConversionState
+import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.GrantedUnshortenPermission
+import page.ooooo.geoshare.lib.conversion.Initial
+import page.ooooo.geoshare.lib.conversion.LoadingIndicator
+import page.ooooo.geoshare.lib.conversion.LocationActionReady
+import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
+import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
+import page.ooooo.geoshare.lib.conversion.LocationRationaleRequested
+import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
+import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
+import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
@@ -47,15 +90,24 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.ui.components.*
+import page.ooooo.geoshare.ui.components.ConfirmationDialog
+import page.ooooo.geoshare.ui.components.Headline
+import page.ooooo.geoshare.ui.components.MainForm
+import page.ooooo.geoshare.ui.components.MainInfo
+import page.ooooo.geoshare.ui.components.MainMenu
+import page.ooooo.geoshare.ui.components.PermissionDialog
+import page.ooooo.geoshare.ui.components.ResultError
+import page.ooooo.geoshare.ui.components.ResultSuccessApps
+import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
+import page.ooooo.geoshare.ui.components.ResultSuccessMessage
+import page.ooooo.geoshare.ui.components.ResultSuccessSheetContent
+import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ConversionScreen(
-    onBack: () -> Unit,
-    onFinish: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
@@ -69,9 +121,9 @@ fun ConversionScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
+    val changelogShown by viewModel.changelogShown.collectAsState()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
-    val changelogShown by viewModel.changelogShown.collectAsState()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
@@ -150,17 +202,13 @@ fun ConversionScreen(
     ConversionScreen(
         currentState = currentState,
         changelogShown = changelogShown,
+        inputUriString = viewModel.inputUriString,
         loadingIndicator = loadingIndicator,
-        onBack = {
-            viewModel.cancel()
-            onBack()
-        },
         onCancel = {
             locationJob?.cancel()
             viewModel.cancel()
         },
         onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
-        onFinish = onFinish,
         onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
         onNavigateToAboutScreen = {
             viewModel.cancel()
@@ -186,14 +234,13 @@ fun ConversionScreen(
             viewModel.cancel()
             onNavigateToUserPreferencesAutomationScreen()
         },
-        onRetry = { newUriString ->
-            viewModel.updateInput(newUriString)
-            viewModel.start()
-        },
+        onReset = { viewModel.reset() },
         onRun = { action, i ->
             viewModel.cancel()
             viewModel.runAction(action, i)
         },
+        onStart = { viewModel.start() },
+        onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) }
     )
 }
 
@@ -201,14 +248,13 @@ fun ConversionScreen(
     ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
-fun ConversionScreen(
+private fun ConversionScreen(
     currentState: State,
     changelogShown: Boolean,
+    inputUriString: String,
     loadingIndicator: LoadingIndicator?,
-    onBack: () -> Unit,
     onCancel: () -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
-    onFinish: () -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
@@ -216,8 +262,10 @@ fun ConversionScreen(
     onNavigateToIntroScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onRetry: (newUriString: String) -> Unit,
+    onReset: () -> Unit,
     onRun: (action: Action, i: Int?) -> Unit,
+    onStart: () -> Unit,
+    onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
     val clipboard = LocalClipboard.current
@@ -225,24 +273,27 @@ fun ConversionScreen(
     val spacing = LocalSpacing.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = remember { mutableStateOf(false) }
+    val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
+    val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = retain { mutableStateOf(false) }
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
-    BackHandler {
-        onBack()
+    BackHandler(currentState !is Initial) {
+        onReset()
     }
 
     TwoPaneScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         navigationIcon = {
-            IconButton(
-                onBack,
-                Modifier.testTag("geoShareConversionBackButton"),
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.nav_back_content_description)
-                )
+            if (currentState !is Initial) {
+                IconButton(
+                    onReset,
+                    Modifier.testTag("geoShareConversionBackButton"),
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.nav_back_content_description)
+                    )
+                }
             }
         },
         actions = {
@@ -272,10 +323,7 @@ fun ConversionScreen(
                             color = MaterialTheme.colorScheme.tertiary,
                         )
                         Button(
-                            {
-                                onCancel()
-                                onFinish()
-                            },
+                            onCancel,
                             Modifier
                                 .align(Alignment.CenterHorizontally)
                                 .padding(top = spacing.small, bottom = spacing.medium),
@@ -312,7 +360,8 @@ fun ConversionScreen(
                                 setRetryLoadingIndicator(true)
                                 delay(1000)
                                 setRetryLoadingIndicator(false)
-                                onRetry(currentState.inputUriString)
+                                onUpdateInput(currentState.inputUriString)
+                                onStart()
                             }
                         },
                     )
@@ -328,6 +377,18 @@ fun ConversionScreen(
                             onCancel()
                             setSelectedPositionAndIndex(position to i)
                         },
+                    )
+                }
+            }
+
+            currentState is Initial -> {
+                {
+                    MainForm(
+                        inputUriString = inputUriString,
+                        errorMessageResId = errorMessageResId,
+                        onSetErrorMessageResId = setErrorMessageResId,
+                        onSubmit = onStart,
+                        onUpdateInput = onUpdateInput,
                     )
                 }
             }
@@ -349,6 +410,17 @@ fun ConversionScreen(
                             windowSizeClass = windowSizeClass,
                         )
                     }
+                }
+            }
+
+            currentState is Initial -> {
+                {
+                    MainInfo(
+                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onSetErrorMessageResId = setErrorMessageResId,
+                        onUpdateInput = onUpdateInput,
+                    )
                 }
             }
 
@@ -470,7 +542,7 @@ fun ConversionScreen(
             loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
             currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-            else -> Color.Unspecified
+            else -> MaterialTheme.colorScheme.surface
         },
         contentColor = when {
             loadingIndicator is LoadingIndicator.Large -> Color.Unspecified
@@ -478,6 +550,7 @@ fun ConversionScreen(
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> Color.Unspecified
         },
+        ratio = if (currentState is Initial) 0.6f else 0.5f,
         windowSizeClass = windowSizeClass,
     )
 
@@ -517,17 +590,12 @@ fun ConversionScreen(
 private fun DefaultPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = ActionFinished(
-                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
-                action = NoopAutomation,
-            ),
-            changelogShown = true,
+            currentState = Initial(),
+            changelogShown = false,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -535,8 +603,10 @@ private fun DefaultPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -546,17 +616,12 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = ActionFinished(
-                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
-                action = NoopAutomation,
-            ),
-            changelogShown = true,
+            currentState = Initial(),
+            changelogShown = false,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -564,8 +629,10 @@ private fun DarkPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -575,17 +642,12 @@ private fun DarkPreview() {
 private fun TabletPreview() {
     AppTheme {
         ConversionScreen(
-            currentState = ActionFinished(
-                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
-                action = NoopAutomation,
-            ),
-            changelogShown = true,
+            currentState = Initial(),
+            changelogShown = false,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -593,8 +655,100 @@ private fun TabletPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SucceededPreview() {
+    AppTheme {
+        ConversionScreen(
+            currentState = ActionFinished(
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                position = Position.example,
+                action = NoopAutomation,
+            ),
+            changelogShown = true,
+            inputUriString = "",
+            loadingIndicator = null,
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onReset = {},
+            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkSucceededPreview() {
+    AppTheme {
+        ConversionScreen(
+            currentState = ActionFinished(
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                position = Position.example,
+                action = NoopAutomation,
+            ),
+            changelogShown = true,
+            inputUriString = "",
+            loadingIndicator = null,
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onReset = {},
+            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletSucceededPreview() {
+    AppTheme {
+        ConversionScreen(
+            currentState = ActionFinished(
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                position = Position.example,
+                action = NoopAutomation,
+            ),
+            changelogShown = true,
+            inputUriString = "",
+            loadingIndicator = null,
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onReset = {},
+            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -613,11 +767,10 @@ private fun AutomationPreview() {
                 delay = 3.seconds,
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -625,8 +778,10 @@ private fun AutomationPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -645,11 +800,10 @@ private fun DarkAutomationPreview() {
                 delay = 3.seconds,
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -657,8 +811,10 @@ private fun DarkAutomationPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -677,11 +833,10 @@ private fun TabletAutomationPreview() {
                 delay = 3.seconds,
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -689,8 +844,10 @@ private fun TabletAutomationPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -705,11 +862,10 @@ private fun ErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -717,8 +873,10 @@ private fun ErrorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -733,11 +891,10 @@ private fun DarkErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -745,8 +902,10 @@ private fun DarkErrorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -761,11 +920,10 @@ private fun TabletErrorPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = null,
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -773,8 +931,10 @@ private fun TabletErrorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -799,14 +959,13 @@ private fun LoadingIndicatorPreview() {
                 )
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -814,8 +973,10 @@ private fun LoadingIndicatorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -840,14 +1001,13 @@ private fun DarkLoadingIndicatorPreview() {
                 )
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -855,8 +1015,10 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }
@@ -881,14 +1043,13 @@ private fun TabletLoadingIndicatorPreview() {
                 )
             ),
             changelogShown = true,
+            inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
-            onBack = {},
             onCancel = {},
             onDeny = {},
-            onFinish = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
             onNavigateToFaqScreen = {},
@@ -896,83 +1057,10 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToInputsScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
+            onReset = {},
             onRun = { _, _ -> },
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun InitialPreview() {
-    AppTheme {
-        ConversionScreen(
-            currentState = Initial(),
-            changelogShown = true,
-            loadingIndicator = null,
-            onBack = {},
-            onCancel = {},
-            onDeny = {},
-            onFinish = {},
-            onGrant = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
-            onRun = { _, _ -> },
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkInitialPreview() {
-    AppTheme {
-        ConversionScreen(
-            currentState = Initial(),
-            changelogShown = true,
-            loadingIndicator = null,
-            onBack = {},
-            onCancel = {},
-            onDeny = {},
-            onFinish = {},
-            onGrant = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
-            onRun = { _, _ -> },
-        )
-    }
-}
-
-@Preview(showBackground = true, device = Devices.TABLET)
-@Composable
-private fun TabletInitialPreview() {
-    AppTheme {
-        ConversionScreen(
-            currentState = Initial(),
-            changelogShown = true,
-            loadingIndicator = null,
-            onBack = {},
-            onCancel = {},
-            onDeny = {},
-            onFinish = {},
-            onGrant = {},
-            onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
-            onNavigateToUserPreferencesScreen = {},
-            onNavigateToUserPreferencesAutomationScreen = {},
-            onRetry = {},
-            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
         )
     }
 }

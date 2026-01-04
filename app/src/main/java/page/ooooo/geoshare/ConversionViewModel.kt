@@ -57,11 +57,7 @@ class ConversionViewModel @Inject constructor(
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
 
-    var inputUriString by SavableDelegate(
-        savedStateHandle,
-        "inputUriString",
-        "",
-    )
+    var inputUriString by SavableDelegate(savedStateHandle, "inputUriString", "")
 
     private val _loadingIndicator = MutableStateFlow<LoadingIndicator?>(null)
     val loadingIndicator: StateFlow<LoadingIndicator?> = _loadingIndicator
@@ -259,6 +255,9 @@ class ConversionViewModel @Inject constructor(
         withMutableSnapshot {
             inputUriString = value
         }
+    }
+
+    fun reset() {
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
         }
