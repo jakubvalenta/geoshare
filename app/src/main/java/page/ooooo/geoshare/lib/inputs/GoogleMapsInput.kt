@@ -43,6 +43,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["destination"] }
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["query"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["viewpoint"] }
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }

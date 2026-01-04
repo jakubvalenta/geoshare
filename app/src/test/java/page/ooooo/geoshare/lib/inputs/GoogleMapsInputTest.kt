@@ -299,7 +299,23 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_parameterQTakesPrecedence() = runTest {
+    fun parseUri_parameterLlTakesPrecedenceOverViewpointAndCenter() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(Position(Srs.GCJ02, 49.93556240, -7.30123395)),
+            parseUri("https://maps.google.com/?ll=49.93556240,-7.30123395&viewpoint=34.0522,-118.2437"),
+        )
+        assertEquals(
+            ParseUriResult.Succeeded(Position(Srs.GCJ02, 49.93556240, -7.30123395)),
+            parseUri("https://maps.google.com/?ll=49.93556240,-7.30123395&center=34.0522,-118.2437"),
+        )
+    }
+
+    @Test
+    fun parseUri_parameterQTakesPrecedenceOverLlAndViewpointAndCenter() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(Position(Srs.GCJ02, 40.7128, -74.0060)),
+            parseUri("https://www.google.com/?q=40.7128,-74.0060&ll=34.0522,-118.2437"),
+        )
         assertEquals(
             ParseUriResult.Succeeded(Position(Srs.GCJ02, 40.7128, -74.0060)),
             parseUri("https://www.google.com/?q=40.7128,-74.0060&viewpoint=34.0522,-118.2437"),
