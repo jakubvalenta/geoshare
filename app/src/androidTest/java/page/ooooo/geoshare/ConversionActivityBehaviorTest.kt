@@ -16,7 +16,7 @@ import page.ooooo.geoshare.lib.position.Srs
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
-    fun conversionScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
+    fun mainScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
         assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
 
         // Share a Google Maps coordinates link with the app
@@ -38,7 +38,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun conversionScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
+    fun mainScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
             assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
 
@@ -66,7 +66,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_copiesCoords() = uiAutomator {
+    fun mainScreen_whenFullUriIsSharedAndAutomationIsConfiguredToCopyCoordsDec_copiesCoords() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()
@@ -86,7 +86,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun conversionScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_opensApp() = uiAutomator {
+    fun mainScreen_whenFullUriIsSharedAndAutomationIsConfiguredToOpenAnInstalledApp_opensApp() = uiAutomator {
         assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
 
         // Launch application and close intro
@@ -117,7 +117,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun conversionScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -147,7 +147,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -186,7 +186,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -200,7 +200,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             onElement { viewIdResourceName == "geoShareConversionError" }
 
             // Close the window (this is necessary, for some reason)
-            onElement { viewIdResourceName == "geoShareConversionBackButton" }.click()
+            onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
 
             // Share the Google Maps short link with the app again
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -210,7 +210,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenShortUriIsSharedAndUnshortenPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -225,7 +225,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             onElement { viewIdResourceName == "geoShareConversionError" }
 
             // Close the window (this is necessary, for some reason)
-            onElement { viewIdResourceName == "geoShareConversionBackButton" }.click()
+            onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
 
             // Share the Google Maps short link with the app again
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -235,7 +235,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenNonexistentShortUriIsSharedAndUnshortenPermissionIsDismissed_closesTheDialogAndDoesNothing() =
+    fun mainScreen_whenNonexistentShortUriIsSharedAndUnshortenPermissionIsDismissed_closesTheDialogAndDoesNothing() =
         uiAutomator {
             // Share a Google Maps short non-existent link with the app
             shareUri("https://maps.app.goo.gl/spam")
@@ -250,7 +250,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_opensAppleMapsAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_opensAppleMapsAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I7BA098CC17989C16&_provider=9902")
@@ -272,7 +272,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_opensAppleMapsAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_opensAppleMapsAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I1CBDEBCF5A275CB2&_provider=9902")
@@ -295,7 +295,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I8D204FAB527CE0EB&_provider=9902")
@@ -309,7 +309,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             onElement { viewIdResourceName == "geoShareConversionError" }
 
             // Close the window (this is necessary, for some reason)
-            onElement { viewIdResourceName == "geoShareConversionBackButton" }.click()
+            onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
 
             // Share the Apple Maps place link with the app again
             shareUri("https://maps.apple.com/place?place-id=IE08A4F5FAA2F0502&_provider=9902")
@@ -319,7 +319,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkThatRequiresHtmlParsingIsSharedAndParseHtmlPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share an Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I5ECF0E5A2703FCD1&_provider=9902")
@@ -334,7 +334,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             onElement { viewIdResourceName == "geoShareConversionError" }
 
             // Close the window (this is necessary, for some reason)
-            onElement { viewIdResourceName == "geoShareConversionBackButton" }.click()
+            onElement { viewIdResourceName == "geoShareMainBackButton" }.click()
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I263680A7B546CF16&_provider=9902")
@@ -344,7 +344,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
@@ -374,7 +374,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
@@ -413,7 +413,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsDismissedWithoutDoNotAsk_closesTheDialogAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
@@ -437,7 +437,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsDismissedWithDoNotAsk_closesTheDialogAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
@@ -465,7 +465,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenShortUriWithCoordinatesInHtmlIsSharedAndUnshortenPermissionDialogIsConfirmed_doesNotAskForParseHtmlPermission() =
+    fun mainScreen_whenShortUriWithCoordinatesInHtmlIsSharedAndUnshortenPermissionDialogIsConfirmed_doesNotAskForParseHtmlPermission() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
@@ -488,7 +488,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun conversionScreen_whenGpxRouteIsShared_allowsOpeningTomTom() = uiAutomator {
+    fun mainScreen_whenGpxRouteIsShared_allowsOpeningTomTom() = uiAutomator {
         assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
 
         // Share a geo: URI with the app
@@ -534,7 +534,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun conversionScreen_whenGpxRouteIsSharedAndAutomationIsConfigured_opensTomTom() = uiAutomator {
+    fun mainScreen_whenGpxRouteIsSharedAndAutomationIsConfigured_opensTomTom() = uiAutomator {
         assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
 
         // Launch application and close intro
@@ -569,7 +569,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun conversionScreen_whenCopyButtonIsTapped_opensSheetAndAllowsCopyingMagicEarthUri() = uiAutomator {
+    fun mainScreen_whenCopyButtonIsTapped_opensSheetAndAllowsCopyingMagicEarthUri() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()

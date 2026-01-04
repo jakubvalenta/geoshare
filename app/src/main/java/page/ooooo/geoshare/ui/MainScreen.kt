@@ -107,7 +107,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun ConversionScreen(
+fun MainScreen(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
@@ -199,7 +199,7 @@ fun ConversionScreen(
         }
     }
 
-    ConversionScreen(
+    MainScreen(
         currentState = currentState,
         changelogShown = changelogShown,
         inputUriString = viewModel.inputUriString,
@@ -248,7 +248,7 @@ fun ConversionScreen(
     ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
-private fun ConversionScreen(
+private fun MainScreen(
     currentState: State,
     changelogShown: Boolean,
     inputUriString: String,
@@ -288,7 +288,7 @@ private fun ConversionScreen(
             if (currentState !is Initial) {
                 IconButton(
                     onReset,
-                    Modifier.testTag("geoShareConversionBackButton"),
+                    Modifier.testTag("geoShareMainBackButton"),
                 ) {
                     Icon(
                         Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.nav_back_content_description)
@@ -589,7 +589,7 @@ private fun ConversionScreen(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = Initial(),
             changelogShown = false,
             inputUriString = "",
@@ -615,7 +615,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = Initial(),
             changelogShown = false,
             inputUriString = "",
@@ -641,7 +641,7 @@ private fun DarkPreview() {
 @Composable
 private fun TabletPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = Initial(),
             changelogShown = false,
             inputUriString = "",
@@ -667,7 +667,7 @@ private fun TabletPreview() {
 @Composable
 private fun SucceededPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -697,7 +697,7 @@ private fun SucceededPreview() {
 @Composable
 private fun DarkSucceededPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -727,7 +727,7 @@ private fun DarkSucceededPreview() {
 @Composable
 private fun TabletSucceededPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -757,7 +757,7 @@ private fun TabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -790,7 +790,7 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -823,7 +823,7 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(userPreferencesRepository = FakeUserPreferencesRepository()),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -856,7 +856,7 @@ private fun TabletAutomationPreview() {
 @Composable
 private fun ErrorPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ConversionFailed(
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -885,7 +885,7 @@ private fun ErrorPreview() {
 @Composable
 private fun DarkErrorPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ConversionFailed(
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -914,7 +914,7 @@ private fun DarkErrorPreview() {
 @Composable
 private fun TabletErrorPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = ConversionFailed(
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -943,7 +943,7 @@ private fun TabletErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
@@ -985,7 +985,7 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
@@ -1027,7 +1027,7 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
-        ConversionScreen(
+        MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),

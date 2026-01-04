@@ -63,7 +63,7 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
             )
         }
         composable<MainRoute> {
-            ConversionScreen(
+            MainScreen(
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
