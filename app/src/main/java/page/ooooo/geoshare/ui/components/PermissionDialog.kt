@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -36,7 +37,7 @@ fun PermissionDialog(
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    var doNotAsk by remember { mutableStateOf(false) }
+    var doNotAsk by retain { mutableStateOf(false) }
 
     ConfirmationDialog(
         title = title,

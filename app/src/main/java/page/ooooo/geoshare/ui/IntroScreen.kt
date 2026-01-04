@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -67,7 +68,7 @@ private fun IntroScreen(
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
     val pageCount = 2
-    var page by remember { mutableIntStateOf(initialPage) }
+    var page by retain { mutableIntStateOf(initialPage) }
     val animatedProgress by animateFloatAsState(
         targetValue = (page + 1f) / pageCount,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,

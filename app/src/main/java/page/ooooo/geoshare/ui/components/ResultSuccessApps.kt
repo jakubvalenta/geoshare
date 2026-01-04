@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -107,7 +108,7 @@ fun RowScope.ResultSuccessApp(
     onRun: (action: Action, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    var menuExpanded by remember { mutableStateOf(false) }
+    var menuExpanded by retain { mutableStateOf(false) }
 
     Column(
         Modifier
