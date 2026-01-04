@@ -9,7 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.ui.ConversionNavigation
+import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
@@ -23,14 +23,14 @@ class ConversionActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                ConversionNavigation(viewModel, onFinish = { finish() })
+                MainNavigation(viewModel, introEnabled = false)
             }
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Log.i(null, "New intent: ${intent.data}")
+        Log.i("ConversionActivity", "New intent: ${intent.data}")
         viewModel.updateInput(AndroidTools.getIntentUriString(intent) ?: "")
         viewModel.start()
     }

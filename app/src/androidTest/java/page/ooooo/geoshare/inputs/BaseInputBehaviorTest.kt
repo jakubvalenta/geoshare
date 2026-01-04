@@ -19,14 +19,14 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         onElementOrNull(3000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
     }
 
-    protected fun goBackFromConversionScreenIfItIsVisible() = uiAutomator {
+    protected fun goToMainForm() = uiAutomator {
         // Make sure we leave the result screen, if we're there, so that we don't accidentally test the old result.
-        onElementOrNull(1000L) { viewIdResourceName == "geoShareConversionBackButton" }?.click()
+        onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
     protected fun testUri(expectedPosition: Position, unsafeUriString: String) = uiAutomator {
-        // Go back from conversion screen
-        goBackFromConversionScreenIfItIsVisible()
+        // Go to main form
+        goToMainForm()
 
         // Share URI and confirm permission dialog
         shareUri(unsafeUriString)
@@ -43,8 +43,8 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n $PACKAGE_NAME/page.ooooo.geoshare.ConversionActivity $PACKAGE_NAME"
         // )
 
-        // Go back from conversion screen
-        goBackFromConversionScreenIfItIsVisible()
+        // Go to main form
+        goToMainForm()
 
         // Set main input
         onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }.setText(unsafeText)

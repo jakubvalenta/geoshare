@@ -17,9 +17,6 @@ import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 object AboutRoute
 
 @Serializable
-object ConversionRoute
-
-@Serializable
 object FaqRoute
 
 @Serializable
@@ -36,12 +33,12 @@ data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MainNavigation(viewModel: ConversionViewModel) {
+fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
     val navController = rememberNavController()
     val introShown by viewModel.introShown.collectAsState()
 
-    LaunchedEffect(introShown) {
-        if (!introShown) {
+    LaunchedEffect(introEnabled, introShown) {
+        if (introEnabled && !introShown) {
             navController.navigate(IntroRoute) {
                 popUpTo(MainRoute) { inclusive = false }
             }
@@ -54,10 +51,19 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
-        composable<ConversionRoute> {
-            ConversionScreen(
+        composable<FaqRoute> {
+            FaqScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                onFinish = {},
+            )
+        }
+        composable<IntroRoute> {
+            IntroScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                viewModel = viewModel,
+            )
+        }
+        composable<MainRoute> {
+            MainScreen(
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
@@ -66,28 +72,6 @@ fun MainNavigation(viewModel: ConversionViewModel) {
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
                 },
-                viewModel = viewModel,
-            )
-        }
-        composable<FaqRoute> {
-            FaqScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-            )
-        }
-        composable<IntroRoute> {
-            IntroScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate(ConversionRoute) },
-                viewModel = viewModel,
-            )
-        }
-        composable<MainRoute> {
-            MainScreen(
-                onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
-                onNavigateToConversionScreen = { navController.navigate(ConversionRoute) },
-                onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
-                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
-                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 viewModel = viewModel,
             )
         }

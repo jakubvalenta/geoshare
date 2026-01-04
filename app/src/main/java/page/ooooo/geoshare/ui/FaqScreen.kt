@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,7 +34,7 @@ fun FaqScreen(
     onBack: () -> Unit = {},
 ) {
     val spacing = LocalSpacing.current
-    var expandedItemId by remember { mutableStateOf(initialExpandedItemId) }
+    var expandedItemId by retain { mutableStateOf(initialExpandedItemId) }
 
     Scaffold(
         topBar = {
