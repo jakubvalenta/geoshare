@@ -221,7 +221,7 @@ abstract class BaseActivityBehaviorTest {
         grantLocationPermissionIfNecessary()
 
         // If there is Importing GPX tracks dialog, confirm it
-        onElementOrNull(3_000L) {
+        onElementOrNull(5_000L) {
             @Suppress("SpellCheckingInspection")
             when (textAsString()) {
                 "Got it", "J'ai compris" -> true
