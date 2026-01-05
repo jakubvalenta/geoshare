@@ -1,2 +1,3 @@
 - Added support for Google Maps ll parameter.
 - Fixed blank screen when resuming the app.
+- Fixed Supported Maps screen on tablets.
