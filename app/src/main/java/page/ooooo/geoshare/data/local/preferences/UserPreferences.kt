@@ -8,10 +8,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -84,15 +82,14 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
     ) {
         val value = getValue(values)
         val spacing = LocalSpacing.current
-        var inputValue by remember { mutableStateOf(value.toString()) }
+        val (inputValue, setInputValue) = remember { mutableStateOf(value.toString()) }
+        val error = getError(inputValue)
+
         OutlinedTextField(
             value = inputValue,
             onValueChange = {
-                @Suppress("AssignedValueIsNeverRead")
-                inputValue = it
-                onValueChange { preferences ->
-                    setValue(preferences, fromString(it))
-                }
+                setInputValue(it)
+                onValueChange { preferences -> setValue(preferences, fromString(it)) }
             },
             modifier = modifier.padding(top = spacing.tiny),
             suffix = suffix()?.let { text ->
@@ -102,20 +99,29 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
             },
             trailingIcon = {
                 IconButton({
-                    onValueChange { preferences ->
-                        setValue(preferences, default)
-                    }
+                    setInputValue(default.toString())
+                    onValueChange { preferences -> setValue(preferences, default) }
                 }) {
                     Icon(
                         Icons.Default.Refresh,
-                        "refresh" // TODO
+                        stringResource(R.string.reset),
                     )
                 }
             },
+            supportingText = error?.let { error ->
+                {
+                    Text(error)
+                }
+            },
+            isError = error != null,
+            singleLine = true,
         )
     }
 
     protected abstract fun fromString(value: String?): T
+
+    @Composable
+    protected abstract fun getError(value: String?): String?
 }
 
 abstract class IntUserPreference : NumberUserPreference<Int>() {
@@ -123,11 +129,14 @@ abstract class IntUserPreference : NumberUserPreference<Int>() {
     override val minValue = Int.MIN_VALUE
     override val maxValue = Int.MAX_VALUE
 
-    override fun fromString(value: String?): Int = try {
-        value?.toInt()?.coerceIn(minValue, maxValue)
-    } catch (_: NumberFormatException) {
+    override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
+
+    @Composable
+    override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
         null
-    } ?: default
+    } else {
+        stringResource(R.string.user_preferences_number_error_range, minValue, maxValue)
+    }
 }
 
 abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
@@ -135,11 +144,14 @@ abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
     override val minValue = Int.MIN_VALUE
     override val maxValue = Int.MAX_VALUE
 
-    override fun fromString(value: String?): Int? = try {
-        value?.toInt()?.coerceIn(minValue, maxValue)
-    } catch (_: NumberFormatException) {
+    override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
+
+    @Composable
+    override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
         null
-    } ?: default
+    } else {
+        stringResource(R.string.user_preferences_number_error_range, minValue, maxValue)
+    }
 }
 
 data class UserPreferenceOption<T>(
