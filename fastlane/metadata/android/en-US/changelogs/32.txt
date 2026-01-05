@@ -1,3 +1,4 @@
 - Added support for Google Maps ll parameter.
+- Added the option to set automation delay.
 - Fixed blank screen when resuming the app.
 - Fixed Supported Maps screen on tablets.
