@@ -38,6 +38,7 @@ import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
 import page.ooooo.geoshare.ui.components.UserPreferencesListPane
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -52,7 +53,9 @@ sealed class UserPreferencesGroup(
     val titleResId: Int,
     val userPreferences: List<UserPreference<*>>,
     val visible: Boolean = true,
-)
+) {
+    open fun enabled(values: UserPreferencesValues): Boolean = true
+}
 
 object ConnectionPermissionUserPreferencesGroup : UserPreferencesGroup(
     id = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -70,8 +73,9 @@ object AutomationDelayUserPreferencesGroup : UserPreferencesGroup(
     id = UserPreferencesGroupId.AUTOMATION_DELAY,
     titleResId = R.string.user_preferences_automation_delay_sec_title,
     userPreferences = listOf(AutomationDelaySec),
-    visible = false,
-)
+) {
+    override fun enabled(values: UserPreferencesValues) = values.automationValue is Automation.HasDelay
+}
 
 object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup(
     id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
@@ -171,11 +175,6 @@ private fun UserPreferencesScreen(
                                     } else {
                                         onBack()
                                     }
-                                }
-                            },
-                            onNavigateToGroup = { id ->
-                                coroutineScope.launch {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
                                 }
                             },
                             onValueChange = onValueChange,

@@ -17,7 +17,6 @@ import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
 import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
 import page.ooooo.geoshare.ui.DeveloperOptionsUserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroup
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -27,7 +26,6 @@ fun UserPreferencesDetailPane(
     expanded: Boolean,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
-    onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -48,7 +46,7 @@ fun UserPreferencesDetailPane(
                     userPreference.description()?.let { description ->
                         ParagraphHtml(description)
                     }
-                    userPreference.Component(userPreferencesValues, onNavigateToGroup) { transform ->
+                    userPreference.Component(userPreferencesValues) { transform ->
                         onValueChange(transform)
                     }
                 }
@@ -70,7 +68,6 @@ private fun ConnectionPermissionPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -89,7 +86,6 @@ private fun DarkConnectionPermissionPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -110,7 +106,6 @@ private fun AutomationPreview() {
                         automationValue = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -131,7 +126,6 @@ private fun DarkAutomationPreview() {
                         automationValue = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -150,7 +144,6 @@ private fun AutomationDelayPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -169,7 +162,6 @@ private fun DarkAutomationDelayPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -188,7 +180,6 @@ private fun DeveloperOptionsPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -207,7 +198,6 @@ private fun DarkDeveloperOptionsPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }

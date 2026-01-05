@@ -20,7 +20,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 data class RadioButtonOption<T>(
     val value: T,
     val modifier: Modifier = Modifier,
-    val label: @Composable (selected: Boolean) -> Unit,
+    val label: @Composable () -> Unit,
 )
 
 @Composable
@@ -53,7 +53,7 @@ fun <T> RadioButtonGroup(
                     onClick = null
                 )
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                    option.label(option.value == selectedValue)
+                    option.label()
                 }
             }
         }

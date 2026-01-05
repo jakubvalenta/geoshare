@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -53,6 +54,7 @@ fun UserPreferencesListPane(
         onBack = onBack,
     ) {
         groups.filter { it.visible }.forEach { group ->
+            val enabled = group.enabled(userPreferencesValues)
             ListItem(
                 headlineContent = {
                     Text(
@@ -61,7 +63,8 @@ fun UserPreferencesListPane(
                     )
                 },
                 modifier = Modifier
-                    .clickable(onClick = { onNavigateToGroup(group.id) })
+                    .alpha(if (enabled) 1f else 0.5f)
+                    .clickable(enabled = enabled, onClick = { onNavigateToGroup(group.id) })
                     .testTag("geoShareUserPreferencesGroup_${group.id}"),
                 supportingContent = group.userPreferences.takeIf { it.size == 1 }?.firstOrNull()
                     ?.let { userPreference ->
