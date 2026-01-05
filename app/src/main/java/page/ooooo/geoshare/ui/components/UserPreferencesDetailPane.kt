@@ -11,7 +11,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.outputs.GpxOutput
+import page.ooooo.geoshare.ui.AutomationDelayUserPreferencesGroup
+import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
+import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
+import page.ooooo.geoshare.ui.DeveloperOptionsUserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroup
+import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -21,6 +27,7 @@ fun UserPreferencesDetailPane(
     expanded: Boolean,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
+    onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -41,7 +48,7 @@ fun UserPreferencesDetailPane(
                     userPreference.description()?.let { description ->
                         ParagraphHtml(description)
                     }
-                    userPreference.Component(userPreferencesValues) { transform ->
+                    userPreference.Component(userPreferencesValues, onNavigateToGroup) { transform ->
                         onValueChange(transform)
                     }
                 }
@@ -59,10 +66,11 @@ private fun ConnectionPermissionPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -77,10 +85,11 @@ private fun DarkConnectionPermissionPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -88,17 +97,20 @@ private fun DarkConnectionPermissionPreview() {
     }
 }
 
-@Preview(showBackground = true, device = "spec:width=1080px,height=1600px,dpi=440")
+@Preview(showBackground = true)
 @Composable
 private fun AutomationPreview() {
     AppTheme {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = UserPreferencesGroup.automation,
+                    currentGroup = AutomationUserPreferencesGroup,
                     expanded = true,
-                    userPreferencesValues = defaultFakeUserPreferences,
+                    userPreferencesValues = UserPreferencesValues(
+                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                    ),
                     onBack = {},
+                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -106,21 +118,58 @@ private fun AutomationPreview() {
     }
 }
 
-@Preview(
-    showBackground = true,
-    device = "spec:width=1080px,height=1600px,dpi=440",
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = UserPreferencesGroup.automation,
+                    currentGroup = AutomationUserPreferencesGroup,
+                    expanded = true,
+                    userPreferencesValues = UserPreferencesValues(
+                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                    ),
+                    onBack = {},
+                    onNavigateToGroup = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AutomationDelayPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationDelayUserPreferencesGroup,
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToGroup = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkAutomationDelayPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationDelayUserPreferencesGroup,
+                    expanded = true,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -135,10 +184,11 @@ private fun DeveloperOptionsPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = UserPreferencesGroup.developerOptions,
+                    currentGroup = DeveloperOptionsUserPreferencesGroup,
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }
@@ -153,10 +203,11 @@ private fun DarkDeveloperOptionsPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = UserPreferencesGroup.developerOptions,
+                    currentGroup = DeveloperOptionsUserPreferencesGroup,
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToGroup = {},
                     onValueChange = {},
                 )
             }

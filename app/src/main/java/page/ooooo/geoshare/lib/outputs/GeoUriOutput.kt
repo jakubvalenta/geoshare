@@ -23,7 +23,6 @@ import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration.Companion.seconds
 
 object GeoUriOutput : Output {
 
@@ -94,7 +93,6 @@ object GeoUriOutput : Output {
         override val type = Automation.Type.SHARE
         override val packageName = ""
         override val testTag = null
-        override val delay = 5.seconds
 
         @Composable
         override fun successText() = stringResource(R.string.conversion_automation_share_succeeded)
@@ -116,8 +114,6 @@ object GeoUriOutput : Output {
 
         override val type = Automation.Type.OPEN_APP
         override val testTag = "geoShareUserPreferenceAutomationOpenApp_${packageName}"
-
-        override val delay = 5.seconds
 
         @Composable
         override fun Label() {

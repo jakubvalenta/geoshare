@@ -48,6 +48,7 @@ class FakeUserPreferencesRepository @Inject constructor() :
 
 val defaultFakeUserPreferences = UserPreferencesValues(
     automationValue = NoopAutomation,
+    automationDelaySecValue = 5,
     changelogShownForVersionCodeValue = 22,
     connectionPermissionValue = Permission.ALWAYS,
     introShownForVersionCodeValue = 0,

@@ -19,6 +19,7 @@ import org.mockito.kotlin.verify
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.AutomationDelaySec
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -1736,13 +1737,15 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
+        val delaySec = 2
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
+            onBlocking { getValue(AutomationDelaySec) } doReturn delaySec
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
-            ActionWaiting(stateContext, inputUriString, position, null, action, 5.seconds),
+            ActionWaiting(stateContext, inputUriString, position, null, action, delaySec),
             state.transition(),
         )
     }
@@ -1751,14 +1754,16 @@ class ConversionStateTest {
     fun conversionSucceeded_userPreferenceAutomationIsSaveGpx_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
-        val action = GpxOutput.SaveGpxPointsAutomation
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
+        val delaySec = 2
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
+            onBlocking { getValue(AutomationDelaySec) } doReturn delaySec
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
-            ActionWaiting(stateContext, inputUriString, position, null, action, 5.seconds),
+            ActionWaiting(stateContext, inputUriString, position, null, action, delaySec),
             state.transition(),
         )
     }
@@ -1768,13 +1773,15 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GeoUriOutput.ShareGeoUriAutomation
+        val delaySec = 2
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
+            onBlocking { getValue(AutomationDelaySec) } doReturn delaySec
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertEquals(
-            ActionWaiting(stateContext, inputUriString, position, null, action, 5.seconds),
+            ActionWaiting(stateContext, inputUriString, position, null, action, delaySec),
             state.transition(),
         )
     }
@@ -1792,14 +1799,14 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GpxOutput.SaveGpxPointsAutomation
         val stateContext = mockStateContext()
-        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, 5.seconds)
+        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, 3)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
                 ActionReady(inputUriString, position, 2, action),
                 state.transition(),
             )
         }
-        Assert.assertEquals(action.delay, workDuration)
+        Assert.assertEquals(3.seconds, workDuration)
     }
 
     @Test
@@ -1808,7 +1815,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GpxOutput.SaveGpxPointsAutomation
         val stateContext = mockStateContext()
-        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, (-1).seconds)
+        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, -1)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
                 ActionReady(inputUriString, position, 2, action),
@@ -1824,7 +1831,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = GpxOutput.SaveGpxPointsAutomation
         val stateContext = mockStateContext()
-        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, 5.seconds)
+        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, 3)
         var res: State? = null
         val job = launch {
             res = state.transition()

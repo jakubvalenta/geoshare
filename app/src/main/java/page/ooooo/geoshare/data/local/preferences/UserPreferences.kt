@@ -1,20 +1,38 @@
 package page.ooooo.geoshare.data.local.preferences
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.NoopAutomation
+import page.ooooo.geoshare.lib.outputs.allOutputs
+import page.ooooo.geoshare.lib.outputs.findAutomation
+import page.ooooo.geoshare.lib.outputs.getAutomations
+import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -36,19 +54,23 @@ interface UserPreference<T> {
     fun ValueLabel(values: UserPreferencesValues)
 
     @Composable
-    fun Component(values: UserPreferencesValues, onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit)
+    fun Component(
+        values: UserPreferencesValues,
+        onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
+        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+    )
 }
 
-abstract class NullableIntUserPreference(
-    val key: Preferences.Key<String>,
-    val default: Int?,
-    val modifier: Modifier = Modifier,
-) : UserPreference<Int?> {
-    override val loading = null
+abstract class NumberUserPreference<T> : UserPreference<T> {
+    abstract val key: Preferences.Key<String>
+    abstract val default: T
+    abstract val modifier: Modifier
+    abstract val minValue: T
+    abstract val maxValue: T
 
-    override fun getValue(preferences: Preferences): Int? = fromString(preferences[key])
+    override fun getValue(preferences: Preferences): T = fromString(preferences[key])
 
-    override fun setValue(preferences: MutablePreferences, value: Int?) {
+    override fun setValue(preferences: MutablePreferences, value: T) {
         preferences[key] = value.toString()
     }
 
@@ -61,6 +83,7 @@ abstract class NullableIntUserPreference(
     @Composable
     override fun Component(
         values: UserPreferencesValues,
+        onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
     ) {
         val value = getValue(values)
@@ -79,8 +102,28 @@ abstract class NullableIntUserPreference(
         )
     }
 
-    private fun fromString(value: String?): Int? = try {
-        value?.toInt()
+    protected abstract fun fromString(value: String?): T
+}
+
+abstract class IntUserPreference : NumberUserPreference<Int>() {
+    override val loading = default
+    override val minValue = Int.MIN_VALUE
+    override val maxValue = Int.MAX_VALUE
+
+    override fun fromString(value: String?): Int = try {
+        value?.toInt()?.coerceIn(minValue, maxValue)
+    } catch (_: NumberFormatException) {
+        null
+    } ?: default
+}
+
+abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
+    override val loading = null
+    override val minValue = Int.MIN_VALUE
+    override val maxValue = Int.MAX_VALUE
+
+    override fun fromString(value: String?): Int? = try {
+        value?.toInt()?.coerceIn(minValue, maxValue)
     } catch (_: NumberFormatException) {
         null
     } ?: default
@@ -89,7 +132,7 @@ abstract class NullableIntUserPreference(
 data class UserPreferenceOption<T>(
     val value: T,
     val modifier: Modifier = Modifier,
-    val label: @Composable () -> Unit,
+    val label: @Composable (selected: Boolean) -> Unit,
 )
 
 abstract class OptionsUserPreference<T>(
@@ -98,19 +141,20 @@ abstract class OptionsUserPreference<T>(
     override val loading = default
 
     @Composable
-    abstract fun options(): List<UserPreferenceOption<T>>
+    abstract fun options(onNavigateToGroup: ((id: UserPreferencesGroupId) -> Unit)? = null): List<UserPreferenceOption<T>>
 
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
         val value = getValue(values)
         (options().find { it.value == value } ?: options().find { it.value == default })?.also { option ->
-            option.label()
+            option.label(true)
         } ?: Text(value.toString())
     }
 
     @Composable
     override fun Component(
         values: UserPreferencesValues,
+        onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
     ) {
         val value = getValue(values)
@@ -124,7 +168,7 @@ abstract class OptionsUserPreference<T>(
             },
             modifier = Modifier.padding(top = spacing.tiny),
         ) {
-            options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
+            options(onNavigateToGroup).map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
         }
     }
 }
@@ -135,7 +179,7 @@ object ConnectionPermission : OptionsUserPreference<Permission>(
     private val key = stringPreferencesKey("connect_to_google_permission")
 
     @Composable
-    override fun options() = listOf(
+    override fun options(onNavigateToGroup: ((id: UserPreferencesGroupId) -> Unit)?) = listOf(
         UserPreferenceOption(
             Permission.ALWAYS,
             Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
@@ -179,7 +223,7 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
     private val packageNameKey = stringPreferencesKey("automation_package_name")
 
     @Composable
-    override fun options(): List<UserPreferenceOption<Automation>> {
+    override fun options(onNavigateToGroup: ((id: UserPreferencesGroupId) -> Unit)?): List<UserPreferenceOption<Automation>> {
         val context = LocalContext.current
         val apps = AndroidTools.queryApps(context.packageManager)
         return buildList {
@@ -210,8 +254,32 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
             UserPreferenceOption(
                 value = automation,
                 modifier = automation.testTag?.let { Modifier.testTag(it) } ?: Modifier,
-            ) {
-                automation.Label()
+            ) { selected ->
+                if (onNavigateToGroup == null || !selected || automation !is Automation.HasDelay) {
+                    automation.Label()
+                } else {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        automation.Label()
+                        Text(
+                            stringResource(R.string.user_preferences_automation_delay_sec_button),
+                            Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    MaterialTheme.shapes.extraLarge,
+                                )
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                .clickable(role = Role.Button) {
+                                    onNavigateToGroup(UserPreferencesGroupId.AUTOMATION_DELAY)
+                                },
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+                }
             }
         }
     }
@@ -243,10 +311,47 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
     override fun description() = stringResource(R.string.user_preferences_automation_description)
 }
 
-object IntroShowForVersionCode : NullableIntUserPreference(
-    key = stringPreferencesKey("intro_shown_for_version_code"),
-    default = 0,
-) {
+object AutomationDelaySec : IntUserPreference() {
+    override val key = stringPreferencesKey("automation_delay")
+    override val default = 5
+    override val modifier = Modifier
+
+    override fun getValue(values: UserPreferencesValues) = values.automationDelaySecValue
+
+    @Composable
+    override fun title() = stringResource(R.string.user_preferences_automation_delay_sec_title)
+
+    @Composable
+    override fun description() = stringResource(R.string.user_preferences_automation_delay_sec_description)
+
+    @Composable
+    override fun Component(
+        values: UserPreferencesValues,
+        onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
+        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+    ) {
+        val value = getValue(values)
+        val spacing = LocalSpacing.current
+        var inputValue by remember { mutableStateOf(value.toString()) }
+        OutlinedTextField(
+            value = inputValue,
+            onValueChange = {
+                @Suppress("AssignedValueIsNeverRead")
+                inputValue = it
+                onValueChange { preferences ->
+                    setValue(preferences, fromString(it))
+                }
+            },
+            modifier = modifier.padding(top = spacing.tiny),
+        )
+    }
+}
+
+object IntroShowForVersionCode : NullableIntUserPreference() {
+    override val key = stringPreferencesKey("intro_shown_for_version_code")
+    override val default = 0
+    override val modifier = Modifier
+
     override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCodeValue
 
     @Composable
@@ -256,11 +361,11 @@ object IntroShowForVersionCode : NullableIntUserPreference(
     override fun description() = null
 }
 
-object ChangelogShownForVersionCode : NullableIntUserPreference(
-    key = stringPreferencesKey("changelog_shown_for_version_code"),
-    default = BuildConfig.VERSION_CODE,
-    modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
-) {
+object ChangelogShownForVersionCode : NullableIntUserPreference() {
+    override val key = stringPreferencesKey("changelog_shown_for_version_code")
+    override val default = BuildConfig.VERSION_CODE
+    override val modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode")
+
     override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCodeValue
 
     @Composable
@@ -272,6 +377,7 @@ object ChangelogShownForVersionCode : NullableIntUserPreference(
 
 data class UserPreferencesValues(
     val automationValue: Automation = AutomationUserPreference.loading,
+    val automationDelaySecValue: Int = AutomationDelaySec.loading,
     val changelogShownForVersionCodeValue: Int? = ChangelogShownForVersionCode.loading,
     val connectionPermissionValue: Permission = ConnectionPermission.loading,
     val introShownForVersionCodeValue: Int? = IntroShowForVersionCode.loading,

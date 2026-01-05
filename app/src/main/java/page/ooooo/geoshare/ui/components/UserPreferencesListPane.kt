@@ -19,6 +19,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.ui.AutomationDelayUserPreferencesGroup
+import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
+import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
+import page.ooooo.geoshare.ui.DeveloperOptionsUserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -48,7 +52,7 @@ fun UserPreferencesListPane(
         containerColor = containerColor,
         onBack = onBack,
     ) {
-        for (group in groups) {
+        groups.filter { it.visible }.forEach { group ->
             ListItem(
                 headlineContent = {
                     Text(
@@ -84,8 +88,13 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = false,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -103,8 +112,13 @@ private fun DarkPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = false,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -122,8 +136,13 @@ private fun ExpandedPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -141,8 +160,13 @@ private fun DarkExpandedPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},

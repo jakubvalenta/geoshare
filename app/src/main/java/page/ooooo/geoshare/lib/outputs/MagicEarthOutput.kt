@@ -22,7 +22,6 @@ import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated:
@@ -132,7 +131,6 @@ object MagicEarthOutput : Output {
 
         override val type = Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO
         override val testTag = null
-        override val delay = 5.seconds
 
         @Composable
         override fun Label() {

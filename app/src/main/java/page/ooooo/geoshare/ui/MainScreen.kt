@@ -104,7 +104,6 @@ import page.ooooo.geoshare.ui.components.ResultSuccessSheetContent
 import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MainScreen(
@@ -764,7 +763,7 @@ private fun AutomationPreview() {
                 position = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                delay = 3.seconds,
+                delaySec = 3,
             ),
             changelogShown = true,
             inputUriString = "",
@@ -797,7 +796,7 @@ private fun DarkAutomationPreview() {
                 position = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                delay = 3.seconds,
+                delaySec = 3,
             ),
             changelogShown = true,
             inputUriString = "",
@@ -830,7 +829,7 @@ private fun TabletAutomationPreview() {
                 position = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                delay = 3.seconds,
+                delaySec = 3,
             ),
             changelogShown = true,
             inputUriString = "",
