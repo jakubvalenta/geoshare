@@ -5,13 +5,17 @@ import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +57,6 @@ private fun getDocumentationInputDetails(
         )
     }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsDetailPane(
     currentDocumentation: InputDocumentation,
@@ -61,7 +64,7 @@ fun InputsDetailPane(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    var documentationInputInfos by remember {
+    var documentationInputInfos by remember(currentDocumentation) {
         mutableStateOf(getDocumentationInputDetails(currentDocumentation, context.packageManager))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -77,7 +80,6 @@ fun InputsDetailPane(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InputsDetailPane(
     @StringRes nameResId: Int,
@@ -89,32 +91,24 @@ private fun InputsDetailPane(
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
 
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            if (expanded) {
-                IconButton(onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            }
-        },
-    )
-    Column(Modifier.widthIn(max = 600.dp)) {
-        SelectionContainer {
-            Headline(stringResource(nameResId))
-        }
-        InputsHeader(
-            text = stringResource(R.string.inputs_detail_text, appName),
-            onShowOpenByDefaultSettings = onShowOpenByDefaultSettings,
-        )
-        Column(Modifier.padding(start = spacing.windowPadding, top = spacing.small, end = spacing.windowPadding)) {
+    ScrollablePane(
+        titleResId = nameResId,
+        onBack = onBack.takeIf { expanded },
+    ) {
+        Column(
+            Modifier
+                .widthIn(max = 600.dp)
+                .padding(horizontal = spacing.windowPadding),
+        ) {
+            ParagraphText(
+                stringResource(R.string.inputs_detail_text, appName),
+                Modifier.padding(top = spacing.tiny, bottom = spacing.medium),
+            )
+            InputsSettingsButton(onShowOpenByDefaultSettings)
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = spacing.medium, bottom = spacing.small),
+                    .padding(top = spacing.large, bottom = spacing.small),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -129,44 +123,40 @@ private fun InputsDetailPane(
                 )
             }
             HorizontalDivider()
-            Column(
-                Modifier.verticalScroll(rememberScrollState()),
-            ) {
-                documentationInputDetails.forEach { documentationInputDetails ->
-                    Row(
-                        Modifier.padding(vertical = spacing.small),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        SelectionContainer(Modifier.weight(1f)) {
-                            Text(
-                                when (documentationInputDetails.documentationInput) {
-                                    is InputDocumentationItem.Text ->
-                                        documentationInputDetails.documentationInput.text()
-
-                                    is InputDocumentationItem.Url ->
-                                        documentationInputDetails.documentationInput.urlString
-                                            .removePrefix("https://")
-                                            .trimEnd('/')
-                                },
-                                Modifier.padding(end = spacing.tiny),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
+            documentationInputDetails.forEach { documentationInputDetails ->
+                Row(
+                    Modifier.padding(vertical = spacing.small),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SelectionContainer(Modifier.weight(1f)) {
                         Text(
-                            stringResource(
-                                when (documentationInputDetails.defaultHandlerEnabled) {
-                                    true -> R.string.yes
-                                    false -> R.string.no
-                                    null -> R.string.not_available
-                                },
-                                appName,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
+                            when (documentationInputDetails.documentationInput) {
+                                is InputDocumentationItem.Text ->
+                                    documentationInputDetails.documentationInput.text()
+
+                                is InputDocumentationItem.Url ->
+                                    documentationInputDetails.documentationInput.urlString
+                                        .removePrefix("https://")
+                                        .trimEnd('/')
+                            },
+                            Modifier.padding(end = spacing.tiny),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
-                    HorizontalDivider()
+                    Text(
+                        stringResource(
+                            when (documentationInputDetails.defaultHandlerEnabled) {
+                                true -> R.string.yes
+                                false -> R.string.no
+                                null -> R.string.not_available
+                            },
+                            appName,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                 }
+                HorizontalDivider()
             }
         }
     }
