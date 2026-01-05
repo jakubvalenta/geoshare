@@ -3,14 +3,18 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,7 +30,6 @@ import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputsListPane(
     currentDocumentation: InputDocumentation?,
@@ -52,7 +55,6 @@ fun InputsListPane(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InputsListPane(
     currentDocumentation: InputDocumentation?,
@@ -78,38 +80,19 @@ private fun InputsListPane(
         }.takeIf { it.isNotEmpty() }
     }
 
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            FilledIconButton(
-                onBack,
-                Modifier.testTag("geoShareInputsBack"),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.nav_back_content_description)
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = containerColor,
-        ),
-    )
-    Column(
-        Modifier
-            .background(containerColor)
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
+    ScrollablePane(
+        titleResId = R.string.inputs_title,
+        containerColor = containerColor,
+        onBack = onBack,
     ) {
-        Headline(stringResource(R.string.inputs_title))
         if (expanded) {
-            InputsHeader(
-                text = stringResource(R.string.inputs_list_text, appName),
-                onShowOpenByDefaultSettings = onShowOpenByDefaultSettings,
-            )
+            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+                ParagraphText(
+                    stringResource(R.string.inputs_list_text, appName),
+                    Modifier.padding(top = spacing.tiny, bottom = spacing.medium),
+                )
+                InputsSettingsButton(onShowOpenByDefaultSettings)
+            }
         }
         if (recentDocumentations != null) {
             LabelLarge(
