@@ -64,8 +64,7 @@ fun InputsDetailPane(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    // FIXME Table doesn't refresh on tablets
-    var documentationInputInfos by remember {
+    var documentationInputInfos by remember(currentDocumentation) {
         mutableStateOf(getDocumentationInputDetails(currentDocumentation, context.packageManager))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
