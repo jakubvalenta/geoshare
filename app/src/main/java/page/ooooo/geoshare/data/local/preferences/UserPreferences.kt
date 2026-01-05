@@ -1,6 +1,10 @@
 package page.ooooo.geoshare.data.local.preferences
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +46,7 @@ interface UserPreference<T> {
     fun description(): String?
 
     @Composable
-    fun supportingText(): String? = null
+    fun suffix(): String? = null
 
     @Composable
     fun ValueLabel(values: UserPreferencesValues)
@@ -91,9 +95,21 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
                 }
             },
             modifier = modifier.padding(top = spacing.tiny),
-            supportingText = supportingText()?.let { text ->
+            suffix = suffix()?.let { text ->
                 {
                     Text(text)
+                }
+            },
+            trailingIcon = {
+                IconButton({
+                    onValueChange { preferences ->
+                        setValue(preferences, default)
+                    }
+                }) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        "refresh" // TODO
+                    )
                 }
             },
         )
@@ -287,6 +303,8 @@ object AutomationDelaySec : IntUserPreference() {
     override val key = stringPreferencesKey("automation_delay")
     override val default = 5
     override val modifier = Modifier
+    override val minValue = 0
+    override val maxValue = 60
 
     override fun getValue(values: UserPreferencesValues) = values.automationDelaySecValue
 
@@ -297,7 +315,7 @@ object AutomationDelaySec : IntUserPreference() {
     override fun description() = stringResource(R.string.user_preferences_automation_delay_sec_description)
 
     @Composable
-    override fun supportingText() = stringResource(R.string.seconds)
+    override fun suffix() = stringResource(R.string.seconds)
 
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
