@@ -337,6 +337,7 @@ object AutomationUserPreference : OptionsUserPreference<Automation>() {
 
     @Composable
     override fun description() = stringResource(R.string.user_preferences_automation_description)
+    // TODO Subscribe button
 }
 
 object AutomationDelay : DurationUserPreference() {

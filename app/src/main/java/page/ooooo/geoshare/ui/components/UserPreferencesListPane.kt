@@ -99,7 +99,11 @@ fun UserPreferencesListPane(
                                     painterResource(R.drawable.crown_24px),
                                     stringResource(R.string.premium_feature),
                                 )
-                                Text("Buy premium", style = MaterialTheme.typography.labelMedium)
+                                // TODO Change text if subscribed to premium
+                                Text(
+                                    stringResource(R.string.premium_button),
+                                    style = MaterialTheme.typography.labelMedium,
+                                )
                             }
                         }
                     }

@@ -180,6 +180,7 @@
     <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
     <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
+    <string name="premium_button">Buy premium</string>
     <string name="premium_feature">Premium feature</string>
     <string name="seconds_unit">seconds</string>
     <string name="reset">reset</string>
