@@ -335,8 +335,6 @@ object AutomationDelay : DurationUserPreference() {
         if (values.automationValue is Automation.HasDelay) {
             val seconds = getValue(values).toInt(DurationUnit.SECONDS)
             Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
-        } else {
-            Text(stringResource(R.string.user_preferences_automation_delay_sec_not_available))
         }
     }
 }
