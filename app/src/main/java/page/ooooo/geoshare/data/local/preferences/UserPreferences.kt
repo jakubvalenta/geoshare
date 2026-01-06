@@ -160,7 +160,7 @@ abstract class DurationUserPreference : NumberUserPreference<Duration>() {
     override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
 
     @Composable
-    override fun suffix() = stringResource(R.string.seconds)
+    override fun suffix() = stringResource(R.string.seconds_unit)
 
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
