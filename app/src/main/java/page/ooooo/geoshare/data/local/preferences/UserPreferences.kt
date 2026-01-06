@@ -156,7 +156,6 @@ abstract class NullableLongUserPreference : NumberUserPreference<Long?>() {
 }
 
 abstract class DurationUserPreference : NumberUserPreference<Duration>() {
-    override val loading = default
     open val minValue = Int.MIN_VALUE
     open val maxValue = Int.MAX_VALUE
 
@@ -191,7 +190,6 @@ data class UserPreferenceOption<T>(
 
 abstract class OptionsUserPreference<T> : UserPreference<T> {
     abstract val default: T
-    override val loading = default
 
     @Composable
     abstract fun options(): List<UserPreferenceOption<T>>
@@ -227,6 +225,7 @@ abstract class OptionsUserPreference<T> : UserPreference<T> {
 
 object ConnectionPermission : OptionsUserPreference<Permission>() {
     override val default = Permission.ASK
+    override val loading = default
 
     private val key = stringPreferencesKey("connect_to_google_permission")
 
@@ -270,6 +269,7 @@ object ConnectionPermission : OptionsUserPreference<Permission>() {
 
 object AutomationUserPreference : OptionsUserPreference<Automation>() {
     override val default = NoopAutomation
+    override val loading = default
 
     private val typeKey = stringPreferencesKey("automation")
     private val packageNameKey = stringPreferencesKey("automation_package_name")
@@ -343,6 +343,7 @@ object AutomationUserPreference : OptionsUserPreference<Automation>() {
 object AutomationDelay : DurationUserPreference() {
     override val key = stringPreferencesKey("automation_delay")
     override val default = 5.seconds
+    override val loading = default
     override val modifier = Modifier
     override val minValue = 0
     override val maxValue = 60
