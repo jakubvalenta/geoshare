@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,16 +65,18 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
     abstract val default: T
     abstract val modifier: Modifier
 
-    override fun getValue(preferences: Preferences): T = fromString(preferences[key])
+    protected abstract fun serialize(value: T): String
 
-    override fun setValue(preferences: MutablePreferences, value: T) {
-        preferences[key] = value.toString()
-    }
+    protected abstract fun deserialize(value: String?): T
+
+    override fun getValue(preferences: Preferences): T = deserialize(preferences[key])
+
+    override fun setValue(preferences: MutablePreferences, value: T) = preferences.set(key, serialize(value))
 
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
         val value = getValue(values)
-        Text((value ?: default).toString())
+        Text(serialize(value ?: default))
     }
 
     @Composable
@@ -83,24 +86,31 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
     ) {
         val value = getValue(values)
         val spacing = LocalSpacing.current
-        val (inputValue, setInputValue) = remember { mutableStateOf(value.toString()) }
+        val (inputValue, setInputValue) = remember { mutableStateOf(serialize(value)) }
         val error = getError(inputValue)
 
         OutlinedTextField(
             value = inputValue,
             onValueChange = {
                 setInputValue(it)
-                onValueChange { preferences -> setValue(preferences, fromString(it)) }
+                onValueChange { preferences -> setValue(preferences, deserialize(it)) }
             },
             modifier = modifier.padding(top = spacing.tiny),
             suffix = suffix()?.let { text ->
                 {
-                    Text(text)
+                    Text(
+                        text,
+                        color = if (error == null) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        },
+                    )
                 }
             },
             trailingIcon = {
                 IconButton({
-                    setInputValue(default.toString())
+                    setInputValue(serialize(default))
                     onValueChange { preferences -> setValue(preferences, default) }
                 }) {
                     Icon(
@@ -119,8 +129,6 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
         )
     }
 
-    protected abstract fun fromString(value: String?): T
-
     @Composable
     protected abstract fun getError(value: String?): String?
 }
@@ -130,7 +138,9 @@ abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
     open val minValue = Int.MIN_VALUE
     open val maxValue = Int.MAX_VALUE
 
-    override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
+    override fun serialize(value: Int?) = value.toString()
+
+    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
 
     @Composable
     override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
@@ -145,7 +155,20 @@ abstract class DurationUserPreference : NumberUserPreference<Duration>() {
     open val minValue = Int.MIN_VALUE
     open val maxValue = Int.MAX_VALUE
 
-    override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
+    override fun serialize(value: Duration) = value.toInt(DurationUnit.SECONDS).toString()
+
+    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
+
+    @Composable
+    override fun suffix() = stringResource(R.string.seconds)
+
+    @Composable
+    override fun ValueLabel(values: UserPreferencesValues) {
+        if (values.automationValue is Automation.HasDelay) {
+            val seconds = getValue(values).toInt(DurationUnit.SECONDS)
+            Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
+        }
+    }
 
     @Composable
     override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
@@ -326,17 +349,6 @@ object AutomationDelay : DurationUserPreference() {
 
     @Composable
     override fun description() = stringResource(R.string.user_preferences_automation_delay_sec_description)
-
-    @Composable
-    override fun suffix() = stringResource(R.string.seconds)
-
-    @Composable
-    override fun ValueLabel(values: UserPreferencesValues) {
-        if (values.automationValue is Automation.HasDelay) {
-            val seconds = getValue(values).toInt(DurationUnit.SECONDS)
-            Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
-        }
-    }
 }
 
 object IntroShowForVersionCode : NullableIntUserPreference() {
