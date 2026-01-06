@@ -62,6 +62,7 @@ import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Composable
 fun ResultSuccessMessage(
@@ -126,7 +127,7 @@ fun ResultSuccessMessage(
                 ResultMessageRow {
                     ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationCounter")) {
                         LaunchedEffect(targetState.action) {
-                            counterSec = targetState.delaySec
+                            counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
                             while (counterSec > 0) {
                                 delay(1.seconds)
                                 counterSec--
@@ -306,7 +307,7 @@ private fun ActionWaitingPreview() {
                     position = Position.example,
                     i = null,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                    delaySec = 3,
+                    delay = 3.seconds,
                 ),
                 loadingIndicator = null,
                 animationsEnabled = false,
@@ -329,7 +330,7 @@ private fun DarkActionWaitingPreview() {
                     position = Position.example,
                     i = null,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                    delaySec = 3,
+                    delay = 3.seconds,
                 ),
                 loadingIndicator = null,
                 animationsEnabled = false,

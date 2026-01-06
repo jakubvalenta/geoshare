@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.AutomationDelaySec
+import page.ooooo.geoshare.data.local.preferences.AutomationDelay
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -18,6 +18,7 @@ import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import java.io.IOException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 interface ConversionState : State {
@@ -356,8 +357,8 @@ data class ConversionSucceeded(
                     null
 
                 is Automation.HasDelay ->
-                    stateContext.userPreferencesRepository.getValue(AutomationDelaySec).let { delaySec ->
-                        ActionWaiting(stateContext, inputUriString, position, null, automation, delaySec)
+                    stateContext.userPreferencesRepository.getValue(AutomationDelay).let { delay ->
+                        ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
                     }
 
                 else ->
@@ -377,12 +378,12 @@ data class ActionWaiting(
     override val position: Position,
     val i: Int?,
     val action: Action,
-    val delaySec: Int,
+    val delay: Duration,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State =
         try {
-            if (delaySec > 0) {
-                delay(delaySec.seconds)
+            if (delay.isPositive()) {
+                delay(delay)
             }
             ActionReady(inputUriString, position, i, action)
         } catch (_: CancellationException) {

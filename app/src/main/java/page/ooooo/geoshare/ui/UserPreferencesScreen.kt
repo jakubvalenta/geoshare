@@ -31,7 +31,7 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.AutomationDelaySec
+import page.ooooo.geoshare.data.local.preferences.AutomationDelay
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
@@ -72,7 +72,7 @@ object AutomationUserPreferencesGroup : UserPreferencesGroup(
 object AutomationDelayUserPreferencesGroup : UserPreferencesGroup(
     id = UserPreferencesGroupId.AUTOMATION_DELAY,
     titleResId = R.string.user_preferences_automation_delay_sec_title,
-    userPreferences = listOf(AutomationDelaySec),
+    userPreferences = listOf(AutomationDelay),
 ) {
     override fun enabled(values: UserPreferencesValues) = values.automationValue is Automation.HasDelay
 }

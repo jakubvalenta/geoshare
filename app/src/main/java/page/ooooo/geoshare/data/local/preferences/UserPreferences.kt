@@ -29,6 +29,9 @@ import page.ooooo.geoshare.lib.outputs.getAutomations
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 interface UserPreference<T> {
     val loading: T
@@ -60,8 +63,6 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
     abstract val key: Preferences.Key<String>
     abstract val default: T
     abstract val modifier: Modifier
-    abstract val minValue: T
-    abstract val maxValue: T
 
     override fun getValue(preferences: Preferences): T = fromString(preferences[key])
 
@@ -124,10 +125,10 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
     protected abstract fun getError(value: String?): String?
 }
 
-abstract class IntUserPreference : NumberUserPreference<Int>() {
-    override val loading = default
-    override val minValue = Int.MIN_VALUE
-    override val maxValue = Int.MAX_VALUE
+abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
+    override val loading = null
+    open val minValue = Int.MIN_VALUE
+    open val maxValue = Int.MAX_VALUE
 
     override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
 
@@ -139,12 +140,12 @@ abstract class IntUserPreference : NumberUserPreference<Int>() {
     }
 }
 
-abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
-    override val loading = null
-    override val minValue = Int.MIN_VALUE
-    override val maxValue = Int.MAX_VALUE
+abstract class DurationUserPreference : NumberUserPreference<Duration>() {
+    override val loading = default
+    open val minValue = Int.MIN_VALUE
+    open val maxValue = Int.MAX_VALUE
 
-    override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
+    override fun fromString(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
 
     @Composable
     override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
@@ -311,14 +312,14 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
     override fun description() = stringResource(R.string.user_preferences_automation_description)
 }
 
-object AutomationDelaySec : IntUserPreference() {
+object AutomationDelay : DurationUserPreference() {
     override val key = stringPreferencesKey("automation_delay")
-    override val default = 5
+    override val default = 5.seconds
     override val modifier = Modifier
     override val minValue = 0
     override val maxValue = 60
 
-    override fun getValue(values: UserPreferencesValues) = values.automationDelaySecValue
+    override fun getValue(values: UserPreferencesValues) = values.automationDelayValue
 
     @Composable
     override fun title() = stringResource(R.string.user_preferences_automation_delay_sec_title)
@@ -332,8 +333,8 @@ object AutomationDelaySec : IntUserPreference() {
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
         if (values.automationValue is Automation.HasDelay) {
-            val value = getValue(values)
-            Text(pluralStringResource(R.plurals.seconds, value, value))
+            val seconds = getValue(values).toInt(DurationUnit.SECONDS)
+            Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
         } else {
             Text(stringResource(R.string.user_preferences_automation_delay_sec_not_available))
         }
@@ -370,7 +371,7 @@ object ChangelogShownForVersionCode : NullableIntUserPreference() {
 
 data class UserPreferencesValues(
     val automationValue: Automation = AutomationUserPreference.loading,
-    val automationDelaySecValue: Int = AutomationDelaySec.loading,
+    val automationDelayValue: Duration = AutomationDelay.loading,
     val changelogShownForVersionCodeValue: Int? = ChangelogShownForVersionCode.loading,
     val connectionPermissionValue: Permission = ConnectionPermission.loading,
     val introShownForVersionCodeValue: Int? = IntroShowForVersionCode.loading,
