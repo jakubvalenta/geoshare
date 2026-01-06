@@ -68,7 +68,7 @@ private fun DefaultPreview() {
     AppTheme {
         RadioButtonGroup(
             selectedValue = 2,
-            onSelect = {}
+            onSelect = {},
         ) {
             listOf(
                 RadioButtonOption(value = 1) {
@@ -88,7 +88,7 @@ private fun DarkPreview() {
     AppTheme {
         RadioButtonGroup(
             selectedValue = 2,
-            onSelect = {}
+            onSelect = {},
         ) {
             listOf(
                 RadioButtonOption(value = 1) {

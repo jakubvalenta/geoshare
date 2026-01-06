@@ -21,7 +21,6 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
@@ -142,7 +141,6 @@ object GoogleMapsOutput : Output {
 
         override val type = Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO
         override val testTag = null
-        override val delay = 5.seconds
 
         override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
             formatNavigateToUriString(position, i, uriQuote)
@@ -199,7 +197,6 @@ object GoogleMapsOutput : Output {
 
         override val type = Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW
         override val testTag = null
-        override val delay = 5.seconds
 
         override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
             formatStreetViewUriString(position, i, uriQuote)

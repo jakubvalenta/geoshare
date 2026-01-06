@@ -36,6 +36,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
         }.map {
             UserPreferencesValues(
                 automationValue = AutomationUserPreference.getValue(it),
+                automationDelayValue = AutomationDelay.getValue(it),
                 changelogShownForVersionCodeValue = ChangelogShownForVersionCode.getValue(it),
                 connectionPermissionValue = ConnectionPermission.getValue(it),
                 introShownForVersionCodeValue = IntroShowForVersionCode.getValue(it),

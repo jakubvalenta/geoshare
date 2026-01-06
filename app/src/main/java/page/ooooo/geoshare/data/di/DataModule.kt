@@ -15,6 +15,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("unused")
 @Module
@@ -48,6 +49,7 @@ class FakeUserPreferencesRepository @Inject constructor() :
 
 val defaultFakeUserPreferences = UserPreferencesValues(
     automationValue = NoopAutomation,
+    automationDelayValue = 5.seconds,
     changelogShownForVersionCodeValue = 22,
     connectionPermissionValue = Permission.ALWAYS,
     introShownForVersionCodeValue = 0,

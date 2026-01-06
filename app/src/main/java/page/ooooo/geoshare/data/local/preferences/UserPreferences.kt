@@ -1,12 +1,20 @@
 package page.ooooo.geoshare.data.local.preferences
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -14,10 +22,17 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.NoopAutomation
+import page.ooooo.geoshare.lib.outputs.allOutputs
+import page.ooooo.geoshare.lib.outputs.findAutomation
+import page.ooooo.geoshare.lib.outputs.getAutomations
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 interface UserPreference<T> {
     val loading: T
@@ -33,29 +48,35 @@ interface UserPreference<T> {
     fun description(): String?
 
     @Composable
+    fun suffix(): String? = null
+
+    @Composable
     fun ValueLabel(values: UserPreferencesValues)
 
     @Composable
-    fun Component(values: UserPreferencesValues, onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit)
+    fun Component(
+        values: UserPreferencesValues,
+        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+    )
 }
 
-abstract class NullableIntUserPreference(
-    val key: Preferences.Key<String>,
-    val default: Int?,
-    val modifier: Modifier = Modifier,
-) : UserPreference<Int?> {
-    override val loading = null
+abstract class NumberUserPreference<T> : UserPreference<T> {
+    abstract val key: Preferences.Key<String>
+    abstract val default: T
+    abstract val modifier: Modifier
 
-    override fun getValue(preferences: Preferences): Int? = fromString(preferences[key])
+    protected abstract fun serialize(value: T): String
 
-    override fun setValue(preferences: MutablePreferences, value: Int?) {
-        preferences[key] = value.toString()
-    }
+    protected abstract fun deserialize(value: String?): T
+
+    override fun getValue(preferences: Preferences): T = deserialize(preferences[key])
+
+    override fun setValue(preferences: MutablePreferences, value: T) = preferences.set(key, serialize(value))
 
     @Composable
     override fun ValueLabel(values: UserPreferencesValues) {
         val value = getValue(values)
-        Text((value ?: default).toString())
+        Text(serialize(value ?: default))
     }
 
     @Composable
@@ -65,25 +86,96 @@ abstract class NullableIntUserPreference(
     ) {
         val value = getValue(values)
         val spacing = LocalSpacing.current
-        var inputValue by remember { mutableStateOf(value.toString()) }
+        val (inputValue, setInputValue) = remember { mutableStateOf(serialize(value)) }
+        val error = getError(inputValue)
+
         OutlinedTextField(
             value = inputValue,
             onValueChange = {
-                @Suppress("AssignedValueIsNeverRead")
-                inputValue = it
-                onValueChange { preferences ->
-                    setValue(preferences, fromString(it))
-                }
+                setInputValue(it)
+                onValueChange { preferences -> setValue(preferences, deserialize(it)) }
             },
             modifier = modifier.padding(top = spacing.tiny),
+            suffix = suffix()?.let { text ->
+                {
+                    Text(
+                        text,
+                        color = if (error == null) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        },
+                    )
+                }
+            },
+            trailingIcon = {
+                IconButton({
+                    setInputValue(serialize(default))
+                    onValueChange { preferences -> setValue(preferences, default) }
+                }) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        stringResource(R.string.reset),
+                    )
+                }
+            },
+            supportingText = error?.let { error ->
+                {
+                    Text(error)
+                }
+            },
+            isError = error != null,
+            singleLine = true,
         )
     }
 
-    private fun fromString(value: String?): Int? = try {
-        value?.toInt()
-    } catch (_: NumberFormatException) {
+    @Composable
+    protected abstract fun getError(value: String?): String?
+}
+
+abstract class NullableIntUserPreference : NumberUserPreference<Int?>() {
+    override val loading = null
+    open val minValue = Int.MIN_VALUE
+    open val maxValue = Int.MAX_VALUE
+
+    override fun serialize(value: Int?) = value.toString()
+
+    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue) ?: default
+
+    @Composable
+    override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
         null
-    } ?: default
+    } else {
+        stringResource(R.string.user_preferences_number_error_range, minValue, maxValue)
+    }
+}
+
+abstract class DurationUserPreference : NumberUserPreference<Duration>() {
+    override val loading = default
+    open val minValue = Int.MIN_VALUE
+    open val maxValue = Int.MAX_VALUE
+
+    override fun serialize(value: Duration) = value.toInt(DurationUnit.SECONDS).toString()
+
+    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
+
+    @Composable
+    override fun suffix() = stringResource(R.string.seconds)
+
+    @Composable
+    override fun ValueLabel(values: UserPreferencesValues) {
+        if (values.automationValue is Automation.HasDelay) {
+            val seconds = getValue(values).toInt(DurationUnit.SECONDS)
+            Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
+        }
+    }
+
+    @Composable
+    override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
+        null
+    } else {
+        stringResource(R.string.user_preferences_number_error_range, minValue, maxValue)
+    }
 }
 
 data class UserPreferenceOption<T>(
@@ -243,10 +335,27 @@ object AutomationUserPreference : OptionsUserPreference<Automation>(
     override fun description() = stringResource(R.string.user_preferences_automation_description)
 }
 
-object IntroShowForVersionCode : NullableIntUserPreference(
-    key = stringPreferencesKey("intro_shown_for_version_code"),
-    default = 0,
-) {
+object AutomationDelay : DurationUserPreference() {
+    override val key = stringPreferencesKey("automation_delay")
+    override val default = 5.seconds
+    override val modifier = Modifier
+    override val minValue = 0
+    override val maxValue = 60
+
+    override fun getValue(values: UserPreferencesValues) = values.automationDelayValue
+
+    @Composable
+    override fun title() = stringResource(R.string.user_preferences_automation_delay_sec_title)
+
+    @Composable
+    override fun description() = stringResource(R.string.user_preferences_automation_delay_sec_description)
+}
+
+object IntroShowForVersionCode : NullableIntUserPreference() {
+    override val key = stringPreferencesKey("intro_shown_for_version_code")
+    override val default = 0
+    override val modifier = Modifier
+
     override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCodeValue
 
     @Composable
@@ -256,11 +365,11 @@ object IntroShowForVersionCode : NullableIntUserPreference(
     override fun description() = null
 }
 
-object ChangelogShownForVersionCode : NullableIntUserPreference(
-    key = stringPreferencesKey("changelog_shown_for_version_code"),
-    default = BuildConfig.VERSION_CODE,
-    modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode"),
-) {
+object ChangelogShownForVersionCode : NullableIntUserPreference() {
+    override val key = stringPreferencesKey("changelog_shown_for_version_code")
+    override val default = BuildConfig.VERSION_CODE
+    override val modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode")
+
     override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCodeValue
 
     @Composable
@@ -272,6 +381,7 @@ object ChangelogShownForVersionCode : NullableIntUserPreference(
 
 data class UserPreferencesValues(
     val automationValue: Automation = AutomationUserPreference.loading,
+    val automationDelayValue: Duration = AutomationDelay.loading,
     val changelogShownForVersionCodeValue: Int? = ChangelogShownForVersionCode.loading,
     val connectionPermissionValue: Permission = ConnectionPermission.loading,
     val introShownForVersionCodeValue: Int? = IntroShowForVersionCode.loading,

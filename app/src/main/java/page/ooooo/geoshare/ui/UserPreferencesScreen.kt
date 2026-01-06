@@ -31,50 +31,61 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
+import page.ooooo.geoshare.data.local.preferences.AutomationDelay
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
 import page.ooooo.geoshare.ui.components.UserPreferencesListPane
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Keep
 enum class UserPreferencesGroupId {
-    AUTOMATION, CONNECTION_PERMISSION, DEVELOPER_OPTIONS,
+    AUTOMATION, AUTOMATION_DELAY, CONNECTION_PERMISSION, DEVELOPER_OPTIONS,
 }
 
-data class UserPreferencesGroup(
+sealed class UserPreferencesGroup(
     val id: UserPreferencesGroupId,
     val titleResId: Int,
     val userPreferences: List<UserPreference<*>>,
     val visible: Boolean = true,
 ) {
-    companion object {
-        val automation = UserPreferencesGroup(
-            id = UserPreferencesGroupId.AUTOMATION,
-            titleResId = R.string.user_preferences_automation_title,
-            userPreferences = listOf(AutomationUserPreference),
-        )
-        val connectionPermission = UserPreferencesGroup(
-            id = UserPreferencesGroupId.CONNECTION_PERMISSION,
-            titleResId = R.string.user_preferences_connection_title,
-            userPreferences = listOf(ConnectionPermission),
-        )
-        val developerOptions = UserPreferencesGroup(
-            id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
-            titleResId = R.string.user_preferences_developer_title,
-            userPreferences = listOf(
-                ChangelogShownForVersionCode,
-                IntroShowForVersionCode,
-            ),
-            visible = BuildConfig.DEBUG,
-        )
-        val all = listOf(connectionPermission, automation, developerOptions)
-    }
+    open fun enabled(values: UserPreferencesValues): Boolean = true
 }
+
+object ConnectionPermissionUserPreferencesGroup : UserPreferencesGroup(
+    id = UserPreferencesGroupId.CONNECTION_PERMISSION,
+    titleResId = R.string.user_preferences_connection_title,
+    userPreferences = listOf(ConnectionPermission),
+)
+
+object AutomationUserPreferencesGroup : UserPreferencesGroup(
+    id = UserPreferencesGroupId.AUTOMATION,
+    titleResId = R.string.user_preferences_automation_title,
+    userPreferences = listOf(AutomationUserPreference),
+)
+
+object AutomationDelayUserPreferencesGroup : UserPreferencesGroup(
+    id = UserPreferencesGroupId.AUTOMATION_DELAY,
+    titleResId = R.string.user_preferences_automation_delay_sec_title,
+    userPreferences = listOf(AutomationDelay),
+) {
+    override fun enabled(values: UserPreferencesValues) = values.automationValue is Automation.HasDelay
+}
+
+object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup(
+    id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
+    titleResId = R.string.user_preferences_developer_title,
+    userPreferences = listOf(
+        ChangelogShownForVersionCode,
+        IntroShowForVersionCode,
+    ),
+    visible = BuildConfig.DEBUG,
+)
 
 @Composable
 fun UserPreferencesScreen(
@@ -85,7 +96,12 @@ fun UserPreferencesScreen(
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
-        groups = UserPreferencesGroup.all,
+        groups = listOf(
+            ConnectionPermissionUserPreferencesGroup,
+            AutomationUserPreferencesGroup,
+            AutomationDelayUserPreferencesGroup,
+            DeveloperOptionsUserPreferencesGroup,
+        ),
         initialGroupId = initialGroupId,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
@@ -182,7 +198,12 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    groups = UserPreferencesGroup.all,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -200,7 +221,12 @@ private fun DarkPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    groups = UserPreferencesGroup.all,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -218,7 +244,12 @@ private fun TabletPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    groups = UserPreferencesGroup.all,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -236,7 +267,12 @@ private fun EmptyPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    groups = UserPreferencesGroup.all,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -254,7 +290,12 @@ private fun DarkEmptyPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    groups = UserPreferencesGroup.all,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -272,7 +313,12 @@ private fun TabletEmptyPreview() {
         Surface {
             Column {
                 UserPreferencesScreen(
-                    groups = UserPreferencesGroup.all,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},

@@ -5,6 +5,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.AutomationDelay
 import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -356,7 +357,9 @@ data class ConversionSucceeded(
                     null
 
                 is Automation.HasDelay ->
-                    ActionWaiting(stateContext, inputUriString, position, null, automation, automation.delay)
+                    stateContext.userPreferencesRepository.getValue(AutomationDelay).let { delay ->
+                        ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
+                    }
 
                 else ->
                     ActionReady(inputUriString, position, null, automation)

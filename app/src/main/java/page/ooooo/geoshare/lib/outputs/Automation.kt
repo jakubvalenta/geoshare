@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import kotlin.time.Duration
 
 sealed interface Automation : Action {
     @Suppress("SpellCheckingInspection")
@@ -33,8 +32,6 @@ sealed interface Automation : Action {
     val testTag: String?
 
     interface HasDelay {
-        val delay: Duration
-
         @Composable
         fun waitingText(counterSec: Int): String
     }

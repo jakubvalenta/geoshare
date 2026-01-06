@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -19,6 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.ui.AutomationDelayUserPreferencesGroup
+import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
+import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
+import page.ooooo.geoshare.ui.DeveloperOptionsUserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroup
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -48,7 +53,8 @@ fun UserPreferencesListPane(
         containerColor = containerColor,
         onBack = onBack,
     ) {
-        for (group in groups) {
+        groups.filter { it.visible }.forEach { group ->
+            val enabled = group.enabled(userPreferencesValues)
             ListItem(
                 headlineContent = {
                     Text(
@@ -57,7 +63,8 @@ fun UserPreferencesListPane(
                     )
                 },
                 modifier = Modifier
-                    .clickable(onClick = { onNavigateToGroup(group.id) })
+                    .alpha(if (enabled) 1f else 0.5f)
+                    .clickable(enabled = enabled, onClick = { onNavigateToGroup(group.id) })
                     .testTag("geoShareUserPreferencesGroup_${group.id}"),
                 supportingContent = group.userPreferences.takeIf { it.size == 1 }?.firstOrNull()
                     ?.let { userPreference ->
@@ -84,8 +91,13 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = false,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -103,8 +115,13 @@ private fun DarkPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = false,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -122,8 +139,13 @@ private fun ExpandedPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -141,8 +163,13 @@ private fun DarkExpandedPreview() {
         Surface {
             Column {
                 UserPreferencesListPane(
-                    currentGroup = UserPreferencesGroup.connectionPermission,
-                    groups = UserPreferencesGroup.all,
+                    currentGroup = ConnectionPermissionUserPreferencesGroup,
+                    groups = listOf(
+                        ConnectionPermissionUserPreferencesGroup,
+                        AutomationUserPreferencesGroup,
+                        AutomationDelayUserPreferencesGroup,
+                        DeveloperOptionsUserPreferencesGroup,
+                    ),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},

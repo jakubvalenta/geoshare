@@ -30,8 +30,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import java.io.File
 import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.time.Duration.Companion.seconds
+import java.util.Locale
 
 object GpxOutput : Output {
 
@@ -166,7 +165,6 @@ object GpxOutput : Output {
 
         override val type = Automation.Type.OPEN_APP_GPX_ROUTE
         override val testTag = "geoShareUserPreferenceAutomationShareGpxWithApp"
-        override val delay = 5.seconds
 
         @Composable
         override fun Label() {
@@ -220,7 +218,6 @@ object GpxOutput : Output {
         override val type = Automation.Type.SHARE_GPX_ROUTE
         override val packageName = ""
         override val testTag = null
-        override val delay = 5.seconds
 
         @Composable
         override fun successText() = stringResource(R.string.output_gpx_route_share_automation_succeeded)
@@ -239,7 +236,6 @@ object GpxOutput : Output {
         override val type = Automation.Type.SAVE_GPX
         override val packageName = ""
         override val testTag = null
-        override val delay = 5.seconds
 
         @Composable
         override fun Label() {
