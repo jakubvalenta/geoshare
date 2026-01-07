@@ -1,5 +1,5 @@
 package page.ooooo.geoshare.lib.features
 
 interface Feature {
-    suspend fun validate(): Boolean
+    suspend fun validate(): Boolean?
 }

@@ -354,8 +354,8 @@ data class ConversionSucceeded(
         if (automation is NoopAutomation) {
             return null
         }
-        val valid = stateContext.features.validate(AutomationFeature, AutomationFeatureValidatedAt)
-        if (!valid) {
+        val automationValid = stateContext.features.validate(AutomationFeature, AutomationFeatureValidatedAt)
+        if (automationValid == false) { // TODO Test null
             return null
         }
         if (automation is Automation.HasDelay) {

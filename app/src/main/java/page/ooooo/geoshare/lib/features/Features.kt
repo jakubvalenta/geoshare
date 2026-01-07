@@ -18,16 +18,15 @@ class Features(
         feature: Feature,
         userPreference: NullableLongUserPreference,
         now: Long = System.currentTimeMillis(),
-    ): Boolean {
+    ): Boolean? {
         val automationFeatureValidatedAt = userPreferencesRepository.getValue(userPreference)
         return if (automationFeatureValidatedAt == null) {
             // Validation info not found -- validate synchronously
-            if (feature.validate()) {
+            val automationValid = feature.validate()
+            if (automationValid == true) {
                 userPreferencesRepository.setValue(userPreference, now)
-                true
-            } else {
-                false
             }
+            automationValid
         } else if (automationFeatureValidatedAt.milliseconds + MAX_AGE <= now.milliseconds) {
             // Validation info cached -- consider the feature valid
             true
@@ -37,7 +36,7 @@ class Features(
             supervisorScope {
                 launch {
                     val automationValid = feature.validate()
-                    userPreferencesRepository.setValue(userPreference, if (automationValid) now else null)
+                    userPreferencesRepository.setValue(userPreference, if (automationValid == true) now else null)
                 }
             }
             true

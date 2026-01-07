@@ -113,12 +113,12 @@ class ConversionViewModel @Inject constructor(
         AutomationUserPreference.default,
     )
 
-    val automationFeatureValid: StateFlow<Boolean> = flow<Boolean> {
+    val automationFeatureValid: StateFlow<Boolean?> = flow<Boolean?> {
         features.validate(AutomationFeature, AutomationFeatureValidatedAt)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        true,
+        null,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)

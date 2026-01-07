@@ -92,6 +92,7 @@ import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
+import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainInfo
@@ -113,6 +114,7 @@ fun MainScreen(
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSubscriptionScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
@@ -229,6 +231,10 @@ fun MainScreen(
             viewModel.cancel()
             onNavigateToIntroScreen()
         },
+        onNavigateToSubscriptionScreen = {
+            viewModel.cancel()
+            onNavigateToSubscriptionScreen()
+        },
         onNavigateToUserPreferencesScreen = {
             viewModel.cancel()
             onNavigateToUserPreferencesScreen()
@@ -253,7 +259,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    automationFeatureValid: Boolean,
+    automationFeatureValid: Boolean?,
     changelogShown: Boolean,
     inputUriString: String,
     loadingIndicator: LoadingIndicator?,
@@ -264,6 +270,7 @@ private fun MainScreen(
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToSubscriptionScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onReset: () -> Unit,
@@ -301,6 +308,13 @@ private fun MainScreen(
             }
         },
         actions = {
+            if (automationFeatureValid == true) {
+                FeatureBadgeSmall(
+                    onClick = onNavigateToSubscriptionScreen,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             MainMenu(
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = onNavigateToAboutScreen,
@@ -607,6 +621,7 @@ private fun DefaultPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -634,6 +649,7 @@ private fun DarkPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -650,7 +666,7 @@ private fun TabletPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -661,6 +677,7 @@ private fun TabletPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -681,7 +698,7 @@ private fun SucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -692,6 +709,7 @@ private fun SucceededPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -712,7 +730,7 @@ private fun DarkSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -723,6 +741,7 @@ private fun DarkSucceededPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -743,7 +762,7 @@ private fun TabletSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -754,6 +773,7 @@ private fun TabletSucceededPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -781,7 +801,7 @@ private fun AutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -792,6 +812,7 @@ private fun AutomationPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -819,7 +840,7 @@ private fun DarkAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -830,6 +851,7 @@ private fun DarkAutomationPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -857,7 +879,7 @@ private fun TabletAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -868,6 +890,7 @@ private fun TabletAutomationPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -887,7 +910,7 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -898,6 +921,7 @@ private fun ErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -917,7 +941,7 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -928,6 +952,7 @@ private fun DarkErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -947,7 +972,7 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -958,6 +983,7 @@ private fun TabletErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -989,7 +1015,7 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1003,6 +1029,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -1034,7 +1061,7 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1048,6 +1075,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -1079,7 +1107,7 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automationFeatureValid = true,
+            automationFeatureValid = null,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1093,6 +1121,7 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
+            onNavigateToSubscriptionScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},

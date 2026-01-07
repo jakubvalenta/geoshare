@@ -94,6 +94,7 @@ object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup(
 fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     onBack: () -> Unit,
+    onNavigateToSubscriptionScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val automationFeatureValid by viewModel.automationFeatureValid.collectAsStateWithLifecycle()
@@ -109,6 +110,7 @@ fun UserPreferencesScreen(
         initialGroupId = initialGroupId,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
+        onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen,
         onValueChange = { transform -> viewModel.editUserPreferences(transform) },
     )
 }
@@ -120,6 +122,7 @@ private fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
+    onNavigateToSubscriptionScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -181,6 +184,7 @@ private fun UserPreferencesScreen(
                                     }
                                 }
                             },
+                            onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen,
                             onValueChange = onValueChange,
                         )
                     }
@@ -211,6 +215,7 @@ private fun DefaultPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -234,6 +239,7 @@ private fun DarkPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -257,6 +263,7 @@ private fun TabletPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -280,6 +287,7 @@ private fun EmptyPreview() {
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -303,6 +311,7 @@ private fun DarkEmptyPreview() {
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -326,6 +335,7 @@ private fun TabletEmptyPreview() {
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }

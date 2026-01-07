@@ -2,6 +2,7 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
@@ -26,30 +27,37 @@ fun UserPreferencesDetailPane(
     expanded: Boolean,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
+    onNavigateToSubscriptionScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val spacing = LocalSpacing.current
+    val enabled = currentGroup.featureValid != false
 
     ScrollablePane(
         titleResId = currentGroup.titleResId,
         onBack = onBack.takeIf { expanded },
     ) {
-        Column(
-            Modifier.padding(horizontal = spacing.windowPadding),
-            verticalArrangement = Arrangement.spacedBy(spacing.medium),
-        ) {
-            for (userPreference in currentGroup.userPreferences) {
-                Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                    if (currentGroup.userPreferences.size > 1) {
-                        ParagraphHtml(userPreference.title())
-                    }
-                    userPreference.description()?.let { description ->
-                        ParagraphHtml(description)
-                    }
-                    userPreference.Component(userPreferencesValues) { transform ->
-                        onValueChange(transform)
+        Box {
+            Column(
+                Modifier.padding(horizontal = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(spacing.medium),
+            ) {
+                for (userPreference in currentGroup.userPreferences) {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+                        if (currentGroup.userPreferences.size > 1) {
+                            ParagraphHtml(userPreference.title())
+                        }
+                        userPreference.Description(enabled = enabled)
+                        userPreference.Component(
+                            values = userPreferencesValues,
+                            onValueChange = onValueChange,
+                            enabled = enabled,
+                        )
                     }
                 }
+            }
+            if (currentGroup.featureValid == false) {
+                FeatureBadgeLarge(onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen)
             }
         }
     }
@@ -68,6 +76,7 @@ private fun ConnectionPermissionPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -86,6 +95,7 @@ private fun DarkConnectionPermissionPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -106,6 +116,7 @@ private fun AutomationPreview() {
                         automationValue = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -122,8 +133,11 @@ private fun DarkAutomationPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationUserPreferencesGroup(null),
                     expanded = true,
-                    userPreferencesValues = defaultFakeUserPreferences,
+                    userPreferencesValues = UserPreferencesValues(
+                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                    ),
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -133,15 +147,39 @@ private fun DarkAutomationPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun AutomationFeatureValidPreview() {
+private fun AutomationFeatureNotValidPreview() {
     AppTheme {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(true),
+                    currentGroup = AutomationUserPreferencesGroup(false),
                     expanded = true,
-                    userPreferencesValues = defaultFakeUserPreferences,
+                    userPreferencesValues = UserPreferencesValues(
+                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                    ),
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkAutomationFeatureNotValidPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesDetailPane(
+                    currentGroup = AutomationUserPreferencesGroup(false),
+                    expanded = true,
+                    userPreferencesValues = UserPreferencesValues(
+                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                    ),
+                    onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -160,6 +198,7 @@ private fun AutomationDelayPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -178,60 +217,7 @@ private fun DarkAutomationDelayPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onValueChange = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkAutomationFeatureValidPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(true),
-                    expanded = true,
-                    userPreferencesValues = defaultFakeUserPreferences,
-                    onBack = {},
-                    onValueChange = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun AutomationFeatureNotValidPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(false),
-                    expanded = true,
-                    userPreferencesValues = defaultFakeUserPreferences,
-                    onBack = {},
-                    onValueChange = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkAutomationFeatureNotValidPreview() {
-    AppTheme {
-        Surface {
-            Column {
-                UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(false),
-                    expanded = true,
-                    userPreferencesValues = defaultFakeUserPreferences,
-                    onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -250,6 +236,7 @@ private fun DeveloperOptionsPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }
@@ -268,6 +255,7 @@ private fun DarkDeveloperOptionsPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
+                    onNavigateToSubscriptionScreen = {},
                     onValueChange = {},
                 )
             }

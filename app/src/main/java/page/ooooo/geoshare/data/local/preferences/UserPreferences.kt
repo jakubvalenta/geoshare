@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -27,6 +28,7 @@ import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.findAutomation
 import page.ooooo.geoshare.lib.outputs.getAutomations
+import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -45,7 +47,8 @@ interface UserPreference<T> {
     fun title(): String
 
     @Composable
-    fun description(): String?
+    fun Description(enabled: Boolean = true) {
+    }
 
     @Composable
     fun suffix(): String? = null
@@ -57,6 +60,7 @@ interface UserPreference<T> {
     fun Component(
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+        enabled: Boolean = true,
     )
 }
 
@@ -83,6 +87,7 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
     override fun Component(
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+        enabled: Boolean,
     ) {
         val value = getValue(values)
         val spacing = LocalSpacing.current
@@ -96,6 +101,7 @@ abstract class NumberUserPreference<T> : UserPreference<T> {
                 onValueChange { preferences -> setValue(preferences, deserialize(it)) }
             },
             modifier = modifier.padding(top = spacing.tiny),
+            enabled = enabled,
             suffix = suffix()?.let { text ->
                 {
                     Text(
@@ -206,6 +212,7 @@ abstract class OptionsUserPreference<T> : UserPreference<T> {
     override fun Component(
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
+        enabled: Boolean,
     ) {
         val value = getValue(values)
         val spacing = LocalSpacing.current
@@ -217,6 +224,7 @@ abstract class OptionsUserPreference<T> : UserPreference<T> {
                 }
             },
             modifier = Modifier.padding(top = spacing.tiny),
+            enabled = enabled,
         ) {
             options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
         }
@@ -263,8 +271,12 @@ object ConnectionPermission : OptionsUserPreference<Permission>() {
     override fun title() = stringResource(R.string.user_preferences_connection_title)
 
     @Composable
-    override fun description() =
-        stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name))
+    override fun Description(enabled: Boolean) {
+        ParagraphHtml(
+            stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name)),
+            if (enabled) Modifier else Modifier.alpha(0.7f),
+        )
+    }
 }
 
 object AutomationUserPreference : OptionsUserPreference<Automation>() {
@@ -336,8 +348,12 @@ object AutomationUserPreference : OptionsUserPreference<Automation>() {
     override fun title() = stringResource(R.string.user_preferences_automation_title)
 
     @Composable
-    override fun description() = stringResource(R.string.user_preferences_automation_description)
-    // TODO Subscribe button
+    override fun Description(enabled: Boolean) {
+        ParagraphHtml(
+            stringResource(R.string.user_preferences_automation_description),
+            if (enabled) Modifier else Modifier.alpha(0.7f),
+        )
+    }
 }
 
 object AutomationDelay : DurationUserPreference() {
@@ -354,7 +370,12 @@ object AutomationDelay : DurationUserPreference() {
     override fun title() = stringResource(R.string.user_preferences_automation_delay_sec_title)
 
     @Composable
-    override fun description() = stringResource(R.string.user_preferences_automation_delay_sec_description)
+    override fun Description(enabled: Boolean) {
+        ParagraphHtml(
+            stringResource(R.string.user_preferences_automation_delay_sec_description),
+            if (enabled) Modifier else Modifier.alpha(0.7f),
+        )
+    }
 }
 
 object AutomationFeatureValidatedAt : NullableLongUserPreference() {
@@ -366,9 +387,6 @@ object AutomationFeatureValidatedAt : NullableLongUserPreference() {
 
     @Composable
     override fun title() = stringResource(R.string.user_preferences_automation_feature_validated_at_title)
-
-    @Composable
-    override fun description() = null
 }
 
 object IntroShowForVersionCode : NullableIntUserPreference() {
@@ -380,9 +398,6 @@ object IntroShowForVersionCode : NullableIntUserPreference() {
 
     @Composable
     override fun title() = stringResource(R.string.user_preferences_last_run_version_code_title)
-
-    @Composable
-    override fun description() = null
 }
 
 object ChangelogShownForVersionCode : NullableIntUserPreference() {
@@ -394,9 +409,6 @@ object ChangelogShownForVersionCode : NullableIntUserPreference() {
 
     @Composable
     override fun title() = stringResource(R.string.user_preferences_changelog_shown_for_version_code_title)
-
-    @Composable
-    override fun description() = null
 }
 
 data class UserPreferencesValues(

@@ -68,6 +68,9 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
+                onNavigateToSubscriptionScreen = {
+                    // TODO Navigate to subscription screen
+                },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
@@ -88,6 +91,9 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
             UserPreferencesScreen(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                onNavigateToSubscriptionScreen = {
+                    // TODO Navigate to subscription screen
+                },
                 viewModel = viewModel,
             )
         }

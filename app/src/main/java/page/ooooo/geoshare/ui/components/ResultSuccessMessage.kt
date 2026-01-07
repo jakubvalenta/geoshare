@@ -10,27 +10,22 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,11 +65,10 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
-    automationFeatureValid: Boolean,
+    automationFeatureValid: Boolean?,
     loadingIndicator: LoadingIndicator?,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
@@ -211,40 +204,21 @@ fun ResultSuccessMessage(
                         stringResource(R.string.conversion_succeeded_apps_headline),
                         style = MaterialTheme.typography.headlineSmall,
                     )
-                    Box(contentAlignment = Alignment.CenterEnd) {
+                    FeatureBadged(
+                        enabled = automationFeatureValid == false,
+                        badge = { modifier ->
+                            FeatureBadgeSmall(onNavigateToUserPreferencesAutomationScreen, modifier)
+                        },
+                    ) { modifier ->
                         Button(
                             onNavigateToUserPreferencesAutomationScreen,
-                            Modifier
-                                .testTag("geoShareConversionSuccessAutomationPreferencesButton")
-                                .run {
-                                    if (!automationFeatureValid) {
-                                        this.padding(end = 17.dp)
-                                    } else {
-                                        this
-                                    }
-                                },
+                            modifier.testTag("geoShareConversionSuccessAutomationPreferencesButton"),
                             colors = ButtonDefaults.elevatedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                             ),
                         ) {
                             Text(stringResource(R.string.user_preferences_automation_title))
-                        }
-                        if (!automationFeatureValid) {
-                            FilledIconButton(
-                                onNavigateToUserPreferencesAutomationScreen,
-                                Modifier.offset(y = (-13).dp),
-                                shape = MaterialShapes.Sunny.toShape(),
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                ),
-                            ) {
-                                Icon(
-                                    painterResource(R.drawable.crown_24px),
-                                    stringResource(R.string.premium_feature)
-                                )
-                            }
                         }
                     }
                 }

@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.lib.features
 
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -29,7 +28,7 @@ class FeaturesTest {
                 onBlocking { getValue(mockUserPreference) } doReturn null
                 onBlocking { setValue(eq(mockUserPreference), any()) } doReturn Unit
             }
-            assertTrue(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now))
+            assertEquals(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now), true)
             verify(mockUserPreferencesRepository).setValue(
                 eq(mockUserPreference),
                 eq(now),
@@ -48,7 +47,7 @@ class FeaturesTest {
                 onBlocking { getValue(mockUserPreference) } doReturn null
                 onBlocking { setValue(eq(mockUserPreference), any()) } doReturn Unit
             }
-            assertFalse(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now))
+            assertEquals(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now), false)
             verify(mockUserPreferencesRepository, never()).setValue(
                 eq(mockUserPreference),
                 any(),
@@ -66,7 +65,7 @@ class FeaturesTest {
             onBlocking { getValue(mockUserPreference) } doReturn now - 60.minutes.inWholeMilliseconds
             onBlocking { setValue(eq(mockUserPreference), any()) } doReturn Unit
         }
-        assertTrue(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now))
+        assertEquals(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now), true)
         verify(mockUserPreferencesRepository, never()).setValue(
             eq(mockUserPreference),
             any(),
@@ -85,7 +84,7 @@ class FeaturesTest {
                 onBlocking { getValue(mockUserPreference) } doReturn now - 5.days.inWholeMilliseconds
                 onBlocking { setValue(eq(mockUserPreference), any()) } doReturn Unit
             }
-            assertTrue(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now))
+            assertEquals(Features(mockUserPreferencesRepository).validate(feature, mockUserPreference, now), true)
             verify(mockUserPreferencesRepository, never()).setValue(
                 eq(mockUserPreference),
                 any(),
