@@ -355,7 +355,7 @@ data class ConversionSucceeded(
             return null
         }
         val automationValid = stateContext.features.validate(AutomationFeature, AutomationFeatureValidatedAt)
-        if (automationValid == false) { // TODO Test null
+        if (automationValid == false) {
             return null
         }
         if (automation is Automation.HasDelay) {

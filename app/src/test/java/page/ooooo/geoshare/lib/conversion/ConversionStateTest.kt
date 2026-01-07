@@ -1709,7 +1709,20 @@ class ConversionStateTest {
     }
 
     @Test
-    fun conversionSucceeded_automationFeatureIsNotValid_returnsNull() = runTest {
+    fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = NoopAutomation
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationUserPreference) } doReturn action
+        }
+        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        Assert.assertNull(state.transition())
+    }
+
+    @Test
+    fun conversionSucceeded_automationFeatureValidateReturnsFalse_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
@@ -1730,16 +1743,27 @@ class ConversionStateTest {
     }
 
     @Test
-    fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsNull() = runTest {
+    fun conversionSucceeded_automationFeatureValidateReturnsNull_returnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
-        val action = NoopAutomation
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockFeatures: Features = mock {
+            onBlocking {
+                validate(eq(AutomationFeature), eq(AutomationFeatureValidatedAt), any())
+            } doReturn null
+        }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationUserPreference) } doReturn action
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            features = mockFeatures,
+        )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
-        Assert.assertNull(state.transition())
+        Assert.assertEquals(
+            ActionReady(inputUriString, position, null, action),
+            state.transition(),
+        )
     }
 
     @Test
