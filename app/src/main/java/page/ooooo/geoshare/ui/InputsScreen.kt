@@ -16,7 +16,6 @@ import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationIt
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -24,6 +23,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
@@ -39,7 +39,7 @@ fun InputsScreen(
     onBack: () -> Unit = {},
     viewModel: ConversionViewModel,
 ) {
-    val changelogShownForVersionCode by viewModel.changelogShownForVersionCode.collectAsState()
+    val changelogShownForVersionCode by viewModel.changelogShownForVersionCode.collectAsStateWithLifecycle()
 
     InputsScreen(
         changelogShownForVersionCode = changelogShownForVersionCode,

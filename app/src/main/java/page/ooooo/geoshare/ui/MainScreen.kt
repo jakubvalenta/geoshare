@@ -30,7 +30,6 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -124,8 +123,8 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val automationFeatureValid by viewModel.automationFeatureValid.collectAsState()
-    val changelogShown by viewModel.changelogShown.collectAsState()
+    val automationFeatureValid by viewModel.automationFeatureValid.collectAsStateWithLifecycle()
+    val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
 
@@ -308,6 +307,7 @@ private fun MainScreen(
             }
         },
         actions = {
+            Text("Valid: $automationFeatureValid")
             if (automationFeatureValid == true) {
                 FeatureBadgeSmall(
                     onClick = onNavigateToSubscriptionScreen,

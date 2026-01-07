@@ -3,8 +3,8 @@ package page.ooooo.geoshare.ui
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,7 +35,7 @@ data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
 @Composable
 fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
     val navController = rememberNavController()
-    val introShown by viewModel.introShown.collectAsState()
+    val introShown by viewModel.introShown.collectAsStateWithLifecycle()
 
     LaunchedEffect(introEnabled, introShown) {
         if (introEnabled && !introShown) {
