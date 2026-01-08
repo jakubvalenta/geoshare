@@ -23,13 +23,14 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.billing.allProducts
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.findAutomation
 import page.ooooo.geoshare.lib.outputs.getAutomations
-import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.allProducts
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.RadioButtonOption
@@ -56,13 +57,14 @@ interface UserPreference<T> {
     fun suffix(): String? = null
 
     @Composable
-    fun ValueLabel(values: UserPreferencesValues)
+    fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus)
 
     @Composable
     fun Component(
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
         enabled: Boolean = true,
+        featureStatus: FeatureStatus,
     )
 }
 
@@ -80,7 +82,7 @@ abstract class NumberPreference<T> : UserPreference<T> {
     override fun setValue(preferences: MutablePreferences, value: T) = preferences.set(key, serialize(value))
 
     @Composable
-    override fun ValueLabel(values: UserPreferencesValues) {
+    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
         val value = getValue(values)
         Text(serialize(value ?: default))
     }
@@ -90,6 +92,7 @@ abstract class NumberPreference<T> : UserPreference<T> {
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
         enabled: Boolean,
+        featureStatus: FeatureStatus,
     ) {
         val value = getValue(values)
         val spacing = LocalSpacing.current
@@ -164,7 +167,7 @@ abstract class DurationPreference : NumberPreference<Duration>() {
     override fun suffix() = stringResource(R.string.seconds_unit)
 
     @Composable
-    override fun ValueLabel(values: UserPreferencesValues) {
+    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
         if (values.automation is Automation.HasDelay) {
             val seconds = getValue(values).toInt(DurationUnit.SECONDS)
             Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
@@ -192,11 +195,19 @@ abstract class OptionsPreference<T> : UserPreference<T> {
     abstract fun options(): List<PreferenceOption<T>>
 
     @Composable
-    override fun ValueLabel(values: UserPreferencesValues) {
+    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
         val value = getValue(values)
-        (options().find { it.value == value } ?: options().find { it.value == default })?.also { option ->
+        val option = if (featureStatus == FeatureStatus.NOT_AVAILABLE) {
+            options().find { it.value == default }
+        } else {
+            options().find { it.value == value }
+                ?: options().find { it.value == default }
+        }
+        if (option != null) {
             option.label()
-        } ?: Text(value.toString())
+        } else {
+            Text(value.toString())
+        }
     }
 
     @Composable
@@ -204,8 +215,13 @@ abstract class OptionsPreference<T> : UserPreference<T> {
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
         enabled: Boolean,
+        featureStatus: FeatureStatus,
     ) {
-        val value = getValue(values)
+        val value = if (featureStatus == FeatureStatus.AVAILABLE) {
+            getValue(values)
+        } else {
+            default
+        }
         val spacing = LocalSpacing.current
         RadioButtonGroup(
             selectedValue = value,
@@ -396,7 +412,7 @@ object BillingStatusPreference : UserPreference<BillingStatus> {
     }
 
     @Composable
-    override fun ValueLabel(values: UserPreferencesValues) {
+    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
     }
 
     @Composable
@@ -404,6 +420,7 @@ object BillingStatusPreference : UserPreference<BillingStatus> {
         values: UserPreferencesValues,
         onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
         enabled: Boolean,
+        featureStatus: FeatureStatus,
     ) {
     }
 

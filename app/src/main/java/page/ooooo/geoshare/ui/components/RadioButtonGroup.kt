@@ -50,8 +50,9 @@ fun <T> RadioButtonGroup(
                         .padding(vertical = spacing.tiny)
                         .selectable(
                             selected = (option.value == selectedValue),
+                            enabled = enabled,
+                            role = Role.RadioButton,
                             onClick = { onSelect(option.value) },
-                            role = Role.RadioButton
                         ),
                     horizontalArrangement = Arrangement.spacedBy(spacing.small),
                     verticalAlignment = Alignment.CenterVertically

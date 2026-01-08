@@ -12,8 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.outputs.GpxOutput
 import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.outputs.GpxOutput
 import page.ooooo.geoshare.ui.AutomationDelayUserPreferencesGroup
 import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
 import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
@@ -32,33 +32,37 @@ fun UserPreferencesDetailPane(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val spacing = LocalSpacing.current
+    val enabled = currentGroup.enabled(userPreferencesValues)
 
-    ScrollablePane(
-        titleResId = currentGroup.titleResId,
-        onBack = onBack.takeIf { expanded },
-    ) {
-        Box {
-            Column(
-                Modifier.padding(horizontal = spacing.windowPadding),
-                verticalArrangement = Arrangement.spacedBy(spacing.medium),
+    Box {
+        Column {
+            ScrollablePane(
+                titleResId = currentGroup.titleResId,
+                onBack = onBack.takeIf { expanded },
             ) {
-                for (userPreference in currentGroup.userPreferences) {
-                    Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                        if (currentGroup.userPreferences.size > 1) {
-                            ParagraphHtml(userPreference.title())
+                Column(
+                    Modifier.padding(horizontal = spacing.windowPadding),
+                    verticalArrangement = Arrangement.spacedBy(spacing.medium),
+                ) {
+                    for (userPreference in currentGroup.userPreferences) {
+                        Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+                            if (currentGroup.userPreferences.size > 1) {
+                                ParagraphHtml(userPreference.title())
+                            }
+                            userPreference.Description(enabled && currentGroup.featureStatus == FeatureStatus.AVAILABLE)
+                            userPreference.Component(
+                                values = userPreferencesValues,
+                                onValueChange = onValueChange,
+                                enabled = enabled && currentGroup.featureStatus == FeatureStatus.AVAILABLE,
+                                featureStatus = currentGroup.featureStatus,
+                            )
                         }
-                        userPreference.Description(enabled = currentGroup.featureStatus == FeatureStatus.AVAILABLE)
-                        userPreference.Component(
-                            values = userPreferencesValues,
-                            onValueChange = onValueChange,
-                            enabled = currentGroup.featureStatus == FeatureStatus.AVAILABLE,
-                        )
                     }
                 }
             }
-            if (currentGroup.featureStatus == FeatureStatus.NOT_AVAILABLE) {
-                FeatureBadgeLarge(onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen)
-            }
+        }
+        if (currentGroup.featureStatus == FeatureStatus.NOT_AVAILABLE) {
+            FeatureBadgeLarge(onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen)
         }
     }
 }
@@ -110,7 +114,7 @@ private fun AutomationPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
+                    currentGroup = AutomationUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
@@ -131,7 +135,7 @@ private fun DarkAutomationPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
+                    currentGroup = AutomationUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
@@ -152,7 +156,7 @@ private fun AutomationFeatureNotEnabledPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
+                    currentGroup = AutomationUserPreferencesGroup(FeatureStatus.NOT_AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
@@ -173,7 +177,7 @@ private fun DarkAutomationFeatureNotEnabledPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
+                    currentGroup = AutomationUserPreferencesGroup(FeatureStatus.NOT_AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
@@ -194,7 +198,7 @@ private fun AutomationDelayPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
+                    currentGroup = AutomationDelayUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -213,7 +217,7 @@ private fun DarkAutomationDelayPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
+                    currentGroup = AutomationDelayUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},

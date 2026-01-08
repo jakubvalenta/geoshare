@@ -79,13 +79,15 @@ class AutomationUserPreferencesGroup(override val featureStatus: FeatureStatus) 
     override val visible = true
 }
 
-class AutomationDelayUserPreferencesGroup(override val featureStatus: FeatureStatus) : UserPreferencesGroup {
+class AutomationDelayUserPreferencesGroup(val featureStatusParam: FeatureStatus) : UserPreferencesGroup {
     override val id = UserPreferencesGroupId.AUTOMATION_DELAY
     override val titleResId = R.string.user_preferences_automation_delay_sec_title
     override val userPreferences = listOf(AutomationDelayPreference)
     override val visible = true
+    override val featureStatus = FeatureStatus.AVAILABLE
 
-    override fun enabled(values: UserPreferencesValues) = values.automation is Automation.HasDelay
+    override fun enabled(values: UserPreferencesValues) =
+        featureStatusParam == FeatureStatus.AVAILABLE && values.automation is Automation.HasDelay
 }
 
 object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup {
@@ -219,8 +221,8 @@ private fun DefaultPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
-                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationUserPreferencesGroup(FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -243,8 +245,8 @@ private fun DarkPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
-                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationUserPreferencesGroup(FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -267,8 +269,8 @@ private fun TabletPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
-                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationUserPreferencesGroup(FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -291,8 +293,8 @@ private fun EmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
-                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationUserPreferencesGroup(FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
@@ -315,8 +317,8 @@ private fun DarkEmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
-                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationUserPreferencesGroup(FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
@@ -339,8 +341,8 @@ private fun TabletEmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
-                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationUserPreferencesGroup(FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
