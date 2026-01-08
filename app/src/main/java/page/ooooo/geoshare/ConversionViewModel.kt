@@ -12,15 +12,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
-import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
-import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
-import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
+import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.conversion.ActionFinished
@@ -39,8 +39,7 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
 import page.ooooo.geoshare.lib.conversion.ReceivedUriString
 import page.ooooo.geoshare.lib.conversion.State
-import page.ooooo.geoshare.lib.features.AutomationFeature
-import page.ooooo.geoshare.lib.features.Features
+import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
@@ -55,12 +54,12 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val features = Features(userPreferencesRepository)
+    val billing = Billing(viewModelScope, userPreferencesRepository)
 
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         userPreferencesRepository = userPreferencesRepository,
-        features = features,
+        billing = billing,
     ) { newState ->
         _currentState.value = newState
         when (newState) {
@@ -95,64 +94,57 @@ class ConversionViewModel @Inject constructor(
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values.mapLatest {
-        it
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        UserPreferencesValues(),
-    )
+    val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            UserPreferencesValues(),
+        )
+
+    val automation: StateFlow<Automation> = userPreferencesRepository.values
+        .map { it.automation }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            AutomationPreference.default,
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val automation: StateFlow<Automation> = userPreferencesValues.mapLatest {
-        it.automationValue
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        AutomationUserPreference.default,
-    )
-
-    val automationFeatureValid: StateFlow<Boolean?> = flow<Boolean?> {
-        features.validate(AutomationFeature, AutomationFeatureValidatedAt)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        null,
-    )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val changelogShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.changelogShownForVersionCodeValue?.let { changelogShownForVersionCodeValue ->
-            stateContext.inputs.all { input ->
-                input.documentation.items.all { input ->
-                    input.addedInVersionCode <= changelogShownForVersionCodeValue
+    val changelogShown: StateFlow<Boolean> = userPreferencesRepository.values
+        .map { it.changelogShownForVersionCode }
+        .distinctUntilChanged()
+        .mapLatest { changelogShownForVersionCodeValue ->
+            if (changelogShownForVersionCodeValue != null) {
+                stateContext.inputs.all { input ->
+                    input.documentation.items.all { inputDocumentationItem ->
+                        inputDocumentationItem.addedInVersionCode <= changelogShownForVersionCodeValue
+                    }
                 }
+            } else {
+                true
             }
-        } ?: true
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        true,
-    )
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true,
+        )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val changelogShownForVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
-        it.changelogShownForVersionCodeValue
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        ChangelogShownForVersionCode.default,
-    )
+    val changelogShownForVersionCode: StateFlow<Int?> = userPreferencesRepository.values
+        .map { it.changelogShownForVersionCode }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            ChangelogShownForVersionCodePreference.default,
+        )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.introShownForVersionCodeValue != IntroShowForVersionCode.default
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        userPreferencesValues.value.introShownForVersionCodeValue != IntroShowForVersionCode.default,
-    )
+    val introShown: StateFlow<Boolean> = userPreferencesRepository.values
+        .map { it.introShownForVersionCode != IntroShowForVersionCodePreference.default }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true,
+        )
 
     fun start() {
         stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
@@ -306,11 +298,11 @@ class ConversionViewModel @Inject constructor(
         val newestInputAddedInVersionCode = allInputs.maxOf { input ->
             input.documentation.items.maxOf { it.addedInVersionCode }
         }
-        setUserPreferenceValue(ChangelogShownForVersionCode, newestInputAddedInVersionCode)
+        setUserPreferenceValue(ChangelogShownForVersionCodePreference, newestInputAddedInVersionCode)
     }
 
     fun setIntroShown() {
-        setUserPreferenceValue(IntroShowForVersionCode, BuildConfig.VERSION_CODE)
+        setUserPreferenceValue(IntroShowForVersionCodePreference, BuildConfig.VERSION_CODE)
     }
 
     fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {

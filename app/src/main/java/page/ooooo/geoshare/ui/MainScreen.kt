@@ -66,6 +66,12 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.DefaultProduct
+import page.ooooo.geoshare.lib.billing.FullProduct
+import page.ooooo.geoshare.lib.billing.ProProduct
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
@@ -84,7 +90,6 @@ import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
 import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
-import page.ooooo.geoshare.lib.features.Features
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
@@ -123,9 +128,9 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val automationFeatureValid by viewModel.automationFeatureValid.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+    val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
@@ -143,6 +148,10 @@ fun MainScreen(
                 }
             }
         }
+
+    LaunchedEffect(Unit) {
+        viewModel.billing.refresh()
+    }
 
     LaunchedEffect(currentState) {
         currentState.let { currentState ->
@@ -204,7 +213,7 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
-        automationFeatureValid = automationFeatureValid,
+        billingStatus = billingStatus,
         changelogShown = changelogShown,
         inputUriString = viewModel.inputUriString,
         loadingIndicator = loadingIndicator,
@@ -258,7 +267,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    automationFeatureValid: Boolean?,
+    billingStatus: BillingStatus,
     changelogShown: Boolean,
     inputUriString: String,
     loadingIndicator: LoadingIndicator?,
@@ -307,8 +316,7 @@ private fun MainScreen(
             }
         },
         actions = {
-            Text("Valid: $automationFeatureValid")
-            if (automationFeatureValid == true) {
+            if ((billingStatus as? BillingStatus.Done)?.product !in setOf(null, DefaultProduct, FullProduct)) {
                 FeatureBadgeSmall(
                     onClick = onNavigateToSubscriptionScreen,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -401,6 +409,8 @@ private fun MainScreen(
 
             currentState is Initial -> {
                 {
+                    Text("Billing: ${if (billingStatus is BillingStatus.Loading) "LOADING" else "DONE"}")
+                    Text("Feature: ${billingStatus.getFeatureStatus(AutomationFeature)}")
                     MainForm(
                         inputUriString = inputUriString,
                         errorMessageResId = errorMessageResId,
@@ -418,9 +428,9 @@ private fun MainScreen(
                 {
                     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                         ResultSuccessMessage(
-                            currentState,
-                            automationFeatureValid,
-                            loadingIndicator,
+                            currentState = currentState,
+                            automationFeatureStatus = billingStatus.getFeatureStatus(AutomationFeature),
+                            loadingIndicator = loadingIndicator,
                             onCancel = onCancel,
                             onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                         )
@@ -610,7 +620,7 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            automationFeatureValid = true,
+            billingStatus = BillingStatus.Done(ProProduct),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -638,7 +648,7 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            automationFeatureValid = true,
+            billingStatus = BillingStatus.Done(ProProduct),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -666,7 +676,7 @@ private fun TabletPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -698,7 +708,7 @@ private fun SucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -730,7 +740,7 @@ private fun DarkSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -762,7 +772,7 @@ private fun TabletSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -788,12 +798,13 @@ private fun TabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
+        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    features = Features(userPreferencesRepository),
+                    billing = Billing(coroutineScope, userPreferencesRepository),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -801,7 +812,7 @@ private fun AutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -827,12 +838,13 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
+        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    features = Features(userPreferencesRepository),
+                    billing = Billing(coroutineScope, userPreferencesRepository),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -840,7 +852,7 @@ private fun DarkAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -866,12 +878,13 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
+        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    features = Features(userPreferencesRepository),
+                    billing = Billing(coroutineScope, userPreferencesRepository),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -879,7 +892,7 @@ private fun TabletAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -910,7 +923,7 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -941,7 +954,7 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -972,7 +985,7 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -998,6 +1011,7 @@ private fun TabletErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
+        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -1005,7 +1019,7 @@ private fun LoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    features = Features(userPreferencesRepository),
+                    billing = Billing(coroutineScope, userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1015,7 +1029,7 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1044,6 +1058,7 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
+        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -1051,7 +1066,7 @@ private fun DarkLoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    features = Features(userPreferencesRepository),
+                    billing = Billing(coroutineScope, userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1061,7 +1076,7 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1090,6 +1105,7 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
+        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -1097,7 +1113,7 @@ private fun TabletLoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    features = Features(userPreferencesRepository),
+                    billing = Billing(coroutineScope, userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1107,7 +1123,7 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            automationFeatureValid = null,
+            billingStatus = BillingStatus.Done(FullProduct),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(

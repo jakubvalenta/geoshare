@@ -5,14 +5,12 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.AutomationDelay
-import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
-import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
-import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
+import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
+import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.features.AutomationFeature
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
@@ -25,6 +23,8 @@ import page.ooooo.geoshare.lib.outputs.LocationAutomation
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.FeatureStatus
 import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -82,7 +82,9 @@ data class ReceivedUri(
             val m = input.shortUriPattern.matcher(uri.toString())
             if (m.matches()) {
                 val uri = Uri.parse(m.group(), stateContext.uriQuote)
-                return when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
+                return when (permission ?: stateContext.userPreferencesRepository.getValue(
+                    ConnectionPermissionPreference
+                )) {
                     Permission.ALWAYS -> GrantedUnshortenPermission(
                         stateContext, inputUriString, input, uri
                     )
@@ -111,14 +113,14 @@ data class RequestedUnshortenPermission(
 
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
         return GrantedUnshortenPermission(stateContext, inputUriString, input, uri)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, inputUriString, input)
     }
@@ -209,7 +211,8 @@ data class UnshortenedUrl(
 
             is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
                 if (input is Input.HasHtml) {
-                    when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
+                    when (permission
+                        ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseHtmlPermission(
                             stateContext, inputUriString, input, uri, res.position, res.htmlUriString
                         )
@@ -244,14 +247,14 @@ data class RequestedParseHtmlPermission(
 
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
         return GrantedParseHtmlPermission(stateContext, inputUriString, input, uri, positionFromUri, htmlUriString)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
         return ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
     }
@@ -350,19 +353,20 @@ data class ConversionSucceeded(
     override val position: Position,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State? {
-        val automation = stateContext.userPreferencesRepository.getValue(AutomationUserPreference)
+        val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null
         }
-        val automationValid = stateContext.features.validate(AutomationFeature, AutomationFeatureValidatedAt)
-        if (automationValid == false) {
-            return null
+        // TODO Check if billing refreshing gets cancelled when running automation and switching to another app
+        stateContext.billing.refresh()
+        if (stateContext.billing.status.value.getFeatureStatus(AutomationFeature) == FeatureStatus.AVAILABLE) {
+            if (automation is Automation.HasDelay) {
+                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
+                return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
+            }
+            return ActionReady(inputUriString, position, null, automation)
         }
-        if (automation is Automation.HasDelay) {
-            val delay = stateContext.userPreferencesRepository.getValue(AutomationDelay)
-            return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
-        }
-        return ActionReady(inputUriString, position, null, automation)
+        return null
     }
 }
 

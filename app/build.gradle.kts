@@ -50,11 +50,6 @@ android {
         // invocation. This command ensures that the app's state is completely cleared between tests.
         testInstrumentationRunnerArguments += mapOf("clearPackageData" to "true")
     }
-
-    testOptions {
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
-    }
-
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
@@ -66,6 +61,16 @@ android {
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
+        }
+    }
+    flavorDimensions += "version"
+    productFlavors {
+        create("full") {
+            dimension = "version"
+        }
+        create("paid") {
+            dimension = "version"
+            versionNameSuffix = "-paid"
         }
     }
     buildFeatures {

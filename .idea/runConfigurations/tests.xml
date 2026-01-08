@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":app:testDebugUnitTest" />
+          <option value=":app:testFullDebugUnitTest" />
         </list>
       </option>
       <option name="vmOptions" />

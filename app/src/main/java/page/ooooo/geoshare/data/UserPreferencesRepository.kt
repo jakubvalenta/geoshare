@@ -35,11 +35,12 @@ class DefaultUserPreferencesRepository @Inject constructor(
             }
         }.map {
             UserPreferencesValues(
-                automationValue = AutomationUserPreference.getValue(it),
-                automationDelayValue = AutomationDelay.getValue(it),
-                changelogShownForVersionCodeValue = ChangelogShownForVersionCode.getValue(it),
-                connectionPermissionValue = ConnectionPermission.getValue(it),
-                introShownForVersionCodeValue = IntroShowForVersionCode.getValue(it),
+                automation = AutomationPreference.getValue(it),
+                automationDelay = AutomationDelayPreference.getValue(it),
+                billingStatus = BillingStatusPreference.getValue(it),
+                changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
+                connectionPermission = ConnectionPermissionPreference.getValue(it),
+                introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),
             )
         }
 

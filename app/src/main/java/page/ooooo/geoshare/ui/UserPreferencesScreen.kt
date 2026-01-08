@@ -31,64 +31,74 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.AutomationDelay
-import page.ooooo.geoshare.data.local.preferences.AutomationFeatureValidatedAt
-import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
-import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCode
-import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
-import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCode
+import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
+import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.BillingStatusPreference
+import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
 import page.ooooo.geoshare.ui.components.UserPreferencesListPane
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Keep
 enum class UserPreferencesGroupId {
-    AUTOMATION, AUTOMATION_DELAY, CONNECTION_PERMISSION, DEVELOPER_OPTIONS,
+    AUTOMATION,
+    AUTOMATION_DELAY,
+    CONNECTION_PERMISSION,
+    DEVELOPER_OPTIONS,
 }
 
-sealed class UserPreferencesGroup(
-    val id: UserPreferencesGroupId,
-    val titleResId: Int,
-    val userPreferences: List<UserPreference<*>>,
-    val visible: Boolean = true,
-    open val featureValid: Boolean? = null,
-) {
-    open fun enabled(values: UserPreferencesValues): Boolean = true
+sealed interface UserPreferencesGroup {
+    val id: UserPreferencesGroupId
+    val titleResId: Int
+    val userPreferences: List<UserPreference<*>>
+    val visible: Boolean
+    val featureStatus: FeatureStatus
+
+    fun enabled(values: UserPreferencesValues): Boolean = true
 }
 
-object ConnectionPermissionUserPreferencesGroup : UserPreferencesGroup(
-    id = UserPreferencesGroupId.CONNECTION_PERMISSION,
-    titleResId = R.string.user_preferences_connection_title,
-    userPreferences = listOf(ConnectionPermission),
-)
-
-class AutomationUserPreferencesGroup(override val featureValid: Boolean?) : UserPreferencesGroup(
-    id = UserPreferencesGroupId.AUTOMATION,
-    titleResId = R.string.user_preferences_automation_title,
-    userPreferences = listOf(AutomationUserPreference),
-)
-
-object AutomationDelayUserPreferencesGroup : UserPreferencesGroup(
-    id = UserPreferencesGroupId.AUTOMATION_DELAY,
-    titleResId = R.string.user_preferences_automation_delay_sec_title,
-    userPreferences = listOf(AutomationDelay),
-) {
-    override fun enabled(values: UserPreferencesValues) = values.automationValue is Automation.HasDelay
+object ConnectionPermissionUserPreferencesGroup : UserPreferencesGroup {
+    override val id = UserPreferencesGroupId.CONNECTION_PERMISSION
+    override val titleResId = R.string.user_preferences_connection_title
+    override val userPreferences = listOf(ConnectionPermissionPreference)
+    override val visible = true
+    override val featureStatus = FeatureStatus.AVAILABLE
 }
 
-object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup(
-    id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
-    titleResId = R.string.user_preferences_developer_title,
-    userPreferences = listOf(
-        ChangelogShownForVersionCode,
-        IntroShowForVersionCode,
-        AutomationFeatureValidatedAt,
-    ),
-    visible = BuildConfig.DEBUG,
-)
+class AutomationUserPreferencesGroup(override val featureStatus: FeatureStatus) : UserPreferencesGroup {
+    override val id = UserPreferencesGroupId.AUTOMATION
+    override val titleResId = R.string.user_preferences_automation_title
+    override val userPreferences = listOf(AutomationPreference)
+    override val visible = true
+}
+
+class AutomationDelayUserPreferencesGroup(override val featureStatus: FeatureStatus) : UserPreferencesGroup {
+    override val id = UserPreferencesGroupId.AUTOMATION_DELAY
+    override val titleResId = R.string.user_preferences_automation_delay_sec_title
+    override val userPreferences = listOf(AutomationDelayPreference)
+    override val visible = true
+
+    override fun enabled(values: UserPreferencesValues) = values.automation is Automation.HasDelay
+}
+
+object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup {
+    override val id = UserPreferencesGroupId.DEVELOPER_OPTIONS
+    override val titleResId = R.string.user_preferences_developer_title
+    override val userPreferences = listOf(
+        ChangelogShownForVersionCodePreference,
+        IntroShowForVersionCodePreference,
+        BillingStatusPreference,
+    )
+    override val visible = BuildConfig.DEBUG
+    override val featureStatus = FeatureStatus.AVAILABLE
+}
 
 @Composable
 fun UserPreferencesScreen(
@@ -97,14 +107,15 @@ fun UserPreferencesScreen(
     onNavigateToSubscriptionScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val automationFeatureValid by viewModel.automationFeatureValid.collectAsStateWithLifecycle()
+    val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
+    val automationFeatureStatus = billingStatus.getFeatureStatus(AutomationFeature)
 
     UserPreferencesScreen(
         groups = listOf(
             ConnectionPermissionUserPreferencesGroup,
-            AutomationUserPreferencesGroup(automationFeatureValid),
-            AutomationDelayUserPreferencesGroup,
+            AutomationUserPreferencesGroup(automationFeatureStatus),
+            AutomationDelayUserPreferencesGroup(automationFeatureStatus),
             DeveloperOptionsUserPreferencesGroup,
         ),
         initialGroupId = initialGroupId,
@@ -208,8 +219,8 @@ private fun DefaultPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -232,8 +243,8 @@ private fun DarkPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -256,8 +267,8 @@ private fun TabletPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
@@ -280,8 +291,8 @@ private fun EmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
@@ -304,8 +315,8 @@ private fun DarkEmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
@@ -328,8 +339,8 @@ private fun TabletEmptyPreview() {
                 UserPreferencesScreen(
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,

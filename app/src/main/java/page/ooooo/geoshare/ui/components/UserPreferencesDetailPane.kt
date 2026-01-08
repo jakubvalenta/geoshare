@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.outputs.GpxOutput
+import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.ui.AutomationDelayUserPreferencesGroup
 import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
 import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
@@ -31,7 +32,6 @@ fun UserPreferencesDetailPane(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val enabled = currentGroup.featureValid != false
 
     ScrollablePane(
         titleResId = currentGroup.titleResId,
@@ -47,16 +47,16 @@ fun UserPreferencesDetailPane(
                         if (currentGroup.userPreferences.size > 1) {
                             ParagraphHtml(userPreference.title())
                         }
-                        userPreference.Description(enabled = enabled)
+                        userPreference.Description(enabled = currentGroup.featureStatus == FeatureStatus.AVAILABLE)
                         userPreference.Component(
                             values = userPreferencesValues,
                             onValueChange = onValueChange,
-                            enabled = enabled,
+                            enabled = currentGroup.featureStatus == FeatureStatus.AVAILABLE,
                         )
                     }
                 }
             }
-            if (currentGroup.featureValid == false) {
+            if (currentGroup.featureStatus == FeatureStatus.NOT_AVAILABLE) {
                 FeatureBadgeLarge(onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen)
             }
         }
@@ -110,10 +110,10 @@ private fun AutomationPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(null),
+                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
-                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                        automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
                     onNavigateToSubscriptionScreen = {},
@@ -131,10 +131,10 @@ private fun DarkAutomationPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(null),
+                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
-                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                        automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
                     onNavigateToSubscriptionScreen = {},
@@ -147,15 +147,15 @@ private fun DarkAutomationPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun AutomationFeatureNotValidPreview() {
+private fun AutomationFeatureNotEnabledPreview() {
     AppTheme {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(false),
+                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
-                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                        automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
                     onNavigateToSubscriptionScreen = {},
@@ -168,15 +168,15 @@ private fun AutomationFeatureNotValidPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkAutomationFeatureNotValidPreview() {
+private fun DarkAutomationFeatureNotEnabledPreview() {
     AppTheme {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationUserPreferencesGroup(false),
+                    currentGroup = AutomationUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
                     expanded = true,
                     userPreferencesValues = UserPreferencesValues(
-                        automationValue = GpxOutput.SaveGpxPointsAutomation,
+                        automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
                     onNavigateToSubscriptionScreen = {},
@@ -194,7 +194,7 @@ private fun AutomationDelayPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationDelayUserPreferencesGroup,
+                    currentGroup = AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -213,7 +213,7 @@ private fun DarkAutomationDelayPreview() {
         Surface {
             Column {
                 UserPreferencesDetailPane(
-                    currentGroup = AutomationDelayUserPreferencesGroup,
+                    currentGroup = AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},

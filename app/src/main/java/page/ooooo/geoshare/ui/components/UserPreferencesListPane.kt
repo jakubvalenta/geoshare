@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.ui.AutomationDelayUserPreferencesGroup
 import page.ooooo.geoshare.ui.AutomationUserPreferencesGroup
 import page.ooooo.geoshare.ui.ConnectionPermissionUserPreferencesGroup
@@ -76,7 +77,7 @@ fun UserPreferencesListPane(
                             }
                         }
                     },
-                trailingContent = if (group.featureValid == false) {
+                trailingContent = if (group.featureStatus == FeatureStatus.NOT_AVAILABLE) {
                     {
                         FeatureBadgeSmall(onClick = { onNavigateToGroup(group.id) })
                     }
@@ -103,8 +104,8 @@ private fun DefaultPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = false,
@@ -127,8 +128,8 @@ private fun DarkPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = false,
@@ -143,7 +144,7 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun FeatureValidPreview() {
+private fun FeatureEnabledPreview() {
     AppTheme {
         Surface {
             Column {
@@ -151,8 +152,8 @@ private fun FeatureValidPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(true),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = false,
@@ -167,7 +168,7 @@ private fun FeatureValidPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkFeatureValidPreview() {
+private fun DarkFeatureEnabledPreview() {
     AppTheme {
         Surface {
             Column {
@@ -175,8 +176,8 @@ private fun DarkFeatureValidPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(true),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.AVAILABLE),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = false,
@@ -191,7 +192,7 @@ private fun DarkFeatureValidPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun FeatureNotValidPreview() {
+private fun FeatureNotEnabledPreview() {
     AppTheme {
         Surface {
             Column {
@@ -199,8 +200,8 @@ private fun FeatureNotValidPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(false),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = false,
@@ -215,7 +216,7 @@ private fun FeatureNotValidPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkFeatureNotValidPreview() {
+private fun DarkFeatureNotEnabledPreview() {
     AppTheme {
         Surface {
             Column {
@@ -223,8 +224,8 @@ private fun DarkFeatureNotValidPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(false),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.NOT_AVAILABLE),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = false,
@@ -247,8 +248,8 @@ private fun ExpandedPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = true,
@@ -271,8 +272,8 @@ private fun DarkExpandedPreview() {
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     groups = listOf(
                         ConnectionPermissionUserPreferencesGroup,
-                        AutomationUserPreferencesGroup(null),
-                        AutomationDelayUserPreferencesGroup,
+                        AutomationUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
+                        AutomationDelayUserPreferencesGroup(featureStatus = FeatureStatus.LOADING),
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     expanded = true,
