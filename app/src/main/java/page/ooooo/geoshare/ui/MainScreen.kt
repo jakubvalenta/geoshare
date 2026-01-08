@@ -149,10 +149,6 @@ fun MainScreen(
             }
         }
 
-    LaunchedEffect(Unit) {
-        viewModel.billing.refresh()
-    }
-
     LaunchedEffect(currentState) {
         currentState.let { currentState ->
             when (currentState) {
@@ -409,8 +405,6 @@ private fun MainScreen(
 
             currentState is Initial -> {
                 {
-                    Text("Billing: ${if (billingStatus is BillingStatus.Loading) "LOADING" else "DONE"}")
-                    Text("Feature: ${billingStatus.getFeatureStatus(AutomationFeature)}")
                     MainForm(
                         inputUriString = inputUriString,
                         errorMessageResId = errorMessageResId,

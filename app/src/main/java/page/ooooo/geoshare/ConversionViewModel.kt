@@ -294,6 +294,12 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
+    fun refreshBilling() {
+        viewModelScope.launch {
+            billing.refresh()
+        }
+    }
+
     fun setChangelogShown() {
         val newestInputAddedInVersionCode = allInputs.maxOf { input ->
             input.documentation.items.maxOf { it.addedInVersionCode }
