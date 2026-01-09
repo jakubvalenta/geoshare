@@ -2,33 +2,24 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import android.view.KeyEvent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,33 +36,21 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun MainForm(
     inputUriString: String,
     errorMessageResId: Int?,
+    paid: Boolean = false,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSubmit: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-    val density = LocalDensity.current
     val spacing = LocalSpacing.current
-    val appName = stringResource(R.string.app_name)
 
-    Row(
+    AppHeadline(
         Modifier
             .padding(vertical = spacing.large)
             .padding(start = 13.dp, end = spacing.windowPadding),
-        horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = stringResource(R.string.about_app_icon_content_description),
-            modifier = Modifier.size(
-                with(density) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2f }
-            ),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-        )
-        Text(appName, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineLarge)
-    }
+        paid = paid,
+    )
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.medium),
@@ -135,28 +114,17 @@ fun MainForm(
                 onDone = { onSubmit() },
             ),
         )
-        Column(Modifier.padding(horizontal = 9.dp)) {
-            Button(
-                {
-                    if (inputUriString.isEmpty()) {
-                        // To show the user immediate feedback on this screen, do a simple validation before
-                        // starting the conversion. Else the user would see an error message only on the conversion
-                        // screen.
-                        onSetErrorMessageResId(R.string.conversion_failed_missing_url)
-                    } else {
-                        onSubmit()
-                    }
-                },
-                Modifier
-                    .testTag("geoShareMainSubmitButton")
-                    .align(Alignment.CenterHorizontally)
-                    .width(400.dp)
-            ) {
-                Text(
-                    stringResource(R.string.main_create_geo_uri),
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                    lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.5,
-                )
+        LargeButton(
+            stringResource(R.string.main_create_geo_uri),
+            Modifier.testTag("geoShareMainSubmitButton"),
+        ) {
+            if (inputUriString.isEmpty()) {
+                // To show the user immediate feedback on this screen, do a simple validation before
+                // starting the conversion. Else the user would see an error message only on the conversion
+                // screen.
+                onSetErrorMessageResId(R.string.conversion_failed_missing_url)
+            } else {
+                onSubmit()
             }
         }
     }
@@ -209,6 +177,7 @@ private fun FilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = null,
+                    paid = true,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -227,6 +196,7 @@ private fun DarkFilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = null,
+                    paid = true,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},

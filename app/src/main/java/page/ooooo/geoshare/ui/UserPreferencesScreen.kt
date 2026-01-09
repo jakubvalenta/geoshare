@@ -106,7 +106,7 @@ object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup {
 fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     onBack: () -> Unit,
-    onNavigateToSubscriptionScreen: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
@@ -123,7 +123,7 @@ fun UserPreferencesScreen(
         initialGroupId = initialGroupId,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
-        onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen,
+        onNavigateToBillingScreen = onNavigateToBillingScreen,
         onValueChange = { transform -> viewModel.editUserPreferences(transform) },
     )
 }
@@ -135,7 +135,7 @@ private fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
-    onNavigateToSubscriptionScreen: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -197,7 +197,7 @@ private fun UserPreferencesScreen(
                                     }
                                 }
                             },
-                            onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen,
+                            onNavigateToBillingScreen = onNavigateToBillingScreen,
                             onValueChange = onValueChange,
                         )
                     }
@@ -228,7 +228,7 @@ private fun DefaultPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -252,7 +252,7 @@ private fun DarkPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -276,7 +276,7 @@ private fun TabletPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -300,7 +300,7 @@ private fun EmptyPreview() {
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -324,7 +324,7 @@ private fun DarkEmptyPreview() {
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -348,7 +348,7 @@ private fun TabletEmptyPreview() {
                     initialGroupId = null,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }

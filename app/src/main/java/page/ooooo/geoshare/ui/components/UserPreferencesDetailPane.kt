@@ -28,7 +28,7 @@ fun UserPreferencesDetailPane(
     expanded: Boolean,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
-    onNavigateToSubscriptionScreen: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -62,7 +62,7 @@ fun UserPreferencesDetailPane(
             }
         }
         if (currentGroup.featureStatus == FeatureStatus.NOT_AVAILABLE) {
-            FeatureBadgeLarge(onNavigateToSubscriptionScreen = onNavigateToSubscriptionScreen)
+            FeatureBadgeLarge(onNavigateToBillingScreen = onNavigateToBillingScreen)
         }
     }
 }
@@ -80,7 +80,7 @@ private fun ConnectionPermissionPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -99,7 +99,7 @@ private fun DarkConnectionPermissionPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -120,7 +120,7 @@ private fun AutomationPreview() {
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -141,7 +141,7 @@ private fun DarkAutomationPreview() {
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -162,7 +162,7 @@ private fun AutomationFeatureNotEnabledPreview() {
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -183,7 +183,7 @@ private fun DarkAutomationFeatureNotEnabledPreview() {
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -202,7 +202,7 @@ private fun AutomationDelayPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -221,7 +221,7 @@ private fun DarkAutomationDelayPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -240,7 +240,7 @@ private fun DeveloperOptionsPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }
@@ -259,7 +259,7 @@ private fun DarkDeveloperOptionsPreview() {
                     expanded = true,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
-                    onNavigateToSubscriptionScreen = {},
+                    onNavigateToBillingScreen = {},
                     onValueChange = {},
                 )
             }

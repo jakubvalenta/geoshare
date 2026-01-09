@@ -29,6 +29,9 @@ object IntroRoute
 object MainRoute
 
 @Serializable
+object BillingRoute
+
+@Serializable
 data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -68,9 +71,7 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
                 onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
                 onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
                 onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
-                onNavigateToSubscriptionScreen = {
-                    // TODO Navigate to subscription screen
-                },
+                onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
@@ -86,14 +87,17 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
                 viewModel = viewModel,
             )
         }
+        composable<BillingRoute> {
+            BillingScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+            )
+        }
         composable<UserPreferencesRoute> { backStackEntry ->
             val route: UserPreferencesRoute = backStackEntry.toRoute()
             UserPreferencesScreen(
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                onNavigateToSubscriptionScreen = {
-                    // TODO Navigate to subscription screen
-                },
+                onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 viewModel = viewModel,
             )
         }

@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
@@ -139,14 +140,14 @@ private fun InputsListDocumentations(
                         Text(name, style = MaterialTheme.typography.bodyLarge)
                     },
                     modifier = Modifier
-                        .clickable(onClick = { onNavigateToDocumentation(documentation.id) })
+                        .clickable(onClick = { onNavigateToDocumentation(documentation.id) }, role = Role.Button)
                         .testTag("${testTagPrefix}${documentation.id}"),
                     colors = ListItemDefaults.colors(
                         containerColor = if (currentDocumentation == documentation) {
                             MaterialTheme.colorScheme.surfaceContainerHighest
                         } else {
                             MaterialTheme.colorScheme.surfaceContainerHigh
-                        }
+                        },
                     ),
                 )
                 if (i != documentations.size - 1) {

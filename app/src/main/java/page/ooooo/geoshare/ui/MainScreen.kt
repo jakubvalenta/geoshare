@@ -69,7 +69,6 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.DefaultProduct
 import page.ooooo.geoshare.lib.billing.FullProduct
 import page.ooooo.geoshare.lib.billing.ProProduct
 import page.ooooo.geoshare.lib.conversion.ActionFinished
@@ -115,10 +114,10 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun MainScreen(
     onNavigateToAboutScreen: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToSubscriptionScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     viewModel: ConversionViewModel,
@@ -223,6 +222,10 @@ fun MainScreen(
             viewModel.cancel()
             onNavigateToAboutScreen()
         },
+        onNavigateToBillingScreen = {
+            viewModel.cancel()
+            onNavigateToBillingScreen()
+        },
         onNavigateToFaqScreen = {
             viewModel.cancel()
             onNavigateToFaqScreen()
@@ -234,10 +237,6 @@ fun MainScreen(
         onNavigateToIntroScreen = {
             viewModel.cancel()
             onNavigateToIntroScreen()
-        },
-        onNavigateToSubscriptionScreen = {
-            viewModel.cancel()
-            onNavigateToSubscriptionScreen()
         },
         onNavigateToUserPreferencesScreen = {
             viewModel.cancel()
@@ -274,7 +273,7 @@ private fun MainScreen(
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToSubscriptionScreen: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
     onReset: () -> Unit,
@@ -291,6 +290,7 @@ private fun MainScreen(
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = retain { mutableStateOf(false) }
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
+    val paid = (billingStatus as? BillingStatus.Done)?.product?.paid == true
     val sheetState = rememberModalBottomSheetState()
 
     BackHandler(currentState !is Initial) {
@@ -312,9 +312,9 @@ private fun MainScreen(
             }
         },
         actions = {
-            if ((billingStatus as? BillingStatus.Done)?.product !in setOf(null, DefaultProduct, FullProduct)) {
+            if (paid) {
                 FeatureBadgeSmall(
-                    onClick = onNavigateToSubscriptionScreen,
+                    onClick = onNavigateToBillingScreen,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -408,6 +408,7 @@ private fun MainScreen(
                     MainForm(
                         inputUriString = inputUriString,
                         errorMessageResId = errorMessageResId,
+                        paid = paid,
                         onSetErrorMessageResId = setErrorMessageResId,
                         onSubmit = onStart,
                         onUpdateInput = onUpdateInput,
@@ -625,7 +626,7 @@ private fun DefaultPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -653,7 +654,7 @@ private fun DarkPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -681,7 +682,7 @@ private fun TabletPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -713,7 +714,7 @@ private fun SucceededPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -745,7 +746,7 @@ private fun DarkSucceededPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -777,7 +778,7 @@ private fun TabletSucceededPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -817,7 +818,7 @@ private fun AutomationPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -857,7 +858,7 @@ private fun DarkAutomationPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -897,7 +898,7 @@ private fun TabletAutomationPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -928,7 +929,7 @@ private fun ErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -959,7 +960,7 @@ private fun DarkErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -990,7 +991,7 @@ private fun TabletErrorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -1037,7 +1038,7 @@ private fun LoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -1084,7 +1085,7 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},
@@ -1131,7 +1132,7 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToFaqScreen = {},
             onNavigateToIntroScreen = {},
             onNavigateToInputsScreen = {},
-            onNavigateToSubscriptionScreen = {},
+            onNavigateToBillingScreen = {},
             onNavigateToUserPreferencesScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
             onReset = {},

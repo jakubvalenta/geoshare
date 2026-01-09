@@ -37,15 +37,9 @@ fun TwoPaneScaffold(
                 title = {},
                 navigationIcon = navigationIcon,
                 actions = actions,
-                colors = if (expanded) {
-                    TopAppBarDefaults.topAppBarColors()
-                } else {
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = containerColor,
-                        navigationIconContentColor = contentColor,
-                        actionIconContentColor = contentColor,
-                    )
-                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
             )
         },
     ) { innerPadding ->

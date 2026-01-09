@@ -37,7 +37,7 @@ fun FeatureBadgeSmall(
     ) {
         Icon(
             painterResource(R.drawable.crown_24px),
-            stringResource(R.string.feature_not_valid)
+            contentDescription = stringResource(R.string.billing_pro_feature),
         )
     }
 }

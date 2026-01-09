@@ -26,13 +26,11 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun BoxScope.FeatureBadgeLarge(onNavigateToSubscriptionScreen: () -> Unit) {
-    val appName = stringResource(R.string.app_name)
-
+fun BoxScope.FeatureBadgeLarge(onNavigateToBillingScreen: () -> Unit) {
     ElevatedCard(
         Modifier
             .align(Alignment.Center)
-            .clickable(onClick = onNavigateToSubscriptionScreen, role = Role.Button),
+            .clickable(onClick = onNavigateToBillingScreen, role = Role.Button),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -52,11 +50,11 @@ fun BoxScope.FeatureBadgeLarge(onNavigateToSubscriptionScreen: () -> Unit) {
         ) {
             Icon(painterResource(R.drawable.crown_24px), null)
             Text(
-                stringResource(R.string.feature_badge_text, appName),
+                "${stringResource(R.string.billing_intro)} ${stringResource(R.string.app_name_pro)}",
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Button(onNavigateToSubscriptionScreen) {
-                Text(stringResource(R.string.feature_badge_button))
+            Button(onNavigateToBillingScreen) {
+                Text(stringResource(R.string.billing_pricing))
             }
         }
     }
@@ -70,7 +68,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Box {
-                FeatureBadgeLarge(onNavigateToSubscriptionScreen = {})
+                FeatureBadgeLarge(onNavigateToBillingScreen = {})
             }
         }
     }
@@ -82,7 +80,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Box {
-                FeatureBadgeLarge(onNavigateToSubscriptionScreen = {})
+                FeatureBadgeLarge(onNavigateToBillingScreen = {})
             }
         }
     }

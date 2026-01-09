@@ -6,11 +6,13 @@ import kotlinx.collections.immutable.persistentListOf
 sealed interface Product {
     val id: String
     val features: ImmutableList<Feature>
+    val paid: Boolean
 }
 
 object DefaultProduct : Product {
     override val id = "default"
     override val features = persistentListOf<Feature>()
+    override val paid = false
 }
 
 object FullProduct : Product {
@@ -18,6 +20,7 @@ object FullProduct : Product {
     override val features = persistentListOf(
         AutomationFeature,
     )
+    override val paid = false
 }
 
 object ProProduct : Product {
@@ -25,6 +28,7 @@ object ProProduct : Product {
     override val features = persistentListOf(
         AutomationFeature,
     )
+    override val paid = true
 }
 
 val allProducts = mapOf(

@@ -1,6 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Geo Share</string>
+    <string name="app_name_pro" translatable="false">Geo Share Pro</string>
     <string name="not_available">Not available</string>
+    <string name="billing_automation_copy">Copy to clipboard</string>
+    <string name="billing_automation_navigate">Launch navigation in TomTom, Waze, MagicEarth…</string>
+    <string name="billing_automation_open_app">Show map</string>
+    <string name="billing_automation_title">Save time with the Automation feature</string>
+    <string name="billing_buy">Checkout</string>
+    <string name="billing_intro">Upgrade to</string>
+    <string name="billing_pricing">Pricing</string>
+    <string name="billing_pro_feature">Pro feature</string>
+    <string name="billing_product_subscription_title">Monthly subscription</string>
+    <string name="billing_product_subscription_description">Cancel anytime</string>
+    <string name="billing_product_one_time_title">One time payment</string>
+    <string name="billing_product_one_time_description">Cancel within 14 days with full refund</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
@@ -180,13 +193,11 @@
     <string name="network_exception_socket_timeout" translatable="false">socket timeout</string>
     <string name="network_exception_unknown" translatable="false">unknown error</string>
     <string name="network_exception_unresolved_address" translatable="false">unresolved address</string>
-    <string name="feature_not_valid">pro feature</string>
-    <string name="seconds_unit">seconds</string>
     <string name="reset">reset</string>
-    <string name="feature_badge_text">Get %1$s Pro</string>
-    <string name="feature_badge_button">Pricing</string>
+    <string name="seconds_unit">seconds</string>
     <plurals name="seconds">
         <item quantity="one">%1$d second</item>
         <item quantity="other">%1$d seconds</item>
     </plurals>
+    <string name="text_list_bullet" translatable="false">•</string>
 </resources>
