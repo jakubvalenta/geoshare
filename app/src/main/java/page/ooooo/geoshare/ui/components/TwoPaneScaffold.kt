@@ -1,15 +1,27 @@
 package page.ooooo.geoshare.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -28,7 +40,6 @@ fun TwoPaneScaffold(
     ratio: Float = 0.5f,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
-    val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
     val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
@@ -40,7 +51,7 @@ fun TwoPaneScaffold(
                 navigationIcon = navigationIcon,
                 actions = actions,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
+                    containerColor = containerColor,
                     navigationIconContentColor = contentColor,
                     actionIconContentColor = contentColor,
                 ),
@@ -103,13 +114,7 @@ fun TwoPaneScaffold(
         } else {
             Column(
                 Modifier
-                    .padding(
-                        PaddingValues(
-                            start = innerPadding.calculateStartPadding(layoutDirection),
-                            end = innerPadding.calculateEndPadding(layoutDirection),
-                            bottom = innerPadding.calculateBottomPadding(),
-                        )
-                    )
+                    .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
                     .imePadding()
             ) {
@@ -127,9 +132,7 @@ fun TwoPaneScaffold(
                                 contentColor = contentColor,
                             ),
                         ) {
-                            Column(Modifier.padding(top = innerPadding.calculateTopPadding())) {
-                                firstPane()
-                            }
+                            firstPane()
                         }
                     }
                     if (secondPane != null) {
