@@ -49,6 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
@@ -138,13 +140,11 @@ fun BillingScreen(
             ) {
                 Column(
                     Modifier
-                        .weight(1f)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(spacing.medium),
                 ) {
                     Card(
-                        Modifier.padding(top = spacing.large),
+                        Modifier.padding(top = spacing.largeAdaptive),
                         shape = MaterialShapes.Sunny.toShape(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -160,53 +160,65 @@ fun BillingScreen(
                     }
                     Text(
                         stringResource(R.string.billing_intro),
+                        Modifier.padding(top = spacing.mediumAdaptive),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyLarge,
                     )
-                    AppHeadline(paid = true)
-                    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                        TextList(
-                            Modifier
-                                .padding(horizontal = spacing.windowPadding, vertical = spacing.medium)
-                                .padding(start = spacing.tiny),
-                        ) {
-                            TextListItem(
-                                Modifier.padding(bottom = spacing.small),
-                                bullet = {
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-                                }) {
-                                Text(
-                                    stringResource(R.string.billing_automation_title),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.bodyLarge,
+                    AppHeadline(Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false, paid = true)
+                }
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                    TextList(
+                        Modifier.padding(
+                            start = spacing.small,
+                            top = spacing.largeAdaptive,
+                            end = spacing.medium,
+                            bottom = spacing.mediumAdaptive,
+                        ),
+                        bulletSpace = spacing.tiny,
+                        bulletWidth = 44.dp,
+                    ) {
+                        TextListItem(
+                            Modifier.padding(bottom = spacing.smallAdaptive),
+                            bullet = {
+                                Icon(
+                                    imageVector = Icons.Default.Done,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
                                 )
+                            },
+                        ) {
+                            Text(
+                                stringResource(R.string.billing_automation_title),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                        TextListItem(Modifier.padding(bottom = spacing.smallAdaptive)) {
+                            Text(
+                                stringResource(R.string.user_preferences_automation_description),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    lineBreak = LineBreak.Paragraph,
+                                    hyphens = Hyphens.Auto,
+                                )
+                            )
+                        }
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
+                                Text(stringResource(R.string.billing_automation_open_app))
                             }
-                            TextListItem(Modifier.padding(bottom = spacing.small)) {
-                                Text(stringResource(R.string.user_preferences_automation_description))
+                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
+                                Text(stringResource(R.string.billing_automation_navigate))
                             }
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                                    Text(stringResource(R.string.billing_automation_open_app))
-                                }
-                                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                                    Text(stringResource(R.string.billing_automation_navigate))
-                                }
-                                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                                    Text(stringResource(R.string.billing_automation_copy))
-                                }
+                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
+                                Text(stringResource(R.string.billing_automation_copy))
                             }
                         }
                     }
-                    // TODO Change content if subscribed
-                    // TODO Add TOS link
                 }
+                // TODO Change content if subscribed
+                // TODO Add TOS link
             }
             ElevatedCard(
-                Modifier.padding(top = spacing.large),
                 shape = MaterialTheme.shapes.large.copy(
                     bottomStart = ZeroCornerSize,
                     bottomEnd = ZeroCornerSize,
@@ -220,7 +232,7 @@ fun BillingScreen(
                 ElevatedCard(
                     Modifier
                         .selectableGroup()
-                        .padding(spacing.medium),
+                        .padding(spacing.small),
                 ) {
                     paymentOptions.forEachIndexed { i, paymentOption ->
                         ListItem(
@@ -271,7 +283,9 @@ fun BillingScreen(
             Surface(color = MaterialTheme.colorScheme.surface) {
                 LargeButton(
                     stringResource(R.string.billing_buy),
-                    Modifier.padding(vertical = spacing.medium),
+                    Modifier.padding(vertical = spacing.small),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     // TODO
                 }

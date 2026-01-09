@@ -24,13 +24,13 @@ data class TextListScope(val bulletSpace: Dp, val bulletWidth: Dp)
 fun TextList(
     modifier: Modifier = Modifier,
     bulletSpace: Dp = 6.dp,
-    bulletWidth: Dp = 24.dp,
+    bulletWidth: Dp = 12.dp,
     verticalSpace: Dp = 0.dp,
     content: @Composable TextListScope.() -> Unit,
 ) {
     val textListScope = TextListScope(bulletSpace = bulletSpace, bulletWidth = bulletWidth)
     Column(
-        modifier.padding(end = bulletWidth),
+        modifier,
         verticalArrangement = Arrangement.spacedBy(verticalSpace),
     ) {
         textListScope.content()

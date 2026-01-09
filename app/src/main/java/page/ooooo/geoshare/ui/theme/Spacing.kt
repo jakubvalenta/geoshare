@@ -11,17 +11,20 @@ data class Spacing(
     val medium: Dp = 30.dp,
     val large: Dp = 45.dp,
 
+    val tinyAdaptive: Dp = tiny,
+    val smallAdaptive: Dp = small,
+    val mediumAdaptive: Dp = medium,
+    val largeAdaptive: Dp = large,
+
     val builtInTopBarPaddingEnd: Dp = 8.dp,
     val windowPadding: Dp = 16.dp,
 )
 
 val defaultSpacing = Spacing()
 
-val smallWindowSpacing = defaultSpacing.run {
-    copy(
-        tiny = 4.dp,
-        small = 8.dp,
-        medium = 16.dp,
-        large = 24.dp,
-    )
-}
+val smallWindowSpacing = Spacing(
+    tinyAdaptive = 4.dp,
+    smallAdaptive = 8.dp,
+    mediumAdaptive = 16.dp,
+    largeAdaptive = 24.dp,
+)

@@ -22,21 +22,29 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun AppHeadline(modifier: Modifier = Modifier, paid: Boolean = false) {
+fun AppHeadline(modifier: Modifier = Modifier, iconEnabled: Boolean = true, paid: Boolean = false) {
     val iconSize = with(LocalDensity.current) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2f }
     val space = 4.dp
 
     Row(
-        modifier.padding(end = iconSize - space),
+        modifier.run {
+            if (iconEnabled) {
+                this.padding(end = iconSize - space)
+            } else {
+                this
+            }
+        },
         horizontalArrangement = Arrangement.spacedBy(space),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = stringResource(R.string.about_app_icon_content_description),
-            modifier = Modifier.requiredSize(iconSize),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-        )
+        if (iconEnabled) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = stringResource(R.string.about_app_icon_content_description),
+                modifier = Modifier.requiredSize(iconSize),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+            )
+        }
         Text(
             stringResource(if (paid) R.string.app_name_pro else R.string.app_name),
             color = MaterialTheme.colorScheme.primary,
