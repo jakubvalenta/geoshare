@@ -59,7 +59,7 @@ fun FaqScreen(
                 .padding(horizontal = spacing.windowPadding)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(spacing.small),
+            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
         ) {
             FaqItem(
                 itemId = FaqItemId.HOW_IT_WORKS,
@@ -95,11 +95,11 @@ fun FaqItem(
 ) {
     val spacing = LocalSpacing.current
     val expanded = itemId == expandedItemId
-    Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+    Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(top = spacing.tiny)
+                .padding(top = spacing.tinyAdaptive)
                 .clickable(
                     onClickLabel = stringResource(if (expanded) R.string.faq_item_collapse else R.string.faq_item_expand),
                     onClick = { onSetExpandedItemId(if (expanded) null else itemId) },
@@ -119,7 +119,7 @@ fun FaqItem(
             )
         }
         AnimatedVisibility(expanded) {
-            Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
                 content()
             }
         }

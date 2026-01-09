@@ -47,7 +47,7 @@ fun ResultSuccessSheetContent(
             item {
                 Text(
                     headline,
-                    Modifier.padding(start = 16.dp, end = 16.dp, bottom = spacing.medium),
+                    Modifier.padding(start = 16.dp, end = 16.dp, bottom = spacing.mediumAdaptive),
                     style = MaterialTheme.typography.headlineSmall,
                 )
             }

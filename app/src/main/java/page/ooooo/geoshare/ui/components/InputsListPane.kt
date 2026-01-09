@@ -90,7 +90,7 @@ private fun InputsListPane(
             Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                 ParagraphText(
                     stringResource(R.string.inputs_list_text, appName),
-                    Modifier.padding(top = spacing.tiny, bottom = spacing.medium),
+                    Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
                 )
                 InputsSettingsButton(onShowOpenByDefaultSettings)
             }
@@ -109,7 +109,7 @@ private fun InputsListPane(
             )
             LabelLarge(stringResource(R.string.inputs_all))
         } else {
-            Spacer(Modifier.height(spacing.medium))
+            Spacer(Modifier.height(spacing.mediumAdaptive))
         }
         InputsListDocumentations(
             currentDocumentation = currentDocumentation,

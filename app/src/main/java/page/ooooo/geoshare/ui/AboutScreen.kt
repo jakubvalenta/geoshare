@@ -68,7 +68,7 @@ fun AboutScreen(
                     appName,
                     BuildConfig.VERSION_NAME
                 ),
-                Modifier.padding(bottom = spacing.medium),
+                Modifier.padding(bottom = spacing.mediumAdaptive),
                 style = MaterialTheme.typography.headlineSmall,
             )
             ParagraphHtml(stringResource(R.string.about_text, appName))

@@ -104,7 +104,7 @@ fun ResultSuccessMessage(
     AnimatedContent(
         targetState,
         modifier = Modifier
-            .padding(top = spacing.large)
+            .padding(top = spacing.largeAdaptive)
             .fillMaxWidth()
             .height(40.dp),
         transitionSpec = {

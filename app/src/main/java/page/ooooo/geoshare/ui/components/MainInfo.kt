@@ -33,7 +33,7 @@ fun MainInfo(
 
     Column(
         Modifier
-            .padding(top = spacing.large)
+            .padding(top = spacing.largeAdaptive)
             .padding(horizontal = spacing.windowPadding),
     ) {
         TextButton(onNavigateToInputsScreen) {

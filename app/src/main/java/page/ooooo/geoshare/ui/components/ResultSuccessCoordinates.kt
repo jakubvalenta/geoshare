@@ -55,7 +55,7 @@ fun ResultSuccessCoordinates(
                             Modifier
                                 .testTag("geoShareConversionSuccessPositionDescription")
                                 .fillMaxWidth()
-                                .padding(top = spacing.tiny, bottom = spacing.small),
+                                .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
                             fontStyle = FontStyle.Italic,
                             style = MaterialTheme.typography.bodySmall,
                         )
@@ -75,7 +75,7 @@ fun ResultSuccessCoordinates(
             },
             bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
                 {
-                    Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive)) {
                         points.indices.forEach { i ->
                             ResultSuccessPoint(
                                 position = position,

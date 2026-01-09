@@ -105,7 +105,7 @@ abstract class NumberPreference<T> : UserPreference<T> {
                 setInputValue(it)
                 onValueChange { preferences -> setValue(preferences, deserialize(it)) }
             },
-            modifier = modifier.padding(top = spacing.tiny),
+            modifier = modifier.padding(top = spacing.tinyAdaptive),
             enabled = enabled,
             suffix = suffix()?.let { text ->
                 {
@@ -230,7 +230,7 @@ abstract class OptionsPreference<T> : UserPreference<T> {
                     setValue(preferences, it)
                 }
             },
-            modifier = Modifier.padding(top = spacing.tiny),
+            modifier = Modifier.padding(top = spacing.tinyAdaptive),
             enabled = enabled,
         ) {
             options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }

@@ -47,7 +47,7 @@ fun PermissionDialog(
         onDismissRequest = { onDismissRequest(doNotAsk) },
         modifier = modifier,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive)) {
             content()
             Row(
                 Modifier.fillMaxWidth(),

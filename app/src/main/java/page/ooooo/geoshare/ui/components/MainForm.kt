@@ -47,13 +47,13 @@ fun MainForm(
 
     AppHeadline(
         Modifier
-            .padding(vertical = spacing.large)
+            .padding(vertical = spacing.largeAdaptive)
             .padding(start = 13.dp, end = spacing.windowPadding),
         paid = paid,
     )
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
-        verticalArrangement = Arrangement.spacedBy(spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(spacing.mediumAdaptive),
     ) {
         OutlinedTextField(
             value = inputUriString,
@@ -103,7 +103,7 @@ fun MainForm(
             supportingText = {
                 Text(
                     stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text),
-                    Modifier.padding(top = spacing.tiny),
+                    Modifier.padding(top = spacing.tinyAdaptive),
                 )
             },
             isError = errorMessageResId != null,

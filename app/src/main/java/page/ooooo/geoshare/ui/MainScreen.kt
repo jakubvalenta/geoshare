@@ -335,7 +335,7 @@ private fun MainScreen(
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(top = spacing.small)
+                            .padding(top = spacing.smallAdaptive)
                             .padding(horizontal = spacing.windowPadding),
                     ) {
                         LoadingIndicator(
@@ -348,7 +348,7 @@ private fun MainScreen(
                             onCancel,
                             Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .padding(top = spacing.small, bottom = spacing.medium),
+                                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
                             colors = ButtonDefaults.elevatedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                 contentColor = MaterialTheme.colorScheme.onSurface,
@@ -359,7 +359,7 @@ private fun MainScreen(
                         loadingIndicator.description()?.let { text ->
                             Text(
                                 text,
-                                Modifier.padding(bottom = spacing.medium),
+                                Modifier.padding(bottom = spacing.mediumAdaptive),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium,
                             )
@@ -460,7 +460,9 @@ private fun MainScreen(
                     }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
-                                start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
+                                start = spacing.windowPadding,
+                                top = spacing.tinyAdaptive,
+                                bottom = spacing.smallAdaptive,
                             )
                         )
                     }
@@ -476,7 +478,9 @@ private fun MainScreen(
                     }) {
                         Text(
                             stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
-                                start = spacing.windowPadding, top = spacing.tiny, bottom = spacing.small
+                                start = spacing.windowPadding,
+                                top = spacing.tinyAdaptive,
+                                bottom = spacing.smallAdaptive,
                             )
                         )
                     }

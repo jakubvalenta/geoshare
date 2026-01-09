@@ -42,10 +42,10 @@ fun UserPreferencesDetailPane(
             ) {
                 Column(
                     Modifier.padding(horizontal = spacing.windowPadding),
-                    verticalArrangement = Arrangement.spacedBy(spacing.medium),
+                    verticalArrangement = Arrangement.spacedBy(spacing.mediumAdaptive),
                 ) {
                     for (userPreference in currentGroup.userPreferences) {
-                        Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
                             if (currentGroup.userPreferences.size > 1) {
                                 ParagraphHtml(userPreference.title())
                             }

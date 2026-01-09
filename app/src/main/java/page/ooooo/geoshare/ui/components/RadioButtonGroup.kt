@@ -47,7 +47,7 @@ fun <T> RadioButtonGroup(
                 Row(
                     option.modifier
                         .fillMaxWidth()
-                        .padding(vertical = spacing.tiny)
+                        .padding(vertical = spacing.tinyAdaptive)
                         .selectable(
                             selected = (option.value == selectedValue),
                             enabled = enabled,

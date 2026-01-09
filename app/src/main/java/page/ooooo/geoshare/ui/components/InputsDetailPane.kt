@@ -102,13 +102,13 @@ private fun InputsDetailPane(
         ) {
             ParagraphText(
                 stringResource(R.string.inputs_detail_text, appName),
-                Modifier.padding(top = spacing.tiny, bottom = spacing.medium),
+                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
             )
             InputsSettingsButton(onShowOpenByDefaultSettings)
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = spacing.large, bottom = spacing.small),
+                    .padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -125,7 +125,7 @@ private fun InputsDetailPane(
             HorizontalDivider()
             documentationInputDetails.forEach { documentationInputDetails ->
                 Row(
-                    Modifier.padding(vertical = spacing.small),
+                    Modifier.padding(vertical = spacing.smallAdaptive),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

@@ -48,8 +48,8 @@ fun ScrollablePane(
 
     val scrollState = rememberScrollState()
     val headlineHeightPx = with(density) { MaterialTheme.typography.headlineMedium.fontSize.toPx() }
-    val headlinePaddingTopPx = with(density) { spacing.large.toPx() }
-    val headlinePaddingBottomPx = with(density) { spacing.medium.toPx() }
+    val headlinePaddingTopPx = with(density) { spacing.largeAdaptive.toPx() }
+    val headlinePaddingBottomPx = with(density) { spacing.mediumAdaptive.toPx() }
     val calcHeadlineAlpha = createLinearFunc(
         headlinePaddingTopPx, 1f,
         headlinePaddingTopPx + headlineHeightPx, 0f,

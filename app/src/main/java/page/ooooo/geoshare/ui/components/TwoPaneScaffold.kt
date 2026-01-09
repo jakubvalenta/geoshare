@@ -68,7 +68,7 @@ fun TwoPaneScaffold(
                                 Column(
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(start = spacing.tiny, end = spacing.tiny, bottom = spacing.tiny),
+                                        .padding(start = spacing.tiny, end = spacing.tiny, bottom = spacing.tinyAdaptive),
                                 ) {
                                     firstPane()
                                 }

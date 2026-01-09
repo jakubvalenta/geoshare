@@ -20,7 +20,7 @@ fun Headline(text: String, modifier: Modifier = Modifier) {
         modifier
             .fillMaxWidth()
             .padding(horizontal = spacing.windowPadding)
-            .padding(top = spacing.large, bottom = spacing.medium),
+            .padding(top = spacing.largeAdaptive, bottom = spacing.mediumAdaptive),
         style = MaterialTheme.typography.headlineMedium,
     )
 }

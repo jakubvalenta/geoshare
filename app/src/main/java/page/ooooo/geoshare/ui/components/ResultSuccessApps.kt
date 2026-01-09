@@ -77,11 +77,11 @@ fun ResultSuccessApps(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(top = spacing.large),
-        verticalArrangement = Arrangement.spacedBy(spacing.large),
+            .padding(top = spacing.largeAdaptive),
+        verticalArrangement = Arrangement.spacedBy(spacing.largeAdaptive),
     ) {
         grid.chunked(columnCount).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
                 row.forEach { gridItem ->
                     when (gridItem) {
                         is GridItem.App -> gridItem.let { (app, actions) ->
@@ -119,7 +119,7 @@ fun RowScope.ResultSuccessApp(
             }
             .weight(1f)
             .testTag("geoShareResultCardApp_${appDetails.packageName}"),
-        verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+        verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive)) {
         Box(
             Modifier
                 .align(Alignment.CenterHorizontally)
