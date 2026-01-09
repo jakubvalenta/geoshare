@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -27,6 +28,7 @@ fun TwoPaneScaffold(
     ratio: Float = 0.5f,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
     val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
@@ -38,7 +40,9 @@ fun TwoPaneScaffold(
                 navigationIcon = navigationIcon,
                 actions = actions,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = Color.Transparent,
+                    navigationIconContentColor = contentColor,
+                    actionIconContentColor = contentColor,
                 ),
             )
         },
@@ -68,7 +72,11 @@ fun TwoPaneScaffold(
                                 Column(
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(start = spacing.tiny, end = spacing.tiny, bottom = spacing.tinyAdaptive),
+                                        .padding(
+                                            start = spacing.tiny,
+                                            end = spacing.tiny,
+                                            bottom = spacing.tinyAdaptive
+                                        ),
                                 ) {
                                     firstPane()
                                 }
@@ -95,7 +103,13 @@ fun TwoPaneScaffold(
         } else {
             Column(
                 Modifier
-                    .padding(innerPadding)
+                    .padding(
+                        PaddingValues(
+                            start = innerPadding.calculateStartPadding(layoutDirection),
+                            end = innerPadding.calculateEndPadding(layoutDirection),
+                            bottom = innerPadding.calculateBottomPadding(),
+                        )
+                    )
                     .consumeWindowInsets(innerPadding)
                     .imePadding()
             ) {
@@ -113,7 +127,9 @@ fun TwoPaneScaffold(
                                 contentColor = contentColor,
                             ),
                         ) {
-                            firstPane()
+                            Column(Modifier.padding(top = innerPadding.calculateTopPadding())) {
+                                firstPane()
+                            }
                         }
                     }
                     if (secondPane != null) {
