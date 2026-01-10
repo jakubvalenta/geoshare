@@ -63,13 +63,13 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
-    flavorDimensions += "version"
+    flavorDimensions += "tier"
     productFlavors {
         create("full") {
-            dimension = "version"
+            dimension = "tier"
         }
         create("paid") {
-            dimension = "version"
+            dimension = "tier"
             versionNameSuffix = "-paid"
         }
     }
@@ -113,6 +113,9 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    "paidImplementation"(libs.android.billingclient.billing)
+    "paidImplementation"(libs.android.billingclient.billing.ktx)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

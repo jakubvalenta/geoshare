@@ -1,6 +1,7 @@
 [versions]
 accompanistDrawablePainter = "0.37.3"
 agp = "8.13.2"
+androidBillingClient = "8.3.0"
 androidxActivityCompose = "1.12.2"
 androidxComposeBom = "2025.12.01"
 androidxComposeMaterial3 = "1.5.0-alpha11"
@@ -27,6 +28,8 @@ re2j = "1.8"
 
 [libraries]
 accompanist-drawableplainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablePainter" }
+android-billingclient-billing = { module = "com.android.billingclient:billing", version.ref = "androidBillingClient" }
+android-billingclient-billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "androidBillingClient" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core-android" }
