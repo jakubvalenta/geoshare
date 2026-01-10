@@ -13,7 +13,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.BillingStatusPreference
+import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
 import page.ooooo.geoshare.lib.FakeLog
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -27,14 +27,14 @@ class BillingTest {
             val initialStatus = BillingStatus.Done(DefaultProduct)
             val cachedBillingStatus = BillingStatus.Loading
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(BillingStatusPreference) } doReturn cachedBillingStatus
+                onBlocking { getValue(BillingCachedProductIdPreference) } doReturn cachedBillingStatus
             }
             val newBillingStatus = BillingStatus.Loading
-            val billing = Billing(
+            val billing = BillingImpl(
                 coroutineScope = backgroundScope,
                 userPreferencesRepository = mockUserPreferencesRepository,
-                billingProvider = object : BillingProvider {
-                    override suspend fun queryStatus() = newBillingStatus
+                billingProvider = object : Billing {
+                    override suspend fun refreshStatus() = newBillingStatus
                 },
                 initialStatus = initialStatus,
                 log = FakeLog,
@@ -44,7 +44,7 @@ class BillingTest {
             assertEquals(newBillingStatus, billing.status.value)
             job?.join()
             assertEquals(newBillingStatus, billing.status.value)
-            verify(mockUserPreferencesRepository).setValue(BillingStatusPreference, newBillingStatus)
+            verify(mockUserPreferencesRepository).setValue(BillingCachedProductIdPreference, newBillingStatus)
         }
 
     @Test
@@ -54,14 +54,14 @@ class BillingTest {
             val initialStatus = BillingStatus.Done(DefaultProduct)
             val cachedBillingStatus = BillingStatus.Loading
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(BillingStatusPreference) } doReturn cachedBillingStatus
+                onBlocking { getValue(BillingCachedProductIdPreference) } doReturn cachedBillingStatus
             }
             val newBillingStatus = BillingStatus.Done(ProProduct, now)
-            val billing = Billing(
+            val billing = BillingImpl(
                 coroutineScope = backgroundScope,
                 userPreferencesRepository = mockUserPreferencesRepository,
-                billingProvider = object : BillingProvider {
-                    override suspend fun queryStatus() = newBillingStatus
+                billingProvider = object : Billing {
+                    override suspend fun refreshStatus() = newBillingStatus
                 },
                 initialStatus = initialStatus,
                 log = FakeLog,
@@ -71,7 +71,7 @@ class BillingTest {
             assertEquals(newBillingStatus, billing.status.value)
             job?.join()
             assertEquals(newBillingStatus, billing.status.value)
-            verify(mockUserPreferencesRepository).setValue(BillingStatusPreference, newBillingStatus)
+            verify(mockUserPreferencesRepository).setValue(BillingCachedProductIdPreference, newBillingStatus)
         }
 
     @Test
@@ -81,14 +81,14 @@ class BillingTest {
             val initialStatus = BillingStatus.Done(DefaultProduct)
             val cachedBillingStatus = BillingStatus.Done(ProProduct, now - 25.hours.inWholeMilliseconds)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(BillingStatusPreference) } doReturn cachedBillingStatus
+                onBlocking { getValue(BillingCachedProductIdPreference) } doReturn cachedBillingStatus
             }
             val newBillingStatus = BillingStatus.Loading
-            val billing = Billing(
+            val billing = BillingImpl(
                 coroutineScope = backgroundScope,
                 userPreferencesRepository = mockUserPreferencesRepository,
-                billingProvider = object : BillingProvider {
-                    override suspend fun queryStatus(): BillingStatus = withContext(Dispatchers.IO) {
+                billingProvider = object : Billing {
+                    override suspend fun refreshStatus(): BillingStatus = withContext(Dispatchers.IO) {
                         delay(10.milliseconds)
                         newBillingStatus
                     }
@@ -101,7 +101,7 @@ class BillingTest {
             assertEquals(initialStatus, billing.status.value)
             job?.join()
             assertEquals(newBillingStatus, billing.status.value)
-            verify(mockUserPreferencesRepository).setValue(BillingStatusPreference, newBillingStatus)
+            verify(mockUserPreferencesRepository).setValue(BillingCachedProductIdPreference, newBillingStatus)
         }
 
     @Test
@@ -111,14 +111,14 @@ class BillingTest {
             val initialStatus = BillingStatus.Done(DefaultProduct)
             val cachedBillingStatus = BillingStatus.Done(ProProduct, now - 25.hours.inWholeMilliseconds)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(BillingStatusPreference) } doReturn cachedBillingStatus
+                onBlocking { getValue(BillingCachedProductIdPreference) } doReturn cachedBillingStatus
             }
             val newBillingStatus = BillingStatus.Done(ProProduct)
-            val billing = Billing(
+            val billing = BillingImpl(
                 coroutineScope = backgroundScope,
                 userPreferencesRepository = mockUserPreferencesRepository,
-                billingProvider = object : BillingProvider {
-                    override suspend fun queryStatus() = newBillingStatus
+                billingProvider = object : Billing {
+                    override suspend fun refreshStatus() = newBillingStatus
                 },
                 initialStatus = initialStatus,
                 log = FakeLog,
@@ -128,7 +128,7 @@ class BillingTest {
             assertEquals(initialStatus, billing.status.value)
             job?.join()
             assertEquals(newBillingStatus, billing.status.value)
-            verify(mockUserPreferencesRepository).setValue(BillingStatusPreference, newBillingStatus)
+            verify(mockUserPreferencesRepository).setValue(BillingCachedProductIdPreference, newBillingStatus)
         }
 
     @Test
@@ -138,13 +138,13 @@ class BillingTest {
             val initialStatus = BillingStatus.Done(DefaultProduct)
             val cachedBillingStatus = BillingStatus.Done(ProProduct, now - 25.hours.inWholeMilliseconds)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(BillingStatusPreference) } doReturn cachedBillingStatus
+                onBlocking { getValue(BillingCachedProductIdPreference) } doReturn cachedBillingStatus
             }
-            val billing = Billing(
+            val billing = BillingImpl(
                 coroutineScope = backgroundScope,
                 userPreferencesRepository = mockUserPreferencesRepository,
-                billingProvider = object : BillingProvider {
-                    override suspend fun queryStatus(): BillingStatus {
+                billingProvider = object : Billing {
+                    override suspend fun refreshStatus(): BillingStatus {
                         throw Exception("Billing provider error")
                     }
                 },
@@ -156,7 +156,7 @@ class BillingTest {
             assertEquals(initialStatus, billing.status.value)
             job?.join()
             assertEquals(BillingStatus.Loading, billing.status.value)
-            verify(mockUserPreferencesRepository, never()).setValue(eq(BillingStatusPreference), any())
+            verify(mockUserPreferencesRepository, never()).setValue(eq(BillingCachedProductIdPreference), any())
         }
 
     @Test
@@ -166,13 +166,13 @@ class BillingTest {
             val initialStatus = BillingStatus.Done(DefaultProduct)
             val cachedBillingStatus = BillingStatus.Done(ProProduct, now - 23.hours.inWholeMilliseconds)
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-                onBlocking { getValue(BillingStatusPreference) } doReturn cachedBillingStatus
+                onBlocking { getValue(BillingCachedProductIdPreference) } doReturn cachedBillingStatus
             }
-            val billing = Billing(
+            val billing = BillingImpl(
                 coroutineScope = backgroundScope,
                 initialStatus = initialStatus,
-                billingProvider = object : BillingProvider {
-                    override suspend fun queryStatus() = BillingStatus.Done(FullProduct) // Not called
+                billingProvider = object : Billing {
+                    override suspend fun refreshStatus() = BillingStatus.Done(FullProduct) // Not called
                 },
                 userPreferencesRepository = mockUserPreferencesRepository,
             )
@@ -181,6 +181,6 @@ class BillingTest {
             assertEquals(cachedBillingStatus, billing.status.value)
             job?.join()
             assertEquals(cachedBillingStatus, billing.status.value)
-            verify(mockUserPreferencesRepository, never()).setValue(eq(BillingStatusPreference), any())
+            verify(mockUserPreferencesRepository, never()).setValue(eq(BillingCachedProductIdPreference), any())
         }
 }

@@ -18,6 +18,7 @@ class ConversionActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // TODO Start billing connection before starting conversion
         viewModel.updateInput(AndroidTools.getIntentUriString(intent) ?: "")
         viewModel.start()
         enableEdgeToEdge()
@@ -26,6 +27,16 @@ class ConversionActivity : ComponentActivity() {
                 MainNavigation(viewModel, introEnabled = false)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.billing.startConnection(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.billing.endConnection()
     }
 
     override fun onNewIntent(intent: Intent) {

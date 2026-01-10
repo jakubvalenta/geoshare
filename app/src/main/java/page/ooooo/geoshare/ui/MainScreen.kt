@@ -67,10 +67,9 @@ import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
-import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FullProduct
-import page.ooooo.geoshare.lib.billing.ProProduct
+import page.ooooo.geoshare.lib.billing.FakeFullPlan
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
@@ -290,7 +289,7 @@ private fun MainScreen(
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = retain { mutableStateOf(false) }
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
-    val paid = (billingStatus as? BillingStatus.Done)?.product?.paid == true
+    val plan = (billingStatus as? BillingStatus.Done)?.plan
     val sheetState = rememberModalBottomSheetState()
 
     BackHandler(currentState !is Initial) {
@@ -312,7 +311,7 @@ private fun MainScreen(
             }
         },
         actions = {
-            if (paid) {
+            if (plan != null) {
                 FeatureBadgeSmall(
                     onClick = onNavigateToBillingScreen,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -408,7 +407,7 @@ private fun MainScreen(
                     MainForm(
                         inputUriString = inputUriString,
                         errorMessageResId = errorMessageResId,
-                        paid = paid,
+                        plan = plan,
                         onSetErrorMessageResId = setErrorMessageResId,
                         onSubmit = onStart,
                         onUpdateInput = onUpdateInput,
@@ -619,7 +618,7 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            billingStatus = BillingStatus.Done(ProProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -647,7 +646,7 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            billingStatus = BillingStatus.Done(ProProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -675,7 +674,7 @@ private fun TabletPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -707,7 +706,7 @@ private fun SucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -739,7 +738,7 @@ private fun DarkSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -771,7 +770,7 @@ private fun TabletSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -803,7 +802,7 @@ private fun AutomationPreview() {
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = Billing(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -811,7 +810,7 @@ private fun AutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -843,7 +842,7 @@ private fun DarkAutomationPreview() {
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = Billing(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -851,7 +850,7 @@ private fun DarkAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -883,7 +882,7 @@ private fun TabletAutomationPreview() {
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = Billing(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -891,7 +890,7 @@ private fun TabletAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -922,7 +921,7 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -953,7 +952,7 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -984,7 +983,7 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
@@ -1018,7 +1017,7 @@ private fun LoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = Billing(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1028,7 +1027,7 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1065,7 +1064,7 @@ private fun DarkLoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = Billing(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1075,7 +1074,7 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
@@ -1112,7 +1111,7 @@ private fun TabletLoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = Billing(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1122,7 +1121,7 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            billingStatus = BillingStatus.Done(FullProduct),
+            billingStatus = BillingStatus.Done(FakeFullPlan),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(

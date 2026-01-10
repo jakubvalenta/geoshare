@@ -90,6 +90,7 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
         composable<BillingRoute> {
             BillingScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                viewModel = viewModel,
             )
         }
         composable<UserPreferencesRoute> { backStackEntry ->

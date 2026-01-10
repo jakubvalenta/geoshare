@@ -15,12 +15,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.refreshBilling()
         enableEdgeToEdge()
         setContent {
             AppTheme {
                 MainNavigation(viewModel, introEnabled = true)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.billing.startConnection(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.billing.endConnection()
     }
 }

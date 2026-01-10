@@ -37,7 +37,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
             UserPreferencesValues(
                 automation = AutomationPreference.getValue(it),
                 automationDelay = AutomationDelayPreference.getValue(it),
-                billingStatus = BillingStatusPreference.getValue(it),
+                billingCachedProductId = BillingCachedProductIdPreference.getValue(it),
                 changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
                 connectionPermission = ConnectionPermissionPreference.getValue(it),
                 introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),

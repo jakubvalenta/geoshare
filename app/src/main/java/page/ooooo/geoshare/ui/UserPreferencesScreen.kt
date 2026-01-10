@@ -33,15 +33,15 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.BillingStatusPreference
+import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
 import page.ooooo.geoshare.ui.components.UserPreferencesListPane
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -96,7 +96,7 @@ object DeveloperOptionsUserPreferencesGroup : UserPreferencesGroup {
     override val userPreferences = listOf(
         ChangelogShownForVersionCodePreference,
         IntroShowForVersionCodePreference,
-        BillingStatusPreference,
+        BillingCachedProductIdPreference,
     )
     override val visible = BuildConfig.DEBUG
     override val featureStatus = FeatureStatus.AVAILABLE

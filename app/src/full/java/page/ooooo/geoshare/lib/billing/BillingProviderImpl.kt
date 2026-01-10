@@ -1,5 +1,13 @@
 package page.ooooo.geoshare.lib.billing
 
 object BillingProviderImpl : BillingProvider {
-    override suspend fun queryStatus() = BillingStatus.Done(FullProduct)
+
+    @Immutable
+    object FullPlan : Plan {
+        override val features = persistentListOf(AutomationFeature)
+        override val oneTimeProductIds = persistentListOf()
+        override val subscriptionProductIds = persistentListOf()
+    }
+
+    override suspend fun queryStatus() = BillingStatus.Done(FullPlan)
 }

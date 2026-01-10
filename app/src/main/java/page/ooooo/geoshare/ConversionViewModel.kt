@@ -23,6 +23,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
@@ -39,7 +40,6 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.LocationReceived
 import page.ooooo.geoshare.lib.conversion.ReceivedUriString
 import page.ooooo.geoshare.lib.conversion.State
-import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
@@ -54,7 +54,7 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    val billing = Billing(viewModelScope, userPreferencesRepository)
+    val billing = BillingImpl(viewModelScope, userPreferencesRepository)
 
     val stateContext = ConversionStateContext(
         inputs = allInputs,
@@ -291,12 +291,6 @@ class ConversionViewModel @Inject constructor(
     fun reset() {
         if (stateContext.currentState !is Initial) {
             stateContext.currentState = Initial()
-        }
-    }
-
-    fun refreshBilling() {
-        viewModelScope.launch {
-            billing.refresh()
         }
     }
 

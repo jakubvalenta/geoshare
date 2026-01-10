@@ -19,10 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun AppHeadline(modifier: Modifier = Modifier, iconEnabled: Boolean = true, paid: Boolean = false) {
+fun AppHeadline(plan: Plan?, modifier: Modifier = Modifier, iconEnabled: Boolean = true) {
     val iconSize = with(LocalDensity.current) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2f }
     val space = 4.dp
 
@@ -46,7 +48,7 @@ fun AppHeadline(modifier: Modifier = Modifier, iconEnabled: Boolean = true, paid
             )
         }
         Text(
-            stringResource(if (paid) R.string.app_name_pro else R.string.app_name),
+            stringResource(plan?.appNameResId ?: R.string.app_name),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineLarge,
         )
@@ -60,7 +62,7 @@ fun AppHeadline(modifier: Modifier = Modifier, iconEnabled: Boolean = true, paid
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            AppHeadline()
+            AppHeadline(plan = null)
         }
     }
 }
@@ -70,27 +72,27 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            AppHeadline()
+            AppHeadline(plan = null)
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun PaidPreview() {
+private fun PurchasedPreview() {
     AppTheme {
         Surface {
-            AppHeadline(paid = true)
+            AppHeadline(plan = FakeFullPlan)
         }
     }
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkPaidPreview() {
+private fun DarkPurchasedPreview() {
     AppTheme {
         Surface {
-            AppHeadline(paid = true)
+            AppHeadline(plan = FakeFullPlan)
         }
     }
 }

@@ -13,8 +13,6 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
-import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FullProduct
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
@@ -50,7 +48,7 @@ class FakeUserPreferencesRepository @Inject constructor() : UserPreferencesRepos
 val defaultFakeUserPreferences = UserPreferencesValues(
     automation = NoopAutomation,
     automationDelay = 5.seconds,
-    billingStatus = BillingStatus.Done(FullProduct),
+    billingCachedProductId = "",
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
     introShownForVersionCode = 0,

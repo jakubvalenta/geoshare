@@ -11,6 +11,8 @@ import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
@@ -23,8 +25,6 @@ import page.ooooo.geoshare.lib.outputs.LocationAutomation
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.billing.AutomationFeature
-import page.ooooo.geoshare.lib.billing.FeatureStatus
 import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -357,8 +357,6 @@ data class ConversionSucceeded(
         if (automation is NoopAutomation) {
             return null
         }
-        // TODO Check if billing refreshing gets cancelled when running automation and switching to another app
-        stateContext.billing.refresh()
         if (stateContext.billing.status.value.getFeatureStatus(AutomationFeature) == FeatureStatus.AVAILABLE) {
             if (automation is Automation.HasDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)

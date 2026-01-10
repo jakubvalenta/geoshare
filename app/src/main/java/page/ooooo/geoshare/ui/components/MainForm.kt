@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -36,7 +38,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun MainForm(
     inputUriString: String,
     errorMessageResId: Int?,
-    paid: Boolean = false,
+    plan: Plan?,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSubmit: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
@@ -46,10 +48,10 @@ fun MainForm(
     val spacing = LocalSpacing.current
 
     AppHeadline(
+        plan,
         Modifier
             .padding(vertical = spacing.largeAdaptive)
             .padding(start = 13.dp, end = spacing.windowPadding),
-        paid = paid,
     )
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),
@@ -141,6 +143,7 @@ private fun DefaultPreview() {
                 MainForm(
                     inputUriString = "",
                     errorMessageResId = null,
+                    plan = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -159,6 +162,7 @@ private fun DarkPreview() {
                 MainForm(
                     inputUriString = "",
                     errorMessageResId = null,
+                    plan = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -177,7 +181,7 @@ private fun FilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = null,
-                    paid = true,
+                    plan = FakeFullPlan,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -196,7 +200,7 @@ private fun DarkFilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = null,
-                    paid = true,
+                    plan = FakeFullPlan,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -215,6 +219,7 @@ private fun ErrorPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = R.string.conversion_failed_missing_url,
+                    plan = null,
                     onSetErrorMessageResId = {},
                     onUpdateInput = {},
                     onSubmit = {},
@@ -233,6 +238,7 @@ private fun DarkErrorPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = R.string.conversion_failed_missing_url,
+                    plan = null,
                     onSetErrorMessageResId = {},
                     onUpdateInput = {},
                     onSubmit = {},

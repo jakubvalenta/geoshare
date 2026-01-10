@@ -11,8 +11,8 @@ sealed interface BillingStatus {
     }
 
     @Immutable
-    data class Done(val product: Product, val validatedAt: Long = System.currentTimeMillis()) : BillingStatus {
-        override fun getFeatureStatus(feature: Feature) = if (product.features.contains(feature)) {
+    data class Done(val plan: Plan?) : BillingStatus {
+        override fun getFeatureStatus(feature: Feature) = if (plan?.features?.contains(feature) == true) {
             FeatureStatus.AVAILABLE
         } else {
             FeatureStatus.NOT_AVAILABLE

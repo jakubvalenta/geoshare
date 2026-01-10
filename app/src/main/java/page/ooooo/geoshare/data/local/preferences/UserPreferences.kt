@@ -23,9 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.FeatureStatus
-import page.ooooo.geoshare.lib.billing.allProducts
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.outputs.allOutputs
@@ -68,10 +66,11 @@ interface UserPreference<T> {
     )
 }
 
-abstract class NumberPreference<T> : UserPreference<T> {
+abstract class SingleKeyPreference<T>() : UserPreference<T> {
     abstract val key: Preferences.Key<String>
     abstract val default: T
-    abstract val modifier: Modifier
+
+    open val modifier: Modifier = Modifier
 
     protected abstract fun serialize(value: T): String
 
@@ -141,27 +140,25 @@ abstract class NumberPreference<T> : UserPreference<T> {
     }
 
     @Composable
-    protected abstract fun getError(value: String?): String?
+    open fun getError(value: String?): String? = null
 }
 
-abstract class NullableIntPreference : NumberPreference<Int?>() {
+abstract class NullableIntPreference : SingleKeyPreference<Int?>() {
     override val loading = null
 
     override fun serialize(value: Int?) = value.toString()
 
     override fun deserialize(value: String?) = value?.toIntOrNull() ?: default
-
-    @Composable
-    override fun getError(value: String?) = null
 }
 
-abstract class DurationPreference : NumberPreference<Duration>() {
+abstract class DurationPreference : SingleKeyPreference<Duration>() {
     open val minValue = Int.MIN_VALUE
     open val maxValue = Int.MAX_VALUE
 
     override fun serialize(value: Duration) = value.toInt(DurationUnit.SECONDS).toString()
 
-    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
+    override fun deserialize(value: String?) =
+        value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
 
     @Composable
     override fun suffix() = stringResource(R.string.seconds_unit)
@@ -385,49 +382,19 @@ object AutomationDelayPreference : DurationPreference() {
     }
 }
 
-object BillingStatusPreference : UserPreference<BillingStatus> {
-    override val loading = BillingStatus.Loading
+object BillingCachedProductIdPreference : SingleKeyPreference<String?>() {
+    override val key = stringPreferencesKey("billing_product_id")
+    override val default = ""
+    override val loading = ""
 
-    private val productIdKey = stringPreferencesKey("billing_product_id")
-    private val validatedAtKey = stringPreferencesKey("billing_validated_at")
+    override fun serialize(value: String?) = value.orEmpty()
 
-    override fun getValue(preferences: Preferences) =
-        preferences[productIdKey]
-            ?.let { allProducts[it] }
-            ?.let { product -> BillingStatus.Done(product, preferences[validatedAtKey]?.toLongOrNull() ?: 0) }
-            ?: BillingStatus.Loading
+    override fun deserialize(value: String?) = value?.ifEmpty { null }
 
-    override fun setValue(preferences: MutablePreferences, value: BillingStatus) {
-        when (value) {
-            is BillingStatus.Loading -> {
-                preferences[productIdKey] = ""
-                preferences[validatedAtKey] = ""
-            }
-
-            is BillingStatus.Done -> {
-                preferences[productIdKey] = value.product.id
-                preferences[validatedAtKey] = value.validatedAt.toString()
-            }
-        }
-    }
+    override fun getValue(values: UserPreferencesValues) = values.billingCachedProductId
 
     @Composable
-    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
-    }
-
-    @Composable
-    override fun Component(
-        values: UserPreferencesValues,
-        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
-        enabled: Boolean,
-        featureStatus: FeatureStatus,
-    ) {
-    }
-
-    override fun getValue(values: UserPreferencesValues) = values.billingStatus
-
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_automation_feature_validated_at_title)
+    override fun title() = stringResource(R.string.user_preferences_billing_cached_product_id)
 }
 
 object IntroShowForVersionCodePreference : NullableIntPreference() {
@@ -455,7 +422,7 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference() {
 data class UserPreferencesValues(
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
-    val billingStatus: BillingStatus = BillingStatusPreference.loading,
+    val billingCachedProductId: String? = BillingCachedProductIdPreference.loading,
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,

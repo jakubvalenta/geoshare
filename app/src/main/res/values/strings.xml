@@ -155,7 +155,7 @@
     <string name="user_preferences_automation_title">Automation</string>
     <string name="user_preferences_automation_delay_sec_title">Automation delay</string>
     <string name="user_preferences_automation_delay_sec_description">Set how long the app waits before launching an automated action (e.g. before automatically opening a map app).</string>
-    <string name="user_preferences_automation_feature_validated_at_title" translatable="false">When was the automation feature last validated?</string>
+    <string name="user_preferences_billing_cached_product_id" translatable="false">Cached product id</string>
     <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
     <string name="yes">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
@@ -200,4 +200,7 @@
         <item quantity="other">%1$d seconds</item>
     </plurals>
     <string name="text_list_bullet" translatable="false">•</string>
+    <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
+    <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
+    <string name="billing_setup_error_unknown">Unknown error when fetching purchases</string>
 </resources>

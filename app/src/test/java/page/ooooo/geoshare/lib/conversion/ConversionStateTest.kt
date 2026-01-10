@@ -33,9 +33,10 @@ import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.DefaultProduct
-import page.ooooo.geoshare.lib.billing.FullProduct
+import page.ooooo.geoshare.lib.billing.FakeEmptyPlan
+import page.ooooo.geoshare.lib.billing.FakeFullPlan
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -97,7 +98,7 @@ class ConversionStateTest {
         inputs: List<Input> = listOf(GeoUriInput, GoogleMapsInput),
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
-        billing: Billing = Billing(this, fakeUserPreferencesRepository),
+        billing: Billing = BillingImpl(this, fakeUserPreferencesRepository),
         log: ILog = FakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
@@ -468,11 +469,12 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
-                        throw CancellationException()
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                    override fun onRequestLocationHeader(url: URL): String? =
+                        if (url.toString() == inputUriString) {
+                            throw CancellationException()
+                        } else {
+                            super.onRequestLocationHeader(url)
+                        }
                 },
             )
             val state = GrantedUnshortenPermission(
@@ -494,11 +496,12 @@ class ConversionStateTest {
             )
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
-                        throw tr
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                    override fun onRequestLocationHeader(url: URL): String? =
+                        if (url.toString() == inputUriString) {
+                            throw tr
+                        } else {
+                            super.onRequestLocationHeader(url)
+                        }
                 },
             )
             val state = GrantedUnshortenPermission(
@@ -522,11 +525,12 @@ class ConversionStateTest {
             )
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
-                        throw tr
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                    override fun onRequestLocationHeader(url: URL): String? =
+                        if (url.toString() == inputUriString) {
+                            throw tr
+                        } else {
+                            super.onRequestLocationHeader(url)
+                        }
                 },
             )
             val state = GrantedUnshortenPermission(
@@ -551,14 +555,15 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
-                        throw UnrecoverableException(
-                            R.string.network_exception_server_response_error,
-                            Exception(),
-                        )
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                    override fun onRequestLocationHeader(url: URL): String? =
+                        if (url.toString() == inputUriString) {
+                            throw UnrecoverableException(
+                                R.string.network_exception_server_response_error,
+                                Exception(),
+                            )
+                        } else {
+                            super.onRequestLocationHeader(url)
+                        }
                 },
             )
             val state = GrantedUnshortenPermission(
@@ -577,14 +582,15 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
-                        throw UnrecoverableException(
-                            R.string.network_exception_server_response_error,
-                            SocketTimeoutException(),
-                        )
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                    override fun onRequestLocationHeader(url: URL): String? =
+                        if (url.toString() == inputUriString) {
+                            throw UnrecoverableException(
+                                R.string.network_exception_server_response_error,
+                                SocketTimeoutException(),
+                            )
+                        } else {
+                            super.onRequestLocationHeader(url)
+                        }
                 },
             )
             val state = GrantedUnshortenPermission(
@@ -603,11 +609,12 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
-                    override fun onRequestLocationHeader(url: URL): String? = if (url.toString() == inputUriString) {
-                        null
-                    } else {
-                        super.onRequestLocationHeader(url)
-                    }
+                    override fun onRequestLocationHeader(url: URL): String? =
+                        if (url.toString() == inputUriString) {
+                            null
+                        } else {
+                            super.onRequestLocationHeader(url)
+                        }
                 },
             )
             val state = GrantedUnshortenPermission(
@@ -1726,7 +1733,6 @@ class ConversionStateTest {
         this.backgroundScope
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading)
-            onBlocking { refresh(any()) } doReturn null
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1737,7 +1743,6 @@ class ConversionStateTest {
         )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertNull(state.transition())
-        verify(mockBilling).refresh(any())
     }
 
     @Test
@@ -1747,8 +1752,7 @@ class ConversionStateTest {
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         this.backgroundScope
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(DefaultProduct))
-            onBlocking { refresh(any()) } doReturn null
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeEmptyPlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1759,7 +1763,6 @@ class ConversionStateTest {
         )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertNull(state.transition())
-        verify(mockBilling).refresh(any())
     }
 
     @Test
@@ -1768,8 +1771,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FullProduct))
-            onBlocking { refresh(any()) } doReturn null
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1783,7 +1785,6 @@ class ConversionStateTest {
             ActionReady(inputUriString, position, null, action),
             state.transition(),
         )
-        verify(mockBilling).refresh(any())
     }
 
     @Test
@@ -1792,8 +1793,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FullProduct))
-            onBlocking { refresh(any()) } doReturn null
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1816,8 +1816,7 @@ class ConversionStateTest {
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FullProduct))
-            onBlocking { refresh(any()) } doReturn null
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1841,8 +1840,7 @@ class ConversionStateTest {
         val action = GpxOutput.SaveGpxPointsAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FullProduct))
-            onBlocking { refresh(any()) } doReturn null
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1866,8 +1864,7 @@ class ConversionStateTest {
         val action = GeoUriOutput.ShareGeoUriAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FullProduct))
-            onBlocking { refresh(any()) } doReturn null
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action

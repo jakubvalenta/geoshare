@@ -46,7 +46,7 @@ import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.conversion.ActionFailed
 import page.ooooo.geoshare.lib.conversion.ActionFinished
@@ -361,7 +361,7 @@ private fun ActionWaitingPreview() {
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         userPreferencesRepository = userPreferencesRepository,
-                        billing = Billing(coroutineScope, userPreferencesRepository),
+                        billing = BillingImpl(coroutineScope, userPreferencesRepository),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
@@ -390,7 +390,7 @@ private fun DarkActionWaitingPreview() {
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         userPreferencesRepository = userPreferencesRepository,
-                        billing = Billing(coroutineScope, userPreferencesRepository),
+                        billing = BillingImpl(coroutineScope, userPreferencesRepository),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,

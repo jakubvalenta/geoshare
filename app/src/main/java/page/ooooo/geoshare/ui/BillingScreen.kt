@@ -59,8 +59,13 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
+import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.ui.components.AppHeadline
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.TextList
@@ -108,9 +113,23 @@ private val paymentOptions = listOf(
     OneTimePaymentOption,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BillingScreen(
+    onBack: () -> Unit = {},
+    viewModel: ConversionViewModel,
+) {
+    val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
+
+    BillingScreen(
+        billingStatus = billingStatus,
+        onBack = onBack,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BillingScreen(
+    billingStatus: BillingStatus,
     onBack: () -> Unit = {},
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
@@ -118,6 +137,7 @@ fun BillingScreen(
     val spacing = LocalSpacing.current
     val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
     var selectedPaymentOption by remember { mutableStateOf(paymentOptions[0]) }
+    val plan = (billingStatus as? BillingStatus.Done)?.plan
 
     Scaffold(
         topBar = {
@@ -151,7 +171,7 @@ fun BillingScreen(
                             .weight(1f, true)
                             .verticalScroll(rememberScrollState()),
                     ) {
-                        BillingFirstPane()
+                        BillingFirstPane(plan)
                     }
                 }
                 Column(Modifier.weight(0.4f)) {
@@ -186,7 +206,7 @@ fun BillingScreen(
                         .weight(1f)
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    BillingFirstPane()
+                    BillingFirstPane(plan)
                 }
                 ElevatedCard(
                     shape = MaterialTheme.shapes.large.copy(
@@ -211,7 +231,7 @@ fun BillingScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun BillingFirstPane() {
+private fun BillingFirstPane(plan: Plan?) {
     val spacing = LocalSpacing.current
 
     Column(
@@ -239,7 +259,7 @@ private fun BillingFirstPane() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyLarge,
         )
-        AppHeadline(Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false, paid = true)
+        AppHeadline(plan, Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false)
     }
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
         TextList(
@@ -291,6 +311,8 @@ private fun BillingFirstPane() {
         }
     }
     // TODO Change content if subscribed
+    // TODO Manage your subscription: https://play.google.com/store/account/subscriptions?sku=your-sub-product-id&package=your-app-package
+    // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
     // TODO Add TOS link
 }
 
@@ -372,7 +394,7 @@ private fun BillingSecondPane(
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        BillingScreen()
+        BillingScreen(billingStatus = BillingStatus.Done(null))
     }
 }
 
@@ -380,7 +402,7 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        BillingScreen()
+        BillingScreen(billingStatus = BillingStatus.Done(null))
     }
 }
 
@@ -388,6 +410,30 @@ private fun DarkPreview() {
 @Composable
 private fun TabletPreview() {
     AppTheme {
-        BillingScreen()
+        BillingScreen(billingStatus = BillingStatus.Done(null))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PurchasedPreview() {
+    AppTheme {
+        BillingScreen(billingStatus = BillingStatus.Done(FakeFullPlan))
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPurchasedPreview() {
+    AppTheme {
+        BillingScreen(billingStatus = BillingStatus.Done(FakeFullPlan))
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPurchasedPreview() {
+    AppTheme {
+        BillingScreen(billingStatus = BillingStatus.Done(FakeFullPlan))
     }
 }
