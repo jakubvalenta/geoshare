@@ -148,4 +148,12 @@
     <string name="inputs_link">链接</string>
     <string name="inputs_list_text">您可以将以下地图服务的链接分享给 %1$s 或将其粘贴到应用中。</string>
     <string name="inputs_settings">转到 Android 设置，选择应始终在 %1$s 中打开的链接</string>
+    <string name="reset">重置</string>
+    <plurals name="seconds">
+        <item quantity="other">%1$d 秒</item>
+    </plurals>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">值必须介于 %1$d 和 %2$d 之间</string>
+    <string name="user_preferences_automation_delay_sec_description">设置应用在启动自动操作前的等待时间（例如，自动打开地图应用前的等待时长）。</string>
+    <string name="user_preferences_automation_delay_sec_title">自动化延迟</string>
+    <string name="seconds_unit">秒</string>
 </resources>
