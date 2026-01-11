@@ -12,15 +12,14 @@ abstract class Billing(
     val userPreferencesRepository: UserPreferencesRepository,
 ) {
     abstract val status: StateFlow<BillingStatus>
+    abstract val offers: StateFlow<List<Offer>>
     abstract val errorMessageResId: StateFlow<Int?>
 
     abstract fun startConnection(context: Context)
 
     abstract fun endConnection()
 
-    abstract suspend fun launchBillingFlow(activity: Activity, offerToken: String): Boolean
-
-    abstract suspend fun queryOffers(): List<Offer>
+    abstract fun launchBillingFlow(activity: Activity, offerToken: String)
 
     suspend fun getCachedProductId(): String? =
         userPreferencesRepository.getValue(BillingCachedProductIdPreference)

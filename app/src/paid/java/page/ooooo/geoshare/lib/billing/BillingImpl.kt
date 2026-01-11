@@ -21,10 +21,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,20 +39,54 @@ class BillingImpl(
 ) :
     Billing(coroutineScope, userPreferencesRepository) {
 
-    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
-    override val status: StateFlow<BillingStatus> = _status
-
-    private val _errorMessageResId: MutableStateFlow<Int?> = MutableStateFlow(null)
-    override val errorMessageResId: StateFlow<Int?> = _errorMessageResId
-
-    private var billingClient: BillingClient? = null
-
     private val plan = object : Plan {
         @StringRes
         override val appNameResId = R.string.app_name_pro
         override val oneTimeProductId = "pro_one_time"
         override val subscriptionProductId = "pro_subscription"
         override val features = persistentListOf(AutomationFeature)
+    }
+
+    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
+    override val status: StateFlow<BillingStatus> = _status
+
+    override val offers: StateFlow<List<Offer>> = flow<List<Offer>> {
+        queryProductDetailsAndOffers()
+            .map { (_, offer) -> offer }
+            .toList()
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList(),
+    )
+
+    private val _errorMessageResId: MutableStateFlow<Int?> = MutableStateFlow(null)
+    override val errorMessageResId: StateFlow<Int?> = _errorMessageResId
+
+    private var billingClient: BillingClient? = null
+
+    val billingClientListener = object : BillingClientStateListener {
+        override fun onBillingSetupFinished(billingResult: BillingResult) {
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Log.i("Billing", "Billing setup ok")
+                coroutineScope.launch {
+                    val purchases = queryPurchases()
+                    val newProductId = purchases.findProductId(plan)
+                    val newPlan = plan.takeIf { newProductId != null }
+                    val newStatus = BillingStatus.Done(newPlan)
+                    setCachedProductId(newProductId)
+                    _status.value = newStatus
+                }
+            } else {
+                Log.e("Billing", "Billing setup error: ${billingResult.debugMessage}")
+                _errorMessageResId.value = R.string.billing_setup_error_unknown
+            }
+        }
+
+        override fun onBillingServiceDisconnected() {
+            Log.i("Billing", "Billing service disconnected")
+            // Let's hope it's fine to do nothing here, since we use automatic reconnection
+        }
     }
 
     val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
@@ -78,30 +114,6 @@ class BillingImpl(
         }
     }
 
-    val billingClientListener = object : BillingClientStateListener {
-        override fun onBillingSetupFinished(billingResult: BillingResult) {
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                Log.i("Billing", "Billing setup ok")
-                coroutineScope.launch {
-                    val purchases = queryPurchases()
-                    val newProductId = purchases.findProductId(plan)
-                    val newPlan = plan.takeIf { newProductId != null }
-                    val newStatus = BillingStatus.Done(newPlan)
-                    setCachedProductId(newProductId)
-                    _status.value = newStatus
-                }
-            } else {
-                Log.e("Billing", "Billing setup error: ${billingResult.debugMessage}")
-                _errorMessageResId.value = R.string.billing_setup_error_unknown
-            }
-        }
-
-        override fun onBillingServiceDisconnected() {
-            Log.i("Billing", "Billing service disconnected")
-            // Let's hope it's fine to do nothing here, since we use automatic reconnection
-        }
-    }
-
     override fun startConnection(context: Context) {
         coroutineScope.launch {
             val newProductId = getCachedProductId()
@@ -112,8 +124,7 @@ class BillingImpl(
                 .setListener(purchasesUpdatedListener)
                 .enableAutoServiceReconnection()
                 .build()
-
-            billingClient?.startConnection(billingClientListener)
+                .apply { startConnection(billingClientListener) }
         }
     }
 
@@ -121,30 +132,38 @@ class BillingImpl(
         billingClient?.endConnection()
     }
 
-    override suspend fun launchBillingFlow(activity: Activity, offerToken: String): Boolean {
-        val (productDetails) = queryProductDetailsAndOffers()
-            .firstOrNull { it.second.token == offerToken }
-            ?: return false
+    override fun launchBillingFlow(activity: Activity, offerToken: String) {
+        coroutineScope.launch {
+            val (productDetails) = queryProductDetailsAndOffers()
+                .firstOrNull { it.second.token == offerToken }
+                ?: return@launch // TODO Don't exit silently
 
-        val productDetailsParamsList = listOf(
-            BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(productDetails)
-                .setOfferToken(offerToken)
+            val productDetailsParamsList = listOf(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(productDetails)
+                    .setOfferToken(offerToken)
+                    .build()
+            )
+            val billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
                 .build()
-        )
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(productDetailsParamsList)
-            .build()
 
-        val billingResult = billingClient?.launchBillingFlow(activity, billingFlowParams)
-        return billingResult?.responseCode == BillingClient.BillingResponseCode.OK
+            billingClient?.let { billingClient ->
+                val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
+                when (billingResult.responseCode) {
+                    BillingClient.BillingResponseCode.OK -> {
+                        Log.i("Billing", "Billing flow ok")
+                    }
+
+                    else -> {
+                        Log.e("Billing", "Billing flow error: ${billingResult.debugMessage}")
+                        _errorMessageResId.value = R.string.billing_purchase_error_unknown
+                    }
+                }
+            }
+            // TODO Don't exit silently if billingClient is null
+        }
     }
-
-    // TODO Turn queryOffers into StateFlow
-    override suspend fun queryOffers() =
-        queryProductDetailsAndOffers()
-            .map { (_, offer) -> offer }
-            .toList()
 
     private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
         val productList = listOf(

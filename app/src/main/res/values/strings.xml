@@ -10,10 +10,10 @@
     <string name="billing_intro">Upgrade to</string>
     <string name="billing_pricing">Pricing</string>
     <string name="billing_pro_feature">Pro feature</string>
-    <string name="billing_product_subscription_title">Monthly subscription</string>
-    <string name="billing_product_subscription_description">Cancel anytime</string>
-    <string name="billing_product_one_time_title">One time payment</string>
-    <string name="billing_product_one_time_description">Cancel within 14 days with full refund</string>
+    <string name="billing_offer_subscription_title">Monthly subscription</string>
+    <string name="billing_offer_subscription_description">Cancel anytime</string>
+    <string name="billing_offer_one_time_title">One time payment</string>
+    <string name="billing_offer_one_time_description">Cancel within 14 days with full refund</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
