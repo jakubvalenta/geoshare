@@ -149,4 +149,13 @@
     <string name="inputs_link">Връзка</string>
     <string name="inputs_list_text">Можете да споделите връзки към следните картографски услуги с %1$s или да ги поставите в приложението.</string>
     <string name="inputs_settings">Отидете в настройките на Android, за да изберете връзки, които винаги да се отварят в %1$s</string>
+    <string name="user_preferences_automation_delay_sec_title">Забавяне на автоматизацията</string>
+    <string name="user_preferences_automation_delay_sec_description">Задайте колко време приложението да чака, преди да стартира автоматизирано действие (например, преди автоматично да отвори приложение за карта).</string>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Стойността трябва да е между %1$d и %2$d</string>
+    <string name="seconds_unit">секунди</string>
+    <string name="reset">нулиране</string>
+    <plurals name="seconds">
+        <item quantity="one">%1$d секунда</item>
+        <item quantity="other">%1$d секунди</item>
+    </plurals>
 </resources>
