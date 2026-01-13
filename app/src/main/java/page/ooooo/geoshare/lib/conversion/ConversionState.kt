@@ -3,15 +3,23 @@ package page.ooooo.geoshare.lib.conversion
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.timeout
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
@@ -351,13 +359,44 @@ data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
     override val position: Position,
+    val billingStatusTimeout: Duration = 3.seconds,
 ) : ConversionState.HasResult {
+    @OptIn(FlowPreview::class)
     override suspend fun transition(): State? {
         val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null
         }
-        if (stateContext.billing.status.value.getFeatureStatus(AutomationFeature) == FeatureStatus.AVAILABLE) {
+
+        // TODO Test billingStatus caching
+        val billingStatus: BillingStatus = try {
+            // Wait for billing status to appear; it should appear, because we call Billing.startConnection() in onCreate
+            stateContext.billing.status
+                .filter { it is BillingStatus.Done }
+                .timeout(billingStatusTimeout)
+                .onEach {
+                    // If billing status appeared, cache it
+                    val productId = (it as? BillingStatus.Done)?.plan?.oneTimeProductId
+                    stateContext.userPreferencesRepository.setValue(BillingCachedProductIdPreference, productId)
+                }
+                .first()
+        } catch (_: TimeoutCancellationException) {
+            // If billing status didn't appear, try to read it from cache
+            stateContext.log.w(null, "Automation: Billing status didn't appear within $billingStatusTimeout")
+            stateContext.userPreferencesRepository.getValue(BillingCachedProductIdPreference)
+                ?.let { productId -> stateContext.billing.plans.firstOrNull { it.hasProductId(productId) } }
+                .let { plan ->
+                    if (plan != null) {
+                        stateContext.log.w(null, "Automation: Found cached billing status")
+                        BillingStatus.Done(plan)
+                    } else {
+                        stateContext.log.w(null, "Automation: Didn't find cached billing status")
+                        BillingStatus.Loading
+                    }
+                }
+        }
+
+        if (billingStatus.getFeatureStatus(AutomationFeature) == FeatureStatus.AVAILABLE) {
             if (automation is Automation.HasDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
                 return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)

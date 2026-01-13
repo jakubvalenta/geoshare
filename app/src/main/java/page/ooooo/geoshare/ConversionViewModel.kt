@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.app.Activity
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.SavedStateHandle
@@ -24,6 +25,8 @@ import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePrefere
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.billing.BillingImpl
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
@@ -51,10 +54,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val billing: BillingImpl,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    val billing = BillingImpl(viewModelScope, userPreferencesRepository)
 
     val stateContext = ConversionStateContext(
         inputs = allInputs,
@@ -93,6 +95,10 @@ class ConversionViewModel @Inject constructor(
 
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
+
+    val billingStatus: StateFlow<BillingStatus> = billing.status
+    val billingOffers: StateFlow<List<Offer>> = billing.offers
+    val billingErrorMessageResId: StateFlow<Int?> = billing.errorMessageResId
 
     val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
         .stateIn(
@@ -261,6 +267,12 @@ class ConversionViewModel @Inject constructor(
 
     fun writeGpx(writer: Appendable) {
         (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpxPoints(writer)
+    }
+
+    fun launchBillingFlow(activity: Activity, offerToken: String) {
+        viewModelScope.launch {
+            billing.launchBillingFlow(activity, offerToken)
+        }
     }
 
     private fun transition() {

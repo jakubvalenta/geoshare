@@ -32,11 +32,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -355,13 +355,12 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
 private fun ActionWaitingPreview() {
     AppTheme {
         Surface {
-            val coroutineScope = rememberCoroutineScope()
             val userPreferencesRepository = FakeUserPreferencesRepository()
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         userPreferencesRepository = userPreferencesRepository,
-                        billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                        billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
@@ -384,13 +383,12 @@ private fun ActionWaitingPreview() {
 private fun DarkActionWaitingPreview() {
     AppTheme {
         Surface {
-            val coroutineScope = rememberCoroutineScope()
             val userPreferencesRepository = FakeUserPreferencesRepository()
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         userPreferencesRepository = userPreferencesRepository,
-                        billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                        billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,

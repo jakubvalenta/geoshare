@@ -109,7 +109,7 @@ fun UserPreferencesScreen(
     onNavigateToBillingScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
+    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
     val automationFeatureStatus = billingStatus.getFeatureStatus(AutomationFeature)
 

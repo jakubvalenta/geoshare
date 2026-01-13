@@ -86,9 +86,9 @@ fun BillingScreen(
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
-    val errorMessageResId by viewModel.billing.errorMessageResId.collectAsStateWithLifecycle()
-    val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
-    val offers by viewModel.billing.offers.collectAsStateWithLifecycle()
+    val errorMessageResId by viewModel.billingErrorMessageResId.collectAsStateWithLifecycle()
+    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
+    val offers by viewModel.billingOffers.collectAsStateWithLifecycle()
 
     BillingScreen(
         billingStatus = billingStatus,
@@ -96,7 +96,7 @@ fun BillingScreen(
         offers = offers,
         onBack = onBack,
         onLaunchBillingFlow = { offerToken ->
-            viewModel.billing.launchBillingFlow(context as Activity, offerToken)
+            viewModel.launchBillingFlow(context as Activity, offerToken)
         }
     )
 }

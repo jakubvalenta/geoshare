@@ -128,7 +128,7 @@ fun MainScreen(
 
     val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-    val billingStatus by viewModel.billing.status.collectAsStateWithLifecycle()
+    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
@@ -796,13 +796,12 @@ private fun TabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
-        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -836,13 +835,12 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
-        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -876,13 +874,12 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
-        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 position = Position.example,
@@ -1009,7 +1006,6 @@ private fun TabletErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -1017,7 +1013,7 @@ private fun LoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1056,7 +1052,6 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -1064,7 +1059,7 @@ private fun DarkLoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
@@ -1103,7 +1098,6 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
-        val coroutineScope = rememberCoroutineScope()
         val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
@@ -1111,7 +1105,7 @@ private fun TabletLoadingIndicatorPreview() {
                     listOf(),
                     NetworkTools(),
                     userPreferencesRepository = userPreferencesRepository,
-                    billing = BillingImpl(coroutineScope, userPreferencesRepository),
+                    billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 GoogleMapsInput,
