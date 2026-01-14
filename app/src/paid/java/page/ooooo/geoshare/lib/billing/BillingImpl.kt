@@ -92,8 +92,12 @@ class BillingImpl(
                 // TODO Acknowledge the purchase
                 log.i("Billing", "Purchase update: ok")
                 val plan = purchases.firstNotNullOfOrNull { purchase ->
-                    purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }?.products?.firstNotNullOfOrNull { productId ->
-                        availablePlans.firstOrNull { it.hasProductId(productId) }
+                    if (purchase.purchaseState == PurchaseState.PURCHASED) {
+                        purchase.products.firstNotNullOfOrNull { productId ->
+                            availablePlans.firstOrNull { it.hasProductId(productId) }
+                        }
+                    } else {
+                        null
                     }
                 }
                 if (plan != null) {
@@ -118,8 +122,12 @@ class BillingImpl(
             BillingClient.BillingResponseCode.OK -> {
                 log.i("Billing", "Purchases query: ok")
                 val plan = purchases.firstNotNullOfOrNull { purchase ->
-                    purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }?.products?.firstNotNullOfOrNull { productId ->
-                        availablePlans.firstOrNull { it.hasProductId(productId) }
+                    if (purchase.purchaseState == PurchaseState.PURCHASED) {
+                        purchase.products.firstNotNullOfOrNull { productId ->
+                            availablePlans.firstOrNull { it.hasProductId(productId) }
+                        }
+                    } else {
+                        null
                     }
                 }
                 if (plan != null) {
