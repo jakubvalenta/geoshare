@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 abstract class Billing(
     @Suppress("unused") context: Context,
 ) {
-    abstract val plans: List<Plan>
+    abstract val availablePlans: List<Plan>
     abstract val status: StateFlow<BillingStatus>
     abstract val offers: StateFlow<List<Offer>>
     abstract val errorMessageResId: StateFlow<Int?>

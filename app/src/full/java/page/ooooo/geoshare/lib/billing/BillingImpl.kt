@@ -13,17 +13,17 @@ import page.ooooo.geoshare.R
 
 class BillingImpl(context: Context) : Billing(context) {
 
-    override val plans = listOf(
-        object : Plan {
-            @StringRes
-            override val appNameResId = R.string.app_name
-            override val oneTimeProductId = "full_one_time"
-            override val subscriptionProductId = "full_subscription"
-            override val features = persistentListOf(AutomationFeature)
-        },
-    )
+    private val plan = object : Plan {
+        @StringRes
+        override val appNameResId = R.string.app_name
+        override val oneTimeProductId = "full_one_time"
+        override val subscriptionProductId = "full_subscription"
+        override val features = persistentListOf(AutomationFeature)
+    }
 
-    override val status = flowOf(BillingStatus.Done(plans[0]))
+    override val availablePlans = listOf(plan)
+
+    override val status = flowOf(BillingStatus.Done(plan))
         .stateIn(
             scope = CoroutineScope(Dispatchers.Default),
             started = SharingStarted.Eagerly,

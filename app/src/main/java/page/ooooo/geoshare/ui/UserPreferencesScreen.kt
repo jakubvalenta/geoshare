@@ -39,7 +39,6 @@ import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.ui.components.UserPreferencesDetailPane
@@ -109,9 +108,8 @@ fun UserPreferencesScreen(
     onNavigateToBillingScreen: () -> Unit,
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
-    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
+    val automationFeatureStatus by viewModel.automationFeatureStatus.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
-    val automationFeatureStatus = billingStatus.getFeatureStatus(AutomationFeature)
 
     UserPreferencesScreen(
         groups = listOf(

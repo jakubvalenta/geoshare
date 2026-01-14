@@ -66,7 +66,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.FakeFullPlan
 import page.ooooo.geoshare.lib.billing.FakeOneTimeOffer
 import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
@@ -86,27 +85,30 @@ fun BillingScreen(
     viewModel: ConversionViewModel,
 ) {
     val context = LocalContext.current
+    val availablePlans = viewModel.availablePlans
+    val offers by viewModel.offers.collectAsStateWithLifecycle()
     val errorMessageResId by viewModel.billingErrorMessageResId.collectAsStateWithLifecycle()
-    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
-    val offers by viewModel.billingOffers.collectAsStateWithLifecycle()
+    val plan by viewModel.plan.collectAsStateWithLifecycle()
 
     BillingScreen(
-        billingStatus = billingStatus,
+        availablePlans = availablePlans,
         errorMessageResId = errorMessageResId,
         offers = offers,
+        plan = plan,
         onBack = onBack,
         onLaunchBillingFlow = { offerToken ->
             viewModel.launchBillingFlow(context as Activity, offerToken)
-        }
+        },
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BillingScreen(
-    billingStatus: BillingStatus,
+    availablePlans: List<Plan>,
     @StringRes errorMessageResId: Int?,
     offers: List<Offer>,
+    plan: Plan?,
     onBack: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
@@ -114,7 +116,6 @@ private fun BillingScreen(
     val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
     val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
-    val plan = (billingStatus as? BillingStatus.Done)?.plan
 
     Scaffold(
         topBar = {
@@ -148,7 +149,7 @@ private fun BillingScreen(
                             .weight(1f, true)
                             .verticalScroll(rememberScrollState()),
                     ) {
-                        BillingFirstPane(plan)
+                        BillingFirstPane(plan, availablePlans)
                     }
                 }
                 Column(Modifier.weight(0.4f)) {
@@ -184,7 +185,7 @@ private fun BillingScreen(
                         .weight(1f)
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    BillingFirstPane(plan)
+                    BillingFirstPane(plan, availablePlans)
                 }
                 ElevatedCard(
                     shape = MaterialTheme.shapes.large.copy(
@@ -208,9 +209,19 @@ private fun BillingScreen(
     }
 }
 
+@Composable
+private fun BillingFirstPane(
+    plan: Plan?,
+    availablePlans: List<Plan>,
+) {
+    availablePlans.filter { it != plan }.forEach { plan ->
+        BillingPlan(plan)
+    }
+}
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun BillingFirstPane(plan: Plan?) {
+private fun BillingPlan(plan: Plan) {
     val spacing = LocalSpacing.current
 
     Column(
@@ -226,7 +237,7 @@ private fun BillingFirstPane(plan: Plan?) {
         ) {
             Icon(
                 painterResource(R.drawable.crown_24px),
-                contentDescription = stringResource(R.string.billing_pro_feature),
+                null,
                 Modifier
                     .padding(15.dp)
                     .requiredSize(48.dp),
@@ -240,7 +251,12 @@ private fun BillingFirstPane(plan: Plan?) {
         )
         AppHeadline(plan, Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false)
     }
-    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+    CompositionLocalProvider(
+        LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+            lineBreak = LineBreak.Paragraph,
+            hyphens = Hyphens.Auto,
+        )
+    ) {
         TextList(
             Modifier.padding(
                 start = spacing.small,
@@ -251,40 +267,34 @@ private fun BillingFirstPane(plan: Plan?) {
             bulletSpace = spacing.tiny,
             bulletWidth = 44.dp,
         ) {
-            TextListItem(
-                Modifier.padding(bottom = spacing.smallAdaptive),
-                bullet = {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+            plan.features.forEach { feature ->
+                TextListItem(
+                    Modifier.padding(bottom = spacing.smallAdaptive),
+                    bullet = {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                ) {
+                    Text(
+                        stringResource(feature.titleResId),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
-                },
-            ) {
-                Text(
-                    stringResource(R.string.billing_automation_title),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-            TextListItem(Modifier.padding(bottom = spacing.smallAdaptive)) {
-                Text(
-                    stringResource(R.string.user_preferences_automation_description),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        lineBreak = LineBreak.Paragraph,
-                        hyphens = Hyphens.Auto,
-                    )
-                )
-            }
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_open_app))
                 }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_navigate))
+                TextListItem(Modifier.padding(bottom = spacing.smallAdaptive)) {
+                    Text(stringResource(feature.descriptionResId))
                 }
-                TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_copy))
+                feature.itemsResIds.takeIf { it.isNotEmpty() }?.let { itemsResIds ->
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                        itemsResIds.forEach { itemResId ->
+                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
+                                Text(stringResource(itemResId))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -401,9 +411,10 @@ private fun BillingSecondPane(
 private fun DefaultPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(null),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = null,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -415,9 +426,10 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(null),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = null,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -429,9 +441,10 @@ private fun DarkPreview() {
 private fun TabletPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(null),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = null,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -443,9 +456,10 @@ private fun TabletPreview() {
 private fun PurchasedPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = FakeFullPlan,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -457,9 +471,10 @@ private fun PurchasedPreview() {
 private fun DarkPurchasedPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = FakeFullPlan,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -471,9 +486,10 @@ private fun DarkPurchasedPreview() {
 private fun TabletPurchasedPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = FakeFullPlan,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -485,9 +501,10 @@ private fun TabletPurchasedPreview() {
 private fun ErrorPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = R.string.billing_purchase_error_cancelled,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = null,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -499,9 +516,10 @@ private fun ErrorPreview() {
 private fun DarkErrorPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = R.string.billing_purchase_error_cancelled,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = null,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -513,9 +531,10 @@ private fun DarkErrorPreview() {
 private fun TabletErrorPreview() {
     AppTheme {
         BillingScreen(
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            availablePlans = listOf(FakeFullPlan),
             errorMessageResId = R.string.billing_purchase_error_cancelled,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            plan = null,
             onBack = {},
             onLaunchBillingFlow = {},
         )

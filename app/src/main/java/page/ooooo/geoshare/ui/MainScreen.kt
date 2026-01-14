@@ -66,10 +66,10 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
-import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
@@ -126,10 +126,11 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
-    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
+    val automationFeatureStatus by viewModel.automationFeatureStatus.collectAsStateWithLifecycle()
+    val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
+    val plan by viewModel.plan.collectAsStateWithLifecycle()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
@@ -207,10 +208,11 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
-        billingStatus = billingStatus,
+        automationFeatureStatus = automationFeatureStatus,
         changelogShown = changelogShown,
         inputUriString = viewModel.inputUriString,
         loadingIndicator = loadingIndicator,
+        plan = plan,
         onCancel = {
             locationJob?.cancel()
             viewModel.cancel()
@@ -261,10 +263,11 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     currentState: State,
-    billingStatus: BillingStatus,
+    automationFeatureStatus: FeatureStatus,
     changelogShown: Boolean,
     inputUriString: String,
     loadingIndicator: LoadingIndicator?,
+    plan: Plan?,
     onCancel: () -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
@@ -289,7 +292,6 @@ private fun MainScreen(
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = retain { mutableStateOf(false) }
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
-    val plan = (billingStatus as? BillingStatus.Done)?.plan
     val sheetState = rememberModalBottomSheetState()
 
     BackHandler(currentState !is Initial) {
@@ -423,7 +425,7 @@ private fun MainScreen(
                     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                         ResultSuccessMessage(
                             currentState = currentState,
-                            automationFeatureStatus = billingStatus.getFeatureStatus(AutomationFeature),
+                            automationFeatureStatus = automationFeatureStatus,
                             loadingIndicator = loadingIndicator,
                             onCancel = onCancel,
                             onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
@@ -618,10 +620,11 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -646,10 +649,11 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -674,10 +678,11 @@ private fun TabletPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -706,10 +711,11 @@ private fun SucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -738,10 +744,11 @@ private fun DarkSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -770,10 +777,11 @@ private fun TabletSucceededPreview() {
                 position = Position.example,
                 action = NoopAutomation,
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -809,10 +817,11 @@ private fun AutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -848,10 +857,11 @@ private fun DarkAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -887,10 +897,11 @@ private fun TabletAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -918,10 +929,11 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -949,10 +961,11 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -980,10 +993,11 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -1023,13 +1037,14 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -1069,13 +1084,14 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -1115,13 +1131,14 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
-            billingStatus = BillingStatus.Done(FakeFullPlan),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = LoadingIndicator.Large(
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
+            plan = FakeFullPlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},

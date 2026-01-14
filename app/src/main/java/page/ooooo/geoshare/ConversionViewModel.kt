@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,9 +26,12 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.billing.Offer
+import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
@@ -96,9 +101,23 @@ class ConversionViewModel @Inject constructor(
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
 
-    val billingStatus: StateFlow<BillingStatus> = billing.status
-    val billingOffers: StateFlow<List<Offer>> = billing.offers
+    val availablePlans: List<Plan> = billing.availablePlans
     val billingErrorMessageResId: StateFlow<Int?> = billing.errorMessageResId
+    val offers: StateFlow<List<Offer>> = billing.offers
+    val plan: StateFlow<Plan?> = billing.status.map {
+        (it as? BillingStatus.Done)?.plan
+    }.stateIn(
+        scope = CoroutineScope(Dispatchers.Default),
+        started = SharingStarted.Eagerly,
+        initialValue = null,
+    )
+    val automationFeatureStatus: StateFlow<FeatureStatus> = billing.status.map {
+        it.getFeatureStatus(AutomationFeature)
+    }.stateIn(
+        scope = CoroutineScope(Dispatchers.Default),
+        started = SharingStarted.Eagerly,
+        initialValue = FeatureStatus.LOADING,
+    )
 
     val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
         .stateIn(

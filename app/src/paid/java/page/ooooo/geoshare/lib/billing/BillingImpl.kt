@@ -43,7 +43,7 @@ class BillingImpl(
     PurchasesResponseListener,
     PurchasesUpdatedListener {
 
-    override val plans = listOf(
+    val availablePlans = listOf(
         object : Plan {
             @StringRes
             override val appNameResId = R.string.app_name_pro

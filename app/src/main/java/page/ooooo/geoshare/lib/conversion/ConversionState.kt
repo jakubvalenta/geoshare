@@ -384,7 +384,7 @@ data class ConversionSucceeded(
             // If billing status didn't appear, try to read it from cache
             stateContext.log.w(null, "Automation: Billing status didn't appear within $billingStatusTimeout")
             stateContext.userPreferencesRepository.getValue(BillingCachedProductIdPreference)
-                ?.let { productId -> stateContext.billing.plans.firstOrNull { it.hasProductId(productId) } }
+                ?.let { productId -> stateContext.billing.availablePlans.firstOrNull { it.hasProductId(productId) } }
                 .let { plan ->
                     if (plan != null) {
                         stateContext.log.w(null, "Automation: Found cached billing status")
