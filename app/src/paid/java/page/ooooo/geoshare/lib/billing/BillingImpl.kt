@@ -37,38 +37,32 @@ class BillingImpl(
     context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     private val log: ILog = DefaultLog,
-) :
-    Billing(context),
-    BillingClientStateListener,
-    PurchasesResponseListener,
-    PurchasesUpdatedListener {
+) : Billing(context), BillingClientStateListener, PurchasesResponseListener, PurchasesUpdatedListener {
 
     override val availablePlans = listOf(
         object : Plan {
             @StringRes
             override val appNameResId = R.string.app_name_pro
-            override val oneTimeProductId = "pro_one_time"
-            override val subscriptionProductId = "pro_subscription"
+            override val products = persistentListOf(
+                BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
+            )
             override val features = persistentListOf(AutomationFeature)
         },
     )
 
-    private val billingClient: BillingClient = billingClientBuilder
-        .setListener(this)
-        .enableAutoServiceReconnection()
-        .build()
+    private val billingClient: BillingClient =
+        billingClientBuilder.setListener(this).enableAutoServiceReconnection().build()
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
     override val status: StateFlow<BillingStatus> = _status
 
     override val offers: StateFlow<List<Offer>> = flow<List<Offer>> {
-        queryProductDetailsAndOffers()
-            .map { (_, offer) -> offer }
-            .toList()
+        queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList()
     }.stateIn(
-        scope = CoroutineScope(Dispatchers.Default),
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList(),
+        CoroutineScope(Dispatchers.Default),
+        SharingStarted.WhileSubscribed(5000),
+        emptyList(),
     )
 
     private val _errorMessageResId: MutableStateFlow<Int?> = MutableStateFlow(null)
@@ -78,9 +72,7 @@ class BillingImpl(
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
             log.i("Billing", "Billing setup: ok")
             for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
-                val queryPurchasesParams = QueryPurchasesParams.newBuilder()
-                    .setProductType(productType)
-                    .build()
+                val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
                 billingClient.queryPurchasesAsync(queryPurchasesParams, this)
             }
         } else {
@@ -100,10 +92,9 @@ class BillingImpl(
                 // TODO Acknowledge the purchase
                 log.i("Billing", "Purchase update: ok")
                 val plan = purchases.firstNotNullOfOrNull { purchase ->
-                    purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }
-                        ?.products?.firstNotNullOfOrNull { productId ->
-                            availablePlans.firstOrNull { it.hasProductId(productId) }
-                        }
+                    purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }?.products?.firstNotNullOfOrNull { productId ->
+                        availablePlans.firstOrNull { it.hasProductId(productId) }
+                    }
                 }
                 if (plan != null) {
                     _status.value = BillingStatus.Done(plan)
@@ -127,10 +118,9 @@ class BillingImpl(
             BillingClient.BillingResponseCode.OK -> {
                 log.i("Billing", "Purchases query: ok")
                 val plan = purchases.firstNotNullOfOrNull { purchase ->
-                    purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }
-                        ?.products?.firstNotNullOfOrNull { productId ->
-                            availablePlans.firstOrNull { it.hasProductId(productId) }
-                        }
+                    purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }?.products?.firstNotNullOfOrNull { productId ->
+                        availablePlans.firstOrNull { it.hasProductId(productId) }
+                    }
                 }
                 if (plan != null) {
                     _status.value = BillingStatus.Done(plan)
@@ -156,8 +146,7 @@ class BillingImpl(
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         val (productDetails) = try {
-            queryProductDetailsAndOffers()
-                .first { (_, offer) -> offer.token == offerToken }
+            queryProductDetailsAndOffers().first { (_, offer) -> offer.token == offerToken }
         } catch (_: NoSuchElementException) {
             log.e("Billing", "Offer token not found: $offerToken")
             _errorMessageResId.value = R.string.billing_purchase_error_unknown
@@ -165,14 +154,11 @@ class BillingImpl(
         }
 
         val productDetailsParamsList = listOf(
-            BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(productDetails)
-                .setOfferToken(offerToken)
-                .build()
+            BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(productDetails)
+                .setOfferToken(offerToken).build()
         )
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(productDetailsParamsList)
-            .build()
+        val billingFlowParams =
+            BillingFlowParams.newBuilder().setProductDetailsParamsList(productDetailsParamsList).build()
 
         val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
         when (billingResult.responseCode) {
@@ -188,27 +174,25 @@ class BillingImpl(
     }
 
     private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
-        val productList = availablePlans.flatMap { plan ->
-            listOf(
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(plan.oneTimeProductId)
-                    .setProductType(ProductType.INAPP)
-                    .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(plan.subscriptionProductId)
-                    .setProductType(ProductType.SUBS)
-                    .build(),
-            )
-        }
-        val params = QueryProductDetailsParams.newBuilder()
-        params.setProductList(productList)
+        availablePlans.flatMap { it.products }.groupBy { it.type }.forEach { (billingProductType, billingProducts) ->
+            val productType = when (billingProductType) {
+                BillingProduct.Type.ONE_TIME -> ProductType.INAPP
+                BillingProduct.Type.SUBSCRIPTION -> ProductType.SUBS
+            }
+            val productList = billingProducts.map { billingProduct ->
+                QueryProductDetailsParams.Product.newBuilder().setProductId(billingProduct.id)
+                    .setProductType(productType).build()
+            }
+            val params = QueryProductDetailsParams.newBuilder()
+            params.setProductList(productList)
 
-        val productDetailsResult = withContext(Dispatchers.IO) {
-            billingClient.queryProductDetails(params.build())
-        }
-        productDetailsResult.productDetailsList?.forEach { productDetails ->
-            for (offer in productDetails.getOffers()) {
-                emit(productDetails to offer)
+            val productDetailsResult = withContext(Dispatchers.IO) {
+                billingClient.queryProductDetails(params.build())
+            }
+            productDetailsResult.productDetailsList?.forEach { productDetails ->
+                for (offer in productDetails.getOffers()) {
+                    emit(productDetails to offer)
+                }
             }
         }
     }

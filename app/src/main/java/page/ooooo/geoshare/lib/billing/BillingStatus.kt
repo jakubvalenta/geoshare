@@ -4,11 +4,11 @@ import androidx.compose.runtime.Immutable
 
 sealed interface BillingStatus {
 
-    fun getFeatureStatus(feature: Feature): FeatureStatus
+    fun getFeatureStatus(feature: Feature): FeatureStatus = FeatureStatus.LOADING
 
-    object Loading : BillingStatus {
-        override fun getFeatureStatus(feature: Feature) = FeatureStatus.LOADING
-    }
+    fun getFirstProductId(): String? = null
+
+    object Loading : BillingStatus
 
     @Immutable
     data class Done(val plan: Plan?) : BillingStatus {
@@ -17,5 +17,7 @@ sealed interface BillingStatus {
         } else {
             FeatureStatus.NOT_AVAILABLE
         }
+
+        override fun getFirstProductId() = plan?.products?.firstOrNull()?.id
     }
 }

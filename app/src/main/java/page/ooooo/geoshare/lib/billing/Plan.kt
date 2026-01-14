@@ -7,9 +7,7 @@ import kotlinx.collections.immutable.ImmutableList
 interface Plan {
     val appNameResId: Int
     val features: ImmutableList<Feature>
-    val oneTimeProductId: String
-    val subscriptionProductId: String
+    val products: ImmutableList<BillingProduct>
 
-    fun hasProductId(productId: String): Boolean =
-        oneTimeProductId == productId || subscriptionProductId == productId
+    fun hasProductId(productId: String): Boolean = products.any { it.id == productId }
 }

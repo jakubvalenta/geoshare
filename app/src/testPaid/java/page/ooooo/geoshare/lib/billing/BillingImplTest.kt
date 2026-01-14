@@ -7,10 +7,8 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.QueryPurchasesParams
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.add
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.putJsonArray
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.FakeLog
 
@@ -26,13 +24,10 @@ class BillingImplTest {
                         .setResponseCode(BillingResponseCode.OK)
                         .build(),
                     listOf(
-                        // TODO Mock JSONObject
-                        Purchase(
-                            buildJsonObject {
-                                putJsonArray("productIds") { add("pro_one_time") }
-                            }.toString(),
-                            "test signature",
-                        ),
+                        mock<Purchase> {
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { products } doReturn listOf("pro_one_time")
+                        },
                     )
                 )
             }

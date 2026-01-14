@@ -376,8 +376,10 @@ data class ConversionSucceeded(
                 .timeout(billingStatusTimeout)
                 .onEach {
                     // If billing status appeared, cache it
-                    val productId = (it as? BillingStatus.Done)?.plan?.oneTimeProductId
-                    stateContext.userPreferencesRepository.setValue(BillingCachedProductIdPreference, productId)
+                    stateContext.userPreferencesRepository.setValue(
+                        BillingCachedProductIdPreference,
+                        it.getFirstProductId(),
+                    )
                 }
                 .first()
         } catch (_: TimeoutCancellationException) {

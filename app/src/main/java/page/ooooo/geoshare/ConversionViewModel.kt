@@ -7,8 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -107,16 +105,16 @@ class ConversionViewModel @Inject constructor(
     val plan: StateFlow<Plan?> = billing.status.map {
         (it as? BillingStatus.Done)?.plan
     }.stateIn(
-        scope = CoroutineScope(Dispatchers.Default),
-        started = SharingStarted.Eagerly,
-        initialValue = null,
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        null,
     )
     val automationFeatureStatus: StateFlow<FeatureStatus> = billing.status.map {
         it.getFeatureStatus(AutomationFeature)
     }.stateIn(
-        scope = CoroutineScope(Dispatchers.Default),
-        started = SharingStarted.Eagerly,
-        initialValue = FeatureStatus.LOADING,
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        FeatureStatus.LOADING,
     )
 
     val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
