@@ -12,6 +12,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.FakeLog
 
 class BillingImplTest {
 
@@ -25,6 +26,7 @@ class BillingImplTest {
                         .setResponseCode(BillingResponseCode.OK)
                         .build(),
                     listOf(
+                        // TODO Mock JSONObject
                         Purchase(
                             buildJsonObject {
                                 putJsonArray("productIds") { add("pro_one_time") }
@@ -44,7 +46,7 @@ class BillingImplTest {
             }
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val billingImpl = BillingImpl(context, billingClientBuilder)
+        val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
     }
 

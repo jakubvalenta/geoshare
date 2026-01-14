@@ -43,7 +43,7 @@ class BillingImpl(
     PurchasesResponseListener,
     PurchasesUpdatedListener {
 
-    val availablePlans = listOf(
+    override val availablePlans = listOf(
         object : Plan {
             @StringRes
             override val appNameResId = R.string.app_name_pro
@@ -102,7 +102,7 @@ class BillingImpl(
                 val plan = purchases.firstNotNullOfOrNull { purchase ->
                     purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }
                         ?.products?.firstNotNullOfOrNull { productId ->
-                            plans.firstOrNull { it.hasProductId(productId) }
+                            availablePlans.firstOrNull { it.hasProductId(productId) }
                         }
                 }
                 if (plan != null) {
@@ -129,7 +129,7 @@ class BillingImpl(
                 val plan = purchases.firstNotNullOfOrNull { purchase ->
                     purchase.takeIf { it.purchaseState == PurchaseState.PURCHASED }
                         ?.products?.firstNotNullOfOrNull { productId ->
-                            plans.firstOrNull { it.hasProductId(productId) }
+                            availablePlans.firstOrNull { it.hasProductId(productId) }
                         }
                 }
                 if (plan != null) {
@@ -188,7 +188,7 @@ class BillingImpl(
     }
 
     private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
-        val productList = plans.flatMap { plan ->
+        val productList = availablePlans.flatMap { plan ->
             listOf(
                 QueryProductDetailsParams.Product.newBuilder()
                     .setProductId(plan.oneTimeProductId)
