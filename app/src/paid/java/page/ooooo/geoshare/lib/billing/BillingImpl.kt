@@ -38,7 +38,7 @@ class BillingImpl(
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     private val log: ILog = DefaultLog,
 ) :
-    Billing,
+    Billing(context),
     BillingClientStateListener,
     PurchasesResponseListener,
     PurchasesUpdatedListener {

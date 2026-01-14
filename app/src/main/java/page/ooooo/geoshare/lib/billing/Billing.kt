@@ -1,17 +1,20 @@
 package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
+import android.content.Context
 import kotlinx.coroutines.flow.StateFlow
 
-interface Billing {
-    val plans: List<Plan>
-    val status: StateFlow<BillingStatus>
-    val offers: StateFlow<List<Offer>>
-    val errorMessageResId: StateFlow<Int?>
+abstract class Billing(
+    @Suppress("unused") context: Context,
+) {
+    abstract val plans: List<Plan>
+    abstract val status: StateFlow<BillingStatus>
+    abstract val offers: StateFlow<List<Offer>>
+    abstract val errorMessageResId: StateFlow<Int?>
 
-    fun startConnection()
+    abstract fun startConnection()
 
-    fun endConnection()
+    abstract fun endConnection()
 
-    suspend fun launchBillingFlow(activity: Activity, offerToken: String)
+    abstract suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 }

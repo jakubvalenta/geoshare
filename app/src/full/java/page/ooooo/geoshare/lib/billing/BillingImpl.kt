@@ -11,10 +11,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.R
 
-class BillingImpl(
-    context: Context,
-) :
-    Billing {
+class BillingImpl(context: Context) : Billing(context) {
 
     override val plans = listOf(
         object : Plan {
