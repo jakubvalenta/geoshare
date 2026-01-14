@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.FakePlan
 import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -82,7 +82,7 @@ private fun DarkPreview() {
 private fun PurchasedPreview() {
     AppTheme {
         Surface {
-            AppHeadline(plan = FakeFullPlan)
+            AppHeadline(plan = FakePlan)
         }
     }
 }
@@ -92,7 +92,7 @@ private fun PurchasedPreview() {
 private fun DarkPurchasedPreview() {
     AppTheme {
         Surface {
-            AppHeadline(plan = FakeFullPlan)
+            AppHeadline(plan = FakePlan)
         }
     }
 }

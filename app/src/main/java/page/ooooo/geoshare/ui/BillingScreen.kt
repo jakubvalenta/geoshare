@@ -66,7 +66,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.FakePlan
 import page.ooooo.geoshare.lib.billing.FakeOneTimeOffer
 import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Offer
@@ -411,7 +411,7 @@ private fun BillingSecondPane(
 private fun DefaultPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             plan = null,
@@ -426,7 +426,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             plan = null,
@@ -441,7 +441,7 @@ private fun DarkPreview() {
 private fun TabletPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             plan = null,
@@ -456,10 +456,10 @@ private fun TabletPreview() {
 private fun PurchasedPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            plan = FakeFullPlan,
+            plan = FakePlan,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -471,10 +471,10 @@ private fun PurchasedPreview() {
 private fun DarkPurchasedPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            plan = FakeFullPlan,
+            plan = FakePlan,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -486,10 +486,10 @@ private fun DarkPurchasedPreview() {
 private fun TabletPurchasedPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = null,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            plan = FakeFullPlan,
+            plan = FakePlan,
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -501,7 +501,7 @@ private fun TabletPurchasedPreview() {
 private fun ErrorPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = R.string.billing_purchase_error_cancelled,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             plan = null,
@@ -516,7 +516,7 @@ private fun ErrorPreview() {
 private fun DarkErrorPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = R.string.billing_purchase_error_cancelled,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             plan = null,
@@ -531,7 +531,7 @@ private fun DarkErrorPreview() {
 private fun TabletErrorPreview() {
     AppTheme {
         BillingScreen(
-            availablePlans = listOf(FakeFullPlan),
+            availablePlans = listOf(FakePlan),
             errorMessageResId = R.string.billing_purchase_error_cancelled,
             offers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             plan = null,

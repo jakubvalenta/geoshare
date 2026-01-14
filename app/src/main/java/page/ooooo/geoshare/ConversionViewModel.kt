@@ -101,7 +101,11 @@ class ConversionViewModel @Inject constructor(
 
     val availablePlans: List<Plan> = billing.availablePlans
     val billingErrorMessageResId: StateFlow<Int?> = billing.errorMessageResId
-    val offers: StateFlow<List<Offer>> = billing.offers
+    val offers: StateFlow<List<Offer>> = billing.offers.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList(),
+    )
     val plan: StateFlow<Plan?> = billing.status.map {
         (it as? BillingStatus.Done)?.plan
     }.stateIn(

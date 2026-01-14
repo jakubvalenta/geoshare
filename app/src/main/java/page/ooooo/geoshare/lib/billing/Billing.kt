@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
 import android.content.Context
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class Billing(
@@ -9,7 +10,7 @@ abstract class Billing(
 ) {
     abstract val availablePlans: List<Plan>
     abstract val status: StateFlow<BillingStatus>
-    abstract val offers: StateFlow<List<Offer>>
+    abstract val offers: Flow<List<Offer>>
     abstract val errorMessageResId: StateFlow<Int?>
 
     abstract fun startConnection()

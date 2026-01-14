@@ -17,16 +17,13 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
@@ -57,13 +54,11 @@ class BillingImpl(
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
     override val status: StateFlow<BillingStatus> = _status
 
-    override val offers: StateFlow<List<Offer>> = flow<List<Offer>> {
-        queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList()
-    }.stateIn(
-        CoroutineScope(Dispatchers.Default),
-        SharingStarted.WhileSubscribed(5000),
-        emptyList(),
-    )
+    override val offers = flow {
+        emit(
+            queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList()
+        )
+    }
 
     private val _errorMessageResId: MutableStateFlow<Int?> = MutableStateFlow(null)
     override val errorMessageResId: StateFlow<Int?> = _errorMessageResId
@@ -194,11 +189,17 @@ class BillingImpl(
             val params = QueryProductDetailsParams.newBuilder()
             params.setProductList(productList)
 
-            val productDetailsResult = withContext(Dispatchers.IO) {
-                billingClient.queryProductDetails(params.build())
+            val productDetailsResult = try {
+                withContext(Dispatchers.IO) {
+                    billingClient.queryProductDetails(params.build())
+                }
+            } catch (e: Exception) {
+                log.e("Billing", "Product details query: error", e)
+                return@flow
             }
+            log.i("Billing", "Product details query: ok")
             productDetailsResult.productDetailsList?.forEach { productDetails ->
-                for (offer in productDetails.getOffers()) {
+                for (offer in productDetails.getOffers(log)) {
                     emit(productDetails to offer)
                 }
             }

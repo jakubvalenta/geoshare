@@ -4,17 +4,7 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 
-object FakeEmptyPlan : Plan {
-    @StringRes
-    override val appNameResId: Int = R.string.app_name
-    override val features = persistentListOf<Feature>()
-    override val products = persistentListOf(
-        BillingProduct("fake_one_time_product", BillingProduct.Type.ONE_TIME),
-        BillingProduct("fake_subscription_product", BillingProduct.Type.SUBSCRIPTION),
-    )
-}
-
-object FakeFullPlan : Plan {
+object FakePlan : Plan {
     @StringRes
     override val appNameResId: Int = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature)

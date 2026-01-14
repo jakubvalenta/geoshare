@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,9 +35,11 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingImpl
+import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FakeEmptyPlan
-import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.FakePlan
+import page.ooooo.geoshare.lib.billing.Feature
+import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -1753,7 +1756,11 @@ class ConversionStateTest {
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         this.backgroundScope
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeEmptyPlan))
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(object : Plan {
+                override val appNameResId = -1
+                override val features = persistentListOf<Feature>()
+                override val products = persistentListOf<BillingProduct>()
+            }))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1772,7 +1779,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1794,7 +1801,7 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1817,7 +1824,7 @@ class ConversionStateTest {
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1841,7 +1848,7 @@ class ConversionStateTest {
         val action = GpxOutput.SaveGpxPointsAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1865,7 +1872,7 @@ class ConversionStateTest {
         val action = GeoUriOutput.ShareGeoUriAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakeFullPlan))
+            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action

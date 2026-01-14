@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.billing.FakeFullPlan
+import page.ooooo.geoshare.lib.billing.FakePlan
 import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -181,7 +181,7 @@ private fun FilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = null,
-                    plan = FakeFullPlan,
+                    plan = FakePlan,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -200,7 +200,7 @@ private fun DarkFilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     errorMessageResId = null,
-                    plan = FakeFullPlan,
+                    plan = FakePlan,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
