@@ -7,28 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class ConversionActivity : ComponentActivity() {
-    private lateinit var billing: BillingImpl
-    private val viewModel: ConversionViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return ConversionViewModel(
-                    userPreferencesRepository,
-                    billing,
-                ) as T
-            }
-        }
-    }
+    private val viewModel: ConversionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,12 +30,12 @@ class ConversionActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        billing.startConnection()
+        viewModel.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        billing.endConnection()
+        viewModel.onPause()
     }
 
     override fun onNewIntent(intent: Intent) {

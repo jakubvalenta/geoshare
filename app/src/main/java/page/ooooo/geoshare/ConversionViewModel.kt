@@ -24,7 +24,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.billing.BillingImpl
+import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.lib.conversion.ActionFinished
@@ -54,7 +54,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val billing: BillingImpl,
+    private val billing: Billing,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -327,5 +327,18 @@ class ConversionViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferencesRepository.edit(transform)
         }
+    }
+
+    fun onResume() {
+        billing.startConnection()
+    }
+
+    fun onPause() {
+        billing.endConnection()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        billing.endConnection()
     }
 }

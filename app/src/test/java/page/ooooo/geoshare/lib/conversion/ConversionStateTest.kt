@@ -1,10 +1,10 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.Context
 import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -94,11 +94,12 @@ class ConversionStateTest {
     private val uriQuote = FakeUriQuote()
     private val fakeUserPreferencesRepository: UserPreferencesRepository = FakeUserPreferencesRepository()
 
-    private fun CoroutineScope.mockStateContext(
+    private fun mockStateContext(
         inputs: List<Input> = listOf(GeoUriInput, GoogleMapsInput),
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
-        billing: Billing = BillingImpl(this, fakeUserPreferencesRepository),
+        context: Context = mock {},
+        billing: Billing = BillingImpl(context),
         log: ILog = FakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
