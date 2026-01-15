@@ -150,4 +150,14 @@
     <string name="inputs_link">Link</string>
     <string name="inputs_list_text">Você pode compartilhar links usando os seguintes serviços de mapa com o %1$s ou colá-los no app.</string>
     <string name="inputs_settings">Vá às configurações do Android para escolher quais links devem sempre abrir no %1$s</string>
+    <string name="user_preferences_automation_delay_sec_title">Atraso da automação</string>
+    <string name="user_preferences_automation_delay_sec_description">Configure por quanto tempo o app deve esperar antes de realizar uma ação automatizada (p. ex. antes de abrir um app de mapa automaticamente).</string>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">O valor deve ficar entre %1$d e %2$d</string>
+    <string name="seconds_unit">segundos</string>
+    <string name="reset">reconfigurar</string>
+    <plurals name="seconds">
+        <item quantity="one">%1$d segundos</item>
+        <item quantity="many">%1$d de segundos</item>
+        <item quantity="other">%1$d segundos</item>
+    </plurals>
 </resources>
