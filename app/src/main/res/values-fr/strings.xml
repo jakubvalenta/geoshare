@@ -150,8 +150,8 @@
     <string name="inputs_link">Lien</string>
     <string name="inputs_list_text">Vous pouvez partager des liens vers les services de cartographie suivants avec %1$s ou les coller dans l’application.</string>
     <string name="inputs_settings">Accédez aux paramètres Android pour choisir les liens qui doivent toujours s’ouvrir dans %1$s</string>
-    <string name="user_preferences_automation_delay_sec_title">Délai d\'automatisation</string>
-    <string name="user_preferences_automation_delay_sec_description">Définissez la durée pendant laquelle l\'application attend avant de lancer une action automatisée (par exemple, avant d\'ouvrir automatiquement une application de cartographie).</string>
+    <string name="user_preferences_automation_delay_sec_title">Délai d’automatisation</string>
+    <string name="user_preferences_automation_delay_sec_description">Définissez la durée pendant laquelle l’application attend avant de lancer une action automatisée (par exemple, avant d’ouvrir automatiquement une application de cartographie).</string>
     <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">La valeur doit être comprise entre %1$d et %2$d</string>
     <string name="seconds_unit">secondes</string>
     <string name="reset">réinitialiser</string>
