@@ -149,5 +149,13 @@
     <string name="inputs_link">Link</string>
     <string name="inputs_list_text">Du kannst Links zu den folgenden Kartendiensten mit %1$s teilen oder in die App einfügen.</string>
     <string name="inputs_settings">Geh zu Android-Einstellungen, um Links auszuwählen, die immer in %1$s geöffnet werden sollen</string>
-    <string name="user_preferences_automation_delay_sec_title">Automatische Pause</string>
+    <string name="user_preferences_automation_delay_sec_title">Automatisierungsverzögerung</string>
+    <string name="user_preferences_automation_delay_sec_description">Legen Sie fest, wie lange die App wartet, bevor sie eine automatische Aktion startet (z.B. bevor sie automatisch eine Karten-App öffnet).</string>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Der Wert muss zwischen %1$d und %2$d liegen</string>
+    <string name="seconds_unit">Sekunden</string>
+    <string name="reset">zurücksetzen</string>
+    <plurals name="seconds">
+        <item quantity="one">%1$d Sekunde</item>
+        <item quantity="other">%1$d Sekunden</item>
+    </plurals>
 </resources>
