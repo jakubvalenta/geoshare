@@ -153,4 +153,17 @@
     <string name="inputs_link">الرابط</string>
     <string name="inputs_list_text">يمكنك مشاركة روابط خدمات الخرائط التالية مع %1$s أو لصقها في التطبيق.</string>
     <string name="inputs_settings">انتقل إلى إعدادات أندرويد لاختيار الروابط التي يجب أن تفتح دائمًا في %1$s</string>
+    <string name="user_preferences_automation_delay_sec_title">تأخير الأتمتة</string>
+    <string name="user_preferences_automation_delay_sec_description">عيّن المدة التي ينتظرها التطبيق قبل تنفيذ إجراء آلي (مثل الانتظار قبل فتح تطبيق الخرائط تلقائيًا).</string>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">يجب أن تكون القيمة بين %1$d و %2$d</string>
+    <string name="seconds_unit">ثوانِ</string>
+    <string name="reset">صفّر</string>
+    <plurals name="seconds">
+        <item quantity="zero">لا ثانية</item>
+        <item quantity="one">ثانية</item>
+        <item quantity="two">ثانيتان</item>
+        <item quantity="few">%1$d ثوانِ</item>
+        <item quantity="many">%1$d ثانية</item>
+        <item quantity="other">%1$d ثانية</item>
+    </plurals>
 </resources>
