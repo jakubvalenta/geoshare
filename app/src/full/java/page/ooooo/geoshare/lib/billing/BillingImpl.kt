@@ -16,8 +16,10 @@ class BillingImpl(context: Context) : Billing(context) {
     private val plan = object : Plan {
         @StringRes
         override val appNameResId = R.string.app_name
-        override val oneTimeProductId = "full_one_time"
-        override val subscriptionProductId = "full_subscription"
+        override val products = persistentListOf(
+            BillingProduct("full_one_time", BillingProduct.Type.ONE_TIME),
+            BillingProduct("full_subscription", BillingProduct.Type.SUBSCRIPTION),
+        )
         override val features = persistentListOf(AutomationFeature)
     }
 
