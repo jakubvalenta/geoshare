@@ -26,7 +26,9 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 object GeoUriOutput : Output {
 
-    private val GCJ_PACKAGE_NAMES = GoogleMapsOutput.PACKAGE_NAMES
+    @Suppress("SpellCheckingInspection")
+    const val AMAP_PACKAGE_NAME = "com.autonavi.minimap"
+    private val GCJ_PACKAGE_NAMES = GoogleMapsOutput.PACKAGE_NAMES + AMAP_PACKAGE_NAME
 
     @Suppress("SpellCheckingInspection")
     private val NAME_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""de\.schildbach\.oeffi""")
