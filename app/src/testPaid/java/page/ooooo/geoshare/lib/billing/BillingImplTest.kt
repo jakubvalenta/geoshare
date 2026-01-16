@@ -14,6 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -47,10 +48,7 @@ class BillingImplTest {
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
-        assertEquals(
-            BillingStatus.Loading,
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.Loading)
     }
 
     @Test
@@ -76,10 +74,7 @@ class BillingImplTest {
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.Loading,
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
             R.string.billing_setup_error_unknown,
             billingImpl.errorMessageResId.value,
@@ -109,10 +104,7 @@ class BillingImplTest {
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.Loading,
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
             R.string.billing_purchase_error_unknown,
             billingImpl.errorMessageResId.value,
@@ -143,7 +135,7 @@ class BillingImplTest {
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
         assertEquals(
-            BillingStatus.Done(billingImpl.availablePlans.first()),
+            BillingStatus.Purchased(billingImpl.products.first { it.id == "pro_one_time" }),
             billingImpl.status.value,
         )
     }
@@ -171,10 +163,7 @@ class BillingImplTest {
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.Done(null),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -209,7 +198,7 @@ class BillingImplTest {
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
         assertEquals(
-            BillingStatus.Done(billingImpl.availablePlans.first()),
+            BillingStatus.Purchased(billingImpl.products.first { it.id == "pro_subscription" }),
             billingImpl.status.value,
         )
     }
@@ -237,10 +226,7 @@ class BillingImplTest {
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
-        assertEquals(
-            BillingStatus.Done(null),
-            billingImpl.status.value,
-        )
+        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
     }
 
     @Test
@@ -271,7 +257,7 @@ class BillingImplTest {
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
         assertEquals(
-            BillingStatus.Done(billingImpl.availablePlans.first()),
+            BillingStatus.Purchased(billingImpl.products.first { it.id == "pro_one_time" }),
             billingImpl.status.value,
         )
     }

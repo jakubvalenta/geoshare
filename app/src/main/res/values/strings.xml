@@ -7,7 +7,8 @@
     <string name="billing_automation_open_app">Show map</string>
     <string name="billing_automation_title">Save time with the Automation feature</string>
     <string name="billing_buy">Checkout</string>
-    <string name="billing_intro">Upgrade to</string>
+    <string name="billing_intro_not_purchased">Upgrade to</string>
+    <string name="billing_intro_purchased">Thanks for using</string>
     <string name="billing_pricing">Pricing</string>
     <string name="billing_pro_feature">Pro feature</string>
     <string name="billing_offer_subscription_title">Monthly subscription</string>
@@ -203,4 +204,6 @@
     <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
     <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
     <string name="billing_setup_error_unknown">Unknown error when fetching purchases</string>
+    <string name="billing_manage_subscription_button">Manage your subscription</string>
+    <string name="billing_manage_subscription_description">Cancel, pause, change payment method:</string>
 </resources>

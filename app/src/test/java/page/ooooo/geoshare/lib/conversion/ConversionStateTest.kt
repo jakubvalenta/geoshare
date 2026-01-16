@@ -33,13 +33,11 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FakePlan
-import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -1736,7 +1734,7 @@ class ConversionStateTest {
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         this.backgroundScope
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Loading)
+            on { status } doReturn MutableStateFlow(BillingStatus.Loading())
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1756,11 +1754,10 @@ class ConversionStateTest {
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         this.backgroundScope
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(object : Plan {
-                override val appNameResId = -1
-                override val features = persistentListOf<Feature>()
-                override val products = persistentListOf<BillingProduct>()
-            }))
+            on { status } doReturn MutableStateFlow(
+                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            )
+            on { features } doReturn persistentListOf()
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1779,7 +1776,10 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
+            on { status } doReturn MutableStateFlow(
+                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            )
+            on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1801,7 +1801,10 @@ class ConversionStateTest {
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
+            on { status } doReturn MutableStateFlow(
+                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            )
+            on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1824,7 +1827,10 @@ class ConversionStateTest {
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
+            on { status } doReturn MutableStateFlow(
+                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            )
+            on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1848,7 +1854,10 @@ class ConversionStateTest {
         val action = GpxOutput.SaveGpxPointsAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
+            on { status } doReturn MutableStateFlow(
+                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            )
+            on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
@@ -1872,7 +1881,10 @@ class ConversionStateTest {
         val action = GeoUriOutput.ShareGeoUriAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
-            on { status } doReturn MutableStateFlow(BillingStatus.Done(FakePlan))
+            on { status } doReturn MutableStateFlow(
+                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            )
+            on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action

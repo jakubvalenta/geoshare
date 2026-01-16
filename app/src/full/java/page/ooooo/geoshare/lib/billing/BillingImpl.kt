@@ -13,37 +13,32 @@ import page.ooooo.geoshare.R
 
 class BillingImpl(context: Context) : Billing(context) {
 
-    private val plan = object : Plan {
-        @StringRes
-        override val appNameResId = R.string.app_name
-        override val products = persistentListOf(
-            BillingProduct("full_one_time", BillingProduct.Type.ONE_TIME),
-            BillingProduct("full_subscription", BillingProduct.Type.SUBSCRIPTION),
-        )
-        override val features = persistentListOf(AutomationFeature)
-    }
+    private val product = BillingProduct("full_one_time", BillingProduct.Type.ONE_TIME)
 
-    override val availablePlans = listOf(plan)
+    @StringRes
+    override val appNameResId = R.string.app_name
+    override val products = persistentListOf(product)
+    override val features = persistentListOf(AutomationFeature)
 
-    override val status = flowOf(BillingStatus.Done(plan))
+    override val status = flowOf(BillingStatus.Purchased(product))
         .stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
-            started = SharingStarted.Eagerly,
-            initialValue = BillingStatus.Loading,
+            CoroutineScope(Dispatchers.Default),
+            SharingStarted.WhileSubscribed(5000),
+            BillingStatus.Loading(),
         )
 
     override val offers = flowOf(emptyList<Offer>())
         .stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
-            started = SharingStarted.Eagerly,
-            initialValue = emptyList(),
+            CoroutineScope(Dispatchers.Default),
+            SharingStarted.WhileSubscribed(5000),
+            emptyList(),
         )
 
     override val errorMessageResId = flowOf(null)
         .stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
-            started = SharingStarted.Eagerly,
-            initialValue = null,
+            CoroutineScope(Dispatchers.Default),
+            SharingStarted.WhileSubscribed(5000),
+            null,
         )
 
     override fun startConnection() {}

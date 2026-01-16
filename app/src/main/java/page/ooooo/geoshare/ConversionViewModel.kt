@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -27,9 +28,9 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.billing.Offer
-import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
@@ -99,27 +100,26 @@ class ConversionViewModel @Inject constructor(
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
 
-    val availablePlans: List<Plan> = billing.availablePlans
-    val billingErrorMessageResId: StateFlow<Int?> = billing.errorMessageResId
-    val offers: StateFlow<List<Offer>> = billing.offers.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList(),
-    )
-    val plan: StateFlow<Plan?> = billing.status.map {
-        (it as? BillingStatus.Done)?.plan
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        null,
-    )
     val automationFeatureStatus: StateFlow<FeatureStatus> = billing.status.map {
-        it.getFeatureStatus(AutomationFeature)
+        if (it is BillingStatus.Purchased && billing.features.contains(AutomationFeature)) {
+            FeatureStatus.AVAILABLE
+        } else {
+            FeatureStatus.NOT_AVAILABLE
+        }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         FeatureStatus.LOADING,
     )
+    val billingAppNameResId: Int = billing.appNameResId
+    val billingErrorMessageResId: StateFlow<Int?> = billing.errorMessageResId
+    val billingFeatures: ImmutableList<Feature> = billing.features
+    val billingOffers: StateFlow<List<Offer>> = billing.offers.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList(),
+    )
+    val billingStatus: StateFlow<BillingStatus> = billing.status
 
     val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
         .stateIn(

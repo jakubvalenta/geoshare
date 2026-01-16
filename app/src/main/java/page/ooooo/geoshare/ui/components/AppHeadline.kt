@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -19,12 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.billing.FakePlan
-import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun AppHeadline(plan: Plan?, modifier: Modifier = Modifier, iconEnabled: Boolean = true) {
+fun AppHeadline(@StringRes appNameResId: Int, modifier: Modifier = Modifier, iconEnabled: Boolean = true) {
     val iconSize = with(LocalDensity.current) { MaterialTheme.typography.headlineLarge.fontSize.toDp() * 2f }
     val space = 4.dp
 
@@ -48,7 +47,7 @@ fun AppHeadline(plan: Plan?, modifier: Modifier = Modifier, iconEnabled: Boolean
             )
         }
         Text(
-            stringResource(plan?.appNameResId ?: R.string.app_name),
+            stringResource(appNameResId),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineLarge,
         )
@@ -62,7 +61,7 @@ fun AppHeadline(plan: Plan?, modifier: Modifier = Modifier, iconEnabled: Boolean
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            AppHeadline(plan = null)
+            AppHeadline(appNameResId = R.string.app_name)
         }
     }
 }
@@ -72,7 +71,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            AppHeadline(plan = null)
+            AppHeadline(appNameResId = R.string.app_name)
         }
     }
 }
@@ -82,7 +81,7 @@ private fun DarkPreview() {
 private fun PurchasedPreview() {
     AppTheme {
         Surface {
-            AppHeadline(plan = FakePlan)
+            AppHeadline(appNameResId = R.string.app_name_pro)
         }
     }
 }
@@ -92,7 +91,7 @@ private fun PurchasedPreview() {
 private fun DarkPurchasedPreview() {
     AppTheme {
         Surface {
-            AppHeadline(plan = FakePlan)
+            AppHeadline(appNameResId = R.string.app_name_pro)
         }
     }
 }

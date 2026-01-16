@@ -20,7 +20,6 @@ import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
@@ -372,13 +371,13 @@ data class ConversionSucceeded(
         val billingStatus: BillingStatus = try {
             // Wait for billing status to appear; it should appear, because we call Billing.startConnection() in onCreate
             stateContext.billing.status
-                .filter { it is BillingStatus.Done }
+                .filter { it is BillingStatus.Purchased }
                 .timeout(billingStatusTimeout)
                 .onEach {
                     // If billing status appeared, cache it
                     stateContext.userPreferencesRepository.setValue(
                         BillingCachedProductIdPreference,
-                        it.getFirstProductId(),
+                        (it as? BillingStatus.Purchased)?.product?.id,
                     )
                 }
                 .first()
@@ -386,19 +385,19 @@ data class ConversionSucceeded(
             // If billing status didn't appear, try to read it from cache
             stateContext.log.w(null, "Automation: Billing status didn't appear within $billingStatusTimeout")
             stateContext.userPreferencesRepository.getValue(BillingCachedProductIdPreference)
-                ?.let { productId -> stateContext.billing.availablePlans.firstOrNull { it.hasProductId(productId) } }
-                .let { plan ->
-                    if (plan != null) {
+                ?.let { productId -> stateContext.billing.products.firstOrNull { product -> productId == product.id } }
+                .let { product ->
+                    if (product != null) {
                         stateContext.log.w(null, "Automation: Found cached billing status")
-                        BillingStatus.Done(plan)
+                        BillingStatus.Purchased(product)
                     } else {
                         stateContext.log.w(null, "Automation: Didn't find cached billing status")
-                        BillingStatus.Loading
+                        BillingStatus.Loading()
                     }
                 }
         }
 
-        if (billingStatus.getFeatureStatus(AutomationFeature) == FeatureStatus.AVAILABLE) {
+        if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
             if (automation is Automation.HasDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
                 return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)

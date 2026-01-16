@@ -50,7 +50,7 @@ fun BoxScope.FeatureBadgeLarge(onNavigateToBillingScreen: () -> Unit) {
         ) {
             Icon(painterResource(R.drawable.crown_24px), null)
             Text(
-                "${stringResource(R.string.billing_intro)} ${stringResource(R.string.app_name_pro)}",
+                "${stringResource(R.string.billing_intro_not_purchased)} ${stringResource(R.string.app_name_pro)}",
                 style = MaterialTheme.typography.bodyMedium,
             )
             Button(onNavigateToBillingScreen) {

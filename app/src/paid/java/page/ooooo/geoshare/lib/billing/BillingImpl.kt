@@ -36,22 +36,18 @@ class BillingImpl(
     private val log: ILog = DefaultLog,
 ) : Billing(context), BillingClientStateListener, PurchasesResponseListener, PurchasesUpdatedListener {
 
-    override val availablePlans = listOf(
-        object : Plan {
-            @StringRes
-            override val appNameResId = R.string.app_name_pro
-            override val products = persistentListOf(
-                BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
-            )
-            override val features = persistentListOf(AutomationFeature)
-        },
+    @StringRes
+    override val appNameResId = R.string.app_name_pro
+    override val features = persistentListOf(AutomationFeature)
+    override val products = persistentListOf(
+        BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
+        BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
     )
 
     private val billingClient: BillingClient =
         billingClientBuilder.setListener(this).enableAutoServiceReconnection().build()
 
-    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
+    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
     override val status: StateFlow<BillingStatus> = _status
 
     override val offers = flow {
@@ -85,18 +81,21 @@ class BillingImpl(
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK if purchases != null -> {
                 // TODO Acknowledge the purchase
-                log.i("Billing", "Purchase update: ok")
-                val plan = purchases.firstNotNullOfOrNull { purchase ->
+                val product = purchases.firstNotNullOfOrNull { purchase ->
                     if (purchase.purchaseState == PurchaseState.PURCHASED) {
                         purchase.products.firstNotNullOfOrNull { productId ->
-                            availablePlans.firstOrNull { it.hasProductId(productId) }
+                            products.firstOrNull { billingProduct -> billingProduct.id == productId }
                         }
                     } else {
                         null
                     }
                 }
-                if (plan != null) {
-                    _status.value = BillingStatus.Done(plan)
+                if (product != null) {
+                    log.i("Billing", "Purchase update: purchased")
+                    _status.value = BillingStatus.Purchased(product)
+                } else {
+                    log.i("Billing", "Purchase update: not purchased")
+                    _status.value = BillingStatus.NotPurchased()
                 }
             }
 
@@ -115,20 +114,21 @@ class BillingImpl(
     override fun onQueryPurchasesResponse(billingResult: BillingResult, purchases: List<Purchase>) {
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                log.i("Billing", "Purchases query: ok")
-                val plan = purchases.firstNotNullOfOrNull { purchase ->
+                val product = purchases.firstNotNullOfOrNull { purchase ->
                     if (purchase.purchaseState == PurchaseState.PURCHASED) {
                         purchase.products.firstNotNullOfOrNull { productId ->
-                            availablePlans.firstOrNull { it.hasProductId(productId) }
+                            products.firstOrNull { billingProduct -> billingProduct.id == productId }
                         }
                     } else {
                         null
                     }
                 }
-                if (plan != null) {
-                    _status.value = BillingStatus.Done(plan)
+                if (product != null) {
+                    log.i("Billing", "Purchase query: purchased")
+                    _status.value = BillingStatus.Purchased(product)
                 } else if (_status.value is BillingStatus.Loading) {
-                    _status.value = BillingStatus.Done(null)
+                    log.i("Billing", "Purchase query: not purchased")
+                    _status.value = BillingStatus.NotPurchased()
                 }
             }
 
@@ -177,7 +177,7 @@ class BillingImpl(
     }
 
     private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
-        availablePlans.flatMap { it.products }.groupBy { it.type }.forEach { (billingProductType, billingProducts) ->
+        products.groupBy { it.type }.forEach { (billingProductType, billingProducts) ->
             val productType = when (billingProductType) {
                 BillingProduct.Type.ONE_TIME -> ProductType.INAPP
                 BillingProduct.Type.SUBSCRIPTION -> ProductType.SUBS

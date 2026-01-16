@@ -29,16 +29,17 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.billing.FakePlan
-import page.ooooo.geoshare.lib.billing.Plan
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainForm(
     inputUriString: String,
+    billingAppNameResId: Int,
+    billingStatus: BillingStatus,
     errorMessageResId: Int?,
-    plan: Plan?,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSubmit: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
@@ -47,8 +48,14 @@ fun MainForm(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
+    val appNameResId = if (billingStatus is BillingStatus.Purchased) {
+        billingAppNameResId
+    } else {
+        R.string.app_name
+    }
+
     AppHeadline(
-        plan,
+        appNameResId,
         Modifier
             .padding(vertical = spacing.largeAdaptive)
             .padding(start = 13.dp, end = spacing.windowPadding),
@@ -142,8 +149,9 @@ private fun DefaultPreview() {
             Column {
                 MainForm(
                     inputUriString = "",
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = null,
-                    plan = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -161,8 +169,9 @@ private fun DarkPreview() {
             Column {
                 MainForm(
                     inputUriString = "",
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = null,
-                    plan = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -180,8 +189,9 @@ private fun FilledPreview() {
             Column {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
                     errorMessageResId = null,
-                    plan = FakePlan,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -199,8 +209,9 @@ private fun DarkFilledPreview() {
             Column {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
                     errorMessageResId = null,
-                    plan = FakePlan,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
                     onUpdateInput = {},
@@ -218,8 +229,9 @@ private fun ErrorPreview() {
             Column {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = R.string.conversion_failed_missing_url,
-                    plan = null,
                     onSetErrorMessageResId = {},
                     onUpdateInput = {},
                     onSubmit = {},
@@ -237,8 +249,9 @@ private fun DarkErrorPreview() {
             Column {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    billingAppNameResId = R.string.app_name_pro,
+                    billingStatus = BillingStatus.NotPurchased(),
                     errorMessageResId = R.string.conversion_failed_missing_url,
-                    plan = null,
                     onSetErrorMessageResId = {},
                     onUpdateInput = {},
                     onSubmit = {},

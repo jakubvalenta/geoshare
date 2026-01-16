@@ -67,9 +67,9 @@ import page.ooooo.geoshare.lib.AndroidTools
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.BillingImpl
-import page.ooooo.geoshare.lib.billing.FakePlan
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.FeatureStatus
-import page.ooooo.geoshare.lib.billing.Plan
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.BasicActionReady
@@ -127,10 +127,12 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+
     val automationFeatureStatus by viewModel.automationFeatureStatus.collectAsStateWithLifecycle()
+    val billingAppNameResId = viewModel.billingAppNameResId
+    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
     val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
     val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
-    val plan by viewModel.plan.collectAsStateWithLifecycle()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
@@ -209,10 +211,11 @@ fun MainScreen(
     MainScreen(
         currentState = currentState,
         automationFeatureStatus = automationFeatureStatus,
+        billingAppNameResId = billingAppNameResId,
+        billingStatus = billingStatus,
         changelogShown = changelogShown,
         inputUriString = viewModel.inputUriString,
         loadingIndicator = loadingIndicator,
-        plan = plan,
         onCancel = {
             locationJob?.cancel()
             viewModel.cancel()
@@ -264,10 +267,11 @@ fun MainScreen(
 private fun MainScreen(
     currentState: State,
     automationFeatureStatus: FeatureStatus,
+    billingAppNameResId: Int,
+    billingStatus: BillingStatus,
     changelogShown: Boolean,
     inputUriString: String,
     loadingIndicator: LoadingIndicator?,
-    plan: Plan?,
     onCancel: () -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
@@ -313,7 +317,7 @@ private fun MainScreen(
             }
         },
         actions = {
-            if (plan != null) {
+            if (billingStatus is BillingStatus.Purchased) {
                 FeatureBadgeSmall(
                     onClick = onNavigateToBillingScreen,
                     containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -408,8 +412,9 @@ private fun MainScreen(
                 {
                     MainForm(
                         inputUriString = inputUriString,
+                        billingAppNameResId = billingAppNameResId,
+                        billingStatus = billingStatus,
                         errorMessageResId = errorMessageResId,
-                        plan = plan,
                         onSetErrorMessageResId = setErrorMessageResId,
                         onSubmit = onStart,
                         onUpdateInput = onUpdateInput,
@@ -621,10 +626,11 @@ private fun DefaultPreview() {
         MainScreen(
             currentState = Initial(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -650,10 +656,11 @@ private fun DarkPreview() {
         MainScreen(
             currentState = Initial(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -679,10 +686,11 @@ private fun TabletPreview() {
         MainScreen(
             currentState = Initial(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -712,10 +720,11 @@ private fun SucceededPreview() {
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -745,10 +754,11 @@ private fun DarkSucceededPreview() {
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -778,10 +788,11 @@ private fun TabletSucceededPreview() {
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -818,10 +829,11 @@ private fun AutomationPreview() {
                 delay = 3.seconds,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -858,10 +870,11 @@ private fun DarkAutomationPreview() {
                 delay = 3.seconds,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -897,11 +910,12 @@ private fun TabletAutomationPreview() {
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
                 delay = 3.seconds,
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -929,11 +943,12 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -961,11 +976,12 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -993,11 +1009,12 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
             loadingIndicator = null,
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -1037,6 +1054,8 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
@@ -1044,7 +1063,6 @@ private fun LoadingIndicatorPreview() {
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -1084,6 +1102,8 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
@@ -1091,7 +1111,6 @@ private fun DarkLoadingIndicatorPreview() {
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
@@ -1131,6 +1150,8 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
@@ -1138,7 +1159,6 @@ private fun TabletLoadingIndicatorPreview() {
                 titleResId = R.string.converter_google_maps_loading_indicator_title,
                 description = { null },
             ),
-            plan = FakePlan,
             onCancel = {},
             onDeny = {},
             onGrant = {},
