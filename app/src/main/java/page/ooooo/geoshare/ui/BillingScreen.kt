@@ -313,7 +313,7 @@ private fun BillingSecondPane(
     onLaunchBillingFlow: (offerToken: String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    var selectedOffer by remember { mutableStateOf(offers[0]) }
+    var selectedOffer by remember { mutableStateOf(offers.firstOrNull()) }
 
     Column(
         Modifier.safeDrawingPadding(),
@@ -396,10 +396,12 @@ private fun BillingSecondPane(
         LargeButton(
             stringResource(R.string.billing_buy),
             Modifier.padding(vertical = spacing.small),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = if (selectedOffer != null) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
+            contentColor = if (selectedOffer != null) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
         ) {
-            onLaunchBillingFlow(selectedOffer.token)
+            selectedOffer?.let { selectedOffer ->
+                onLaunchBillingFlow(selectedOffer.token)
+            }
         }
     }
 }
