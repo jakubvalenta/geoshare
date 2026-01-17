@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -60,16 +61,24 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.FakeOneTimeOffer
@@ -288,7 +297,6 @@ private fun BillingFirstPane(
                             start = spacing.small,
                             top = spacing.largeAdaptive,
                             end = spacing.medium,
-                            bottom = spacing.mediumAdaptive,
                         ),
                     bulletSpace = spacing.tiny,
                     bulletWidth = 44.dp,
@@ -337,11 +345,51 @@ private fun BillingFirstPane(
                     }
                 }
             }
+            if (billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION) {
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
+                    LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                ) {
+                    HorizontalDivider(
+                        Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.largeAdaptive),
+                        thickness = Dp.Hairline,
+                    )
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = spacing.windowPadding + 18.dp),
+                        verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
+                    ) {
+                        Text(buildAnnotatedString {
+                            withLink(
+                                LinkAnnotation.Url(
+                                    "https://geoshare.ooooo.page/terms/",
+                                    TextLinkStyles(
+                                        SpanStyle(textDecoration = TextDecoration.Underline)
+                                    )
+                                )
+                            ) {
+                                append(stringResource(R.string.billing_terms_of_service))
+                            }
+                        })
+                        Text(buildAnnotatedString {
+                            withLink(
+                                LinkAnnotation.Url(
+                                    "mailto:geoshare-support@jakubvalenta.cz",
+                                    TextLinkStyles(
+                                        SpanStyle(textDecoration = TextDecoration.Underline)
+                                    )
+                                )
+                            ) {
+                                append(stringResource(R.string.billing_support_email))
+                            }
+                        })
+                    }
+                }
+            }
+            // TODO Show success message
+            // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
         }
-        // TODO Show success message
-        // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
-        // TODO Add TOS link
-        // TODO Add support email
     }
 }
 
@@ -383,13 +431,16 @@ private fun BillingSecondPane(
     when (billingStatus) {
         is BillingStatus.NotPurchased -> {
             Column(
-                Modifier.safeDrawingPadding(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                Modifier
+                    .safeDrawingPadding()
+                    .padding(vertical = spacing.small),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(spacing.small),
             ) {
                 ElevatedCard(
                     Modifier
                         .selectableGroup()
-                        .padding(spacing.small),
+                        .padding(horizontal = spacing.small),
                 ) {
                     billingOffers.forEachIndexed { i, offer ->
                         ListItem(
@@ -445,10 +496,8 @@ private fun BillingSecondPane(
                         }
                     }
                 }
-                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerHigh)
                 LargeButton(
                     stringResource(R.string.billing_purchase_button),
-                    Modifier.padding(vertical = spacing.small),
                     containerColor = if (selectedOffer != null) {
                         MaterialTheme.colorScheme.primaryContainer
                     } else {

@@ -18,10 +18,12 @@
     <string name="billing_purchase_button">Checkout</string>
     <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
     <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
-    <string name="billing_refund_description">Request a refund within 48h since the purchase</string>
+    <string name="billing_refund_description">Refund within 48h since the purchase</string>
     <string name="billing_setup_error_unknown">Unknown error when fetching purchases</string>
     <string name="billing_subscription_cancel_description">Cancel anytime</string>
     <string name="billing_subscription_monthly">Monthly subscription</string>
+    <string name="billing_terms_of_service">Terms of service</string>
+    <string name="billing_support_email">Support email</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
