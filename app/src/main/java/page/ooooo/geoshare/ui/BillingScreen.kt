@@ -2,6 +2,7 @@ package page.ooooo.geoshare.ui
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
-import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -84,6 +84,9 @@ import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.DurationUnit
 
 @Composable
 fun BillingScreen(
@@ -92,16 +95,18 @@ fun BillingScreen(
 ) {
     val context = LocalContext.current
     val billingAppNameResId = viewModel.billingAppNameResId
+    val billingErrorMessageResId by viewModel.billingErrorMessageResId.collectAsStateWithLifecycle()
     val billingFeatures = viewModel.billingFeatures
     val billingOffers by viewModel.billingOffers.collectAsStateWithLifecycle()
+    val billingRefundableDuration = viewModel.billingRefundableDuration
     val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
-    val billingErrorMessageResId by viewModel.billingErrorMessageResId.collectAsStateWithLifecycle()
 
     BillingScreen(
         billingAppNameResId = billingAppNameResId,
         billingErrorMessageResId = billingErrorMessageResId,
         billingFeatures = billingFeatures,
         billingOffers = billingOffers,
+        billingRefundableDuration = billingRefundableDuration,
         billingStatus = billingStatus,
         onBack = onBack,
         onLaunchBillingFlow = { offerToken ->
@@ -117,6 +122,7 @@ private fun BillingScreen(
     @StringRes billingErrorMessageResId: Int?,
     billingFeatures: List<Feature>,
     billingOffers: List<Offer>,
+    billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
     onBack: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
@@ -170,7 +176,13 @@ private fun BillingScreen(
                             contentColor = MaterialTheme.colorScheme.onSurface,
                         ),
                     ) {
-                        BillingSecondPane(billingErrorMessageResId, billingOffers, billingStatus, onLaunchBillingFlow)
+                        BillingSecondPane(
+                            billingErrorMessageResId,
+                            billingOffers,
+                            billingRefundableDuration,
+                            billingStatus,
+                            onLaunchBillingFlow
+                        )
                     }
                 }
             }
@@ -203,7 +215,13 @@ private fun BillingScreen(
                     ),
                     elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
                 ) {
-                    BillingSecondPane(billingErrorMessageResId, billingOffers, billingStatus, onLaunchBillingFlow)
+                    BillingSecondPane(
+                        billingErrorMessageResId,
+                        billingOffers,
+                        billingRefundableDuration,
+                        billingStatus,
+                        onLaunchBillingFlow
+                    )
                 }
             }
         }
@@ -313,6 +331,7 @@ private fun BillingFirstPane(
         // TODO Change content if subscribed
         // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
         // TODO Add TOS link
+        // TODO Add support email
     }
 }
 
@@ -320,6 +339,7 @@ private fun BillingFirstPane(
 private fun BillingSecondPane(
     @StringRes billingErrorMessageResId: Int?,
     billingOffers: List<Offer>,
+    billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
 ) {
@@ -327,31 +347,31 @@ private fun BillingSecondPane(
     val uriHandler = LocalUriHandler.current
     var selectedOffer by remember { mutableStateOf(billingOffers.firstOrNull()) }
 
-    if (billingStatus !is BillingStatus.Loading) {
-        if (billingErrorMessageResId != null) {
-            Column(
-                Modifier.safeDrawingPadding(),
-                horizontalAlignment = Alignment.CenterHorizontally
+    if (billingErrorMessageResId != null) {
+        Column(
+            Modifier.safeDrawingPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(spacing.small),
+                shape = MaterialTheme.shapes.extraSmall,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                ),
             ) {
-                Card(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(spacing.small),
-                    shape = MaterialTheme.shapes.extraSmall,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ),
-                ) {
-                    Text(
-                        stringResource(billingErrorMessageResId),
-                        Modifier.padding(spacing.small),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
+                Text(
+                    stringResource(billingErrorMessageResId),
+                    Modifier.padding(spacing.small),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
-        if (billingStatus is BillingStatus.NotPurchased) {
+    }
+    when (billingStatus) {
+        is BillingStatus.NotPurchased -> {
             Column(
                 Modifier.safeDrawingPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -376,15 +396,19 @@ private fun BillingSecondPane(
                                     Column(Modifier.weight(1f)) {
                                         Text(
                                             when (offer.period) {
-                                                Offer.Period.ONE_TIME -> stringResource(R.string.billing_offer_one_time_title)
-                                                Offer.Period.MONTHLY -> stringResource(R.string.billing_offer_subscription_title)
+                                                Offer.Period.ONE_TIME -> stringResource(R.string.billing_one_time)
+                                                Offer.Period.MONTHLY -> stringResource(R.string.billing_subscription_monthly)
                                             },
                                             style = MaterialTheme.typography.bodyLarge,
                                         )
                                         Text(
                                             when (offer.period) {
-                                                Offer.Period.ONE_TIME -> stringResource(R.string.billing_offer_one_time_description)
-                                                Offer.Period.MONTHLY -> stringResource(R.string.billing_offer_subscription_description)
+                                                Offer.Period.ONE_TIME -> stringResource(
+                                                    R.string.billing_refund_description,
+                                                    billingRefundableDuration.toInt(DurationUnit.HOURS),
+                                                )
+
+                                                Offer.Period.MONTHLY -> stringResource(R.string.billing_subscription_cancel_description)
                                             },
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             style = MaterialTheme.typography.bodySmall,
@@ -413,7 +437,7 @@ private fun BillingSecondPane(
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerHigh)
                 LargeButton(
-                    stringResource(R.string.billing_buy),
+                    stringResource(R.string.billing_purchase),
                     Modifier.padding(vertical = spacing.small),
                     containerColor = if (selectedOffer != null) {
                         MaterialTheme.colorScheme.primaryContainer
@@ -431,7 +455,9 @@ private fun BillingSecondPane(
                     }
                 }
             }
-        } else if ((billingStatus as? BillingStatus.Purchased)?.product?.type == BillingProduct.Type.SUBSCRIPTION) {
+        }
+
+        is BillingStatus.Purchased -> billingStatus.product.let { product ->
             Column(
                 Modifier
                     .safeDrawingPadding()
@@ -439,21 +465,42 @@ private fun BillingSecondPane(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(spacing.tiny),
             ) {
-                Text(
-                    stringResource(R.string.billing_manage_subscription_description),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                when (product.type) {
+                    BillingProduct.Type.ONE_TIME if billingStatus.refundable -> stringResource(
+                        R.string.billing_refund_description,
+                        billingRefundableDuration.toInt(DurationUnit.HOURS)
+                    )
+
+                    BillingProduct.Type.ONE_TIME -> null
+                    BillingProduct.Type.SUBSCRIPTION -> stringResource(R.string.billing_manage_subscription_description)
+                }?.let { description ->
+                    Text(
+                        description,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
                 LargeButton(
-                    stringResource(R.string.billing_manage_subscription_button),
+                    stringResource(
+                        when (product.type) {
+                            BillingProduct.Type.ONE_TIME -> R.string.billing_order_history
+                            BillingProduct.Type.SUBSCRIPTION -> R.string.billing_manage_subscription
+                        }
+                    ),
                 ) {
-                    val sku = "" // TODO SKU
-                    uriHandler.openUri("https://play.google.com/store/account/subscriptions?sku=$sku&package=${BuildConfig.APPLICATION_ID}")
+                    @Suppress("SpellCheckingInspection")
+                    val uri = when (product.type) {
+                        BillingProduct.Type.ONE_TIME -> "https://play.google.com/store/account/orderhistory"
+                        BillingProduct.Type.SUBSCRIPTION -> ("https://play.google.com/store/account/subscriptions"
+                            + "?sku=${Uri.encode(product.id)}&package=page.ooooo.geoshare")
+                    }
+                    uriHandler.openUri(uri)
                 }
             }
-            // TODO Add refund info or button
-            // TODO Add donation button
         }
+        // TODO Add donation button
+
+        is BillingStatus.Loading -> {}
     }
 }
 
@@ -468,6 +515,7 @@ private fun DefaultPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
@@ -484,6 +532,7 @@ private fun DarkPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
@@ -500,6 +549,7 @@ private fun TabletPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
@@ -516,7 +566,11 @@ private fun PurchasedOneTimePreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -532,7 +586,11 @@ private fun DarkPurchasedOneTimePreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -548,7 +606,71 @@ private fun TabletPurchasedOneTimePreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                true,
+            ),
+            onBack = {},
+            onLaunchBillingFlow = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PurchasedOneTimeNotRefundablePreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingErrorMessageResId = null,
+            billingFeatures = listOf(AutomationFeature),
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                false,
+            ),
+            onBack = {},
+            onLaunchBillingFlow = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPurchasedOneTimeNotRefundablePreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingErrorMessageResId = null,
+            billingFeatures = listOf(AutomationFeature),
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                false,
+            ),
+            onBack = {},
+            onLaunchBillingFlow = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPurchasedOneTimeNotRefundablePreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingErrorMessageResId = null,
+            billingFeatures = listOf(AutomationFeature),
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                false,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -564,7 +686,11 @@ private fun PurchasedSubscriptionPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.SUBSCRIPTION)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -580,7 +706,11 @@ private fun DarkPurchasedSubscriptionPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.SUBSCRIPTION)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -596,7 +726,11 @@ private fun TabletPurchasedSubscriptionPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.SUBSCRIPTION)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -612,7 +746,11 @@ private fun ErrorPreview() {
             billingErrorMessageResId = R.string.billing_purchase_error_cancelled,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -628,7 +766,11 @@ private fun DarkErrorPreview() {
             billingErrorMessageResId = R.string.billing_purchase_error_cancelled,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -644,7 +786,11 @@ private fun TabletErrorPreview() {
             billingErrorMessageResId = R.string.billing_purchase_error_cancelled,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
@@ -660,6 +806,7 @@ private fun LoadingPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Loading(),
             onBack = {},
             onLaunchBillingFlow = {},
@@ -676,6 +823,7 @@ private fun DarkLoadingPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Loading(),
             onBack = {},
             onLaunchBillingFlow = {},
@@ -692,6 +840,7 @@ private fun TabletLoadingPreview() {
             billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Loading(),
             onBack = {},
             onLaunchBillingFlow = {},

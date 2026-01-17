@@ -8,9 +8,9 @@ import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
+import kotlin.time.Duration.Companion.hours
 
 class BillingImpl(
     context: Context,
@@ -43,9 +44,13 @@ class BillingImpl(
         BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
         BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
     )
+    override val refundableDuration = 48.hours
 
-    private val billingClient: BillingClient =
-        billingClientBuilder.setListener(this).enableAutoServiceReconnection().build()
+    private val billingClient: BillingClient = billingClientBuilder
+        .setListener(this)
+        .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+        .enableAutoServiceReconnection()
+        .build()
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
     override val status: StateFlow<BillingStatus> = _status
@@ -81,22 +86,13 @@ class BillingImpl(
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK if purchases != null -> {
                 // TODO Acknowledge the purchase
-                val product = purchases.firstNotNullOfOrNull { purchase ->
-                    if (purchase.purchaseState == PurchaseState.PURCHASED) {
-                        purchase.products.firstNotNullOfOrNull { productId ->
-                            products.firstOrNull { billingProduct -> billingProduct.id == productId }
-                        }
-                    } else {
-                        null
-                    }
-                }
-                if (product != null) {
+                val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
+                if (newBillingStatus is BillingStatus.Purchased) {
                     log.i("Billing", "Purchase update: purchased")
-                    _status.value = BillingStatus.Purchased(product)
                 } else {
                     log.i("Billing", "Purchase update: not purchased")
-                    _status.value = BillingStatus.NotPurchased()
                 }
+                _status.value = newBillingStatus
             }
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
@@ -114,21 +110,21 @@ class BillingImpl(
     override fun onQueryPurchasesResponse(billingResult: BillingResult, purchases: List<Purchase>) {
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                val product = purchases.firstNotNullOfOrNull { purchase ->
-                    if (purchase.purchaseState == PurchaseState.PURCHASED) {
-                        purchase.products.firstNotNullOfOrNull { productId ->
-                            products.firstOrNull { billingProduct -> billingProduct.id == productId }
-                        }
-                    } else {
-                        null
-                    }
-                }
-                if (product != null) {
+                val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
+                if (newBillingStatus is BillingStatus.Purchased) {
                     log.i("Billing", "Purchase query: purchased")
-                    _status.value = BillingStatus.Purchased(product)
+                    _status.value = newBillingStatus
                 } else if (_status.value is BillingStatus.Loading) {
-                    log.i("Billing", "Purchase query: not purchased")
-                    _status.value = BillingStatus.NotPurchased()
+                    log.i(
+                        "Billing",
+                        "Purchase query: not purchased; setting status, because the previous status was loading"
+                    )
+                    _status.value = newBillingStatus
+                } else {
+                    log.i(
+                        "Billing",
+                        "Purchase query: not purchased; not setting status, because the previous status contains another purchased product"
+                    )
                 }
             }
 

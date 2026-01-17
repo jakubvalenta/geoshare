@@ -6,15 +6,21 @@
     <string name="billing_automation_navigate">Launch navigation in TomTom, Waze, MagicEarth…</string>
     <string name="billing_automation_open_app">Show map</string>
     <string name="billing_automation_title">Save time with the Automation feature</string>
-    <string name="billing_buy">Checkout</string>
     <string name="billing_intro_not_purchased">Upgrade to</string>
     <string name="billing_intro_purchased">Thanks for using</string>
+    <string name="billing_manage_subscription">Manage your subscription</string>
+    <string name="billing_manage_subscription_description">Cancel, pause, or change payment method</string>
+    <string name="billing_one_time">One time payment</string>
+    <string name="billing_order_history">Order history</string>
     <string name="billing_pricing">Pricing</string>
     <string name="billing_pro_feature">Pro feature</string>
-    <string name="billing_offer_subscription_title">Monthly subscription</string>
-    <string name="billing_offer_subscription_description">Cancel anytime</string>
-    <string name="billing_offer_one_time_title">One time payment</string>
-    <string name="billing_offer_one_time_description">Cancel within 14 days with full refund</string>
+    <string name="billing_purchase">Checkout</string>
+    <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
+    <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
+    <string name="billing_refund_description">Request a refund within 48h since the purchase</string>
+    <string name="billing_setup_error_unknown">Unknown error when fetching purchases</string>
+    <string name="billing_subscription_cancel_description">Cancel anytime</string>
+    <string name="billing_subscription_monthly">Monthly subscription</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
@@ -201,9 +207,4 @@
         <item quantity="other">%1$d seconds</item>
     </plurals>
     <string name="text_list_bullet" translatable="false">•</string>
-    <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
-    <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
-    <string name="billing_setup_error_unknown">Unknown error when fetching purchases</string>
-    <string name="billing_manage_subscription_button">Manage your subscription</string>
-    <string name="billing_manage_subscription_description">Cancel, pause, change payment method:</string>
 </resources>

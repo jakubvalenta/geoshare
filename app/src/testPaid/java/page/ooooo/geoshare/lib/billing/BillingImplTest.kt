@@ -20,6 +20,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.FakeLog
+import kotlin.time.Duration.Companion.hours
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BillingImplTest {
@@ -28,13 +29,15 @@ class BillingImplTest {
 
     @Test
     fun status_whenStartConnectionIsNotCalled_isLoading() {
+        val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("pro_one_time")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -53,13 +56,15 @@ class BillingImplTest {
 
     @Test
     fun status_whenBillingSetupResponseIsError_isLoading() {
+        val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("pro_one_time")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -83,13 +88,15 @@ class BillingImplTest {
 
     @Test
     fun status_whenPurchasesResponseIsError_isLoading() {
+        val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("pro_one_time")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -112,14 +119,16 @@ class BillingImplTest {
     }
 
     @Test
-    fun status_whenPurchasesResponseContainsKnownProductWithTypePurchased_isDoneAndHasPlan() = runTest {
+    fun status_whenPurchasesResponseContainsKnownProductWithStatePurchased_isPurchased() = runTest {
+        val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("pro_one_time")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -135,20 +144,59 @@ class BillingImplTest {
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
         assertEquals(
-            BillingStatus.Purchased(billingImpl.products.first { it.id == "pro_one_time" }),
+            BillingStatus.Purchased(
+                product = billingImpl.products.first { it.id == "pro_one_time" },
+                refundable = true
+            ),
             billingImpl.status.value,
         )
     }
 
     @Test
-    fun status_whenPurchasesResponseContainsKnownProductWithTypePending_isDoneAndHasPlanNull() {
+    fun status_whenPurchasesResponseContainsProductWithOldPurchaseTime_isPurchasedAndNotRefundable() {
+        val purchaseTimeValue = System.currentTimeMillis() - 49.hours.inWholeMilliseconds
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
+                            on { products } doReturn listOf("pro_one_time")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
+                        },
+                    )
+                )
+            }
+
+            override fun startConnection(p0: BillingClientStateListener) {
+                p0.onBillingSetupFinished(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
+                )
+            }
+        }
+        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+        val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
+        billingImpl.startConnection()
+        assertEquals(
+            BillingStatus.Purchased(
+                product = billingImpl.products.first { it.id == "pro_one_time" },
+                refundable = false
+            ),
+            billingImpl.status.value,
+        )
+    }
+
+    @Test
+    fun status_whenPurchasesResponseContainsKnownProductWithStatePending_isNotPurchased() {
+        val purchaseTimeValue = System.currentTimeMillis()
+        val billingClient = object : FakeBillingClient() {
+            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                p1.onQueryPurchasesResponse(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        mock<Purchase> {
+                            on { products } doReturn listOf("spam")
                             on { purchaseState } doReturn Purchase.PurchaseState.PENDING
-                            on { products } doReturn listOf("spam")
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -167,22 +215,26 @@ class BillingImplTest {
     }
 
     @Test
-    fun status_whenPurchasesResponseContainsKnownAndUnknownProducts_isDoneAndHasPlan() {
+    fun status_whenPurchasesResponseContainsKnownAndUnknownProducts_isPurchased() {
+        val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("spam_1")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("pro_subscription")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("spam_2")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -198,20 +250,25 @@ class BillingImplTest {
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
         assertEquals(
-            BillingStatus.Purchased(billingImpl.products.first { it.id == "pro_subscription" }),
+            BillingStatus.Purchased(
+                product = billingImpl.products.first { it.id == "pro_subscription" },
+                refundable = true
+            ),
             billingImpl.status.value,
         )
     }
 
     @Test
-    fun status_whenPurchasesResponseDoesNotContainKnownProduct_isDoneAndHasPlanNull() {
+    fun status_whenPurchasesResponseDoesNotContainKnownProduct_isNotPurchased() {
+        val purchaseTimeValue = System.currentTimeMillis()
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf("spam")
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -230,7 +287,8 @@ class BillingImplTest {
     }
 
     @Test
-    fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseContainsUnknownProduct_isDoneAndHasPlan() {
+    fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseContainsUnknownProduct_isPurchased() {
+        val purchaseTimeValue = System.currentTimeMillis()
         val responseProductIds = listOf(
             "pro_one_time",
             "spam",
@@ -240,8 +298,9 @@ class BillingImplTest {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { products } doReturn listOf(responseProductIds.next())
+                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                            on { purchaseTime } doReturn purchaseTimeValue
                         },
                     )
                 )
@@ -257,7 +316,10 @@ class BillingImplTest {
         val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
         billingImpl.startConnection()
         assertEquals(
-            BillingStatus.Purchased(billingImpl.products.first { it.id == "pro_one_time" }),
+            BillingStatus.Purchased(
+                product = billingImpl.products.first { it.id == "pro_one_time" },
+                refundable = true
+            ),
             billingImpl.status.value,
         )
     }

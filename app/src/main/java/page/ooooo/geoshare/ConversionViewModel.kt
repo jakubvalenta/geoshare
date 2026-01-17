@@ -54,6 +54,7 @@ import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.ui.SavableDelegate
 import javax.inject.Inject
+import kotlin.time.Duration
 
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
@@ -119,6 +120,7 @@ class ConversionViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5000),
         emptyList(),
     )
+    val billingRefundableDuration: Duration = billing.refundableDuration
     val billingStatus: StateFlow<BillingStatus> = billing.status
 
     val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values

@@ -38,6 +38,7 @@ import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.FakeBillingClientBuilder
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -100,7 +101,7 @@ class ConversionStateTest {
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
         context: Context = mock {},
-        billing: Billing = BillingImpl(context),
+        billing: Billing = BillingImpl(context, FakeBillingClientBuilder()),
         log: ILog = FakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
@@ -1755,7 +1756,10 @@ class ConversionStateTest {
         this.backgroundScope
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    refundable = true,
+                )
             )
             on { features } doReturn persistentListOf()
         }
@@ -1777,7 +1781,10 @@ class ConversionStateTest {
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    refundable = true,
+                )
             )
             on { features } doReturn persistentListOf(AutomationFeature)
         }
@@ -1802,7 +1809,10 @@ class ConversionStateTest {
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    refundable = true,
+                )
             )
             on { features } doReturn persistentListOf(AutomationFeature)
         }
@@ -1828,7 +1838,10 @@ class ConversionStateTest {
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    refundable = true,
+                )
             )
             on { features } doReturn persistentListOf(AutomationFeature)
         }
@@ -1855,7 +1868,10 @@ class ConversionStateTest {
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    refundable = true,
+                )
             )
             on { features } doReturn persistentListOf(AutomationFeature)
         }
@@ -1882,7 +1898,10 @@ class ConversionStateTest {
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
-                BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+                BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    refundable = true,
+                )
             )
             on { features } doReturn persistentListOf(AutomationFeature)
         }

@@ -190,7 +190,10 @@ private fun FilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
-                    billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+                    billingStatus = BillingStatus.Purchased(
+                        product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                        refundable = true,
+                    ),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
@@ -210,7 +213,10 @@ private fun DarkFilledPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
-                    billingStatus = BillingStatus.Purchased(BillingProduct("test", BillingProduct.Type.ONE_TIME)),
+                    billingStatus = BillingStatus.Purchased(
+                        product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                        refundable = true,
+                    ),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},

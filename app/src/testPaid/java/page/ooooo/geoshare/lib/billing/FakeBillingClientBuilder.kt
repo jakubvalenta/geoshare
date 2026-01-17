@@ -26,6 +26,7 @@ import com.android.billingclient.api.InAppMessageParams
 import com.android.billingclient.api.InAppMessageResponseListener
 import com.android.billingclient.api.LaunchExternalLinkParams
 import com.android.billingclient.api.LaunchExternalLinkResponseListener
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetailsResponseListener
 import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
@@ -143,6 +144,11 @@ class FakeBillingClientBuilder(
 ) : BillingClientBuilder {
     private lateinit var purchasesUpdatedListener: PurchasesUpdatedListener
 
+    override fun build(): BillingClient {
+        billingClient.purchasesUpdatedListener = purchasesUpdatedListener
+        return billingClient
+    }
+
     override fun setListener(listener: PurchasesUpdatedListener): BillingClientBuilder {
         this.purchasesUpdatedListener = listener
         return this
@@ -152,8 +158,7 @@ class FakeBillingClientBuilder(
         return this
     }
 
-    override fun build(): BillingClient {
-        billingClient.purchasesUpdatedListener = purchasesUpdatedListener
-        return billingClient
+    override fun enablePendingPurchases(pendingPurchasesParams: PendingPurchasesParams): BillingClientBuilder {
+        return this
     }
 }

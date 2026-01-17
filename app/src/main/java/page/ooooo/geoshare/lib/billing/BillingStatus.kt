@@ -7,5 +7,5 @@ sealed interface BillingStatus {
     class NotPurchased : BillingStatus
 
     @Immutable
-    data class Purchased(val product: BillingProduct) : BillingStatus
+    data class Purchased(val product: BillingProduct, val refundable: Boolean): BillingStatus
 }
