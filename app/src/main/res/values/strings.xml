@@ -7,7 +7,7 @@
     <string name="billing_automation_open_app">Show map</string>
     <string name="billing_automation_title">Save time with the Automation feature</string>
     <string name="billing_intro_not_purchased">Upgrade to</string>
-    <string name="billing_intro_purchased">Thanks for using</string>
+    <string name="billing_intro_purchased">You have</string>
     <string name="billing_manage_subscription">Manage your subscription</string>
     <string name="billing_manage_subscription_description">Cancel, pause, or change payment method</string>
     <string name="billing_one_time">One time payment</string>
@@ -42,6 +42,8 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>
+    <string name="donation_button">Donate on Ko-fi</string>
+    <string name="donation_description">Does %1$s make your life easier?</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>

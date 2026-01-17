@@ -4,5 +4,5 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class BillingProduct(val id: String, val type: Type) {
-    enum class Type { ONE_TIME, SUBSCRIPTION }
+    enum class Type { DONATION, ONE_TIME, SUBSCRIPTION }
 }

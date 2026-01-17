@@ -175,6 +175,7 @@ class BillingImpl(
     private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
         products.groupBy { it.type }.forEach { (billingProductType, billingProducts) ->
             val productType = when (billingProductType) {
+                BillingProduct.Type.DONATION -> return@forEach
                 BillingProduct.Type.ONE_TIME -> ProductType.INAPP
                 BillingProduct.Type.SUBSCRIPTION -> ProductType.SUBS
             }

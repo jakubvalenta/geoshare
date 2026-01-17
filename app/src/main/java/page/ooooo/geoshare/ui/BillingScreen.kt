@@ -328,7 +328,6 @@ private fun BillingFirstPane(
             }
         }
         // TODO Show success message
-        // TODO Change content if subscribed
         // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
         // TODO Add TOS link
         // TODO Add support email
@@ -466,6 +465,11 @@ private fun BillingSecondPane(
                 verticalArrangement = Arrangement.spacedBy(spacing.tiny),
             ) {
                 when (product.type) {
+                    BillingProduct.Type.DONATION -> stringResource(
+                        R.string.donation_description,
+                        stringResource(R.string.app_name)
+                    )
+
                     BillingProduct.Type.ONE_TIME if billingStatus.refundable -> stringResource(
                         R.string.billing_refund_description,
                         billingRefundableDuration.toInt(DurationUnit.HOURS)
@@ -483,6 +487,7 @@ private fun BillingSecondPane(
                 LargeButton(
                     stringResource(
                         when (product.type) {
+                            BillingProduct.Type.DONATION -> R.string.donation_button
                             BillingProduct.Type.ONE_TIME -> R.string.billing_order_history
                             BillingProduct.Type.SUBSCRIPTION -> R.string.billing_manage_subscription
                         }
@@ -490,6 +495,7 @@ private fun BillingSecondPane(
                 ) {
                     @Suppress("SpellCheckingInspection")
                     val uri = when (product.type) {
+                        BillingProduct.Type.DONATION -> "https://ko-fi.com/jakubvalenta"
                         BillingProduct.Type.ONE_TIME -> "https://play.google.com/store/account/orderhistory"
                         BillingProduct.Type.SUBSCRIPTION -> ("https://play.google.com/store/account/subscriptions"
                             + "?sku=${Uri.encode(product.id)}&package=page.ooooo.geoshare")
@@ -498,7 +504,6 @@ private fun BillingSecondPane(
                 }
             }
         }
-        // TODO Add donation button
 
         is BillingStatus.Loading -> {}
     }
@@ -551,6 +556,66 @@ private fun TabletPreview() {
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
+            onBack = {},
+            onLaunchBillingFlow = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PurchasedDonationPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingErrorMessageResId = null,
+            billingFeatures = listOf(AutomationFeature),
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.DONATION),
+                true,
+            ),
+            onBack = {},
+            onLaunchBillingFlow = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPurchasedDonationPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingErrorMessageResId = null,
+            billingFeatures = listOf(AutomationFeature),
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.DONATION),
+                true,
+            ),
+            onBack = {},
+            onLaunchBillingFlow = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPurchasedDonationPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingErrorMessageResId = null,
+            billingFeatures = listOf(AutomationFeature),
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.Purchased(
+                BillingProduct("test", BillingProduct.Type.DONATION),
+                true,
+            ),
             onBack = {},
             onLaunchBillingFlow = {},
         )
