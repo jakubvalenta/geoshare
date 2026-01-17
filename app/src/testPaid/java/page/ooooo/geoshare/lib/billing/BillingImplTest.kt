@@ -22,6 +22,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.FakeLog
 import kotlin.time.Duration.Companion.hours
 
+@Suppress("EmptyMethod")
 @OptIn(ExperimentalCoroutinesApi::class)
 class BillingImplTest {
 
