@@ -35,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -294,6 +293,22 @@ private fun BillingFirstPane(
                     bulletSpace = spacing.tiny,
                     bulletWidth = 44.dp,
                 ) {
+                    TextListItem(
+                        Modifier.padding(bottom = spacing.smallAdaptive),
+                        bullet = {
+                            Icon(
+                                imageVector = Icons.Default.Done,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                    ) {
+                        Text(
+                            stringResource(R.string.billing_feature_all),
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                     billingFeatures.forEach { feature ->
                         TextListItem(
                             Modifier.padding(bottom = spacing.smallAdaptive),
@@ -314,13 +329,9 @@ private fun BillingFirstPane(
                         TextListItem(Modifier.padding(bottom = spacing.smallAdaptive)) {
                             Text(stringResource(feature.descriptionResId))
                         }
-                        feature.itemsResIds.takeIf { it.isNotEmpty() }?.let { itemsResIds ->
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                                itemsResIds.forEach { itemResId ->
-                                    TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                                        Text(stringResource(itemResId))
-                                    }
-                                }
+                        feature.itemsResIds.forEach { itemResId ->
+                            TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
+                                Text(stringResource(itemResId))
                             }
                         }
                     }
@@ -436,7 +447,7 @@ private fun BillingSecondPane(
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerHigh)
                 LargeButton(
-                    stringResource(R.string.billing_purchase),
+                    stringResource(R.string.billing_purchase_button),
                     Modifier.padding(vertical = spacing.small),
                     containerColor = if (selectedOffer != null) {
                         MaterialTheme.colorScheme.primaryContainer

@@ -11,14 +11,14 @@ sealed interface Feature {
 
 object AutomationFeature : Feature {
     @StringRes
-    override val titleResId = R.string.billing_automation_title
+    override val titleResId = R.string.user_preferences_automation_title
 
     @StringRes
-    override val descriptionResId = R.string.user_preferences_automation_description
+    override val descriptionResId = R.string.billing_feature_automation_description
 
     override val itemsResIds = listOf(
-        R.string.billing_automation_open_app,
-        R.string.billing_automation_navigate,
-        R.string.billing_automation_copy,
+        R.string.billing_feature_automation_item_open_app,
+        R.string.billing_feature_automation_item_navigate,
+        R.string.billing_feature_automation_item_copy,
     )
 }

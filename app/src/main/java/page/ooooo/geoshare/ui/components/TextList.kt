@@ -72,13 +72,13 @@ private fun DefaultPreview() {
                     Text(stringResource(R.string.user_preferences_automation_description))
                 }
                 TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_open_app))
+                    Text(stringResource(R.string.billing_feature_automation_item_open_app))
                 }
                 TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_navigate))
+                    Text(stringResource(R.string.billing_feature_automation_item_navigate))
                 }
                 TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_copy))
+                    Text(stringResource(R.string.billing_feature_automation_item_copy))
                 }
             }
         }
@@ -95,13 +95,13 @@ private fun DarkPreview() {
                     Text(stringResource(R.string.user_preferences_automation_description))
                 }
                 TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_open_app))
+                    Text(stringResource(R.string.billing_feature_automation_item_open_app))
                 }
                 TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_navigate))
+                    Text(stringResource(R.string.billing_feature_automation_item_navigate))
                 }
                 TextListItem(Modifier.padding(bottom = 2.dp), bullet = { TextListBullet() }) {
-                    Text(stringResource(R.string.billing_automation_copy))
+                    Text(stringResource(R.string.billing_feature_automation_item_copy))
                 }
             }
         }

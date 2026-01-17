@@ -2,10 +2,11 @@
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="app_name_pro" translatable="false">Geo Share Pro</string>
     <string name="not_available">Not available</string>
-    <string name="billing_automation_copy">Copy to clipboard</string>
-    <string name="billing_automation_navigate">Launch navigation in TomTom, Waze, MagicEarth…</string>
-    <string name="billing_automation_open_app">Show map</string>
-    <string name="billing_automation_title">Save time with the Automation feature</string>
+    <string name="billing_feature_all">All features of the basic version</string>
+    <string name="billing_feature_automation_description">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
+    <string name="billing_feature_automation_item_copy">Copy to clipboard</string>
+    <string name="billing_feature_automation_item_navigate">Launch navigation in TomTom, Waze, MagicEarth…</string>
+    <string name="billing_feature_automation_item_open_app">Show map</string>
     <string name="billing_intro_not_purchased">Upgrade to</string>
     <string name="billing_intro_purchased">You have</string>
     <string name="billing_manage_subscription">Manage your subscription</string>
@@ -14,7 +15,7 @@
     <string name="billing_order_history">Order history</string>
     <string name="billing_pricing">Pricing</string>
     <string name="billing_pro_feature">Pro feature</string>
-    <string name="billing_purchase">Checkout</string>
+    <string name="billing_purchase_button">Checkout</string>
     <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
     <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
     <string name="billing_refund_description">Request a refund within 48h since the purchase</string>
