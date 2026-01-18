@@ -94,6 +94,11 @@ class BillingImpl(
                     log.i("Billing", "Purchase update: not purchased")
                 }
                 _status.value = newBillingStatus
+                _message.value = Message(
+                    context.getString(
+                        R.string.billing_purchase_success, context.getString(appNameResId)
+                    )
+                )
             }
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
@@ -164,11 +169,6 @@ class BillingImpl(
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 log.i("Billing", "Billing flow: ok")
-                _message.value = Message(
-                    context.getString(
-                        R.string.billing_purchase_success, context.getString(appNameResId)
-                    )
-                )
             }
 
             else -> {

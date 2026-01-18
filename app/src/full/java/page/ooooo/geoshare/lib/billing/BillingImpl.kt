@@ -14,10 +14,10 @@ import kotlin.time.Duration
 
 class BillingImpl(context: Context) : Billing(context) {
 
-    private val product = BillingProduct("full_one_time", BillingProduct.Type.ONE_TIME)
+    private val product = BillingProduct("full_one_time", BillingProduct.Type.DONATION)
 
     @StringRes
-    override val appNameResId = R.string.app_name
+    override val appNameResId = R.string.app_name // TODO Change name
     override val products = persistentListOf(product)
     override val features = persistentListOf(AutomationFeature)
     override val refundableDuration = Duration.ZERO

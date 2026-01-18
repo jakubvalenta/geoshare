@@ -28,8 +28,8 @@ import kotlin.time.Duration.Companion.hours
 class BillingImplTest {
 
     private val context: Context = mock {
-        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Unknown error when making a purchase"
-        on { getString(R.string.billing_setup_error_unknown) } doReturn "Unknown error when fetching purchases"
+        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Error when making a purchase"
+        on { getString(R.string.billing_setup_error_unknown) } doReturn "Error when fetching purchases"
     }
 
     @Test
@@ -86,7 +86,7 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            Message("Unknown error when fetching purchases", isError = true),
+            Message("Error when fetching purchases", isError = true),
             billingImpl.message.value,
         )
     }
@@ -118,7 +118,7 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            Message("Unknown error when making a purchase", isError = true),
+            Message("Error when making a purchase", isError = true),
             billingImpl.message.value,
         )
     }
