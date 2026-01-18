@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.R
+import kotlin.time.Duration
 
 class BillingImpl(context: Context) : Billing(context) {
 
@@ -19,8 +20,9 @@ class BillingImpl(context: Context) : Billing(context) {
     override val appNameResId = R.string.app_name
     override val products = persistentListOf(product)
     override val features = persistentListOf(AutomationFeature)
+    override val refundableDuration = Duration.ZERO
 
-    override val status = flowOf(BillingStatus.Purchased(product))
+    override val status = flowOf(BillingStatus.Purchased(product, refundable = false))
         .stateIn(
             CoroutineScope(Dispatchers.Default),
             SharingStarted.WhileSubscribed(5000),
@@ -34,7 +36,7 @@ class BillingImpl(context: Context) : Billing(context) {
             emptyList(),
         )
 
-    override val errorMessageResId = flowOf(null)
+    override val message = flowOf(null)
         .stateIn(
             CoroutineScope(Dispatchers.Default),
             SharingStarted.WhileSubscribed(5000),
