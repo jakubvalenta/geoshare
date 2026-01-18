@@ -94,7 +94,6 @@ import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
-import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainInfo
@@ -317,23 +316,11 @@ private fun MainScreen(
             }
         },
         actions = {
-            // TODO Figure out when to show the badge and in what color
-            FeatureBadgeSmall(
-                onClick = onNavigateToBillingScreen,
-                containerColor = if (billingStatus is BillingStatus.Purchased) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceContainerHigh
-                },
-                contentColor = if (billingStatus is BillingStatus.Purchased) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
             MainMenu(
+                billingAppNameResId = billingAppNameResId,
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = onNavigateToAboutScreen,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
