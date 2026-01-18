@@ -317,13 +317,20 @@ private fun MainScreen(
             }
         },
         actions = {
-            if (billingStatus is BillingStatus.Purchased) {
-                FeatureBadgeSmall(
-                    onClick = onNavigateToBillingScreen,
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            // TODO Figure out when to show the badge and in what color
+            FeatureBadgeSmall(
+                onClick = onNavigateToBillingScreen,
+                containerColor = if (billingStatus is BillingStatus.Purchased) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerHigh
+                },
+                contentColor = if (billingStatus is BillingStatus.Purchased) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
             MainMenu(
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = onNavigateToAboutScreen,
