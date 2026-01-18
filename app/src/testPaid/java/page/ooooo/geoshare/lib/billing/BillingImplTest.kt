@@ -20,13 +20,17 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.FakeLog
+import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 @Suppress("EmptyMethod")
 @OptIn(ExperimentalCoroutinesApi::class)
 class BillingImplTest {
 
-    private val context: Context = mock {}
+    private val context: Context = mock {
+        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Unknown error when making a purchase"
+        on { getString(R.string.billing_setup_error_unknown) } doReturn "Unknown error when fetching purchases"
+    }
 
     @Test
     fun status_whenStartConnectionIsNotCalled_isLoading() {
@@ -82,8 +86,8 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            R.string.billing_setup_error_unknown,
-            billingImpl.errorMessageResId.value,
+            Message("Unknown error when fetching purchases", isError = true),
+            billingImpl.message.value,
         )
     }
 
@@ -114,8 +118,8 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            R.string.billing_purchase_error_unknown,
-            billingImpl.errorMessageResId.value,
+            Message("Unknown error when making a purchase", isError = true),
+            billingImpl.message.value,
         )
     }
 

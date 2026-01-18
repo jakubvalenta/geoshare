@@ -5,6 +5,7 @@ import android.content.Context
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration
 
 abstract class Billing(
@@ -15,7 +16,7 @@ abstract class Billing(
     abstract val products: ImmutableList<BillingProduct>
     abstract val refundableDuration: Duration
 
-    abstract val errorMessageResId: StateFlow<Int?>
+    abstract val message: StateFlow<Message?>
     abstract val offers: Flow<List<Offer>>
     abstract val status: StateFlow<BillingStatus>
 

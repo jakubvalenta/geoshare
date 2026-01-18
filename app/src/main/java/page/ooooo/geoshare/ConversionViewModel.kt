@@ -25,6 +25,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.UserPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -113,7 +114,7 @@ class ConversionViewModel @Inject constructor(
         FeatureStatus.LOADING,
     )
     val billingAppNameResId: Int = billing.appNameResId
-    val billingErrorMessageResId: StateFlow<Int?> = billing.errorMessageResId
+    val billingMessage: StateFlow<Message?> = billing.message
     val billingFeatures: ImmutableList<Feature> = billing.features
     val billingOffers: StateFlow<List<Offer>> = billing.offers.stateIn(
         viewModelScope,

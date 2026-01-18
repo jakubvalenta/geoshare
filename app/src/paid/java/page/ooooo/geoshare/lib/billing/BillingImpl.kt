@@ -29,10 +29,11 @@ import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 class BillingImpl(
-    context: Context,
+    private val context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     private val log: ILog = DefaultLog,
 ) : Billing(context), BillingClientStateListener, PurchasesResponseListener, PurchasesUpdatedListener {
@@ -61,8 +62,8 @@ class BillingImpl(
         )
     }
 
-    private val _errorMessageResId: MutableStateFlow<Int?> = MutableStateFlow(null)
-    override val errorMessageResId: StateFlow<Int?> = _errorMessageResId
+    private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
+    override val message: StateFlow<Message?> = _message
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
@@ -73,7 +74,7 @@ class BillingImpl(
             }
         } else {
             log.e("Billing", "Billing setup: error ${billingResult.debugMessage}")
-            _errorMessageResId.value = R.string.billing_setup_error_unknown
+            _message.value = Message(context.getString(R.string.billing_setup_error_unknown), isError = true)
         }
     }
 
@@ -97,12 +98,12 @@ class BillingImpl(
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
                 log.i("Billing", "Purchase update: cancelled")
-                _errorMessageResId.value = R.string.billing_purchase_error_cancelled
+                _message.value = Message(context.getString(R.string.billing_purchase_error_cancelled), isError = true)
             }
 
             else -> {
                 log.e("Billing", "Purchase update: error ${billingResult.debugMessage}")
-                _errorMessageResId.value = R.string.billing_purchase_error_unknown
+                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
     }
@@ -130,7 +131,7 @@ class BillingImpl(
 
             else -> {
                 log.e("Billing", "Purchases query: error ${billingResult.debugMessage}")
-                _errorMessageResId.value = R.string.billing_purchase_error_unknown
+                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
     }
@@ -148,7 +149,7 @@ class BillingImpl(
             queryProductDetailsAndOffers().first { (_, offer) -> offer.token == offerToken }
         } catch (_: NoSuchElementException) {
             log.e("Billing", "Offer token not found: $offerToken")
-            _errorMessageResId.value = R.string.billing_purchase_error_unknown
+            _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             return
         }
 
@@ -163,11 +164,16 @@ class BillingImpl(
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 log.i("Billing", "Billing flow: ok")
+                _message.value = Message(
+                    context.getString(
+                        R.string.billing_purchase_success, context.getString(appNameResId)
+                    )
+                )
             }
 
             else -> {
                 log.e("Billing", "Billing flow: error ${billingResult.debugMessage}")
-                _errorMessageResId.value = R.string.billing_purchase_error_unknown
+                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
     }

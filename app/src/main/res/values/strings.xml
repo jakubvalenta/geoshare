@@ -18,6 +18,7 @@
     <string name="billing_purchase_button">Checkout</string>
     <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
     <string name="billing_purchase_error_unknown">Unknown error when making a purchase</string>
+    <string name="billing_purchase_success">Thanks for buying %1$s</string>
     <string name="billing_refund_description">Refund within 48h since the purchase</string>
     <string name="billing_setup_error_unknown">Unknown error when fetching purchases</string>
     <string name="billing_subscription_cancel_description">Cancel anytime</string>

@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui
 import android.app.Activity
 import android.content.res.Configuration
 import android.net.Uri
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,6 +40,11 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +52,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,6 +82,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -95,6 +101,14 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 
+private class MessageSnackbarVisuals(message: Message) : SnackbarVisuals {
+    override val message = message.text
+    override val actionLabel = null
+    override val withDismissAction = false
+    override val duration = SnackbarDuration.Short
+    val isError = message.isError
+}
+
 @Composable
 fun BillingScreen(
     onBack: () -> Unit = {},
@@ -102,16 +116,16 @@ fun BillingScreen(
 ) {
     val context = LocalContext.current
     val billingAppNameResId = viewModel.billingAppNameResId
-    val billingErrorMessageResId by viewModel.billingErrorMessageResId.collectAsStateWithLifecycle()
     val billingFeatures = viewModel.billingFeatures
+    val billingMessage by viewModel.billingMessage.collectAsStateWithLifecycle()
     val billingOffers by viewModel.billingOffers.collectAsStateWithLifecycle()
     val billingRefundableDuration = viewModel.billingRefundableDuration
     val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
 
     BillingScreen(
         billingAppNameResId = billingAppNameResId,
-        billingErrorMessageResId = billingErrorMessageResId,
         billingFeatures = billingFeatures,
+        billingMessage = billingMessage,
         billingOffers = billingOffers,
         billingRefundableDuration = billingRefundableDuration,
         billingStatus = billingStatus,
@@ -126,8 +140,8 @@ fun BillingScreen(
 @Composable
 private fun BillingScreen(
     billingAppNameResId: Int,
-    @StringRes billingErrorMessageResId: Int?,
     billingFeatures: List<Feature>,
+    billingMessage: Message?,
     billingOffers: List<Offer>,
     billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
@@ -138,6 +152,13 @@ private fun BillingScreen(
     val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
     val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(billingMessage) {
+        if (billingMessage != null) {
+            snackbarHostState.showSnackbar(MessageSnackbarVisuals(billingMessage))
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -155,6 +176,53 @@ private fun BillingScreen(
                     containerColor = Color.Transparent,
                 ),
             )
+        },
+        bottomBar = {
+            if (!expanded) {
+                ElevatedCard(
+                    shape = MaterialTheme.shapes.large.copy(
+                        bottomStart = ZeroCornerSize,
+                        bottomEnd = ZeroCornerSize,
+                    ),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
+                ) {
+                    BillingSecondPane(
+                        billingOffers,
+                        billingRefundableDuration,
+                        billingStatus,
+                        onLaunchBillingFlow
+                    )
+                }
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = spacing.small), // TODO Snackbar bottom spacing
+            ) { snackbarData ->
+                val isError = (snackbarData.visuals as? MessageSnackbarVisuals)?.isError ?: false
+                val containerColor = if (isError) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                }
+                val contentColor = if (isError) {
+                    MaterialTheme.colorScheme.onError
+                } else {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                }
+                Snackbar(
+                    snackbarData = snackbarData,
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                    dismissActionContentColor = contentColor,
+                    actionColor = contentColor,
+                )
+            }
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) { innerPadding ->
@@ -184,7 +252,6 @@ private fun BillingScreen(
                         ),
                     ) {
                         BillingSecondPane(
-                            billingErrorMessageResId,
                             billingOffers,
                             billingRefundableDuration,
                             billingStatus,
@@ -202,34 +269,10 @@ private fun BillingScreen(
             Column(
                 Modifier
                     .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
+                    .consumeWindowInsets(innerPadding)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    BillingFirstPane(billingAppNameResId, billingFeatures, billingStatus)
-                }
-                ElevatedCard(
-                    shape = MaterialTheme.shapes.large.copy(
-                        bottomStart = ZeroCornerSize,
-                        bottomEnd = ZeroCornerSize,
-                    ),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
-                ) {
-                    BillingSecondPane(
-                        billingErrorMessageResId,
-                        billingOffers,
-                        billingRefundableDuration,
-                        billingStatus,
-                        onLaunchBillingFlow
-                    )
-                }
+                BillingFirstPane(billingAppNameResId, billingFeatures, billingStatus)
             }
         }
     }
@@ -386,7 +429,6 @@ private fun BillingFirstPane(
                     }
                 }
             }
-            // TODO Show success message
             // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
         }
     }
@@ -394,7 +436,6 @@ private fun BillingFirstPane(
 
 @Composable
 private fun BillingSecondPane(
-    @StringRes billingErrorMessageResId: Int?,
     billingOffers: List<Offer>,
     billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
@@ -404,29 +445,6 @@ private fun BillingSecondPane(
     val uriHandler = LocalUriHandler.current
     var selectedOffer by remember { mutableStateOf(billingOffers.firstOrNull()) }
 
-    if (billingErrorMessageResId != null) {
-        Column(
-            Modifier.safeDrawingPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Card(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(spacing.small),
-                shape = MaterialTheme.shapes.extraSmall,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                ),
-            ) {
-                Text(
-                    stringResource(billingErrorMessageResId),
-                    Modifier.padding(spacing.small),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-        }
-    }
     when (billingStatus) {
         is BillingStatus.NotPurchased -> {
             Column(
@@ -576,8 +594,8 @@ private fun DefaultPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
@@ -593,8 +611,8 @@ private fun DarkPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
@@ -610,8 +628,8 @@ private fun TabletPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.NotPurchased(),
@@ -627,8 +645,8 @@ private fun PurchasedDonationPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -647,8 +665,8 @@ private fun DarkPurchasedDonationPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -667,8 +685,8 @@ private fun TabletPurchasedDonationPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -687,8 +705,8 @@ private fun PurchasedOneTimePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -707,8 +725,8 @@ private fun DarkPurchasedOneTimePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -727,8 +745,8 @@ private fun TabletPurchasedOneTimePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -747,8 +765,8 @@ private fun PurchasedOneTimeNotRefundablePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -767,8 +785,8 @@ private fun DarkPurchasedOneTimeNotRefundablePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -787,8 +805,8 @@ private fun TabletPurchasedOneTimeNotRefundablePreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -807,8 +825,8 @@ private fun PurchasedSubscriptionPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -827,8 +845,8 @@ private fun DarkPurchasedSubscriptionPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -847,8 +865,8 @@ private fun TabletPurchasedSubscriptionPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
@@ -863,72 +881,12 @@ private fun TabletPurchasedSubscriptionPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ErrorPreview() {
-    AppTheme {
-        BillingScreen(
-            billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = R.string.billing_purchase_error_cancelled,
-            billingFeatures = listOf(AutomationFeature),
-            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Purchased(
-                BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
-            ),
-            onBack = {},
-            onLaunchBillingFlow = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkErrorPreview() {
-    AppTheme {
-        BillingScreen(
-            billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = R.string.billing_purchase_error_cancelled,
-            billingFeatures = listOf(AutomationFeature),
-            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Purchased(
-                BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
-            ),
-            onBack = {},
-            onLaunchBillingFlow = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, device = Devices.TABLET)
-@Composable
-private fun TabletErrorPreview() {
-    AppTheme {
-        BillingScreen(
-            billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = R.string.billing_purchase_error_cancelled,
-            billingFeatures = listOf(AutomationFeature),
-            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
-            billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Purchased(
-                BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
-            ),
-            onBack = {},
-            onLaunchBillingFlow = {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun LoadingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Loading(),
@@ -944,8 +902,8 @@ private fun DarkLoadingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Loading(),
@@ -961,8 +919,8 @@ private fun TabletLoadingPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
-            billingErrorMessageResId = null,
             billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Loading(),
