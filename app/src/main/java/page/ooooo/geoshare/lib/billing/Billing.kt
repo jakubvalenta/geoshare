@@ -17,12 +17,13 @@ abstract class Billing(
     abstract val refundableDuration: Duration
 
     abstract val message: StateFlow<Message?>
-    abstract val offers: Flow<List<Offer>>
     abstract val status: StateFlow<BillingStatus>
 
     abstract fun startConnection()
 
     abstract fun endConnection()
+
+    abstract suspend fun queryOffers(): List<Offer>
 
     abstract suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 

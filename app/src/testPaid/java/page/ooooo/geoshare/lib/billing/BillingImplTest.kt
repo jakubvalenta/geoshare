@@ -11,7 +11,6 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsResult
 import com.android.billingclient.api.QueryPurchasesParams
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -330,101 +329,105 @@ class BillingImplTest {
     }
 
     @Test
-    fun offers_whenStartConnectionIsNotCalled_isEmptyList() {
+    fun queryOffers_whenStartConnectionIsNotCalled_isEmptyList() {
     }
 
     @Test
-    fun offers_whenProductDetailsResponseIsError_isEmptyList() {
+    fun queryOffers_whenProductDetailsResponseIsError_isEmptyList() {
     }
 
     @Test
-    fun offers_whenProductDetailsResponseThrowsException_isEmptyList() {
+    fun queryOffers_whenProductDetailsResponseThrowsException_isEmptyList() {
     }
 
     @Test
-    fun offers_whenProductDetailsResponseContainsNoProductDetails_isEmptyList() {
+    fun queryOffers_whenProductDetailsResponseContainsNoProductDetails_isEmptyList() {
     }
 
     @Test
-    fun offers_whenProductDetailsResponseContainsNoOffers_isEmptyList() {
+    fun queryOffers_whenProductDetailsResponseContainsNoOffers_isEmptyList() {
     }
 
     @Test
-    fun offers_whenProductDetailsResponseContainsSeveralProductDetailsWithSeveralOffers_isListOfAllOffers() = runTest {
-        val responseProductDetailsLists = listOf(
-            listOf(
-                mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details_list"
-                    on { formattedPrice } doReturn "$1"
-                }.let { oneTimePurchaseOfferDetails ->
-                    mock {
-                        on { productId } doReturn "product_1"
-                        on { oneTimePurchaseOfferDetailsList } doReturn listOf(oneTimePurchaseOfferDetails)
-                    }
-                },
-                mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details"
-                    on { formattedPrice } doReturn "$3.33"
-                }.let { oneTimePurchaseOfferDetailsParam ->
-                    mock<ProductDetails> {
-                        on { productId } doReturn "product_2"
-                        on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
-                    }
-                },
-            ),
-            listOf(
-                mock<ProductDetails.PricingPhase> {
-                    on { billingPeriod } doReturn "P1M"
-                    on { formattedPrice } doReturn "$99.90"
-                    on { recurrenceMode } doReturn ProductDetails.RecurrenceMode.INFINITE_RECURRING
-                }.let { pricingPhase ->
-                    mock<ProductDetails.PricingPhases> {
-                        on { pricingPhaseList } doReturn listOf(pricingPhase)
-                    }
-                }.let { pricingPhasesParam ->
-                    mock<ProductDetails.SubscriptionOfferDetails> {
-                        on { offerToken } doReturn "offer_subscription_details"
-                        on { pricingPhases } doReturn pricingPhasesParam
-                    }
-                }.let { subscriptionOfferDetailsParam ->
-                    mock {
-                        on { productId } doReturn "product_2"
-                        on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
-                    }
-                },
-            ),
-        ).iterator()
-        val billingClient = object : FakeBillingClient() {
-            override fun queryProductDetailsAsync(p0: QueryProductDetailsParams, p1: ProductDetailsResponseListener) {
-                p1.onProductDetailsResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
-                    QueryProductDetailsResult.create(
-                        responseProductDetailsLists.next(),
-                        emptyList(),
+    fun queryOffers_whenProductDetailsResponseContainsSeveralProductDetailsWithSeveralOffers_isListOfAllOffers() =
+        runTest {
+            val responseProductDetailsLists = listOf(
+                listOf(
+                    mock<ProductDetails.OneTimePurchaseOfferDetails> {
+                        on { offerToken } doReturn "offer_one_time_details_list"
+                        on { formattedPrice } doReturn "$1"
+                    }.let { oneTimePurchaseOfferDetails ->
+                        mock {
+                            on { productId } doReturn "product_1"
+                            on { oneTimePurchaseOfferDetailsList } doReturn listOf(oneTimePurchaseOfferDetails)
+                        }
+                    },
+                    mock<ProductDetails.OneTimePurchaseOfferDetails> {
+                        on { offerToken } doReturn "offer_one_time_details"
+                        on { formattedPrice } doReturn "$3.33"
+                    }.let { oneTimePurchaseOfferDetailsParam ->
+                        mock<ProductDetails> {
+                            on { productId } doReturn "product_2"
+                            on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
+                        }
+                    },
+                ),
+                listOf(
+                    mock<ProductDetails.PricingPhase> {
+                        on { billingPeriod } doReturn "P1M"
+                        on { formattedPrice } doReturn "$99.90"
+                        on { recurrenceMode } doReturn ProductDetails.RecurrenceMode.INFINITE_RECURRING
+                    }.let { pricingPhase ->
+                        mock<ProductDetails.PricingPhases> {
+                            on { pricingPhaseList } doReturn listOf(pricingPhase)
+                        }
+                    }.let { pricingPhasesParam ->
+                        mock<ProductDetails.SubscriptionOfferDetails> {
+                            on { offerToken } doReturn "offer_subscription_details"
+                            on { pricingPhases } doReturn pricingPhasesParam
+                        }
+                    }.let { subscriptionOfferDetailsParam ->
+                        mock {
+                            on { productId } doReturn "product_2"
+                            on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
+                        }
+                    },
+                ),
+            ).iterator()
+            val billingClient = object : FakeBillingClient() {
+                override fun queryProductDetailsAsync(
+                    p0: QueryProductDetailsParams,
+                    p1: ProductDetailsResponseListener,
+                ) {
+                    p1.onProductDetailsResponse(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        QueryProductDetailsResult.create(
+                            responseProductDetailsLists.next(),
+                            emptyList(),
+                        )
                     )
-                )
-            }
+                }
 
-            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
-            }
+                override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                }
 
-            override fun startConnection(p0: BillingClientStateListener) {}
+                override fun startConnection(p0: BillingClientStateListener) {}
+            }
+            val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+            val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
+            billingImpl.startConnection()
+            assertEquals(
+                listOf(
+                    Offer("offer_one_time_details_list", "$1", Offer.Period.ONE_TIME, "product_1"),
+                    Offer("offer_one_time_details", "$3.33", Offer.Period.ONE_TIME, "product_2"),
+                    Offer("offer_subscription_details", "$99.90", Offer.Period.MONTHLY, "product_2"),
+                ),
+                billingImpl.queryOffers(),
+            )
         }
-        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val billingImpl = BillingImpl(context, billingClientBuilder, FakeLog)
-        billingImpl.startConnection()
-        assertEquals(
-            listOf(
-                Offer("offer_one_time_details_list", "$1", Offer.Period.ONE_TIME, "product_1"),
-                Offer("offer_one_time_details", "$3.33", Offer.Period.ONE_TIME, "product_2"),
-                Offer("offer_subscription_details", "$99.90", Offer.Period.MONTHLY, "product_2"),
-            ),
-            billingImpl.offers.first(),
-        )
-    }
 
     @Test
-    fun offers_whenProductDetailsResponseContainsWeeklyOrFiniteSubscriptions_isListOfOnlyMonthlyInfiniteOffers() =
+    fun queryOffers_whenProductDetailsResponseContainsWeeklyOrFiniteSubscriptions_isListOfOnlyMonthlyInfiniteOffers() =
         runTest {
             val responseProductDetailsLists = listOf(
                 emptyList(),
@@ -514,7 +517,7 @@ class BillingImplTest {
                 listOf(
                     Offer("offer_monthly_infinite", "$3", Offer.Period.MONTHLY, "product_1"),
                 ),
-                billingImpl.offers.first(),
+                billingImpl.queryOffers(),
             )
         }
 }

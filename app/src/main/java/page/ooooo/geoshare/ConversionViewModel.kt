@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -117,11 +118,17 @@ class ConversionViewModel @Inject constructor(
     val billingAppNameResId: Int = billing.appNameResId
     val billingMessage: StateFlow<Message?> = billing.message
     val billingFeatures: ImmutableList<Feature> = billing.features
-    val billingOffers: StateFlow<List<Offer>> = billing.offers.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList(),
-    )
+    val billingOffers: StateFlow<List<Offer>> = billing.status
+        .filter { it is BillingStatus.Purchased }
+        .distinctUntilChanged()
+        .map {
+            billing.queryOffers()
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList(),
+        )
     val billingRefundableDuration: Duration = billing.refundableDuration
     val billingStatus: StateFlow<BillingStatus> = billing.status
 

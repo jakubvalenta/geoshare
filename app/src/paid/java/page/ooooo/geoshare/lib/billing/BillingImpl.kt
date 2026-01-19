@@ -47,6 +47,10 @@ class BillingImpl(
 ) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, PurchasesResponseListener,
     PurchasesUpdatedListener {
 
+    companion object {
+        const val TAG = "Billing"
+    }
+
     @StringRes
     override val appNameResId = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature)
@@ -63,28 +67,24 @@ class BillingImpl(
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
     override val status: StateFlow<BillingStatus> = _status
 
-    override val offers = flow {
-        emit(queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList())
-    }
-
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
     override val message: StateFlow<Message?> = _message
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-            log.i("Billing", "Billing setup: ok")
+            log.i(TAG, "Billing setup: ok")
             for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
                 val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
                 billingClient.queryPurchasesAsync(queryPurchasesParams, this)
             }
         } else {
-            log.e("Billing", "Billing setup: error ${billingResult.debugMessage}")
+            log.e(TAG, "Billing setup: error ${billingResult.debugMessage}")
             _message.value = Message(context.getString(R.string.billing_setup_error_unknown), isError = true)
         }
     }
 
     override fun onBillingServiceDisconnected() {
-        log.i("Billing", "Disconnected")
+        log.i(TAG, "Disconnected")
         // Let's hope it's fine to do nothing here, since we use automatic reconnection
     }
 
@@ -93,6 +93,7 @@ class BillingImpl(
             BillingClient.BillingResponseCode.OK if purchases != null -> {
                 for (purchase in purchases) {
                     if (purchase.purchaseState == PurchaseState.PURCHASED && !purchase.isAcknowledged) {
+                        // Notice that we don't support consumable products.
                         val acknowledgePurchaseParams =
                             AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this)
@@ -100,7 +101,7 @@ class BillingImpl(
                 }
                 val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
                 if (newBillingStatus is BillingStatus.Purchased) {
-                    log.i("Billing", "Purchase update: purchased")
+                    log.i(TAG, "Purchase update: purchased")
                     _status.value = newBillingStatus
                     _message.value = Message(
                         context.getString(
@@ -108,18 +109,18 @@ class BillingImpl(
                         )
                     )
                 } else {
-                    log.i("Billing", "Purchase update: not purchased")
+                    log.i(TAG, "Purchase update: not purchased")
                     _status.value = newBillingStatus
                 }
             }
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
-                log.i("Billing", "Purchase update: cancelled")
+                log.i(TAG, "Purchase update: cancelled")
                 _message.value = Message(context.getString(R.string.billing_purchase_error_cancelled), isError = true)
             }
 
             else -> {
-                log.e("Billing", "Purchase update: error ${billingResult.debugMessage}")
+                log.e(TAG, "Purchase update: error ${billingResult.debugMessage}")
                 _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
@@ -130,24 +131,24 @@ class BillingImpl(
             BillingClient.BillingResponseCode.OK -> {
                 val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
                 if (newBillingStatus is BillingStatus.Purchased) {
-                    log.i("Billing", "Purchase query: purchased")
+                    log.i(TAG, "Purchase query: purchased")
                     _status.value = newBillingStatus
                 } else if (_status.value is BillingStatus.Loading) {
                     log.i(
-                        "Billing",
+                        TAG,
                         "Purchase query: not purchased; setting status, because the previous status was loading"
                     )
                     _status.value = newBillingStatus
                 } else {
                     log.i(
-                        "Billing",
+                        TAG,
                         "Purchase query: not purchased; not setting status, because the previous status contains another purchased product"
                     )
                 }
             }
 
             else -> {
-                log.e("Billing", "Purchases query: error ${billingResult.debugMessage}")
+                log.e(TAG, "Purchases query: error ${billingResult.debugMessage}")
                 _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
@@ -156,11 +157,11 @@ class BillingImpl(
     override fun onAcknowledgePurchaseResponse(billingResult: BillingResult) {
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                Log.i("Billing", "Purchase acknowledgement: ok")
+                Log.i(TAG, "Purchase acknowledgement: ok")
             }
 
             else -> {
-                Log.e("Billing", "Purchase acknowledgement: error ${billingResult.debugMessage}")
+                Log.e(TAG, "Purchase acknowledgement: error ${billingResult.debugMessage}")
             }
         }
     }
@@ -174,12 +175,15 @@ class BillingImpl(
         billingClient.endConnection()
     }
 
+    override suspend fun queryOffers(): List<Offer> =
+        queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList()
+
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
         val (productDetails) = try {
             queryProductDetailsAndOffers().first { (_, offer) -> offer.token == offerToken }
         } catch (_: NoSuchElementException) {
-            log.e("Billing", "Offer token not found: $offerToken")
+            log.e(TAG, "Offer token not found: $offerToken")
             _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             return
         }
@@ -194,11 +198,11 @@ class BillingImpl(
         val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                log.i("Billing", "Billing flow: ok")
+                log.i(TAG, "Billing flow: ok")
             }
 
             else -> {
-                log.e("Billing", "Billing flow: error ${billingResult.debugMessage}")
+                log.e(TAG, "Billing flow: error ${billingResult.debugMessage}")
                 _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
@@ -223,10 +227,10 @@ class BillingImpl(
                     billingClient.queryProductDetails(params.build())
                 }
             } catch (e: Exception) {
-                log.e("Billing", "Product details query: error", e)
+                log.e(TAG, "Product details query: error", e)
                 return@flow
             }
-            log.i("Billing", "Product details query: ok")
+            log.i(TAG, "Product details query: ok")
             productDetailsResult.productDetailsList?.forEach { productDetails ->
                 for (offer in productDetails.getOffers(log)) {
                     emit(productDetails to offer)
