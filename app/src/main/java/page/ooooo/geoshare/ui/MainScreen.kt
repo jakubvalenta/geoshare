@@ -250,7 +250,10 @@ fun MainScreen(
             viewModel.cancel()
             onNavigateToUserPreferencesAutomationScreen()
         },
-        onReset = { viewModel.reset() },
+        onReset = {
+            viewModel.cancel()
+            viewModel.reset()
+        },
         onRun = { action, i ->
             viewModel.cancel()
             viewModel.runAction(action, i)
