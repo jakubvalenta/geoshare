@@ -154,11 +154,7 @@ class FakeBillingClientBuilder(
         return this
     }
 
-    override fun enableAutoServiceReconnection(): BillingClientBuilder {
-        return this
-    }
+    override fun enableAutoServiceReconnection(): BillingClientBuilder = this
 
-    override fun enablePendingPurchases(pendingPurchasesParams: PendingPurchasesParams): BillingClientBuilder {
-        return this
-    }
+    override fun enablePendingPurchases(pendingPurchasesParams: PendingPurchasesParams): BillingClientBuilder = this
 }

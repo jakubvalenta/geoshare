@@ -13,7 +13,6 @@ import com.android.billingclient.api.AcknowledgePurchaseResponseListener
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
-import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
@@ -48,6 +47,8 @@ class BillingImpl(
         BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
         BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
     ),
+    private val productDetailsParamsBuilder: () -> ProductDetailsParamsBuilder = { DefaultProductDetailsParamsBuilder() },
+    private val billingFlowParamsBuilder: () -> BillingFlowParamsBuilder = { DefaultBillingFlowParamsBuilder() },
     private val log: ILog = DefaultLog,
 ) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, PurchasesResponseListener,
     PurchasesUpdatedListener {
@@ -136,8 +137,7 @@ class BillingImpl(
                     _status.value = newBillingStatus
                 } else if (_status.value is BillingStatus.Loading) {
                     log.i(
-                        TAG,
-                        "Purchase query: not purchased; setting status, because the previous status was loading"
+                        TAG, "Purchase query: not purchased; setting status, because the previous status was loading"
                     )
                     _status.value = newBillingStatus
                 } else {
@@ -190,11 +190,10 @@ class BillingImpl(
         }
 
         val productDetailsParamsList = listOf(
-            BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(productDetails)
-                .setOfferToken(offerToken).build()
+            productDetailsParamsBuilder().setProductDetails(productDetails).setOfferToken(offerToken).build()
         )
         val billingFlowParams =
-            BillingFlowParams.newBuilder().setProductDetailsParamsList(productDetailsParamsList).build()
+            billingFlowParamsBuilder().setProductDetailsParamsList(productDetailsParamsList).build()
 
         val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
         when (billingResult.responseCode) {

@@ -15,9 +15,7 @@ interface BillingClientBuilder {
 class DefaultBillingClientBuilder(val context: Context) : BillingClientBuilder {
     private val builder = BillingClient.newBuilder(context)
 
-    override fun build(): BillingClient {
-        return builder.build()
-    }
+    override fun build(): BillingClient = builder.build()
 
     override fun enableAutoServiceReconnection(): BillingClientBuilder {
         builder.enableAutoServiceReconnection()
