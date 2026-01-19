@@ -24,6 +24,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +44,10 @@ import kotlin.time.Duration.Companion.hours
 class BillingImpl(
     context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
+    override val products: ImmutableList<BillingProduct> = persistentListOf(
+        BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
+        BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
+    ),
     private val log: ILog = DefaultLog,
 ) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, PurchasesResponseListener,
     PurchasesUpdatedListener {
@@ -54,10 +59,6 @@ class BillingImpl(
     @StringRes
     override val appNameResId = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature)
-    override val products = persistentListOf(
-        BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
-        BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
-    )
     override val refundableDuration = 48.hours
 
     private val billingClient: BillingClient = billingClientBuilder.setListener(this)
