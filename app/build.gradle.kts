@@ -66,6 +66,7 @@ android {
     flavorDimensions += "tier"
     productFlavors {
         create("free") {
+            isDefault = true
             dimension = "tier"
         }
         create("paid") {
