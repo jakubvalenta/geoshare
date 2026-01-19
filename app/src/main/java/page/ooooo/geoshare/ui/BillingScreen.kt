@@ -2,7 +2,6 @@ package page.ooooo.geoshare.ui
 
 import android.app.Activity
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -105,6 +103,9 @@ fun BillingScreen(
         onLaunchBillingFlow = { offerToken ->
             viewModel.launchBillingFlow(context as Activity, offerToken)
         },
+        onManageBillingProduct = { product ->
+            viewModel.manageBillingProduct(product)
+        },
     )
 }
 
@@ -119,6 +120,7 @@ private fun BillingScreen(
     billingStatus: BillingStatus,
     onBack: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
+    onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
     TwoPaneScaffold(
         navigationIcon = {
@@ -134,7 +136,13 @@ private fun BillingScreen(
             BillingFirstPane(billingAppNameResId, billingFeatures, billingMessage, billingStatus)
         },
         actionsPane = {
-            BillingActionsPane(billingOffers, billingRefundableDuration, billingStatus, onLaunchBillingFlow)
+            BillingActionsPane(
+                billingOffers,
+                billingRefundableDuration,
+                billingStatus,
+                onLaunchBillingFlow,
+                onManageBillingProduct,
+            )
         },
         ratio = 0.6f,
     )
@@ -321,9 +329,9 @@ private fun BillingActionsPane(
     billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
+    onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val uriHandler = LocalUriHandler.current
     var selectedOffer by remember { mutableStateOf(billingOffers.firstOrNull()) }
 
     when (billingStatus) {
@@ -415,7 +423,7 @@ private fun BillingActionsPane(
                     ScaffoldAction(
                         text = stringResource(R.string.billing_order_history),
                         onClick = {
-                            uriHandler.openUri("https://play.google.com/store/account/orderhistory")
+                            onManageBillingProduct(billingStatus.product)
                         },
                     ) {
                         if (billingStatus.refundable) {
@@ -435,9 +443,7 @@ private fun BillingActionsPane(
                     ScaffoldAction(
                         text = stringResource(R.string.billing_manage_subscription),
                         onClick = {
-                            @Suppress("SpellCheckingInspection") uriHandler.openUri(
-                                "https://play.google.com/store/account/subscriptions?sku=${Uri.encode(billingStatus.product.id)}&package=page.ooooo.geoshare"
-                            )
+                            onManageBillingProduct(billingStatus.product)
                         },
                     ) {
                         Text(
@@ -469,6 +475,7 @@ private fun DefaultPreview() {
             billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -486,6 +493,7 @@ private fun DarkPreview() {
             billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -503,6 +511,7 @@ private fun TabletPreview() {
             billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -523,6 +532,7 @@ private fun PurchasedDonationPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -543,6 +553,7 @@ private fun DarkPurchasedDonationPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -563,6 +574,7 @@ private fun TabletPurchasedDonationPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -583,6 +595,7 @@ private fun PurchasedOneTimePreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -603,6 +616,7 @@ private fun DarkPurchasedOneTimePreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -623,6 +637,7 @@ private fun TabletPurchasedOneTimePreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -643,6 +658,7 @@ private fun PurchasedOneTimeNotRefundablePreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -663,6 +679,7 @@ private fun DarkPurchasedOneTimeNotRefundablePreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -683,6 +700,7 @@ private fun TabletPurchasedOneTimeNotRefundablePreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -703,6 +721,7 @@ private fun PurchasedSubscriptionPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -723,6 +742,7 @@ private fun DarkPurchasedSubscriptionPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -743,6 +763,7 @@ private fun TabletPurchasedSubscriptionPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -767,6 +788,7 @@ private fun SuccessPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -791,6 +813,7 @@ private fun DarkSuccessPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -815,6 +838,7 @@ private fun TabletSuccessPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -835,6 +859,7 @@ private fun ErrorPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -855,6 +880,7 @@ private fun DarkErrorPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -875,6 +901,7 @@ private fun TabletErrorPreview() {
             ),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -892,6 +919,7 @@ private fun LoadingPreview() {
             billingStatus = BillingStatus.Loading(),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -909,6 +937,7 @@ private fun DarkLoadingPreview() {
             billingStatus = BillingStatus.Loading(),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }
@@ -926,6 +955,7 @@ private fun TabletLoadingPreview() {
             billingStatus = BillingStatus.Loading(),
             onBack = {},
             onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
         )
     }
 }

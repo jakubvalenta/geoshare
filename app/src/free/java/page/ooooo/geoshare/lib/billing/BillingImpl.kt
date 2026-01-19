@@ -14,12 +14,12 @@ import kotlin.time.Duration
 
 class BillingImpl(context: Context) : Billing(context) {
 
-    private val product = BillingProduct("full_one_time", BillingProduct.Type.DONATION)
+    private val product = BillingProduct("free_one_time", BillingProduct.Type.DONATION)
 
     @StringRes
     override val appNameResId = R.string.app_name
-    override val products = persistentListOf(product)
     override val features = persistentListOf(AutomationFeature)
+    override val products = persistentListOf(product)
     override val refundableDuration = Duration.ZERO
 
     override val status = flowOf(BillingStatus.Purchased(product, refundable = false))
@@ -48,4 +48,6 @@ class BillingImpl(context: Context) : Billing(context) {
     override fun endConnection() {}
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {}
+
+    override fun manageProduct(product: BillingProduct) {}
 }

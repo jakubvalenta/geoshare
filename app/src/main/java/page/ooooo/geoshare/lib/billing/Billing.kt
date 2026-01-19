@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration
 
 abstract class Billing(
-    @Suppress("unused") context: Context,
+    protected val context: Context,
 ) {
     abstract val appNameResId: Int
     abstract val features: ImmutableList<Feature>
@@ -25,4 +25,6 @@ abstract class Billing(
     abstract fun endConnection()
 
     abstract suspend fun launchBillingFlow(activity: Activity, offerToken: String)
+
+    abstract fun manageProduct(product: BillingProduct)
 }

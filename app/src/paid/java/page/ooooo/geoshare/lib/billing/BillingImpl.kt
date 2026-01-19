@@ -33,7 +33,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 class BillingImpl(
-    private val context: Context,
+    context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     private val log: ILog = DefaultLog,
 ) : Billing(context), BillingClientStateListener, PurchasesResponseListener, PurchasesUpdatedListener {
@@ -90,15 +90,16 @@ class BillingImpl(
                 val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
                 if (newBillingStatus is BillingStatus.Purchased) {
                     log.i("Billing", "Purchase update: purchased")
+                    _status.value = newBillingStatus
+                    _message.value = Message(
+                        context.getString(
+                            R.string.billing_purchase_success, context.getString(appNameResId)
+                        )
+                    )
                 } else {
                     log.i("Billing", "Purchase update: not purchased")
+                    _status.value = newBillingStatus
                 }
-                _status.value = newBillingStatus
-                _message.value = Message(
-                    context.getString(
-                        R.string.billing_purchase_success, context.getString(appNameResId)
-                    )
-                )
             }
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
@@ -206,6 +207,34 @@ class BillingImpl(
                     emit(productDetails to offer)
                 }
             }
+        }
+    }
+
+    override fun manageProduct(product: BillingProduct) {
+        try {
+            when (product.type) {
+                BillingProduct.Type.DONATION -> {}
+
+                BillingProduct.Type.ONE_TIME -> {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/account/orderhistory"),
+                        )
+                    )
+                }
+
+                BillingProduct.Type.SUBSCRIPTION -> {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/account/subscriptions?sku=${Uri.encode(product.id)}&package=page.ooooo.geoshare"),
+                        )
+                    )
+                }
+            }
+        } catch (_: ActivityNotFoundException) {
+            _message.value = Message(context.getString(R.string.billing_manage_error), isError = true)
         }
     }
 }

@@ -28,6 +28,7 @@ import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.FeatureStatus
@@ -297,6 +298,10 @@ class ConversionViewModel @Inject constructor(
         viewModelScope.launch {
             billing.launchBillingFlow(activity, offerToken)
         }
+    }
+
+    fun manageBillingProduct(product: BillingProduct) {
+        billing.manageProduct(product)
     }
 
     private fun transition() {

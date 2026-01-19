@@ -65,12 +65,16 @@ android {
     }
     flavorDimensions += "tier"
     productFlavors {
-        create("full") {
+        create("free") {
             dimension = "tier"
         }
         create("paid") {
             dimension = "tier"
             versionNameSuffix = "-paid"
+        }
+        create("demo") {
+            dimension = "tier"
+            versionNameSuffix = "-demo"
         }
     }
     buildFeatures {
