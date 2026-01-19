@@ -2,30 +2,30 @@
     <string name="app_name" translatable="false">Geo Share</string>
     <string name="app_name_pro" translatable="false">Geo Share Pro</string>
     <string name="not_available">Not available</string>
-    <string name="billing_feature_all">All features of the basic version</string>
-    <string name="billing_feature_automation_description">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
-    <string name="billing_feature_automation_item_copy">Copy to clipboard</string>
-    <string name="billing_feature_automation_item_navigate">Launch navigation in TomTom, Waze, MagicEarth…</string>
-    <string name="billing_feature_automation_item_open_app">Show map</string>
-    <string name="billing_intro_not_purchased">Upgrade to</string>
-    <string name="billing_intro_purchased">You have</string>
-    <string name="billing_manage_subscription">Manage your subscription</string>
-    <string name="billing_manage_subscription_description">Cancel, pause, or change payment method</string>
-    <string name="billing_manage_error">Failed to open Google Play</string>
-    <string name="billing_one_time">One time payment</string>
-    <string name="billing_order_history">Order history</string>
-    <string name="billing_pricing">Pricing</string>
-    <string name="billing_pro_feature">Pro feature</string>
-    <string name="billing_purchase_button">Checkout</string>
-    <string name="billing_purchase_error_cancelled">Purchase cancelled</string>
-    <string name="billing_purchase_error_unknown">Failed to make the purchase</string>
-    <string name="billing_purchase_success">Thanks for buying %1$s</string>
-    <string name="billing_refund_description">Refund within 48h since the purchase</string>
-    <string name="billing_setup_error_unknown">Failed to fetch purchases</string>
-    <string name="billing_subscription_cancel_description">Cancel anytime</string>
-    <string name="billing_subscription_monthly">Monthly subscription</string>
-    <string name="billing_terms_of_service">Terms of service</string>
-    <string name="billing_support_email">Support email</string>
+    <string name="billing_feature_all" translatable="false">All features of the basic version</string>
+    <string name="billing_feature_automation_description" translatable="false">Save time by performing an action automatically when a map link is converted to coordinates. You can:</string>
+    <string name="billing_feature_automation_item_copy" translatable="false">Copy to clipboard</string>
+    <string name="billing_feature_automation_item_navigate" translatable="false">Launch navigation in TomTom, Waze, MagicEarth…</string>
+    <string name="billing_feature_automation_item_open_app" translatable="false">Show map</string>
+    <string name="billing_intro_not_purchased" translatable="false">Upgrade to</string>
+    <string name="billing_intro_purchased" translatable="false">You have</string>
+    <string name="billing_manage_subscription" translatable="false">Manage your subscription</string>
+    <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method</string>
+    <string name="billing_manage_error" translatable="false">Failed to open Google Play</string>
+    <string name="billing_one_time" translatable="false">One time payment</string>
+    <string name="billing_order_history" translatable="false">Order history</string>
+    <string name="billing_pricing" translatable="false">Pricing</string>
+    <string name="billing_pro_feature" translatable="false">Pro feature</string>
+    <string name="billing_purchase_button" translatable="false">Checkout</string>
+    <string name="billing_purchase_error_cancelled" translatable="false">Purchase cancelled</string>
+    <string name="billing_purchase_error_unknown" translatable="false">Failed to make the purchase</string>
+    <string name="billing_purchase_success" translatable="false">Thanks for buying %1$s</string>
+    <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase</string>
+    <string name="billing_setup_error_unknown" translatable="false">Failed to fetch purchases</string>
+    <string name="billing_subscription_cancel_description" translatable="false">Cancel anytime</string>
+    <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
+    <string name="billing_terms_of_service" translatable="false">Terms of service</string>
+    <string name="billing_support_email" translatable="false">Support email</string>
     <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
