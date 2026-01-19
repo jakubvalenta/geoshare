@@ -6,9 +6,12 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
@@ -24,6 +27,7 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.AndroidTools
@@ -58,6 +62,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ConversionStateTest {
 
     private open class MockNetworkTools : NetworkTools() {
@@ -1729,16 +1734,18 @@ class ConversionStateTest {
     }
 
     @Test
-    fun conversionSucceeded_billingProductIsLoading_returnsNull() = runTest {
+    fun conversionSucceeded_billingStatusIsLoadingAndCachedProductIdIsNotSet_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
-        this.backgroundScope
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
+            onBlocking { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -1746,14 +1753,74 @@ class ConversionStateTest {
         )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertNull(state.transition())
+        verify(mockUserPreferencesRepository, never()).setValue(
+            eq(BillingCachedProductIdPreference),
+            any(),
+        )
     }
 
     @Test
-    fun conversionSucceeded_billingProductDoesNotContainAutomationFeature_returnsNull() = runTest {
+    fun conversionSucceeded_billingStatusIsLoadingAndCachedProductIsAnUnknownProduct_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
-        this.backgroundScope
+        val mockBilling: Billing = mock {
+            on { status } doReturn MutableStateFlow(BillingStatus.Loading())
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            on { features } doReturn persistentListOf(AutomationFeature)
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationPreference) } doReturn action
+            onBlocking { getValue(BillingCachedProductIdPreference) } doReturn "spam"
+            onBlocking { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
+        }
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            billing = mockBilling,
+        )
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        Assert.assertNull(state.transition())
+        verify(mockUserPreferencesRepository, never()).setValue(
+            eq(BillingCachedProductIdPreference),
+            any(),
+        )
+    }
+
+    @Test
+    fun conversionSucceeded_billingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockBilling: Billing = mock {
+            on { status } doReturn MutableStateFlow(BillingStatus.Loading())
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            on { features } doReturn persistentListOf(AutomationFeature)
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationPreference) } doReturn action
+            onBlocking { getValue(BillingCachedProductIdPreference) } doReturn "test"
+            onBlocking { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
+        }
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            billing = mockBilling,
+        )
+        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        Assert.assertEquals(
+            ActionReady(inputUriString, position, null, action),
+            state.transition(),
+        )
+        verify(mockUserPreferencesRepository, never()).setValue(
+            eq(BillingCachedProductIdPreference),
+            any(),
+        )
+    }
+
+    @Test
+    fun conversionSucceeded_billingStatusDoesNotContainAutomationFeature_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
@@ -1761,10 +1828,12 @@ class ConversionStateTest {
                     refundable = true,
                 )
             )
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf()
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             onBlocking { getValue(AutomationPreference) } doReturn action
+            onBlocking { setValue(eq(BillingCachedProductIdPreference), any()) } doReturn Unit
         }
         val stateContext = mockStateContext(
             userPreferencesRepository = mockUserPreferencesRepository,
@@ -1772,10 +1841,14 @@ class ConversionStateTest {
         )
         val state = ConversionSucceeded(stateContext, inputUriString, position)
         Assert.assertNull(state.transition())
+        verify(mockUserPreferencesRepository).setValue(
+            BillingCachedProductIdPreference,
+            "test",
+        )
     }
 
     @Test
-    fun conversionSucceeded_billingProductContainsAutomationFeature_returnsActionReady() = runTest {
+    fun conversionSucceeded_billingStatusContainsAutomationFeature_returnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val position = Position(Srs.WGS84, 1.0, 2.0)
         val action = CoordinatesOutput.CopyDecCoordsAutomation
@@ -1786,6 +1859,7 @@ class ConversionStateTest {
                     refundable = true,
                 )
             )
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -1799,6 +1873,85 @@ class ConversionStateTest {
         Assert.assertEquals(
             ActionReady(inputUriString, position, null, action),
             state.transition(),
+        )
+        verify(mockUserPreferencesRepository).setValue(
+            BillingCachedProductIdPreference,
+            "test",
+        )
+    }
+
+    @Test
+    fun conversionSucceeded_billingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
+        val mockBilling: Billing = mock {
+            on { status } doReturn mockStatus
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            on { features } doReturn persistentListOf(AutomationFeature)
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationPreference) } doReturn action
+        }
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            billing = mockBilling,
+        )
+        val state = ConversionSucceeded(stateContext, inputUriString, position, billingStatusTimeout = 3.seconds)
+        var res: State? = null
+        launch {
+            res = state.transition()
+        }
+        advanceTimeBy(2.seconds)
+        mockStatus.value = BillingStatus.Purchased(
+            product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+            refundable = true,
+        )
+        advanceUntilIdle()
+        Assert.assertEquals(
+            ActionReady(inputUriString, position, null, action),
+            res,
+        )
+        verify(mockUserPreferencesRepository).setValue(
+            BillingCachedProductIdPreference,
+            "test",
+        )
+    }
+
+    @Test
+    fun conversionSucceeded_billingStatusIsLoadingAndItBecomesPurchasedAfterTimeout_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
+        val mockBilling: Billing = mock {
+            on { status } doReturn mockStatus
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            on { features } doReturn persistentListOf(AutomationFeature)
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationPreference) } doReturn action
+        }
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            billing = mockBilling,
+        )
+        val state = ConversionSucceeded(stateContext, inputUriString, position, billingStatusTimeout = 3.seconds)
+        var res: State? = null
+        launch {
+            res = state.transition()
+        }
+        advanceTimeBy(5.seconds)
+        mockStatus.value = BillingStatus.Purchased(
+            product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+            refundable = true,
+        )
+        advanceUntilIdle()
+        Assert.assertNull(res)
+        verify(mockUserPreferencesRepository, never()).setValue(
+            eq(BillingCachedProductIdPreference),
+            any(),
         )
     }
 
@@ -1814,6 +1967,7 @@ class ConversionStateTest {
                     refundable = true,
                 )
             )
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -1843,6 +1997,7 @@ class ConversionStateTest {
                     refundable = true,
                 )
             )
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -1873,6 +2028,7 @@ class ConversionStateTest {
                     refundable = true,
                 )
             )
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
@@ -1903,6 +2059,7 @@ class ConversionStateTest {
                     refundable = true,
                 )
             )
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
             on { features } doReturn persistentListOf(AutomationFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {

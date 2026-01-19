@@ -8,7 +8,6 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.timeout
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
@@ -367,19 +366,22 @@ data class ConversionSucceeded(
             return null
         }
 
-        // TODO Test billingStatus caching
         val billingStatus: BillingStatus = try {
             // Wait for billing status to appear; it should appear, because we call Billing.startConnection() in onCreate
             stateContext.billing.status
-                .filter { it is BillingStatus.Purchased }
-                .timeout(billingStatusTimeout)
-                .onEach {
-                    // If billing status appeared, cache it
-                    stateContext.userPreferencesRepository.setValue(
-                        BillingCachedProductIdPreference,
-                        (it as? BillingStatus.Purchased)?.product?.id,
-                    )
+                .filter {
+                    if (it is BillingStatus.Purchased) {
+                        // If billing status appeared within timeout, cache it
+                        stateContext.userPreferencesRepository.setValue(
+                            BillingCachedProductIdPreference,
+                            it.product.id,
+                        )
+                        true
+                    } else {
+                        false
+                    }
                 }
+                .timeout(billingStatusTimeout)
                 .first()
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
