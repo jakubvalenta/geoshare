@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
@@ -27,17 +26,13 @@ class BillingImpl(context: Context) : Billing(context) {
     )
     override val refundableDuration = 48.hours
 
-    private val allOffers = listOf(
+    private val offers = listOf(
         Offer("offer_one_time", "$19", Offer.Period.ONE_TIME, "demo_one_time"),
         Offer("offer_subscription", "$1.50", Offer.Period.MONTHLY, "demo_subscription"),
     )
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
     override val status: StateFlow<BillingStatus> = _status
-
-    override val offers = flow {
-        emit(allOffers)
-    }
 
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
     override val message: StateFlow<Message?> = _message
@@ -52,10 +47,12 @@ class BillingImpl(context: Context) : Billing(context) {
 
     override fun endConnection() {}
 
+    override suspend fun queryOffers(): List<Offer> = offers
+
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
         delay(3.seconds)
-        val product = allOffers.firstOrNull { offer -> offer.token == offerToken }?.let { offer ->
+        val product = offers.firstOrNull { offer -> offer.token == offerToken }?.let { offer ->
             products.firstOrNull { product -> product.id == offer.productId }
         }
         if (product != null) {

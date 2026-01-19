@@ -29,13 +29,6 @@ class BillingImpl(context: Context) : Billing(context) {
             BillingStatus.Loading(),
         )
 
-    override val offers = flowOf(emptyList<Offer>())
-        .stateIn(
-            CoroutineScope(Dispatchers.Default),
-            SharingStarted.WhileSubscribed(5000),
-            emptyList(),
-        )
-
     override val message = flowOf(null)
         .stateIn(
             CoroutineScope(Dispatchers.Default),
@@ -46,6 +39,8 @@ class BillingImpl(context: Context) : Billing(context) {
     override fun startConnection() {}
 
     override fun endConnection() {}
+
+    override suspend fun queryOffers(): List<Offer> = emptyList()
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {}
 
