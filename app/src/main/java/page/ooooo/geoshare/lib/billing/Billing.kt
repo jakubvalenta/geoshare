@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration
 
+@Suppress("EmptyMethod")
 abstract class Billing(
     protected val context: Context,
 ) {
