@@ -317,7 +317,7 @@ private fun MainScreen(
             }
         },
         actions = {
-            if (billingStatus is BillingStatus.NotPurchased) {
+            if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
                 FeatureBadgeSmall(
                     onClick = onNavigateToBillingScreen,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
