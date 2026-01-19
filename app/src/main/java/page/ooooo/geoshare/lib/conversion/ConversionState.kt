@@ -370,15 +370,19 @@ data class ConversionSucceeded(
             // Wait for billing status to appear; it should appear, because we call Billing.startConnection() in onCreate
             stateContext.billing.status
                 .filter {
-                    if (it is BillingStatus.Purchased) {
-                        // If billing status appeared within timeout, cache it
-                        stateContext.userPreferencesRepository.setValue(
-                            BillingCachedProductIdPreference,
-                            it.product.id,
-                        )
-                        true
-                    } else {
-                        false
+                    when (it) {
+                        is BillingStatus.Loading -> false
+
+                        is BillingStatus.NotPurchased -> true
+
+                        is BillingStatus.Purchased -> {
+                            // If billing status appeared within timeout, cache it
+                            stateContext.userPreferencesRepository.setValue(
+                                BillingCachedProductIdPreference,
+                                it.product.id,
+                            )
+                            true
+                        }
                     }
                 }
                 .timeout(billingStatusTimeout)

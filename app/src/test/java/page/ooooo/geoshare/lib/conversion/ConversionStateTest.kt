@@ -42,7 +42,6 @@ import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.FakeBillingClientBuilder
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -106,7 +105,7 @@ class ConversionStateTest {
         networkTools: NetworkTools = MockNetworkTools(),
         userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
         context: Context = mock {},
-        billing: Billing = BillingImpl(context, FakeBillingClientBuilder()),
+        billing: Billing = BillingImpl(context),
         log: ILog = FakeLog,
         uriQuote: UriQuote = this@ConversionStateTest.uriQuote,
     ) = ConversionStateContext(
@@ -1916,6 +1915,42 @@ class ConversionStateTest {
         verify(mockUserPreferencesRepository).setValue(
             BillingCachedProductIdPreference,
             "test",
+        )
+    }
+
+    @Test
+    fun conversionSucceeded_billingStatusIsNotPurchasedAndItBecomesPurchasedWithinTimeout_returnsNull() = runTest {
+        val inputUriString = "https://maps.google.com/foo"
+        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val action = CoordinatesOutput.CopyDecCoordsAutomation
+        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
+        val mockBilling: Billing = mock {
+            on { status } doReturn mockStatus
+            on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
+            on { features } doReturn persistentListOf(AutomationFeature)
+        }
+        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+            onBlocking { getValue(AutomationPreference) } doReturn action
+        }
+        val stateContext = mockStateContext(
+            userPreferencesRepository = mockUserPreferencesRepository,
+            billing = mockBilling,
+        )
+        val state = ConversionSucceeded(stateContext, inputUriString, position, billingStatusTimeout = 3.seconds)
+        var res: State? = null
+        launch {
+            res = state.transition()
+        }
+        advanceTimeBy(2.seconds)
+        mockStatus.value = BillingStatus.Purchased(
+            product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+            refundable = true,
+        )
+        advanceUntilIdle()
+        Assert.assertNull(res)
+        verify(mockUserPreferencesRepository, never()).setValue(
+            eq(BillingCachedProductIdPreference),
+            any(),
         )
     }
 
