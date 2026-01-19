@@ -5,21 +5,13 @@ import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -39,11 +31,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -53,9 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,7 +59,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.window.core.layout.WindowSizeClass
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
@@ -85,10 +70,11 @@ import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.components.AppHeadline
-import page.ooooo.geoshare.ui.components.LargeButton
+import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
+import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
@@ -133,110 +119,35 @@ private fun BillingScreen(
     billingStatus: BillingStatus,
     onBack: () -> Unit,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
-    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
-    val layoutDirection = LocalLayoutDirection.current
-    val spacing = LocalSpacing.current
-    val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.nav_back_content_description)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                ),
-            )
+    TwoPaneScaffold(
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.nav_back_content_description)
+                )
+            }
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
-    ) { innerPadding ->
-        if (expanded) {
-            Row(
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
-            ) {
-                Column(Modifier.weight(0.6f)) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f, true)
-                            .verticalScroll(rememberScrollState()),
-                    ) {
-                        BillingMessageCard(billingMessage)
-                        BillingFirstPane(billingAppNameResId, billingFeatures, billingStatus)
-                    }
-                }
-                Column(Modifier.weight(0.4f)) {
-                    ElevatedCard(
-                        Modifier.padding(end = spacing.windowPadding),
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.elevatedCardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    ) {
-                        BillingSecondPane(
-                            billingOffers,
-                            billingRefundableDuration,
-                            billingStatus,
-                            onLaunchBillingFlow,
-                        )
-                    }
-                }
-            }
-        } else {
-            val innerPadding = PaddingValues(
-                start = innerPadding.calculateStartPadding(layoutDirection),
-                top = innerPadding.calculateTopPadding(),
-                end = innerPadding.calculateEndPadding(layoutDirection),
-            )
-            Column(
-                Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
-            ) {
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    BillingMessageCard(billingMessage)
-                    BillingFirstPane(billingAppNameResId, billingFeatures, billingStatus)
-                }
-                ElevatedCard(
-                    shape = MaterialTheme.shapes.large.copy(
-                        bottomStart = ZeroCornerSize,
-                        bottomEnd = ZeroCornerSize,
-                    ),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
-                ) {
-                    BillingSecondPane(
-                        billingOffers,
-                        billingRefundableDuration,
-                        billingStatus,
-                        onLaunchBillingFlow,
-                    )
-                }
-            }
-        }
-    }
+        firstPane = {
+            BillingFirstPane(billingAppNameResId, billingFeatures, billingMessage, billingStatus)
+        },
+        actionsPane = {
+            BillingActionsPane(billingOffers, billingRefundableDuration, billingStatus, onLaunchBillingFlow)
+        },
+        ratio = 0.6f,
+    )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun BillingMessageCard(billingMessage: Message?) {
+private fun BillingFirstPane(
+    billingAppNameResId: Int,
+    billingFeatures: List<Feature>,
+    billingMessage: Message?,
+    billingStatus: BillingStatus,
+) {
     val spacing = LocalSpacing.current
 
     if (billingMessage != null) {
@@ -260,17 +171,6 @@ private fun BillingMessageCard(billingMessage: Message?) {
             Text(billingMessage.text, Modifier.padding(spacing.small), style = MaterialTheme.typography.bodyMedium)
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun BillingFirstPane(
-    billingAppNameResId: Int,
-    billingFeatures: List<Feature>,
-    billingStatus: BillingStatus,
-) {
-    val spacing = LocalSpacing.current
-
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -302,8 +202,7 @@ private fun BillingFirstPane(
                         R.string.billing_intro_purchased
                     } else {
                         R.string.billing_intro_not_purchased
-                    },
-                    R.string.billing_intro_not_purchased
+                    }, R.string.billing_intro_not_purchased
                 ),
                 Modifier.padding(top = spacing.mediumAdaptive),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -371,7 +270,7 @@ private fun BillingFirstPane(
                     }
                 }
             }
-            if (billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION) {
+            if (billingStatus is BillingStatus.Purchased) {
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
                     LocalTextStyle provides MaterialTheme.typography.bodySmall,
@@ -389,8 +288,7 @@ private fun BillingFirstPane(
                         Text(buildAnnotatedString {
                             withLink(
                                 LinkAnnotation.Url(
-                                    "https://geoshare.ooooo.page/terms/",
-                                    TextLinkStyles(
+                                    "https://geoshare.ooooo.page/terms/", TextLinkStyles(
                                         SpanStyle(textDecoration = TextDecoration.Underline)
                                     )
                                 )
@@ -401,8 +299,7 @@ private fun BillingFirstPane(
                         Text(buildAnnotatedString {
                             withLink(
                                 LinkAnnotation.Url(
-                                    "mailto:geoshare-support@jakubvalenta.cz",
-                                    TextLinkStyles(
+                                    "mailto:geoshare-support@jakubvalenta.cz", TextLinkStyles(
                                         SpanStyle(textDecoration = TextDecoration.Underline)
                                     )
                                 )
@@ -419,7 +316,7 @@ private fun BillingFirstPane(
 }
 
 @Composable
-private fun BillingSecondPane(
+private fun BillingActionsPane(
     billingOffers: List<Offer>,
     billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
@@ -431,12 +328,23 @@ private fun BillingSecondPane(
 
     when (billingStatus) {
         is BillingStatus.NotPurchased -> {
-            Column(
-                Modifier
-                    .safeDrawingPadding()
-                    .padding(vertical = spacing.small),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing.small),
+            ScaffoldAction(
+                text = stringResource(R.string.billing_purchase_button),
+                onClick = {
+                    selectedOffer?.let { selectedOffer ->
+                        onLaunchBillingFlow(selectedOffer.token)
+                    }
+                },
+                containerColor = if (selectedOffer != null) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerHighest
+                },
+                contentColor = if (selectedOffer != null) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
             ) {
                 ElevatedCard(
                     Modifier
@@ -482,12 +390,11 @@ private fun BillingSecondPane(
                                     )
                                 }
                             },
-                            modifier = Modifier
-                                .selectable(
-                                    selected = offer == selectedOffer,
-                                    role = Role.RadioButton,
-                                    onClick = { selectedOffer = offer },
-                                ),
+                            modifier = Modifier.selectable(
+                                selected = offer == selectedOffer,
+                                role = Role.RadioButton,
+                                onClick = { selectedOffer = offer },
+                            ),
                             colors = ListItemDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                             ),
@@ -497,79 +404,48 @@ private fun BillingSecondPane(
                         }
                     }
                 }
-                LargeButton(
-                    stringResource(R.string.billing_purchase_button),
-                    containerColor = if (selectedOffer != null) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surfaceContainerHighest
-                    },
-                    contentColor = if (selectedOffer != null) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
-                ) {
-                    selectedOffer?.let { selectedOffer ->
-                        onLaunchBillingFlow(selectedOffer.token)
-                    }
-                }
             }
         }
 
-        is BillingStatus.Purchased -> billingStatus.product.let { product ->
-            Column(
-                Modifier
-                    .safeDrawingPadding()
-                    .padding(vertical = spacing.small),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-            ) {
-                when (product.type) {
-                    BillingProduct.Type.DONATION -> stringResource(
-                        R.string.donation_description,
-                        stringResource(R.string.app_name)
-                    )
+        is BillingStatus.Purchased -> {
+            when (billingStatus.product.type) {
+                BillingProduct.Type.DONATION -> {}
 
-                    BillingProduct.Type.ONE_TIME if billingStatus.refundable -> stringResource(
-                        R.string.billing_refund_description,
-                        billingRefundableDuration.toInt(DurationUnit.HOURS)
-                    )
-
-                    BillingProduct.Type.ONE_TIME -> null
-                    BillingProduct.Type.SUBSCRIPTION -> stringResource(R.string.billing_manage_subscription_description)
-                }?.let { description ->
-                    Text(
-                        description,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-                LargeButton(
-                    stringResource(
-                        when (product.type) {
-                            BillingProduct.Type.DONATION -> R.string.donation_button
-                            BillingProduct.Type.ONE_TIME -> R.string.billing_order_history
-                            BillingProduct.Type.SUBSCRIPTION -> R.string.billing_manage_subscription
+                BillingProduct.Type.ONE_TIME -> {
+                    ScaffoldAction(
+                        text = stringResource(R.string.billing_order_history),
+                        onClick = {
+                            uriHandler.openUri("https://play.google.com/store/account/orderhistory")
+                        },
+                    ) {
+                        if (billingStatus.refundable) {
+                            Text(
+                                stringResource(
+                                    R.string.billing_refund_description,
+                                    billingRefundableDuration.toInt(DurationUnit.HOURS)
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
                         }
-                    ),
-                    containerColor = when (product.type) {
-                        BillingProduct.Type.DONATION -> MaterialTheme.colorScheme.primaryContainer
-                        else -> MaterialTheme.colorScheme.primary
-                    },
-                    contentColor = when (product.type) {
-                        BillingProduct.Type.DONATION -> MaterialTheme.colorScheme.onPrimaryContainer
-                        else -> MaterialTheme.colorScheme.onPrimary
-                    },
-                ) {
-                    @Suppress("SpellCheckingInspection")
-                    val uri = when (product.type) {
-                        BillingProduct.Type.DONATION -> "https://ko-fi.com/jakubvalenta"
-                        BillingProduct.Type.ONE_TIME -> "https://play.google.com/store/account/orderhistory"
-                        BillingProduct.Type.SUBSCRIPTION -> ("https://play.google.com/store/account/subscriptions"
-                            + "?sku=${Uri.encode(product.id)}&package=page.ooooo.geoshare")
                     }
-                    uriHandler.openUri(uri)
+                }
+
+                BillingProduct.Type.SUBSCRIPTION -> {
+                    ScaffoldAction(
+                        text = stringResource(R.string.billing_manage_subscription),
+                        onClick = {
+                            @Suppress("SpellCheckingInspection") uriHandler.openUri(
+                                "https://play.google.com/store/account/subscriptions?sku=${Uri.encode(billingStatus.product.id)}&package=page.ooooo.geoshare"
+                            )
+                        },
+                    ) {
+                        Text(
+                            stringResource(R.string.billing_manage_subscription_description),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
         }
@@ -880,8 +756,7 @@ private fun SuccessPreview() {
             billingFeatures = listOf(AutomationFeature),
             billingMessage = Message(
                 stringResource(
-                    R.string.billing_purchase_success,
-                    stringResource(R.string.app_name_pro)
+                    R.string.billing_purchase_success, stringResource(R.string.app_name_pro)
                 )
             ),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
@@ -905,8 +780,7 @@ private fun DarkSuccessPreview() {
             billingFeatures = listOf(AutomationFeature),
             billingMessage = Message(
                 stringResource(
-                    R.string.billing_purchase_success,
-                    stringResource(R.string.app_name_pro)
+                    R.string.billing_purchase_success, stringResource(R.string.app_name_pro)
                 )
             ),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
@@ -930,8 +804,7 @@ private fun TabletSuccessPreview() {
             billingFeatures = listOf(AutomationFeature),
             billingMessage = Message(
                 stringResource(
-                    R.string.billing_purchase_success,
-                    stringResource(R.string.app_name_pro)
+                    R.string.billing_purchase_success, stringResource(R.string.app_name_pro)
                 )
             ),
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),

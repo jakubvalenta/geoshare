@@ -31,12 +31,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainMenu(
     billingAppNameResId: Int,
+    billingStatus: BillingStatus,
     changelogShown: Boolean = true,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -121,14 +124,19 @@ fun MainMenu(
                     }
                 },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(billingAppNameResId)) },
-                onClick = {
-                    menuExpanded = false
-                    onNavigateToBillingScreen()
-                },
-                leadingIcon = {},
-            )
+            if (
+                billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION ||
+                billingStatus is BillingStatus.NotPurchased
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(billingAppNameResId)) },
+                    onClick = {
+                        menuExpanded = false
+                        onNavigateToBillingScreen()
+                    },
+                    leadingIcon = {},
+                )
+            }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.about_title)) },
                 onClick = {
@@ -155,6 +163,10 @@ private fun DefaultPreview() {
                     actions = {
                         MainMenu(
                             billingAppNameResId = R.string.app_name_pro,
+                            billingStatus = BillingStatus.Purchased(
+                                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                                refundable = true,
+                            ),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -184,6 +196,76 @@ private fun DarkPreview() {
                     actions = {
                         MainMenu(
                             billingAppNameResId = R.string.app_name_pro,
+                            billingStatus = BillingStatus.Purchased(
+                                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                                refundable = true,
+                            ),
+                            changelogShown = false,
+                            onNavigateToAboutScreen = {},
+                            onNavigateToBillingScreen = {},
+                            onNavigateToFaqScreen = {},
+                            onNavigateToInputsScreen = {},
+                            onNavigateToIntroScreen = {},
+                            onNavigateToUserPreferencesScreen = {},
+                        )
+                    }
+                )
+            },
+        ) { innerPadding ->
+            Column(Modifier.padding(innerPadding)) {}
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DonationPreview() {
+    AppTheme {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    actions = {
+                        MainMenu(
+                            billingAppNameResId = R.string.app_name_pro,
+                            billingStatus = BillingStatus.Purchased(
+                                product = BillingProduct("test", BillingProduct.Type.DONATION),
+                                refundable = true,
+                            ),
+                            changelogShown = false,
+                            onNavigateToAboutScreen = {},
+                            onNavigateToBillingScreen = {},
+                            onNavigateToFaqScreen = {},
+                            onNavigateToInputsScreen = {},
+                            onNavigateToIntroScreen = {},
+                            onNavigateToUserPreferencesScreen = {},
+                        )
+                    }
+                )
+            },
+        ) { innerPadding ->
+            Column(Modifier.padding(innerPadding)) {}
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DarkDonationPreview() {
+    AppTheme {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    actions = {
+                        MainMenu(
+                            billingAppNameResId = R.string.app_name_pro,
+                            billingStatus = BillingStatus.Purchased(
+                                product = BillingProduct("test", BillingProduct.Type.DONATION),
+                                refundable = true,
+                            ),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},

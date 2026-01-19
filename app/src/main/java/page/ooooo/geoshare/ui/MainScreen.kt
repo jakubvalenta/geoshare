@@ -94,6 +94,7 @@ import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
+import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainInfo
@@ -316,8 +317,16 @@ private fun MainScreen(
             }
         },
         actions = {
+            if (billingStatus is BillingStatus.NotPurchased) {
+                FeatureBadgeSmall(
+                    onClick = onNavigateToBillingScreen,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
             MainMenu(
                 billingAppNameResId = billingAppNameResId,
+                billingStatus = billingStatus,
                 changelogShown = changelogShown,
                 onNavigateToAboutScreen = onNavigateToAboutScreen,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -448,7 +457,9 @@ private fun MainScreen(
                 }
             }
 
-            else -> null
+            else -> {
+                {}
+            }
         },
         bottomPane = when {
             (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasError) -> {
@@ -578,6 +589,8 @@ private fun MainScreen(
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> Color.Unspecified
         },
+        expandedContainerColor = MaterialTheme.colorScheme.surface,
+        expandedContentColor = MaterialTheme.colorScheme.onSurface,
         ratio = if (currentState is Initial) 0.6f else 0.5f,
         windowSizeClass = windowSizeClass,
     )
@@ -621,10 +634,7 @@ private fun DefaultPreview() {
             currentState = Initial(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                refundable = true,
-            ),
+            billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -654,10 +664,7 @@ private fun DarkPreview() {
             currentState = Initial(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                refundable = true,
-            ),
+            billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
@@ -687,10 +694,7 @@ private fun TabletPreview() {
             currentState = Initial(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
-            billingStatus = BillingStatus.Purchased(
-                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                refundable = true,
-            ),
+            billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
             inputUriString = "",
             loadingIndicator = null,
