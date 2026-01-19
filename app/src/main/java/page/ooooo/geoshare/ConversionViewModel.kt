@@ -119,7 +119,7 @@ class ConversionViewModel @Inject constructor(
     val billingMessage: StateFlow<Message?> = billing.message
     val billingFeatures: ImmutableList<Feature> = billing.features
     val billingOffers: StateFlow<List<Offer>> = billing.status
-        .filter { it is BillingStatus.Purchased }
+        .filter { it !is BillingStatus.Loading }
         .distinctUntilChanged()
         .map {
             billing.queryOffers()
