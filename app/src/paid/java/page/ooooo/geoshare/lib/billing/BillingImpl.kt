@@ -1,7 +1,10 @@
 package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.StringRes
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.ProductType
@@ -31,6 +34,7 @@ import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
+import androidx.core.net.toUri
 
 class BillingImpl(
     context: Context,
@@ -143,6 +147,7 @@ class BillingImpl(
     }
 
     override fun startConnection() {
+        _message.value = null
         billingClient.startConnection(this)
     }
 
@@ -151,6 +156,7 @@ class BillingImpl(
     }
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
+        _message.value = null
         val (productDetails) = try {
             queryProductDetailsAndOffers().first { (_, offer) -> offer.token == offerToken }
         } catch (_: NoSuchElementException) {
@@ -211,6 +217,7 @@ class BillingImpl(
     }
 
     override fun manageProduct(product: BillingProduct) {
+        _message.value = null
         try {
             when (product.type) {
                 BillingProduct.Type.DONATION -> {}
@@ -219,7 +226,7 @@ class BillingImpl(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/account/orderhistory"),
+                            "https://play.google.com/store/account/orderhistory".toUri(),
                         )
                     )
                 }
@@ -228,7 +235,9 @@ class BillingImpl(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/account/subscriptions?sku=${Uri.encode(product.id)}&package=page.ooooo.geoshare"),
+                            "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare"
+                                .format(Uri.encode(product.id))
+                                .toUri(),
                         )
                     )
                 }

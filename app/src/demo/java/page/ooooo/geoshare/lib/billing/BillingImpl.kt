@@ -43,6 +43,7 @@ class BillingImpl(context: Context) : Billing(context) {
     override val message: StateFlow<Message?> = _message
 
     override fun startConnection() {
+        _message.value = null
         CoroutineScope(Dispatchers.Default).launch {
             delay(3.seconds)
             _status.value = BillingStatus.NotPurchased()
@@ -52,6 +53,7 @@ class BillingImpl(context: Context) : Billing(context) {
     override fun endConnection() {}
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
+        _message.value = null
         delay(3.seconds)
         val product = allOffers.firstOrNull { offer -> offer.token == offerToken }?.let { offer ->
             products.firstOrNull { product -> product.id == offer.productId }
@@ -69,6 +71,7 @@ class BillingImpl(context: Context) : Billing(context) {
     }
 
     override fun manageProduct(product: BillingProduct) {
+        _message.value = null
         when (product.type) {
             BillingProduct.Type.DONATION -> {}
 

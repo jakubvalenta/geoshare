@@ -284,13 +284,15 @@ private fun BillingFirstPane(
                     LocalTextStyle provides MaterialTheme.typography.bodySmall,
                 ) {
                     HorizontalDivider(
-                        Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.largeAdaptive),
+                        Modifier
+                            .padding(horizontal = spacing.windowPadding)
+                            .padding(top = spacing.largeAdaptive),
                         thickness = Dp.Hairline,
                     )
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = spacing.windowPadding + 18.dp),
+                            .padding(horizontal = spacing.windowPadding + 18.dp, vertical = spacing.mediumAdaptive),
                         verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
                     ) {
                         Text(buildAnnotatedString {
@@ -332,7 +334,13 @@ private fun BillingActionsPane(
     onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    var selectedOffer by remember { mutableStateOf(billingOffers.firstOrNull()) }
+    val sortedBillingOffers = billingOffers.sortedBy {
+        when (it.period) {
+            Offer.Period.ONE_TIME -> 1
+            Offer.Period.MONTHLY -> 0
+        }
+    }
+    var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
     when (billingStatus) {
         is BillingStatus.NotPurchased -> {
@@ -359,7 +367,7 @@ private fun BillingActionsPane(
                         .selectableGroup()
                         .padding(horizontal = spacing.small),
                 ) {
-                    billingOffers.forEachIndexed { i, offer ->
+                    sortedBillingOffers.forEachIndexed { i, offer ->
                         ListItem(
                             headlineContent = {
                                 Row(
