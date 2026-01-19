@@ -5,7 +5,11 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
+import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
@@ -14,6 +18,7 @@ import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
@@ -34,13 +39,13 @@ import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
-import androidx.core.net.toUri
 
 class BillingImpl(
     context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     private val log: ILog = DefaultLog,
-) : Billing(context), BillingClientStateListener, PurchasesResponseListener, PurchasesUpdatedListener {
+) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, PurchasesResponseListener,
+    PurchasesUpdatedListener {
 
     @StringRes
     override val appNameResId = R.string.app_name_pro
@@ -51,19 +56,15 @@ class BillingImpl(
     )
     override val refundableDuration = 48.hours
 
-    private val billingClient: BillingClient = billingClientBuilder
-        .setListener(this)
+    private val billingClient: BillingClient = billingClientBuilder.setListener(this)
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
-        .enableAutoServiceReconnection()
-        .build()
+        .enableAutoServiceReconnection().build()
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
     override val status: StateFlow<BillingStatus> = _status
 
     override val offers = flow {
-        emit(
-            queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList()
-        )
+        emit(queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList())
     }
 
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
@@ -90,7 +91,13 @@ class BillingImpl(
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK if purchases != null -> {
-                // TODO Acknowledge the purchase
+                for (purchase in purchases) {
+                    if (purchase.purchaseState == PurchaseState.PURCHASED && !purchase.isAcknowledged) {
+                        val acknowledgePurchaseParams =
+                            AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.purchaseToken).build()
+                        billingClient.acknowledgePurchase(acknowledgePurchaseParams, this)
+                    }
+                }
                 val newBillingStatus = purchases.getBillingStatus(products, refundableDuration)
                 if (newBillingStatus is BillingStatus.Purchased) {
                     log.i("Billing", "Purchase update: purchased")
@@ -142,6 +149,18 @@ class BillingImpl(
             else -> {
                 log.e("Billing", "Purchases query: error ${billingResult.debugMessage}")
                 _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+            }
+        }
+    }
+
+    override fun onAcknowledgePurchaseResponse(billingResult: BillingResult) {
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                Log.i("Billing", "Purchase acknowledgement: ok")
+            }
+
+            else -> {
+                Log.e("Billing", "Purchase acknowledgement: error ${billingResult.debugMessage}")
             }
         }
     }
@@ -235,9 +254,9 @@ class BillingImpl(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare"
-                                .format(Uri.encode(product.id))
-                                .toUri(),
+                            "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare".format(
+                                Uri.encode(product.id)
+                            ).toUri(),
                         )
                     )
                 }
