@@ -1,11 +1,13 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.outputs.GpxOutput
 
 @RunWith(AndroidJUnit4::class)
 class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -59,5 +61,42 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Shows automation preferences button
         onElement { viewIdResourceName == "geoShareResultAutomationButton" }
+    }
+
+    @Test
+    fun automationOpensTomTom() = uiAutomator {
+        assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
+
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Configure automation
+        goToUserPreferencesDetailAutomationScreen()
+        waitForStableInActiveWindow()
+        device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationShareGpxWithApp" }.click()
+
+        // Share a geo: URI with the app
+        shareUri("geo:52.47254,13.4345")
+
+        // Shows automation counter
+        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
+
+        // Confirm location rationale
+        onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
+            confirm()
+        }
+
+        // Grant location permission
+        grantLocationPermission()
+
+        // TomTom starts navigation
+        waitAndAssertTomTomContainsElement {
+            when (textAsString()) {
+                "Drive", "Aller" -> true
+                else -> false
+            }
+        }
     }
 }

@@ -482,41 +482,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun mainScreen_whenGpxRouteIsSharedAndAutomationIsConfigured_opensTomTom() = uiAutomator {
-        assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
-
-        // Launch application and close intro
-        launchApplication()
-        closeIntro()
-
-        // Configure automation
-        goToUserPreferencesDetailAutomationScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationShareGpxWithApp" }.click()
-
-        // Share a geo: URI with the app
-        shareUri("geo:52.47254,13.4345")
-
-        // Shows automation counter
-        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
-
-        // Confirm location rationale
-        onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
-            confirm()
-        }
-
-        // Grant location permission
-        grantLocationPermission()
-
-        // TomTom starts navigation
-        waitAndAssertTomTomContainsElement {
-            when (textAsString()) {
-                "Drive", "Aller" -> true
-                else -> false
-            }
-        }
-    }
-
-    @Test
     fun mainScreen_whenCopyButtonIsTapped_opensSheetAndAllowsCopyingMagicEarthUri() = uiAutomator {
         // Launch application and close intro
         launchApplication()
