@@ -117,7 +117,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             )
 
             // Share another Google Maps short link with the app
-            shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
+            shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA") // FIXME
             waitForStableInActiveWindow()
 
             // Shows precise location again
@@ -294,7 +294,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
+            shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/") // FIXME
 
             // Grant parse HTML permission
             onDialog("geoShareParseHtmlPermissionDialog") {
@@ -415,7 +415,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     fun mainScreen_whenShortUriWithCoordinatesInHtmlIsSharedAndUnshortenPermissionDialogIsConfirmed_doesNotAskForParseHtmlPermission() =
         uiAutomator {
             // Share a Google Maps short link with the app
-            shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8")
+            shareUri("https://maps.app.goo.gl/v4MDUi9mCrh3mNjz8") // FIXME
 
             // Grant unshorten permission
             onDialog("geoShareUnshortenPermissionDialog") {
