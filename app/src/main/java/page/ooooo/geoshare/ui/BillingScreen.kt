@@ -41,9 +41,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -123,6 +126,7 @@ private fun BillingScreen(
     onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
     TwoPaneScaffold(
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
@@ -176,7 +180,19 @@ private fun BillingFirstPane(
                 },
             ),
         ) {
-            Text(billingMessage.text, Modifier.padding(spacing.small), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                billingMessage.text,
+                Modifier
+                    .testTag(
+                        if (!billingMessage.isError) {
+                            "geoShareBillingMessageSuccess"
+                        } else {
+                            "geoShareBillingMessageError"
+                        }
+                    )
+                    .padding(spacing.small),
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
     }
     Column(
@@ -346,6 +362,7 @@ private fun BillingActionsPane(
         is BillingStatus.NotPurchased -> {
             ScaffoldAction(
                 text = stringResource(R.string.billing_purchase_button),
+                modifier = Modifier.testTag("geoShareBillingPurchaseButton"),
                 onClick = {
                     selectedOffer?.let { selectedOffer ->
                         onLaunchBillingFlow(selectedOffer.token)
@@ -406,11 +423,18 @@ private fun BillingActionsPane(
                                     )
                                 }
                             },
-                            modifier = Modifier.selectable(
-                                selected = offer == selectedOffer,
-                                role = Role.RadioButton,
-                                onClick = { selectedOffer = offer },
-                            ),
+                            modifier = Modifier
+                                .testTag(
+                                    when (offer.period) {
+                                        Offer.Period.ONE_TIME -> "geoShareBillingOfferOneTime"
+                                        Offer.Period.MONTHLY -> "geoShareBillingOfferMonthly"
+                                    },
+                                )
+                                .selectable(
+                                    selected = offer == selectedOffer,
+                                    role = Role.RadioButton,
+                                    onClick = { selectedOffer = offer },
+                                ),
                             colors = ListItemDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                             ),
@@ -433,6 +457,7 @@ private fun BillingActionsPane(
                         onClick = {
                             onManageBillingProduct(billingStatus.product)
                         },
+                        modifier = Modifier.testTag("geoShareBillingManageButtonOneTime"),
                     ) {
                         if (billingStatus.refundable) {
                             Text(
@@ -453,6 +478,7 @@ private fun BillingActionsPane(
                         onClick = {
                             onManageBillingProduct(billingStatus.product)
                         },
+                        modifier = Modifier.testTag("geoShareBillingManageButtonSubscription"),
                     ) {
                         Text(
                             stringResource(R.string.billing_manage_subscription_description),

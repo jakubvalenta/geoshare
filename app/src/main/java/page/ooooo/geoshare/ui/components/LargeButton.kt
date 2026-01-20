@@ -21,6 +21,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun LargeButton(
     text: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     onClick: () -> Unit,
@@ -31,6 +32,7 @@ fun LargeButton(
             modifier
                 .align(Alignment.CenterHorizontally)
                 .width(400.dp),
+            enabled = enabled,
             colors = ButtonDefaults.buttonColors(
                 containerColor = containerColor,
                 contentColor = contentColor,

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -29,6 +30,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun BoxScope.FeatureBadgeLarge(onNavigateToBillingScreen: () -> Unit) {
     ElevatedCard(
         Modifier
+            .testTag("geoShareFeatureBadgeLarge")
             .align(Alignment.Center)
             .clickable(onClick = onNavigateToBillingScreen, role = Role.Button),
         shape = MaterialTheme.shapes.extraLarge,
@@ -50,7 +52,7 @@ fun BoxScope.FeatureBadgeLarge(onNavigateToBillingScreen: () -> Unit) {
         ) {
             Icon(painterResource(R.drawable.crown_24px), null)
             Text(
-                "${stringResource(R.string.billing_intro_not_purchased)} ${stringResource(R.string.app_name_pro)}",
+                "${stringResource(R.string.billing_intro_not_purchased)} ${stringResource(R.string.app_name_pro)}", // TODO Read billing appNameResId
                 style = MaterialTheme.typography.bodyMedium,
             )
             Button(onNavigateToBillingScreen) {

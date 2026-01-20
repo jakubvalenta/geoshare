@@ -14,6 +14,8 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ScaffoldAction(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     content: @Composable () -> Unit = {},
@@ -28,6 +30,8 @@ fun ScaffoldAction(
         content()
         LargeButton(
             text,
+            modifier,
+            enabled = enabled,
             containerColor = containerColor,
             contentColor = contentColor,
             onClick = onClick,

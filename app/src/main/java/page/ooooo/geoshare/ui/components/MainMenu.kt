@@ -130,6 +130,7 @@ fun MainMenu(
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(billingAppNameResId)) },
+                    modifier = Modifier.testTag("geoShareMainMenuBilling"),
                     onClick = {
                         menuExpanded = false
                         onNavigateToBillingScreen()
