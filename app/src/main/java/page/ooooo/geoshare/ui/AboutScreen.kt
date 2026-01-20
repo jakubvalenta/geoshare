@@ -122,10 +122,7 @@ private fun AboutScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     Text(
-                        stringResource(
-                            R.string.donation_description,
-                            stringResource(R.string.app_name)
-                        ),
+                        stringResource(R.string.donation_description),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                     )

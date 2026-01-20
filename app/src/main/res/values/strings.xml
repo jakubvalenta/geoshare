@@ -48,7 +48,7 @@
     <string name="conversion_succeeded_share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>
     <string name="donation_button">Donate on Ko-fi</string>
-    <string name="donation_description">Does %1$s make your life easier?</string>
+    <string name="donation_description">Does this app save you time?</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_title">Intro</string>
