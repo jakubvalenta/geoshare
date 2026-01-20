@@ -10,22 +10,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
 
-    @Test
-    fun allowsPurchasingAndRefundingOneTimeProduct() {
-        purchaseAndRefund(
-            offerResourceName = "geoShareBillingOfferOneTime",
-            manageButtonResourceName = "geoShareBillingManageButtonOneTime",
-        )
-    }
-
-    @Test
-    fun allowsPurchasingAndRefundingSubscription() {
-        purchaseAndRefund(
-            offerResourceName = "geoShareBillingOfferMonthly",
-            manageButtonResourceName = "geoShareBillingManageButtonSubscription",
-        )
-    }
-
     private fun purchaseAndRefund(offerResourceName: String, manageButtonResourceName: String) = uiAutomator {
         // Launch application and close intro
         launchApplication()
@@ -46,9 +30,9 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
         pressBack()
 
         // Go to billing screen using billing icon
-        onElement { viewIdResourceName == "geoShareFeatureBadgeSmall" }.click()
+        onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
 
-        // Purchase one time offer
+        // Purchase an offer
         onElement { viewIdResourceName == offerResourceName }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
 
@@ -71,7 +55,7 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share Pro" }
 
         // Does not show billing icon
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareFeatureBadgeSmall" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainBillingIcon" })
 
         // Go to billing screen using main menu
         goToBillingScreen()
@@ -90,5 +74,65 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
 
         // Shows automation paywall
         onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
+    }
+
+    @Test
+    fun allowsPurchasingAndRefundingOneTimeProduct() {
+        purchaseAndRefund(
+            offerResourceName = "geoShareBillingOfferOneTime",
+            manageButtonResourceName = "geoShareBillingManageButtonOneTime",
+        )
+    }
+
+    @Test
+    fun allowsPurchasingAndRefundingSubscription() {
+        purchaseAndRefund(
+            offerResourceName = "geoShareBillingOfferMonthly",
+            manageButtonResourceName = "geoShareBillingManageButtonSubscription",
+        )
+    }
+
+    @Test
+    fun allowsUsingAutomationAfterPurchase() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Share a Google Maps coordinates link with the app
+        shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+        // Shows billing icon
+        onElement { viewIdResourceName == "geoShareResultAutomationBadge" }
+
+        // Go to automation preferences using the button
+        onElement { viewIdResourceName == "geoShareResultAutomationButton" }.click()
+
+        // Go to billing screen using the automation paywall
+        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }.click()
+
+        // Purchase an offer
+        onElement { viewIdResourceName == "geoShareBillingOfferOneTime" }.click()
+        onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
+
+        // Go to automation preferences
+        pressBack()
+
+        // Configure automation
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationCopyCoordsDec" }.click()
+
+        // Go to the result screen
+        pressBack()
+
+        // Does not show billing icon
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareResultAutomationBadge" })
+
+        // Go to the main screen
+        pressBack()
+
+        // Share the link again
+        onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
+
+        // Shows automation success message
+        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessMessage" }
     }
 }

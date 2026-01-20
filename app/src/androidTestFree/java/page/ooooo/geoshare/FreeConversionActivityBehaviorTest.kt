@@ -27,7 +27,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessMessage" }
 
         // Shows automation preferences button
-        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
+        onElement { viewIdResourceName == "geoShareResultAutomationButton" }
     }
 
     @Test
@@ -58,6 +58,6 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         launchApplication()
 
         // Shows automation preferences button
-        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationPreferencesButton" }
+        onElement { viewIdResourceName == "geoShareResultAutomationButton" }
     }
 }

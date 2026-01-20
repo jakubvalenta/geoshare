@@ -323,6 +323,7 @@ private fun MainScreen(
             if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
                 FeatureBadgeSmall(
                     onClick = onNavigateToBillingScreen,
+                    modifier = Modifier.testTag("geoShareMainBillingIcon"),
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 )

@@ -209,12 +209,15 @@ fun ResultSuccessMessage(
                     FeatureBadged(
                         enabled = automationFeatureStatus == FeatureStatus.NOT_AVAILABLE,
                         badge = { modifier ->
-                            FeatureBadgeSmall(onNavigateToUserPreferencesAutomationScreen, modifier)
+                            FeatureBadgeSmall(
+                                onNavigateToUserPreferencesAutomationScreen,
+                                modifier.testTag("geoShareResultAutomationBadge")
+                            )
                         },
                     ) { modifier ->
                         Button(
                             onNavigateToUserPreferencesAutomationScreen,
-                            modifier.testTag("geoShareConversionSuccessAutomationPreferencesButton"),
+                            modifier.testTag("geoShareResultAutomationButton"),
                             colors = ButtonDefaults.elevatedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                 contentColor = MaterialTheme.colorScheme.onSurface,
