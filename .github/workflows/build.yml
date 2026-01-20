@@ -19,17 +19,26 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Run lint for the debug variant
-        run: ./gradlew lintDebug
+      - name: Run lint for the free debug variant
+        run: ./gradlew lintFreeDebug
 
-      - name: Run unit tests for the debug variant
-        run: ./gradlew testFullDebugUnitTest
+      - name: Run lint for the paid debug variant
+        run: ./gradlew lintPaidDebug
 
-      - name: Build the debug variant
-        run: ./gradlew assembleDebug
+      - name: Run unit tests for the free debug variant
+        run: ./gradlew testFreeDebugUnitTest
 
-      - name: Upload debug APK
+      - name: Run unit tests for the paid debug variant
+        run: ./gradlew testPaidDebugUnitTest
+
+      - name: Build the free debug variant
+        run: ./gradlew assembleFreeDebug
+
+      - name: Build the paid debug variant
+        run: ./gradlew assembleFreeDebug
+
+      - name: Upload free debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: free-debug-apk
+          path: app/build/outputs/apk/free/debug/app-free-debug.apk
