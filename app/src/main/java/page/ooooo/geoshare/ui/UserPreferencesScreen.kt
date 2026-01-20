@@ -109,6 +109,7 @@ fun UserPreferencesScreen(
     viewModel: ConversionViewModel = hiltViewModel(),
 ) {
     val automationFeatureStatus by viewModel.automationFeatureStatus.collectAsStateWithLifecycle()
+    val billingAppNameResId = viewModel.billingAppNameResId
     val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
@@ -119,6 +120,7 @@ fun UserPreferencesScreen(
             DeveloperOptionsUserPreferencesGroup,
         ),
         initialGroupId = initialGroupId,
+        billingAppNameResId = billingAppNameResId,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -131,6 +133,7 @@ fun UserPreferencesScreen(
 private fun UserPreferencesScreen(
     groups: List<UserPreferencesGroup>,
     initialGroupId: UserPreferencesGroupId?,
+    billingAppNameResId: Int,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -183,6 +186,7 @@ private fun UserPreferencesScreen(
                 AnimatedPane {
                     if (currentGroup != null) {
                         UserPreferencesDetailPane(
+                            billingAppNameResId = billingAppNameResId,
                             currentGroup = currentGroup,
                             expanded = detailExpanded,
                             userPreferencesValues = userPreferencesValues,
@@ -224,6 +228,7 @@ private fun DefaultPreview() {
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -248,6 +253,7 @@ private fun DarkPreview() {
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -272,6 +278,7 @@ private fun TabletPreview() {
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -296,6 +303,7 @@ private fun EmptyPreview() {
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -320,6 +328,7 @@ private fun DarkEmptyPreview() {
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -344,6 +353,7 @@ private fun TabletEmptyPreview() {
                         DeveloperOptionsUserPreferencesGroup,
                     ),
                     initialGroupId = null,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},

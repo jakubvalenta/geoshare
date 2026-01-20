@@ -27,7 +27,10 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun BoxScope.FeatureBadgeLarge(onNavigateToBillingScreen: () -> Unit) {
+fun BoxScope.FeatureBadgeLarge(
+    billingAppNameResId: Int,
+    onNavigateToBillingScreen: () -> Unit,
+) {
     ElevatedCard(
         Modifier
             .testTag("geoShareFeatureBadgeLarge")
@@ -52,7 +55,7 @@ fun BoxScope.FeatureBadgeLarge(onNavigateToBillingScreen: () -> Unit) {
         ) {
             Icon(painterResource(R.drawable.crown_24px), null)
             Text(
-                "${stringResource(R.string.billing_intro_not_purchased)} ${stringResource(R.string.app_name_pro)}", // TODO Read billing appNameResId
+                "${stringResource(R.string.billing_intro_not_purchased)} ${stringResource(billingAppNameResId)}",
                 style = MaterialTheme.typography.bodyMedium,
             )
             Button(onNavigateToBillingScreen) {
@@ -70,7 +73,10 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Box {
-                FeatureBadgeLarge(onNavigateToBillingScreen = {})
+                FeatureBadgeLarge(
+                    billingAppNameResId = R.string.app_name_pro,
+                    onNavigateToBillingScreen = {},
+                )
             }
         }
     }
@@ -82,7 +88,10 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Box {
-                FeatureBadgeLarge(onNavigateToBillingScreen = {})
+                FeatureBadgeLarge(
+                    billingAppNameResId = R.string.app_name_pro,
+                    onNavigateToBillingScreen = {},
+                )
             }
         }
     }

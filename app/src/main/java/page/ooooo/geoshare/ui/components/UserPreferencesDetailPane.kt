@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.billing.FeatureStatus
@@ -26,6 +27,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun UserPreferencesDetailPane(
     currentGroup: UserPreferencesGroup,
     expanded: Boolean,
+    billingAppNameResId: Int,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -62,7 +64,10 @@ fun UserPreferencesDetailPane(
             }
         }
         if (currentGroup.featureStatus == FeatureStatus.NOT_AVAILABLE) {
-            FeatureBadgeLarge(onNavigateToBillingScreen = onNavigateToBillingScreen)
+            FeatureBadgeLarge(
+                billingAppNameResId = billingAppNameResId,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            )
         }
     }
 }
@@ -78,6 +83,7 @@ private fun ConnectionPermissionPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -97,6 +103,7 @@ private fun DarkConnectionPermissionPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = ConnectionPermissionUserPreferencesGroup,
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -116,6 +123,7 @@ private fun AutomationPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
@@ -137,6 +145,7 @@ private fun DarkAutomationPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
@@ -158,6 +167,7 @@ private fun AutomationFeatureNotEnabledPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationUserPreferencesGroup(FeatureStatus.NOT_AVAILABLE),
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
@@ -179,6 +189,7 @@ private fun DarkAutomationFeatureNotEnabledPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationUserPreferencesGroup(FeatureStatus.NOT_AVAILABLE),
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = UserPreferencesValues(
                         automation = GpxOutput.SaveGpxPointsAutomation,
                     ),
@@ -200,6 +211,7 @@ private fun AutomationDelayPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationDelayUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -219,6 +231,7 @@ private fun DarkAutomationDelayPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = AutomationDelayUserPreferencesGroup(FeatureStatus.AVAILABLE),
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -238,6 +251,7 @@ private fun DeveloperOptionsPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = DeveloperOptionsUserPreferencesGroup,
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -257,6 +271,7 @@ private fun DarkDeveloperOptionsPreview() {
                 UserPreferencesDetailPane(
                     currentGroup = DeveloperOptionsUserPreferencesGroup,
                     expanded = true,
+                    billingAppNameResId = R.string.app_name_pro,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
                     onNavigateToBillingScreen = {},

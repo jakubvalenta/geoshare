@@ -314,9 +314,8 @@ private fun BillingFirstPane(
                         Text(buildAnnotatedString {
                             withLink(
                                 LinkAnnotation.Url(
-                                    "https://geoshare.ooooo.page/terms/", TextLinkStyles(
-                                        SpanStyle(textDecoration = TextDecoration.Underline)
-                                    )
+                                    "https://geoshare.ooooo.page/terms/",
+                                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
                                 )
                             ) {
                                 append(stringResource(R.string.billing_terms_of_service))
@@ -325,9 +324,8 @@ private fun BillingFirstPane(
                         Text(buildAnnotatedString {
                             withLink(
                                 LinkAnnotation.Url(
-                                    "mailto:geoshare-support@jakubvalenta.cz", TextLinkStyles(
-                                        SpanStyle(textDecoration = TextDecoration.Underline)
-                                    )
+                                    "mailto:geoshare-support@jakubvalenta.cz",
+                                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
                                 )
                             ) {
                                 append(stringResource(R.string.billing_support_email))
