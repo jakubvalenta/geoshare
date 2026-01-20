@@ -28,4 +28,6 @@ abstract class Billing(
     abstract suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 
     abstract fun manageProduct(product: BillingProduct)
+
+    abstract suspend fun showInAppMessages(activity: Activity)
 }

@@ -365,8 +365,11 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun onResume() {
+    fun onResume(activity: Activity) {
         billing.startConnection()
+        viewModelScope.launch {
+            billing.showInAppMessages(activity)
+        }
     }
 
     fun onPause() {

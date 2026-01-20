@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.onResume()
+        viewModel.onResume(this)
     }
 
     override fun onPause() {

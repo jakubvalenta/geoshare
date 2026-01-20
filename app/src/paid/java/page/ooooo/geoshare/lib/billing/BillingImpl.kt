@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -14,6 +13,9 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.InAppMessageParams
+import com.android.billingclient.api.InAppMessageResponseListener
+import com.android.billingclient.api.InAppMessageResult
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -50,8 +52,8 @@ class BillingImpl(
     private val productDetailsParamsBuilder: () -> ProductDetailsParamsBuilder = { DefaultProductDetailsParamsBuilder() },
     private val billingFlowParamsBuilder: () -> BillingFlowParamsBuilder = { DefaultBillingFlowParamsBuilder() },
     private val log: ILog = DefaultLog,
-) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, PurchasesResponseListener,
-    PurchasesUpdatedListener {
+) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, InAppMessageResponseListener,
+    PurchasesResponseListener, PurchasesUpdatedListener {
 
     companion object {
         const val TAG = "Billing"
@@ -73,15 +75,16 @@ class BillingImpl(
     override val message: StateFlow<Message?> = _message
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-            log.i(TAG, "Billing setup: ok")
-            for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
-                val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
-                billingClient.queryPurchasesAsync(queryPurchasesParams, this)
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                log.i(TAG, "Billing setup: ok")
+                queryPurchases()
             }
-        } else {
-            log.e(TAG, "Billing setup: error ${billingResult.debugMessage}")
-            _message.value = Message(context.getString(R.string.billing_setup_error_unknown), isError = true)
+
+            else -> {
+                log.e(TAG, "Billing setup: error ${billingResult.debugMessage}")
+                _message.value = Message(context.getString(R.string.billing_setup_error_unknown), isError = true)
+            }
         }
     }
 
@@ -158,11 +161,24 @@ class BillingImpl(
     override fun onAcknowledgePurchaseResponse(billingResult: BillingResult) {
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
-                Log.i(TAG, "Purchase acknowledgement: ok")
+                log.i(TAG, "Purchase acknowledgement: ok")
             }
 
             else -> {
-                Log.e(TAG, "Purchase acknowledgement: error ${billingResult.debugMessage}")
+                log.e(TAG, "Purchase acknowledgement: error ${billingResult.debugMessage}")
+            }
+        }
+    }
+
+    override fun onInAppMessageResponse(inAppMessageResult: InAppMessageResult) {
+        when (inAppMessageResult.responseCode) {
+            InAppMessageResult.InAppMessageResponseCode.NO_ACTION_NEEDED -> {
+                log.i(TAG, "In-app messaging: no action needed")
+            }
+
+            InAppMessageResult.InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED -> {
+                log.i(TAG, "In-app messaging: subscription status updated")
+                queryPurchases()
             }
         }
     }
@@ -192,8 +208,7 @@ class BillingImpl(
         val productDetailsParamsList = listOf(
             productDetailsParamsBuilder().setProductDetails(productDetails).setOfferToken(offerToken).build()
         )
-        val billingFlowParams =
-            billingFlowParamsBuilder().setProductDetailsParamsList(productDetailsParamsList).build()
+        val billingFlowParams = billingFlowParamsBuilder().setProductDetailsParamsList(productDetailsParamsList).build()
 
         val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
         when (billingResult.responseCode) {
@@ -206,6 +221,46 @@ class BillingImpl(
                 _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
+    }
+
+    override fun manageProduct(product: BillingProduct) {
+        _message.value = null
+        try {
+            when (product.type) {
+                BillingProduct.Type.DONATION -> {}
+
+                BillingProduct.Type.ONE_TIME -> {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            "https://play.google.com/store/account/orderhistory".toUri(),
+                        )
+                    )
+                }
+
+                BillingProduct.Type.SUBSCRIPTION -> {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare".format(
+                                Uri.encode(product.id)
+                            ).toUri(),
+                        )
+                    )
+                }
+            }
+        } catch (_: ActivityNotFoundException) {
+            _message.value = Message(context.getString(R.string.billing_manage_error), isError = true)
+        }
+    }
+
+    override suspend fun showInAppMessages(activity: Activity) {
+        // Wait for connection
+        status.first { it !is BillingStatus.Loading }
+
+        val inAppMessageParams = InAppMessageParams.newBuilder()
+            .addInAppMessageCategoryToShow(InAppMessageParams.InAppMessageCategoryId.TRANSACTIONAL).build()
+        billingClient.showInAppMessages(activity, inAppMessageParams, this)
     }
 
     private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
@@ -239,34 +294,10 @@ class BillingImpl(
         }
     }
 
-    override fun manageProduct(product: BillingProduct) {
-        _message.value = null
-        try {
-            when (product.type) {
-                BillingProduct.Type.DONATION -> {}
-
-                BillingProduct.Type.ONE_TIME -> {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            "https://play.google.com/store/account/orderhistory".toUri(),
-                        )
-                    )
-                }
-
-                BillingProduct.Type.SUBSCRIPTION -> {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare".format(
-                                Uri.encode(product.id)
-                            ).toUri(),
-                        )
-                    )
-                }
-            }
-        } catch (_: ActivityNotFoundException) {
-            _message.value = Message(context.getString(R.string.billing_manage_error), isError = true)
+    private fun queryPurchases() {
+        for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
+            val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
+            billingClient.queryPurchasesAsync(queryPurchasesParams, this)
         }
     }
 }

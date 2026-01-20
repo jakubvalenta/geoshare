@@ -45,4 +45,6 @@ class BillingImpl(context: Context) : Billing(context) {
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {}
 
     override fun manageProduct(product: BillingProduct) {}
+
+    override suspend fun showInAppMessages(activity: Activity) {}
 }

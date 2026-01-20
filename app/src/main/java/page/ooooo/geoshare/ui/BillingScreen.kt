@@ -334,7 +334,6 @@ private fun BillingFirstPane(
                     }
                 }
             }
-            // TODO Show subscription error: https://developer.android.com/google/play/billing/subscriptions#in-app-messaging
         }
     }
 }

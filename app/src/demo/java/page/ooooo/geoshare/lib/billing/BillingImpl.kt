@@ -81,4 +81,6 @@ class BillingImpl(context: Context) : Billing(context) {
             }
         }
     }
+
+    override suspend fun showInAppMessages(activity: Activity) {}
 }
