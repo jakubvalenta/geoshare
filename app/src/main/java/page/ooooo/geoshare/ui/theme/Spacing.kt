@@ -15,6 +15,7 @@ data class Spacing(
     val smallAdaptive: Dp = small,
     val mediumAdaptive: Dp = medium,
     val largeAdaptive: Dp = large,
+    val headlineTopAdaptive: Dp = large,
 
     val builtInTopBarPaddingEnd: Dp = 8.dp,
     val builtInTopBarHeight: Dp = 64.dp,
@@ -28,4 +29,5 @@ val smallWindowSpacing = Spacing(
     smallAdaptive = 8.dp,
     mediumAdaptive = 16.dp,
     largeAdaptive = 24.dp,
+    headlineTopAdaptive = 0.dp,
 )

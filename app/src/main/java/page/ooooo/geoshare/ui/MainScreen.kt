@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -434,10 +436,7 @@ private fun MainScreen(
                         if (!wide) {
                             Column(
                                 Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .padding(top = spacing.largeAdaptive),
+                                    .background(MaterialTheme.colorScheme.surface),
                             ) {
                                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                                     MainSupportingPane(
@@ -454,11 +453,18 @@ private fun MainScreen(
                                     )
                                 }
                             }
+                            Spacer(
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface)
+                            )
                         }
                     }
                     MainBottomBar(
                         currentState,
                         loadingIndicator,
+                        modifier = Modifier.safeDrawingPadding(),
                         containerColor = if (wide) Color.Transparent else MaterialTheme.colorScheme.surface,
                         contentColor = if (wide) contentColor else MaterialTheme.colorScheme.onSurface,
                     )
@@ -466,16 +472,16 @@ private fun MainScreen(
             }
         },
         supportingPane = {
-            AnimatedPane(Modifier.preferredWidth(500.dp)) {
+            AnimatedPane(Modifier.preferredWidth(400.dp)) {
                 val insetPadding = if (wide) {
                     PaddingValues(
-                        start = insetPadding.calculateStartPadding(layoutDirection),
+                        top = insetPadding.calculateTopPadding(),
                         end = insetPadding.calculateEndPadding(layoutDirection),
                         bottom = insetPadding.calculateBottomPadding(),
                     )
                 } else {
                     PaddingValues(
-                        top = insetPadding.calculateTopPadding(),
+                        start = insetPadding.calculateStartPadding(layoutDirection),
                         end = insetPadding.calculateEndPadding(layoutDirection),
                         bottom = insetPadding.calculateBottomPadding(),
                     )
@@ -647,44 +653,13 @@ private fun MainMainPane(
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
-    val spacing = LocalSpacing.current
-
     when {
         loadingIndicator is LoadingIndicator.Large -> {
             Headline(stringResource(loadingIndicator.titleResId))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = spacing.smallAdaptive)
-                    .padding(horizontal = spacing.windowPadding),
-            ) {
-                LoadingIndicator(
-                    Modifier
-                        .size(96.dp)
-                        .align(Alignment.CenterHorizontally),
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-                Button(
-                    onCancel,
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                ) {
-                    Text(stringResource(R.string.conversion_loading_indicator_cancel))
-                }
-                loadingIndicator.description()?.let { text ->
-                    Text(
-                        text,
-                        Modifier.padding(bottom = spacing.mediumAdaptive),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
+            MainLoadingIndicator(
+                loadingIndicator,
+                onCancel = onCancel,
+            )
         }
 
         currentState is ConversionState.HasError -> {
@@ -762,12 +737,56 @@ private fun MainSupportingPane(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun MainLoadingIndicator(
+    loadingIndicator: LoadingIndicator.Large,
+    onCancel: () -> Unit,
+) {
+    val spacing = LocalSpacing.current
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = spacing.smallAdaptive)
+            .padding(horizontal = spacing.windowPadding),
+    ) {
+        LoadingIndicator(
+            Modifier
+                .size(96.dp)
+                .align(Alignment.CenterHorizontally),
+            color = MaterialTheme.colorScheme.tertiary,
+        )
+        Button(
+            onCancel,
+            Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
+            colors = ButtonDefaults.elevatedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        ) {
+            Text(stringResource(R.string.conversion_loading_indicator_cancel))
+        }
+        loadingIndicator.description()?.let { text ->
+            Text(
+                text,
+                Modifier.padding(bottom = spacing.mediumAdaptive),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+    }
+}
+
 @Composable
 private fun MainBottomBar(
     currentState: State,
     loadingIndicator: LoadingIndicator?,
     containerColor: Color,
     contentColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     when {
         loadingIndicator is LoadingIndicator.Large -> {}
@@ -776,12 +795,14 @@ private fun MainBottomBar(
             currentState.inputUriString,
             containerColor,
             contentColor,
+            modifier,
         )
 
         currentState is ConversionState.HasResult -> MainSkipButton(
             currentState.inputUriString,
             containerColor,
             contentColor,
+            modifier,
         )
     }
 }
@@ -791,6 +812,7 @@ private fun MainSkipButton(
     inputUriString: String,
     containerColor: Color,
     contentColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
@@ -799,7 +821,8 @@ private fun MainSkipButton(
     Column(
         Modifier
             .background(containerColor)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .then(modifier),
     ) {
         TextButton(
             {

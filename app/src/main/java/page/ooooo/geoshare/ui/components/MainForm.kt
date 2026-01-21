@@ -57,8 +57,12 @@ fun MainForm(
     AppHeadline(
         appNameResId,
         Modifier
-            .padding(vertical = spacing.largeAdaptive)
-            .padding(start = 13.dp, end = spacing.windowPadding),
+            .padding(
+                start = 13.dp,
+                top = spacing.headlineTopAdaptive,
+                end = spacing.windowPadding,
+                bottom = spacing.largeAdaptive,
+            ),
     )
     Column(
         Modifier.padding(horizontal = spacing.windowPadding),

@@ -31,7 +31,11 @@ fun MainInfo(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    Column(Modifier.padding(top = spacing.largeAdaptive)) {
+    Column(
+        Modifier
+            .padding(horizontal = spacing.windowPadding)
+            .padding(top = spacing.headlineTopAdaptive),
+    ) {
         TextButton(onNavigateToInputsScreen) {
             Icon(
                 Icons.Outlined.Info,
