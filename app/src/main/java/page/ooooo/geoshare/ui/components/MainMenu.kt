@@ -33,11 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.conversion.Initial
+import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainMenu(
+    currentState: State,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     changelogShown: Boolean = true,
@@ -51,6 +54,12 @@ fun MainMenu(
     val spacing = LocalSpacing.current
     var menuExpanded by retain { mutableStateOf(false) }
 
+    if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
+        FeatureBadgeSmall(
+            onClick = onNavigateToBillingScreen,
+            modifier = Modifier.testTag("geoShareMainBillingIcon"),
+        )
+    }
     Box {
         IconButton(
             { menuExpanded = true },
@@ -125,8 +134,8 @@ fun MainMenu(
                 },
             )
             if (
-                billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION ||
-                billingStatus is BillingStatus.NotPurchased
+                billingStatus is BillingStatus.NotPurchased ||
+                billingStatus is BillingStatus.Purchased && billingStatus.product.type != BillingProduct.Type.DONATION
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(billingAppNameResId)) },
@@ -163,11 +172,9 @@ private fun DefaultPreview() {
                     title = {},
                     actions = {
                         MainMenu(
+                            currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.Purchased(
-                                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                                refundable = true,
-                            ),
+                            billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -196,11 +203,9 @@ private fun DarkPreview() {
                     title = {},
                     actions = {
                         MainMenu(
+                            currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.Purchased(
-                                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                                refundable = true,
-                            ),
+                            billingStatus = BillingStatus.NotPurchased(),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -229,6 +234,7 @@ private fun DonationPreview() {
                     title = {},
                     actions = {
                         MainMenu(
+                            currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.Purchased(
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),
@@ -262,6 +268,7 @@ private fun DarkDonationPreview() {
                     title = {},
                     actions = {
                         MainMenu(
+                            currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.Purchased(
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),

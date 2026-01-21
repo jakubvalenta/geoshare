@@ -198,19 +198,20 @@ private fun BillingScreen(
             }
         },
         supportingPane = {
-            val (contentHeight, setContentHeight) = remember { mutableStateOf<Dp?>(null) }
             val density = LocalDensity.current
             val spacing = LocalSpacing.current
+            val (contentHeight, setContentHeight) = remember { mutableStateOf<Dp?>(null) }
+
             AnimatedPane(
                 Modifier
                     .preferredWidth(400.dp)
                     .run {
-                    if (contentHeight != null) {
-                        preferredHeight(contentHeight)
-                    } else {
-                        this
-                    }
-                },
+                        if (contentHeight != null) {
+                            preferredHeight(contentHeight)
+                        } else {
+                            this
+                        }
+                    },
             ) {
                 Column(
                     modifier = Modifier
@@ -322,7 +323,8 @@ private fun BillingMainPane(
                         R.string.billing_intro_purchased
                     } else {
                         R.string.billing_intro_not_purchased
-                    }, R.string.billing_intro_not_purchased
+                    },
+                    R.string.billing_intro_not_purchased,
                 ),
                 Modifier.padding(top = spacing.mediumAdaptive),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

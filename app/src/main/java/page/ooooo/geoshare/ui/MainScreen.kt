@@ -6,13 +6,21 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -22,13 +30,23 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
+import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +58,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -53,6 +74,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
@@ -94,7 +116,6 @@ import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
-import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainInfo
@@ -105,7 +126,6 @@ import page.ooooo.geoshare.ui.components.ResultSuccessApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
 import page.ooooo.geoshare.ui.components.ResultSuccessSheetContent
-import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -259,12 +279,14 @@ fun MainScreen(
             viewModel.runAction(action, i)
         },
         onStart = { viewModel.start() },
-        onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) }
-    )
+        onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) })
 }
 
 @OptIn(
-    ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class
+    ExperimentalComposeUiApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalMaterial3AdaptiveApi::class
 )
 @Composable
 private fun MainScreen(
@@ -291,8 +313,8 @@ private fun MainScreen(
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
-    val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
+    val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
@@ -301,302 +323,299 @@ private fun MainScreen(
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
+    val containerColor = when {
+        loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
+        currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+        currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+        else -> MaterialTheme.colorScheme.surface
+    }
+    val contentColor = when {
+        loadingIndicator is LoadingIndicator.Large -> Color.Unspecified
+        currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+        currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+        else -> Color.Unspecified
+    }
+
+    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo())
+    val customDirective = remember(defaultDirective) {
+        defaultDirective.copy(
+            maxVerticalPartitions = 3,
+            verticalPartitionSpacerSize = 0.dp,
+        )
+    }
+    val navigator = rememberSupportingPaneScaffoldNavigator(
+        scaffoldDirective = customDirective,
+    )
+    val supportingReflowed = remember(navigator.scaffoldState) {
+        navigator.scaffoldState.targetState.secondary is PaneAdaptedValue.Reflowed
+    }
+    val insetPadding = WindowInsets.safeDrawing.asPaddingValues()
+
     BackHandler(currentState !is Initial) {
         onReset()
     }
 
-    TwoPaneScaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
-        navigationIcon = {
-            if (currentState !is Initial) {
-                IconButton(
-                    onReset,
-                    Modifier.testTag("geoShareMainBackButton"),
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.nav_back_content_description)
+    // TODO ExtractSupportingPaneScaffold to fix insets on AboutScreen and BillingScreen
+    // TODO Fix loader headline color
+    // TODO Fix pane ratio
+    SupportingPaneScaffold(
+        directive = customDirective,
+        scaffoldState = navigator.scaffoldState,
+        mainPane = {
+            val density = LocalDensity.current
+            val (contentHeight, setContentHeight) = remember { mutableStateOf<Dp?>(null) }
+
+            AnimatedPane(
+                Modifier.run {
+                    if (contentHeight != null) {
+                        preferredHeight(contentHeight)
+                    } else {
+                        this
+                    }
+                },
+            ) {
+                val insetPadding = if (supportingReflowed) {
+                    PaddingValues(
+                        start = insetPadding.calculateStartPadding(layoutDirection),
+                        top = insetPadding.calculateTopPadding(),
+                        end = insetPadding.calculateEndPadding(layoutDirection),
+                    )
+                } else {
+                    PaddingValues(
+                        start = insetPadding.calculateStartPadding(layoutDirection),
+                        top = insetPadding.calculateTopPadding(),
+                        bottom = insetPadding.calculateBottomPadding(),
                     )
                 }
-            }
-        },
-        actions = {
-            if (currentState is Initial && billingStatus is BillingStatus.NotPurchased) {
-                FeatureBadgeSmall(
-                    onClick = onNavigateToBillingScreen,
-                    modifier = Modifier.testTag("geoShareMainBillingIcon"),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            }
-            MainMenu(
-                billingAppNameResId = billingAppNameResId,
-                billingStatus = billingStatus,
-                changelogShown = changelogShown,
-                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-            )
-        },
-        firstPane = when {
-            (loadingIndicator is LoadingIndicator.Large) -> {
-                {
-                    Headline(stringResource(loadingIndicator.titleResId))
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = spacing.smallAdaptive)
-                            .padding(horizontal = spacing.windowPadding),
-                    ) {
-                        LoadingIndicator(
-                            Modifier
-                                .size(96.dp)
-                                .align(Alignment.CenterHorizontally),
-                            color = MaterialTheme.colorScheme.tertiary,
-                        )
-                        Button(
-                            onCancel,
-                            Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
-                            colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                            ),
-                        ) {
-                            Text(stringResource(R.string.conversion_loading_indicator_cancel))
-                        }
-                        loadingIndicator.description()?.let { text ->
-                            Text(
-                                text,
-                                Modifier.padding(bottom = spacing.mediumAdaptive),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
-                    }
-                }
-            }
-
-            currentState is ConversionState.HasError -> {
-                {
-                    Headline(stringResource(R.string.conversion_error_title))
-                    ResultError(
-                        currentState.errorMessageResId,
-                        currentState.inputUriString,
-                        retryLoadingIndicatorVisible,
-                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                        onRetry = {
-                            coroutineScope.launch {
-                                // Show a loading indicator for a while to indicate that conversion is being retried.
-                                setRetryLoadingIndicator(true)
-                                delay(1000)
-                                setRetryLoadingIndicator(false)
-                                onUpdateInput(currentState.inputUriString)
-                                onStart()
+                Column(
+                    Modifier
+                        .background(containerColor)
+                        .padding(insetPadding)
+                        .consumeWindowInsets(insetPadding)
+                        .onGloballyPositioned { coordinates ->
+                            with(density) {
+                                setContentHeight(coordinates.size.height.toDp())
                             }
                         },
-                    )
-                }
-            }
-
-            currentState is ConversionState.HasResult -> {
-                {
-                    ResultSuccessCoordinates(
-                        position = currentState.position,
-                        onRun = onRun,
-                        onSelect = { position, i ->
-                            onCancel()
-                            setSelectedPositionAndIndex(position to i)
+                ) {
+                    TopAppBar(
+                        title = {},
+                        navigationIcon = {
+                            if (currentState !is Initial) {
+                                IconButton(
+                                    onReset,
+                                    Modifier.testTag("geoShareMainBackButton"),
+                                ) {
+                                    Icon(
+                                        Icons.AutoMirrored.Default.ArrowBack,
+                                        stringResource(R.string.nav_back_content_description)
+                                    )
+                                }
+                            }
                         },
-                    )
-                }
-            }
-
-            currentState is Initial -> {
-                {
-                    MainForm(
-                        inputUriString = inputUriString,
-                        billingAppNameResId = billingAppNameResId,
-                        billingStatus = billingStatus,
-                        errorMessageResId = errorMessageResId,
-                        onSetErrorMessageResId = setErrorMessageResId,
-                        onSubmit = onStart,
-                        onUpdateInput = onUpdateInput,
-                    )
-                }
-            }
-
-            else -> null
-        },
-        secondPane = when {
-            (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasResult) -> {
-                {
-                    Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                        ResultSuccessMessage(
-                            currentState = currentState,
-                            automationFeatureStatus = automationFeatureStatus,
-                            loadingIndicator = loadingIndicator,
-                            onCancel = onCancel,
-                            onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                        )
-                        ResultSuccessApps(
-                            onRun = onRun,
-                            windowSizeClass = windowSizeClass,
-                        )
-                    }
-                }
-            }
-
-            currentState is Initial -> {
-                {
-                    MainInfo(
-                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                        onNavigateToIntroScreen = onNavigateToIntroScreen,
-                        onSetErrorMessageResId = setErrorMessageResId,
-                        onUpdateInput = onUpdateInput,
-                    )
-                }
-            }
-
-            else -> {
-                {}
-            }
-        },
-        bottomPane = when {
-            (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasError) -> {
-                {
-                    TextButton({
-                        coroutineScope.launch {
-                            AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
-                        }
-                    }) {
-                        Text(
-                            stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
-                                start = spacing.windowPadding,
-                                top = spacing.tinyAdaptive,
-                                bottom = spacing.smallAdaptive,
-                            )
-                        )
-                    }
-                }
-            }
-
-            (loadingIndicator !is LoadingIndicator.Large && currentState is ConversionState.HasResult) -> {
-                {
-                    TextButton({
-                        coroutineScope.launch {
-                            AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
-                        }
-                    }) {
-                        Text(
-                            stringResource(R.string.conversion_succeeded_skip), Modifier.padding(
-                                start = spacing.windowPadding,
-                                top = spacing.tinyAdaptive,
-                                bottom = spacing.smallAdaptive,
-                            )
-                        )
-                    }
-                }
-            }
-
-            else -> null
-        },
-        dialog = when {
-            loadingIndicator is LoadingIndicator.Large -> null
-
-            currentState is RequestedUnshortenPermission -> {
-                {
-                    PermissionDialog(
-                        title = stringResource(currentState.permissionTitleResId),
-                        confirmText = stringResource(R.string.conversion_permission_common_grant),
-                        dismissText = stringResource(R.string.conversion_permission_common_deny),
-                        onConfirmation = onGrant,
-                        onDismissRequest = onDeny,
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareUnshortenPermissionDialog"),
-                    ) {
-                        Text(
-                            AnnotatedString.fromHtml(
-                                stringResource(
-                                    R.string.conversion_permission_common_text,
-                                    currentState.uri.toString().truncateMiddle(),
-                                    appName,
+                        actions = {
+                            if (supportingReflowed) {
+                                MainMenu(
+                                    currentState = currentState,
+                                    billingAppNameResId = billingAppNameResId,
+                                    billingStatus = billingStatus,
+                                    changelogShown = changelogShown,
+                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                 )
-                            ),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
-                        )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    )
+                    CompositionLocalProvider(LocalContentColor provides contentColor) {
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState()),
+                        ) {
+                            when {
+                                loadingIndicator is LoadingIndicator.Large -> {
+                                    Headline(stringResource(loadingIndicator.titleResId))
+                                    Column(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = spacing.smallAdaptive)
+                                            .padding(horizontal = spacing.windowPadding),
+                                    ) {
+                                        LoadingIndicator(
+                                            Modifier
+                                                .size(96.dp)
+                                                .align(Alignment.CenterHorizontally),
+                                            color = MaterialTheme.colorScheme.tertiary,
+                                        )
+                                        Button(
+                                            onCancel,
+                                            Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
+                                            colors = ButtonDefaults.elevatedButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
+                                        ) {
+                                            Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                                        }
+                                        loadingIndicator.description()?.let { text ->
+                                            Text(
+                                                text,
+                                                Modifier.padding(bottom = spacing.mediumAdaptive),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                            )
+                                        }
+                                    }
+                                }
+
+                                currentState is ConversionState.HasError -> {
+                                    Headline(stringResource(R.string.conversion_error_title))
+                                    ResultError(
+                                        currentState.errorMessageResId,
+                                        currentState.inputUriString,
+                                        retryLoadingIndicatorVisible,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onRetry = {
+                                            coroutineScope.launch {
+                                                // Show a loading indicator for a while to indicate that conversion is being retried.
+                                                setRetryLoadingIndicator(true)
+                                                delay(1000)
+                                                setRetryLoadingIndicator(false)
+                                                onUpdateInput(currentState.inputUriString)
+                                                onStart()
+                                            }
+                                        },
+                                    )
+                                }
+
+                                currentState is ConversionState.HasResult -> {
+                                    ResultSuccessCoordinates(
+                                        position = currentState.position,
+                                        onRun = onRun,
+                                        onSelect = { position, i ->
+                                            onCancel()
+                                            setSelectedPositionAndIndex(position to i)
+                                        },
+                                    )
+                                }
+
+                                currentState is Initial -> {
+                                    MainForm(
+                                        inputUriString = inputUriString,
+                                        billingAppNameResId = billingAppNameResId,
+                                        billingStatus = billingStatus,
+                                        errorMessageResId = errorMessageResId,
+                                        onSetErrorMessageResId = setErrorMessageResId,
+                                        onSubmit = onStart,
+                                        onUpdateInput = onUpdateInput,
+                                    )
+                                }
+                            }
+                        }
+                        if (!supportingReflowed) {
+                            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+                                ResultBottomBar(currentState, loadingIndicator)
+                            }
+                        }
                     }
                 }
             }
-
-            currentState is RequestedParseHtmlPermission -> {
-                {
-                    PermissionDialog(
-                        title = stringResource(currentState.permissionTitleResId),
-                        confirmText = stringResource(R.string.conversion_permission_common_grant),
-                        dismissText = stringResource(R.string.conversion_permission_common_deny),
-                        onConfirmation = onGrant,
-                        onDismissRequest = onDeny,
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareParseHtmlPermissionDialog"),
-                    ) {
-                        Text(
-                            AnnotatedString.fromHtml(
-                                stringResource(
-                                    R.string.conversion_permission_common_text,
-                                    currentState.uri.toString().truncateMiddle(),
-                                    appName,
+        },
+        supportingPane = {
+            AnimatedPane(Modifier.preferredWidth(400.dp)) {
+                val insetPadding = if (supportingReflowed) {
+                    PaddingValues(
+                        start = insetPadding.calculateStartPadding(layoutDirection),
+                        end = insetPadding.calculateEndPadding(layoutDirection),
+                        bottom = insetPadding.calculateBottomPadding(),
+                    )
+                } else {
+                    PaddingValues(
+                        top = insetPadding.calculateTopPadding(),
+                        end = insetPadding.calculateEndPadding(layoutDirection),
+                        bottom = insetPadding.calculateBottomPadding(),
+                    )
+                }
+                Column(
+                    Modifier
+                        .padding(insetPadding)
+                        .consumeWindowInsets(insetPadding),
+                ) {
+                    if (!supportingReflowed) {
+                        TopAppBar(
+                            title = {},
+                            actions = {
+                                MainMenu(
+                                    currentState = currentState,
+                                    billingAppNameResId = billingAppNameResId,
+                                    billingStatus = billingStatus,
+                                    changelogShown = changelogShown,
+                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                                 )
-                            ),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                         )
+                    }
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .padding(horizontal = spacing.windowPadding)
+                                .verticalScroll(rememberScrollState()),
+                        ) {
+                            when {
+                                loadingIndicator is LoadingIndicator.Large -> {}
+
+                                currentState is ConversionState.HasResult -> {
+                                    ResultSuccessMessage(
+                                        currentState = currentState,
+                                        automationFeatureStatus = automationFeatureStatus,
+                                        loadingIndicator = loadingIndicator,
+                                        onCancel = onCancel,
+                                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                    )
+                                    ResultSuccessApps(
+                                        onRun = onRun,
+                                        windowSizeClass = windowSizeClass,
+                                    )
+                                }
+
+                                currentState is Initial -> {
+                                    Column(Modifier.padding(top = spacing.largeAdaptive)) {
+                                        MainInfo(
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                            onSetErrorMessageResId = setErrorMessageResId,
+                                            onUpdateInput = onUpdateInput,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        if (supportingReflowed) {
+                            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+                                ResultBottomBar(currentState, loadingIndicator)
+                            }
+                        }
                     }
                 }
             }
-
-            currentState is LocationRationaleShown -> {
-                {
-                    ConfirmationDialog(
-                        title = stringResource(currentState.permissionTitleResId),
-                        confirmText = stringResource(R.string.conversion_permission_common_grant),
-                        dismissText = stringResource(R.string.conversion_permission_common_deny),
-                        onConfirmation = { onGrant(false) },
-                        onDismissRequest = { onDeny(false) },
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag("geoShareLocationRationaleDialog"),
-                    ) {
-                        Text(
-                            AnnotatedString.fromHtml(currentState.action.permissionText()),
-                            style = TextStyle(lineBreak = LineBreak.Paragraph),
-                        )
-                    }
-                }
-            }
-
-            else -> null
         },
-        containerColor = when {
-            loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
-            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-            else -> MaterialTheme.colorScheme.surface
-        },
-        contentColor = when {
-            loadingIndicator is LoadingIndicator.Large -> Color.Unspecified
-            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-            else -> Color.Unspecified
-        },
-        expandedContainerColor = MaterialTheme.colorScheme.surface,
-        expandedContentColor = MaterialTheme.colorScheme.onSurface,
-        ratio = if (currentState is Initial) 0.6f else 0.5f,
-        windowSizeClass = windowSizeClass,
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .background(MaterialTheme.colorScheme.surface),
     )
 
     selectedPositionAndIndex?.let { (position, i) ->
@@ -614,17 +633,126 @@ private fun MainScreen(
                 position = position,
                 i = i,
                 onHide = {
-                    coroutineScope
-                        .launch { sheetState.hide() }
-                        .invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                setSelectedPositionAndIndex(null)
-                            }
+                    coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            setSelectedPositionAndIndex(null)
                         }
+                    }
                 },
                 onRun = onRun,
             )
         }
+    }
+
+    when {
+        loadingIndicator is LoadingIndicator.Large -> {}
+
+        currentState is RequestedUnshortenPermission -> {
+            PermissionDialog(
+                title = stringResource(currentState.permissionTitleResId),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
+                onConfirmation = onGrant,
+                onDismissRequest = onDeny,
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareUnshortenPermissionDialog"),
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            currentState.uri.toString().truncateMiddle(),
+                            appName,
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
+        }
+
+        currentState is RequestedParseHtmlPermission -> {
+            PermissionDialog(
+                title = stringResource(currentState.permissionTitleResId),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
+                onConfirmation = onGrant,
+                onDismissRequest = onDeny,
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareParseHtmlPermissionDialog"),
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            currentState.uri.toString().truncateMiddle(),
+                            appName,
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
+        }
+
+        currentState is LocationRationaleShown -> {
+            ConfirmationDialog(
+                title = stringResource(currentState.permissionTitleResId),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
+                onConfirmation = { onGrant(false) },
+                onDismissRequest = { onDeny(false) },
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareLocationRationaleDialog"),
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(currentState.action.permissionText()),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ResultBottomBar(
+    currentState: State,
+    loadingIndicator: LoadingIndicator?,
+) {
+    val clipboard = LocalClipboard.current
+
+    when {
+        loadingIndicator is LoadingIndicator.Large -> {}
+
+        currentState is ConversionState.HasError -> {
+            ResultSkipButton {
+                AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
+            }
+        }
+
+        currentState is ConversionState.HasResult -> {
+            ResultSkipButton {
+                AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ResultSkipButton(onClick: suspend () -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
+    val spacing = LocalSpacing.current
+
+    TextButton(
+        {
+            coroutineScope.launch {
+                onClick()
+            }
+        },
+        Modifier.padding(top = spacing.tinyAdaptive),
+    ) {
+        Text(stringResource(R.string.conversion_succeeded_skip))
     }
 }
 
