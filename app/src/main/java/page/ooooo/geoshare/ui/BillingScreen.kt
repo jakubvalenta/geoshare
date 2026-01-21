@@ -2,15 +2,19 @@ package page.ooooo.geoshare.ui
 
 import android.app.Activity
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -31,6 +35,15 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
+import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,7 +53,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -75,7 +92,6 @@ import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
-import page.ooooo.geoshare.ui.components.TwoPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
@@ -112,7 +128,7 @@ fun BillingScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun BillingScreen(
     billingAppNameResId: Int,
@@ -125,36 +141,116 @@ private fun BillingScreen(
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
-    TwoPaneScaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.nav_back_content_description)
-                )
+    val containerColor = MaterialTheme.colorScheme.surfaceContainer
+    val contentColor = MaterialTheme.colorScheme.onSurface
+
+    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo())
+    val customDirective = remember(defaultDirective) {
+        defaultDirective.copy(
+            maxVerticalPartitions = 2,
+            verticalPartitionSpacerSize = 0.dp,
+        )
+    }
+    val navigator = rememberSupportingPaneScaffoldNavigator(
+        scaffoldDirective = customDirective,
+    )
+    val supportingReflowed = remember(navigator.scaffoldState) {
+        navigator.scaffoldState.targetState.secondary is PaneAdaptedValue.Reflowed
+    }
+
+    SupportingPaneScaffold(
+        directive = customDirective,
+        scaffoldState = navigator.scaffoldState,
+        mainPane = {
+            AnimatedPane {
+                Card(
+                    shape = RectangleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                    ),
+                ) {
+                    TopAppBar(
+                        title = {},
+                        navigationIcon = {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                    contentDescription = stringResource(R.string.nav_back_content_description)
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    )
+                    Column(
+                        Modifier
+                            .fillMaxHeight()
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        BillingMainPane(
+                            billingAppNameResId,
+                            billingFeatures,
+                            billingMessage,
+                            billingStatus,
+                        )
+                    }
+                }
             }
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        firstPane = {
-            BillingFirstPane(billingAppNameResId, billingFeatures, billingMessage, billingStatus)
+        supportingPane = {
+            val (contentHeight, setContentHeight) = remember { mutableStateOf<Dp?>(null) }
+            val density = LocalDensity.current
+            val spacing = LocalSpacing.current
+            AnimatedPane(
+                Modifier
+                    .preferredWidth(400.dp)
+                    .run {
+                    if (contentHeight != null) {
+                        preferredHeight(contentHeight)
+                    } else {
+                        this
+                    }
+                },
+            ) {
+                Column(
+                    modifier = Modifier
+                        .run {
+                            if (!supportingReflowed) {
+                                padding(
+                                    start = spacing.windowPadding,
+                                    top = spacing.builtInTopBarHeight,
+                                    end = spacing.windowPadding
+                                )
+                            } else {
+                                this
+                            }
+                        }
+                        .onGloballyPositioned { coordinates ->
+                            with(density) {
+                                setContentHeight(coordinates.size.height.toDp())
+                            }
+                        },
+                ) {
+                    BillingSupportingPane(
+                        billingOffers,
+                        billingRefundableDuration,
+                        billingStatus,
+                        supportingReflowed,
+                        onLaunchBillingFlow,
+                        onManageBillingProduct,
+                    )
+                }
+            }
         },
-        actionsPane = {
-            BillingActionsPane(
-                billingOffers,
-                billingRefundableDuration,
-                billingStatus,
-                onLaunchBillingFlow,
-                onManageBillingProduct,
-            )
-        },
-        ratio = 0.6f,
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .background(containerColor),
     )
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun BillingFirstPane(
+private fun BillingMainPane(
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingMessage: Message?,
@@ -339,10 +435,11 @@ private fun BillingFirstPane(
 }
 
 @Composable
-private fun BillingActionsPane(
+private fun BillingSupportingPane(
     billingOffers: List<Offer>,
     billingRefundableDuration: Duration,
     billingStatus: BillingStatus,
+    reflowed: Boolean,
     onLaunchBillingFlow: (offerToken: String) -> Unit,
     onManageBillingProduct: (product: BillingProduct) -> Unit,
 ) {
@@ -360,6 +457,7 @@ private fun BillingActionsPane(
             ScaffoldAction(
                 text = stringResource(R.string.billing_purchase_button),
                 modifier = Modifier.testTag("geoShareBillingPurchaseButton"),
+                reflowed = reflowed,
                 onClick = {
                     selectedOffer?.let { selectedOffer ->
                         onLaunchBillingFlow(selectedOffer.token)

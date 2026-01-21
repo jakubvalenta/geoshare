@@ -17,6 +17,7 @@ data class Spacing(
     val largeAdaptive: Dp = large,
 
     val builtInTopBarPaddingEnd: Dp = 8.dp,
+    val builtInTopBarHeight: Dp = 64.dp,
     val windowPadding: Dp = 16.dp,
 )
 
