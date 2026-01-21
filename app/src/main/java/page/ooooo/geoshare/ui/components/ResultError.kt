@@ -12,6 +12,9 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -21,6 +24,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -29,11 +34,15 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun ResultError(
     @StringRes errorMessageResId: Int,
     inputUriString: String,
-    retryLoadingIndicatorVisible: Boolean,
+    initialRetryLoadingIndicatorVisible: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
+    val (retryLoadingIndicatorVisible, setRetryLoadingIndicatorVisible) = retain {
+        mutableStateOf(initialRetryLoadingIndicatorVisible)
+    }
 
     ResultCard(
         modifier = Modifier
@@ -46,7 +55,14 @@ fun ResultError(
                     icon = {
                         Icon(Icons.Default.Refresh, null)
                     },
-                    onClick = onRetry,
+                    onClick = {
+                        coroutineScope.launch {
+                            setRetryLoadingIndicatorVisible(true)
+                            delay(1000)
+                            setRetryLoadingIndicatorVisible(false)
+                            onRetry()
+                        }
+                    },
                 )
                 ResultCardChip(
                     { Text(stringResource(R.string.conversion_error_report)) },
@@ -111,7 +127,7 @@ private fun DefaultPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
-                retryLoadingIndicatorVisible = false,
+                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -130,7 +146,7 @@ private fun DarkPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
-                retryLoadingIndicatorVisible = false,
+                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -149,7 +165,7 @@ private fun CoordinatesPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
-                retryLoadingIndicatorVisible = false,
+                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -168,7 +184,7 @@ private fun DarkCoordinatesPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "41°24′12.2″N 2°10′26.5″E",
-                retryLoadingIndicatorVisible = false,
+                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -187,7 +203,7 @@ private fun EmptyPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
-                retryLoadingIndicatorVisible = false,
+                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -206,7 +222,7 @@ private fun DarkEmptyPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
-                retryLoadingIndicatorVisible = false,
+                initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -225,7 +241,7 @@ private fun LoadingIndicatorPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
-                retryLoadingIndicatorVisible = true,
+                initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )
@@ -244,7 +260,7 @@ private fun DarkLoadingIndicatorPreview() {
             ResultError(
                 R.string.conversion_failed_parse_url_error,
                 "",
-                retryLoadingIndicatorVisible = true,
+                initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},
                 onRetry = {},
             )

@@ -51,10 +51,10 @@ fun ResultSuccessApps(
     onQueryApps: (packageManager: PackageManager) -> List<AndroidTools.App> = { packageManager ->
         AndroidTools.queryApps(packageManager)
     },
-    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val context = LocalContext.current
     val spacing = LocalSpacing.current
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
         5
     } else {
@@ -77,6 +77,7 @@ fun ResultSuccessApps(
     Column(
         Modifier
             .fillMaxWidth()
+            .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.largeAdaptive),
         verticalArrangement = Arrangement.spacedBy(spacing.largeAdaptive),
     ) {

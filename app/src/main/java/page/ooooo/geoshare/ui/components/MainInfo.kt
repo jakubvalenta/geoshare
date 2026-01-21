@@ -31,36 +31,38 @@ fun MainInfo(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    TextButton(onNavigateToInputsScreen) {
-        Icon(
-            Icons.Outlined.Info,
-            null,
-            Modifier.padding(end = spacing.tiny),
-        )
-        Text(stringResource(R.string.inputs_title))
-    }
-    TextButton(onNavigateToIntroScreen) {
-        Icon(
-            painterResource(R.drawable.rocket_launch_24px),
-            null,
-            Modifier.padding(end = spacing.tiny),
-        )
-        Text(stringResource(R.string.main_navigate_to_intro))
-    }
-    TextButton({
-        allOutputs.genRandomUriString(
-            resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
-        )?.let { uriString ->
-            onUpdateInput(uriString)
+    Column(Modifier.padding(top = spacing.largeAdaptive)) {
+        TextButton(onNavigateToInputsScreen) {
+            Icon(
+                Icons.Outlined.Info,
+                null,
+                Modifier.padding(end = spacing.tiny),
+            )
+            Text(stringResource(R.string.inputs_title))
         }
-        onSetErrorMessageResId(null)
-    }) {
-        Icon(
-            painterResource(R.drawable.ifl_24px),
-            null,
-            Modifier.padding(end = spacing.tiny),
-        )
-        Text(stringResource(R.string.main_random))
+        TextButton(onNavigateToIntroScreen) {
+            Icon(
+                painterResource(R.drawable.rocket_launch_24px),
+                null,
+                Modifier.padding(end = spacing.tiny),
+            )
+            Text(stringResource(R.string.main_navigate_to_intro))
+        }
+        TextButton({
+            allOutputs.genRandomUriString(
+                resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
+            )?.let { uriString ->
+                onUpdateInput(uriString)
+                onSetErrorMessageResId(null)
+            }
+        }) {
+            Icon(
+                painterResource(R.drawable.ifl_24px),
+                null,
+                Modifier.padding(end = spacing.tiny),
+            )
+            Text(stringResource(R.string.main_random))
+        }
     }
 }
 
@@ -71,14 +73,12 @@ fun MainInfo(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            Column {
-                MainInfo(
-                    onNavigateToInputsScreen = {},
-                    onNavigateToIntroScreen = {},
-                    onSetErrorMessageResId = {},
-                    onUpdateInput = {},
-                )
-            }
+            MainInfo(
+                onNavigateToInputsScreen = {},
+                onNavigateToIntroScreen = {},
+                onSetErrorMessageResId = {},
+                onUpdateInput = {},
+            )
         }
     }
 }
@@ -88,14 +88,12 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            Column {
-                MainInfo(
-                    onNavigateToInputsScreen = {},
-                    onNavigateToIntroScreen = {},
-                    onSetErrorMessageResId = {},
-                    onUpdateInput = {},
-                )
-            }
+            MainInfo(
+                onNavigateToInputsScreen = {},
+                onNavigateToIntroScreen = {},
+                onSetErrorMessageResId = {},
+                onUpdateInput = {},
+            )
         }
     }
 }

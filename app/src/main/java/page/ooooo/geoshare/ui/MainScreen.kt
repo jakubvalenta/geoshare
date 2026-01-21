@@ -58,10 +58,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
@@ -74,13 +72,11 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
@@ -285,8 +281,7 @@ fun MainScreen(
 @OptIn(
     ExperimentalComposeUiApi::class,
     ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3ExpressiveApi::class,
-    ExperimentalMaterial3AdaptiveApi::class
+    ExperimentalMaterial3AdaptiveApi::class,
 )
 @Composable
 private fun MainScreen(
@@ -316,10 +311,8 @@ private fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
-    val (retryLoadingIndicatorVisible, setRetryLoadingIndicator) = retain { mutableStateOf(false) }
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
@@ -330,24 +323,24 @@ private fun MainScreen(
         else -> MaterialTheme.colorScheme.surface
     }
     val contentColor = when {
-        loadingIndicator is LoadingIndicator.Large -> Color.Unspecified
+        loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.onSurface
         currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
         currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-        else -> Color.Unspecified
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
     val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo())
     val customDirective = remember(defaultDirective) {
         defaultDirective.copy(
-            maxVerticalPartitions = 3,
-            verticalPartitionSpacerSize = 0.dp,
+            maxVerticalPartitions = 1,
+            horizontalPartitionSpacerSize = spacing.windowPadding,
         )
     }
     val navigator = rememberSupportingPaneScaffoldNavigator(
         scaffoldDirective = customDirective,
     )
-    val supportingReflowed = remember(navigator.scaffoldState) {
-        navigator.scaffoldState.targetState.secondary is PaneAdaptedValue.Reflowed
+    val wide = remember(navigator.scaffoldState) {
+        navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Expanded
     }
     val insetPadding = WindowInsets.safeDrawing.asPaddingValues()
 
@@ -356,35 +349,22 @@ private fun MainScreen(
     }
 
     // TODO ExtractSupportingPaneScaffold to fix insets on AboutScreen and BillingScreen
-    // TODO Fix loader headline color
-    // TODO Fix pane ratio
     SupportingPaneScaffold(
         directive = customDirective,
         scaffoldState = navigator.scaffoldState,
         mainPane = {
-            val density = LocalDensity.current
-            val (contentHeight, setContentHeight) = remember { mutableStateOf<Dp?>(null) }
-
-            AnimatedPane(
-                Modifier.run {
-                    if (contentHeight != null) {
-                        preferredHeight(contentHeight)
-                    } else {
-                        this
-                    }
-                },
-            ) {
-                val insetPadding = if (supportingReflowed) {
+            AnimatedPane {
+                val insetPadding = if (wide) {
                     PaddingValues(
                         start = insetPadding.calculateStartPadding(layoutDirection),
                         top = insetPadding.calculateTopPadding(),
-                        end = insetPadding.calculateEndPadding(layoutDirection),
+                        bottom = insetPadding.calculateBottomPadding(),
                     )
                 } else {
                     PaddingValues(
                         start = insetPadding.calculateStartPadding(layoutDirection),
                         top = insetPadding.calculateTopPadding(),
-                        bottom = insetPadding.calculateBottomPadding(),
+                        end = insetPadding.calculateEndPadding(layoutDirection),
                     )
                 }
                 Column(
@@ -392,11 +372,6 @@ private fun MainScreen(
                         .background(containerColor)
                         .padding(insetPadding)
                         .consumeWindowInsets(insetPadding)
-                        .onGloballyPositioned { coordinates ->
-                            with(density) {
-                                setContentHeight(coordinates.size.height.toDp())
-                            }
-                        },
                 ) {
                     TopAppBar(
                         title = {},
@@ -414,7 +389,7 @@ private fun MainScreen(
                             }
                         },
                         actions = {
-                            if (supportingReflowed) {
+                            if (!wide) {
                                 MainMenu(
                                     currentState = currentState,
                                     billingAppNameResId = billingAppNameResId,
@@ -431,106 +406,68 @@ private fun MainScreen(
                         },
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     )
-                    CompositionLocalProvider(LocalContentColor provides contentColor) {
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .verticalScroll(rememberScrollState()),
-                        ) {
-                            when {
-                                loadingIndicator is LoadingIndicator.Large -> {
-                                    Headline(stringResource(loadingIndicator.titleResId))
-                                    Column(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = spacing.smallAdaptive)
-                                            .padding(horizontal = spacing.windowPadding),
-                                    ) {
-                                        LoadingIndicator(
-                                            Modifier
-                                                .size(96.dp)
-                                                .align(Alignment.CenterHorizontally),
-                                            color = MaterialTheme.colorScheme.tertiary,
-                                        )
-                                        Button(
-                                            onCancel,
-                                            Modifier
-                                                .align(Alignment.CenterHorizontally)
-                                                .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
-                                            colors = ButtonDefaults.elevatedButtonColors(
-                                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                            ),
-                                        ) {
-                                            Text(stringResource(R.string.conversion_loading_indicator_cancel))
-                                        }
-                                        loadingIndicator.description()?.let { text ->
-                                            Text(
-                                                text,
-                                                Modifier.padding(bottom = spacing.mediumAdaptive),
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                            )
-                                        }
-                                    }
-                                }
-
-                                currentState is ConversionState.HasError -> {
-                                    Headline(stringResource(R.string.conversion_error_title))
-                                    ResultError(
-                                        currentState.errorMessageResId,
-                                        currentState.inputUriString,
-                                        retryLoadingIndicatorVisible,
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides contentColor) {
+                            MainMainPane(
+                                currentState = currentState,
+                                billingAppNameResId = billingAppNameResId,
+                                billingStatus = billingStatus,
+                                errorMessageResId = errorMessageResId,
+                                inputUriString = inputUriString,
+                                loadingIndicator = loadingIndicator,
+                                onCancel = onCancel,
+                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                onRun = onRun,
+                                onSelect = { position, i ->
+                                    onCancel()
+                                    setSelectedPositionAndIndex(position to i)
+                                },
+                                onSetErrorMessageResId = setErrorMessageResId,
+                                onStart = onStart,
+                                onUpdateInput = onUpdateInput,
+                            )
+                        }
+                        if (!wide) {
+                            Column(
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(top = spacing.largeAdaptive),
+                            ) {
+                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                                    MainSupportingPane(
+                                        automationFeatureStatus = automationFeatureStatus,
+                                        currentState = currentState,
+                                        loadingIndicator = loadingIndicator,
+                                        onCancel = onCancel,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onRetry = {
-                                            coroutineScope.launch {
-                                                // Show a loading indicator for a while to indicate that conversion is being retried.
-                                                setRetryLoadingIndicator(true)
-                                                delay(1000)
-                                                setRetryLoadingIndicator(false)
-                                                onUpdateInput(currentState.inputUriString)
-                                                onStart()
-                                            }
-                                        },
-                                    )
-                                }
-
-                                currentState is ConversionState.HasResult -> {
-                                    ResultSuccessCoordinates(
-                                        position = currentState.position,
+                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
                                         onRun = onRun,
-                                        onSelect = { position, i ->
-                                            onCancel()
-                                            setSelectedPositionAndIndex(position to i)
-                                        },
-                                    )
-                                }
-
-                                currentState is Initial -> {
-                                    MainForm(
-                                        inputUriString = inputUriString,
-                                        billingAppNameResId = billingAppNameResId,
-                                        billingStatus = billingStatus,
-                                        errorMessageResId = errorMessageResId,
                                         onSetErrorMessageResId = setErrorMessageResId,
-                                        onSubmit = onStart,
                                         onUpdateInput = onUpdateInput,
                                     )
                                 }
                             }
                         }
-                        if (!supportingReflowed) {
-                            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                                ResultBottomBar(currentState, loadingIndicator)
-                            }
-                        }
                     }
+                    MainBottomBar(
+                        currentState,
+                        loadingIndicator,
+                        containerColor = if (wide) Color.Transparent else MaterialTheme.colorScheme.surface,
+                        contentColor = if (wide) contentColor else MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             }
         },
         supportingPane = {
-            AnimatedPane(Modifier.preferredWidth(400.dp)) {
-                val insetPadding = if (supportingReflowed) {
+            AnimatedPane(Modifier.preferredWidth(500.dp)) {
+                val insetPadding = if (wide) {
                     PaddingValues(
                         start = insetPadding.calculateStartPadding(layoutDirection),
                         end = insetPadding.calculateEndPadding(layoutDirection),
@@ -548,7 +485,7 @@ private fun MainScreen(
                         .padding(insetPadding)
                         .consumeWindowInsets(insetPadding),
                 ) {
-                    if (!supportingReflowed) {
+                    if (wide) {
                         TopAppBar(
                             title = {},
                             actions = {
@@ -572,42 +509,20 @@ private fun MainScreen(
                         Column(
                             Modifier
                                 .weight(1f)
-                                .padding(horizontal = spacing.windowPadding)
                                 .verticalScroll(rememberScrollState()),
                         ) {
-                            when {
-                                loadingIndicator is LoadingIndicator.Large -> {}
-
-                                currentState is ConversionState.HasResult -> {
-                                    ResultSuccessMessage(
-                                        currentState = currentState,
-                                        automationFeatureStatus = automationFeatureStatus,
-                                        loadingIndicator = loadingIndicator,
-                                        onCancel = onCancel,
-                                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                    )
-                                    ResultSuccessApps(
-                                        onRun = onRun,
-                                        windowSizeClass = windowSizeClass,
-                                    )
-                                }
-
-                                currentState is Initial -> {
-                                    Column(Modifier.padding(top = spacing.largeAdaptive)) {
-                                        MainInfo(
-                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                            onSetErrorMessageResId = setErrorMessageResId,
-                                            onUpdateInput = onUpdateInput,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        if (supportingReflowed) {
-                            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                                ResultBottomBar(currentState, loadingIndicator)
-                            }
+                            MainSupportingPane(
+                                automationFeatureStatus = automationFeatureStatus,
+                                currentState = currentState,
+                                loadingIndicator = loadingIndicator,
+                                onCancel = onCancel,
+                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                onRun = onRun,
+                                onSetErrorMessageResId = setErrorMessageResId,
+                                onUpdateInput = onUpdateInput,
+                            )
                         }
                     }
                 }
@@ -715,44 +630,192 @@ private fun MainScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ResultBottomBar(
+private fun MainMainPane(
     currentState: State,
+    billingAppNameResId: Int,
+    billingStatus: BillingStatus,
+    errorMessageResId: Int?,
+    inputUriString: String,
     loadingIndicator: LoadingIndicator?,
+    onCancel: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
+    onRun: (action: Action, i: Int?) -> Unit,
+    onSelect: (position: Position, i: Int?) -> Unit,
+    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
+    onStart: () -> Unit,
+    onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
-    val clipboard = LocalClipboard.current
+    val spacing = LocalSpacing.current
 
     when {
-        loadingIndicator is LoadingIndicator.Large -> {}
-
-        currentState is ConversionState.HasError -> {
-            ResultSkipButton {
-                AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
+        loadingIndicator is LoadingIndicator.Large -> {
+            Headline(stringResource(loadingIndicator.titleResId))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = spacing.smallAdaptive)
+                    .padding(horizontal = spacing.windowPadding),
+            ) {
+                LoadingIndicator(
+                    Modifier
+                        .size(96.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+                Button(
+                    onCancel,
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = spacing.smallAdaptive, bottom = spacing.mediumAdaptive),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                ) {
+                    Text(stringResource(R.string.conversion_loading_indicator_cancel))
+                }
+                loadingIndicator.description()?.let { text ->
+                    Text(
+                        text,
+                        Modifier.padding(bottom = spacing.mediumAdaptive),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
         }
 
+        currentState is ConversionState.HasError -> {
+            Headline(stringResource(R.string.conversion_error_title))
+            ResultError(
+                currentState.errorMessageResId,
+                currentState.inputUriString,
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                onRetry = {
+                    onUpdateInput(currentState.inputUriString)
+                    onStart()
+                },
+            )
+        }
+
         currentState is ConversionState.HasResult -> {
-            ResultSkipButton {
-                AndroidTools.copyToClipboard(clipboard, currentState.inputUriString)
-            }
+            ResultSuccessCoordinates(
+                position = currentState.position,
+                onRun = onRun,
+                onSelect = onSelect,
+            )
+        }
+
+        currentState is Initial -> {
+            MainForm(
+                inputUriString = inputUriString,
+                billingAppNameResId = billingAppNameResId,
+                billingStatus = billingStatus,
+                errorMessageResId = errorMessageResId,
+                onSetErrorMessageResId = onSetErrorMessageResId,
+                onSubmit = onStart,
+                onUpdateInput = onUpdateInput,
+            )
         }
     }
 }
 
 @Composable
-private fun ResultSkipButton(onClick: suspend () -> Unit) {
+private fun MainSupportingPane(
+    automationFeatureStatus: FeatureStatus,
+    currentState: State,
+    loadingIndicator: LoadingIndicator?,
+    onCancel: () -> Unit,
+    onNavigateToInputsScreen: () -> Unit,
+    onNavigateToIntroScreen: () -> Unit,
+    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
+    onRun: (action: Action, i: Int?) -> Unit,
+    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
+    onUpdateInput: (newInputUriString: String) -> Unit,
+) {
+    when {
+        loadingIndicator is LoadingIndicator.Large -> {}
+
+        currentState is ConversionState.HasResult -> {
+            ResultSuccessMessage(
+                currentState = currentState,
+                automationFeatureStatus = automationFeatureStatus,
+                loadingIndicator = loadingIndicator,
+                onCancel = onCancel,
+                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+            )
+            ResultSuccessApps(
+                onRun = onRun,
+            )
+        }
+
+        currentState is Initial -> {
+            MainInfo(
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                onSetErrorMessageResId = onSetErrorMessageResId,
+                onUpdateInput = onUpdateInput,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MainBottomBar(
+    currentState: State,
+    loadingIndicator: LoadingIndicator?,
+    containerColor: Color,
+    contentColor: Color,
+) {
+    when {
+        loadingIndicator is LoadingIndicator.Large -> {}
+
+        currentState is ConversionState.HasError -> MainSkipButton(
+            currentState.inputUriString,
+            containerColor,
+            contentColor,
+        )
+
+        currentState is ConversionState.HasResult -> MainSkipButton(
+            currentState.inputUriString,
+            containerColor,
+            contentColor,
+        )
+    }
+}
+
+@Composable
+private fun MainSkipButton(
+    inputUriString: String,
+    containerColor: Color,
+    contentColor: Color,
+) {
+    val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    TextButton(
-        {
-            coroutineScope.launch {
-                onClick()
-            }
-        },
-        Modifier.padding(top = spacing.tinyAdaptive),
+    Column(
+        Modifier
+            .background(containerColor)
+            .fillMaxWidth(),
     ) {
-        Text(stringResource(R.string.conversion_succeeded_skip))
+        TextButton(
+            {
+                coroutineScope.launch {
+                    AndroidTools.copyToClipboard(clipboard, inputUriString)
+                }
+            },
+            Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.tinyAdaptive),
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = contentColor,
+            )
+        ) {
+            Text(stringResource(R.string.conversion_succeeded_skip))
+        }
     }
 }
 
