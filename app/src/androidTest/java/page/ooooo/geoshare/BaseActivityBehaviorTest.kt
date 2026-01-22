@@ -180,7 +180,8 @@ abstract class BaseActivityBehaviorTest {
         }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
             val expectedDescription = allOutputs.getDescription(expectedPosition)
-            val descriptionElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" }
+            val descriptionElement =
+                onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" }
             assertEquals(expectedDescription, descriptionElement.text)
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })

@@ -14,12 +14,6 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         launchApplication()
         closeIntro()
 
-        // Place
-        testUri(
-            Position(Srs.WGS84, 52.5068441, 13.42473175, name = "Berlin, Germany"),
-            "https://www.google.com/maps/place/Berlin,+Germany/", // FIXME
-        )
-
         // Search
         testUri(
             @Suppress("SpellCheckingInspection")
@@ -62,6 +56,13 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             ),
             @Suppress("SpellCheckingInspection")
             "https://www.google.com/maps/place/%C3%84nderungsschneiderei+Hadamar,+Schulstra%C3%9Fe+3,+65589+Hadamar/@50.4484901,8.0469828,3a,54.9y,5.97h,62.4t/data=!3m5!1e1!3m3!1szFIo-lmR3NWYzi_eWhPHFQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DzFIo-lmR3NWYzi_eWhPHFQ%26w%3D900%26h%3D600%26ll%3D0.0,0.0%26yaw%3D5.0%26pitch%3D28.0%26cb_client%3Dgmm.iv.android!4m2!3m1!1s0x47bc3266a8f3bb4b:0x96d1177f5ecfc466?utm_source=mstt_0&g_ep=CAESBzI1LjM3LjAYACCBgQEqogEsOTQyNjc3MjcsOTQyNzU0MDcsOTQyODQ0NzgsOTQyMjMyOTksOTQyMTY0MTMsOTQyODA1NzYsOTQyMTI0OTYsOTQyMDczOTQsOTQyMDc1MDYsOTQyMDg1MDYsOTQyMTc1MjMsOTQyMTg2NTMsOTQyMjk4MzksOTQyNzUxNjgsOTQyNjI3MzMsNDcwODQzOTMsOTQyMTMyMDAsOTQyNTgzMjVCAkRF&skid=368dc137-203a-4698-9ed3-b974e7bee770&g_st=aw",
+        )
+
+        // Place (succeeds or fails depending on IP address)
+        testUri(
+            Position(Srs.WGS84, 52.5068441, 13.42473175, name = "Berlin, Germany"),
+            "https://www.google.com/maps/place/Berlin,+Germany/",
+            Position(Srs.WGS84, q = "Berlin, Germany"),
         )
 
         // Map view
