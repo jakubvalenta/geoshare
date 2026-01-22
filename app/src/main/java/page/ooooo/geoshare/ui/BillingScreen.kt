@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -128,6 +129,7 @@ fun BillingScreen(
     )
 }
 
+// TODO Use BasicScaffold
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun BillingScreen(
@@ -459,7 +461,8 @@ private fun BillingSupportingPane(
             ScaffoldAction(
                 text = stringResource(R.string.billing_purchase_button),
                 modifier = Modifier.testTag("geoShareBillingPurchaseButton"),
-                reflowed = reflowed,
+                innerPadding = PaddingValues.Zero, // FIXME
+                bottomCorners = reflowed,
                 onClick = {
                     selectedOffer?.let { selectedOffer ->
                         onLaunchBillingFlow(selectedOffer.token)
@@ -554,6 +557,7 @@ private fun BillingSupportingPane(
                         onClick = {
                             onManageBillingProduct(billingStatus.product)
                         },
+                        innerPadding = PaddingValues.Zero, // FIXME
                         modifier = Modifier.testTag("geoShareBillingManageButtonOneTime"),
                     ) {
                         if (billingStatus.refundable) {
@@ -575,6 +579,7 @@ private fun BillingSupportingPane(
                         onClick = {
                             onManageBillingProduct(billingStatus.product)
                         },
+                        innerPadding = PaddingValues.Zero, // FIXME
                         modifier = Modifier.testTag("geoShareBillingManageButtonSubscription"),
                     ) {
                         Text(

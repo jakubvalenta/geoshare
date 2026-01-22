@@ -310,8 +310,34 @@ private fun MainScreen(
         onReset()
     }
 
-    // TODO Use BasicScaffold on AboutScreen and BillingScreen
     BasicScaffold(
+        navigationIcon = {
+            if (currentState !is Initial) {
+                IconButton(
+                    onReset,
+                    Modifier.testTag("geoShareMainBackButton"),
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Default.ArrowBack,
+                        stringResource(R.string.nav_back_content_description)
+                    )
+                }
+            }
+        },
+        actions = {
+            MainMenu(
+                currentState = currentState,
+                billingAppNameResId = billingAppNameResId,
+                billingStatus = billingStatus,
+                changelogShown = changelogShown,
+                onNavigateToAboutScreen = onNavigateToAboutScreen,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+            )
+        },
         mainPane = { innerPadding, wide ->
             Column(
                 Modifier
@@ -394,33 +420,6 @@ private fun MainScreen(
                     onUpdateInput = onUpdateInput,
                 )
             }
-        },
-        navigationIcon = {
-            if (currentState !is Initial) {
-                IconButton(
-                    onReset,
-                    Modifier.testTag("geoShareMainBackButton"),
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Default.ArrowBack,
-                        stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            }
-        },
-        actions = {
-            MainMenu(
-                currentState = currentState,
-                billingAppNameResId = billingAppNameResId,
-                billingStatus = billingStatus,
-                changelogShown = changelogShown,
-                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-            )
         },
         mainContainerColor = when {
             loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer

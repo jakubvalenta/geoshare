@@ -43,10 +43,11 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 )
 @Composable
 fun BasicScaffold(
-    mainPane: @Composable ColumnScope.(innerPadding: PaddingValues, wide: Boolean) -> Unit,
-    supportingPane: @Composable ColumnScope.() -> Unit,
+    title: @Composable () -> Unit = {},
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
+    mainPane: @Composable ColumnScope.(innerPadding: PaddingValues, wide: Boolean) -> Unit,
+    supportingPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     mainContainerColor: Color = Color.Transparent,
@@ -97,7 +98,7 @@ fun BasicScaffold(
                         .consumeWindowInsets(containerPadding)
                 ) {
                     TopAppBar(
-                        title = {},
+                        title = title,
                         navigationIcon = navigationIcon,
                         actions = {
                             if (!wide) {
@@ -148,7 +149,7 @@ fun BasicScaffold(
                         )
                     }
                     CompositionLocalProvider(LocalContentColor provides contentColor) {
-                        supportingPane()
+                        supportingPane(wide)
                     }
                 }
             }

@@ -2,8 +2,9 @@ package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -19,9 +20,10 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ScaffoldAction(
     text: String,
     onClick: () -> Unit,
+    innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    reflowed: Boolean = false,
+    bottomCorners: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     content: @Composable () -> Unit = {},
@@ -29,13 +31,15 @@ fun ScaffoldAction(
     val spacing = LocalSpacing.current
 
     ElevatedCard(
-        shape = if (reflowed) {
-            MaterialTheme.shapes.large.copy(
-                bottomStart = ZeroCornerSize,
-                bottomEnd = ZeroCornerSize,
-            )
-        }  else {
-            MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large.run {
+            if (bottomCorners) {
+                this
+            } else {
+                this.copy(
+                    bottomStart = ZeroCornerSize,
+                    bottomEnd = ZeroCornerSize,
+                )
+            }
         },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -45,7 +49,8 @@ fun ScaffoldAction(
     ) {
         Column(
             Modifier
-                .safeDrawingPadding()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
                 .padding(vertical = spacing.small),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spacing.small),
