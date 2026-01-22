@@ -13,10 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
@@ -26,13 +26,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
  * See https://developers.google.com/maps/documentation/urls/get-started
  */
 object GoogleMapsOutput : Output {
-
-    @Suppress("SpellCheckingInspection")
-    const val GMAPS_WV_PACKAGE_NAME = "us.spotco.maps"
-    val PACKAGE_NAMES = setOf(
-        GOOGLE_MAPS_PACKAGE_NAME,
-        GMAPS_WV_PACKAGE_NAME,
-    )
 
     open class CopyLinkAction : CopyAction() {
         override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
@@ -279,7 +272,7 @@ object GoogleMapsOutput : Output {
     )
 
     override fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = buildList {
-        apps.filter { it.packageName in PACKAGE_NAMES && it.packageName != GMAPS_WV_PACKAGE_NAME }
+        apps.filter { it.packageName in PackageNames.GOOGLE_MAPS_LIKE && it.packageName != PackageNames.GMAPS_WV }
             .forEach { app ->
                 add(app.packageName to ShareNavigateToWithAppAction(app.packageName))
                 add(app.packageName to ShareStreetViewWithAppAction(app.packageName))
@@ -294,7 +287,7 @@ object GoogleMapsOutput : Output {
         add(CopyLinkAutomation)
         add(CopyNavigateToAutomation)
         add(CopyStreetViewAutomation)
-        apps.filter { it.packageName in PACKAGE_NAMES && it.packageName != GMAPS_WV_PACKAGE_NAME }
+        apps.filter { it.packageName in PackageNames.GOOGLE_MAPS_LIKE && it.packageName != PackageNames.GMAPS_WV }
             .forEach { app ->
                 add(ShareNavigateToWithAppAutomation(app.packageName))
                 add(ShareStreetViewWithAppAutomation(app.packageName))

@@ -139,4 +139,9 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
     private fun goToBillingScreen() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
     }
+
+    private fun goToUserPreferencesDetailAutomationScreen() = uiAutomator {
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_AUTOMATION" }.click()
+    }
 }

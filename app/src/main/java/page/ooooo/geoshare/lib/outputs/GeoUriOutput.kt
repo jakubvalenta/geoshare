@@ -15,19 +15,17 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 object GeoUriOutput : Output {
-
-    private val GCJ_PACKAGE_NAMES = GoogleMapsOutput.PACKAGE_NAMES
-
     @Suppress("SpellCheckingInspection")
     private val NAME_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""de\.schildbach\.oeffi""")
     private val ZOOM_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""com\.garmin\..+""")
@@ -57,7 +55,7 @@ object GeoUriOutput : Output {
             formatUriString(
                 position,
                 i,
-                srs = if (packageName in GCJ_PACKAGE_NAMES) Srs.GCJ02 else Srs.WGS84,
+                srs = if (packageName in PackageNames.GCJ02) Srs.GCJ02 else Srs.WGS84,
                 nameDisabled = NAME_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
                 zoomDisabled = ZOOM_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
                 uriQuote = uriQuote,

@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.test.filters.AbstractFilter
 import androidx.test.filters.CustomFilter
 import org.junit.runner.Description
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 
 class NotXiaomiFilter : AbstractFilter() {
     override fun evaluateTest(description: Description?) = !AndroidTools.isMiuiDevice()

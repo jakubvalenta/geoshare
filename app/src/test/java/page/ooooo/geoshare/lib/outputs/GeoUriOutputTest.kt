@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.outputs
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.position.Position
@@ -134,6 +134,32 @@ class GeoUriOutputTest {
                     .firstOrNull { (_, action) -> action.isEnabled(position, null) }
                     ?.second
                     ?.getUriString(position, null, uriQuote)
+            }
+        )
+    }
+
+    @Test
+    fun appOutput_whenPositionIsInWGS84AndPackageNameRequiresGCJ02_returnsUriWithCoordinatesConvertedToGCJ02() {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            listOf(
+                "com.example.test" to "geo:31.2304417,121.4709921?q=31.2304417,121.4709921", // WGS 84
+                "com.google.android.apps.maps" to "geo:31.2285067,121.475524?q=31.2285067,121.475524", // GCJ-02
+                "us.spotco.maps" to "geo:31.2285067,121.475524?q=31.2285067,121.475524", // GCJ-02
+                "com.autonavi.minimap" to "geo:31.2285067,121.475524?q=31.2285067,121.475524", // GCJ-02
+            ),
+            Position(Srs.WGS84, 31.23044166868017, 121.47099209401793).let { position ->
+                output.getAppActions(
+                    @Suppress("SpellCheckingInspection")
+                    listOf(
+                        "com.example.test", // WGS 84
+                        "com.google.android.apps.maps", // GCJ-02
+                        "us.spotco.maps", // GCJ-02
+                        "com.autonavi.minimap", // GCJ-02
+                    ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
+                )
+                    .filter { (_, action) -> action.isEnabled(position, null) }
+                    .map { (packageName, action) -> packageName to action.getUriString(position, null, uriQuote) }
             }
         )
     }
