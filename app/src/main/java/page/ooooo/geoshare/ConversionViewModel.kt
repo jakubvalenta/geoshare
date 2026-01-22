@@ -105,10 +105,10 @@ class ConversionViewModel @Inject constructor(
     private var transitionJob: Job? = null
 
     val automationFeatureStatus: StateFlow<FeatureStatus> = billing.status.map {
-        if (it is BillingStatus.Purchased && billing.features.contains(AutomationFeature)) {
-            FeatureStatus.AVAILABLE
-        } else {
-            FeatureStatus.NOT_AVAILABLE
+        when (it) {
+            is BillingStatus.Loading -> FeatureStatus.LOADING
+            is BillingStatus.Purchased if billing.features.contains(AutomationFeature) -> FeatureStatus.AVAILABLE
+            else -> FeatureStatus.NOT_AVAILABLE
         }
     }.stateIn(
         viewModelScope,
