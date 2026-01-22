@@ -89,20 +89,34 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
         var redirectUriString: String? = null
+        var genericMetaTagFound = false
         val positionFromHtml = buildPosition(srs) {
             val pointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
-            val defaultPointPattern1 = Pattern.compile("""/@$LAT,$LON""")
-            val defaultPointPattern2 = Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
+            val defaultPointLinkPattern = Pattern.compile("""/@$LAT,$LON""")
+            val defaultPointAppInitStatePattern =
+                Pattern.compile("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
+            val genericMetaTagPattern = Pattern.compile(
+                @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
+            )
             val uriPattern = Pattern.compile("""data-url="(?P<url>[^"]+)"""")
+
             while (true) {
                 val line = channel.readUTF8Line() ?: break
+                if (!genericMetaTagFound && (genericMetaTagPattern find line) != null) {
+                    log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
+                    genericMetaTagFound = true
+                }
                 if (addPoints { (pointPattern findAllLatLonZ line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
                 }
-                if (setDefaultPointIfNull { (defaultPointPattern1 findLatLonZ line) }) {
+                if (setDefaultPointIfNull { (defaultPointLinkPattern findLatLonZ line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
                 }
-                if (setDefaultPointIfNull { (defaultPointPattern2 findLatLonZ line) }) {
+                if (!genericMetaTagFound && setDefaultPointIfNull { (defaultPointAppInitStatePattern findLatLonZ line) }) {
+                    // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
+                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE contains coordinates of the
+                    // IP address that the HTTP request came from, instead of correct coordinates. So let's ignore the
+                    // coordinates.
                     log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
                 }
                 if (redirectUriString == null) {

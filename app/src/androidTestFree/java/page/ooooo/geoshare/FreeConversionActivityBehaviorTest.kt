@@ -33,7 +33,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun automationOpensApp() = uiAutomator {
-        assertAppInstalled(PackageNames.GOOGLE_MAPS)
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Launch application and close intro
         launchApplication()
@@ -64,7 +64,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun automationOpensTomTom() = uiAutomator {
-        assertAppInstalled(PackageNames.TOMTOM)
+        assumeAppInstalled(PackageNames.TOMTOM)
 
         // Launch application and close intro
         launchApplication()

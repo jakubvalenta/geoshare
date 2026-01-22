@@ -24,17 +24,26 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    protected fun testUri(expectedPosition: Position, unsafeUriString: String) = uiAutomator {
-        // Go to main form
-        goToMainForm()
+    protected fun testUri(expectedPosition: Position, unsafeUriString: String, fallbackPosition: Position? = null) =
+        uiAutomator {
+            // Go to main form
+            goToMainForm()
 
-        // Share URI and confirm permission dialog
-        shareUri(unsafeUriString)
-        confirmDialogIfItIsVisible()
+            // Share URI and confirm permission dialog
+            shareUri(unsafeUriString)
+            confirmDialogIfItIsVisible()
 
-        // Shows position
-        waitAndAssertPositionIsVisible(expectedPosition)
-    }
+            // Shows position
+            try {
+                waitAndAssertPositionIsVisible(expectedPosition)
+            } catch (e: AssertionError) {
+                if (fallbackPosition != null) {
+                    waitAndAssertPositionIsVisible(fallbackPosition)
+                } else {
+                    throw e
+                }
+            }
+        }
 
     protected fun testTextUri(expectedPosition: Position, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

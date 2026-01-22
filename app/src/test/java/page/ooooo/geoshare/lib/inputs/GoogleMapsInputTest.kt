@@ -615,6 +615,17 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
+    fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNull() = runTest {
+        assertNull(
+            parseHtml(
+                @Suppress("SpellCheckingInspection")
+                """<head><meta content="Google Maps" itemprop="name">
+    <script>window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0, 0, 0],[1024, 768],13.1]"""
+            ),
+        )
+    }
+
+    @Test
     fun parseHtml_placeList() = runTest {
         assertEquals(
             ParseHtmlResult.Succeeded(
