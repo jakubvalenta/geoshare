@@ -135,4 +135,8 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
         // Shows automation success message
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessMessage" }
     }
+
+    private fun goToBillingScreen() {
+        goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
+    }
 }

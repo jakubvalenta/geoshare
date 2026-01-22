@@ -246,10 +246,6 @@ abstract class BaseActivityBehaviorTest {
         onElement(block = block).click()
     }
 
-    protected fun goToBillingScreen() = uiAutomator {
-        goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
-    }
-
     protected fun goToInputsScreen() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuInputs" }
     }
