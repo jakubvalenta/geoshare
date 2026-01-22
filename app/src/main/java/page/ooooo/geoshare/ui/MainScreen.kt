@@ -8,17 +8,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -37,15 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.layout.AnimatedPane
-import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
-import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
-import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
-import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -62,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -113,10 +99,11 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.ui.components.BasicScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
-import page.ooooo.geoshare.ui.components.MainInfo
+import page.ooooo.geoshare.ui.components.MainFormLinks
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultError
@@ -310,213 +297,52 @@ private fun MainScreen(
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
     val appName = stringResource(R.string.app_name)
+    val containerColor = MaterialTheme.colorScheme.surface
+    val contentColor = MaterialTheme.colorScheme.onSurface
     val coroutineScope = rememberCoroutineScope()
-    val layoutDirection = LocalLayoutDirection.current
     val spacing = LocalSpacing.current
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain { mutableStateOf<Pair<Position, Int?>?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
-    val containerColor = when {
-        loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
-        currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-        currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-        else -> MaterialTheme.colorScheme.surface
-    }
-    val contentColor = when {
-        loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.onSurface
-        currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-        currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-        else -> MaterialTheme.colorScheme.onSurface
-    }
-
-    val defaultDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo())
-    val customDirective = remember(defaultDirective) {
-        defaultDirective.copy(
-            maxVerticalPartitions = 1,
-            horizontalPartitionSpacerSize = spacing.windowPadding,
-        )
-    }
-    val navigator = rememberSupportingPaneScaffoldNavigator(
-        scaffoldDirective = customDirective,
-    )
-    val wide = remember(navigator.scaffoldState) {
-        navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Expanded
-    }
-    val insetPadding = WindowInsets.safeDrawing.asPaddingValues()
-
     BackHandler(currentState !is Initial) {
         onReset()
     }
 
-    // TODO ExtractSupportingPaneScaffold to fix insets on AboutScreen and BillingScreen
-    SupportingPaneScaffold(
-        directive = customDirective,
-        scaffoldState = navigator.scaffoldState,
-        mainPane = {
-            AnimatedPane {
-                val insetPadding = if (wide) {
-                    PaddingValues(
-                        start = insetPadding.calculateStartPadding(layoutDirection),
-                        top = insetPadding.calculateTopPadding(),
-                        bottom = insetPadding.calculateBottomPadding(),
-                    )
-                } else {
-                    PaddingValues(
-                        start = insetPadding.calculateStartPadding(layoutDirection),
-                        top = insetPadding.calculateTopPadding(),
-                        end = insetPadding.calculateEndPadding(layoutDirection),
-                    )
-                }
-                Column(
-                    Modifier
-                        .background(containerColor)
-                        .padding(insetPadding)
-                        .consumeWindowInsets(insetPadding)
-                ) {
-                    TopAppBar(
-                        title = {},
-                        navigationIcon = {
-                            if (currentState !is Initial) {
-                                IconButton(
-                                    onReset,
-                                    Modifier.testTag("geoShareMainBackButton"),
-                                ) {
-                                    Icon(
-                                        Icons.AutoMirrored.Default.ArrowBack,
-                                        stringResource(R.string.nav_back_content_description)
-                                    )
-                                }
-                            }
-                        },
-                        actions = {
-                            if (!wide) {
-                                MainMenu(
-                                    currentState = currentState,
-                                    billingAppNameResId = billingAppNameResId,
-                                    billingStatus = billingStatus,
-                                    changelogShown = changelogShown,
-                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                    )
+    // TODO Use BasicScaffold on AboutScreen and BillingScreen
+    BasicScaffold(
+        mainPane = { innerPadding, wide ->
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                MainMainPane(
+                    currentState = currentState,
+                    billingAppNameResId = billingAppNameResId,
+                    billingStatus = billingStatus,
+                    errorMessageResId = errorMessageResId,
+                    inputUriString = inputUriString,
+                    loadingIndicator = loadingIndicator,
+                    onCancel = onCancel,
+                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                    onRun = onRun,
+                    onSelect = { position, i ->
+                        onCancel()
+                        setSelectedPositionAndIndex(position to i)
+                    },
+                    onSetErrorMessageResId = setErrorMessageResId,
+                    onStart = onStart,
+                    onUpdateInput = onUpdateInput,
+                )
+                if (!wide) {
                     Column(
                         Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState()),
+                            .background(containerColor)
+                            .padding(top = spacing.largeAdaptive)
                     ) {
                         CompositionLocalProvider(LocalContentColor provides contentColor) {
-                            MainMainPane(
-                                currentState = currentState,
-                                billingAppNameResId = billingAppNameResId,
-                                billingStatus = billingStatus,
-                                errorMessageResId = errorMessageResId,
-                                inputUriString = inputUriString,
-                                loadingIndicator = loadingIndicator,
-                                onCancel = onCancel,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onRun = onRun,
-                                onSelect = { position, i ->
-                                    onCancel()
-                                    setSelectedPositionAndIndex(position to i)
-                                },
-                                onSetErrorMessageResId = setErrorMessageResId,
-                                onStart = onStart,
-                                onUpdateInput = onUpdateInput,
-                            )
-                        }
-                        if (!wide) {
-                            Column(
-                                Modifier
-                                    .background(MaterialTheme.colorScheme.surface),
-                            ) {
-                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                                    MainSupportingPane(
-                                        automationFeatureStatus = automationFeatureStatus,
-                                        currentState = currentState,
-                                        loadingIndicator = loadingIndicator,
-                                        onCancel = onCancel,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                        onRun = onRun,
-                                        onSetErrorMessageResId = setErrorMessageResId,
-                                        onUpdateInput = onUpdateInput,
-                                    )
-                                }
-                            }
-                            Spacer(
-                                Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
-                            )
-                        }
-                    }
-                    MainBottomBar(
-                        currentState,
-                        loadingIndicator,
-                        modifier = Modifier.safeDrawingPadding(),
-                        containerColor = if (wide) Color.Transparent else MaterialTheme.colorScheme.surface,
-                        contentColor = if (wide) contentColor else MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
-        },
-        supportingPane = {
-            AnimatedPane(Modifier.preferredWidth(400.dp)) {
-                val insetPadding = if (wide) {
-                    PaddingValues(
-                        top = insetPadding.calculateTopPadding(),
-                        end = insetPadding.calculateEndPadding(layoutDirection),
-                        bottom = insetPadding.calculateBottomPadding(),
-                    )
-                } else {
-                    PaddingValues(
-                        start = insetPadding.calculateStartPadding(layoutDirection),
-                        end = insetPadding.calculateEndPadding(layoutDirection),
-                        bottom = insetPadding.calculateBottomPadding(),
-                    )
-                }
-                Column(
-                    Modifier
-                        .padding(insetPadding)
-                        .consumeWindowInsets(insetPadding),
-                ) {
-                    if (wide) {
-                        TopAppBar(
-                            title = {},
-                            actions = {
-                                MainMenu(
-                                    currentState = currentState,
-                                    billingAppNameResId = billingAppNameResId,
-                                    billingStatus = billingStatus,
-                                    changelogShown = changelogShown,
-                                    onNavigateToAboutScreen = onNavigateToAboutScreen,
-                                    onNavigateToBillingScreen = onNavigateToBillingScreen,
-                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-                                )
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                        )
-                    }
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .verticalScroll(rememberScrollState()),
-                        ) {
                             MainSupportingPane(
                                 automationFeatureStatus = automationFeatureStatus,
                                 currentState = currentState,
@@ -531,12 +357,83 @@ private fun MainScreen(
                             )
                         }
                     }
+                    Spacer(
+                        Modifier
+                            .background(containerColor)
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
+            }
+            MainBottomBar(
+                currentState,
+                loadingIndicator,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+                containerColor = if (wide) Color.Transparent else containerColor,
+                contentColor = if (wide) LocalContentColor.current else contentColor,
+            )
+        },
+        supportingPane = {
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                MainSupportingPane(
+                    automationFeatureStatus = automationFeatureStatus,
+                    currentState = currentState,
+                    loadingIndicator = loadingIndicator,
+                    onCancel = onCancel,
+                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                    onRun = onRun,
+                    onSetErrorMessageResId = setErrorMessageResId,
+                    onUpdateInput = onUpdateInput,
+                )
+            }
+        },
+        navigationIcon = {
+            if (currentState !is Initial) {
+                IconButton(
+                    onReset,
+                    Modifier.testTag("geoShareMainBackButton"),
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Default.ArrowBack,
+                        stringResource(R.string.nav_back_content_description)
+                    )
                 }
             }
         },
-        modifier = Modifier
-            .semantics { testTagsAsResourceId = true }
-            .background(MaterialTheme.colorScheme.surface),
+        actions = {
+            MainMenu(
+                currentState = currentState,
+                billingAppNameResId = billingAppNameResId,
+                billingStatus = billingStatus,
+                changelogShown = changelogShown,
+                onNavigateToAboutScreen = onNavigateToAboutScreen,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+            )
+        },
+        mainContainerColor = when {
+            loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
+            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+            else -> containerColor
+        },
+        mainContentColor = when {
+            loadingIndicator is LoadingIndicator.Large -> contentColor
+            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+            else -> contentColor
+        },
     )
 
     selectedPositionAndIndex?.let { (position, i) ->
@@ -727,7 +624,7 @@ private fun MainSupportingPane(
         }
 
         currentState is Initial -> {
-            MainInfo(
+            MainFormLinks(
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
                 onSetErrorMessageResId = onSetErrorMessageResId,

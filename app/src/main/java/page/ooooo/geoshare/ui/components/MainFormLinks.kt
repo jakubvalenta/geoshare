@@ -22,7 +22,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun MainInfo(
+fun MainFormLinks(
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
@@ -77,7 +77,7 @@ fun MainInfo(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            MainInfo(
+            MainFormLinks(
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
@@ -92,7 +92,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            MainInfo(
+            MainFormLinks(
                 onNavigateToInputsScreen = {},
                 onNavigateToIntroScreen = {},
                 onSetErrorMessageResId = {},
