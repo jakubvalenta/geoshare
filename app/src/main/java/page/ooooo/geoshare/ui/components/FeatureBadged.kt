@@ -3,6 +3,8 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -30,7 +32,7 @@ fun FeatureBadged(
     if (enabled) {
         Box(contentAlignment = Alignment.CenterEnd) {
             content(Modifier.padding(end = 17.dp))
-            badge(Modifier.offset(y = (-13).dp))
+            badge(Modifier.offset(y = 15.dp))
         }
     } else {
         content(Modifier)
@@ -44,7 +46,7 @@ fun FeatureBadged(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            Column(Modifier.padding(top = 10.dp)) {
+            Column {
                 FeatureBadged(
                     enabled = true,
                     badge = { modifier ->
@@ -62,6 +64,7 @@ private fun DefaultPreview() {
                         Text(stringResource(R.string.user_preferences_automation_title))
                     }
                 }
+                Spacer(Modifier.height(10.dp))
             }
         }
     }
@@ -72,7 +75,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            Column(Modifier.padding(top = 10.dp)) {
+            Column {
                 FeatureBadged(
                     enabled = true,
                     badge = { modifier ->
@@ -90,6 +93,7 @@ private fun DarkPreview() {
                         Text(stringResource(R.string.user_preferences_automation_title))
                     }
                 }
+                Spacer(Modifier.height(10.dp))
             }
         }
     }

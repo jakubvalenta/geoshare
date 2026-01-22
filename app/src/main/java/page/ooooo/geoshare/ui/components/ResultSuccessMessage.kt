@@ -10,8 +10,10 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -206,7 +208,6 @@ fun ResultSuccessMessage(
                         stringResource(R.string.conversion_succeeded_apps_headline),
                         style = MaterialTheme.typography.headlineSmall,
                     )
-                    // TODO Fix badge cropped on tablet
                     FeatureBadged(
                         enabled = automationFeatureStatus == FeatureStatus.NOT_AVAILABLE,
                         badge = { modifier ->
@@ -317,18 +318,21 @@ private fun DarkActionFinishedPreview() {
 private fun ActionFinishedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
-            ResultSuccessMessage(
-                currentState = ActionFinished(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                ),
-                automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
-                loadingIndicator = null,
-                animationsEnabled = false,
-                onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
-            )
+            Column {
+                ResultSuccessMessage(
+                    currentState = ActionFinished(
+                        inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        position = Position.example,
+                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
+                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
+                    loadingIndicator = null,
+                    animationsEnabled = false,
+                    onCancel = {},
+                    onNavigateToUserPreferencesAutomationScreen = {},
+                )
+                Spacer(Modifier.height(15.dp))
+            }
         }
     }
 }
@@ -338,18 +342,21 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
 private fun DarkActionFinishedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
-            ResultSuccessMessage(
-                currentState = ActionFinished(
-                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
-                ),
-                automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
-                loadingIndicator = null,
-                animationsEnabled = false,
-                onCancel = {},
-                onNavigateToUserPreferencesAutomationScreen = {},
-            )
+            Column {
+                ResultSuccessMessage(
+                    currentState = ActionFinished(
+                        inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                        position = Position.example,
+                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    ),
+                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
+                    loadingIndicator = null,
+                    animationsEnabled = false,
+                    onCancel = {},
+                    onNavigateToUserPreferencesAutomationScreen = {},
+                )
+                Spacer(Modifier.height(15.dp))
+            }
         }
     }
 }
