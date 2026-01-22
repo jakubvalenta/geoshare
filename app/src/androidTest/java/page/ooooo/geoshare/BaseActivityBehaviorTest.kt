@@ -10,6 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
@@ -152,8 +153,8 @@ abstract class BaseActivityBehaviorTest {
         }.click()
     }
 
-    protected fun assertAppInstalled(packageName: String) = uiAutomator {
-        assertTrue(
+    protected fun assumeAppInstalled(packageName: String) = uiAutomator {
+        assumeTrue(
             "This test only works when $packageName is installed on the device",
             device.executeShellCommand("pm path $packageName").isNotEmpty(),
         )

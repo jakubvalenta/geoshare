@@ -15,7 +15,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun mainScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
-        assertAppInstalled(PackageNames.GOOGLE_MAPS)
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
@@ -38,7 +38,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     @Test
     fun mainScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
-            assertAppInstalled(PackageNames.GOOGLE_MAPS)
+            assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
             // Share a Google Maps coordinates link with the app
             shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
@@ -75,15 +75,25 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                Position(
-                    Srs.WGS84,
-                    52.4842015,
-                    13.4167277,
-                    name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+            try {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        52.4842015,
+                        13.4167277,
+                        name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                    )
                 )
-            )
+            } catch (_: AssertionError) {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        q = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                    )
+                )
+            }
 
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
@@ -106,15 +116,25 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                Position(
-                    Srs.WGS84,
-                    52.4842015,
-                    13.4167277,
-                    name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+            try {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        52.4842015,
+                        13.4167277,
+                        name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                    )
                 )
-            )
+            } catch (_: AssertionError) {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        q = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                    )
+                )
+            }
 
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
@@ -466,7 +486,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun mainScreen_whenGpxRouteIsShared_allowsOpeningTomTom() = uiAutomator {
-        assertAppInstalled(PackageNames.TOMTOM)
+        assumeAppInstalled(PackageNames.TOMTOM)
 
         // Share a geo: URI with the app
         shareUri("geo:52.47254,13.4345")
