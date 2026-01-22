@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 

@@ -40,7 +40,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the texts, so we put the text in the main screen of the app instead.
         // device.executeShellCommand(
-        //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n $PACKAGE_NAME/page.ooooo.geoshare.ConversionActivity $PACKAGE_NAME"
+        //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n ${PackageNames.GEO_SHARE_DEBUG}/page.ooooo.geoshare.ConversionActivity ${PackageNames.GEO_SHARE_DEBUG}"
         // )
 
         // Go to main form

@@ -22,7 +22,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.NoopAutomation

@@ -1,7 +1,11 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.android
 
 import android.Manifest
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.location.Location
@@ -21,7 +25,13 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.core.content.FileProvider
 import androidx.core.location.LocationListenerCompat
 import androidx.core.net.toUri
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.position.Point
@@ -30,7 +40,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
-import java.util.*
+import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration
@@ -40,8 +50,6 @@ import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
 object AndroidTools {
-
-    const val GOOGLE_MAPS_PACKAGE_NAME = "com.google.android.apps.maps"
 
     enum class AppType { GEO_URI, GPX, MAGIC_EARTH }
 
@@ -163,9 +171,9 @@ object AndroidTools {
             putExtra(
                 Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
                     @Suppress("SpellCheckingInspection")
-                    (ComponentName("page.ooooo.geoshare", "page.ooooo.geoshare.ConversionActivity")),
+                    (ComponentName(PackageNames.GEO_SHARE, "page.ooooo.geoshare.ConversionActivity")),
                     @Suppress("SpellCheckingInspection")
-                    (ComponentName("page.ooooo.geoshare.debug", "page.ooooo.geoshare.ConversionActivity")),
+                    (ComponentName(PackageNames.GEO_SHARE_DEBUG, "page.ooooo.geoshare.ConversionActivity")),
                 )
             )
         }
@@ -268,7 +276,13 @@ object AndroidTools {
                             // Use LocationListenerCompat instead of LocationListener or lambda, so that we don't have
                             // to override onStatusChanged on Android Q and older.
                             override fun onLocationChanged(location: Location) {
-                                cont.resume(location.let { Point(Srs.WGS84, it.latitude, it.longitude) })
+                                cont.resume(location.let {
+                                    Point(
+                                        Srs.WGS84,
+                                        it.latitude,
+                                        it.longitude
+                                    )
+                                })
                             }
                         },
                         Looper.getMainLooper(),

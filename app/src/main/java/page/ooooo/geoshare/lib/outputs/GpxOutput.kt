@@ -21,8 +21,8 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.AndroidTools.queryAppDetails
+import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools.queryAppDetails
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
@@ -33,9 +33,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 object GpxOutput : Output {
-
-    @Suppress("SpellCheckingInspection")
-    const val TOMTOM_PACKAGE_NAME = "com.tomtom.speedcams.android.map"
 
     open class ShareGpxRouteWithAppAction(override val packageName: String) :
         LocationAction,

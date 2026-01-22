@@ -6,8 +6,7 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
-import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.outputs.GpxOutput
+import page.ooooo.geoshare.lib.android.PackageNames
 
 @RunWith(AndroidJUnit4::class)
 class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -34,7 +33,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun automationOpensApp() = uiAutomator {
-        assertAppInstalled(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME)
+        assertAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Launch application and close intro
         launchApplication()
@@ -42,7 +41,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Configure automation
         goToUserPreferencesDetailAutomationScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${AndroidTools.GOOGLE_MAPS_PACKAGE_NAME}" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
@@ -51,10 +50,10 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
 
         // Google Maps doesn't open while the counter is running
-        assertNull(onElementOrNull(3_000L) { packageName == AndroidTools.GOOGLE_MAPS_PACKAGE_NAME })
+        assertNull(onElementOrNull(3_000L) { packageName == PackageNames.GOOGLE_MAPS })
 
         // Google Maps opens
-        onElement { packageName == AndroidTools.GOOGLE_MAPS_PACKAGE_NAME }
+        onElement { packageName == PackageNames.GOOGLE_MAPS }
 
         // Go back to Geo Share
         launchApplication()
@@ -65,7 +64,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun automationOpensTomTom() = uiAutomator {
-        assertAppInstalled(GpxOutput.TOMTOM_PACKAGE_NAME)
+        assertAppInstalled(PackageNames.TOMTOM)
 
         // Launch application and close intro
         launchApplication()
@@ -98,5 +97,10 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 else -> false
             }
         }
+    }
+
+    private fun goToUserPreferencesDetailAutomationScreen() = uiAutomator {
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_AUTOMATION" }.click()
     }
 }

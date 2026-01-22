@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.ui.components.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -139,7 +139,7 @@ private fun IntroScreen(
                             ScreenshotOpenByDefaultMapApp()
                             Button(
                                 {
-                                    onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
+                                    onShowOpenByDefaultSettingsForPackage(PackageNames.GOOGLE_MAPS)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,

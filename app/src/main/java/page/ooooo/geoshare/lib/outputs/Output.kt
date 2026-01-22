@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.position.Position
 

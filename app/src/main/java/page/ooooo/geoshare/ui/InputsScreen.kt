@@ -47,7 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem

@@ -24,9 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.AndroidTools
-import page.ooooo.geoshare.lib.AndroidTools.AppType
-import page.ooooo.geoshare.lib.AndroidTools.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.AndroidTools.AppType
 import page.ooooo.geoshare.lib.extensions.group
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -216,7 +215,7 @@ private fun DefaultPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            GOOGLE_MAPS_PACKAGE_NAME,
+                            "com.google.android.apps.maps",
                             "app.comaps.fdroid",
                             "app.organicmaps",
                             "com.generalmagic.magicearth",
@@ -252,7 +251,7 @@ private fun DarkPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            GOOGLE_MAPS_PACKAGE_NAME,
+                            "com.google.android.apps.maps",
                             "app.comaps.fdroid",
                             "app.organicmaps",
                             "com.generalmagic.magicearth",
@@ -288,7 +287,7 @@ private fun OneAppPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            GOOGLE_MAPS_PACKAGE_NAME,
+                            "com.google.android.apps.maps",
                             "app.comaps.fdroid",
                             "app.organicmaps",
                             "com.generalmagic.magicearth",
@@ -324,7 +323,7 @@ private fun DarkOneAppPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            GOOGLE_MAPS_PACKAGE_NAME,
+                            "com.google.android.apps.maps",
                             "app.comaps.fdroid",
                             "app.organicmaps",
                             "com.generalmagic.magicearth",

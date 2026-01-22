@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.AndroidTools
+import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.conversion.ActionFailed
@@ -280,7 +280,7 @@ private fun ActionFinishedPreview() {
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = null,
@@ -301,7 +301,7 @@ private fun DarkActionFinishedPreview() {
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = null,
@@ -323,7 +323,7 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         position = Position.example,
-                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     ),
                     automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
                     loadingIndicator = null,
@@ -347,7 +347,7 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         position = Position.example,
-                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     ),
                     automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
                     loadingIndicator = null,
@@ -376,7 +376,7 @@ private fun ActionWaitingPreview() {
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     i = null,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     delay = 3.seconds,
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -404,7 +404,7 @@ private fun DarkActionWaitingPreview() {
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     i = null,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     delay = 3.seconds,
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -427,7 +427,7 @@ private fun LocationPermissionReceivedPreview() {
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     i = null,
-                    action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GpxOutput.ShareGpxRouteWithAppAction(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = LoadingIndicator.Small(
@@ -451,7 +451,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
                     i = null,
-                    action = GpxOutput.ShareGpxRouteWithAppAction(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GpxOutput.ShareGpxRouteWithAppAction(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = LoadingIndicator.Small(
@@ -474,7 +474,7 @@ private fun SucceededPreview() {
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = null,
@@ -495,7 +495,7 @@ private fun DarSucceededPreview() {
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = null,
@@ -516,7 +516,7 @@ private fun FailedPreview() {
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = null,
@@ -537,7 +537,7 @@ private fun DarkFailedPreview() {
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     position = Position.example,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(AndroidTools.GOOGLE_MAPS_PACKAGE_NAME),
+                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
                 loadingIndicator = null,
