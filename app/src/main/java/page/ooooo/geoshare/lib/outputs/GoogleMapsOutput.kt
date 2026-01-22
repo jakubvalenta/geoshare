@@ -281,7 +281,7 @@ object GoogleMapsOutput : Output {
 
     override fun getChipActions() = listOf(CopyLinkChipAction)
 
-    override fun getRandomAction(): CopyAction = CopyLinkAction()
+    override fun getRandomAction() = listOf(CopyLinkAction(), CopyNavigateToAction()).randomOrNull()
 
     override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
         add(CopyLinkAutomation)

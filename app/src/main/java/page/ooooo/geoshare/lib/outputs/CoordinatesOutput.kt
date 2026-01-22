@@ -100,7 +100,7 @@ object CoordinatesOutput : Output {
         CopyDecCoordsAction(),
     )
 
-    override fun getRandomAction(): CopyAction = CopyDecCoordsAction()
+    override fun getRandomAction() = listOf(CopyDecCoordsAction(), CopyDegMinSecCoordsAction()).randomOrNull()
 
     override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = listOf(
         CopyDecCoordsAutomation,

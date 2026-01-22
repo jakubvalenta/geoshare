@@ -309,14 +309,15 @@ object AutomationPreference : OptionsPreference<Automation>() {
                 Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO -> 7
                 Automation.Type.OPEN_APP_GPX_ROUTE -> 8
                 Automation.Type.COPY_APPLE_MAPS_URI -> 9
-                Automation.Type.COPY_GOOGLE_MAPS_URI -> 10
-                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 11
-                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 12
-                Automation.Type.COPY_MAGIC_EARTH_URI -> 13
-                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 14
-                Automation.Type.SAVE_GPX -> 15
-                Automation.Type.SHARE -> 16
-                Automation.Type.SHARE_GPX_ROUTE -> 17
+                Automation.Type.COPY_APPLE_MAPS_NAVIGATE_TO_URI -> 10
+                Automation.Type.COPY_GOOGLE_MAPS_URI -> 11
+                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 12
+                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 13
+                Automation.Type.COPY_MAGIC_EARTH_URI -> 14
+                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 15
+                Automation.Type.SAVE_GPX -> 16
+                Automation.Type.SHARE -> 17
+                Automation.Type.SHARE_GPX_ROUTE -> 18
             }
         }.map { automation ->
             PreferenceOption(
