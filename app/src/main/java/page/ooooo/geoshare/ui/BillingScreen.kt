@@ -72,7 +72,7 @@ import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.components.AppHeadline
-import page.ooooo.geoshare.ui.components.BasicScaffold
+import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
@@ -127,7 +127,7 @@ private fun BillingScreen(
 ) {
     val spacing = LocalSpacing.current
 
-    BasicScaffold(
+    BasicSupportingPaneScaffold(
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(

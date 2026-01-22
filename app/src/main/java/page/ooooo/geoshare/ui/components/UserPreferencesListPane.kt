@@ -54,7 +54,6 @@ fun UserPreferencesListPane(
 
     ScrollablePane(
         titleResId = R.string.user_preferences_title,
-        containerColor = containerColor,
         onBack = onBack,
     ) {
         groups.filter { it.visible }.forEach { group ->

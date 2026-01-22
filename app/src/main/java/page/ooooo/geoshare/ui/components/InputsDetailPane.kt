@@ -60,7 +60,7 @@ private fun getDocumentationInputDetails(
 @Composable
 fun InputsDetailPane(
     currentDocumentation: InputDocumentation,
-    expanded: Boolean,
+    wide: Boolean,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -74,7 +74,7 @@ fun InputsDetailPane(
     InputsDetailPane(
         nameResId = currentDocumentation.nameResId,
         documentationInputDetails = documentationInputInfos,
-        expanded = expanded,
+        wide = wide,
         onBack = onBack,
         onShowOpenByDefaultSettings = { AndroidTools.showOpenByDefaultSettings(context, settingsLauncher) },
     )
@@ -84,7 +84,7 @@ fun InputsDetailPane(
 private fun InputsDetailPane(
     @StringRes nameResId: Int,
     documentationInputDetails: List<DocumentationInputDetails>,
-    expanded: Boolean,
+    wide: Boolean,
     onBack: () -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
 ) {
@@ -93,7 +93,7 @@ private fun InputsDetailPane(
 
     ScrollablePane(
         titleResId = nameResId,
-        onBack = onBack.takeIf { expanded },
+        onBack = onBack.takeUnless { wide },
     ) {
         Column(
             Modifier
@@ -178,7 +178,7 @@ private fun DefaultPreview() {
                             i and 1 == 0,
                         )
                     },
-                    expanded = true,
+                    wide = false,
                     onBack = {},
                     onShowOpenByDefaultSettings = {},
                 )
@@ -201,7 +201,7 @@ private fun DarkPreview() {
                             i and 1 == 0,
                         )
                     },
-                    expanded = true,
+                    wide = false,
                     onBack = {},
                     onShowOpenByDefaultSettings = {},
                 )
@@ -224,7 +224,7 @@ private fun TextInputPreview() {
                             i and 1 == 0,
                         )
                     },
-                    expanded = true,
+                    wide = false,
                     onBack = {},
                     onShowOpenByDefaultSettings = {},
                 )
@@ -247,7 +247,7 @@ private fun DarkTextInputPreview() {
                             i and 1 == 0,
                         )
                     },
-                    expanded = true,
+                    wide = false,
                     onBack = {},
                     onShowOpenByDefaultSettings = {},
                 )
@@ -270,7 +270,7 @@ private fun TabletPreview() {
                             i and 1 == 0,
                         )
                     },
-                    expanded = true,
+                    wide = true,
                     onBack = {},
                     onShowOpenByDefaultSettings = {},
                 )

@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,8 +36,9 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun InputsListPane(
     currentDocumentation: InputDocumentation?,
     documentations: List<InputDocumentation>,
-    expanded: Boolean,
     changelogShownForVersionCode: Int?,
+    containerColor: Color,
+    wide: Boolean,
     onBack: () -> Unit,
     onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
 ) {
@@ -48,8 +50,9 @@ fun InputsListPane(
     InputsListPane(
         currentDocumentation = currentDocumentation,
         documentations = documentations,
-        expanded = expanded,
         changelogShownForVersionCode = changelogShownForVersionCode,
+        containerColor = containerColor,
+        wide = wide,
         onBack = onBack,
         onNavigateToDocumentation = onNavigateToDocumentation,
         onShowOpenByDefaultSettings = { AndroidTools.showOpenByDefaultSettings(context, settingsLauncher) },
@@ -60,8 +63,9 @@ fun InputsListPane(
 private fun InputsListPane(
     currentDocumentation: InputDocumentation?,
     documentations: List<InputDocumentation>,
-    expanded: Boolean,
     changelogShownForVersionCode: Int?,
+    containerColor: Color,
+    wide: Boolean,
     onBack: () -> Unit,
     onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
@@ -69,24 +73,19 @@ private fun InputsListPane(
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
 
-    val containerColor = if (expanded) {
-        Color.Unspecified
-    } else {
-        MaterialTheme.colorScheme.surfaceContainer
-    }
-
-    val recentDocumentations = changelogShownForVersionCode?.let { changelogShownForVersionCode ->
-        documentations.filter { documentation ->
-            documentation.items.any { it.addedInVersionCode > changelogShownForVersionCode }
-        }.takeIf { it.isNotEmpty() }
+    val recentDocumentations = remember(changelogShownForVersionCode, documentations) {
+        changelogShownForVersionCode?.let { changelogShownForVersionCode ->
+            documentations.filter { documentation ->
+                documentation.items.any { it.addedInVersionCode > changelogShownForVersionCode }
+            }.takeIf { it.isNotEmpty() }
+        }
     }
 
     ScrollablePane(
         titleResId = R.string.inputs_title,
-        containerColor = containerColor,
         onBack = onBack,
     ) {
-        if (expanded) {
+        if (!wide) {
             Column(Modifier.padding(horizontal = spacing.windowPadding)) {
                 ParagraphText(
                     stringResource(R.string.inputs_list_text, appName),
@@ -168,8 +167,9 @@ private fun DefaultPreview() {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = true,
                     changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = false,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -188,8 +188,9 @@ private fun DarkPreview() {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = true,
                     changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = false,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -208,8 +209,9 @@ private fun NoRecentPreview() {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = true,
-                    changelogShownForVersionCode = 999,
+                    changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = false,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -228,8 +230,9 @@ private fun DarkNoRecentPreview() {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = true,
-                    changelogShownForVersionCode = 999,
+                    changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = false,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -241,15 +244,16 @@ private fun DarkNoRecentPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun NotExpandedPreview() {
+private fun WidePreview() {
     AppTheme {
         Surface {
             Column {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = false,
                     changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = true,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -261,15 +265,16 @@ private fun NotExpandedPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkNotExpandedPreview() {
+private fun DarkWidePreview() {
     AppTheme {
         Surface {
             Column {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = false,
                     changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = true,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -281,15 +286,16 @@ private fun DarkNotExpandedPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun NotExpandedNoRecentPreview() {
+private fun WideNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = false,
-                    changelogShownForVersionCode = 999,
+                    changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = true,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},
@@ -301,15 +307,16 @@ private fun NotExpandedNoRecentPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkNotExpandedNoRecentPreview() {
+private fun DarkWideNoRecentPreview() {
     AppTheme {
         Surface {
             Column {
                 InputsListPane(
                     currentDocumentation = null,
                     documentations = allInputs.map { it.documentation },
-                    expanded = false,
-                    changelogShownForVersionCode = 999,
+                    changelogShownForVersionCode = 25,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    wide = true,
                     onBack = {},
                     onNavigateToDocumentation = {},
                     onShowOpenByDefaultSettings = {},

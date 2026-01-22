@@ -40,7 +40,7 @@ import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.ui.components.BasicScaffold
+import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -68,7 +68,7 @@ private fun AboutScreen(
 ) {
     val spacing = LocalSpacing.current
 
-    BasicScaffold(
+    BasicSupportingPaneScaffold(
         title = { Text(stringResource(R.string.about_title)) },
         navigationIcon = {
             IconButton(onClick = onBack) {

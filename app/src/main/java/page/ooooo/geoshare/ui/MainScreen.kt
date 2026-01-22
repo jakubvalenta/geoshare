@@ -97,7 +97,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.ui.components.BasicScaffold
+import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
@@ -304,7 +304,7 @@ private fun MainScreen(
         onReset()
     }
 
-    BasicScaffold(
+    BasicSupportingPaneScaffold(
         navigationIcon = {
             if (currentState !is Initial) {
                 IconButton(

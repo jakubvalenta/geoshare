@@ -3,24 +3,17 @@ package page.ooooo.geoshare.ui
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationItem
-import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +21,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.allInputs
+import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.InputsDetailPane
 import page.ooooo.geoshare.ui.components.InputsListPane
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -69,68 +63,58 @@ private fun InputsScreen(
         ),
     )
     val documentations = allInputs.map { input -> input.documentation }
-    val currentDocumentation =
+    val currentDocumentation = remember(navigator.currentDestination) {
         navigator.currentDestination?.contentKey?.let { id -> documentations.find { it.id == id } }
-    val listExpanded = navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Hidden
-    val detailExpanded = navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Hidden
+    }
 
     BackHandler {
         onBack()
     }
 
-    Scaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
-    ) { innerPadding ->
-        NavigableListDetailPaneScaffold(
-            navigator = navigator,
-            listPane = {
-                AnimatedPane {
-                    InputsListPane(
-                        currentDocumentation = currentDocumentation,
-                        documentations = documentations,
-                        expanded = listExpanded || detailExpanded,
-                        changelogShownForVersionCode = changelogShownForVersionCode,
-                        onBack = {
-                            coroutineScope.launch {
-                                if (navigator.canNavigateBack()) {
-                                    navigator.navigateBack()
-                                } else {
-                                    onBack()
-                                }
-                            }
-                        },
-                        onNavigateToDocumentation = { id ->
-                            coroutineScope.launch {
-                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
-                            }
-                        },
-                    )
-                }
-            },
-            detailPane = {
-                AnimatedPane {
-                    if (currentDocumentation != null) {
-                        InputsDetailPane(
-                            currentDocumentation = currentDocumentation,
-                            expanded = listExpanded || detailExpanded,
-                            onBack = {
-                                coroutineScope.launch {
-                                    if (navigator.canNavigateBack()) {
-                                        navigator.navigateBack()
-                                    } else {
-                                        onBack()
-                                    }
-                                }
-                            },
-                        )
+    BasicListDetailScaffold(
+        navigator = navigator,
+        listPane = { wide, containerColor ->
+            InputsListPane(
+                currentDocumentation = currentDocumentation,
+                documentations = documentations,
+                changelogShownForVersionCode = changelogShownForVersionCode,
+                containerColor = containerColor,
+                wide = wide,
+                onBack = {
+                    coroutineScope.launch {
+                        if (navigator.canNavigateBack()) {
+                            navigator.navigateBack()
+                        } else {
+                            onBack()
+                        }
                     }
-                }
-            },
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
-        )
-    }
+                },
+                onNavigateToDocumentation = { id ->
+                    coroutineScope.launch {
+                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, id)
+                    }
+                },
+            )
+        },
+        detailPane = { wide ->
+            if (currentDocumentation != null) {
+                InputsDetailPane(
+                    currentDocumentation = currentDocumentation,
+                    wide = wide,
+                    onBack = {
+                        coroutineScope.launch {
+                            if (navigator.canNavigateBack()) {
+                                navigator.navigateBack()
+                            } else {
+                                onBack()
+                            }
+                        }
+                    },
+                )
+            }
+        },
+        listContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+    )
 }
 
 // Previews

@@ -27,7 +27,6 @@ import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -37,12 +36,11 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(
-    ExperimentalComposeUiApi::class,
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3AdaptiveApi::class,
 )
 @Composable
-fun BasicScaffold(
+fun BasicSupportingPaneScaffold(
     title: @Composable () -> Unit = {},
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
