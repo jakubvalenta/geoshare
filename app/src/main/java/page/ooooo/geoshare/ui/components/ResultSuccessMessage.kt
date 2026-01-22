@@ -67,6 +67,13 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+private fun isMessageShown(state: ConversionState.HasResult?, loadingIndicator: LoadingIndicator?): Boolean =
+    state is ActionWaiting && state.action is Automation.HasDelay ||
+        state is ActionSucceeded && state.action is Action.HasSuccessMessage ||
+        state is ActionFailed && state.action is Action.HasErrorMessage ||
+        state is LocationFindingFailed ||
+        loadingIndicator is LoadingIndicator.Small
+
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
@@ -76,18 +83,11 @@ fun ResultSuccessMessage(
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
 ) {
-    fun isMessageShown(state: ConversionState.HasResult?): Boolean =
-        state is ActionWaiting && state.action is Automation.HasDelay ||
-            state is ActionSucceeded && state.action is Action.HasSuccessMessage ||
-            state is ActionFailed && state.action is Action.HasErrorMessage ||
-            state is LocationFindingFailed ||
-            loadingIndicator is LoadingIndicator.Small
-
     val spacing = LocalSpacing.current
     var counterSec by remember { mutableIntStateOf(0) }
     var targetState by remember {
         mutableStateOf(
-            if (animationsEnabled && isMessageShown(currentState)) {
+            if (animationsEnabled && isMessageShown(currentState, loadingIndicator)) {
                 // To make the message appear with an animation, first start with null state and only later change it to
                 // the current state (using LaunchedEffect).
                 null
@@ -111,8 +111,8 @@ fun ResultSuccessMessage(
             if (!animationsEnabled) {
                 EnterTransition.None togetherWith ExitTransition.None
             } else {
-                val initialStateMessageShown = isMessageShown(this.initialState)
-                val targetStateMessageShown = isMessageShown(this.targetState)
+                val initialStateMessageShown = isMessageShown(this.initialState, loadingIndicator)
+                val targetStateMessageShown = isMessageShown(this.targetState, loadingIndicator)
                 if (!initialStateMessageShown && !targetStateMessageShown) {
                     // Message stays hidden
                     EnterTransition.None togetherWith ExitTransition.None
@@ -206,6 +206,7 @@ fun ResultSuccessMessage(
                         stringResource(R.string.conversion_succeeded_apps_headline),
                         style = MaterialTheme.typography.headlineSmall,
                     )
+                    // TODO Fix badge cropped on tablet
                     FeatureBadged(
                         enabled = automationFeatureStatus == FeatureStatus.NOT_AVAILABLE,
                         badge = { modifier ->
