@@ -163,27 +163,50 @@ abstract class BaseActivityBehaviorTest {
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
         val expectedText = allOutputs.getText(expectedPosition, null)
-        val coordinatesElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" }
-        assertEquals(expectedText, coordinatesElement.text)
+        onElement {
+            if (viewIdResourceName == "geoShareConversionSuccessPositionCoordinates") {
+                assertEquals(expectedText, textAsString())
+                true
+            } else {
+                false
+            }
+        }
         val expectedName = expectedPosition.points?.lastOrNull()?.name?.replace('+', ' ')
             ?: expectedPosition.points?.size?.takeIf { it > 1 }?.let { "point $it" }
-        val nameElement = onElement { viewIdResourceName == "geoShareConversionSuccessPositionName" }
         if (expectedName != null) {
-            assertEquals(expectedName, nameElement.text)
-        } else {
-            assertTrue(
-                @Suppress("SpellCheckingInspection")
-                when (nameElement.text) {
-                    "Coordinates", "Coordonnées" -> true
-                    else -> false
+            onElement {
+                if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
+                    assertEquals(expectedName, textAsString())
+                    true
+                } else {
+                    false
                 }
-            )
+            }
+        } else {
+            onElement {
+                if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
+                    assertTrue(
+                        when (textAsString()) {
+                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées" -> true
+                            else -> false
+                        }
+                    )
+                    true
+                } else {
+                    false
+                }
+            }
         }
         if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
             val expectedDescription = allOutputs.getDescription(expectedPosition)
-            val descriptionElement =
-                onElement { viewIdResourceName == "geoShareConversionSuccessPositionDescription" }
-            assertEquals(expectedDescription, descriptionElement.text)
+            onElement {
+                if (viewIdResourceName == "geoShareConversionSuccessPositionDescription") {
+                    assertEquals(expectedDescription, textAsString())
+                    true
+                } else {
+                    false
+                }
+            }
         } else {
             assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })
         }

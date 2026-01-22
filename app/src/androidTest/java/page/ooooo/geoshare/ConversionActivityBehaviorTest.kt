@@ -383,7 +383,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Hermannstr. 20, Berlin",
                     )
                 )
-            } catch (_: Exception) {
+            } catch (_: AssertionError) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -453,6 +453,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+41,+Berlin/")
+            waitForStableInActiveWindow()
 
             // Shows location search
             waitAndAssertPositionIsVisible(
