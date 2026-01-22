@@ -63,7 +63,7 @@ private fun InputsScreen(
         ),
     )
     val documentations = allInputs.map { input -> input.documentation }
-    val currentDocumentation = remember(navigator.currentDestination) {
+    val currentDocumentation = remember(navigator.currentDestination, documentations) {
         navigator.currentDestination?.contentKey?.let { id -> documentations.find { it.id == id } }
     }
 
