@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-class BillingImpl(context: Context) : Billing(context) {
+class BillingImpl(private val context: Context) : Billing {
 
     @StringRes
     override val appNameResId = R.string.app_name_pro

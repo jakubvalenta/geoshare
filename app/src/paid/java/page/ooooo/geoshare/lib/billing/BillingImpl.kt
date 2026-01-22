@@ -43,7 +43,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 class BillingImpl(
-    context: Context,
+    private val context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     override val products: ImmutableList<BillingProduct> = persistentListOf(
         BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
@@ -52,7 +52,7 @@ class BillingImpl(
     private val productDetailsParamsBuilder: () -> ProductDetailsParamsBuilder = { DefaultProductDetailsParamsBuilder() },
     private val billingFlowParamsBuilder: () -> BillingFlowParamsBuilder = { DefaultBillingFlowParamsBuilder() },
     private val log: ILog = DefaultLog,
-) : Billing(context), AcknowledgePurchaseResponseListener, BillingClientStateListener, InAppMessageResponseListener,
+) : Billing, AcknowledgePurchaseResponseListener, BillingClientStateListener, InAppMessageResponseListener,
     PurchasesResponseListener, PurchasesUpdatedListener {
 
     companion object {
