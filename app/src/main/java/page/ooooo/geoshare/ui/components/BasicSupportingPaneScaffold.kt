@@ -105,8 +105,8 @@ fun BasicSupportingPaneScaffold(
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = Color.Transparent,
-                            navigationIconContentColor = contentColor,
-                            actionIconContentColor = contentColor,
+                            navigationIconContentColor = mainContentColor,
+                            actionIconContentColor = mainContentColor,
                         ),
                     )
                     CompositionLocalProvider(LocalContentColor provides mainContentColor) {
