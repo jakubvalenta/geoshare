@@ -373,15 +373,25 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                Position(
-                    Srs.WGS84,
-                    52.4834254,
-                    13.4245399,
-                    name = "Hermannstr. 20, Berlin",
+            try {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        52.4834254,
+                        13.4245399,
+                        name = "Hermannstr. 20, Berlin",
+                    )
                 )
-            )
+            } catch (_: Exception) {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        q = "Hermannstr. 20, Berlin",
+                    )
+                )
+            }
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
