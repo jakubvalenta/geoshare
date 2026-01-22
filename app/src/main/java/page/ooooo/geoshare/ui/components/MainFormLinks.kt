@@ -22,7 +22,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun MainInfo(
+fun MainFormLinks(
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
@@ -33,7 +33,6 @@ fun MainInfo(
 
     Column(
         Modifier
-            .padding(top = spacing.large)
             .padding(horizontal = spacing.windowPadding),
     ) {
         TextButton(onNavigateToInputsScreen) {
@@ -57,8 +56,8 @@ fun MainInfo(
                 resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
             )?.let { uriString ->
                 onUpdateInput(uriString)
+                onSetErrorMessageResId(null)
             }
-            onSetErrorMessageResId(null)
         }) {
             Icon(
                 painterResource(R.drawable.ifl_24px),
@@ -77,14 +76,12 @@ fun MainInfo(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            Column {
-                MainInfo(
-                    onNavigateToInputsScreen = {},
-                    onNavigateToIntroScreen = {},
-                    onSetErrorMessageResId = {},
-                    onUpdateInput = {},
-                )
-            }
+            MainFormLinks(
+                onNavigateToInputsScreen = {},
+                onNavigateToIntroScreen = {},
+                onSetErrorMessageResId = {},
+                onUpdateInput = {},
+            )
         }
     }
 }
@@ -94,14 +91,12 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            Column {
-                MainInfo(
-                    onNavigateToInputsScreen = {},
-                    onNavigateToIntroScreen = {},
-                    onSetErrorMessageResId = {},
-                    onUpdateInput = {},
-                )
-            }
+            MainFormLinks(
+                onNavigateToInputsScreen = {},
+                onNavigateToIntroScreen = {},
+                onSetErrorMessageResId = {},
+                onUpdateInput = {},
+            )
         }
     }
 }

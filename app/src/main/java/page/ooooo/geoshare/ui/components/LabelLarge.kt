@@ -15,9 +15,9 @@ fun LabelLarge(text: String, color: Color = MaterialTheme.colorScheme.primary) {
         text,
         Modifier.padding(
             start = spacing.windowPadding,
-            top = spacing.large,
+            top = spacing.largeAdaptive,
             end = spacing.windowPadding,
-            bottom = spacing.small,
+            bottom = spacing.smallAdaptive,
         ),
         color = color,
         style = MaterialTheme.typography.labelLarge,

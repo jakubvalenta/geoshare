@@ -29,10 +29,8 @@ interface DataModule {
     ): UserPreferencesRepository
 }
 
-class FakeUserPreferencesRepository @Inject constructor() :
-    UserPreferencesRepository {
-    override val values: Flow<UserPreferencesValues> =
-        flowOf(defaultFakeUserPreferences)
+class FakeUserPreferencesRepository @Inject constructor() : UserPreferencesRepository {
+    override val values: Flow<UserPreferencesValues> = flowOf(defaultFakeUserPreferences)
 
     override suspend fun <T> getValue(userPreference: UserPreference<T>): T {
         throw NotImplementedError()
@@ -48,9 +46,10 @@ class FakeUserPreferencesRepository @Inject constructor() :
 }
 
 val defaultFakeUserPreferences = UserPreferencesValues(
-    automationValue = NoopAutomation,
-    automationDelayValue = 5.seconds,
-    changelogShownForVersionCodeValue = 22,
-    connectionPermissionValue = Permission.ALWAYS,
-    introShownForVersionCodeValue = 0,
+    automation = NoopAutomation,
+    automationDelay = 5.seconds,
+    billingCachedProductId = "",
+    changelogShownForVersionCode = 22,
+    connectionPermission = Permission.ALWAYS,
+    introShownForVersionCode = 0,
 )

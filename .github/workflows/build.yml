@@ -10,26 +10,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v5
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'gradle'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-    - name: Run lint for the debug variant
-      run: ./gradlew lintDebug
+      - name: Run lint for the free debug variant
+        run: ./gradlew lintFreeDebug
 
-    - name: Run unit tests for the debug variant
-      run: ./gradlew testDebugUnitTest
+      - name: Run lint for the paid debug variant
+        run: ./gradlew lintPaidDebug
 
-    - name: Build the debug variant
-      run: ./gradlew assembleDebug
+      - name: Run unit tests for the free debug variant
+        run: ./gradlew testFreeDebugUnitTest
 
-    - name: Upload debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: debug-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Run unit tests for the paid debug variant
+        run: ./gradlew testPaidDebugUnitTest
+
+      - name: Build the free debug variant
+        run: ./gradlew assembleFreeDebug
+
+      - name: Build the paid debug variant
+        run: ./gradlew assembleFreeDebug
+
+      - name: Upload free debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-debug-apk
+          path: app/build/outputs/apk/free/debug/app-free-debug.apk

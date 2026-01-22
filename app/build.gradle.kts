@@ -14,6 +14,7 @@ kotlin {
 android {
     namespace = "page.ooooo.geoshare"
     compileSdk = 36
+    compileSdkMinor = 1
 
     defaultConfig {
         applicationId = "page.ooooo.geoshare"
@@ -22,15 +23,6 @@ android {
         targetSdk = 36
         versionCode = 31
         versionName = "5.12.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // The following argument makes the Android Test Orchestrator run its
-        // "pm clear" command after each test invocation. This command ensures
-        // that the app's state is completely cleared between tests.
-        testInstrumentationRunnerArguments += mapOf(
-            "clearPackageData" to "true",
-        )
 
         androidResources {
             @Suppress("UnstableApiUsage")
@@ -52,12 +44,12 @@ android {
                 "zh-rTW",
             )
         }
-    }
 
-    testOptions {
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // The following argument makes the Android Test Orchestrator run its "pm clear" command after each test
+        // invocation. This command ensures that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments += mapOf("clearPackageData" to "true")
     }
-
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
@@ -71,12 +63,30 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
+    flavorDimensions += "tier"
+    productFlavors {
+        create("free") {
+            isDefault = true
+            dimension = "tier"
+        }
+        create("paid") {
+            dimension = "tier"
+            versionNameSuffix = "-paid"
+        }
+        create("demo") {
+            dimension = "tier"
+            versionNameSuffix = "-demo"
+        }
+    }
     buildFeatures {
         buildConfig = true
         compose = true
     }
     lint {
         disable += "MissingTranslation" // Translation is crowdsourced, so this isn't viable
+    }
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 }
 
@@ -108,6 +118,9 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    "paidImplementation"(libs.android.billingclient.billing)
+    "paidImplementation"(libs.android.billingclient.billing.ktx)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

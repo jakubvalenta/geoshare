@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
@@ -35,7 +36,12 @@ fun ResultSuccessCoordinates(
     Column {
         (allOutputs.getName(position, null)
             ?: stringResource(R.string.conversion_succeeded_title)).let { text ->
-            Headline(text, Modifier.testTag("geoShareConversionSuccessPositionName"))
+            Headline(
+                text,
+                Modifier
+                    .testTag("geoShareConversionSuccessPositionName")
+                    .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
+            )
         }
         ResultCard(
             main = {
@@ -55,7 +61,7 @@ fun ResultSuccessCoordinates(
                             Modifier
                                 .testTag("geoShareConversionSuccessPositionDescription")
                                 .fillMaxWidth()
-                                .padding(top = spacing.tiny, bottom = spacing.small),
+                                .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
                             fontStyle = FontStyle.Italic,
                             style = MaterialTheme.typography.bodySmall,
                         )
@@ -75,7 +81,7 @@ fun ResultSuccessCoordinates(
             },
             bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
                 {
-                    Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive)) {
                         points.indices.forEach { i ->
                             ResultSuccessPoint(
                                 position = position,

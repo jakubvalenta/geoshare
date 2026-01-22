@@ -3,18 +3,32 @@ package page.ooooo.geoshare.lib.conversion
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.timeout
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.AutomationDelay
-import page.ooooo.geoshare.data.local.preferences.AutomationUserPreference
-import page.ooooo.geoshare.data.local.preferences.ConnectionPermission
+import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
+import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
+import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
-import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.Automation
+import page.ooooo.geoshare.lib.outputs.BasicAction
+import page.ooooo.geoshare.lib.outputs.BasicAutomation
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.LocationAutomation
+import page.ooooo.geoshare.lib.outputs.NoopAutomation
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import java.io.IOException
@@ -74,25 +88,19 @@ data class ReceivedUri(
             val m = input.shortUriPattern.matcher(uri.toString())
             if (m.matches()) {
                 val uri = Uri.parse(m.group(), stateContext.uriQuote)
-                return when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
+                return when (permission ?: stateContext.userPreferencesRepository.getValue(
+                    ConnectionPermissionPreference
+                )) {
                     Permission.ALWAYS -> GrantedUnshortenPermission(
-                        stateContext,
-                        inputUriString,
-                        input,
-                        uri
+                        stateContext, inputUriString, input, uri
                     )
 
                     Permission.ASK -> RequestedUnshortenPermission(
-                        stateContext,
-                        inputUriString,
-                        input,
-                        uri
+                        stateContext, inputUriString, input, uri
                     )
 
                     Permission.NEVER -> DeniedConnectionPermission(
-                        stateContext,
-                        inputUriString,
-                        input
+                        stateContext, inputUriString, input
                     )
                 }
             }
@@ -111,14 +119,14 @@ data class RequestedUnshortenPermission(
 
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
         return GrantedUnshortenPermission(stateContext, inputUriString, input, uri)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
         return DeniedConnectionPermission(stateContext, inputUriString, input)
     }
@@ -209,7 +217,8 @@ data class UnshortenedUrl(
 
             is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
                 if (input is Input.HasHtml) {
-                    when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermission)) {
+                    when (permission
+                        ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseHtmlPermission(
                             stateContext, inputUriString, input, uri, res.position, res.htmlUriString
                         )
@@ -244,14 +253,14 @@ data class RequestedParseHtmlPermission(
 
     override suspend fun grant(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.ALWAYS)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
         return GrantedParseHtmlPermission(stateContext, inputUriString, input, uri, positionFromUri, htmlUriString)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermission, Permission.NEVER)
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
         return ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
     }
@@ -337,34 +346,72 @@ data class ParseHtmlFailed(
     val inputUriString: String,
     val position: Position,
 ) : ConversionState {
-    override suspend fun transition() =
-        if (!position.points.isNullOrEmpty() || !position.q.isNullOrEmpty()) {
-            ConversionSucceeded(stateContext, inputUriString, position)
-        } else {
-            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-        }
+    override suspend fun transition() = if (!position.points.isNullOrEmpty() || !position.q.isNullOrEmpty()) {
+        ConversionSucceeded(stateContext, inputUriString, position)
+    } else {
+        ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+    }
 }
 
 data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
     override val position: Position,
+    val billingStatusTimeout: Duration = 3.seconds,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State? =
-        stateContext.userPreferencesRepository.getValue(AutomationUserPreference).let { automation ->
-            when (automation) {
-                is NoopAutomation ->
-                    null
-
-                is Automation.HasDelay ->
-                    stateContext.userPreferencesRepository.getValue(AutomationDelay).let { delay ->
-                        ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
-                    }
-
-                else ->
-                    ActionReady(inputUriString, position, null, automation)
-            }
+    @OptIn(FlowPreview::class)
+    override suspend fun transition(): State? {
+        val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
+        if (automation is NoopAutomation) {
+            return null
         }
+
+        val billingStatus: BillingStatus = try {
+            // Wait for billing status to appear; it should appear, because we call Billing.startConnection() in onCreate
+            stateContext.billing.status
+                .filter {
+                    when (it) {
+                        is BillingStatus.Loading -> false
+
+                        is BillingStatus.NotPurchased -> true
+
+                        is BillingStatus.Purchased -> {
+                            // If billing status appeared within timeout, cache it
+                            stateContext.userPreferencesRepository.setValue(
+                                BillingCachedProductIdPreference,
+                                it.product.id,
+                            )
+                            true
+                        }
+                    }
+                }
+                .timeout(billingStatusTimeout)
+                .first()
+        } catch (_: TimeoutCancellationException) {
+            // If billing status didn't appear, try to read it from cache
+            stateContext.log.w(null, "Automation: Billing status didn't appear within $billingStatusTimeout")
+            stateContext.userPreferencesRepository.getValue(BillingCachedProductIdPreference)
+                ?.let { productId -> stateContext.billing.products.firstOrNull { product -> productId == product.id } }
+                .let { product ->
+                    if (product != null) {
+                        stateContext.log.w(null, "Automation: Found cached billing status")
+                        BillingStatus.Purchased(product, refundable = true)
+                    } else {
+                        stateContext.log.w(null, "Automation: Didn't find cached billing status")
+                        BillingStatus.Loading()
+                    }
+                }
+        }
+
+        if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
+            if (automation is Automation.HasDelay) {
+                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
+                return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
+            }
+            return ActionReady(inputUriString, position, null, automation)
+        }
+        return null
+    }
 }
 
 data class ConversionFailed(
@@ -380,15 +427,14 @@ data class ActionWaiting(
     val action: Action,
     val delay: Duration,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        try {
-            if (delay.isPositive()) {
-                delay(delay)
-            }
-            ActionReady(inputUriString, position, i, action)
-        } catch (_: CancellationException) {
-            ActionFinished(inputUriString, position, action)
+    override suspend fun transition(): State = try {
+        if (delay.isPositive()) {
+            delay(delay)
         }
+        ActionReady(inputUriString, position, i, action)
+    } catch (_: CancellationException) {
+        ActionFinished(inputUriString, position, action)
+    }
 }
 
 data class ActionReady(
@@ -397,13 +443,12 @@ data class ActionReady(
     val i: Int?,
     val action: Action,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        when (action) {
-            is BasicAutomation -> BasicActionReady(inputUriString, position, i, action)
-            is BasicAction -> BasicActionReady(inputUriString, position, i, action)
-            is LocationAutomation -> LocationRationaleRequested(inputUriString, position, i, action)
-            is LocationAction -> LocationRationaleRequested(inputUriString, position, i, action)
-        }
+    override suspend fun transition(): State = when (action) {
+        is BasicAutomation -> BasicActionReady(inputUriString, position, i, action)
+        is BasicAction -> BasicActionReady(inputUriString, position, i, action)
+        is LocationAutomation -> LocationRationaleRequested(inputUriString, position, i, action)
+        is LocationAction -> LocationRationaleRequested(inputUriString, position, i, action)
+    }
 }
 
 data class BasicActionReady(
@@ -427,14 +472,13 @@ data class ActionRan(
     val action: Action,
     val success: Boolean?,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        when (success) {
-            true -> ActionSucceeded(inputUriString, position, action)
+    override suspend fun transition(): State = when (success) {
+        true -> ActionSucceeded(inputUriString, position, action)
 
-            false -> ActionFailed(inputUriString, position, action)
+        false -> ActionFailed(inputUriString, position, action)
 
-            else -> ActionFinished(inputUriString, position, action)
-        }
+        else -> ActionFinished(inputUriString, position, action)
+    }
 }
 
 data class ActionSucceeded(
@@ -492,8 +536,7 @@ data class LocationRationaleShown(
     override suspend fun grant(doNotAsk: Boolean): State =
         LocationRationaleConfirmed(inputUriString, position, i, action)
 
-    override suspend fun deny(doNotAsk: Boolean): State =
-        ActionFinished(inputUriString, position, action)
+    override suspend fun deny(doNotAsk: Boolean): State = ActionFinished(inputUriString, position, action)
 }
 
 data class LocationRationaleConfirmed(
@@ -521,12 +564,11 @@ data class LocationReceived(
     val action: LocationAction,
     val location: Point?,
 ) : ConversionState.HasResult {
-    override suspend fun transition(): State =
-        if (location == null) {
-            LocationFindingFailed(inputUriString, position, action)
-        } else {
-            LocationActionReady(inputUriString, position, i, action, location)
-        }
+    override suspend fun transition(): State = if (location == null) {
+        LocationFindingFailed(inputUriString, position, action)
+    } else {
+        LocationActionReady(inputUriString, position, i, action, location)
+    }
 }
 
 data class LocationFindingFailed(

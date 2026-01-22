@@ -1,36 +1,75 @@
 package page.ooooo.geoshare
 
+import android.app.Activity
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.*
-import page.ooooo.geoshare.ui.SavableDelegate
-import page.ooooo.geoshare.lib.conversion.*
+import page.ooooo.geoshare.data.local.preferences.AutomationPreference
+import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
+import page.ooooo.geoshare.data.local.preferences.UserPreference
+import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.Feature
+import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.billing.Offer
+import page.ooooo.geoshare.lib.conversion.ActionFinished
+import page.ooooo.geoshare.lib.conversion.ActionRan
+import page.ooooo.geoshare.lib.conversion.ActionReady
+import page.ooooo.geoshare.lib.conversion.BasicActionReady
+import page.ooooo.geoshare.lib.conversion.ConversionFailed
+import page.ooooo.geoshare.lib.conversion.ConversionState
+import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.Initial
+import page.ooooo.geoshare.lib.conversion.LoadingIndicator
+import page.ooooo.geoshare.lib.conversion.LocationActionReady
+import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
+import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
+import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
+import page.ooooo.geoshare.lib.conversion.LocationReceived
+import page.ooooo.geoshare.lib.conversion.ReceivedUriString
+import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.ui.SavableDelegate
 import javax.inject.Inject
+import kotlin.time.Duration
 
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val billing: Billing,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         userPreferencesRepository = userPreferencesRepository,
+        billing = billing,
     ) { newState ->
         _currentState.value = newState
         when (newState) {
@@ -65,55 +104,85 @@ class ConversionViewModel @Inject constructor(
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val userPreferencesValues: StateFlow<UserPreferencesValues> =
-        userPreferencesRepository.values.mapLatest { it }.stateIn(
+    val automationFeatureStatus: StateFlow<FeatureStatus> = billing.status.map {
+        when (it) {
+            is BillingStatus.Loading -> FeatureStatus.LOADING
+            is BillingStatus.Purchased if billing.features.contains(AutomationFeature) -> FeatureStatus.AVAILABLE
+            else -> FeatureStatus.NOT_AVAILABLE
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        FeatureStatus.LOADING,
+    )
+    val billingAppNameResId: Int = billing.appNameResId
+    val billingMessage: StateFlow<Message?> = billing.message
+    val billingFeatures: ImmutableList<Feature> = billing.features
+    val billingOffers: StateFlow<List<Offer>> = billing.status
+        .filter { it !is BillingStatus.Loading }
+        .distinctUntilChanged()
+        .map {
+            billing.queryOffers()
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList(),
+        )
+    val billingRefundableDuration: Duration = billing.refundableDuration
+    val billingStatus: StateFlow<BillingStatus> = billing.status
+
+    val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
+        .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             UserPreferencesValues(),
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val automation: StateFlow<Automation> = userPreferencesValues.mapLatest {
-        it.automationValue
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        AutomationUserPreference.default,
-    )
+    val automation: StateFlow<Automation> = userPreferencesRepository.values
+        .map { it.automation }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            AutomationPreference.default,
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val changelogShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.changelogShownForVersionCodeValue?.let { changelogShownForVersionCodeValue ->
-            stateContext.inputs.all { input ->
-                input.documentation.items.all { input ->
-                    input.addedInVersionCode <= changelogShownForVersionCodeValue
+    val changelogShown: StateFlow<Boolean> = userPreferencesRepository.values
+        .map { it.changelogShownForVersionCode }
+        .distinctUntilChanged()
+        .mapLatest { changelogShownForVersionCodeValue ->
+            if (changelogShownForVersionCodeValue != null) {
+                stateContext.inputs.all { input ->
+                    input.documentation.items.all { inputDocumentationItem ->
+                        inputDocumentationItem.addedInVersionCode <= changelogShownForVersionCodeValue
+                    }
                 }
+            } else {
+                true
             }
-        } ?: true
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        true,
-    )
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true,
+        )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val changelogShownForVersionCode: StateFlow<Int?> = userPreferencesValues.mapLatest {
-        it.changelogShownForVersionCodeValue
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        ChangelogShownForVersionCode.default,
-    )
+    val changelogShownForVersionCode: StateFlow<Int?> = userPreferencesRepository.values
+        .map { it.changelogShownForVersionCode }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            ChangelogShownForVersionCodePreference.default,
+        )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val introShown: StateFlow<Boolean> = userPreferencesValues.mapLatest {
-        it.introShownForVersionCodeValue != IntroShowForVersionCode.default
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        userPreferencesValues.value.introShownForVersionCodeValue != IntroShowForVersionCode.default,
-    )
+    val introShown: StateFlow<Boolean> = userPreferencesRepository.values
+        .map { it.introShownForVersionCode != IntroShowForVersionCodePreference.default }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            true,
+        )
 
     fun start() {
         stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
@@ -232,6 +301,16 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpxPoints(writer)
     }
 
+    fun launchBillingFlow(activity: Activity, offerToken: String) {
+        viewModelScope.launch {
+            billing.launchBillingFlow(activity, offerToken)
+        }
+    }
+
+    fun manageBillingProduct(product: BillingProduct) {
+        billing.manageProduct(product)
+    }
+
     private fun transition() {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
@@ -267,11 +346,11 @@ class ConversionViewModel @Inject constructor(
         val newestInputAddedInVersionCode = allInputs.maxOf { input ->
             input.documentation.items.maxOf { it.addedInVersionCode }
         }
-        setUserPreferenceValue(ChangelogShownForVersionCode, newestInputAddedInVersionCode)
+        setUserPreferenceValue(ChangelogShownForVersionCodePreference, newestInputAddedInVersionCode)
     }
 
     fun setIntroShown() {
-        setUserPreferenceValue(IntroShowForVersionCode, BuildConfig.VERSION_CODE)
+        setUserPreferenceValue(IntroShowForVersionCodePreference, BuildConfig.VERSION_CODE)
     }
 
     fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {
@@ -284,5 +363,21 @@ class ConversionViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferencesRepository.edit(transform)
         }
+    }
+
+    fun onResume(activity: Activity) {
+        billing.startConnection()
+        viewModelScope.launch {
+            billing.showInAppMessages(activity)
+        }
+    }
+
+    fun onPause() {
+        billing.endConnection()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        billing.endConnection()
     }
 }

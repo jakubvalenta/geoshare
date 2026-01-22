@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.rememberScrollState
@@ -39,7 +38,6 @@ private fun createLinearFunc(x1: Float, y1: Float, x2: Float, y2: Float): (x: In
 @Composable
 fun ScrollablePane(
     @StringRes titleResId: Int,
-    containerColor: Color = Color.Unspecified,
     onBack: (() -> Unit)?,
     content: @Composable () -> Unit,
 ) {
@@ -48,8 +46,8 @@ fun ScrollablePane(
 
     val scrollState = rememberScrollState()
     val headlineHeightPx = with(density) { MaterialTheme.typography.headlineMedium.fontSize.toPx() }
-    val headlinePaddingTopPx = with(density) { spacing.large.toPx() }
-    val headlinePaddingBottomPx = with(density) { spacing.medium.toPx() }
+    val headlinePaddingTopPx = with(density) { spacing.largeAdaptive.toPx() }
+    val headlinePaddingBottomPx = with(density) { spacing.mediumAdaptive.toPx() }
     val calcHeadlineAlpha = createLinearFunc(
         headlinePaddingTopPx, 1f,
         headlinePaddingTopPx + headlineHeightPx, 0f,
@@ -92,11 +90,10 @@ fun ScrollablePane(
                 }
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
     )
     Column(
         Modifier
-            .background(containerColor)
             .fillMaxHeight()
             .verticalScroll(scrollState),
     ) {

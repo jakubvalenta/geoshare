@@ -103,7 +103,7 @@ private fun IntroScreen(
         ) {
             LinearProgressIndicator(
                 { animatedProgress },
-                Modifier.padding(vertical = spacing.tiny),
+                Modifier.padding(vertical = spacing.tinyAdaptive),
                 trackColor = MaterialTheme.colorScheme.surface,
             )
             Column(
@@ -175,7 +175,7 @@ private fun IntroScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(vertical = spacing.tiny),
+                    .padding(vertical = spacing.tinyAdaptive),
             ) {
                 if (page != pageCount - 1) {
                     TextButton(
@@ -226,12 +226,12 @@ private fun IntroPage(
             headline,
             Modifier
                 .testTag("geoShareIntroPage${page}HeadingText")
-                .padding(vertical = spacing.small),
+                .padding(vertical = spacing.smallAdaptive),
             style = MaterialTheme.typography.headlineSmall,
         )
         Column(
             Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(spacing.small),
+            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
         ) {
             content()
         }
@@ -247,7 +247,7 @@ private fun IntroFigure(
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(spacing.tiny),
+        verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive),
     ) {
         ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
         content()

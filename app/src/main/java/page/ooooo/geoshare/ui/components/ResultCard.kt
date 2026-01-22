@@ -34,7 +34,7 @@ fun ResultCard(
             Modifier.padding(
                 start = spacing.windowPadding,
                 end = (if (end != null) 4.dp else spacing.windowPadding),
-                bottom = spacing.small,
+                bottom = spacing.smallAdaptive,
             ),
         ) {
             Column(
@@ -49,14 +49,14 @@ fun ResultCard(
             Column(
                 Modifier
                     .padding(horizontal = spacing.windowPadding)
-                    .padding(bottom = spacing.small)
+                    .padding(bottom = spacing.smallAdaptive)
             ) {
                 bottom()
             }
         }
         Row(
             Modifier
-                .padding(start = spacing.windowPadding, bottom = spacing.small)
+                .padding(start = spacing.windowPadding, bottom = spacing.smallAdaptive)
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(spacing.small),
         ) {

@@ -13,6 +13,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 class MainActivity : ComponentActivity() {
     private val viewModel: ConversionViewModel by viewModels()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,5 +22,15 @@ class MainActivity : ComponentActivity() {
                 MainNavigation(viewModel, introEnabled = true)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onPause()
     }
 }
