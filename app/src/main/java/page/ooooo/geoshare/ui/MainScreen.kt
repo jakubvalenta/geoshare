@@ -399,6 +399,7 @@ private fun MainScreen(
             Column(
                 Modifier
                     .weight(1f)
+                    .padding(top = spacing.headlineTopAdaptive)
                     .verticalScroll(rememberScrollState()),
             ) {
                 MainSupportingPane(

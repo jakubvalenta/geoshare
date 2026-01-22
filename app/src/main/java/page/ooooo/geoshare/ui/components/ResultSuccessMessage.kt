@@ -105,7 +105,6 @@ fun ResultSuccessMessage(
         targetState,
         modifier = Modifier
             .padding(horizontal = spacing.windowPadding)
-            .padding(top = spacing.headlineTopAdaptive)
             .fillMaxWidth()
             .height(40.dp),
         transitionSpec = {

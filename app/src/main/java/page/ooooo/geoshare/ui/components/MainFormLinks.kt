@@ -33,8 +33,7 @@ fun MainFormLinks(
 
     Column(
         Modifier
-            .padding(horizontal = spacing.windowPadding)
-            .padding(top = spacing.headlineTopAdaptive),
+            .padding(horizontal = spacing.windowPadding),
     ) {
         TextButton(onNavigateToInputsScreen) {
             Icon(
