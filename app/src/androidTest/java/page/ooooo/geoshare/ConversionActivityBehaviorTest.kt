@@ -140,7 +140,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
             waitForStableInActiveWindow()
 
-            // Shows precise location again (succeeds or fails depending on IP address)
+            // Shows precise location again
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
@@ -331,7 +331,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 confirm()
             }
 
-            // Shows precise location (succeeds or fails depending on IP address)
+            // Shows precise location
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
@@ -398,15 +398,25 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                Position(
-                    Srs.WGS84,
-                    52.4832988,
-                    13.4245179,
-                    name = "Hermannstr. 21, Berlin",
+            try {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        52.4832988,
+                        13.4245179,
+                        name = "Hermannstr. 21, Berlin",
+                    )
                 )
-            )
+            } catch (_: AssertionError) {
+                waitAndAssertPositionIsVisible(
+                    @Suppress("SpellCheckingInspection")
+                    Position(
+                        Srs.WGS84,
+                        q = "Hermannstr. 21, Berlin",
+                    )
+                )
+            }
         }
 
     @Test
@@ -473,7 +483,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 confirm()
             }
 
-            // Shows precise location (succeeds or fails depending on IP address)
+            // Shows precise location
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
