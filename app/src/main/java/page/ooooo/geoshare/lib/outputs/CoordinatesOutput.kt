@@ -1,9 +1,11 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
@@ -24,6 +26,10 @@ object CoordinatesOutput : Output {
         @Composable
         override fun Label() {
             Text(stringResource(R.string.conversion_succeeded_copy_coordinates))
+        }
+
+        override fun getIcon() = @Composable {
+            Icon(painterResource(R.drawable.content_copy_24px), null)
         }
     }
 
@@ -91,16 +97,16 @@ object CoordinatesOutput : Output {
     override fun getDescription(position: Position, uriQuote: UriQuote) = formatDescriptionString(position)
 
     override fun getPositionActions(): List<BasicAction> = listOf(
-        CopyDegMinSecCoordsAction(),
         CopyDecCoordsAction(),
+        CopyDegMinSecCoordsAction(),
     )
 
     override fun getPointActions(): List<BasicAction> = listOf(
-        CopyDegMinSecCoordsAction(),
         CopyDecCoordsAction(),
+        CopyDegMinSecCoordsAction(),
     )
 
-    override fun getRandomAction(): CopyAction = CopyDecCoordsAction()
+    override fun getRandomAction() = listOf(CopyDecCoordsAction(), CopyDegMinSecCoordsAction()).randomOrNull()
 
     override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = listOf(
         CopyDecCoordsAutomation,

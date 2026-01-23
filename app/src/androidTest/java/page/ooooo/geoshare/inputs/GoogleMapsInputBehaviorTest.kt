@@ -71,23 +71,6 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
 
-        // Place list
-        testUri(
-            Position(
-                points = persistentListOf(
-                    Point(Srs.GCJ02, 59.1293656, 11.4585672),
-                    Point(Srs.GCJ02, 59.4154007, 11.659710599999999),
-                    Point(Srs.GCJ02, 59.3443991, 11.672637),
-                    Point(Srs.GCJ02, 59.2557409, 11.5857853),
-                    Point(Srs.GCJ02, 59.1579458, 11.7337507),
-                    Point(Srs.GCJ02, 59.229344899999994, 11.6892173),
-                    Point(Srs.GCJ02, 59.2999243, 11.6587237),
-                    Point(Srs.GCJ02, 59.147731699999994, 11.550661199999999),
-                ),
-            ),
-            "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
-        )
-
         // Directions
         testUri(
             @Suppress("SpellCheckingInspection")
@@ -102,10 +85,27 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             "https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2",
         )
 
-        // Text
+        // Center
         testUri(
             Position(Srs.WGS84, 52.5067296, 13.2599309),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
+        )
+
+        // Place list (sometimes fails, probably due to IP address blocking)
+        testUri(
+            Position(
+                points = persistentListOf(
+                    Point(Srs.GCJ02, 59.1293656, 11.4585672),
+                    Point(Srs.GCJ02, 59.4154007, 11.659710599999999),
+                    Point(Srs.GCJ02, 59.3443991, 11.672637),
+                    Point(Srs.GCJ02, 59.2557409, 11.5857853),
+                    Point(Srs.GCJ02, 59.1579458, 11.7337507),
+                    Point(Srs.GCJ02, 59.229344899999994, 11.6892173),
+                    Point(Srs.GCJ02, 59.2999243, 11.6587237),
+                    Point(Srs.GCJ02, 59.147731699999994, 11.550661199999999),
+                ),
+            ),
+            "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
         )
     }
 

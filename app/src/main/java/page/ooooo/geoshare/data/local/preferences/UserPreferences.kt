@@ -1,16 +1,21 @@
 package page.ooooo.geoshare.data.local.preferences
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -182,6 +187,7 @@ abstract class DurationPreference : SingleKeyPreference<Duration>() {
 data class PreferenceOption<T>(
     val value: T,
     val modifier: Modifier = Modifier,
+    val icon: (@Composable () -> Unit)? = null,
     val label: @Composable () -> Unit,
 )
 
@@ -201,7 +207,19 @@ abstract class OptionsPreference<T> : UserPreference<T> {
                 ?: options().find { it.value == default }
         }
         if (option != null) {
-            option.label()
+            if (option.icon != null) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                        option.icon()
+                    }
+                    option.label()
+                }
+            } else {
+                option.label()
+            }
         } else {
             Text(value.toString())
         }
@@ -230,7 +248,21 @@ abstract class OptionsPreference<T> : UserPreference<T> {
             modifier = Modifier.padding(top = spacing.tinyAdaptive),
             enabled = enabled,
         ) {
-            options().map { option -> RadioButtonOption(option.value, option.modifier, option.label) }
+            options().map { option ->
+                RadioButtonOption(option.value, option.modifier) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (option.icon != null) {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                                option.icon()
+                            }
+                        }
+                        option.label()
+                    }
+                }
+            }
         }
     }
 }
@@ -309,19 +341,21 @@ object AutomationPreference : OptionsPreference<Automation>() {
                 Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO -> 7
                 Automation.Type.OPEN_APP_GPX_ROUTE -> 8
                 Automation.Type.COPY_APPLE_MAPS_URI -> 9
-                Automation.Type.COPY_GOOGLE_MAPS_URI -> 10
-                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 11
-                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 12
-                Automation.Type.COPY_MAGIC_EARTH_URI -> 13
-                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 14
-                Automation.Type.SAVE_GPX -> 15
-                Automation.Type.SHARE -> 16
-                Automation.Type.SHARE_GPX_ROUTE -> 17
+                Automation.Type.COPY_APPLE_MAPS_NAVIGATE_TO_URI -> 10
+                Automation.Type.COPY_GOOGLE_MAPS_URI -> 11
+                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 12
+                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 13
+                Automation.Type.COPY_MAGIC_EARTH_URI -> 14
+                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 15
+                Automation.Type.SAVE_GPX -> 16
+                Automation.Type.SHARE -> 17
+                Automation.Type.SHARE_GPX_ROUTE -> 18
             }
         }.map { automation ->
             PreferenceOption(
                 value = automation,
                 modifier = automation.testTag?.let { Modifier.testTag(it) } ?: Modifier,
+                icon = automation.getIcon(),
             ) {
                 automation.Label()
             }

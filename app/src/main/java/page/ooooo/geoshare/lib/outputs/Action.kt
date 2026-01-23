@@ -15,6 +15,8 @@ sealed interface Action {
     @Composable
     fun Label()
 
+    fun getIcon(): (@Composable () -> Unit)? = null
+
     fun isEnabled(position: Position, i: Int?): Boolean = true
 
     interface HasPackageName {

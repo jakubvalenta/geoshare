@@ -361,6 +361,7 @@ private fun MainScreen(
                     Column(
                         Modifier
                             .background(containerColor)
+                            .fillMaxWidth()
                             .padding(top = spacing.largeAdaptive)
                     ) {
                         CompositionLocalProvider(LocalContentColor provides contentColor) {

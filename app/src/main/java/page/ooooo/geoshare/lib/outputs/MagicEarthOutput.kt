@@ -1,27 +1,22 @@
 package page.ooooo.geoshare.lib.outputs
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.MagicEarthInput
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.components.AppIcon
+import page.ooooo.geoshare.ui.components.TextIcon
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated:
@@ -39,6 +34,10 @@ object MagicEarthOutput : Output {
         @Composable
         override fun Label() {
             Text(stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthInput.NAME))
+        }
+
+        override fun getIcon() = @Composable {
+            TextIcon("M")
         }
     }
 
@@ -84,7 +83,8 @@ object MagicEarthOutput : Output {
             Text(
                 stringResource(
                     R.string.conversion_succeeded_open_app_display,
-                    queryAppDetails()?.label ?: packageName,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
                 ),
             )
         }
@@ -99,8 +99,9 @@ object MagicEarthOutput : Output {
             Text(
                 stringResource(
                     R.string.conversion_succeeded_open_app_navigate_to,
-                    queryAppDetails()?.label ?: packageName,
-                ),
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
+                )
             )
         }
     }
@@ -124,63 +125,44 @@ object MagicEarthOutput : Output {
     }
 
     data class ShareNavigateToUriWithAppAutomation(override val packageName: String) :
-        ShareNavigateToUriWithAppAction(packageName),
-        Action.HasSuccessMessage,
-        BasicAutomation,
-        Automation.HasDelay {
+        ShareNavigateToUriWithAppAction(packageName), Action.HasSuccessMessage, BasicAutomation, Automation.HasDelay {
 
         override val type = Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO
         override val testTag = null
 
         @Composable
         override fun Label() {
-            val spacing = LocalSpacing.current
-            queryAppDetails()?.let { appDetails ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        rememberDrawablePainter(appDetails.icon),
-                        appDetails.label,
-                        Modifier.widthIn(max = 24.dp),
-                    )
-                    Text(
-                        stringResource(
-                            R.string.conversion_succeeded_open_app_navigate_to,
-                            appDetails.label
-                        )
-                    )
-                }
-            } ?: Text(
+            Text(
                 stringResource(
                     R.string.conversion_succeeded_open_app_navigate_to,
-                    packageName
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
                 )
             )
         }
 
-        @Composable
-        override fun successText() =
-            stringResource(
-                R.string.conversion_automation_open_app_succeeded,
-                queryAppDetails()?.label ?: packageName,
-            )
+        override fun getIcon() = @Composable {
+            AppIcon(packageName)
+        }
 
         @Composable
-        override fun errorText() =
-            stringResource(
-                R.string.conversion_automation_open_app_failed,
-                queryAppDetails()?.label ?: packageName,
-            )
+        override fun successText() = stringResource(
+            R.string.conversion_automation_open_app_succeeded,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
+        )
 
         @Composable
-        override fun waitingText(counterSec: Int) =
-            stringResource(
-                R.string.conversion_automation_open_app_waiting,
-                queryAppDetails()?.label ?: packageName,
-                counterSec,
-            )
+        override fun errorText() = stringResource(
+            R.string.conversion_automation_open_app_failed,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
+        )
+
+        @Composable
+        override fun waitingText(counterSec: Int) = stringResource(
+            R.string.conversion_automation_open_app_waiting,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
+            counterSec,
+        )
     }
 
     override fun getPositionActions() = listOf(
@@ -213,60 +195,56 @@ object MagicEarthOutput : Output {
     }
 
     override fun findAutomation(type: Automation.Type, packageName: String?): Automation? = when (type) {
-        Automation.Type.COPY_MAGIC_EARTH_URI ->
-            CopyDisplayUriAutomation
+        Automation.Type.COPY_MAGIC_EARTH_URI -> CopyDisplayUriAutomation
 
-        Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI ->
-            CopyNavigateToUriAutomation
+        Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> CopyNavigateToUriAutomation
 
-        Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO if packageName != null ->
-            ShareNavigateToUriWithAppAutomation(packageName)
+        Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO if packageName != null -> ShareNavigateToUriWithAppAutomation(
+            packageName
+        )
 
         else -> null
     }
 
-    private fun formatDisplayUriString(position: Position, i: Int?, uriQuote: UriQuote): String =
-        Uri(
-            scheme = "magicearth",
-            path = "//",
-            queryParams = buildMap {
-                (position.getPoint(i) ?: Point(Srs.WGS84)).let { point ->
-                    point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
-                        if (position.q == null) {
-                            set("show_on_map", "")
-                            set("lat", latStr)
-                            set("lon", lonStr)
-                            point.name?.let { name ->
-                                set("name", name)
-                            }
-                        } else {
-                            if (point.lat == 0.0 && point.lon == 0.0) {
-                                set("open_search", "")
-                            } else {
-                                set("search_around", "")
-                                set("lat", latStr)
-                                set("lon", lonStr)
-                            }
-                            set("q", position.q)
-                        }
-                    }
-                }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
-
-    private fun formatNavigateToUriString(position: Position, i: Int?, uriQuote: UriQuote): String =
-        Uri(
-            scheme = "magicearth",
-            path = "//",
-            queryParams = buildMap {
-                set("get_directions", "")
-                (position.getPoint(i) ?: Point(Srs.WGS84))
-                    .toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+    private fun formatDisplayUriString(position: Position, i: Int?, uriQuote: UriQuote): String = Uri(
+        scheme = "magicearth",
+        path = "//",
+        queryParams = buildMap {
+            (position.getPoint(i) ?: Point(Srs.WGS84)).let { point ->
+                point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                    if (position.q == null) {
+                        set("show_on_map", "")
                         set("lat", latStr)
                         set("lon", lonStr)
+                        point.name?.let { name ->
+                            set("name", name)
+                        }
+                    } else {
+                        if (point.lat == 0.0 && point.lon == 0.0) {
+                            set("open_search", "")
+                        } else {
+                            set("search_around", "")
+                            set("lat", latStr)
+                            set("lon", lonStr)
+                        }
+                        set("q", position.q)
                     }
-            }.toImmutableMap(),
-            uriQuote = uriQuote,
-        ).toString()
+                }
+            }
+        }.toImmutableMap(),
+        uriQuote = uriQuote,
+    ).toString()
+
+    private fun formatNavigateToUriString(position: Position, i: Int?, uriQuote: UriQuote): String = Uri(
+        scheme = "magicearth",
+        path = "//",
+        queryParams = buildMap {
+            set("get_directions", "")
+            (position.getPoint(i) ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                set("lat", latStr)
+                set("lon", lonStr)
+            }
+        }.toImmutableMap(),
+        uriQuote = uriQuote,
+    ).toString()
 }

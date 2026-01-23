@@ -56,16 +56,8 @@ abstract class OpenAppAction(override val packageName: String) :
     override fun errorText() =
         stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
-                ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
-
-    private var appDetailsCache: AndroidTools.AppDetails? = null
-
-    @Composable
-    protected fun queryAppDetails(): AndroidTools.AppDetails? =
-        appDetailsCache ?: AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)
-            ?.also { appDetailsCache = it }
 }
 
 abstract class OpenChooserAction : BasicAction, Action.HasErrorMessage {

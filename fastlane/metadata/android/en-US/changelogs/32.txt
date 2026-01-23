@@ -1,5 +1,6 @@
-- Added the option to set automation delay.
+- Added automation delay preference.
 - Added support for Google Maps ll parameter.
+- Added copy Apple Maps navigation link item.
 - Fixed Google Maps sometimes returning generic page instead of place location.
 - Fixed location precision when opening coordinates that are in China in Amap.
 - Fixed blank screen when resuming the app.

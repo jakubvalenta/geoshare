@@ -8,6 +8,7 @@ sealed interface Automation : Action {
     @Immutable
     enum class Type {
         COPY_APPLE_MAPS_URI,
+        COPY_APPLE_MAPS_NAVIGATE_TO_URI,
         COPY_COORDS_DEC,
         COPY_COORDS_NSWE_DEC,
         COPY_GEO_URI,
