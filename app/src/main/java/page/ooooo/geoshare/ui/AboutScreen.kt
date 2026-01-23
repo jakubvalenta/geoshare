@@ -5,9 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -81,7 +79,7 @@ private fun AboutScreen(
         mainPane = { innerPadding, wide ->
             Column(
                 Modifier
-                    .padding(horizontal = spacing.windowPadding)
+                    .weight(1f)
                     .run {
                         if (wide) {
                             padding(innerPadding)
@@ -90,13 +88,12 @@ private fun AboutScreen(
                             this
                         }
                     }
-                    .fillMaxHeight()
+                    .padding(horizontal = spacing.windowPadding)
                     .verticalScroll(rememberScrollState()),
             ) {
                 AboutMainPane(donation = donation)
             }
             if (!wide) {
-                Spacer(Modifier.weight(1f))
                 AboutSupportingPane(donation = donation, innerPadding = innerPadding, bottomCorners = false)
             }
         },
