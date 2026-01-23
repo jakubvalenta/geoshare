@@ -85,7 +85,7 @@ object AndroidTools {
             }
         }
 
-    fun queryAppDetails(packageManager: PackageManager, packageName: String): AppDetails? {
+    private fun queryAppDetailsWithoutCache(packageManager: PackageManager, packageName: String): AppDetails? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
@@ -103,6 +103,12 @@ object AndroidTools {
             null
         }
     }
+
+    private val appDetailsCache: HashMap<String, AppDetails> = hashMapOf()
+
+    fun queryAppDetails(packageManager: PackageManager, packageName: String): AppDetails? =
+        appDetailsCache[packageName] ?: queryAppDetailsWithoutCache(packageManager, packageName)
+            ?.also { appDetailsCache[packageName] = it }
 
     private fun queryPackageNames(packageManager: PackageManager, intent: Intent): List<String> {
         val resolveInfos = try {

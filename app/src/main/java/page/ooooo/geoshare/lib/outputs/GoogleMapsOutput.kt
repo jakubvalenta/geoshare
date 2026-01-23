@@ -1,26 +1,20 @@
 package page.ooooo.geoshare.lib.outputs
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.components.AppIcon
+import page.ooooo.geoshare.ui.components.TextIcon
 
 /**
  * See https://developers.google.com/maps/documentation/urls/get-started
@@ -34,6 +28,10 @@ object GoogleMapsOutput : Output {
         @Composable
         override fun Label() {
             Text(stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsInput.NAME))
+        }
+
+        override fun getIcon() = @Composable {
+            TextIcon("G")
         }
     }
 
@@ -75,7 +73,8 @@ object GoogleMapsOutput : Output {
             Text(
                 stringResource(
                     R.string.conversion_succeeded_open_app_navigate_to,
-                    queryAppDetails()?.label ?: packageName,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
                 ),
             )
         }
@@ -90,7 +89,8 @@ object GoogleMapsOutput : Output {
             Text(
                 stringResource(
                     R.string.conversion_succeeded_open_app_street_view,
-                    queryAppDetails()?.label ?: packageName,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
                 ),
             )
         }
@@ -140,43 +140,35 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            val spacing = LocalSpacing.current
-            queryAppDetails()?.let { appDetails ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        rememberDrawablePainter(appDetails.icon),
-                        appDetails.label,
-                        Modifier.widthIn(max = 24.dp),
-                    )
-                    Text(
-                        stringResource(
-                            R.string.conversion_succeeded_open_app_navigate_to,
-                            queryAppDetails()?.label ?: packageName
-                        )
-                    )
-                }
-            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, packageName))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_navigate_to,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
+                )
+            )
+        }
+
+        override fun getIcon() = @Composable {
+            AppIcon(packageName)
         }
 
         @Composable
         override fun successText() = stringResource(
             R.string.conversion_automation_open_app_succeeded,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun errorText() = stringResource(
             R.string.conversion_automation_open_app_failed,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun waitingText(counterSec: Int) = stringResource(
             R.string.conversion_automation_open_app_waiting,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )
     }
@@ -196,43 +188,35 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            val spacing = LocalSpacing.current
-            queryAppDetails()?.let { appDetails ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        rememberDrawablePainter(appDetails.icon),
-                        appDetails.label,
-                        Modifier.widthIn(max = 24.dp),
-                    )
-                    Text(
-                        stringResource(
-                            R.string.conversion_succeeded_open_app_street_view,
-                            queryAppDetails()?.label ?: packageName
-                        )
-                    )
-                }
-            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_street_view, packageName))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_street_view,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
+                )
+            )
+        }
+
+        override fun getIcon() = @Composable {
+            AppIcon(packageName)
         }
 
         @Composable
         override fun successText() = stringResource(
             R.string.conversion_automation_open_app_succeeded,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun errorText() = stringResource(
             R.string.conversion_automation_open_app_failed,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun waitingText(counterSec: Int) = stringResource(
             R.string.conversion_automation_open_app_waiting,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )
     }

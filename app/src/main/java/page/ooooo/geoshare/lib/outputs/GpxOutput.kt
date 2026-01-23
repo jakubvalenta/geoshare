@@ -5,28 +5,21 @@ import android.content.Intent
 import android.content.res.Resources
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.AndroidTools.queryAppDetails
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.components.AppIcon
 import java.io.File
 import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
@@ -58,8 +51,9 @@ object GpxOutput : Output {
             Text(
                 stringResource(
                     R.string.conversion_succeeded_open_app,
-                    queryAppDetails()?.label ?: packageName,
-                ),
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
+                )
             )
         }
 
@@ -72,15 +66,8 @@ object GpxOutput : Output {
         @Composable
         override fun errorText(): String = stringResource(
             R.string.conversion_succeeded_open_app_failed,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
-
-        private var appDetailsCache: AndroidTools.AppDetails? = null
-
-        @Composable
-        protected fun queryAppDetails(): AndroidTools.AppDetails? =
-            appDetailsCache ?: queryAppDetails(LocalContext.current.packageManager, packageName)
-                ?.also { appDetailsCache = it }
     }
 
     open class ShareGpxRouteAction : LocationAction, Action.HasErrorMessage {
@@ -150,6 +137,10 @@ object GpxOutput : Output {
             Text(stringResource(R.string.conversion_succeeded_save_gpx))
         }
 
+        override fun getIcon() = @Composable {
+            Icon(painterResource(R.drawable.file_save_24px), null)
+        }
+
         @Composable
         override fun errorText() = stringResource(R.string.conversion_succeeded_save_gpx_failed)
     }
@@ -165,43 +156,35 @@ object GpxOutput : Output {
 
         @Composable
         override fun Label() {
-            val spacing = LocalSpacing.current
-            queryAppDetails()?.let { appDetails ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        rememberDrawablePainter(appDetails.icon),
-                        appDetails.label,
-                        Modifier.widthIn(max = 24.dp),
-                    )
-                    Text(
-                        stringResource(
-                            R.string.conversion_succeeded_open_app_navigate_to,
-                            queryAppDetails()?.label ?: packageName
-                        )
-                    )
-                }
-            } ?: Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, packageName))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_navigate_to,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
+                )
+            )
+        }
+
+        override fun getIcon() = @Composable {
+            AppIcon(packageName)
         }
 
         @Composable
         override fun successText() = stringResource(
             R.string.conversion_automation_open_app_succeeded,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun errorText() = stringResource(
             R.string.conversion_automation_open_app_failed,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun waitingText(counterSec: Int) = stringResource(
             R.string.conversion_automation_open_app_waiting,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )
     }
@@ -251,13 +234,13 @@ object GpxOutput : Output {
     }
 
     override fun getPositionActions(): List<Action> = listOf(
-        SaveGpxPointsAction(),
         ShareGpxRouteAction(),
+        SaveGpxPointsAction(),
     )
 
     override fun getPointActions(): List<Action> = listOf(
-        SaveGpxPointsAction(),
         ShareGpxRouteAction(),
+        SaveGpxPointsAction(),
     )
 
     override fun getAppActions(apps: List<AndroidTools.App>) =
@@ -267,8 +250,8 @@ object GpxOutput : Output {
     override fun getChipActions() = listOf(SaveGpxPointsAction())
 
     override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
-        add(SaveGpxPointsAutomation)
         add(ShareGpxRouteAutomation)
+        add(SaveGpxPointsAutomation)
         apps.filter { it.type == AndroidTools.AppType.GPX }
             .forEach { add(ShareGpxRouteWithAppAutomation(it.packageName)) }
     }

@@ -54,7 +54,11 @@ fun ResultSuccessSheetContent(
         }
         copyActions.mapNotNull { it as? CopyAction }.forEach { action ->
             item {
-                ResultSuccessSheetItem({ action.Label() }, description = action.getText(position, i)) {
+                ResultSuccessSheetItem(
+                    label = { action.Label() },
+                    icon = action.getIcon(),
+                    description = action.getText(position, i),
+                ) {
                     onHide()
                     onRun(action, i)
                 }
@@ -67,7 +71,10 @@ fun ResultSuccessSheetContent(
         }
         otherActions.forEach { action ->
             item {
-                ResultSuccessSheetItem({ action.Label() }) {
+                ResultSuccessSheetItem(
+                    label = { action.Label() },
+                    icon = action.getIcon(),
+                ) {
                     onHide()
                     onRun(action, i)
                 }
@@ -79,6 +86,7 @@ fun ResultSuccessSheetContent(
 @Composable
 private fun ResultSuccessSheetItem(
     label: @Composable () -> Unit,
+    icon: (@Composable () -> Unit)? = null,
     description: String? = null,
     onClick: () -> Unit,
 ) {
@@ -95,11 +103,14 @@ private fun ResultSuccessSheetItem(
                 )
             }
         },
+        leadingContent = icon ?: {
+            PlaceholderIcon()
+        },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=2800px,dpi=440")
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -115,7 +126,11 @@ private fun DefaultPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    device = "spec:width=1080px,height=2800px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun DarkPreview() {
     AppTheme {

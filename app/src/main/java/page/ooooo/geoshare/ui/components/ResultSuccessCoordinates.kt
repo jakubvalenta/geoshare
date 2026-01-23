@@ -96,7 +96,7 @@ fun ResultSuccessCoordinates(
                 allOutputs.getChipActions()
                     .filter { it.isEnabled(position, null) }
                     .forEach { action ->
-                        ResultCardChip({ action.Label() }) { onRun(action, null) }
+                        ResultCardChip({ action.Label() }, icon = action.getIcon()) { onRun(action, null) }
                     }
             },
         )

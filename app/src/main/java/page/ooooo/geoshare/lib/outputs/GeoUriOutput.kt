@@ -1,29 +1,25 @@
 package page.ooooo.geoshare.lib.outputs
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.components.AppIcon
 
 object GeoUriOutput : Output {
     @Suppress("SpellCheckingInspection")
@@ -38,6 +34,10 @@ object GeoUriOutput : Output {
         override fun Label() {
             Text(stringResource(R.string.conversion_succeeded_copy_geo))
         }
+
+        override fun getIcon() = @Composable {
+            Icon(painterResource(R.drawable.language_24px), null)
+        }
     }
 
     open class ShareGeoUriAction : OpenChooserAction() {
@@ -47,6 +47,10 @@ object GeoUriOutput : Output {
         @Composable
         override fun Label() {
             Text(stringResource(R.string.conversion_succeeded_share))
+        }
+
+        override fun getIcon() = @Composable {
+            Icon(Icons.Default.Share, null)
         }
     }
 
@@ -67,7 +71,7 @@ object GeoUriOutput : Output {
                 stringResource(
                     R.string.conversion_succeeded_open_app,
                     AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
-                        ?: packageName
+                        ?: packageName,
                 )
             )
         }
@@ -115,43 +119,35 @@ object GeoUriOutput : Output {
 
         @Composable
         override fun Label() {
-            val spacing = LocalSpacing.current
-            queryAppDetails()?.let { appDetails ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        rememberDrawablePainter(appDetails.icon),
-                        appDetails.label,
-                        Modifier.widthIn(max = 24.dp),
-                    )
-                    Text(
-                        stringResource(
-                            R.string.conversion_succeeded_open_app,
-                            queryAppDetails()?.label ?: packageName
-                        )
-                    )
-                }
-            } ?: Text(stringResource(R.string.conversion_succeeded_open_app, packageName))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app,
+                    AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label
+                        ?: packageName,
+                )
+            )
+        }
+
+        override fun getIcon() = @Composable {
+            AppIcon(packageName)
         }
 
         @Composable
         override fun successText() = stringResource(
             R.string.conversion_automation_open_app_succeeded,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun errorText() = stringResource(
             R.string.conversion_automation_open_app_failed,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
         )
 
         @Composable
         override fun waitingText(counterSec: Int) = stringResource(
             R.string.conversion_automation_open_app_waiting,
-            queryAppDetails()?.label ?: packageName,
+            AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )
     }

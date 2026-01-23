@@ -1,24 +1,17 @@
 package page.ooooo.geoshare.lib.outputs
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.AppleMapsInput
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.components.TextIcon
 
 /**
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
@@ -31,22 +24,11 @@ object AppleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            val spacing = LocalSpacing.current
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Card(
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
-                ) {
-                    Text("\u24B6")
-                }
-                Text(stringResource(R.string.conversion_succeeded_copy_link, AppleMapsInput.NAME))
-            }
+            Text(stringResource(R.string.conversion_succeeded_copy_link, AppleMapsInput.NAME))
+        }
 
+        override fun getIcon() = @Composable {
+            TextIcon("A")
         }
     }
 
