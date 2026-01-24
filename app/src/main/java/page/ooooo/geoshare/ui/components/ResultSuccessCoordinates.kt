@@ -13,6 +13,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
@@ -34,15 +36,12 @@ fun ResultSuccessCoordinates(
     val spacing = LocalSpacing.current
 
     Column {
-        (allOutputs.getName(position, null)
-            ?: stringResource(R.string.conversion_succeeded_title)).let { text ->
-            Headline(
-                text,
-                Modifier
-                    .testTag("geoShareConversionSuccessPositionName")
-                    .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
-            )
-        }
+        Headline(
+            allOutputs.getName(position, null) ?: stringResource(R.string.conversion_succeeded_title),
+            Modifier
+                .testTag("geoShareConversionSuccessPositionName")
+                .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
+        )
         ResultCard(
             main = {
                 allOutputs.getText(position, null)?.let { text ->
@@ -53,20 +52,17 @@ fun ResultSuccessCoordinates(
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
-                }
-                allOutputs.getDescription(position)?.takeIf { it.isNotEmpty() }?.let { text ->
-                    SelectionContainer {
-                        Text(
-                            text,
-                            Modifier
-                                .testTag("geoShareConversionSuccessPositionDescription")
-                                .fillMaxWidth()
-                                .padding(top = spacing.tinyAdaptive, bottom = spacing.smallAdaptive),
-                            fontStyle = FontStyle.Italic,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                }
+                } ?: Text(
+                    stringResource(R.string.conversion_succeeded_description_q_only),
+                    Modifier
+                        .testTag("geoShareConversionSuccessPositionDescription")
+                        .fillMaxWidth(),
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        lineBreak = LineBreak.Paragraph,
+                        hyphens = Hyphens.Auto,
+                    ),
+                )
             },
             end = {
                 IconButton(
@@ -148,7 +144,7 @@ private fun DescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
+                position = Position(Srs.WGS84, q = "Berlin, Germany", z = 13.0),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -165,7 +161,7 @@ private fun DarkDescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position.example.copy(q = "Berlin, Germany", z = 13.0),
+                position = Position(Srs.WGS84, q = "Berlin, Germany", z = 13.0),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )

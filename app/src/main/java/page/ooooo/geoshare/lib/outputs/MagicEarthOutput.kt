@@ -240,9 +240,14 @@ object MagicEarthOutput : Output {
         path = "//",
         queryParams = buildMap {
             set("get_directions", "")
-            (position.getPoint(i) ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
-                set("lat", latStr)
-                set("lon", lonStr)
+            position.getPoint(i)?.let { point ->
+                point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+                    set("lat", latStr)
+                    set("lon", lonStr)
+                }
+            } ?: position.q?.let { q ->
+                @Suppress("SpellCheckingInspection")
+                set("daddr", q)  // TODO Test MagicEarth daddr
             }
         }.toImmutableMap(),
         uriQuote = uriQuote,

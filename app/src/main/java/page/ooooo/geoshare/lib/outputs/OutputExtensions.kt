@@ -13,9 +13,6 @@ fun List<Output>.getText(position: Position, i: Int?, uriQuote: UriQuote = Defau
 fun List<Output>.getName(position: Position, i: Int?, uriQuote: UriQuote = DefaultUriQuote()) =
     this.firstNotNullOfOrNull { it.getName(position, i, uriQuote) }
 
-fun List<Output>.getDescription(position: Position, uriQuote: UriQuote = DefaultUriQuote()) =
-    this.firstNotNullOfOrNull { it.getDescription(position, uriQuote) }
-
 fun List<Output>.getAppActions(apps: List<AndroidTools.App>) =
     this.flatMap { it.getAppActions(apps) }
 

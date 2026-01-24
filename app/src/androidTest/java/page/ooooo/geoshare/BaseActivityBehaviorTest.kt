@@ -20,7 +20,6 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.outputs.allOutputs
-import page.ooooo.geoshare.lib.outputs.getDescription
 import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.lib.position.Position
 import kotlin.math.pow
@@ -87,15 +86,12 @@ abstract class BaseActivityBehaviorTest {
             }
         } else {
             // On Android API < 28, swipe from the center of the screen towards the bottom edge to reveal "Clear all"
-            if (
-                onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                    @Suppress("SpellCheckingInspection")
-                    when (textAsString()) {
+            if (onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
+                    @Suppress("SpellCheckingInspection") when (textAsString()) {
                         "No recent items", "Aucun élément récent" -> true
                         else -> false
                     }
-                } != null
-            ) {
+                } != null) {
                 // Sometimes it can happen that the recent apps screen shows nothing, so we tap the recent button again
                 device.pressRecentApps()
                 waitForStableInActiveWindow()
@@ -130,8 +126,7 @@ abstract class BaseActivityBehaviorTest {
     }
 
     private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =
-        @Suppress("SpellCheckingInspection")
-        when (element.textAsString()?.lowercase()) {
+        @Suppress("SpellCheckingInspection") when (element.textAsString()?.lowercase()) {
             "only this time", "uniquement cette fois-ci" -> true
             else -> false
         }
@@ -146,8 +141,7 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun denyLocationPermission() = uiAutomator {
         onElement {
-            @Suppress("SpellCheckingInspection")
-            when (textAsString()?.lowercase()) {
+            @Suppress("SpellCheckingInspection") when (textAsString()?.lowercase()) {
                 "don't allow", "don’t allow", "ne pas autoriser" -> true
                 else -> false
             }
@@ -162,54 +156,50 @@ abstract class BaseActivityBehaviorTest {
     }
 
     protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
-        onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionCoordinates" || viewIdResourceName == "geoShareConversionErrorMessage" }
-        val expectedText = allOutputs.getText(expectedPosition, null)
+        onElement(NETWORK_TIMEOUT) {
+            when (viewIdResourceName) {
+                "geoShareConversionSuccessPositionName" -> true
+                "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
+                else -> false
+            }
+        }
         onElement {
-            if (viewIdResourceName == "geoShareConversionSuccessPositionCoordinates") {
-                assertEquals(expectedText, textAsString())
+            if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
+                if (!expectedPosition.points?.last()?.name.isNullOrEmpty()) {
+                    assertEquals(
+                        expectedPosition.points.last().name?.replace('+', ' '),
+                        textAsString(),
+                    )
+                } else if (expectedPosition.points != null && expectedPosition.points.size > 1) {
+                    assertEquals("point ${expectedPosition.points.size}", textAsString())
+                } else if (!expectedPosition.q.isNullOrEmpty()) {
+                    assertEquals(
+                        expectedPosition.q.replace('+', ' '),
+                        textAsString(),
+                    )
+                } else {
+                    assertTrue(
+                        "Expected ${textAsString()} to equal 'Coordinates' (or a translation)",
+                        textAsString() in setOf(
+                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
+                        ),
+                    )
+                }
                 true
             } else {
                 false
             }
         }
-        val expectedName = expectedPosition.points?.lastOrNull()?.name?.replace('+', ' ')
-            ?: expectedPosition.points?.size?.takeIf { it > 1 }?.let { "point $it" }
-        if (expectedName != null) {
+        val expectedText = allOutputs.getText(expectedPosition, null)
+        if (expectedText != null) {
             onElement {
-                if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
-                    assertEquals(expectedName, textAsString())
+                if (viewIdResourceName == "geoShareConversionSuccessPositionCoordinates") {
+                    assertEquals(expectedText, textAsString())
                     true
                 } else {
                     false
                 }
             }
-        } else {
-            onElement {
-                if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
-                    assertTrue(
-                        when (textAsString()) {
-                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées" -> true
-                            else -> false
-                        }
-                    )
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-        if (!expectedPosition.q.isNullOrEmpty() || expectedPosition.z != null) {
-            val expectedDescription = allOutputs.getDescription(expectedPosition)
-            onElement {
-                if (viewIdResourceName == "geoShareConversionSuccessPositionDescription") {
-                    assertEquals(expectedDescription, textAsString())
-                    true
-                } else {
-                    false
-                }
-            }
-        } else {
-            assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareConversionSuccessPositionDescription" })
         }
     }
 
@@ -219,19 +209,16 @@ abstract class BaseActivityBehaviorTest {
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
-            packageName == PackageNames.GOOGLE_MAPS &&
-                @Suppress("SpellCheckingInspection")
-                when (textAsString()) {
-                    "Make it your map", "Profitez d'une carte personnalisée" -> true
-                    else -> false
-                }
+            packageName == PackageNames.GOOGLE_MAPS && @Suppress("SpellCheckingInspection") when (textAsString()) {
+                "Make it your map", "Profitez d'une carte personnalisée" -> true
+                else -> false
+            }
         }?.also {
             onElement {
-                packageName == PackageNames.GOOGLE_MAPS &&
-                    when (textAsString()?.lowercase()) {
-                        "skip", "ignorer" -> true
-                        else -> false
-                    }
+                packageName == PackageNames.GOOGLE_MAPS && when (textAsString()?.lowercase()) {
+                    "skip", "ignorer" -> true
+                    else -> false
+                }
             }.click()
         }
 
@@ -248,8 +235,7 @@ abstract class BaseActivityBehaviorTest {
 
         // If there is Importing GPX tracks dialog, confirm it
         onElementOrNull(5_000L) {
-            @Suppress("SpellCheckingInspection")
-            when (textAsString()) {
+            @Suppress("SpellCheckingInspection") when (textAsString()) {
                 "Got it", "J'ai compris" -> true
                 else -> false
             }
@@ -262,8 +248,7 @@ abstract class BaseActivityBehaviorTest {
     protected fun shareUri(unsafeUriString: String) = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi
         device.executeShellCommand(
-            @Suppress("SpellCheckingInspection")
-            "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${PackageNames.GEO_SHARE_DEBUG}/page.ooooo.geoshare.ConversionActivity ${PackageNames.GEO_SHARE_DEBUG}"
+            @Suppress("SpellCheckingInspection") "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${PackageNames.GEO_SHARE_DEBUG}/page.ooooo.geoshare.ConversionActivity ${PackageNames.GEO_SHARE_DEBUG}"
         )
     }
 

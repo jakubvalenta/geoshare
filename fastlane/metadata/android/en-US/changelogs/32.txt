@@ -2,7 +2,7 @@
 - Added 'Copy Apple Maps navigation link' to copy menu.
 - Added support for Google Maps 'll' and Apple Maps 'daddr' parameters.
 - Added support for input geo: URIs with space (technically invalid).
-- Fixed Google Maps sometimes returning generic page instead of place location.
+- Improved Google Maps place links without coordinates by showing a warning instead of 0 coordinates.
 - Fixed location precision when opening coordinates that are in China in Amap.
 - Fixed blank screen when resuming the app.
 - Fixed Supported Maps screen on tablets.

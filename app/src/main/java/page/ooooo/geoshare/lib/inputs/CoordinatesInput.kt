@@ -32,7 +32,7 @@ object CoordinatesInput : Input {
         nameResId = R.string.converter_coordinates_name,
         items = listOf(
             InputDocumentationItem.Text(20) {
-                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Position.example, null))
+                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Point.example))
             },
         ),
     )
