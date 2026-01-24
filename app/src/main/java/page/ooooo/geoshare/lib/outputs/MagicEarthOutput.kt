@@ -246,8 +246,7 @@ object MagicEarthOutput : Output {
                     set("lon", lonStr)
                 }
             } ?: position.q?.let { q ->
-                @Suppress("SpellCheckingInspection")
-                set("daddr", q)  // TODO Test MagicEarth daddr
+                set("q", q)
             }
         }.toImmutableMap(),
         uriQuote = uriQuote,

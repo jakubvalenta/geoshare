@@ -48,12 +48,24 @@ class MagicEarthOutputTest {
     }
 
     @Test
-    fun getPositionActions_returnsNavigateToUri() {
+    fun getPositionActions_positionHasCoordinates_returnsNavigateToUriWithLatAndLonParameters() {
         assertEquals(
             listOf(
                 "magicearth://?get_directions&lat=50.123456&lon=-11.123456",
             ),
             Position(Srs.WGS84, 50.123456, -11.123456).let { position ->
+                output.getPositionActions().drop(1).map { it.getText(position, null, uriQuote) }
+            },
+        )
+    }
+
+    @Test
+    fun getPositionActions_positionHasCoordinates_returnsNavigateToUrWithQParameter() {
+        assertEquals(
+            listOf(
+                "magicearth://?get_directions&q=foo%20bar",
+            ),
+            Position(Srs.WGS84, q = "foo bar").let { position ->
                 output.getPositionActions().drop(1).map { it.getText(position, null, uriQuote) }
             },
         )
