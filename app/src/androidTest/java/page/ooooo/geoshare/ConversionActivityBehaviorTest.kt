@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
@@ -85,7 +86,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -126,7 +127,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -151,7 +152,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -342,7 +343,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Hermannstr. 10, Berlin",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -383,7 +384,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Hermannstr. 20, Berlin",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -408,7 +409,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Hermannstr. 21, Berlin",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(
@@ -494,7 +495,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                         name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                     )
                 )
-            } catch (_: AssertionError) {
+            } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
                     Position(

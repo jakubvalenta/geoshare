@@ -2,11 +2,26 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -130,7 +145,7 @@ private fun DefaultPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
+                    CoordinatesOutput.formatDegMinSecString(Point.example),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -176,7 +191,7 @@ private fun DarkPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
+                    CoordinatesOutput.formatDegMinSecString(Point.example),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -237,7 +252,7 @@ private fun DefaultTopAndBottomPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
+                    CoordinatesOutput.formatDegMinSecString(Point.example),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -298,7 +313,7 @@ private fun DarkTopAndBottomPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
+                    CoordinatesOutput.formatDegMinSecString(Point.example),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -334,7 +349,7 @@ private fun ErrorPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
+                    CoordinatesOutput.formatDegMinSecString(Point.example),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -370,7 +385,7 @@ private fun DarkErrorPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Position.example, null),
+                    CoordinatesOutput.formatDegMinSecString(Point.example),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.uiAutomator
 import page.ooooo.geoshare.BaseActivityBehaviorTest
 import page.ooooo.geoshare.lib.position.Position
@@ -36,7 +37,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
             // Shows position
             try {
                 waitAndAssertPositionIsVisible(expectedPosition)
-            } catch (e: AssertionError) {
+            } catch (e: ElementNotFoundException) {
                 if (fallbackPosition != null) {
                     waitAndAssertPositionIsVisible(fallbackPosition)
                 } else {

@@ -21,7 +21,7 @@ object CoordinatesOutput : Output {
 
     open class CopyDecCoordsAction : CopyAction() {
         override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatDecString(position, i)
+            formatDecString(position.getPoint(i) ?: Point(Srs.WGS84))
 
         @Composable
         override fun Label() {
@@ -35,7 +35,7 @@ object CoordinatesOutput : Output {
 
     open class CopyDegMinSecCoordsAction : CopyAction() {
         override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatDegMinSecString(position, i)
+            formatDegMinSecString(position.getPoint(i) ?: Point(Srs.WGS84))
 
         @Composable
         override fun Label() {
@@ -55,7 +55,7 @@ object CoordinatesOutput : Output {
                     stringResource(R.string.conversion_succeeded_copy_coordinates)
                 )
                 Text(
-                    formatDecString(Position.example, null),
+                    formatDecString(Point.example),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -78,7 +78,7 @@ object CoordinatesOutput : Output {
                     stringResource(R.string.conversion_succeeded_copy_coordinates)
                 )
                 Text(
-                    formatDegMinSecString(Position.example, null),
+                    formatDegMinSecString(Point.example),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -89,12 +89,11 @@ object CoordinatesOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    override fun getText(position: Position, i: Int?, uriQuote: UriQuote) = formatDegMinSecString(position, i)
+    override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
+        position.getPoint(i)?.let { point -> formatDegMinSecString(point) }
 
     @Composable
     override fun getName(position: Position, i: Int?, uriQuote: UriQuote) = name(position, i)
-
-    override fun getDescription(position: Position, uriQuote: UriQuote) = formatDescriptionString(position)
 
     override fun getPositionActions(): List<BasicAction> = listOf(
         CopyDecCoordsAction(),
@@ -119,35 +118,17 @@ object CoordinatesOutput : Output {
         else -> null
     }
 
-    private fun formatDecString(position: Position, i: Int?): String =
-        (position.getPoint(i) ?: Point(Srs.WGS84))
-            .toStringPair(Srs.WGS84)
-            .let { (latStr, lonStr) -> "$latStr, $lonStr" }
+    private fun formatDecString(point: Point): String =
+        point.toStringPair(Srs.WGS84).let { (latStr, lonStr) -> "$latStr, $lonStr" }
 
-    fun formatDegMinSecString(position: Position, i: Int?): String =
-        (position.getPoint(i) ?: Point(Srs.WGS84))
-            .toSrs(Srs.WGS84).run {
-                lat.toDegMinSec().let { (deg, min, sec) ->
-                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
-                } + lon.toDegMinSec().let { (deg, min, sec) ->
-                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
-                }
+    fun formatDegMinSecString(point: Point): String =
+        point.toSrs(Srs.WGS84).run {
+            lat.toDegMinSec().let { (deg, min, sec) ->
+                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
+            } + lon.toDegMinSec().let { (deg, min, sec) ->
+                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
             }
-
-    private fun formatDescriptionString(position: Position): String = position.run {
-        buildList {
-            q.takeUnless { it.isNullOrEmpty() }?.let { q ->
-                (points?.lastOrNull() ?: Point(Srs.WGS84)).toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
-                    if (q != "$latStr,$lonStr") {
-                        add(q.replace('+', ' '))
-                    }
-                }
-            }
-            zStr?.let { zStr ->
-                add("z$zStr")
-            }
-        }.joinToString("\t\t")
-    }
+        }
 
     @Composable
     private fun name(position: Position, i: Int?): String? =
@@ -156,5 +137,5 @@ object CoordinatesOutput : Output {
                 ?: position.points?.size?.takeIf { it > 1 }?.let { size ->
                     stringResource(R.string.conversion_succeeded_point_number, if (i == null) size else i + 1)
                 }
-        }
+        } ?: position.q?.replace('+', ' ')
 }

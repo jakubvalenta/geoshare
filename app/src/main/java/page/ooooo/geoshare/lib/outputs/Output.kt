@@ -11,8 +11,6 @@ interface Output {
     @Composable
     fun getName(position: Position, i: Int?, uriQuote: UriQuote): String? = null
 
-    fun getDescription(position: Position, uriQuote: UriQuote): String? = null
-
     fun getPositionActions(): List<Action> = emptyList()
 
     fun getPointActions(): List<Action> = emptyList()

@@ -1,36 +1,15 @@
 package page.ooooo.geoshare.lib.outputs
 
-import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Point
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 
 class CoordinatesOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val output = CoordinatesOutput
-
-    @Test
-    fun descriptionOutput_returnsQueryAndZoomButNotPoints() {
-        assertEquals(
-            "foo bar\t\tz3.4",
-            output.getDescription(
-                Position(
-                    q = "foo bar",
-                    z = 3.4,
-                    points = persistentListOf(
-                        Point(Srs.WGS84, 59.1293656, 11.4585672),
-                        Point(Srs.WGS84, 59.4154007, 11.659710599999999),
-                        Point(Srs.WGS84, 59.147731699999994, 11.550661199999999),
-                    ),
-                ),
-                uriQuote,
-            ),
-        )
-    }
 
     @Test
     fun copyAction_returnsSouthWestForNegativeCoordinates() {

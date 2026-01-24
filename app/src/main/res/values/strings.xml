@@ -34,6 +34,7 @@
     <string name="conversion_succeeded_copy_link_display">Copy link to show map in %1$s</string>
     <string name="conversion_succeeded_copy_link_drive_to">Copy link to navigate in %1$s</string>
     <string name="conversion_succeeded_copy_link_street_view">Copy link to street view in %1$s</string>
+    <string name="conversion_succeeded_description_q_only">The original link doesn’t contain coordinates, only a place name. When you open this location in another app, it might find a different place than the original link.</string>
     <string name="conversion_succeeded_location_failed">Failed to find location</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Finding your location…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">Allow location access?</string>
