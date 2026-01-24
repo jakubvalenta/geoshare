@@ -65,6 +65,23 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
+    fun parseUri_directionsCoordinates() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626)),
+            parseUri("https://maps.apple.com/?daddr=50.894967,4.341626"),
+        )
+    }
+
+    @Test
+    fun parseUri_directionsQuery() = runTest {
+        assertEquals(
+            @Suppress("SpellCheckingInspection")
+            ParseUriResult.Succeeded(Position(Srs.WGS84, q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            parseUri("https://maps.apple.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany"),
+        )
+    }
+
+    @Test
     fun parseUri_view() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(Position(Srs.WGS84, 52.49115540927951, 13.42595574770533)),
@@ -105,7 +122,7 @@ class AppleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_parameterLlTakesPrecedence() = runTest {
+    fun parseUri_parameterLlTakesPrecedenceOverCenterAndSllAndCoordinate() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
             parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533"),
@@ -120,24 +137,40 @@ class AppleMapsInputTest : BaseInputTest() {
         )
     }
 
+    @Suppress("SpellCheckingInspection")
     @Test
-    fun parseUri_parameterAddressTakesPrecedence() = runTest {
+    fun parseUri_parameterAddressTakesPrecedenceOverQAndNameAndDaddr() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
             parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
             parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz"),
         )
+        assertEquals(
+            ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&daddr=Reuterplatz"),
+        )
     }
 
+    @Suppress("SpellCheckingInspection")
+    @Test
+    fun parseUri_parameterDaddrTakesPrecedenceOverQAndName() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            parseUri("https://maps.apple.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"),
+        )
+        assertEquals(
+            ParseUriResult.Succeeded(Position(q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            parseUri("https://maps.apple.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz"),
+        )
+    }
+
+    @Suppress("SpellCheckingInspection")
     @Test
     fun parseUri_parameterNameTakesPrecedenceOverQ() = runTest {
         assertEquals(
-            @Suppress("SpellCheckingInspection")
             ParseUriResult.Succeeded(Position(q = "Reuterplatz")),
             parseUri("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park"),
         )
@@ -145,7 +178,7 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Suppress("SpellCheckingInspection")
     @Test
-    fun parseUri_AuidOnly() = runTest {
+    fun parseUri_auidOnly() = runTest {
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
                 Position(),
