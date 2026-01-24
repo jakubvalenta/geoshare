@@ -1,6 +1,6 @@
 - Added automation delay preference.
 - Added 'Copy Apple Maps navigation link' to copy menu.
-- Added support for Google Maps 'll' and Apple Maps 'daddr' parameters.
+- Added support for Google Maps 'll' and Apple Maps destination parameters.
 - Added support for input geo: URIs with space (technically invalid).
 - Improved Google Maps place links without coordinates by showing a warning instead of 0 coordinates.
 - Fixed location precision when opening coordinates that are in China in Amap.
