@@ -32,9 +32,13 @@ object AppleMapsInput : Input.HasHtml {
         val position = buildPosition(srs) {
             uri.run {
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+                @Suppress("SpellCheckingInspection")
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["daddr"] }
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
                 setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
+                @Suppress("SpellCheckingInspection")
+                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
                 setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
                 setQWithCenterIfNull {
                     (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
