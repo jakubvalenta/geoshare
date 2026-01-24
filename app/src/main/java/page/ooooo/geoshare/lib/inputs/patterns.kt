@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 
 const val MAX_COORD_PRECISION = 17
-private const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
-private const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?"""
+const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
+const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?"""
 const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
 const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
 const val Z = """(?P<z>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""

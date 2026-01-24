@@ -15,6 +15,11 @@ class GeoUriInputTest : BaseInputTest() {
     }
 
     @Test
+    fun uriPattern_geoUriWithSpaceInQ() = runTest {
+        assertTrue(doesUriPatternMatch("geo:0,0?q=45.4786785, 9.2473799"))
+    }
+
+    @Test
     fun uriPattern_noPath() {
         assertTrue(doesUriPatternMatch("geo:?q=foo"))
     }
@@ -114,6 +119,14 @@ class GeoUriInputTest : BaseInputTest() {
         assertEquals(
             ParseUriResult.Succeeded(Position(q = "foo bar")),
             parseUri("geo:?q=foo%20bar"),
+        )
+    }
+
+    @Test
+    fun parseUri_coordsInQWithSpace() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(Position(Srs.WGS84, 45.4786785, 9.2473799)),
+            parseUri("geo:0,0?q=45.4786785,%209.2473799"),
         )
     }
 }
