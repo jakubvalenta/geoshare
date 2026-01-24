@@ -21,7 +21,7 @@ kotlin = "2.3.0"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.10.0"
-ksp = "2.3.2"
+ksp = "2.3.4"
 ktor = "3.3.3"
 mockitoKotlin = "6.2.2"
 re2j = "1.8"
@@ -63,6 +63,5 @@ re2j = { group = "com.google.re2j", name = "re2j", version.ref = "re2j" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
