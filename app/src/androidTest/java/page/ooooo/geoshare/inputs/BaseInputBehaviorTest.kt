@@ -57,7 +57,9 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 
         // Set main input
         onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }.setText(unsafeText)
-        waitForStableInActiveWindow()
+
+        // Hide keyboard
+        pressBack()
 
         // Submit and confirm permission dialog
         onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
