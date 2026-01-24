@@ -13,7 +13,8 @@ object GeoUriInput : Input {
 
     private val srs = Srs.WGS84
 
-    override val uriPattern: Pattern = Pattern.compile("""geo:\S+""")
+    override val uriPattern: Pattern =
+        Pattern.compile("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
