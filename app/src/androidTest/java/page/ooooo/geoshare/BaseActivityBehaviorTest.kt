@@ -125,6 +125,7 @@ abstract class BaseActivityBehaviorTest {
     ) = uiAutomator {
         val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
         DialogElement(dialog).block()
+        waitForStableInActiveWindow()
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == resourceName })
     }
 
