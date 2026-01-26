@@ -156,4 +156,7 @@
     <string name="user_preferences_automation_delay_sec_description">设置应用在启动自动操作前的等待时间（例如，自动打开地图应用前的等待时长）。</string>
     <string name="user_preferences_automation_delay_sec_title">自动化延迟</string>
     <string name="seconds_unit">秒</string>
+    <string name="donation_button">在 Ko-fi 上捐赠</string>
+    <string name="donation_description">本应用节约您的时间了吗？</string>
+    <string name="conversion_succeeded_description_q_only">原始链接不包含坐标信息，只有地名。如果在其他应用中打开此位置，找到的地点可能与原始链接的地点不同。</string>
 </resources>
