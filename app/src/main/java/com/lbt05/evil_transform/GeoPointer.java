@@ -32,7 +32,7 @@ public class GeoPointer {
         } else {
             if (other instanceof GeoPointer otherPointer) {
                 return df.format(latitude).equals(df.format(otherPointer.latitude))
-                        && df.format(longitude).equals(df.format(otherPointer.longitude));
+                    && df.format(longitude).equals(df.format(otherPointer.longitude));
             } else {
                 return false;
             }
@@ -46,8 +46,8 @@ public class GeoPointer {
     public double distance(GeoPointer target) {
         double earthR = 6371000;
         double x =
-                Math.cos(this.latitude * Math.PI / 180) * Math.cos(target.latitude * Math.PI / 180)
-                        * Math.cos((this.longitude - target.longitude) * Math.PI / 180);
+            Math.cos(this.latitude * Math.PI / 180) * Math.cos(target.latitude * Math.PI / 180)
+                * Math.cos((this.longitude - target.longitude) * Math.PI / 180);
         double y = Math.sin(this.latitude * Math.PI / 180) * Math.sin(target.latitude * Math.PI / 180);
         double s = x + y;
         if (s > 1) {
