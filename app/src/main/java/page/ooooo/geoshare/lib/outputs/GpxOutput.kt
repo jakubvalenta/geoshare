@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -182,8 +183,9 @@ object GpxOutput : Output {
         )
 
         @Composable
-        override fun waitingText(counterSec: Int) = stringResource(
-            R.string.conversion_automation_open_app_waiting,
+        override fun waitingText(counterSec: Int) = pluralStringResource(
+            R.plurals.conversion_automation_open_app_waiting,
+            counterSec,
             AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )
@@ -204,7 +206,7 @@ object GpxOutput : Output {
 
         @Composable
         override fun waitingText(counterSec: Int) =
-            stringResource(R.string.output_gpx_route_share_automation_waiting, counterSec)
+            pluralStringResource(R.plurals.output_gpx_route_share_automation_waiting, counterSec, counterSec)
     }
 
     object SaveGpxPointsAutomation :
@@ -230,7 +232,7 @@ object GpxOutput : Output {
 
         @Composable
         override fun waitingText(counterSec: Int) =
-            stringResource(R.string.conversion_automation_save_gpx_waiting, counterSec)
+            pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
     }
 
     override fun getPositionActions(): List<Action> = listOf(

@@ -71,11 +71,17 @@
     <string name="conversion_automation_copy_succeeded">Koordinatlar otomatik olarak kopyalandı</string>
     <string name="conversion_automation_open_app_failed">%1$s otomatik olarak açılamadı</string>
     <string name="conversion_automation_open_app_succeeded">%1$s otomatik olarak açıldı</string>
-    <string name="conversion_automation_open_app_waiting">%1$s %2$ds içinde otomatik olarak açılacak</string>
+    <plurals name="conversion_automation_open_app_waiting">
+        <item quantity="one">%1$s %2$ds içinde otomatik olarak açılacak</item>
+        <item quantity="other">%1$s %2$ds içinde otomatik olarak açılacak</item>
+    </plurals>
     <string name="conversion_automation_share_failed">Bağlantı otomatik olarak paylaşılamadı</string>
     <string name="conversion_automation_share_succeeded">Bağlantı otomatik olarak paylaşıldı</string>
     <string name="intro_settings_activity_not_found">Ayarlar açılamadı</string>
-    <string name="conversion_automation_share_waiting">Bağlantı %1$ds’de otomatik olarak paylaşılıyor</string>
+    <plurals name="conversion_automation_share_waiting">
+        <item quantity="one">Bağlantı %1$ds’de otomatik olarak paylaşılıyor</item>
+        <item quantity="other">Bağlantı %1$ds’de otomatik olarak paylaşılıyor</item>
+    </plurals>
     <string name="conversion_error_title">Hata</string>
     <string name="conversion_error_report">Sorun bildir</string>
     <string name="conversion_error_retry">Tekrar deneyin</string>

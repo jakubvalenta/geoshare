@@ -109,12 +109,18 @@
     <string name="conversion_automation_copy_succeeded">自動複製座標</string>
     <string name="conversion_automation_open_app_failed">自動開啟 %1$s時失敗</string>
     <string name="conversion_automation_open_app_succeeded">自動開啟 %1$s</string>
-    <string name="conversion_automation_open_app_waiting">在%2$d中自動開啟%1$s</string>
+    <plurals name="conversion_automation_open_app_waiting">
+        <item quantity="other">在%2$d中自動開啟%1$s</item>
+    </plurals>
     <string name="conversion_automation_save_gpx_succeeded">自動儲存GPX檔</string>
-    <string name="conversion_automation_save_gpx_waiting">自動在%1$d中儲存GPX檔</string>
+    <plurals name="conversion_automation_save_gpx_waiting">
+        <item quantity="other">自動在%1$d中儲存GPX檔</item>
+    </plurals>
     <string name="conversion_automation_share_failed">自動分享連結時發生錯誤</string>
     <string name="conversion_automation_share_succeeded">自動分享連結</string>
-    <string name="conversion_automation_share_waiting">自動在%1$d中分享連結</string>
+    <plurals name="conversion_automation_share_waiting">
+        <item quantity="other">自動在%1$d中分享連結</item>
+    </plurals>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">因為 %3$s，正在進行第 %1$d 次嘗試（共 %2$d 次）。</string>
     <string name="conversion_succeeded_copy_coordinates">複製座標</string>
     <string name="conversion_succeeded_copy_link">複製%1$s連結</string>

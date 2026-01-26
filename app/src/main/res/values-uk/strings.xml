@@ -113,12 +113,27 @@
     <string name="conversion_automation_copy_succeeded">Автоматично скопійовані координати</string>
     <string name="conversion_automation_open_app_failed">Не вдалося автоматично відкрити %1$s</string>
     <string name="conversion_automation_open_app_succeeded">Автоматично відкрито %1$s</string>
-    <string name="conversion_automation_open_app_waiting">Автоматичне відкриття %1$s через %2$ds</string>
+    <plurals name="conversion_automation_open_app_waiting">
+        <item quantity="one">Автоматичне відкриття %1$s через %2$ds</item>
+        <item quantity="few">Автоматичне відкриття %1$s через %2$ds</item>
+        <item quantity="many">Автоматичне відкриття %1$s через %2$ds</item>
+        <item quantity="other">Автоматичне відкриття %1$s через %2$ds</item>
+    </plurals>
     <string name="conversion_automation_save_gpx_succeeded">Автоматично збережений GPX</string>
-    <string name="conversion_automation_save_gpx_waiting">Автоматичне збереження GPX через %1$ds</string>
+    <plurals name="conversion_automation_save_gpx_waiting">
+        <item quantity="one">Автоматичне збереження GPX через %1$ds</item>
+        <item quantity="few">Автоматичне збереження GPX через %1$ds</item>
+        <item quantity="many">Автоматичне збереження GPX через %1$ds</item>
+        <item quantity="other">Автоматичне збереження GPX через %1$ds</item>
+    </plurals>
     <string name="conversion_automation_share_failed">Не вдалося автоматично поділитися посиланням</string>
     <string name="conversion_automation_share_succeeded">Автоматично опубліковане посилання</string>
-    <string name="conversion_automation_share_waiting">Автоматичне поширення посилання через %1$ds</string>
+    <plurals name="conversion_automation_share_waiting">
+        <item quantity="one">Автоматичне поширення посилання через %1$ds</item>
+        <item quantity="few">Автоматичне поширення посилання через %1$ds</item>
+        <item quantity="many">Автоматичне поширення посилання через %1$ds</item>
+        <item quantity="other">Автоматичне поширення посилання через %1$ds</item>
+    </plurals>
     <string name="conversion_succeeded_copy_coordinates">Копіювати координати</string>
     <string name="conversion_succeeded_copy_link">Копіювати посилання %1$s</string>
     <string name="user_preferences_automation_description">Виберіть дію, яка має виконуватися автоматично під час перетворення посилання на карту на координати.</string>
@@ -144,7 +159,12 @@
     <string name="output_gpx_route_share">Поділитися маршрутом GPX</string>
     <string name="output_gpx_route_share_failed">Не вдалося поділитися маршрутом GPX</string>
     <string name="output_gpx_route_share_automation_succeeded">Автоматично опублікований GPX-маршрут</string>
-    <string name="output_gpx_route_share_automation_waiting">Автоматичне поширення GPX-маршруту через %1$ds</string>
+    <plurals name="output_gpx_route_share_automation_waiting">
+        <item quantity="one">Автоматичне поширення GPX-маршруту через %1$ds</item>
+        <item quantity="few">Автоматичне поширення GPX-маршруту через %1$ds</item>
+        <item quantity="many">Автоматичне поширення GPX-маршруту через %1$ds</item>
+        <item quantity="other">Автоматичне поширення GPX-маршруту через %1$ds</item>
+    </plurals>
     <string name="faq_location_permission_headline">Дозвіл на доступ до геоданих</string>
     <string name="faq_location_permission_text">%1$s запитує дозвіл на визначення місцезнаходження під час запуску навігації TomTom та під час обміну маршрутом GPX, оскільки в цих випадках програмі потрібно створити маршрут GPX, який починається у вашому поточному місці розташування. Інформація про місцезнаходження видаляється одразу після створення маршруту.</string>
     <string name="not_available">Недоступно</string>
