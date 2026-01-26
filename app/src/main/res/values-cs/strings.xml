@@ -161,4 +161,7 @@
         <item quantity="many">%1$d sekund</item>
         <item quantity="other">%1$d sekund</item>
     </plurals>
+    <string name="conversion_succeeded_description_q_only">Původní odkaz neobsahuje souřadnice, pouze název místa. Když tuto polohu otevřete v jiné aplikaci, může najít jiné místo než původní odkaz.</string>
+    <string name="donation_button">Přispějte na Ko-fi</string>
+    <string name="donation_description">Šetří vám tato aplikace čas?</string>
 </resources>

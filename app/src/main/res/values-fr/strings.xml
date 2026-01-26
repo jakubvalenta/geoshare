@@ -162,5 +162,5 @@
     </plurals>
     <string name="donation_button">Faites un don sur Ko-fi</string>
     <string name="donation_description">Cette application vous fait-elle gagner du temps ?</string>
-    <string name="conversion_succeeded_description_q_only">Le lien d\'origine ne contient pas de coordonnées, seulement un nom de lieu. Lorsque vous ouvrez cet emplacement dans une autre application, celle-ci peut trouver un lieu différent de celui du lien d\'origine.</string>
+    <string name="conversion_succeeded_description_q_only">Le lien d’origine ne contient pas de coordonnées, seulement un nom de lieu. Lorsque vous ouvrez cet emplacement dans une autre application, celle-ci peut trouver un lieu différent de celui du lien d’origine.</string>
 </resources>
