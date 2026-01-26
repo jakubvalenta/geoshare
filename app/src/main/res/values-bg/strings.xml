@@ -158,4 +158,7 @@
         <item quantity="one">%1$d секунда</item>
         <item quantity="other">%1$d секунди</item>
     </plurals>
+    <string name="donation_button">Дарете на Ko-fi</string>
+    <string name="donation_description">Това приложение спестява ли ви време?</string>
+    <string name="conversion_succeeded_description_q_only">Оригиналната връзка не съдържа координати, а само име на място. Когато отворите това местоположение в друго приложение, то може да открие различно място от оригиналната връзка.</string>
 </resources>
