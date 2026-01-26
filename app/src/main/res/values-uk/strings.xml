@@ -162,4 +162,7 @@
         <item quantity="many">%1$d секунд</item>
         <item quantity="other">%1$d секунд</item>
     </plurals>
+    <string name="donation_button">Пожертвувати на Ko-fi</string>
+    <string name="donation_description">Чи економить цей додаток ваш час?</string>
+    <string name="conversion_succeeded_description_q_only">Оригінальне посилання не містить координат, лише назву місця. Коли ви відкриєте це місце в іншому додатку, воно може знайти інше місце, ніж оригінальне посилання.</string>
 </resources>
