@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
@@ -158,8 +159,9 @@ object MagicEarthOutput : Output {
         )
 
         @Composable
-        override fun waitingText(counterSec: Int) = stringResource(
-            R.string.conversion_automation_open_app_waiting,
+        override fun waitingText(counterSec: Int) = pluralStringResource(
+            R.plurals.conversion_automation_open_app_waiting,
+            counterSec,
             AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )

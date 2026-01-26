@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
 import kotlinx.collections.immutable.toImmutableMap
@@ -104,7 +105,7 @@ object GeoUriOutput : Output {
 
         @Composable
         override fun waitingText(counterSec: Int) =
-            stringResource(R.string.conversion_automation_share_waiting, counterSec)
+            pluralStringResource(R.plurals.conversion_automation_share_waiting, counterSec, counterSec)
     }
 
     data class ShareGeoUriWithAppAutomation(override val packageName: String) :
@@ -145,8 +146,9 @@ object GeoUriOutput : Output {
         )
 
         @Composable
-        override fun waitingText(counterSec: Int) = stringResource(
-            R.string.conversion_automation_open_app_waiting,
+        override fun waitingText(counterSec: Int) = pluralStringResource(
+            R.plurals.conversion_automation_open_app_waiting,
+            counterSec,
             AndroidTools.queryAppDetails(LocalContext.current.packageManager, packageName)?.label ?: packageName,
             counterSec,
         )
