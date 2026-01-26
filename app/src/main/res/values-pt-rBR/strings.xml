@@ -160,4 +160,7 @@
         <item quantity="many">%1$d de segundos</item>
         <item quantity="other">%1$d segundos</item>
     </plurals>
+    <string name="conversion_succeeded_description_q_only">O link original não contém coordenadas, somente o nome do lugar. Quando você abrir esta localização em outro app, ele pode encontrar um lugar diferente do que o link original.</string>
+    <string name="donation_button">Doar no Ko-fi</string>
+    <string name="donation_description">Esse app otimiza seu tempo?</string>
 </resources>
