@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="intro_title">مقدمة</string>
-    <string name="intro_nav_close">إغلاق</string>
+    <string name="intro_nav_close">أغلِق</string>
     <string name="about_title">حول</string>
     <string name="about_app_icon_content_description">أيقونة التطبيق</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -17,26 +17,26 @@
     <string name="intro_how_to_share_google_maps_content_description">لقطة شاشة لشاشة المشاركة في خرائط جوجل</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[اختر <i>%1$s</i> وسيسمح لك التطبيق بفتح نفس الموقع في أي تطبيق خرائط مثبت.]]></string>
     <string name="intro_how_to_share_app_content_description">لقطة شاشة لشاشة المشاركة في %1$s</string>
-    <string name="intro_open_by_default_headline">تكوين أندرويد لفتح روابط خرائط جوجل في خرائط بديلة (اختياري)</string>
+    <string name="intro_open_by_default_headline">اضبط أندرويد لفتح روابط خرائط جوجل في خرائط بديلة (اختياري)</string>
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[أولاً، انتقل إلى الإعدادات &#8592; التطبيقات &8592; الخرائط &#8592; <i>فتح افتراضيًا</i> وأوقف فتح الروابط في هذا التطبيق.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">لقطة شاشة لإعدادات فتح افتراضيًا في خرائط جوجل</string>
     <string name="intro_open_by_default_google_maps_button">افتح إعدادات خرائط جوجل</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[ثم انتقل إلى الإعدادات &#8592; التطبيقات &#8592; %1$s &#8592; <i>فتح افتراضيًا</i>، وفعّل فتح الروابط في هذا التطبيق، وانقر على <i>إضافة روابط</i>.]]></string>
     <string name="intro_open_by_default_app_content_description">لقطة شاشة لإعدادات فتح افتراضيًا في %1$s</string>
-    <string name="intro_open_by_default_app_button">فتح إعدادات %1$s</string>
+    <string name="intro_open_by_default_app_button">افتح إعدادات %1$s</string>
     <string name="intro_open_by_default_app_note"><![CDATA[حدد على الأقل <tt>maps.google.com</tt> و<tt>maps.app.goo.gl</tt>. إذا كانت بعض الروابط معطلة، فإن تطبيقات جوجل الأخرى مضبوطة لفتحها افتراضيًا. يمكنك العثور على هذه التطبيقات وإيقاف فتح الروابط لها، كما فعلنا مع خرائط جوجل.]]></string>
     <string name="intro_nav_next">التالي</string>
     <string name="intro_nav_finish">ابدأ</string>
     <string name="intro_settings_activity_not_found">فشل في فتح الإعدادات</string>
     <string name="main_input_uri_label">ألصق رابط خرائط هنا</string>
-    <string name="main_input_uri_clear_content_description">مسح</string>
+    <string name="main_input_uri_clear_content_description">امحُ</string>
     <string name="main_input_uri_supporting_text">مثال: https://maps.app.goo.gl/… أو maps.apple.com/…</string>
-    <string name="conversion_succeeded_copy_content_description">نسخ</string>
+    <string name="conversion_succeeded_copy_content_description">انسخ</string>
     <string name="main_create_geo_uri">أظهر الإحداثيات</string>
     <string name="main_navigate_to_intro">اكتشف المزيد من ميزات التطبيق</string>
     <string name="converter_google_maps_permission_title">الاتصال بجوجل؟</string>
     <string name="conversion_permission_common_grant">موافق</string>
-    <string name="conversion_permission_common_deny">إلغاء</string>
+    <string name="conversion_permission_common_deny">ألغِ</string>
     <string name="conversion_permission_common_text"><![CDATA[الرابط <tt>%1$s</tt> لا يحتوي على إحداثيات. يحتاج %2$s إلى الاتصال بخدمة الخرائط للحصول عليهم.]]></string>
     <string name="about_text"><![CDATA[<p>%1$s هو تطبيق مجاني ومفتوح المصدر يتم توزيعه بموجب رخصة <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> أو أحدث.</p><br><p>يمكنك العثور على الكود على <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>، حيث يمكنك أيضًا <a href="https://github.com/jakubvalenta/geoshare/issues">الإبلاغ عن المشكلات</a>.</p><br><p>ملاحظاتك مرحب بها. يمكنك التواصل معي على <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="faq_title">الأسئلة الشائعة</string>
@@ -44,7 +44,7 @@
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>يحوّل %1$s روابط الخرائط إلى روابط geo: يمكن فتحها بواسطة تطبيقات خرائط أخرى. لإنشاء رابط geo:، يلزم وجود إحداثيات جغرافية. يستخرج %1$s هذه الإحداثيات من رابط الخرائط.</p><br><p>ومع ذلك، لا تحتوي جميع روابط الخرائط على إحداثيات. في هذه الحالات، سيعرض %1$s <b>طلب إذن للاتصال خدمة الخرائط (خرائط جوجل، خرائط Apple، إلخ)</b> واسترجاع الإحداثيات من رؤوس HTTP أو من مستند HTML للرابط.</p><br><p>بشكل أدق، هناك ثلاث سيناريوهات لكيفية تحويل %1$s لرابط خرائط إلى رابط geo:</p><br><p><b>1.</b></p><br><p>إذا كان رابط الخرائط يحتوي بالفعل على إحداثيات جغرافية (مثال: <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>)، يتم تحليله ولا يتم إجراء طلب إلى خدمة الخرائط.</p><br><p><b>2.</b></p><br><p>إذا لم يحتوِ رابط الخرائط على إحداثيات جغرافية (مثال: <tt>https://www.google.com/maps/place/Central+Park/</tt>)، يسأل %1$s عما إذا كان يمكنه الاتصال بخدمة الخرائط.</p><br><p>إذا سمحت بالاتصال بخدمة الخرائط، يقوم %1$s بإجراء <b>طلب HTTP GET</b> إلى خرائط جوجل (أو Apple، إلخ.) ويحلل الإحداثيات من استجابة HTML. يمكنك تخيل ذلك كـ <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>إذا لم تسمح بالاتصال بخدمة الخرائط، يُنشئ %1$s رابط geo: بمصطلح بحث عن المكان (مثال: <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>إذا كان رابط الخرائط رابطًا قصيرًا (مثال: <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>)، يسأل %1$s عما إذا كان يمكنه الاتصال بخدمة الخرائط.</p><br><p>إذا سمحت بالاتصال بخدمة الخرائط، يقوم %1$s بإجراء <b>طلب HTTP HEAD</b> إلى الرابط القصير ويقرأ الرابط الكامل من رؤوس الاستجابة. يمكنك تخيل ذلك كـ <tt>curl --head https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. ثم يواصل %1$s مع السيناريو 1 أو 2، بناءً على ما إذا كان الرابط الكامل يحتوي على إحداثيات أم لا. في حالة السيناريو 2، سيتم إجراء اتصال آخر بخدمة الخرائط، ولكن هذه المرة دون سؤال.</p><br><p>إذا لم تسمح بالاتصال بخدمة الخرائط، يلغي %1$s إنشاء رابط geo:.</p><br><p>للسماح أو الرفض الدائم للاتصال بخدمة الخرائط بدلاً من السؤال دائمًا (الافتراضي)، انتقل إلى تفضيلات التطبيق.</p>]]></string>
     <string name="faq_item_collapse">طي القسم</string>
     <string name="user_preferences_title">التفضيلات</string>
-    <string name="user_preferences_connection_title">السماح بالاتصال بخدمة الخرائط (جوجل، آبل، إلخ)؟</string>
+    <string name="user_preferences_connection_title">السماح بالاتصال بخدمة الخرائط (جوجل، Apple، إلخ)؟</string>
     <string name="user_preferences_connection_description">لدعم روابط الخرائط القصيرة، وللحصول على الإحداثيات من صفحة الويب الخاصة بخدمة الخرائط عندما لا يحتوي الرابط عليها، يمكن لـ %1$s الاتصال بخدمة الخرائط. يمكنك العثور على مزيد من المعلومات في شاشة الأسئلة الشائعة.</string>
     <string name="yes">نعم</string>
     <string name="user_preferences_connection_option_ask">اسأل قبل الاتصال</string>
@@ -52,7 +52,7 @@
     <string name="conversion_failed_missing_url">رابط مفقود</string>
     <string name="conversion_failed_unshorten_connection_error">فشل في حل الرابط القصير</string>
     <string name="conversion_failed_parse_url_error">فشل في معالجة رابط الخريطة</string>
-    <string name="conversion_succeeded_apps_not_found">لم يتم تثبيت تطبيق الخرائط</string>
+    <string name="conversion_succeeded_apps_not_found">لم يُثبّت تطبيق الخرائط</string>
     <string name="conversion_failed_parse_html_error">فشل جلب صفحة الويب من خدمة الخرائط</string>
     <string name="conversion_error_report">بلّغ عن مشكلة</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">مشاركة مع</string>
@@ -94,7 +94,7 @@
     <string name="example">مثال: %1$s</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_waze_permission_title">الاتصال ب Waze؟</string>
-    <string name="converter_waze_loading_indicator_title">جارِ الاتصال ب Waze…</string>
+    <string name="converter_waze_loading_indicator_title">يتصل ب Waze…</string>
     <string name="conversion_succeeded_copy_google_maps">انسخ خرائط جوجل</string>
     <string name="conversion_succeeded_save_gpx">احفظ GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s نتيجة %2$s.gpx</string>
@@ -106,7 +106,7 @@
     <string name="converter_open_street_map_permission_title">الاتصال ب OpenStreetMap؟</string>
     <string name="converter_open_street_map_loading_indicator_title">يتصل ب OpenStreetMap…</string>
     <string name="inputs_all">جميع خدمات الخرائط</string>
-    <string name="inputs_recent">مضافة مؤخرًا</string>
+    <string name="inputs_recent">مُضافة حديثًا</string>
     <string name="inputs_default_handler">يُفتح افتراضيًا في %1$s</string>
     <string name="conversion_loading_indicator_description">المحاولة %1$d من أصل %2$d بسبب %3$s.</string>
     <string name="conversion_succeeded_save_gpx_failed">فشل حفظ GPX</string>
@@ -121,7 +121,7 @@
     <string name="conversion_automation_save_gpx_waiting">يحفظ GPX تلقائيًا في %1$ds</string>
     <string name="conversion_automation_share_failed">فشل في مشاركة الرابط تلقائيًا</string>
     <string name="conversion_automation_share_succeeded">رابط مشترك تلقائيًا</string>
-    <string name="conversion_automation_share_waiting">مشاركة الرابط تلقائيًا خلال %1$d ثانية</string>
+    <string name="conversion_automation_share_waiting">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</string>
     <string name="conversion_succeeded_copy_coordinates">انسخ الإحداثيات</string>
     <string name="conversion_succeeded_copy_link">انسخ رابط %1$s</string>
     <string name="user_preferences_automation_description">اختر إجراءً ليتم تنفيذه تلقائيًا عند تحويل رابط الخريطة إلى إحداثيات.</string>
@@ -137,7 +137,7 @@
     <string name="converter_amap_loading_indicator_title">يتصل ب Amap…</string>
     <string name="converter_amap_permission_title">اتصل ب Amap؟</string>
     <string name="converter_urbi_permission_title">الاتصال بـ 2GIS / Urbi؟</string>
-    <string name="converter_urbi_loading_indicator_title">جارٍ الاتصال بـ 2GIS / Urbi…</string>
+    <string name="converter_urbi_loading_indicator_title">يتصل ب بـ 2GIS / Urbi…</string>
     <string name="conversion_succeeded_location_failed">فشل في العثور على الموقع</string>
     <string name="conversion_succeeded_location_loading_indicator_title">جارِ تحديد موقعك…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">السماح بالوصول إلى الموقع؟</string>
@@ -166,4 +166,7 @@
         <item quantity="many">%1$d ثانية</item>
         <item quantity="other">%1$d ثانية</item>
     </plurals>
+    <string name="donation_button">تبرّع على Ko-fi</string>
+    <string name="donation_description">هل يوفر هذا التطبيق وقتك؟</string>
+    <string name="conversion_succeeded_description_q_only">الرابط الأصلي لا يحتوي على إحداثيات، بل على اسم مكان فقط. عند فتح هذا الموقع في تطبيق آخر، قد يُعثر على مكان مختلف عن الرابط الأصلي.</string>
 </resources>
