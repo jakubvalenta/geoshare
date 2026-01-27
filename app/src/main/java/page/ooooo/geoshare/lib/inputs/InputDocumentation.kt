@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 enum class InputDocumentationId {
     AMAP,
     APPLE_MAPS,
+    BAIDU_MAP,
     COORDINATES,
     GEO_URI,
     GOOGLE_MAPS,

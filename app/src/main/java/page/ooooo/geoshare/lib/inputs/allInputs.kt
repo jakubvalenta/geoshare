@@ -5,6 +5,7 @@ val allInputs: List<Input> = listOf(
     GoogleMapsInput,
     AppleMapsInput,
     AmapInput,
+    BaiduMapInput,
     HereWeGoInput,
     MagicEarthInput,
     MapyComInput,
