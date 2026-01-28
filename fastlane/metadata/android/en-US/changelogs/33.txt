@@ -1,1 +1,1 @@
-- Added Baidu Map support.
+- Added basic Baidu Map support (no short links yet).

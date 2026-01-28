@@ -326,7 +326,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="j.map.baidu.com"
+                    android:host="map.baidu.com"
                     android:scheme="https" />
             </intent-filter>
             <!-- Geo URI -->

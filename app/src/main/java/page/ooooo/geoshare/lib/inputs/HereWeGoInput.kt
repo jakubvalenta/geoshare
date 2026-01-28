@@ -4,7 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.LatLonZName
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
 import kotlin.io.encoding.Base64
@@ -31,15 +31,15 @@ object HereWeGoInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         val position = buildPosition(srs) {
             uri.run {
-                setPointIfNull { """/l/$LAT,$LON""" matchLatLonZ path }
-                setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZ queryParams["map"]) else null }
+                setPointIfNull { """/l/$LAT,$LON""" matchLatLonZName path }
+                setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZName queryParams["map"]) else null }
                 setPointIfNull {
                     ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
                         ?.let { encoded ->
                             Base64.decode(encoded).decodeToString().let { decoded ->
                                 ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
                                     ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
-                                        LatLonZ(lat, lon, null)
+                                        LatLonZName(lat, lon)
                                     }
                                 }
                             }

@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.AppleMapsInput
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.components.TextIcon
 
 /**
@@ -87,10 +86,9 @@ object AppleMapsOutput : Output {
         host = "maps.apple.com",
         path = "/",
         queryParams = buildMap {
-            position.getPoint(i)
-                ?.toStringPair(Srs.WGS84)?.let { (latStr, lonStr) ->
-                    set("ll", "$latStr,$lonStr")
-                } ?: position.q?.let { q ->
+            position.getPoint(i)?.toWGS84()?.run {
+                set("ll", "$latStr,$lonStr")
+            } ?: position.q?.let { q ->
                 set("q", q)
             }
             position.zStr?.let { zStr ->
@@ -105,11 +103,10 @@ object AppleMapsOutput : Output {
         host = "maps.apple.com",
         path = "/",
         queryParams = buildMap {
-            position.getPoint(i)
-                ?.toStringPair(Srs.WGS84)?.let { (latStr, lonStr) ->
-                    @Suppress("SpellCheckingInspection")
-                    set("daddr", "$latStr,$lonStr")
-                } ?: position.q?.let { q ->
+            position.getPoint(i)?.toWGS84()?.run {
+                @Suppress("SpellCheckingInspection")
+                set("daddr", "$latStr,$lonStr")
+            } ?: position.q?.let { q ->
                 @Suppress("SpellCheckingInspection")
                 set("daddr", q)
             }

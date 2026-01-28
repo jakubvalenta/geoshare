@@ -25,7 +25,6 @@ object GeoUriInput : Input {
                     GeoUriOutput.formatUriString(
                         Position.example,
                         null,
-                        Srs.WGS84,
                         nameDisabled = false,
                         zoomDisabled = false,
                     ),
@@ -37,10 +36,7 @@ object GeoUriInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         val position = buildPosition(srs) {
             uri.run {
-                ("""$LAT,$LON$NAME_REGEX?""" match queryParams["q"])?.let { m ->
-                    setPointIfNull { m.toLatLon()?.let { (lat, lon) -> LatLonZ(lat, lon, null) } }
-                    setQOrNameIfEmpty { m.groupOrNull("name") }
-                }
+                setPointIfNull { """$LAT,$LON$NAME_REGEX?""" matchLatLonZName queryParams["q"] }
                 setQOrNameIfEmpty {
                     queryParams.firstNotNullOfOrNull { (key, value) ->
                         if (key != "q" && key != "z" && value.isEmpty()) {
@@ -51,7 +47,7 @@ object GeoUriInput : Input {
                     }
                 }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ path }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName path }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
             }
         }

@@ -110,8 +110,6 @@
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
     <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
-    <string name="converter_baidu_map_loading_indicator_title">Connecting to Baidu Map…</string>
-    <string name="converter_baidu_map_name" translatable="false">百度地图 (Baidu Map)</string>
     <string name="converter_baidu_map_permission_title">Connect to Baidu Map?</string>
     <string name="converter_coordinates_name">coordinates</string>
     <string name="example">e.g. %1$s</string>

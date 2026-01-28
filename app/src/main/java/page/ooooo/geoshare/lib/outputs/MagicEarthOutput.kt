@@ -212,25 +212,23 @@ object MagicEarthOutput : Output {
         scheme = "magicearth",
         path = "//",
         queryParams = buildMap {
-            (position.getPoint(i) ?: Point(Srs.WGS84)).let { point ->
-                point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
-                    if (position.q == null) {
-                        set("show_on_map", "")
+            (position.getPoint(i)?.toWGS84() ?: Point(Srs.WGS84)).run {
+                if (position.q == null) {
+                    set("show_on_map", "")
+                    set("lat", latStr)
+                    set("lon", lonStr)
+                    name?.let { name ->
+                        set("name", name)
+                    }
+                } else {
+                    if (lat == 0.0 && lon == 0.0) {
+                        set("open_search", "")
+                    } else {
+                        set("search_around", "")
                         set("lat", latStr)
                         set("lon", lonStr)
-                        point.name?.let { name ->
-                            set("name", name)
-                        }
-                    } else {
-                        if (point.lat == 0.0 && point.lon == 0.0) {
-                            set("open_search", "")
-                        } else {
-                            set("search_around", "")
-                            set("lat", latStr)
-                            set("lon", lonStr)
-                        }
-                        set("q", position.q)
                     }
+                    set("q", position.q)
                 }
             }
         }.toImmutableMap(),
@@ -242,11 +240,9 @@ object MagicEarthOutput : Output {
         path = "//",
         queryParams = buildMap {
             set("get_directions", "")
-            position.getPoint(i)?.let { point ->
-                point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
-                    set("lat", latStr)
-                    set("lon", lonStr)
-                }
+            position.getPoint(i)?.toWGS84()?.run {
+                set("lat", latStr)
+                set("lon", lonStr)
             } ?: position.q?.let { q ->
                 set("q", q)
             }

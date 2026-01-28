@@ -40,12 +40,12 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
         val position = buildPosition(srs) {
             uri.run {
                 // Try query parameters for all URLs
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["destination"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["query"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["viewpoint"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["destination"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["q"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["query"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["ll"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["viewpoint"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["center"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
@@ -67,12 +67,12 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                         val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
                         parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
                             if (part.startsWith("data=")) {
-                                setPointIfNull { """!3d$LAT!4d$LON""" findLatLonZ part }
-                                addPoints { """!1d$LON!2d$LAT""" findAllLatLonZ part }
+                                setPointIfNull { """!3d$LAT!4d$LON""" findLatLonZName part }
+                                addPoints { """!1d$LON!2d$LAT""" findAllLatLonZName part }
                             } else if (part.startsWith('@')) {
-                                setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZ part }
+                                setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZName part }
                             } else {
-                                setPointIfNull { pointPattern matchLatLonZ part }
+                                setPointIfNull { pointPattern matchLatLonZName part }
                                 setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
                             }
                         }
@@ -106,13 +106,13 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                     log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
                     genericMetaTagFound = true
                 }
-                if (addPoints { (pointPattern findAllLatLonZ line) }) {
+                if (addPoints { (pointPattern findAllLatLonZName line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
                 }
-                if (setDefaultPointIfNull { (defaultPointLinkPattern findLatLonZ line) }) {
+                if (setDefaultPointIfNull { (defaultPointLinkPattern findLatLonZName line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
                 }
-                if (!genericMetaTagFound && setDefaultPointIfNull { (defaultPointAppInitStatePattern findLatLonZ line) }) {
+                if (!genericMetaTagFound && setDefaultPointIfNull { (defaultPointAppInitStatePattern findLatLonZName line) }) {
                     // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
                     // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE contains coordinates of the
                     // IP address that the HTTP request came from, instead of correct coordinates. So let's ignore the

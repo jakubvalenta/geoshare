@@ -4,7 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.LatLonZName
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
 
@@ -31,11 +31,11 @@ object MagicEarthInput : Input {
                 setPointIfNull {
                     (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
                         (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
-                            LatLonZ(lat, lon, null)
+                            LatLonZName(lat, lon)
                         }
                     }
                 }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["name"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["name"] }
                 setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
                 @Suppress("SpellCheckingInspection")
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }

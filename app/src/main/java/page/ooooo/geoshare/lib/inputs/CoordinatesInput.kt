@@ -43,7 +43,7 @@ object CoordinatesInput : Input {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
                 setPointIfNull {
                     ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
-                        LatLonZ(
+                        LatLonZName(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
                                 m.groupOrNull("latSig"),
@@ -54,7 +54,6 @@ object CoordinatesInput : Input {
                                 m.groupOrNull("lonSig"),
                                 m.groupOrNull("lonDeg"),
                             ),
-                            null,
                         )
                     }
                 }
@@ -62,7 +61,7 @@ object CoordinatesInput : Input {
                 // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
                 setPointIfNull {
                     ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
-                        LatLonZ(
+                        LatLonZName(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
                                 m.groupOrNull("latSig"),
@@ -77,7 +76,6 @@ object CoordinatesInput : Input {
                                 m.groupOrNull("lonMin"),
                                 m.groupOrNull("lonSec"),
                             ),
-                            null,
                         )
                     }
                 }
@@ -85,7 +83,7 @@ object CoordinatesInput : Input {
                 // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
                 setPointIfNull {
                     ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
-                        LatLonZ(
+                        LatLonZName(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
                                 m.groupOrNull("latSig"),
@@ -98,7 +96,6 @@ object CoordinatesInput : Input {
                                 m.groupOrNull("lonDeg"),
                                 m.groupOrNull("lonMin"),
                             ),
-                            null,
                         )
                     }
                 }

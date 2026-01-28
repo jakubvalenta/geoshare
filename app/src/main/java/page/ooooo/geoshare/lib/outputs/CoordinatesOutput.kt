@@ -117,18 +117,16 @@ object CoordinatesOutput : Output {
         Automation.Type.COPY_COORDS_NSWE_DEC -> CopyDegMinSecCoordsAutomation
         else -> null
     }
+    
+    private fun formatDecString(point: Point): String = point.toWGS84().run { "$latStr, $lonStr" }
 
-    private fun formatDecString(point: Point): String =
-        point.toStringPair(Srs.WGS84).let { (latStr, lonStr) -> "$latStr, $lonStr" }
-
-    fun formatDegMinSecString(point: Point): String =
-        point.toSrs(Srs.WGS84).run {
-            lat.toDegMinSec().let { (deg, min, sec) ->
-                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
-            } + lon.toDegMinSec().let { (deg, min, sec) ->
-                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
-            }
+    fun formatDegMinSecString(point: Point): String = point.toWGS84().run {
+        lat.toDegMinSec().let { (deg, min, sec) ->
+            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
+        } + lon.toDegMinSec().let { (deg, min, sec) ->
+            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
         }
+    }
 
     @Composable
     private fun name(position: Position, i: Int?): String? =

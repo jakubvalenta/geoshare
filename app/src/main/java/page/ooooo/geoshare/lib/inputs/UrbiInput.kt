@@ -7,8 +7,8 @@ import io.ktor.utils.io.readUTF8Line
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findLatLonZ
-import page.ooooo.geoshare.lib.extensions.matchLatLonZ
+import page.ooooo.geoshare.lib.extensions.findLatLonZName
+import page.ooooo.geoshare.lib.extensions.matchLatLonZName
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
@@ -52,9 +52,9 @@ object UrbiInput : Input.HasHtml {
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         val position = buildPosition(srs) {
             uri.run {
-                setPointIfNull { """$LON,$LAT/$Z""" matchLatLonZ queryParams["m"] }
-                setPointIfNull { """.*/$LON,$LAT/?$""" matchLatLonZ path }
-                setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["center"] }
+                setPointIfNull { """$LON,$LAT/$Z""" matchLatLonZName queryParams["m"] }
+                setPointIfNull { """.*/$LON,$LAT/?$""" matchLatLonZName path }
+                setPointIfNull { LON_LAT_PATTERN matchLatLonZName queryParams["center"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
             }
         }
@@ -66,7 +66,7 @@ object UrbiInput : Input.HasHtml {
             val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findLatLonZ line }) {
+                if (setPointIfNull { pattern findLatLonZName line }) {
                     break
                 }
             }

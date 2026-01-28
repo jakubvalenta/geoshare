@@ -53,7 +53,7 @@ data class Position(
 
     fun writeGpxPoints(writer: Appendable) = writeGpx(writer) {
         points?.map { point ->
-            point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+            point.toWGS84().run {
                 append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
             }
             if (point.name != null) {
@@ -69,7 +69,7 @@ data class Position(
     fun writeGpxRoute(writer: Appendable) = writeGpx(writer) {
         append("<rte>\n")
         points?.map { point ->
-            point.toStringPair(Srs.WGS84).let { (latStr, lonStr) ->
+            point.toWGS84().run {
                 @Suppress("SpellCheckingInspection")
                 append("<rtept lat=\"$latStr\" lon=\"$lonStr\"")
             }

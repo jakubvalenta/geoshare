@@ -5,7 +5,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.LatLonZName
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
 
@@ -39,14 +39,14 @@ object MapyComInput : Input.HasShortUri {
                             val wholeMatch = m.groupOrNull()
                             val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
                             val lonSig = if (wholeMatch?.contains('W') == true) -1 else 1
-                            LatLonZ(latSig * lat, lonSig * lon, null)
+                            LatLonZName(latSig * lat, lonSig * lon)
                         }
                     }
                 }
                 setPointIfNull {
                     (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
                         (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
-                            LatLonZ(lat, lon, null)
+                            LatLonZName(lat, lon)
                         }
                     }
                 }

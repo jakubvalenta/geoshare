@@ -7,7 +7,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.LatLonZName
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
@@ -31,24 +31,24 @@ object AppleMapsInput : Input.HasHtml {
         var htmlUriString: String? = null
         val position = buildPosition(srs) {
             uri.run {
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["ll"] }
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["daddr"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["coordinate"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["q"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["daddr"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["coordinate"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["q"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
                 @Suppress("SpellCheckingInspection")
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
                 setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
                 setQWithCenterIfNull {
                     (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { newQ ->
-                        (LAT_LON_PATTERN matchLatLonZ queryParams["sll"])?.let { (lat, lon) ->
+                        (LAT_LON_PATTERN matchLatLonZName queryParams["sll"])?.let { (lat, lon) ->
                             Triple(newQ, lat, lon)
                         }
                     }
                 }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["sll"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["center"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["sll"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["center"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setZIfNull { (Z_PATTERN matchZ queryParams["z"]) }
                 if (
@@ -80,7 +80,7 @@ object AppleMapsInput : Input.HasHtml {
                     (lonPattern find line)?.toLon()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
-                    setPointIfNull { LatLonZ(lat, lon, null) }
+                    setPointIfNull { LatLonZName(lat, lon) }
                     break
                 }
             }
