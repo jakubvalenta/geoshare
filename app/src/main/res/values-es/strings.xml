@@ -150,4 +150,17 @@
     <string name="inputs_link">Enlace</string>
     <string name="inputs_list_text">Puedes compartir enlaces a los siguientes servicios de mapa con %1$s o pegarlos en la aplicación.</string>
     <string name="inputs_settings">Ve a los ajustes de Android para elegir los enlaces que deberían siempre abrirse en %1$s</string>
+    <string name="conversion_succeeded_description_q_only">El enlace original no contiene coordenadas, solo el nombre de un lugar. Cuando abras esta ubicación en otra aplicación, podría encontrar un lugar diferente al del enlace original.</string>
+    <string name="donation_button">Donar en Ko-fi</string>
+    <string name="donation_description">¿Esta aplicación te ahorra tiempo?</string>
+    <string name="user_preferences_automation_delay_sec_title">Retraso de automatización</string>
+    <string name="user_preferences_automation_delay_sec_description">Establezca cuánto tiempo espera la aplicación antes de iniciar una acción automatizada (por ejemplo, antes de abrir automáticamente una aplicación de mapas).</string>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">El valor debe estar entre %1$d y %2$d</string>
+    <string name="reset">reiniciar</string>
+    <string name="seconds_unit">segundos</string>
+    <plurals name="seconds">
+        <item quantity="one">%1$d segundo</item>
+        <item quantity="many">%1$d segundos</item>
+        <item quantity="other">%1$d segundos</item>
+    </plurals>
 </resources>
