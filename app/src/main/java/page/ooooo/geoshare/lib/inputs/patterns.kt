@@ -7,7 +7,6 @@ const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?"""
 const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?"""
 const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
 const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
-const val NAME_PATH = """(?P<name>[^/]+)"""
 const val Z = """(?P<z>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
 const val Q_PARAM = """$LAT,$LON|(?P<q>.+)"""  // Notice that if the query is LAT,LON then the Q group doesn't match
 const val Q_PATH = """$LAT,$LON|(?P<q>[^/]+)"""  // Notice that if the query is LAT,LON then the Q group doesn't match
