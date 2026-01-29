@@ -184,4 +184,12 @@
     <string name="conversion_succeeded_description_q_only">Původní odkaz neobsahuje souřadnice, pouze název místa. Když tuto polohu otevřete v jiné aplikaci, může najít jiné místo než původní odkaz.</string>
     <string name="donation_button">Přispějte na Ko-fi</string>
     <string name="donation_description">Šetří vám tato aplikace čas?</string>
+    <string name="network_exception_connect_timeout">časovému limitu spojení</string>
+    <string name="network_exception_eof">uzavřenému spojení</string>
+    <string name="network_exception_request_timeout">časovému limitu požadavku</string>
+    <string name="network_exception_response_error">chybě odpovědi</string>
+    <string name="network_exception_server_response_error">chybě odpovědi serveru</string>
+    <string name="network_exception_socket_timeout">časovému limitu soketu</string>
+    <string name="network_exception_unknown">neznámé chybě</string>
+    <string name="network_exception_unresolved_address">nevyřešené adrese</string>
 </resources>

@@ -179,12 +179,12 @@
     <string name="donation_button">Faites un don sur Ko-fi</string>
     <string name="donation_description">Cette application vous fait-elle gagner du temps ?</string>
     <string name="conversion_succeeded_description_q_only">Le lien d’origine ne contient pas de coordonnées, seulement un nom de lieu. Lorsque vous ouvrez cet emplacement dans une autre application, celle-ci peut trouver un lieu différent de celui du lien d’origine.</string>
-    <string name="network_exception_connect_timeout">délai d\'attente de connexion</string>
+    <string name="network_exception_connect_timeout">délai d’attente de connexion</string>
     <string name="network_exception_eof">connexion fermée</string>
-    <string name="network_exception_request_timeout">délai d\'attente de la requête</string>
+    <string name="network_exception_request_timeout">délai d’attente de la requête</string>
     <string name="network_exception_response_error">erreur de réponse</string>
     <string name="network_exception_server_response_error">erreur de réponse du serveur</string>
-    <string name="network_exception_socket_timeout">délai d\'attente de la prise</string>
+    <string name="network_exception_socket_timeout">délai d’attente de la prise</string>
     <string name="network_exception_unknown">erreur inconnue</string>
     <string name="network_exception_unresolved_address">adresse non résolue</string>
 </resources>

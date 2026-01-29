@@ -186,7 +186,7 @@
     <string name="donation_description">Чи економить цей додаток ваш час?</string>
     <string name="conversion_succeeded_description_q_only">Оригінальне посилання не містить координат, лише назву місця. Коли ви відкриєте це місце в іншому додатку, воно може знайти інше місце, ніж оригінальне посилання.</string>
     <string name="network_exception_connect_timeout">час очікування підключення</string>
-    <string name="network_exception_eof">з\'єднання закрито</string>
+    <string name="network_exception_eof">з’єднання закрито</string>
     <string name="network_exception_request_timeout">час очікування запиту</string>
     <string name="network_exception_response_error">помилка відповіді</string>
     <string name="network_exception_server_response_error">помилка відповіді сервера</string>
