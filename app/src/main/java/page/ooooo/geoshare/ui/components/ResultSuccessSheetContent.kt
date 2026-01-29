@@ -19,13 +19,13 @@ import page.ooooo.geoshare.lib.outputs.CopyAction
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getPointActions
 import page.ooooo.geoshare.lib.outputs.getPositionActions
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultSuccessSheetContent(
-    position: Position,
+    points: ImmutableList<Point>,
     i: Int?,
     headline: String? = null,
     onHide: () -> Unit,

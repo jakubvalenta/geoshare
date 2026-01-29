@@ -8,17 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
 
 abstract class CopyAction : BasicAction, Action.HasSuccessMessage {
-    abstract fun getText(position: Position, i: Int? = null, uriQuote: UriQuote = DefaultUriQuote()): String
+    abstract fun getText(points: ImmutableList<Point>, i: Int? = null, uriQuote: UriQuote = DefaultUriQuote()): String
 
     override suspend fun runAction(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         context: Context,
         clipboard: Clipboard,
@@ -26,7 +27,7 @@ abstract class CopyAction : BasicAction, Action.HasSuccessMessage {
         saveGpxLauncher: ActivityResultLauncher<Intent>,
         uriQuote: UriQuote,
     ): Boolean {
-        AndroidTools.copyToClipboard(clipboard, getText(position, i, uriQuote))
+        AndroidTools.copyToClipboard(clipboard, getText(points, i, uriQuote))
         return true
     }
 
@@ -39,10 +40,10 @@ abstract class OpenAppAction(override val packageName: String) :
     Action.HasErrorMessage,
     Action.HasPackageName {
 
-    abstract fun getUriString(position: Position, i: Int?, uriQuote: UriQuote): String
+    abstract fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String
 
     override suspend fun runAction(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         context: Context,
         clipboard: Clipboard,
@@ -50,7 +51,7 @@ abstract class OpenAppAction(override val packageName: String) :
         saveGpxLauncher: ActivityResultLauncher<Intent>,
         uriQuote: UriQuote,
     ) =
-        AndroidTools.openApp(context, packageName, getUriString(position, i, uriQuote))
+        AndroidTools.openApp(context, packageName, getUriString(points, i, uriQuote))
 
     @Composable
     override fun errorText() =
@@ -61,10 +62,10 @@ abstract class OpenAppAction(override val packageName: String) :
 }
 
 abstract class OpenChooserAction : BasicAction, Action.HasErrorMessage {
-    abstract fun getUriString(position: Position, i: Int?, uriQuote: UriQuote): String
+    abstract fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String
 
     override suspend fun runAction(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         context: Context,
         clipboard: Clipboard,
@@ -72,7 +73,7 @@ abstract class OpenChooserAction : BasicAction, Action.HasErrorMessage {
         saveGpxLauncher: ActivityResultLauncher<Intent>,
         uriQuote: UriQuote,
     ) =
-        AndroidTools.openChooser(context, getUriString(position, i, uriQuote))
+        AndroidTools.openChooser(context, getUriString(points, i, uriQuote))
 
     @Composable
     override fun errorText(): String =

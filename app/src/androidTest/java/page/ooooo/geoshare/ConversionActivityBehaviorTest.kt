@@ -8,8 +8,8 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 @RunWith(AndroidJUnit4::class)
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -22,7 +22,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0))
+        waitAndAssertPositionIsVisible(WGS84Point(52.5067296, 13.2599309, z = 11.0))
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareResultCardApp_${PackageNames.GOOGLE_MAPS}" }.click()
@@ -45,7 +45,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
             // Shows precise location in WGS 84
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 31.23044166868017, 121.47099209401793, z = 11.0))
+            waitAndAssertPositionIsVisible(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
 
             // Open position menu
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
@@ -239,7 +239,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4697882, 13.4257989))
+            waitAndAssertPositionIsVisible(WGS84Point(52.4697882, 13.4257989))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
@@ -262,14 +262,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4778665, 13.426398))
+            waitAndAssertPositionIsVisible(WGS84Point(52.4778665, 13.426398))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(Position(Srs.WGS84, 52.4820815, 13.4338421))
+            waitAndAssertPositionIsVisible(WGS84Point(52.4820815, 13.4338421))
         }
 
     @Test

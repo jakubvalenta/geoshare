@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.lib.outputs
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GeoUriOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
@@ -17,7 +18,7 @@ class GeoUriOutputTest {
         assertEquals(
             "geo:0,0",
             output.getPositionActions().firstNotNullOf { it as? CopyAction }
-                .getText(Position(Srs.WGS84), null, uriQuote),
+                .getText(persistentListOf(), null, uriQuote),
         )
     }
 
@@ -26,7 +27,7 @@ class GeoUriOutputTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             output.getPositionActions().firstNotNullOf { it as? CopyAction }
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456), null, uriQuote),
+                .getText(persistentListOf(WGS84Point(50.123456, -11.123456)), null, uriQuote),
         )
     }
 
@@ -35,7 +36,7 @@ class GeoUriOutputTest {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)",
             output.getPositionActions().firstNotNullOf { it as? CopyAction }
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar"), null, uriQuote),
+                .getText(persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar")), null, uriQuote),
         )
     }
 
@@ -45,7 +46,11 @@ class GeoUriOutputTest {
             "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456(foo%20bar)",
             output
                 .getPositionActions().firstNotNullOf { it as? CopyAction }
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4, name = "foo bar"), null, uriQuote),
+                .getText(
+                    persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4, name = "foo bar")),
+                    null,
+                    uriQuote
+                ),
         )
     }
 
@@ -54,7 +59,11 @@ class GeoUriOutputTest {
         assertEquals(
             "geo:50.123456,-11.123456?z=3.4&q=foo%20bar",
             output.getPositionActions().firstNotNullOf { it as? CopyAction }
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4), null, uriQuote),
+                .getText(
+                    persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4)),
+                    null,
+                    uriQuote
+                ),
         )
     }
 
@@ -65,16 +74,16 @@ class GeoUriOutputTest {
                 "com.example.test" to "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456",
                 "com.garmin.android.apps.explore" to "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4).let { position ->
+            persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4)).let { points ->
                 output.getAppActions(
                     listOf(
                         "com.example.test",
                         "com.garmin.android.apps.explore",
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
                 )
-                    .filter { (_, action) -> action.isEnabled(position, null) }
+                    .filter { (_, action) -> action.isEnabled(points, null) }
                     .map { (packageName, action) ->
-                        packageName to action.getUriString(position, null, uriQuote)
+                        packageName to action.getUriString(points, null, uriQuote)
                     }
             },
         )
@@ -88,7 +97,7 @@ class GeoUriOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "de.schildbach.oeffi" to "geo:50.123456,-11.123456?q=50.123456,-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar").let { position ->
+            persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar")).let { points ->
                 output.getAppActions(
                     listOf(
                         "com.example.test",
@@ -96,9 +105,9 @@ class GeoUriOutputTest {
                         "de.schildbach.oeffi",
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
                 )
-                    .filter { (_, action) -> action.isEnabled(position, null) }
+                    .filter { (_, action) -> action.isEnabled(points, null) }
                     .map { (packageName, action) ->
-                        packageName to action.getUriString(position, null, uriQuote)
+                        packageName to action.getUriString(points, null, uriQuote)
                     }
             },
         )
@@ -108,15 +117,15 @@ class GeoUriOutputTest {
     fun appOutput_whenPositionIsInGCJ02AndIsInJapan_returnsUriWithCoordinatesUnchanged() {
         assertEquals(
             "geo:34.5945482,133.7583428?q=34.5945482,133.7583428",
-            Position(Srs.GCJ02, 34.5945482, 133.7583428).let { position ->
+            persistentListOf(GCJ02Point(34.5945482, 133.7583428)).let { points ->
                 output.getAppActions(
                     listOf(
                         "com.example.test",
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
                 )
-                    .firstOrNull { (_, action) -> action.isEnabled(position, null) }
+                    .firstOrNull { (_, action) -> action.isEnabled(points, null) }
                     ?.second
-                    ?.getUriString(position, null, uriQuote)
+                    ?.getUriString(points, null, uriQuote)
             }
         )
     }
@@ -125,15 +134,15 @@ class GeoUriOutputTest {
     fun appOutput_whenPositionIsInGCJ02AndIsInChina_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
-            Position(Srs.GCJ02, 39.920439, 116.331538).let { position ->
+            persistentListOf(GCJ02Point(39.920439, 116.331538)).let { points ->
                 output.getAppActions(
                     listOf(
                         "com.example.test",
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
                 )
-                    .firstOrNull { (_, action) -> action.isEnabled(position, null) }
+                    .firstOrNull { (_, action) -> action.isEnabled(points, null) }
                     ?.second
-                    ?.getUriString(position, null, uriQuote)
+                    ?.getUriString(points, null, uriQuote)
             }
         )
     }
@@ -148,7 +157,7 @@ class GeoUriOutputTest {
                 "us.spotco.maps" to "geo:31.2285067,121.475524?q=31.2285067,121.475524", // GCJ-02
                 "com.autonavi.minimap" to "geo:31.2285067,121.475524?q=31.2285067,121.475524", // GCJ-02
             ),
-            Position(Srs.WGS84, 31.23044166868017, 121.47099209401793).let { position ->
+            persistentListOf(WGS84Point(31.23044166868017, 121.47099209401793)).let { points ->
                 output.getAppActions(
                     @Suppress("SpellCheckingInspection")
                     listOf(
@@ -158,8 +167,8 @@ class GeoUriOutputTest {
                         "com.autonavi.minimap", // GCJ-02
                     ).map { AndroidTools.App(it, AndroidTools.AppType.GEO_URI) }
                 )
-                    .filter { (_, action) -> action.isEnabled(position, null) }
-                    .map { (packageName, action) -> packageName to action.getUriString(position, null, uriQuote) }
+                    .filter { (_, action) -> action.isEnabled(points, null) }
+                    .map { (packageName, action) -> packageName to action.getUriString(points, null, uriQuote) }
             }
         )
     }

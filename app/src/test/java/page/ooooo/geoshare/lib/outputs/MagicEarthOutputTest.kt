@@ -1,72 +1,76 @@
 package page.ooooo.geoshare.lib.outputs
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class MagicEarthOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
     private val output = MagicEarthOutput
 
     @Test
-    fun getPositionActions_positionHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
+    fun getPositionActions_pointsHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456",
             output.getPositionActions().first()
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456, z = 5.0), null, uriQuote),
+                .getText(persistentListOf(WGS84Point(50.123456, -11.123456, z = 5.0)), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_positionHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
+    fun getPositionActions_pointsHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456&name=foo%20bar",
             output.getPositionActions().first()
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456, name = "foo bar"), null, uriQuote),
+                .getText(persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar")), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_positionHasCoordinatesAndQueryAndZoom_returnsSearchAroundUriAndIgnoresZoom() {
+    fun getPositionActions_pointsHasCoordinatesAndQueryAndZoom_returnsSearchAroundUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?search_around&lat=50.123456&lon=-11.123456&q=foo%20bar",
             output.getPositionActions().first()
-                .getText(Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 5.0), null, uriQuote),
+                .getText(
+                    persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 5.0)),
+                    null,
+                    uriQuote
+                ),
         )
     }
 
     @Test
-    fun getPositionActions_positionHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
+    fun getPositionActions_pointsHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?open_search&q=foo%20bar",
             output.getPositionActions().first()
-                .getText(Position(q = "foo bar", z = 5.0), null, uriQuote),
+                .getText(persistentListOf(WGS84Point(name = "foo bar", z = 5.0)), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_positionHasCoordinates_returnsNavigateToUriWithLatAndLonParameters() {
+    fun getPositionActions_pointsHasCoordinates_returnsNavigateToUriWithLatAndLonParameters() {
         assertEquals(
             listOf(
                 "magicearth://?get_directions&lat=50.123456&lon=-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456).let { position ->
-                output.getPositionActions().drop(1).map { it.getText(position, null, uriQuote) }
+            persistentListOf(WGS84Point(50.123456, -11.123456)).let { points ->
+                output.getPositionActions().drop(1).map { it.getText(points, null, uriQuote) }
             },
         )
     }
 
     @Test
-    fun getPositionActions_positionHasCoordinates_returnsNavigateToUrWithQParameter() {
+    fun getPositionActions_pointsHasCoordinates_returnsNavigateToUrWithQParameter() {
         assertEquals(
             listOf(
                 "magicearth://?get_directions&q=foo%20bar",
             ),
-            Position(Srs.WGS84, q = "foo bar").let { position ->
-                output.getPositionActions().drop(1).map { it.getText(position, null, uriQuote) }
+            persistentListOf(WGS84Point(name = "foo bar")).let { points ->
+                output.getPositionActions().drop(1).map { it.getText(points, null, uriQuote) }
             },
         )
     }

@@ -2,20 +2,27 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import io.ktor.utils.io.*
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readUTF8Line
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.findAllNaivePoint
+import page.ooooo.geoshare.lib.extensions.findNaivePoint
+import page.ooooo.geoshare.lib.extensions.findUriString
+import page.ooooo.geoshare.lib.extensions.forEachReversed
+import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asGCJ02
+import page.ooooo.geoshare.lib.point.buildPoints
 
 object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     const val NAME = "Google Maps"
     private const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
-
-    private val srs = Srs.GCJ02
 
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?((www|maps)\.)?(google(\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
@@ -37,15 +44,15 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
                 // Try query parameters for all URLs
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["destination"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["q"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["query"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["ll"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["viewpoint"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["center"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["destination"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["q"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["query"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["ll"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["viewpoint"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["center"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
@@ -67,12 +74,12 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                         val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
                         parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
                             if (part.startsWith("data=")) {
-                                setPointIfNull { """!3d$LAT!4d$LON""" findLatLonZName part }
-                                addPoints { """!1d$LON!2d$LAT""" findAllLatLonZName part }
+                                setPointIfNull { """!3d$LAT!4d$LON""" findNaivePoint part }
+                                addPoints { """!1d$LON!2d$LAT""" findAllNaivePoint part }
                             } else if (part.startsWith('@')) {
-                                setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchLatLonZName part }
+                                setDefaultPointIfNull { """@$LAT,$LON(,${Z}z)?.*""" matchNaivePoint part }
                             } else {
-                                setPointIfNull { pointPattern matchLatLonZName part }
+                                setPointIfNull { pointPattern matchNaivePoint part }
                                 setQOrNameIfEmpty { Q_PATH_PATTERN matchQ part }
                             }
                         }
@@ -84,13 +91,17 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 }
             }
         }
-        return ParseUriResult.from(position, htmlUriString)
+        return ParseUriResult.from(points.asGCJ02(), htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
+    override suspend fun parseHtml(
+        channel: ByteReadChannel,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog,
+    ): ParseHtmlResult? {
         var redirectUriString: String? = null
         var genericMetaTagFound = false
-        val positionFromHtml = buildPosition(srs) {
+        val pointsFromHtml = buildPoints {
             val pointPattern = Pattern.compile("""\[(null,null,|null,\[)$LAT,$LON\]""")
             val defaultPointLinkPattern = Pattern.compile("""/@$LAT,$LON""")
             val defaultPointAppInitStatePattern =
@@ -106,13 +117,13 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                     log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
                     genericMetaTagFound = true
                 }
-                if (addPoints { (pointPattern findAllLatLonZName line) }) {
+                if (addPoints { (pointPattern findAllNaivePoint line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
                 }
-                if (setDefaultPointIfNull { (defaultPointLinkPattern findLatLonZName line) }) {
+                if (setDefaultPointIfNull { (defaultPointLinkPattern findNaivePoint line) }) {
                     log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
                 }
-                if (!genericMetaTagFound && setDefaultPointIfNull { (defaultPointAppInitStatePattern findLatLonZName line) }) {
+                if (!genericMetaTagFound && setDefaultPointIfNull { (defaultPointAppInitStatePattern findNaivePoint line) }) {
                     // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
                     // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE contains coordinates of the
                     // IP address that the HTTP request came from, instead of correct coordinates. So let's ignore the
@@ -127,7 +138,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 }
             }
         }
-        return ParseHtmlResult.from(positionFromUri, positionFromHtml, redirectUriString)
+        return ParseHtmlResult.from(pointsFromUri, pointsFromHtml.asGCJ02(), redirectUriString)
     }
 
     @StringRes

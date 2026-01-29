@@ -4,7 +4,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.point.*
 
 class GoogleMapsInputTest : BaseInputTest() {
     override val input = GoogleMapsInput

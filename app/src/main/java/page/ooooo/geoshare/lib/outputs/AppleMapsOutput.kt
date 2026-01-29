@@ -3,13 +3,15 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.AppleMapsInput
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.TextIcon
 
 /**
@@ -18,8 +20,8 @@ import page.ooooo.geoshare.ui.components.TextIcon
 object AppleMapsOutput : Output {
 
     open class CopyDisplayLinkAction : CopyAction() {
-        override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatDisplayUriString(position, i, uriQuote)
+        override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
+            formatDisplayUriString(points, i, uriQuote)
 
         @Composable
         override fun Label() {
@@ -32,8 +34,8 @@ object AppleMapsOutput : Output {
     }
 
     open class CopyNavigateToLinkAction : CopyAction() {
-        override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatNavigateToUriString(position, i, uriQuote)
+        override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
+            formatNavigateToUriString(points, i, uriQuote)
 
         @Composable
         override fun Label() {
@@ -81,34 +83,36 @@ object AppleMapsOutput : Output {
         else -> null
     }
 
-    private fun formatDisplayUriString(position: Position, i: Int?, uriQuote: UriQuote): String = Uri(
+    private fun formatDisplayUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String = Uri(
         scheme = "https",
         host = "maps.apple.com",
         path = "/",
         queryParams = buildMap {
-            position.getPoint(i)?.toWGS84()?.run {
-                set("ll", "$latStr,$lonStr")
-            } ?: position.q?.let { q ->
-                set("q", q)
-            }
-            position.zStr?.let { zStr ->
-                set("z", zStr)
+            points.getOrNull(i)?.toWGS84()?.run {
+                if (lat != null && lon != null) {
+                    set("ll", "$latStr,$lonStr")
+                } else if (name != null) {
+                    set("q", name)
+                }
+                zStr?.let { zStr ->
+                    set("z", zStr)
+                }
             }
         }.toImmutableMap(),
         uriQuote = uriQuote,
     ).toString()
 
-    private fun formatNavigateToUriString(position: Position, i: Int?, uriQuote: UriQuote): String = Uri(
+    private fun formatNavigateToUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String = Uri(
         scheme = "https",
         host = "maps.apple.com",
         path = "/",
         queryParams = buildMap {
-            position.getPoint(i)?.toWGS84()?.run {
-                @Suppress("SpellCheckingInspection")
-                set("daddr", "$latStr,$lonStr")
-            } ?: position.q?.let { q ->
-                @Suppress("SpellCheckingInspection")
-                set("daddr", q)
+            points.getOrNull(i)?.toWGS84()?.run {
+                if (isNotEmpty()) {
+                    set(@Suppress("SpellCheckingInspection") "daddr", "$latStr,$lonStr")
+                } else if (name != null) {
+                    set(@Suppress("SpellCheckingInspection") "daddr", name)
+                }
             }
         }.toImmutableMap(),
         uriQuote = uriQuote,

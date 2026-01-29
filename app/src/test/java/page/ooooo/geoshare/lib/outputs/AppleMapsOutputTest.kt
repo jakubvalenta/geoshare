@@ -1,11 +1,11 @@
 package page.ooooo.geoshare.lib.outputs
 
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class AppleMapsOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
@@ -18,8 +18,8 @@ class AppleMapsOutputTest {
                 "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
                 "https://maps.apple.com/?daddr=50.123456,-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4).let { position ->
-                output.getPositionActions().map { it.getText(position, null, uriQuote) }
+            persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4)).let { points ->
+                output.getPositionActions().map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -31,8 +31,8 @@ class AppleMapsOutputTest {
                 "https://maps.apple.com/?ll=50.123456,-11.123456&z=3.4",
                 "https://maps.apple.com/?daddr=50.123456,-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4).let { position ->
-                output.getPositionActions().map { it.getText(position, null, uriQuote) }
+            persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4)).let { points ->
+                output.getPositionActions().map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -44,8 +44,8 @@ class AppleMapsOutputTest {
                 "https://maps.apple.com/?q=foo%20bar&z=3.4",
                 "https://maps.apple.com/?daddr=foo%20bar",
             ),
-            Position(q = "foo bar", z = 3.4).let { position ->
-                output.getPositionActions().map { it.getText(position, null, uriQuote) }
+            persistentListOf(WGS84Point(name = "foo bar", z = 3.4)).let { points ->
+                output.getPositionActions().map { it.getText(points, null, uriQuote) }
             },
         )
     }

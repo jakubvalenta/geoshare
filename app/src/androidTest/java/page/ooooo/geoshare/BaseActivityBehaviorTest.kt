@@ -21,7 +21,7 @@ import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 import kotlin.math.pow
 import kotlin.math.roundToLong
 

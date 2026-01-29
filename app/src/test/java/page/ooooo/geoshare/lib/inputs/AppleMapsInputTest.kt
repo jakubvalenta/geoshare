@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 /**
  * See https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
@@ -50,7 +50,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626)),
+            ParseUriResult.Succeeded(WGS84Point(50.894967, 4.341626)),
             parseUri("https://maps.apple.com/?ll=50.894967,4.341626"),
         )
     }
@@ -59,7 +59,7 @@ class AppleMapsInputTest : BaseInputTest() {
     fun parseUri_place() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.4890246, 13.4295963, name = "Reuterplatz")),
+            ParseUriResult.Succeeded(WGS84Point(52.4890246, 13.4295963, name = "Reuterplatz")),
             parseUri("https://maps.apple.com/place?place-id=I1E40915DF4BA1C96&address=Reuterplatz+3,+12047+Berlin,+Germany&coordinate=52.4890246,13.4295963&name=Reuterplatz&_provider=9902"),
         )
     }
@@ -67,7 +67,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626)),
+            ParseUriResult.Succeeded(WGS84Point(50.894967, 4.341626)),
             parseUri("https://maps.apple.com/?daddr=50.894967,4.341626"),
         )
     }
@@ -76,7 +76,7 @@ class AppleMapsInputTest : BaseInputTest() {
     fun parseUri_directionsQuery() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult.Succeeded(Position(Srs.WGS84, q = "Reuterplatz 3, 12047 Berlin, Germany")),
+            ParseUriResult.Succeeded(WGS84Point(q = "Reuterplatz 3, 12047 Berlin, Germany")),
             parseUri("https://maps.apple.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany"),
         )
     }
@@ -84,7 +84,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_view() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.49115540927951, 13.42595574770533)),
+            ParseUriResult.Succeeded(WGS84Point(52.49115540927951, 13.42595574770533)),
             parseUri("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533"),
         )
     }
@@ -92,7 +92,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchQuery() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, q = "Central Park")),
+            ParseUriResult.Succeeded(WGS84Point(q = "Central Park")),
             parseUri("https://maps.apple.com/?q=Central+Park"),
         )
     }
@@ -100,7 +100,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchLocation() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626)),
+            ParseUriResult.Succeeded(WGS84Point(50.894967, 4.341626)),
             parseUri("https://maps.apple.com/?sll=50.894967,4.341626"),
         )
     }
@@ -108,7 +108,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchLocationAndQueryAndZoom_returnsPointAndQueryAndZoom() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park", z = 10.0)),
+            ParseUriResult.Succeeded(WGS84Point(50.894967, 4.341626, q = "Central Park", z = 10.0)),
             parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s"),
         )
     }
@@ -116,7 +116,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchLocationAndQueryAndInvalidZoom_returnsPointAndQuery() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.894967, 4.341626, q = "Central Park")),
+            ParseUriResult.Succeeded(WGS84Point(50.894967, 4.341626, q = "Central Park")),
             parseUri("https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=spam&t=s"),
         )
     }
@@ -124,15 +124,15 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_parameterLlTakesPrecedenceOverCenterAndSllAndCoordinate() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
+            ParseUriResult.Succeeded(WGS84Point(-17.2165721, -149.9470294)),
             parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&center=52.49115540927951,13.42595574770533"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
+            ParseUriResult.Succeeded(WGS84Point(-17.2165721, -149.9470294)),
             parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&sll=52.49115540927951,13.42595574770533&"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294)),
+            ParseUriResult.Succeeded(WGS84Point(-17.2165721, -149.9470294)),
             parseUri("https://maps.apple.com/?ll=-17.2165721,-149.9470294&&coordinate=52.49115540927951,13.42595574770533"),
         )
     }
@@ -221,7 +221,7 @@ class AppleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_success() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(Position(Srs.WGS84, 52.4735927, 13.4050798)),
+            ParseHtmlResult.Succeeded(WGS84Point(52.4735927, 13.4050798)),
             @Suppress("SpellCheckingInspection")
             parseHtml(
                 """<html>

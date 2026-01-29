@@ -1,15 +1,16 @@
 package page.ooooo.geoshare.lib.outputs
 
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.android.AndroidTools
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.point.Point
 
 interface Output {
-    fun getText(position: Position, i: Int?, uriQuote: UriQuote): String? = null
+    fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String? = null
 
     @Composable
-    fun getName(position: Position, i: Int?, uriQuote: UriQuote): String? = null
+    fun getName(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String? = null
 
     fun getPositionActions(): List<Action> = emptyList()
 

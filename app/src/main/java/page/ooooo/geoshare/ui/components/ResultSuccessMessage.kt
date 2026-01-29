@@ -63,7 +63,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.GpxOutput
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -279,7 +279,7 @@ private fun ActionFinishedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -300,7 +300,7 @@ private fun DarkActionFinishedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -322,7 +322,7 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        position = Position.example,
+                        points = Position.example,
                         action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     ),
                     automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
@@ -346,7 +346,7 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                        position = Position.example,
+                        points = Position.example,
                         action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     ),
                     automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
@@ -374,7 +374,7 @@ private fun ActionWaitingPreview() {
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     i = null,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     delay = 3.seconds,
@@ -402,7 +402,7 @@ private fun DarkActionWaitingPreview() {
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     i = null,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                     delay = 3.seconds,
@@ -425,7 +425,7 @@ private fun LocationPermissionReceivedPreview() {
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     i = null,
                     action = GpxOutput.ShareGpxRouteWithAppAction(PackageNames.GOOGLE_MAPS),
                 ),
@@ -449,7 +449,7 @@ private fun DarkLocationPermissionReceivedPreview() {
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     i = null,
                     action = GpxOutput.ShareGpxRouteWithAppAction(PackageNames.GOOGLE_MAPS),
                 ),
@@ -473,7 +473,7 @@ private fun SucceededPreview() {
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -494,7 +494,7 @@ private fun DarSucceededPreview() {
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -515,7 +515,7 @@ private fun FailedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -536,7 +536,7 @@ private fun DarkFailedPreview() {
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                    position = Position.example,
+                    points = Position.example,
                     action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,

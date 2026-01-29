@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class AmapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test

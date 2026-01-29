@@ -7,14 +7,12 @@ import page.ooooo.geoshare.lib.extensions.matchHash
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
-import page.ooooo.geoshare.lib.position.LatLonZName
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
 
 object MapsMeInput : Input {
     private const val HASH = """(?P<hash>[A-Za-z0-9\-_]{2,})"""
-
-    private val srs = Srs.WGS84
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?(comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
@@ -29,12 +27,12 @@ object MapsMeInput : Input {
     )
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
                 setPointIfNull {
                     (HASH matchHash if (scheme == "ge0") host else pathParts.getOrNull(1))
                         ?.let { hash -> decodeGe0Hash(hash) }
-                        ?.let { (lat, lon, z) -> LatLonZName(lat.toScale(7), lon.toScale(7), z) }
+                        ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(7), lon.toScale(7), z) }
 
                 }
                 setQOrNameIfEmpty {
@@ -43,6 +41,6 @@ object MapsMeInput : Input {
                 }
             }
         }
-        return ParseUriResult.from(position)
+        return ParseUriResult.from(points.asWGS84())
     }
 }

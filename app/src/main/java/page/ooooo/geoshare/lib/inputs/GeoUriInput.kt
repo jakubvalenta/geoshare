@@ -2,16 +2,15 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.*
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.point.*
 
 object GeoUriInput : Input {
     private const val NAME_REGEX = """(\((?P<name>.+)\))"""
-
-    private val srs = Srs.WGS84
 
     override val uriPattern: Pattern =
         Pattern.compile("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:\S+""")
@@ -23,7 +22,7 @@ object GeoUriInput : Input {
                 stringResource(
                     R.string.example,
                     GeoUriOutput.formatUriString(
-                        Position.example,
+                        persistentListOf(Point.example),
                         null,
                         nameDisabled = false,
                         zoomDisabled = false,
@@ -34,9 +33,9 @@ object GeoUriInput : Input {
     )
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
-                setPointIfNull { """$LAT,$LON$NAME_REGEX?""" matchLatLonZName queryParams["q"] }
+                setPointIfNull { """$LAT,$LON$NAME_REGEX?""" matchNaivePoint queryParams["q"] }
                 setQOrNameIfEmpty {
                     queryParams.firstNotNullOfOrNull { (key, value) ->
                         if (key != "q" && key != "z" && value.isEmpty()) {
@@ -47,10 +46,10 @@ object GeoUriInput : Input {
                     }
                 }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName path }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint path }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
             }
         }
-        return ParseUriResult.from(position)
+        return ParseUriResult.from(points.asWGS84())
     }
 }

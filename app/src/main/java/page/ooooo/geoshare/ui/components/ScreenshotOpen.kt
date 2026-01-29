@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.ui.theme.AppTheme

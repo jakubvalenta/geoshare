@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class CoordinatesInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -13,7 +13,7 @@ class CoordinatesInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Decimal
         testTextUri(
-            Position(Srs.WGS84, -68.648556, -152.775879),
+            WGS84Point(-68.648556, -152.775879),
             "N-68.648556,E-152.775879",
         )
     }

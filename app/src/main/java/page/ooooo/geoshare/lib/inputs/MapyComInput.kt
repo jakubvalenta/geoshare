@@ -4,15 +4,17 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZName
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toLat
+import page.ooooo.geoshare.lib.extensions.toLatLon
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
 
 object MapyComInput : Input.HasShortUri {
     private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
-
-    private val srs = Srs.WGS84
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern =
@@ -31,7 +33,7 @@ object MapyComInput : Input.HasShortUri {
     override val shortUriMethod = Input.ShortUriMethod.GET
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
                 setPointIfNull {
                     (COORDS match path)?.let { m ->
@@ -39,21 +41,21 @@ object MapyComInput : Input.HasShortUri {
                             val wholeMatch = m.groupOrNull()
                             val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
                             val lonSig = if (wholeMatch?.contains('W') == true) -1 else 1
-                            LatLonZName(latSig * lat, lonSig * lon)
+                            NaivePoint(latSig * lat, lonSig * lon)
                         }
                     }
                 }
                 setPointIfNull {
                     (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
                         (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
-                            LatLonZName(lat, lon)
+                            NaivePoint(lat, lon)
                         }
                     }
                 }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
             }
         }
-        return ParseUriResult.from(position)
+        return ParseUriResult.from(points.asWGS84())
     }
 
     @StringRes

@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.point.*
 
 object CoordinatesInput : Input {
     @Suppress("SpellCheckingInspection")
@@ -23,8 +23,6 @@ object CoordinatesInput : Input {
     private const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
     private const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
 
-    private val srs = Srs.WGS84
-
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
     override val documentation = InputDocumentation(
@@ -38,12 +36,12 @@ object CoordinatesInput : Input {
     )
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
                 setPointIfNull {
                     ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
-                        LatLonZName(
+                        NaivePoint(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
                                 m.groupOrNull("latSig"),
@@ -61,7 +59,7 @@ object CoordinatesInput : Input {
                 // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
                 setPointIfNull {
                     ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
-                        LatLonZName(
+                        NaivePoint(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
                                 m.groupOrNull("latSig"),
@@ -83,7 +81,7 @@ object CoordinatesInput : Input {
                 // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
                 setPointIfNull {
                     ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
-                        LatLonZName(
+                        NaivePoint(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
                                 m.groupOrNull("latSig"),
@@ -101,7 +99,7 @@ object CoordinatesInput : Input {
                 }
             }
         }
-        return ParseUriResult.from(position)
+        return ParseUriResult.from(points.asWGS84())
     }
 
     private fun degToDec(

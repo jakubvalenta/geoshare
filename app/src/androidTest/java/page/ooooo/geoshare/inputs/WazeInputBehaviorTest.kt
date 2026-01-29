@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class WazeInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -13,7 +13,7 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates
         testUri(
-            Position(Srs.WGS84, 45.6906304, -120.810983, z = 10.0),
+            WGS84Point(45.6906304, -120.810983, z = 10.0),
             "https://waze.com/ul?ll=45.6906304,-120.810983&z=10",
         )
 
@@ -25,25 +25,25 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place id
         testUri(
-            Position(Srs.WGS84, 52.000425474, 4.372739102),
+            WGS84Point(52.000425474, 4.372739102),
             "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
         )
 
         // Map view
         testUri(
-            Position(Srs.WGS84, 45.6906304, -120.810983),
+            WGS84Point(45.6906304, -120.810983),
             "https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983",
         )
 
         // Short URI
         testUri(
-            Position(Srs.WGS84, 19.402564, -99.165666, z = 16.0),
+            WGS84Point(19.402564, -99.165666, z = 16.0),
             "https://waze.com/ul/h9g3qrkju0",
         )
 
         // Text
         testTextUri(
-            Position(Srs.WGS84, 45.829189, 1.259372, z = 16.0),
+            WGS84Point(45.829189, 1.259372, z = 16.0),
             @Suppress("SpellCheckingInspection")
             "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
         )

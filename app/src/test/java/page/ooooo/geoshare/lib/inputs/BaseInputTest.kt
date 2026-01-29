@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 
 abstract class BaseInputTest() {
     protected abstract val input: Input
@@ -29,7 +29,7 @@ abstract class BaseInputTest() {
 
     suspend fun parseHtml(html: String) = (input as Input.HasHtml).parseHtml(
         channel = html.byteInputStream().toByteReadChannel(),
-        positionFromUri = Position(),
+        pointsFromUri = Position(),
         log = log,
     )
 }

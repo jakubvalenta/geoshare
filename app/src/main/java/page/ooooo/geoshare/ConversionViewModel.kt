@@ -54,7 +54,9 @@ import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.toWGS84
+import page.ooooo.geoshare.lib.point.writeGpxPoints
 import page.ooooo.geoshare.ui.SavableDelegate
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -228,7 +230,7 @@ class ConversionViewModel @Inject constructor(
     fun showLocationRationale(action: LocationAction, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = LocationRationaleShown(
-                currentState.inputUriString, currentState.position, i, action
+                currentState.inputUriString, currentState.points, i, action
             )
             transition()
         }
@@ -237,7 +239,7 @@ class ConversionViewModel @Inject constructor(
     fun skipLocationRationale(action: LocationAction, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = LocationPermissionReceived(
-                currentState.inputUriString, currentState.position, i, action
+                currentState.inputUriString, currentState.points, i, action
             )
             transition()
         }
@@ -246,7 +248,7 @@ class ConversionViewModel @Inject constructor(
     fun receiveLocationPermission() {
         (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
             stateContext.currentState = LocationPermissionReceived(
-                currentState.inputUriString, currentState.position, currentState.i, currentState.action
+                currentState.inputUriString, currentState.points, currentState.i, currentState.action
             )
             transition()
         }
@@ -255,7 +257,7 @@ class ConversionViewModel @Inject constructor(
     fun receiveLocation(action: LocationAction, i: Int?, location: Point?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = LocationReceived(
-                currentState.inputUriString, currentState.position, i, action, location
+                currentState.inputUriString, currentState.points, i, action, location
             )
             transition()
         }
@@ -264,7 +266,7 @@ class ConversionViewModel @Inject constructor(
     fun cancelLocationFinding() {
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
             stateContext.currentState = ActionFinished(
-                currentState.inputUriString, currentState.position, currentState.action
+                currentState.inputUriString, currentState.points, currentState.action
             )
             transition()
         }
@@ -273,7 +275,7 @@ class ConversionViewModel @Inject constructor(
     fun runAction(action: Action, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             stateContext.currentState = ActionReady(
-                currentState.inputUriString, currentState.position, i, action
+                currentState.inputUriString, currentState.points, i, action
             )
             transition()
         }
@@ -282,7 +284,7 @@ class ConversionViewModel @Inject constructor(
     fun finishBasicAction(success: Boolean?) {
         (stateContext.currentState as? BasicActionReady)?.let { currentState ->
             stateContext.currentState = ActionRan(
-                currentState.inputUriString, currentState.position, currentState.action, success
+                currentState.inputUriString, currentState.points, currentState.action, success
             )
             transition()
         }
@@ -291,14 +293,14 @@ class ConversionViewModel @Inject constructor(
     fun finishLocationAction(success: Boolean?) {
         (stateContext.currentState as? LocationActionReady)?.let { currentState ->
             stateContext.currentState = ActionRan(
-                currentState.inputUriString, currentState.position, currentState.action, success
+                currentState.inputUriString, currentState.points, currentState.action, success
             )
             transition()
         }
     }
 
     fun writeGpx(writer: Appendable) {
-        (stateContext.currentState as? ConversionState.HasResult)?.position?.writeGpxPoints(writer)
+        (stateContext.currentState as? ConversionState.HasResult)?.points?.toWGS84()?.writeGpxPoints(writer)
     }
 
     fun launchBillingFlow(activity: Activity, offerToken: String) {

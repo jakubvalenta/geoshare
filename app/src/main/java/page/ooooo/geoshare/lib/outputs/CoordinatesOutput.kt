@@ -7,21 +7,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.extensions.toDegMinSec
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.getOrNull
 import kotlin.math.abs
 
 object CoordinatesOutput : Output {
 
     open class CopyDecCoordsAction : CopyAction() {
-        override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatDecString(position.getPoint(i) ?: Point(Srs.WGS84))
+        override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
+            formatDecString(points.getOrNull(i))
 
         @Composable
         override fun Label() {
@@ -34,8 +34,8 @@ object CoordinatesOutput : Output {
     }
 
     open class CopyDegMinSecCoordsAction : CopyAction() {
-        override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatDegMinSecString(position.getPoint(i) ?: Point(Srs.WGS84))
+        override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
+            formatDegMinSecString(points.getOrNull(i))
 
         @Composable
         override fun Label() {
@@ -89,11 +89,11 @@ object CoordinatesOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_succeeded)
     }
 
-    override fun getText(position: Position, i: Int?, uriQuote: UriQuote) =
-        position.getPoint(i)?.let { point -> formatDegMinSecString(point) }
+    override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
+        points.getOrNull(i)?.let { point -> formatDegMinSecString(point) }
 
     @Composable
-    override fun getName(position: Position, i: Int?, uriQuote: UriQuote) = name(position, i)
+    override fun getName(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) = name(points, i)
 
     override fun getPositionActions(): List<BasicAction> = listOf(
         CopyDecCoordsAction(),
@@ -117,23 +117,33 @@ object CoordinatesOutput : Output {
         Automation.Type.COPY_COORDS_NSWE_DEC -> CopyDegMinSecCoordsAutomation
         else -> null
     }
-    
-    private fun formatDecString(point: Point): String = point.toWGS84().run { "$latStr, $lonStr" }
 
-    fun formatDegMinSecString(point: Point): String = point.toWGS84().run {
-        lat.toDegMinSec().let { (deg, min, sec) ->
-            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
-        } + lon.toDegMinSec().let { (deg, min, sec) ->
-            "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
+    private fun formatDecString(point: Point?): String = point?.toWGS84().run {
+        if (this != null && this.lat != null && this.lon != null) {
+            "$latStr, $lonStr"
+        } else {
+            "0, 0"
+        }
+    }
+
+    fun formatDegMinSecString(point: Point?): String = point?.toWGS84().run {
+        if (this != null && lat != null && lon != null) {
+            lat.toDegMinSec().let { (deg, min, sec) ->
+                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
+            } + lon.toDegMinSec().let { (deg, min, sec) ->
+                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
+            }
+        } else {
+            "0 N, 0 E"
         }
     }
 
     @Composable
-    private fun name(position: Position, i: Int?): String? =
-        position.getPoint(i)?.let { point ->
+    private fun name(points: ImmutableList<Point>, i: Int?): String? =
+        points.getOrNull(i)?.let { point ->
             point.name.takeUnless { it.isNullOrEmpty() }?.replace('+', ' ')
-                ?: position.points?.size?.takeIf { it > 1 }?.let { size ->
+                ?: points.size.takeIf { it > 1 }?.let { size ->
                     stringResource(R.string.conversion_succeeded_point_number, if (i == null) size else i + 1)
                 }
-        } ?: position.q?.replace('+', ' ')
+        }
 }

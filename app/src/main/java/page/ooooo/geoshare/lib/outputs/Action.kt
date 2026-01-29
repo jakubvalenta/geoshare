@@ -6,10 +6,10 @@ import android.content.res.Resources
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.Clipboard
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
 
 sealed interface Action {
     @Composable
@@ -17,7 +17,7 @@ sealed interface Action {
 
     fun getIcon(): (@Composable () -> Unit)? = null
 
-    fun isEnabled(position: Position, i: Int?): Boolean = true
+    fun isEnabled(points: ImmutableList<Point>, i: Int?): Boolean = true
 
     interface HasPackageName {
         val packageName: String
@@ -36,7 +36,7 @@ sealed interface Action {
 
 interface BasicAction : Action {
     suspend fun runAction(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         context: Context,
         clipboard: Clipboard,
@@ -48,7 +48,7 @@ interface BasicAction : Action {
 
 interface LocationAction : Action {
     suspend fun runAction(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         location: Point,
         context: Context,

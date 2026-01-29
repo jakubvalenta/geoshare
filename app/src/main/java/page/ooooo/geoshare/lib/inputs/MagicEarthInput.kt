@@ -3,18 +3,21 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZName
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toLat
+import page.ooooo.geoshare.lib.extensions.toLon
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 object MagicEarthInput : Input {
     const val NAME = "Magic Earth"
-
-    private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = InputDocumentation(
@@ -26,16 +29,16 @@ object MagicEarthInput : Input {
     )
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
                 setPointIfNull {
                     (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
                         (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
-                            LatLonZName(lat, lon)
+                            NaivePoint(lat, lon)
                         }
                     }
                 }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["name"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["name"] }
                 setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
                 @Suppress("SpellCheckingInspection")
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
@@ -44,6 +47,6 @@ object MagicEarthInput : Input {
                 setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
             }
         }
-        return ParseUriResult.from(position)
+        return ParseUriResult.from(points.asWGS84())
     }
 }

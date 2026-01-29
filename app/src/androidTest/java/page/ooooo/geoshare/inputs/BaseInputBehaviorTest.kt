@@ -3,7 +3,7 @@ package page.ooooo.geoshare.inputs
 import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.uiAutomator
 import page.ooooo.geoshare.BaseActivityBehaviorTest
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 
 abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 

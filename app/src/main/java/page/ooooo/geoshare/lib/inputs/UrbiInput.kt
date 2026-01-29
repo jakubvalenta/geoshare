@@ -4,19 +4,18 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findLatLonZName
-import page.ooooo.geoshare.lib.extensions.matchLatLonZName
+import page.ooooo.geoshare.lib.extensions.findNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchNaivePoint
 import page.ooooo.geoshare.lib.extensions.matchZ
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
 
 object UrbiInput : Input.HasHtml {
-    private val srs = Srs.WGS84
-
     override val uriPattern: Pattern =
         Pattern.compile("""(https?://)?(www\.)?((go|maps)\.)?(2gis|urbi|urbi-[a-z]{2})(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = InputDocumentation(
@@ -50,28 +49,32 @@ object UrbiInput : Input.HasHtml {
     )
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
-                setPointIfNull { """$LON,$LAT/$Z""" matchLatLonZName queryParams["m"] }
-                setPointIfNull { """.*/$LON,$LAT/?$""" matchLatLonZName path }
-                setPointIfNull { LON_LAT_PATTERN matchLatLonZName queryParams["center"] }
+                setPointIfNull { """$LON,$LAT/$Z""" matchNaivePoint queryParams["m"] }
+                setPointIfNull { """.*/$LON,$LAT/?$""" matchNaivePoint path }
+                setPointIfNull { LON_LAT_PATTERN matchNaivePoint queryParams["center"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
             }
         }
-        return ParseUriResult.from(position, uri.toString())
+        return ParseUriResult.from(points.asWGS84(), uri.toString())
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
-        val positionFromHtml = buildPosition(srs) {
+    override suspend fun parseHtml(
+        channel: ByteReadChannel,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog,
+    ): ParseHtmlResult? {
+        val pointsFromHtml = buildPoints {
             val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findLatLonZName line }) {
+                if (setPointIfNull { pattern findNaivePoint line }) {
                     break
                 }
             }
         }
-        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+        return ParseHtmlResult.from(pointsFromUri, pointsFromHtml.asWGS84())
     }
 
     @StringRes

@@ -2,9 +2,9 @@ package page.ooooo.geoshare.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test

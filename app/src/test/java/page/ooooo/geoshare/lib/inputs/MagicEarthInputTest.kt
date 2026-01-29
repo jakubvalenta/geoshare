@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class MagicEarthInputTest : BaseInputTest() {
     override val input = MagicEarthInput
@@ -35,7 +35,7 @@ class MagicEarthInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 48.85649, 2.35216)),
+            ParseUriResult.Succeeded(WGS84Point(48.85649, 2.35216)),
             parseUri("https://magicearth.com/?show_on_map&lat=48.85649&lon=2.35216&name=48.85649,+2.35216&img_id=12345"),
         )
     }
@@ -67,7 +67,7 @@ class MagicEarthInputTest : BaseInputTest() {
     @Test
     fun parseUri_parametersLatAndLonTakePrecedenceOverQ() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -17.2165721, -149.9470294, name = "Central Park")),
+            ParseUriResult.Succeeded(WGS84Point(-17.2165721, -149.9470294, name = "Central Park")),
             parseUri("https://magicearth.com/?lat=-17.2165721&lon=-149.9470294&q=Central Park"),
         )
     }
@@ -91,7 +91,7 @@ class MagicEarthInputTest : BaseInputTest() {
     @Test
     fun parseUri_customScheme() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4, name = "foo bar")),
+            ParseUriResult.Succeeded(WGS84Point(50.123456, -11.123456, z = 3.4, name = "foo bar")),
             parseUri("magicearth://?lat=50.123456&lon=-11.123456&q=foo%20bar&zoom=3.4"),
         )
     }

@@ -3,9 +3,9 @@ package page.ooooo.geoshare.inputs
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -17,13 +17,13 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         // Search
         testUri(
             @Suppress("SpellCheckingInspection")
-            Position(Srs.WGS84, q = "Louisenstraße 60, 01099 Dresden"),
+            WGS84Point(q = "Louisenstraße 60, 01099 Dresden"),
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
         )
 
         // Short URI in Japan
         testUri(
-            Position(Srs.WGS84, 34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
+            WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
@@ -35,13 +35,13 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates in data
         testUri(
-            Position(Srs.WGS84, 52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
+            WGS84Point(52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
             "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998"
         )
 
         // Coordinates and query (address)
         testUri(
-            Position(Srs.WGS84, 40.785091, -73.968285, z = 15.0, name = "Central Park"),
+            WGS84Point(40.785091, -73.968285, z = 15.0, name = "Central Park"),
             "https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2",
         )
 
@@ -60,14 +60,14 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place
         testUri(
-            Position(Srs.WGS84, 52.5068441, 13.42473175, name = "Berlin, Germany"),
+            WGS84Point(52.5068441, 13.42473175, name = "Berlin, Germany"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
-            Position(Srs.WGS84, q = "Berlin, Germany"),
+            WGS84Point(q = "Berlin, Germany"),
         )
 
         // Map view
         testUri(
-            Position(Srs.WGS84, 52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
+            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
             "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
 
@@ -87,7 +87,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Center
         testUri(
-            Position(Srs.WGS84, 52.5067296, 13.2599309),
+            WGS84Point(52.5067296, 13.2599309),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
 
@@ -120,7 +120,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Google Search
         testUri(
-            Position(Srs.WGS84, 27.765028, -15.600889),
+            WGS84Point(27.765028, -15.600889),
             "https://g.co/kgs/91UYXud",
         )
     }

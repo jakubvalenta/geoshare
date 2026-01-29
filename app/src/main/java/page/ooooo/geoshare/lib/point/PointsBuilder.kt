@@ -1,32 +1,37 @@
-package page.ooooo.geoshare.lib.position
+package page.ooooo.geoshare.lib.point
 
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
 
-class PositionBuilder(val srs: Srs) {
-    private var points: MutableList<Point> = mutableListOf()
-    private var defaultPoint: Point? = null  // Used only if points are empty
-    private var q: String? = null
-    private var z: Double? = null
-    private var name: String? = null
+class PointsBuilder() {
+    private var points: MutableList<NaivePoint> = mutableListOf()
+    private var defaultPoint: NaivePoint? = null  // Used only if points are empty
+    private var q: String? = null // TODO Rename to defaultName
+    private var z: Double? = null // TODO Rename to defaultZ
+    private var name: String? = null // TODO Replace with defaultName
 
-    fun toPosition(): Position = Position(
-        (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) })?.apply {
-            // Set name on the last point
-            if (lastOrNull()?.name == null) {
-                removeLastOrNull()?.copy(name = name)?.let { add(it) }
+    fun toPoints(): ImmutableList<NaivePoint> =
+        (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) } ?: emptyList()).run {
+            // Set z and name on the last point
+            if (z != null || name != null) {
+                transformLast { lastPoint ->
+                    lastPoint.copy(
+                        z = lastPoint.z ?: z?.let { max(1.0, min(21.0, it)) },
+                        name = lastPoint.name ?: name,
+                    )
+                }
+            } else {
+                this
             }
-        }?.toImmutableList(),
-        q = q,
-        z = z?.let { max(1.0, min(21.0, it)) },
-    )
+        }.toImmutableList()
 
     fun hasPoint(): Boolean = defaultPoint != null || points.isNotEmpty()
 
-    fun setPointIfNull(block: () -> LatLonZName?): Boolean = if (points.isEmpty()) {
+    fun setPointIfNull(block: () -> NaivePoint?): Boolean = if (points.isEmpty()) {
         block()?.let { (lat, lon, newZ, name) ->
-            points.add(Point(srs, lat, lon, name))
+            points.add(NaivePoint(lat, lon, name = name))
             if (newZ != null) {
                 z = newZ
             }
@@ -36,9 +41,9 @@ class PositionBuilder(val srs: Srs) {
         false
     }
 
-    fun setDefaultPointIfNull(block: () -> LatLonZName?): Boolean = if (defaultPoint == null) {
+    fun setDefaultPointIfNull(block: () -> NaivePoint?): Boolean = if (defaultPoint == null) {
         block()?.let { (lat, lon, newZ, name) ->
-            defaultPoint = Point(srs, lat, lon, name)
+            defaultPoint = NaivePoint(lat, lon, name = name)
             if (newZ != null) {
                 z = newZ
             }
@@ -48,8 +53,8 @@ class PositionBuilder(val srs: Srs) {
         false
     }
 
-    fun addPoints(block: () -> Sequence<LatLonZName>): Boolean =
-        points.addAll(block().map { (lat, lon, _, name) -> Point(srs, lat, lon, name) })
+    fun addPoints(block: () -> Sequence<NaivePoint>): Boolean =
+        points.addAll(block().map { (lat, lon, _, name) -> NaivePoint(lat, lon, name = name) })
 
     fun setQIfNull(block: () -> String?): Boolean = if (q == null && defaultPoint == null && points.isEmpty()) {
         block()?.let { newQ ->
@@ -78,7 +83,7 @@ class PositionBuilder(val srs: Srs) {
         block()?.let { (newQ, lat, lon) ->
             if (defaultPoint == null && points.isEmpty()) {
                 q = newQ
-                points.add(Point(srs, lat, lon))
+                points.add(NaivePoint(lat, lon))
             } else {
                 name = newQ
             }
@@ -98,5 +103,5 @@ class PositionBuilder(val srs: Srs) {
     }
 }
 
-suspend fun buildPosition(srs: Srs, block: suspend PositionBuilder.() -> Unit): Position =
-    PositionBuilder(srs).apply { this.block() }.toPosition()
+suspend fun buildPoints(block: suspend PointsBuilder.() -> Unit): ImmutableList<NaivePoint> =
+    PointsBuilder().apply { this.block() }.toPoints()

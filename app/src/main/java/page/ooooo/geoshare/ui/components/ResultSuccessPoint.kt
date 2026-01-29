@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -25,7 +25,7 @@ private val iconSize = 16.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessPoint(
-    position: Position,
+    points: ImmutableList<Point>,
     i: Int,
     onSelect: () -> Unit,
 ) {

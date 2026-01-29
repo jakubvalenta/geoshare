@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 
 class AmapInputTest : BaseInputTest() {
     override val input = AmapInput

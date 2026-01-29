@@ -97,7 +97,7 @@ import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.Headline
@@ -159,7 +159,7 @@ fun MainScreen(
             when (currentState) {
                 is BasicActionReady -> {
                     val success = currentState.action.runAction(
-                        position = currentState.position,
+                        position = currentState.points,
                         i = currentState.i,
                         context = context,
                         clipboard = clipboard,
@@ -171,7 +171,7 @@ fun MainScreen(
 
                 is LocationActionReady -> {
                     val success = currentState.action.runAction(
-                        position = currentState.position,
+                        position = currentState.points,
                         i = currentState.i,
                         location = currentState.location,
                         context = context,
@@ -540,7 +540,7 @@ private fun MainMainPane(
     onCancel: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onRun: (action: Action, i: Int?) -> Unit,
-    onSelect: (position: Position, i: Int?) -> Unit,
+    onSelect: (points: ImmutableList<Point>, i: Int?) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
@@ -569,7 +569,7 @@ private fun MainMainPane(
 
         currentState is ConversionState.HasResult -> {
             ResultSuccessCoordinates(
-                position = currentState.position,
+                position = currentState.points,
                 onRun = onRun,
                 onSelect = onSelect,
             )
@@ -833,7 +833,7 @@ private fun SucceededPreview() {
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
+                points = Position.example,
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -870,7 +870,7 @@ private fun DarkSucceededPreview() {
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
+                points = Position.example,
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -907,7 +907,7 @@ private fun TabletSucceededPreview() {
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
+                points = Position.example,
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -949,7 +949,7 @@ private fun AutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
+                points = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 delay = 3.seconds,
@@ -993,7 +993,7 @@ private fun DarkAutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
+                points = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 delay = 3.seconds,
@@ -1037,7 +1037,7 @@ private fun TabletAutomationPreview() {
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                position = Position.example,
+                points = Position.example,
                 i = null,
                 action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
                 delay = 3.seconds,

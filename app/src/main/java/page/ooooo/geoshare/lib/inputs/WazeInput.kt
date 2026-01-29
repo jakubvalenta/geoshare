@@ -2,17 +2,24 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import io.ktor.utils.io.*
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readUTF8Line
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.extensions.findNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchHash
+import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
-import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZName
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -20,8 +27,6 @@ import page.ooooo.geoshare.lib.position.buildPosition
 object WazeInput : Input.HasHtml {
     @Suppress("SpellCheckingInspection")
     private const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
-
-    private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
 
@@ -39,17 +44,17 @@ object WazeInput : Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val position = buildPosition(srs) {
+        val points = buildPoints {
             uri.run {
                 setPointIfNull {
                     (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
                         ?.let { hash -> decodeWazeGeoHash(hash) }
-                        ?.let { (lat, lon, z) -> LatLonZName(lat.toScale(6), lon.toScale(6), z) }
+                        ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(6), lon.toScale(6), z) }
                 }
-                setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZName queryParams["to"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["ll"] }
+                setPointIfNull { """ll\.$LAT,$LON""" matchNaivePoint queryParams["to"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["ll"] }
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["latlng"] }
+                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["latlng"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
                 if (!hasPoint()) {
@@ -85,20 +90,24 @@ object WazeInput : Input.HasHtml {
                 }
             }
         }
-        return ParseUriResult.from(position, htmlUriString)
+        return ParseUriResult.from(points.asWGS84(), htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
-        val positionFromHtml = buildPosition(srs) {
+    override suspend fun parseHtml(
+        channel: ByteReadChannel,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog,
+    ): ParseHtmlResult? {
+        val pointsFromHtml = buildPoints {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findLatLonZName line }) {
+                if (setPointIfNull { pattern findNaivePoint line }) {
                     break
                 }
             }
         }
-        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
+        return ParseHtmlResult.from(pointsFromUri, pointsFromHtml.asWGS84())
     }
 
     @StringRes

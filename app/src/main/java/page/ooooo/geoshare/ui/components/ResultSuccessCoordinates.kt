@@ -20,18 +20,18 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Srs
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
-    position: Position,
+    points: ImmutableList<Point>,
     onRun: (action: Action, i: Int?) -> Unit,
-    onSelect: (position: Position, i: Int?) -> Unit,
+    onSelect: (points: ImmutableList<Point>, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -144,7 +144,7 @@ private fun DescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, q = "Berlin, Germany", z = 13.0),
+                position = WGS84Point(q = "Berlin, Germany", z = 13.0),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -161,7 +161,7 @@ private fun DarkDescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, q = "Berlin, Germany", z = 13.0),
+                position = WGS84Point(q = "Berlin, Germany", z = 13.0),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -178,7 +178,7 @@ private fun LabelPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
+                position = WGS84Point(50.123456, 11.123456, name = "My point"),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -195,7 +195,7 @@ private fun DarkLabelPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
+                position = WGS84Point(50.123456, 11.123456, name = "My point"),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
