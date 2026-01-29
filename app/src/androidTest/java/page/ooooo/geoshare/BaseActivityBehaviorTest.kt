@@ -6,6 +6,8 @@ import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -21,7 +23,7 @@ import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
-import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Point
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -155,7 +157,7 @@ abstract class BaseActivityBehaviorTest {
         )
     }
 
-    protected fun waitAndAssertPositionIsVisible(expectedPosition: Position) = uiAutomator {
+    protected fun waitAndAssertPositionIsVisible(expectedPoints: ImmutableList<Point>) = uiAutomator {
         onElement(NETWORK_TIMEOUT) {
             when (viewIdResourceName) {
                 "geoShareConversionSuccessPositionName" -> true
@@ -165,18 +167,13 @@ abstract class BaseActivityBehaviorTest {
         }
         onElement {
             if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
-                if (!expectedPosition.points?.last()?.name.isNullOrEmpty()) {
+                if (expectedPoints.lastOrNull()?.name?.isNotEmpty() == true) {
                     assertEquals(
-                        expectedPosition.points.last().name?.replace('+', ' '),
+                        expectedPoints.lastOrNull()?.name?.replace('+', ' '),
                         textAsString(),
                     )
-                } else if (expectedPosition.points != null && expectedPosition.points.size > 1) {
-                    assertEquals("point ${expectedPosition.points.size}", textAsString())
-                } else if (!expectedPosition.q.isNullOrEmpty()) {
-                    assertEquals(
-                        expectedPosition.q.replace('+', ' '),
-                        textAsString(),
-                    )
+                } else if (expectedPoints.size > 1) {
+                    assertEquals("point ${expectedPoints.size}", textAsString())
                 } else {
                     assertTrue(
                         "Expected ${textAsString()} to equal 'Coordinates' (or a translation)",
@@ -190,7 +187,7 @@ abstract class BaseActivityBehaviorTest {
                 false
             }
         }
-        val expectedText = allOutputs.getText(expectedPosition, null)
+        val expectedText = allOutputs.getText(expectedPoints, null)
         if (expectedText != null) {
             onElement {
                 if (viewIdResourceName == "geoShareConversionSuccessPositionCoordinates") {
@@ -202,6 +199,9 @@ abstract class BaseActivityBehaviorTest {
             }
         }
     }
+
+    protected fun waitAndAssertPositionIsVisible(expectedPoint: Point) =
+        waitAndAssertPositionIsVisible(persistentListOf(expectedPoint))
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps

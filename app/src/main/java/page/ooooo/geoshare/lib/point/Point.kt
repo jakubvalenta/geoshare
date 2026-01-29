@@ -24,14 +24,15 @@ sealed interface Point {
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
+            z: Double? = null,
             name: String? = null,
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
             val lon = Random.nextDouble(minLon, maxLon).toScale(6)
             return if (isPointInChina(lon, lat)) {
-                GCJ02Point(lat, lon, name = name)
+                GCJ02Point(lat, lon, z, name)
             } else {
-                WGS84Point(lat, lon, name = name)
+                WGS84Point(lat, lon, z, name)
             }
         }
     }
@@ -63,12 +64,10 @@ data class WGS84Point(
     /**
      * @See GCJ02Point.toWGS84
      */
-    override fun toGCJ02() = if (lat == null || lon == null) {
+    override fun toGCJ02() = if (lat == null || lon == null || !isPointInChina(lon, lat)) {
         GCJ02Point(lat, lon, z, name)
-    } else if (isPointInChina(lon, lat)) {
-        WGSPointer(lat, lon).toGCJPointer().run { GCJ02Point(latitude, longitude) }
     } else {
-        GCJ02Point(lat, lon)
+        WGSPointer(lat, lon).toGCJPointer().run { GCJ02Point(latitude, longitude, z, name) }
     }
 }
 
@@ -92,12 +91,10 @@ data class GCJ02Point(
      *
      * @see isPointInChina
      */
-    override fun toWGS84() = if (lat == null || lon == null) {
+    override fun toWGS84() = if (lat == null || lon == null || !isPointInChina(lon, lat)) {
         WGS84Point(lat, lon, z, name)
-    } else if (isPointInChina(lon, lat)) {
-        GCJPointer(lat, lon).toExactWGSPointer().run { WGS84Point(latitude, longitude) }
     } else {
-        WGS84Point(lat, lon)
+        GCJPointer(lat, lon).toExactWGSPointer().run { WGS84Point(latitude, longitude, z, name) }
     }
 
     override fun toGCJ02() = this
@@ -119,6 +116,6 @@ data class BD09MCPoint(
     } else {
         BD09Convertor.convertMC2LL(lat, lon)
             .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
-            .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon) }
+            .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name) }
     }
 }

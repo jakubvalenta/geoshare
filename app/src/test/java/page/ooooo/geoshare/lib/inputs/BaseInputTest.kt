@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.ILog
@@ -8,7 +9,6 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.point.Position
 
 abstract class BaseInputTest() {
     protected abstract val input: Input
@@ -29,7 +29,7 @@ abstract class BaseInputTest() {
 
     suspend fun parseHtml(html: String) = (input as Input.HasHtml).parseHtml(
         channel = html.byteInputStream().toByteReadChannel(),
-        pointsFromUri = Position(),
+        pointsFromUri = persistentListOf(),
         log = log,
     )
 }

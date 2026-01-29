@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class WazeInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -19,7 +18,7 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Query
         testUri(
-            Position(q = "66 Acacia Avenue"),
+            WGS84Point(name = "66 Acacia Avenue"),
             "https://waze.com/ul?q=66%20Acacia%20Avenue",
         )
 

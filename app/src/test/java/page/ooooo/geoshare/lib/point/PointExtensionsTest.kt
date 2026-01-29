@@ -7,34 +7,38 @@ import org.junit.Test
 class PointExtensionsTest {
 
     @Test
-    fun transformLast_pointsAreEmpty_returnsPositionUnchanged() {
+    fun transformLast_pointsAreEmpty_returnsListUnchanged() {
         val points = persistentListOf<WGS84Point>()
         assertEquals(
             points,
-            points.transformLast("foo"),
+            points.transformLast { point ->
+                point.copy(name = "foo")
+            },
         )
     }
 
     @Test
-    fun transformLast_pointsSizeIsOneAndLastPointHasName_returnsPositionUnchanged() {
+    fun transformLast_pointsSizeIsOneAndTransformReturnsNull_returnsListUnchanged() {
         val points = persistentListOf(WGS84Point(1.0, 2.0, name = "bar"))
         assertEquals(
             points,
-            points.transformLast("foo"),
+            points.transformLast { null },
         )
     }
 
     @Test
-    fun transformLast_pointsSizeIsOneAndLastPointDoesNotHaveName_returnsNewPositionWithLastPointNameSet() {
+    fun transformLast_pointsSizeIsOneAndTransformReturnsNewItem_returnsNewListWithLastItemTransformed() {
         val points = persistentListOf(WGS84Point(1.0, 2.0))
         assertEquals(
             persistentListOf(WGS84Point(1.0, 2.0, name = "foo")),
-            points.transformLast("foo"),
+            points.transformLast { point ->
+                point.copy(name = "foo")
+            },
         )
     }
 
     @Test
-    fun transformLast_pointsSizeIsThreeAndLastPointDoesNotHaveName_returnsNewPositionWithLastPointNameSet() {
+    fun transformLast_pointsSizeIsThreeAndTransformReturnsNewItem_returnsNewListWithLastItemTransformed() {
         val points = persistentListOf(
             WGS84Point(1.0, 2.0),
             WGS84Point(3.0, 4.0),
@@ -46,7 +50,9 @@ class PointExtensionsTest {
                 WGS84Point(3.0, 4.0),
                 WGS84Point(5.0, 6.0, name = "foo"),
             ),
-            points.transformLast("foo"),
+            points.transformLast { point ->
+                point.copy(name = "foo")
+            },
         )
     }
 

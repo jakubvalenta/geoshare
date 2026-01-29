@@ -3,9 +3,8 @@ package page.ooooo.geoshare.inputs
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
-import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -17,7 +16,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         // Search
         testUri(
             @Suppress("SpellCheckingInspection")
-            WGS84Point(q = "Louisenstraße 60, 01099 Dresden"),
+            WGS84Point(name = "Louisenstraße 60, 01099 Dresden"),
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
         )
 
@@ -29,7 +28,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Short URI in China
         testUri(
-            Position(Srs.GCJ02, 39.920439, 116.331538),
+            GCJ02Point(39.920439, 116.331538),
             "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
         )
 
@@ -48,12 +47,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         // Coordinates and query (business)
         testUri(
             @Suppress("SpellCheckingInspection")
-            Position(
-                Srs.WGS84,
-                50.4484901,
-                8.0469828,
-                name = "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar",
-            ),
+            WGS84Point(50.4484901, 8.0469828, name = "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar"),
             @Suppress("SpellCheckingInspection")
             "https://www.google.com/maps/place/%C3%84nderungsschneiderei+Hadamar,+Schulstra%C3%9Fe+3,+65589+Hadamar/@50.4484901,8.0469828,3a,54.9y,5.97h,62.4t/data=!3m5!1e1!3m3!1szFIo-lmR3NWYzi_eWhPHFQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DzFIo-lmR3NWYzi_eWhPHFQ%26w%3D900%26h%3D600%26ll%3D0.0,0.0%26yaw%3D5.0%26pitch%3D28.0%26cb_client%3Dgmm.iv.android!4m2!3m1!1s0x47bc3266a8f3bb4b:0x96d1177f5ecfc466?utm_source=mstt_0&g_ep=CAESBzI1LjM3LjAYACCBgQEqogEsOTQyNjc3MjcsOTQyNzU0MDcsOTQyODQ0NzgsOTQyMjMyOTksOTQyMTY0MTMsOTQyODA1NzYsOTQyMTI0OTYsOTQyMDczOTQsOTQyMDc1MDYsOTQyMDg1MDYsOTQyMTc1MjMsOTQyMTg2NTMsOTQyMjk4MzksOTQyNzUxNjgsOTQyNjI3MzMsNDcwODQzOTMsOTQyMTMyMDAsOTQyNTgzMjVCAkRF&skid=368dc137-203a-4698-9ed3-b974e7bee770&g_st=aw",
         )
@@ -62,7 +56,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         testUri(
             WGS84Point(52.5068441, 13.42473175, name = "Berlin, Germany"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
-            WGS84Point(q = "Berlin, Germany"),
+            WGS84Point(name = "Berlin, Germany"),
         )
 
         // Map view
@@ -74,13 +68,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         // Directions
         testUri(
             @Suppress("SpellCheckingInspection")
-            Position(
-                Srs.WGS84,
-                52.4807739,
-                13.4300356,
-                z = 16.0,
-                name = "Reuterstraße 1, Berlin-Neukölln, Germany",
-            ),
+            WGS84Point(52.4807739, 13.4300356, z = 16.0, name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
             @Suppress("SpellCheckingInspection")
             "https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2",
         )
@@ -93,17 +81,15 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place list (sometimes fails, probably due to IP address blocking)
         testUri(
-            Position(
-                points = persistentListOf(
-                    Point(Srs.GCJ02, 59.1293656, 11.4585672),
-                    Point(Srs.GCJ02, 59.4154007, 11.659710599999999),
-                    Point(Srs.GCJ02, 59.3443991, 11.672637),
-                    Point(Srs.GCJ02, 59.2557409, 11.5857853),
-                    Point(Srs.GCJ02, 59.1579458, 11.7337507),
-                    Point(Srs.GCJ02, 59.229344899999994, 11.6892173),
-                    Point(Srs.GCJ02, 59.2999243, 11.6587237),
-                    Point(Srs.GCJ02, 59.147731699999994, 11.550661199999999),
-                ),
+            persistentListOf(
+                GCJ02Point(59.1293656, 11.4585672),
+                GCJ02Point(59.4154007, 11.659710599999999),
+                GCJ02Point(59.3443991, 11.672637),
+                GCJ02Point(59.2557409, 11.5857853),
+                GCJ02Point(59.1579458, 11.7337507),
+                GCJ02Point(59.229344899999994, 11.6892173),
+                GCJ02Point(59.2999243, 11.6587237),
+                GCJ02Point(59.147731699999994, 11.550661199999999),
             ),
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
         )

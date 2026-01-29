@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GeoUriInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -13,7 +12,7 @@ class GeoUriInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates, query and zoom
         testUri(
-            WGS84Point(50.123456, -11.123456, q = "foo bar", z = 3.4),
+            WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4),
             "geo:50.123456,-11.123456?q=foo%20bar&z=3.4",
         )
 

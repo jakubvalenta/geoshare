@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.point
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
@@ -13,19 +14,21 @@ class PointsBuilder() {
     private var name: String? = null // TODO Replace with defaultName
 
     fun toPoints(): ImmutableList<NaivePoint> =
-        (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) } ?: emptyList()).run {
+        (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) })?.run {
             // Set z and name on the last point
-            if (z != null || name != null) {
+            if (q != null || z != null || name != null) {
                 transformLast { lastPoint ->
                     lastPoint.copy(
                         z = lastPoint.z ?: z?.let { max(1.0, min(21.0, it)) },
-                        name = lastPoint.name ?: name,
+                        name = lastPoint.name ?: q ?: name,
                     )
                 }
             } else {
                 this
             }
-        }.toImmutableList()
+        }?.toImmutableList()
+            ?: (q ?: name)?.let { name -> persistentListOf(NaivePoint(z = z, name = name)) }
+            ?: persistentListOf()
 
     fun hasPoint(): Boolean = defaultPoint != null || points.isNotEmpty()
 

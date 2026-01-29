@@ -1,10 +1,10 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class CoordinatesInputTest : BaseInputTest() {
     override val input = CoordinatesInput
@@ -29,7 +29,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimal() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(41.40338, 2.17403)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(41.40338, 2.17403))),
             parseUri("41.40338, 2.17403"),
         )
     }
@@ -37,7 +37,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimalDegreeSign() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(50.21972, -0.68453)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(50.21972, -0.68453))),
             parseUri("50.21972°\u00a0N, 0.68453°\u00a0W"),
         )
     }
@@ -45,7 +45,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimalNorthEastAfter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(41.996601, 6.122383)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(41.996601, 6.122383))),
             parseUri("41.9966006N, 6.1223825E"),
         )
     }
@@ -53,7 +53,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimalNorthEastBefore() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(41.40338, 2.17403)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(41.40338, 2.17403))),
             parseUri("N 41.40338, E 2.17403"),
         )
     }
@@ -61,7 +61,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimalNegativeNorthEastBefore() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(-68.648556, -152.775879)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-68.648556, -152.775879))),
             parseUri("N -68.648556 E -152.775879"),
         )
     }
@@ -69,7 +69,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimalSouthWestBefore() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(-68.648556, -152.775879)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-68.648556, -152.775879))),
             parseUri("S 68.648556 W 152.775879"),
         )
     }
@@ -77,7 +77,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_decimalSouthEastAfter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(-41.996601, -6.122383)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-41.996601, -6.122383))),
             parseUri("41.9966006S, 6.1223825W"),
         )
     }
@@ -85,11 +85,11 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutesSecondsTypographic() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(31.0, 36.5)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(31.0, 36.5))),
             parseUri("""31° 0′ 0″ N, 36° 30′ 0″ E"""),
         )
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(31.95, 35.933333)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(31.95, 35.933333))),
             parseUri("""31°57′N 35°56′E"""),
         )
     }
@@ -97,7 +97,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutesSecondsNorthEastAfter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(41.403389, 2.174028)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(41.403389, 2.174028))),
             parseUri("""41°24'12.2"N 2°10'26.5"E"""),
         )
     }
@@ -105,7 +105,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutesSecondsSouthWestAfter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(-68.648556, -152.775879)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-68.648556, -152.775879))),
             parseUri("""68°38'54.8016S 152°46'33.1644W"""),
         )
     }
@@ -113,7 +113,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutesSecondsNegativeNorthEastBefore() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(-68.648556, -152.775879)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-68.648556, -152.775879))),
             parseUri("""N -68° 38' 54.8016 E -152° 46' 33.1644"""),
         )
     }
@@ -121,7 +121,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutes() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(41.40338, 2.17403)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(41.40338, 2.17403))),
             parseUri("41 24.2028, 2 10.4418"),
         )
     }
@@ -129,7 +129,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutesWhole() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(31.95, 35.933333)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(31.95, 35.933333))),
             parseUri("31°57′N 35°56′E"),
         )
     }
@@ -137,7 +137,7 @@ class CoordinatesInputTest : BaseInputTest() {
     @Test
     fun parseUri_degreesMinutesNegative() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(WGS84Point(-68.648556, -152.775879)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-68.648556, -152.775879))),
             parseUri("-68 38.913360, -152 46.552740"),
         )
     }

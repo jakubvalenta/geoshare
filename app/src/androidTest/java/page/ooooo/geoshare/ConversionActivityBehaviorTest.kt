@@ -8,8 +8,7 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 @RunWith(AndroidJUnit4::class)
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -79,8 +78,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
+                    WGS84Point(
                         52.4842015,
                         13.4167277,
                         name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
@@ -89,10 +87,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                    )
+                    WGS84Point(name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany")
                 )
             }
 
@@ -120,20 +115,16 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
+                    WGS84Point(
                         52.4842015,
                         13.4167277,
                         name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                    )
+                    ),
                 )
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                    )
+                    WGS84Point(name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
                 )
             }
 
@@ -145,20 +136,16 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
+                    WGS84Point(
                         44.4490541,
                         26.0888398,
                         name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    )
+                    ),
                 )
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    )
+                    WGS84Point(name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098"),
                 )
             }
         }
@@ -336,20 +323,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        52.4848232,
-                        13.4240791,
-                        name = "Hermannstr. 10, Berlin",
-                    )
+                    WGS84Point(52.4848232, 13.4240791, name = "Hermannstr. 10, Berlin"),
                 )
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "Hermannstr. 10, Berlin",
-                    )
+                    WGS84Point(name = "Hermannstr. 10, Berlin"),
                 )
             }
 
@@ -377,20 +356,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        52.4834254,
-                        13.4245399,
-                        name = "Hermannstr. 20, Berlin",
-                    )
+                    WGS84Point(52.4834254, 13.4245399, name = "Hermannstr. 20, Berlin"),
                 )
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "Hermannstr. 20, Berlin",
-                    )
+                    WGS84Point(name = "Hermannstr. 20, Berlin"),
                 )
             }
 
@@ -402,20 +373,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        52.4832988,
-                        13.4245179,
-                        name = "Hermannstr. 21, Berlin",
-                    )
+                    WGS84Point(52.4832988, 13.4245179, name = "Hermannstr. 21, Berlin"),
                 )
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "Hermannstr. 21, Berlin",
-                    )
+                    WGS84Point(name = "Hermannstr. 21, Berlin"),
                 )
             }
         }
@@ -434,7 +397,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows location search
             waitAndAssertPositionIsVisible(
                 @Suppress("SpellCheckingInspection")
-                Position(q = "Hermannstr. 30, Berlin")
+                WGS84Point(name = "Hermannstr. 30, Berlin")
             )
 
             // Share another Google Maps place link with the app
@@ -459,7 +422,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows location search
             waitAndAssertPositionIsVisible(
                 @Suppress("SpellCheckingInspection")
-                Position(q = "Hermannstr. 40, Berlin")
+                WGS84Point(name = "Hermannstr. 40, Berlin")
             )
 
             // Share another Google Maps place link with the app
@@ -469,7 +432,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows location search
             waitAndAssertPositionIsVisible(
                 @Suppress("SpellCheckingInspection")
-                Position(q = "Hermannstr. 41, Berlin")
+                WGS84Point(name = "Hermannstr. 41, Berlin")
             )
         }
 
@@ -488,20 +451,16 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             try {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
+                    WGS84Point(
                         51.1982447,
                         6.4389493,
                         name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
-                    )
+                    ),
                 )
             } catch (_: ElementNotFoundException) {
                 waitAndAssertPositionIsVisible(
                     @Suppress("SpellCheckingInspection")
-                    Position(
-                        Srs.WGS84,
-                        q = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
-                    )
+                    WGS84Point(name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
                 )
             }
         }

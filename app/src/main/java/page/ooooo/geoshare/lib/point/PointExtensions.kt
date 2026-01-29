@@ -8,7 +8,11 @@ fun ImmutableList<Point>.getOrNull(i: Int?): Point? =
     if (i == null) {
         this.lastOrNull()
     } else {
-        this.getOrNull(i)
+        try {
+            this[i]
+        } catch (_: IndexOutOfBoundsException) {
+            null
+        }
     }
 
 fun <T> List<T>.transformLast(transform: (item: T) -> T?): Collection<T> {
@@ -17,7 +21,6 @@ fun <T> List<T>.transformLast(transform: (item: T) -> T?): Collection<T> {
         if (lastItem != null) {
             val transformedLastItem = transform(lastItem)
             if (transformedLastItem != null) {
-                // TODO Test transform returns null
                 return this.dropLast(1) + transformedLastItem
             }
         }

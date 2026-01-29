@@ -18,10 +18,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -39,7 +40,7 @@ fun ScreenshotOpen() {
             x = 86,
             y = 100,
         ) {
-            allOutputs.getText(Position.example, null)?.let { text ->
+            allOutputs.getText(persistentListOf(Point.example), null)?.let { text ->
                 ScreenshotText(
                     text,
                     scale,

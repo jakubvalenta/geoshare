@@ -12,11 +12,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.Position
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -30,7 +30,7 @@ fun ResultSuccessPoint(
     onSelect: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val name = allOutputs.getName(position, i)
+    val name = allOutputs.getName(points, i)
 
     Box {
         FlowRow(
@@ -49,7 +49,7 @@ fun ResultSuccessPoint(
                 )
             }
             SelectionContainer {
-                allOutputs.getText(position, i)?.let { text ->
+                allOutputs.getText(points, i)?.let { text ->
                     Text(text, style = MaterialTheme.typography.bodySmall)
                 }
             }
@@ -71,13 +71,11 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             ResultSuccessPoint(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                    ),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
                 ),
                 i = 2,
                 onSelect = {},
@@ -92,13 +90,11 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             ResultSuccessPoint(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                    ),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
                 ),
                 i = 2,
                 onSelect = {},
@@ -114,13 +110,11 @@ private fun LongNamePreview() {
         Surface {
             @Suppress("SpellCheckingInspection")
             ResultSuccessPoint(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
-                        Point.genRandomPoint(),
-                    ),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                    Point.genRandomPoint(),
                 ),
                 i = 2,
                 onSelect = {},
@@ -136,13 +130,11 @@ private fun DarkLongNamePreview() {
         Surface {
             @Suppress("SpellCheckingInspection")
             ResultSuccessPoint(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
-                        Point.genRandomPoint(),
-                    ),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
+                    Point.genRandomPoint(),
                 ),
                 i = 2,
                 onSelect = {},

@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class MapsMeInputBehaviorTest : BaseInputBehaviorTest() {
     @Test

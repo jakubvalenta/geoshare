@@ -56,7 +56,8 @@ object GoogleMapsOutput : Output {
             Text(stringResource(R.string.conversion_succeeded_copy_link_street_view, GoogleMapsInput.NAME))
         }
 
-        override fun isEnabled(points: ImmutableList<Point>, i: Int?) = points.getOrNull(i) != null
+        override fun isEnabled(points: ImmutableList<Point>, i: Int?) =
+            points.getOrNull(i).run { this != null && lat != null && lon != null }
     }
 
     object CopyLinkChipAction : CopyLinkAction() {
@@ -97,7 +98,8 @@ object GoogleMapsOutput : Output {
             )
         }
 
-        override fun isEnabled(points: ImmutableList<Point>, i: Int?) = points.getOrNull(i) != null
+        override fun isEnabled(points: ImmutableList<Point>, i: Int?) =
+            points.getOrNull(i).run { this != null && lat != null && lon != null }
     }
 
     object CopyLinkAutomation : CopyLinkAction(), BasicAutomation {
@@ -325,6 +327,8 @@ object GoogleMapsOutput : Output {
         path = points.getOrNull(i)?.toGCJ02().run {
             if (this != null && this.lat != null && this.lon != null) {
                 "$latStr,$lonStr"
+            } else if (this != null && name != null) {
+                name
             } else {
                 "0,0"
             }

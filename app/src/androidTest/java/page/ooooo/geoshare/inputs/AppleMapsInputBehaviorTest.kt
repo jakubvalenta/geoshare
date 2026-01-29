@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.point.Position
-import page.ooooo.geoshare.lib.point.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -26,7 +25,7 @@ class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Query
         testUri(
-            WGS84Point(50.894967, 4.341626, q = "Central Park", z = 10.0),
+            WGS84Point(50.894967, 4.341626, name = "Central Park", z = 10.0),
             "https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s",
         )
 

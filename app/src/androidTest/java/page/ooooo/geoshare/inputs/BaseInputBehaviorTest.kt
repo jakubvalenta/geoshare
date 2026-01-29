@@ -2,8 +2,10 @@ package page.ooooo.geoshare.inputs
 
 import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BaseActivityBehaviorTest
-import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Point
 
 abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 
@@ -25,7 +27,11 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    protected fun testUri(expectedPosition: Position, unsafeUriString: String, fallbackPosition: Position? = null) =
+    protected fun testUri(
+        expectedPoints: ImmutableList<Point>,
+        unsafeUriString: String,
+        fallbackPoints: ImmutableList<Point>? = null,
+    ) =
         uiAutomator {
             // Go to main form
             goToMainForm()
@@ -36,17 +42,20 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows position
             try {
-                waitAndAssertPositionIsVisible(expectedPosition)
+                waitAndAssertPositionIsVisible(expectedPoints)
             } catch (e: ElementNotFoundException) {
-                if (fallbackPosition != null) {
-                    waitAndAssertPositionIsVisible(fallbackPosition)
+                if (fallbackPoints != null) {
+                    waitAndAssertPositionIsVisible(fallbackPoints)
                 } else {
                     throw e
                 }
             }
         }
 
-    protected fun testTextUri(expectedPosition: Position, unsafeText: String) = uiAutomator {
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point? = null) =
+        testUri(persistentListOf(expectedPoint), unsafeUriString, fallbackPoint?.let { persistentListOf(it) })
+
+    protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the texts, so we put the text in the main screen of the app instead.
         // device.executeShellCommand(
@@ -65,6 +74,9 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         confirmDialogIfItIsVisible()
 
         // Shows position
-        waitAndAssertPositionIsVisible(expectedPosition)
+        waitAndAssertPositionIsVisible(expectedPoints)
     }
+
+    protected fun testTextUri(expectedPoint: Point, unsafeText: String) =
+        testTextUri(persistentListOf(expectedPoint), unsafeText)
 }

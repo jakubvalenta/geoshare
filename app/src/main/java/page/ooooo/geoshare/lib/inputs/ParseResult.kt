@@ -14,7 +14,7 @@ sealed interface ParseUriResult {
             Succeeded(points)
         } else if (htmlUriString != null) {
             SucceededAndSupportsHtmlParsing(points, htmlUriString)
-        } else if (points.lastOrNull()?.name != null) {
+        } else if (!points.lastOrNull()?.name.isNullOrEmpty()) {
             Succeeded(points)
         } else {
             null
@@ -32,21 +32,34 @@ sealed interface ParseHtmlResult {
             pointsFromUri: ImmutableList<Point>,
             pointsFromHtml: ImmutableList<Point>,
             redirectUriString: String? = null,
-        ): ParseHtmlResult? = if (pointsFromHtml.isNotEmpty()) {
+        ): ParseHtmlResult? {
             // Copy search query parsed from URI to the points parsed from HTML
-            val nameFromUri = pointsFromUri.lastOrNull()?.name
-            val pointsMerged = if (nameFromUri != null) {
-                pointsFromHtml.transformLast { lastPoint ->
-                    lastPoint.setName(nameFromUri)
-                }.toImmutableList()
+            val pointsMerged = if (pointsFromHtml.isNotEmpty()) {
+                val nameFromUri = pointsFromUri.lastOrNull()?.name
+                if (!nameFromUri.isNullOrEmpty()) {
+                    pointsFromHtml.transformLast { lastPoint ->
+                        if (lastPoint.name.isNullOrEmpty()) {
+                            // TODO Test that URI name is used on when HTML name is not empty
+                            lastPoint.setName(nameFromUri)
+                        } else {
+                            lastPoint
+                        }
+                    }.toImmutableList()
+                } else {
+                    pointsFromHtml
+                }
             } else {
                 pointsFromHtml
             }
-            Succeeded(pointsMerged)
-        } else if (redirectUriString != null) {
-            RequiresRedirect(redirectUriString)
-        } else {
-            null
+            return if (pointsMerged.lastOrNull()?.run { lat != null && lon != null } == true) {
+                Succeeded(pointsMerged)
+            } else if (redirectUriString != null) {
+                RequiresRedirect(redirectUriString)
+            } else if (!pointsMerged.lastOrNull()?.name.isNullOrEmpty()) {
+                Succeeded(pointsMerged)
+            } else {
+                null
+            }
         }
     }
 

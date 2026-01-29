@@ -108,7 +108,7 @@ object AppleMapsOutput : Output {
         path = "/",
         queryParams = buildMap {
             points.getOrNull(i)?.toWGS84()?.run {
-                if (isNotEmpty()) {
+                if (lat != null && lon != null) {
                     set(@Suppress("SpellCheckingInspection") "daddr", "$latStr,$lonStr")
                 } else if (name != null) {
                     set(@Suppress("SpellCheckingInspection") "daddr", name)

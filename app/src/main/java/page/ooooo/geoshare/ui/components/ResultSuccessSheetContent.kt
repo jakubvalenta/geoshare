@@ -13,13 +13,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.CopyAction
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getPointActions
 import page.ooooo.geoshare.lib.outputs.getPositionActions
-import page.ooooo.geoshare.lib.point.Position
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -40,7 +42,7 @@ fun ResultSuccessSheetContent(
                 getPointActions()
             }
         }
-        .filter { it.isEnabled(position, i) }
+        .filter { it.isEnabled(points, i) }
         .partition { it is CopyAction }
     LazyColumn {
         headline?.let { headline ->
@@ -57,7 +59,7 @@ fun ResultSuccessSheetContent(
                 ResultSuccessSheetItem(
                     label = { action.Label() },
                     icon = action.getIcon(),
-                    description = action.getText(position, i),
+                    description = action.getText(points, i),
                 ) {
                     onHide()
                     onRun(action, i)
@@ -116,7 +118,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             ResultSuccessSheetContent(
-                position = Position.example,
+                points = persistentListOf(Point.example),
                 i = null,
                 headline = stringResource(R.string.conversion_succeeded_point_number, 3),
                 onHide = {},
@@ -136,7 +138,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             ResultSuccessSheetContent(
-                position = Position.example,
+                points = persistentListOf(Point.example),
                 i = null,
                 headline = stringResource(R.string.conversion_succeeded_point_number, 3),
                 onHide = {},
