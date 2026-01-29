@@ -10,8 +10,6 @@ import page.ooooo.geoshare.lib.extensions.toTrimmedString
 import page.ooooo.geoshare.lib.geo.isPointInChina
 import kotlin.random.Random
 
-// TODO Replace Point with WGS84Point, GCJ02Point and BD09Point
-// TODO Move z from Position to Point
 @Immutable
 data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val name: String? = null) {
     companion object {
@@ -61,9 +59,11 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
      * @See toWGS84
      */
     fun toGCJ02(): Point = when (srs) {
-        Srs.BD09MC -> BD09Convertor.convertMC2LL(y = lon, x = lat)
-            .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
-            .let { (gcj02Lat, gcj02Lon) -> Point(Srs.WGS84, gcj02Lat, gcj02Lon) }
+        Srs.BD09MC -> {
+            BD09Convertor.convertMC2LL(lat, lon)
+                .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
+                .let { (gcj02Lat, gcj02Lon) -> Point(Srs.GCJ02, gcj02Lat, gcj02Lon) }
+        }
 
         Srs.GCJ02 -> this
         Srs.WGS84 -> if (isPointInChina(lon, lat)) {
