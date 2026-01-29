@@ -167,4 +167,12 @@
     <string name="donation_button">在 Ko-fi 上捐赠</string>
     <string name="donation_description">本应用节约您的时间了吗？</string>
     <string name="conversion_succeeded_description_q_only">原始链接不包含坐标信息，只有地名。如果在其他应用中打开此位置，找到的地点可能与原始链接的地点不同。</string>
+    <string name="network_exception_connect_timeout">连接超时</string>
+    <string name="network_exception_eof">连接已关闭</string>
+    <string name="network_exception_request_timeout">请求超时</string>
+    <string name="network_exception_response_error">响应错误</string>
+    <string name="network_exception_server_response_error">服务器响应错误</string>
+    <string name="network_exception_socket_timeout">套接字超时</string>
+    <string name="network_exception_unknown">未知错误</string>
+    <string name="network_exception_unresolved_address">无法解析的地址</string>
 </resources>
