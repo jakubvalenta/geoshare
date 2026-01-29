@@ -117,31 +117,31 @@
     <string name="conversion_automation_open_app_failed">فشل فتح %1$s تلقائيًا</string>
     <string name="conversion_automation_open_app_succeeded">فُتح تلقائيًا %1$s</string>
     <plurals name="conversion_automation_open_app_waiting">
-        <item quantity="zero">فتح %1$s تلقائيًا في %2$d ثوانٍ</item>
-        <item quantity="one">فتح %1$s تلقائيًا في %2$d ثوانٍ</item>
-        <item quantity="two">فتح %1$s تلقائيًا في %2$d ثوانٍ</item>
+        <item quantity="zero">فتح %1$s تلقائيًا في %2$d ثانية</item>
+        <item quantity="one">فتح %1$s تلقائيًا في ثانية</item>
+        <item quantity="two">فتح %1$s تلقائيًا في ثانيتين</item>
         <item quantity="few">فتح %1$s تلقائيًا في %2$d ثوانٍ</item>
-        <item quantity="many">فتح %1$s تلقائيًا في %2$d ثوانٍ</item>
-        <item quantity="other">فتح %1$s تلقائيًا في %2$d ثوانٍ</item>
+        <item quantity="many">فتح %1$s تلقائيًا في %2$d ثانية</item>
+        <item quantity="other">فتح %1$s تلقائيًا في %2$d ثانية</item>
     </plurals>
     <string name="conversion_automation_save_gpx_succeeded">حُفظ GPX تلقائيًا</string>
     <plurals name="conversion_automation_save_gpx_waiting">
-        <item quantity="zero">يحفظ GPX تلقائيًا في %1$ds</item>
-        <item quantity="one">يحفظ GPX تلقائيًا في %1$ds</item>
-        <item quantity="two">يحفظ GPX تلقائيًا في %1$ds</item>
-        <item quantity="few">يحفظ GPX تلقائيًا في %1$ds</item>
-        <item quantity="many">يحفظ GPX تلقائيًا في %1$ds</item>
-        <item quantity="other">يحفظ GPX تلقائيًا في %1$ds</item>
+        <item quantity="zero">يحفظ GPX تلقائيًا في%1$d ثانية</item>
+        <item quantity="one">يحفظ GPX تلقائيًا في ثانية</item>
+        <item quantity="two">يحفظ GPX تلقائيًا في ثانيتين</item>
+        <item quantity="few">يحفظ GPX تلقائيًا في%1$d ثوانٍ</item>
+        <item quantity="many">يحفظ GPX تلقائيًا في%1$d ثانية</item>
+        <item quantity="other">يحفظ GPX تلقائيًا في%1$d ثانية</item>
     </plurals>
     <string name="conversion_automation_share_failed">فشل في مشاركة الرابط تلقائيًا</string>
     <string name="conversion_automation_share_succeeded">رابط مشترك تلقائيًا</string>
     <plurals name="conversion_automation_share_waiting">
-        <item quantity="zero">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</item>
-        <item quantity="one">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</item>
-        <item quantity="two">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</item>
+        <item quantity="zero">مشاركة الرابط تلقائيًا خلال %1$d ثانية</item>
+        <item quantity="one">مشاركة الرابط تلقائيًا خلال ثانية</item>
+        <item quantity="two">مشاركة الرابط تلقائيًا خلال ثانيتين</item>
         <item quantity="few">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</item>
-        <item quantity="many">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</item>
-        <item quantity="other">مشاركة الرابط تلقائيًا خلال %1$d ثوانٍ</item>
+        <item quantity="many">مشاركة الرابط تلقائيًا خلال %1$d ثانية</item>
+        <item quantity="other">مشاركة الرابط تلقائيًا خلال %1$d ثانية</item>
     </plurals>
     <string name="conversion_succeeded_copy_coordinates">انسخ الإحداثيات</string>
     <string name="conversion_succeeded_copy_link">انسخ رابط %1$s</string>
@@ -169,9 +169,9 @@
     <string name="output_gpx_route_share_automation_succeeded">مسار GPX مشترك تلقائيًا</string>
     <plurals name="output_gpx_route_share_automation_waiting">
         <item quantity="zero">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</item>
-        <item quantity="one">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</item>
-        <item quantity="two">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</item>
-        <item quantity="few">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</item>
+        <item quantity="one">مشاركة مسار GPX تلقائيًا خلال ثانية</item>
+        <item quantity="two">مشاركة مسار GPX تلقائيًا خلال ثانيتين</item>
+        <item quantity="few">مشاركة مسار GPX تلقائيًا خلال %1$d ثوانٍ</item>
         <item quantity="many">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</item>
         <item quantity="other">مشاركة مسار GPX تلقائيًا خلال %1$d ثانية</item>
     </plurals>
@@ -197,4 +197,12 @@
     <string name="donation_button">تبرّع على Ko-fi</string>
     <string name="donation_description">هل يوفر هذا التطبيق وقتك؟</string>
     <string name="conversion_succeeded_description_q_only">الرابط الأصلي لا يحتوي على إحداثيات، بل على اسم مكان فقط. عند فتح هذا الموقع في تطبيق آخر، قد يُعثر على مكان مختلف عن الرابط الأصلي.</string>
+    <string name="network_exception_connect_timeout">انتهت مهلة الاتصال</string>
+    <string name="network_exception_eof">أُغلق الاتصال</string>
+    <string name="network_exception_request_timeout">انتهت مهلة الطلب</string>
+    <string name="network_exception_response_error">خطأ في الاستجابة</string>
+    <string name="network_exception_server_response_error">خطأ في استجابة الخادم</string>
+    <string name="network_exception_socket_timeout">انتهاء مهلة المقبس</string>
+    <string name="network_exception_unknown">خطأ غير معروف</string>
+    <string name="network_exception_unresolved_address">عنوان غير محلول</string>
 </resources>
