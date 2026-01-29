@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.LatLonZName
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
@@ -44,12 +44,12 @@ object WazeInput : Input.HasHtml {
                 setPointIfNull {
                     (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
                         ?.let { hash -> decodeWazeGeoHash(hash) }
-                        ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(6), lon.toScale(6), z) }
+                        ?.let { (lat, lon, z) -> LatLonZName(lat.toScale(6), lon.toScale(6), z) }
                 }
-                setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZ queryParams["to"] }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["ll"] }
+                setPointIfNull { """ll\.$LAT,$LON""" matchLatLonZName queryParams["to"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["ll"] }
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["latlng"] }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["latlng"] }
                 setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
                 if (!hasPoint()) {
@@ -93,7 +93,7 @@ object WazeInput : Input.HasHtml {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findLatLonZ line }) {
+                if (setPointIfNull { pattern findLatLonZName line }) {
                     break
                 }
             }

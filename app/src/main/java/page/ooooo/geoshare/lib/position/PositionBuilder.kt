@@ -14,7 +14,9 @@ class PositionBuilder(val srs: Srs) {
     fun toPosition(): Position = Position(
         (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) })?.apply {
             // Set name on the last point
-            removeLastOrNull()?.copy(name = name)?.let { add(it) }
+            if (lastOrNull()?.name == null) {
+                removeLastOrNull()?.copy(name = name)?.let { add(it) }
+            }
         }?.toImmutableList(),
         q = q,
         z = z?.let { max(1.0, min(21.0, it)) },
@@ -22,9 +24,9 @@ class PositionBuilder(val srs: Srs) {
 
     fun hasPoint(): Boolean = defaultPoint != null || points.isNotEmpty()
 
-    fun setPointIfNull(block: () -> LatLonZ?): Boolean = if (points.isEmpty()) {
-        block()?.let { (lat, lon, newZ) ->
-            points.add(Point(srs, lat, lon))
+    fun setPointIfNull(block: () -> LatLonZName?): Boolean = if (points.isEmpty()) {
+        block()?.let { (lat, lon, newZ, name) ->
+            points.add(Point(srs, lat, lon, name))
             if (newZ != null) {
                 z = newZ
             }
@@ -34,9 +36,9 @@ class PositionBuilder(val srs: Srs) {
         false
     }
 
-    fun setDefaultPointIfNull(block: () -> LatLonZ?): Boolean = if (defaultPoint == null) {
-        block()?.let { (lat, lon, newZ) ->
-            defaultPoint = Point(srs, lat, lon)
+    fun setDefaultPointIfNull(block: () -> LatLonZName?): Boolean = if (defaultPoint == null) {
+        block()?.let { (lat, lon, newZ, name) ->
+            defaultPoint = Point(srs, lat, lon, name)
             if (newZ != null) {
                 z = newZ
             }
@@ -46,8 +48,8 @@ class PositionBuilder(val srs: Srs) {
         false
     }
 
-    fun addPoints(block: () -> Sequence<LatLonZ>): Boolean =
-        points.addAll(block().map { (lat, lon) -> Point(srs, lat, lon) })
+    fun addPoints(block: () -> Sequence<LatLonZName>): Boolean =
+        points.addAll(block().map { (lat, lon, _, name) -> Point(srs, lat, lon, name) })
 
     fun setQIfNull(block: () -> String?): Boolean = if (q == null && defaultPoint == null && points.isEmpty()) {
         block()?.let { newQ ->

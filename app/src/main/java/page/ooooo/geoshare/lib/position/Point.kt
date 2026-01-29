@@ -1,6 +1,8 @@
 package page.ooooo.geoshare.lib.position
 
 import androidx.compose.runtime.Immutable
+import com.github._46319943.bd09convertor.BD09Convertor
+import com.github.wandergis.coordtransform.CoordTransform
 import com.lbt05.evil_transform.GCJPointer
 import com.lbt05.evil_transform.WGSPointer
 import page.ooooo.geoshare.lib.extensions.toScale
@@ -27,9 +29,8 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
         }
     }
 
-    fun toStringPair(targetSrs: Srs): Pair<String, String> = toSrs(targetSrs).let { (_, lat, lon) ->
-        lat.toScale(7).toTrimmedString() to lon.toScale(7).toTrimmedString()
-    }
+    val latStr get() = lat.toScale(7).toTrimmedString()
+    val lonStr get() = lon.toScale(7).toTrimmedString()
 
     /**
      * Notice that we use a custom check whether a point is in China on top of Evil Transform's check. The reason is
@@ -42,24 +43,33 @@ data class Point(val srs: Srs, val lat: Double = 0.0, val lon: Double = 0.0, val
      *
      * @see isPointInChina
      */
-    fun toSrs(targetSrs: Srs): Point = when (srs) {
-        Srs.WGS84 -> when (targetSrs) {
-            Srs.WGS84 -> this
-            Srs.GCJ02 -> if (isPointInChina(lon, lat)) {
-                WGSPointer(lat, lon).toGCJPointer().run { Point(targetSrs, latitude, longitude) }
-            } else {
-                Point(targetSrs, lat, lon)
-            }
+    fun toWGS84(): Point = when (srs) {
+        Srs.BD09MC -> toGCJ02().toWGS84()
+
+        Srs.GCJ02 -> if (isPointInChina(lon, lat)) {
+            GCJPointer(lat, lon).toExactWGSPointer().run { Point(Srs.WGS84, latitude, longitude) }
+        } else {
+            Point(Srs.WGS84, lat, lon)
         }
 
-        Srs.GCJ02 -> when (targetSrs) {
-            Srs.WGS84 -> if (isPointInChina(lon, lat)) {
-                GCJPointer(lat, lon).toExactWGSPointer().run { Point(targetSrs, latitude, longitude) }
-            } else {
-                Point(targetSrs, lat, lon)
-            }
+        Srs.WGS84 -> this
+    }
 
-            Srs.GCJ02 -> this
+    /**
+     * @See toWGS84
+     */
+    fun toGCJ02(): Point = when (srs) {
+        Srs.BD09MC -> {
+            BD09Convertor.convertMC2LL(lat, lon)
+                .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
+                .let { (gcj02Lat, gcj02Lon) -> Point(Srs.GCJ02, gcj02Lat, gcj02Lon) }
+        }
+
+        Srs.GCJ02 -> this
+        Srs.WGS84 -> if (isPointInChina(lon, lat)) {
+            WGSPointer(lat, lon).toGCJPointer().run { Point(Srs.GCJ02, latitude, longitude) }
+        } else {
+            Point(Srs.GCJ02, lat, lon)
         }
     }
 }

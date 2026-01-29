@@ -31,7 +31,7 @@ class OpenStreetMapInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.org/#map=16/51.49/-0.13"))
+        assertFalse(doesUriPatternMatch("https://www.example.com/#map=16/51.49/-0.13"))
     }
 
     @Test

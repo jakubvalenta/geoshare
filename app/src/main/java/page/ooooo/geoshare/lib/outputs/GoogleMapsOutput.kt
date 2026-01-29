@@ -13,7 +13,6 @@ import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.ui.components.AppIcon
 import page.ooooo.geoshare.ui.components.TextIcon
 
@@ -305,11 +304,9 @@ object GoogleMapsOutput : Output {
         host = "www.google.com",
         path = "/maps",
         queryParams = buildMap {
-            position.getPoint(i)
-                ?.toStringPair(Srs.GCJ02)
-                ?.let { (latStr, lonStr) ->
-                    set("q", "$latStr,$lonStr")
-                } ?: position.q?.let { q ->
+            position.getPoint(i)?.toGCJ02()?.run {
+                set("q", "$latStr,$lonStr")
+            } ?: position.q?.let { q ->
                 set("q", q)
             }
             position.zStr?.let { zStr ->
@@ -321,27 +318,15 @@ object GoogleMapsOutput : Output {
 
     private fun formatNavigateToUriString(position: Position, i: Int?, uriQuote: UriQuote): String = Uri(
         scheme = "google.navigation",
-        path = (position.getPoint(i)
-            ?.toStringPair(Srs.GCJ02)
-            ?.let { (latStr, lonStr) -> "$latStr,$lonStr" }
-            ?: position.q
-            ?: "0,0")
-            .let { q ->
-                "q=$q"
-            },
+        path = (position.getPoint(i)?.toGCJ02()?.run { "$latStr,$lonStr" } ?: position.q ?: "0,0").let { "q=$it" },
         uriQuote = uriQuote,
     ).toString()
 
     private fun formatStreetViewUriString(position: Position, i: Int?, uriQuote: UriQuote): String = Uri(
         scheme = "google.streetview",
-        path = (position.getPoint(i)
-            ?.toStringPair(Srs.GCJ02)
-            ?.let { (latStr, lonStr) -> "$latStr,$lonStr" }
-            ?: "0,0"
-            ).let { coords ->
-                @Suppress("SpellCheckingInspection")
-                "cbll=$coords"
-            },
+        path = (position.getPoint(i)?.toGCJ02()?.run { "$latStr,$lonStr" } ?: "0,0").let {
+            @Suppress("SpellCheckingInspection") "cbll=$it"
+        },
         uriQuote = uriQuote,
     ).toString()
 }

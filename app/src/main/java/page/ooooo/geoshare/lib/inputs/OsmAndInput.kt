@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matchLatLonZ
+import page.ooooo.geoshare.lib.extensions.matchLatLonZName
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
@@ -23,8 +23,8 @@ object OsmAndInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         val position = buildPosition(srs) {
             uri.run {
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["pin"] }
-                setPointIfNull { """$Z/$LAT/$LON.*""" matchLatLonZ fragment }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["pin"] }
+                setPointIfNull { """$Z/$LAT/$LON.*""" matchLatLonZName fragment }
                 setZIfNull { """$Z/.*""" matchZ fragment }
             }
         }

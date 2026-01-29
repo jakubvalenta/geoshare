@@ -38,10 +38,10 @@ object OpenStreetMapInput : Input.HasHtml {
                 setPointIfNull {
                     ("""/go/$HASH""" matchHash path)
                         ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                        ?.let { (lat, lon, z) -> LatLonZ(lat, lon, z) }
+                        ?.let { (lat, lon, z) -> LatLonZName(lat, lon, z) }
                 }
-                setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZ fragment }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZ queryParams["to"] }
+                setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZName fragment }
+                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["to"] }
                 if (!hasPoint()) {
                     (ELEMENT_PATH match path)?.let { m ->
                         m.groupOrNull("type")?.let { type ->
@@ -62,7 +62,7 @@ object OpenStreetMapInput : Input.HasHtml {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                addPoints { pattern findAllLatLonZ line }
+                addPoints { pattern findAllLatLonZName line }
             }
         }
         return ParseHtmlResult.from(positionFromUri, positionFromHtml)

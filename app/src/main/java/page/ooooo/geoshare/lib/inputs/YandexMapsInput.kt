@@ -7,9 +7,9 @@ import io.ktor.utils.io.readUTF8Line
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findLatLonZ
+import page.ooooo.geoshare.lib.extensions.findLatLonZName
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchLatLonZ
+import page.ooooo.geoshare.lib.extensions.matchLatLonZName
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.position.Position
 import page.ooooo.geoshare.lib.position.Srs
@@ -55,8 +55,8 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         val position = buildPosition(srs) {
             uri.run {
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["whatshere[point]"] }
-                setPointIfNull { LON_LAT_PATTERN matchLatLonZ queryParams["ll"] }
+                setPointIfNull { LON_LAT_PATTERN matchLatLonZName queryParams["whatshere[point]"] }
+                setPointIfNull { LON_LAT_PATTERN matchLatLonZName queryParams["ll"] }
                 @Suppress("SpellCheckingInspection")
                 setZIfNull { Z_PATTERN matchZ queryParams["whatshere[zoom]"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
@@ -73,7 +73,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findLatLonZ line }) {
+                if (setPointIfNull { pattern findLatLonZName line }) {
                     break
                 }
             }

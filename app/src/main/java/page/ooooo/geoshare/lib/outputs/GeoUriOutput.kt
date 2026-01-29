@@ -29,7 +29,7 @@ object GeoUriOutput : Output {
 
     open class CopyGeoUriAction : CopyAction() {
         override fun getText(position: Position, i: Int?, uriQuote: UriQuote): String =
-            formatUriString(position, i, Srs.WGS84, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
+            formatUriString(position, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -43,7 +43,7 @@ object GeoUriOutput : Output {
 
     open class ShareGeoUriAction : OpenChooserAction() {
         override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatUriString(position, i, Srs.WGS84, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
+            formatUriString(position, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -60,9 +60,9 @@ object GeoUriOutput : Output {
             formatUriString(
                 position,
                 i,
-                srs = if (packageName in PackageNames.GCJ02) Srs.GCJ02 else Srs.WGS84,
                 nameDisabled = NAME_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
                 zoomDisabled = ZOOM_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
+                useGCJ02 = packageName in PackageNames.GCJ02,
                 uriQuote = uriQuote,
             )
 
@@ -191,40 +191,43 @@ object GeoUriOutput : Output {
     fun formatUriString(
         position: Position,
         i: Int?,
-        srs: Srs,
         nameDisabled: Boolean,
         zoomDisabled: Boolean,
+        useGCJ02: Boolean = false,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ) = buildString {
+    ) = position.getPoint(i).let { point ->
+        if (useGCJ02) {
+            point?.toGCJ02() ?: Point(Srs.GCJ02)
+        } else {
+            point?.toWGS84() ?: Point(Srs.WGS84)
+        }
+    }.run {
         // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
-        (position.getPoint(i) ?: Point(Srs.WGS84)).let { point ->
-            point.toStringPair(srs)
-                .let { (latStr, lonStr) -> "$latStr,$lonStr" }
-                .let { coordsStr ->
-                    append("geo:")
-                    append(Uri.formatPath(coordsStr, uriQuote = uriQuote))
-                    buildMap {
-                        // It's important that the z parameter comes before q, because some map apps require the name (which is
-                        // part of the q parameter) to be at the very end of the URI.
-                        if (!zoomDisabled) {
-                            position.zStr?.let { zStr ->
-                                set("z", zStr)
-                            }
-                        }
-                        if (position.q != null) {
-                            set("q", position.q)
-                        } else if (point.lat != 0.0 && point.lon != 0.0) {
-                            if (!nameDisabled && point.name != null) {
-                                set("q", "$coordsStr(${point.name})")
-                            } else {
-                                set("q", coordsStr)
-                            }
-                        }
+        buildString {
+            val coordsStr = "$latStr,$lonStr"
+            append("geo:")
+            append(Uri.formatPath(coordsStr, uriQuote = uriQuote))
+            buildMap {
+                // It's important that the z parameter comes before q, because some map apps require the name (which is
+                // part of the q parameter) to be at the very end of the URI.
+                if (!zoomDisabled) {
+                    position.zStr?.let { zStr ->
+                        set("z", zStr)
                     }
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
-                        ?.let { append("?$it") }
                 }
+                if (position.q != null) {
+                    set("q", position.q)
+                } else if (lat != 0.0 && lon != 0.0) {
+                    if (!nameDisabled && name != null) {
+                        set("q", "$coordsStr(${name})")
+                    } else {
+                        set("q", coordsStr)
+                    }
+                }
+            }
+                .takeIf { it.isNotEmpty() }
+                ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
+                ?.let { append("?$it") }
         }
     }
 }

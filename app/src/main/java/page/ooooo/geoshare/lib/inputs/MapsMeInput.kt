@@ -7,7 +7,7 @@ import page.ooooo.geoshare.lib.extensions.matchHash
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
-import page.ooooo.geoshare.lib.position.LatLonZ
+import page.ooooo.geoshare.lib.position.LatLonZName
 import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.position.buildPosition
 
@@ -34,7 +34,7 @@ object MapsMeInput : Input {
                 setPointIfNull {
                     (HASH matchHash if (scheme == "ge0") host else pathParts.getOrNull(1))
                         ?.let { hash -> decodeGe0Hash(hash) }
-                        ?.let { (lat, lon, z) -> LatLonZ(lat.toScale(7), lon.toScale(7), z) }
+                        ?.let { (lat, lon, z) -> LatLonZName(lat.toScale(7), lon.toScale(7), z) }
 
                 }
                 setQOrNameIfEmpty {
