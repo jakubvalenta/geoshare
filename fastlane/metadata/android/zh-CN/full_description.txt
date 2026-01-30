@@ -6,6 +6,7 @@
 - Apple 地图
 - 2GIS
 - 高德地图
+- 百度地图（测试，不支持短链接）
 - CoMaps
 - HERE WeGo
 - Magic Earth

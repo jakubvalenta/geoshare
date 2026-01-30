@@ -175,4 +175,5 @@
     <string name="network_exception_socket_timeout">套接字超时</string>
     <string name="network_exception_unknown">未知错误</string>
     <string name="network_exception_unresolved_address">无法解析的地址</string>
+    <string name="converter_baidu_map_permission_title">连接到百度地图？</string>
 </resources>
