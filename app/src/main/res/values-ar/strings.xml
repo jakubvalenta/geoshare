@@ -205,4 +205,5 @@
     <string name="network_exception_socket_timeout">انتهاء مهلة المقبس</string>
     <string name="network_exception_unknown">خطأ غير معروف</string>
     <string name="network_exception_unresolved_address">عنوان غير محلول</string>
+    <string name="converter_baidu_map_permission_title">اتصل ب Baidu Map؟</string>
 </resources>
