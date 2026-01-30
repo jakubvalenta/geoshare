@@ -53,10 +53,11 @@ object UrbiInput : Input.HasHtml {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull { """$LON,$LAT/$Z""" matchNaivePoint queryParams["m"] }
-                setPointIfNull { """.*/$LON,$LAT/?$""" matchNaivePoint path }
-                setPointIfNull { LON_LAT_PATTERN matchNaivePoint queryParams["center"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
+                ("""$LON,$LAT/$Z""" matchNaivePoint queryParams["m"])?.also { points.add(it) }
+                    ?: (""".*/$LON,$LAT/?$""" matchNaivePoint path)?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN matchNaivePoint queryParams["center"])?.also { points.add(it) }
+
+                (Z_PATTERN matchZ queryParams["zoom"])?.let { defaultZ = it }
             }
         }
             .asWGS84()
@@ -69,10 +70,12 @@ object UrbiInput : Input.HasHtml {
     ): ParseHtmlResult? =
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
+
             val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findNaivePoint line }) {
+                (pattern findNaivePoint line)?.also {
+                    points.add(it)
                     break
                 }
             }

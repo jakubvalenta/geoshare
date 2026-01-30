@@ -24,7 +24,6 @@ import page.ooooo.geoshare.lib.point.toParseHtmlResult
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
-    const val NAME = "Google Maps"
     private const val SHORT_URL = """((maps\.)?(app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
 
     override val uriPattern: Pattern =
@@ -79,7 +78,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                         parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
                             if (part.startsWith("data=")) {
                                 setPointIfNull { """!3d$LAT!4d$LON""" findNaivePoint part }
-                                addPoints { """!1d$LON!2d$LAT""" findAllNaivePoint part }
+                                points.addAll("""!1d$LON!2d$LAT""" findAllNaivePoint part)
                             } else if (part.startsWith('@') && defaultCoords == null) {
                                 ("""@$LAT,$LON(,${Z}z)?.*""" matchNaivePoint part)?.let { (lat, lon, z) ->
                                     lat?.let { lat ->

@@ -56,11 +56,13 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         return buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LON_LAT_PATTERN matchNaivePoint queryParams["whatshere[point]"] }
-                setPointIfNull { LON_LAT_PATTERN matchNaivePoint queryParams["ll"] }
+                (LON_LAT_PATTERN matchNaivePoint queryParams["whatshere[point]"])?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN matchNaivePoint queryParams["ll"])?.also { points.add(it) }
+
                 @Suppress("SpellCheckingInspection")
-                setZIfNull { Z_PATTERN matchZ queryParams["whatshere[zoom]"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                (Z_PATTERN matchZ queryParams["whatshere[zoom]"])?.also { defaultZ = it }
+                    ?: (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+
                 if (points.isEmpty() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
                     htmlUriString = uri.toString()
                 }
@@ -76,10 +78,13 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         log: ILog,
     ): ParseHtmlResult? =
         buildPoints {
+            defaultName = pointsFromUri.lastOrNull()?.name
+
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findNaivePoint line }) {
+                (pattern findNaivePoint line)?.also {
+                    points.add(it)
                     break
                 }
             }

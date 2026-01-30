@@ -36,8 +36,8 @@ object MapyComInput : Input.HasShortUri {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull {
-                    (COORDS match path)?.let { m ->
+                (COORDS match path)
+                    ?.let { m ->
                         m.toLatLon()?.let { (lat, lon) ->
                             val wholeMatch = m.groupOrNull()
                             val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
@@ -45,15 +45,14 @@ object MapyComInput : Input.HasShortUri {
                             NaivePoint(latSig * lat, lonSig * lon)
                         }
                     }
-                }
-                setPointIfNull {
-                    (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
+                    ?.also { points.add(it) }
+                    ?: (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
                         (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
                             NaivePoint(lat, lon)
                         }
-                    }
-                }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                    }?.also { points.add(it) }
+
+                (Z_PATTERN matchZ queryParams["z"])?.let { defaultZ = it }
             }
         }
             .asWGS84()

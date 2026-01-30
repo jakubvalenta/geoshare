@@ -44,15 +44,13 @@ object OpenStreetMapInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                setPointIfNull {
-                    ("""/go/$HASH""" matchHash path)
-                        ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                        ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
-                }
-                setPointIfNull { """map=$Z/$LAT/$LON.*""" matchNaivePoint fragment }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["to"] }
-                if (points.isEmpty()) {
-                    (ELEMENT_PATH match path)?.let { m ->
+                ("""/go/$HASH""" matchHash path)
+                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                    ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
+                    ?.also { points.add(it) }
+                    ?: ("""map=$Z/$LAT/$LON.*""" matchNaivePoint fragment)?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchNaivePoint queryParams["to"])?.also { points.add(it) }
+                    ?: (ELEMENT_PATH match path)?.let { m ->
                         m.groupOrNull("type")?.let { type ->
                             m.groupOrNull("id")?.let { id ->
                                 htmlUriString =
@@ -60,7 +58,6 @@ object OpenStreetMapInput : Input.HasHtml {
                             }
                         }
                     }
-                }
             }
         }
             .asWGS84()
@@ -74,10 +71,11 @@ object OpenStreetMapInput : Input.HasHtml {
     ): ParseHtmlResult? =
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
+
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                addPoints { pattern findAllNaivePoint line }
+                points.addAll(pattern findAllNaivePoint line)
             }
         }
             .asWGS84()

@@ -34,7 +34,12 @@ object MagicEarthOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link_display, MagicEarthInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_copy_link_display,
+                    stringResource(R.string.converter_magic_earth_name)
+                )
+            )
         }
 
         override fun getIcon() = @Composable {
@@ -49,7 +54,10 @@ object MagicEarthOutput : Output {
         @Composable
         override fun Label() {
             Text(
-                stringResource(R.string.conversion_succeeded_copy_link_drive_to, MagicEarthInput.NAME),
+                stringResource(
+                    R.string.conversion_succeeded_copy_link_drive_to,
+                    stringResource(R.string.converter_magic_earth_name)
+                ),
                 Modifier.testTag("geoShareOutputMagicEarthCopyNavigateToUri"),
             )
         }
@@ -61,7 +69,12 @@ object MagicEarthOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_open_app_display, MagicEarthInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_display,
+                    stringResource(R.string.converter_magic_earth_name)
+                )
+            )
         }
     }
 
@@ -71,7 +84,12 @@ object MagicEarthOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, MagicEarthInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_navigate_to,
+                    stringResource(R.string.converter_magic_earth_name)
+                )
+            )
         }
     }
 

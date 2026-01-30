@@ -22,9 +22,10 @@ object OsmAndInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["pin"] }
-                setPointIfNull { """$Z/$LAT/$LON.*""" matchNaivePoint fragment }
-                setZIfNull { """$Z/.*""" matchZ fragment }
+                (LAT_LON_PATTERN matchNaivePoint queryParams["pin"])?.also { points.add(it) }
+                    ?: ("""$Z/$LAT/$LON.*""" matchNaivePoint fragment)?.also { points.add(it) }
+
+                ("""$Z/.*""" matchZ fragment)?.also { defaultZ = it }
             }
         }
             .asWGS84()

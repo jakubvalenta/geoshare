@@ -28,8 +28,8 @@ object AmapInput : Input.HasShortUri {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull { """\w+,$LAT,$LON.+""" matchNaivePoint queryParams["p"] }
-                setPointIfNull { """$LAT,$LON.+""" matchNaivePoint queryParams["q"] }
+                ("""\w+,$LAT,$LON.+""" matchNaivePoint queryParams["p"])?.also { points.add(it) }
+                    ?: ("""$LAT,$LON.+""" matchNaivePoint queryParams["q"])?.also { points.add(it) }
             }
         }
             .asGCJ02()

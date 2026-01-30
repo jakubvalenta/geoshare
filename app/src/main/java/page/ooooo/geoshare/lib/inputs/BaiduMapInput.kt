@@ -30,42 +30,32 @@ object BaiduMapInput : Input {
         buildPoints {
             uri.run {
                 val parts = uri.pathParts.drop(1)
-                val firstPart = parts.firstOrNull()
-                when {
-                    firstPart == null -> {}
-
+                val firstPart = parts.firstOrNull() ?: return@run
+                if (firstPart.startsWith('@')) {
                     // Center
                     // https://map.baidu.com/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>
-                    firstPart.startsWith('@') -> {
-                        setPointIfNull { CENTER matchNaivePoint firstPart }
-                    }
+                    (CENTER matchNaivePoint firstPart)?.also { points.add(it) }
 
+                } else if (firstPart == "poi") {
                     // Place
                     // https://map.baidu.com/poi/<NAME>/@<X>,<Y>,<Z>
-                    firstPart == "poi" -> {
-                        setPointIfNull {
-                            (CENTER matchNaivePoint parts.getOrNull(2))
-                                ?.copy(name = parts.getOrNull(1))
-                        }
-                    }
+                    (CENTER matchNaivePoint parts.getOrNull(2))
+                        ?.also { points.add(it.copy(name = parts.getOrNull(1))) }
 
+                } else if (firstPart == "dir") {
                     // Directions
                     // https://map.baidu.com/dir/...?sn=<START_POINT>&en=<WAYPOINT_POINT>$$1$$%20to:<DEST_POINT>
-                    firstPart == "dir" -> {
-                        setPointIfNull { WAYPOINT findNaivePoint queryParams["sn"] }
-                        addPoints { WAYPOINT findAllNaivePoint queryParams["en"] }
+                    (WAYPOINT findNaivePoint queryParams["sn"])?.also { points.add(it) }
+                    points.addAll(WAYPOINT findAllNaivePoint queryParams["en"])
 
-                        // Directions without params
-                        // https://map.baidu.com/dir/<START_NAME>/<WAYPOINT_NAME>/<DEST_NAME>/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>z
-                        if (points.isEmpty()) {
-                            addPoints {
-                                parts
-                                    .drop(1)
-                                    .filterNot { it.startsWith('@') }
-                                    .map { NaivePoint(0.0, 0.0, name = it) }
-                                    .asSequence()
-                            }
-                        }
+                    // Directions without params
+                    // https://map.baidu.com/dir/<START_NAME>/<WAYPOINT_NAME>/<DEST_NAME>/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>z
+                    if (points.isEmpty()) {
+                        parts
+                            .drop(1)
+                            .filterNot { it.startsWith('@') }
+                            .map { NaivePoint(0.0, 0.0, name = it) }
+                            .map { points.add(it) }
                     }
                 }
             }

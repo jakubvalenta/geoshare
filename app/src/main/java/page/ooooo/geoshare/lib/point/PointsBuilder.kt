@@ -44,9 +44,11 @@ class PointsBuilder() {
             // Or return empty list
             ?: persistentListOf()
 
+    @Deprecated("Use [points] directly")
     fun addPoints(block: () -> Sequence<NaivePoint>): Boolean =
         points.addAll(block().map { (lat, lon, _, name) -> NaivePoint(lat, lon, name = name) })
 
+    @Deprecated("Use [points] directly")
     fun setPointIfNull(block: () -> NaivePoint?): Boolean =
         if (points.isEmpty()) {
             block()?.let { (lat, lon, newZ, name) ->
@@ -57,6 +59,7 @@ class PointsBuilder() {
             false
         }
 
+    @Deprecated("Use [defaultName] directly")
     fun setNameIfNull(block: () -> String?): Boolean =
         if (defaultName == null) {
             block()?.let { name ->
@@ -67,6 +70,7 @@ class PointsBuilder() {
             false
         }
 
+    @Deprecated("Use [defaultZ] directly")
     fun setZIfNull(block: () -> Double?): Boolean =
         if (defaultZ == null) {
             block()?.let { newZ ->

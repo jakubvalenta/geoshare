@@ -36,21 +36,32 @@ object HereWeGoInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull { """/l/$LAT,$LON""" matchNaivePoint path }
-                setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchNaivePoint queryParams["map"]) else null }
-                setPointIfNull {
-                    ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
-                        ?.let { encoded ->
-                            Base64.decode(encoded).decodeToString().let { decoded ->
-                                ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
-                                    ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
-                                        NaivePoint(lat, lon)
+                val parts = uri.pathParts.drop(1)
+                val firstPart = parts.firstOrNull() ?: return@run
+                if (firstPart == "") {
+                    ("""$LAT,$LON,$Z""" matchNaivePoint queryParams["map"])?.also { points.add(it) }
+                } else {
+                    val secondPart = parts.getOrNull(1)
+                    if (secondPart != null) {
+                        if (firstPart == "l") {
+                            ("""$LAT,$LON""" matchNaivePoint secondPart)?.also { points.add(it) }
+                        } else if (firstPart == "p") {
+                            ("""[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match secondPart)
+                                ?.groupOrNull("encoded")
+                                ?.let { encoded -> Base64.decode(encoded).decodeToString() }
+                                ?.let { decoded ->
+                                    ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
+                                        ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
+                                            NaivePoint(lat, lon)
+                                        }
                                     }
                                 }
-                            }
+                                ?.also { points.add(it) }
                         }
+                    }
                 }
-                setZIfNull { """.*,$Z""" matchZ queryParams["map"] }
+
+                (""".*,$Z""" matchZ queryParams["map"])?.let { defaultZ = it }
             }
         }
             .asWGS84()

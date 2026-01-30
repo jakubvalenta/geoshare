@@ -35,19 +35,16 @@ object GeoUriInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull { """$LAT,$LON$NAME_REGEX?""" matchNaivePoint queryParams["q"] }
-                setNameIfNull {
-                    queryParams.firstNotNullOfOrNull { (key, value) ->
-                        if (key != "q" && key != "z" && value.isEmpty()) {
-                            NAME_REGEX matchName key
-                        } else {
-                            null
-                        }
-                    }
-                }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint path }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                ("""$LAT,$LON$NAME_REGEX?""" matchNaivePoint queryParams["q"])?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchNaivePoint path)?.also { points.add(it) }
+
+                queryParams
+                    .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
+                    .firstNotNullOfOrNull { (key) -> NAME_REGEX matchName key }
+                    ?.also { defaultName = it }
+                    ?: (Q_PARAM_PATTERN matchQ queryParams["q"])?.also { defaultName = it }
+                
+                (Z_PATTERN matchZ queryParams["z"])?.let { defaultZ = it }
             }
         }
             .asWGS84()

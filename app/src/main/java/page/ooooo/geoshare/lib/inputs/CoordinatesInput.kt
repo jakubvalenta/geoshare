@@ -39,8 +39,8 @@ object CoordinatesInput : Input {
         buildPoints {
             uri.run {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
-                setPointIfNull {
-                    ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
+                ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
+                    points.add(
                         NaivePoint(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
@@ -53,12 +53,13 @@ object CoordinatesInput : Input {
                                 m.groupOrNull("lonDeg"),
                             ),
                         )
-                    }
+                    )
+                    return@run
                 }
 
                 // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-                setPointIfNull {
-                    ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
+                ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
+                    points.add(
                         NaivePoint(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
@@ -75,12 +76,13 @@ object CoordinatesInput : Input {
                                 m.groupOrNull("lonSec"),
                             ),
                         )
-                    }
+                    )
+                    return@run
                 }
 
                 // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-                setPointIfNull {
-                    ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
+                ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
+                    points.add(
                         NaivePoint(
                             degToDec(
                                 m.groupOrNull()?.contains('S') == true,
@@ -95,7 +97,8 @@ object CoordinatesInput : Input {
                                 m.groupOrNull("lonMin"),
                             ),
                         )
-                    }
+                    )
+                    return@run
                 }
             }
         }

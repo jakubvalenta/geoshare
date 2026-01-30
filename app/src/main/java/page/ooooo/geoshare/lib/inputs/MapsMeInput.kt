@@ -30,16 +30,14 @@ object MapsMeInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull {
-                    (HASH matchHash if (scheme == "ge0") host else pathParts.getOrNull(1))
-                        ?.let { hash -> decodeGe0Hash(hash) }
-                        ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(7), lon.toScale(7), z) }
+                (HASH matchHash if (scheme == "ge0") host else pathParts.getOrNull(1))
+                    ?.let { hash -> decodeGe0Hash(hash) }
+                    ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(7), lon.toScale(7), z) }
+                    ?.also { points.add(it) }
 
-                }
-                setNameIfNull {
-                    (Q_PATH_PATTERN matchQ if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
-                        ?.replace('_', ' ')
-                }
+                (Q_PATH_PATTERN matchQ if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
+                    ?.replace('_', ' ')
+                    ?.also { defaultName = it }
             }
         }
             .asWGS84()

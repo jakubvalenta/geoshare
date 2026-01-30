@@ -29,7 +29,12 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link, GoogleMapsInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_copy_link,
+                    stringResource(R.string.converter_google_maps_name)
+                )
+            )
         }
 
         override fun getIcon() = @Composable {
@@ -43,7 +48,12 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link_drive_to, GoogleMapsInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_copy_link_drive_to,
+                    stringResource(R.string.converter_google_maps_name)
+                )
+            )
         }
     }
 
@@ -53,7 +63,12 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_copy_link_street_view, GoogleMapsInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_copy_link_street_view,
+                    stringResource(R.string.converter_google_maps_name)
+                )
+            )
         }
 
         override fun isEnabled(points: ImmutableList<Point>, i: Int?) = points.getOrNull(i)?.hasCoordinates() == true
@@ -223,7 +238,12 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_open_app_navigate_to, GoogleMapsInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_navigate_to,
+                    stringResource(R.string.converter_google_maps_name)
+                )
+            )
         }
     }
 
@@ -233,7 +253,12 @@ object GoogleMapsOutput : Output {
 
         @Composable
         override fun Label() {
-            Text(stringResource(R.string.conversion_succeeded_open_app_street_view, GoogleMapsInput.NAME))
+            Text(
+                stringResource(
+                    R.string.conversion_succeeded_open_app_street_view,
+                    stringResource(R.string.converter_google_maps_name)
+                )
+            )
         }
     }
 

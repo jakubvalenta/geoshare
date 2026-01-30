@@ -4,7 +4,6 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
 import page.ooooo.geoshare.lib.extensions.matchQ
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.extensions.toLat
@@ -18,8 +17,6 @@ import page.ooooo.geoshare.lib.point.toParseUriResult
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 object MagicEarthInput : Input {
-    const val NAME = "Magic Earth"
-
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAGIC_EARTH,
@@ -32,20 +29,19 @@ object MagicEarthInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                setPointIfNull {
-                    (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
-                        (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
-                            NaivePoint(lat, lon)
-                        }
+                (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
+                    (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
+                        NaivePoint(lat, lon)
                     }
-                }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["name"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["name"] }
+                }?.also { points.add(it) }
+
                 @Suppress("SpellCheckingInspection")
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
+                listOf("name", "daddr", "q")
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchQ queryParams[key] }
+                    ?.also { defaultName = it }
+                
+                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                    ?: (Z_PATTERN matchZ queryParams["zoom"])?.also { defaultZ = it }
             }
         }
             .asWGS84()

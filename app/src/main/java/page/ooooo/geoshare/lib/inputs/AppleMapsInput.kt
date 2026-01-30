@@ -22,8 +22,6 @@ import page.ooooo.geoshare.lib.point.toParseHtmlResult
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object AppleMapsInput : Input.HasHtml {
-    const val NAME = "Apple Maps"
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.APPLE_MAPS,
@@ -38,19 +36,18 @@ object AppleMapsInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["ll"] }
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["daddr"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["coordinate"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["q"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["name"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["address"] }
+                listOf("ll", "daddr", "coordinate", "q", "sll", "center") // TODO Add support for search around
+                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN matchNaivePoint queryParams[key] }
+                    ?.let { points.add(it) }
+
                 @Suppress("SpellCheckingInspection")
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["sll"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["center"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setZIfNull { (Z_PATTERN matchZ queryParams["z"]) }
+                listOf("name", "address", "daddr", "q")
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchQ queryParams[key] }
+                    ?.let { defaultName = it }
+
+                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+
                 if (
                     points.isEmpty() && (
                         host == "maps.apple" && path.startsWith("/p/") ||
@@ -73,6 +70,7 @@ object AppleMapsInput : Input.HasHtml {
     ): ParseHtmlResult? =
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
+
             val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
             val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
             var lat: Double? = null
@@ -86,7 +84,7 @@ object AppleMapsInput : Input.HasHtml {
                     (lonPattern find line)?.toLon()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
-                    setPointIfNull { NaivePoint(lat, lon) }
+                    points.add(NaivePoint(lat, lon))
                     break
                 }
             }

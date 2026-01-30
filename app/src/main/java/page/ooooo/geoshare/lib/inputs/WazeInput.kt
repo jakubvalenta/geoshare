@@ -48,17 +48,19 @@ object WazeInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                setPointIfNull {
-                    (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
-                        ?.let { hash -> decodeWazeGeoHash(hash) }
-                        ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(6), lon.toScale(6), z) }
-                }
-                setPointIfNull { """ll\.$LAT,$LON""" matchNaivePoint queryParams["to"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["ll"] }
-                @Suppress("SpellCheckingInspection")
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["latlng"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
+                (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
+                    ?.let { hash -> decodeWazeGeoHash(hash) }
+                    ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(6), lon.toScale(6), z) }
+                    ?.also { points.add(it) }
+                    ?: ("""ll\.$LAT,$LON""" matchNaivePoint queryParams["to"])?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchNaivePoint queryParams["ll"])?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchNaivePoint queryParams[@Suppress("SpellCheckingInspection") "latlng"])
+                        ?.also { points.add(it) }
+
+                (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { defaultName = it }
+
+                (Z_PATTERN matchZ queryParams["z"])?.let { defaultZ = it }
+
                 if (points.isEmpty()) {
                     queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
                         // To skip some redirects when downloading HTML, replace this URL:
@@ -102,10 +104,13 @@ object WazeInput : Input.HasHtml {
         log: ILog,
     ): ParseHtmlResult? =
         buildPoints {
+            defaultName = pointsFromUri.lastOrNull()?.name
+
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findNaivePoint line }) {
+                (pattern findNaivePoint line)?.also {
+                    points.add(it)
                     break
                 }
             }
