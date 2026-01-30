@@ -6,6 +6,7 @@ Teile einen Kartenlink mit Geo Share und die App wird ihn in einer anderen insta
 - Apple Maps
 - 2GIS
 - Amap (AutoNavi)
+- Baidu Map (beta, ohne Kurzlinks)
 - CoMaps
 - HERE WeGo
 - Magic Earth

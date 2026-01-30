@@ -192,4 +192,5 @@
     <string name="network_exception_socket_timeout">časovému limitu soketu</string>
     <string name="network_exception_unknown">neznámé chybě</string>
     <string name="network_exception_unresolved_address">nevyřešené adrese</string>
+    <string name="converter_baidu_map_permission_title">Spojit se s Baidu Map?</string>
 </resources>
