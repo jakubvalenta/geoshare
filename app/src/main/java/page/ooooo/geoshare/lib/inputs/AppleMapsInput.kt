@@ -36,8 +36,9 @@ object AppleMapsInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
+                // Notice that we take the search center 'sll' as a normal point
                 @Suppress("SpellCheckingInspection")
-                listOf("ll", "daddr", "coordinate", "q", "sll", "center") // TODO Add support for search around
+                listOf("ll", "daddr", "coordinate", "q", "sll", "center")
                     .firstNotNullOfOrNull { key -> LAT_LON_PATTERN matchNaivePoint queryParams[key] }
                     ?.let { points.add(it) }
 
