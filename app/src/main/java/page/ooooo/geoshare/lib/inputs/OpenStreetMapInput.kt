@@ -2,19 +2,28 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import com.google.re2j.Pattern
-import io.ktor.utils.io.*
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readUTF8Line
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.extensions.findAllPoints
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchHash
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
-import page.ooooo.geoshare.lib.position.*
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseHtmlResult
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object OpenStreetMapInput : Input.HasHtml {
     private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
     private const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
-
-    private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
     override val documentation = InputDocumentation(
@@ -33,17 +42,15 @@ object OpenStreetMapInput : Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val position = buildPosition(srs) {
+        return buildPoints {
             uri.run {
-                setPointIfNull {
-                    ("""/go/$HASH""" matchHash path)
-                        ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                        ?.let { (lat, lon, z) -> LatLonZName(lat, lon, z) }
-                }
-                setPointIfNull { """map=$Z/$LAT/$LON.*""" matchLatLonZName fragment }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["to"] }
-                if (!hasPoint()) {
-                    (ELEMENT_PATH match path)?.let { m ->
+                ("""/go/$HASH""" matchHash path)
+                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                    ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
+                    ?.also { points.add(it) }
+                    ?: ("""map=$Z/$LAT/$LON.*""" matchPoint fragment)?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchPoint queryParams["to"])?.also { points.add(it) }
+                    ?: (ELEMENT_PATH match path)?.let { m ->
                         m.groupOrNull("type")?.let { type ->
                             m.groupOrNull("id")?.let { id ->
                                 htmlUriString =
@@ -51,22 +58,28 @@ object OpenStreetMapInput : Input.HasHtml {
                             }
                         }
                     }
-                }
             }
         }
-        return ParseUriResult.from(position, htmlUriString)
+            .asWGS84()
+            .toParseUriResult(htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
-        val positionFromHtml = buildPosition(srs) {
+    override suspend fun parseHtml(
+        channel: ByteReadChannel,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog,
+    ): ParseHtmlResult? =
+        buildPoints {
+            defaultName = pointsFromUri.lastOrNull()?.name
+
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                addPoints { pattern findAllLatLonZName line }
+                points.addAll(pattern findAllPoints line)
             }
         }
-        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
-    }
+            .asWGS84()
+            .toParseHtmlResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title

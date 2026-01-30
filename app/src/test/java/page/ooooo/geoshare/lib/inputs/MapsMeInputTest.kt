@@ -1,10 +1,13 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class MapsMeInputTest : BaseInputTest() {
     override val input = MapsMeInput
@@ -53,27 +56,27 @@ class MapsMeInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLink() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 51.0000004, -108.9999868, z = 4.0, name = "América do Norte")),
+            ParseUriResult.Succeeded(
+                persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0, name = "América do Norte"))
+            ),
             parseUri("ge0://ApYSV0YTAl/América_do_Norte"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -18.9249432, 46.4416404, z = 4.0, name = "Madagascar")),
+            ParseUriResult.Succeeded(
+                persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0, name = "Madagascar"))
+            ),
             parseUri("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection") ParseUriResult.Succeeded(
-                Position(
-                    Srs.WGS84,
-                    40.7127405,
-                    -74.005997,
-                    z = 9.0,
-                    name = "Nova Iorque"
-                )
+                persistentListOf(WGS84Point(40.7127405, -74.005997, z = 9.0, name = "Nova Iorque"))
             ),
             parseUri("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 52.4877386, 13.3815233, z = 14.0, name = "Kreuzberg")),
+            ParseUriResult.Succeeded(
+                persistentListOf(WGS84Point(52.4877386, 13.3815233, z = 14.0, name = "Kreuzberg"))
+            ),
             parseUri("https://comaps.at/o4MnIOApKp/Kreuzberg"),
         )
     }
@@ -81,19 +84,19 @@ class MapsMeInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLinkWithoutName() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 51.0000004, -108.9999868, z = 4.0)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0))),
             parseUri("ge0://ApYSV0YTAl"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, 51.0000004, -108.9999868, z = 4.0)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0))),
             parseUri("ge0://ApYSV0YTAl/"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -18.9249432, 46.4416404, z = 4.0)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0))),
             parseUri("http://ge0.me/AbCMCNp0LO"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(Position(Srs.WGS84, -18.9249432, 46.4416404, z = 4.0)),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0))),
             parseUri("http://ge0.me/AbCMCNp0LO/"),
         )
     }

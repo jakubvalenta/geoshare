@@ -3,17 +3,22 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZName
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchPoint
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toLat
+import page.ooooo.geoshare.lib.extensions.toLon
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 object HereWeGoInput : Input {
     private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
-
-    private val srs = Srs.WGS84
 
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(share|wego)\.here\.com/\S+""")
     override val documentation = InputDocumentation(
@@ -28,26 +33,37 @@ object HereWeGoInput : Input {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
-                setPointIfNull { """/l/$LAT,$LON""" matchLatLonZName path }
-                setPointIfNull { if (path == "/") ("""$LAT,$LON,$Z""" matchLatLonZName queryParams["map"]) else null }
-                setPointIfNull {
-                    ("""/p/[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match path)?.groupOrNull("encoded")
-                        ?.let { encoded ->
-                            Base64.decode(encoded).decodeToString().let { decoded ->
-                                ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
-                                    ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
-                                        LatLonZName(lat, lon)
+                val parts = uri.pathParts.drop(1)
+                val firstPart = parts.firstOrNull() ?: return@run
+                if (firstPart == "") {
+                    ("""$LAT,$LON,$Z""" matchPoint queryParams["map"])?.also { points.add(it) }
+                } else {
+                    val secondPart = parts.getOrNull(1)
+                    if (secondPart != null) {
+                        if (firstPart == "l") {
+                            ("""$LAT,$LON""" matchPoint secondPart)?.also { points.add(it) }
+                        } else if (firstPart == "p") {
+                            ("""[a-z]-(?P<encoded>$SIMPLIFIED_BASE64)""" match secondPart)
+                                ?.groupOrNull("encoded")
+                                ?.let { encoded -> Base64.decode(encoded).decodeToString() }
+                                ?.let { decoded ->
+                                    ("""(lat=|"latitude":)$LAT""" find decoded)?.toLat()?.let { lat ->
+                                        ("""(lon=|"longitude":)$LON""" find decoded)?.toLon()?.let { lon ->
+                                            NaivePoint(lat, lon)
+                                        }
                                     }
                                 }
-                            }
+                                ?.also { points.add(it) }
                         }
+                    }
                 }
-                setZIfNull { """.*,$Z""" matchZ queryParams["map"] }
+
+                (""".*,$Z""" matchZ queryParams["map"])?.also { defaultZ = it }
             }
         }
-        return ParseUriResult.from(position)
-    }
+            .asWGS84()
+            .toParseUriResult()
 }

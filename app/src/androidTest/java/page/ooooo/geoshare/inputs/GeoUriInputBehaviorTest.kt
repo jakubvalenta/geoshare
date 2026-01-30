@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GeoUriInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -13,13 +12,13 @@ class GeoUriInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates, query and zoom
         testUri(
-            Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4),
+            WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4),
             "geo:50.123456,-11.123456?q=foo%20bar&z=3.4",
         )
 
         // Coordinates in query with space; this is not a valid URI, but we support it anyway
         testTextUri(
-            Position(Srs.WGS84, 45.4786785, 9.2473799),
+            WGS84Point(45.4786785, 9.2473799),
             "geo:0,0?q=45.4786785, 9.2473799",
         )
     }

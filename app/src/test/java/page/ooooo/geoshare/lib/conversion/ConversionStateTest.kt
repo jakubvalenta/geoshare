@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.conversion
 import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,9 +51,8 @@ import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.outputs.GpxOutput
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.coroutines.cancellation.CancellationException
@@ -244,7 +244,7 @@ class ConversionStateTest {
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-            override suspend fun parseUri(uri: Uri) = ParseUriResult.Succeeded(Position())
+            override suspend fun parseUri(uri: Uri) = ParseUriResult.Succeeded(persistentListOf())
         }
         val stateContext = mockStateContext(inputs = listOf(mockInput))
         val state = ReceivedUri(stateContext, inputUriString, mockInput, uri, Permission.NEVER)
@@ -720,7 +720,7 @@ class ConversionStateTest {
             override val shortUriMethod = Input.ShortUriMethod.GET
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
-            override suspend fun parseUri(uri: Uri) = ParseUriResult.Succeeded(Position())
+            override suspend fun parseUri(uri: Uri) = ParseUriResult.Succeeded(persistentListOf())
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -754,9 +754,9 @@ class ConversionStateTest {
     fun unshortenedUrl_parseUriReturnsSucceeded_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val mockGoogleMapsInput: GoogleMapsInput = mock {
-            on { parseUri(any()) } doReturn ParseUriResult.Succeeded(position)
+            on { parseUri(any()) } doReturn ParseUriResult.Succeeded(points)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(ConnectionPermissionPreference) } doThrow NotImplementedError()
@@ -767,7 +767,7 @@ class ConversionStateTest {
         )
         val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
         Assert.assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, points),
             state.transition(),
         )
     }
@@ -794,7 +794,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position()
+            val points = persistentListOf<WGS84Point>()
             val htmlUriString = "$inputUriString/foo.html"
             val mockInput = object : Input {
                 override val uriPattern: Pattern = Pattern.compile(".")
@@ -802,14 +802,14 @@ class ConversionStateTest {
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
                 override suspend fun parseUri(uri: Uri) =
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockInput))
             val state = UnshortenedUrl(
                 stateContext, inputUriString, mockInput, uri, Permission.ALWAYS
             )
             Assert.assertEquals(
-                ParseHtmlFailed(stateContext, inputUriString, position),
+                ParseHtmlFailed(stateContext, inputUriString, points),
                 state.transition(),
             )
         }
@@ -819,11 +819,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position(q = "bar")
+            val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
                 on { parseUri(any()) } doReturn
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -835,7 +835,7 @@ class ConversionStateTest {
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
-                    position,
+                    points,
                     htmlUriString,
                 ),
                 state.transition(),
@@ -847,11 +847,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position(q = "bar")
+            val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
                 on { parseUri(any()) } doReturn
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -863,7 +863,7 @@ class ConversionStateTest {
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
-                    position,
+                    points,
                     htmlUriString,
                 ),
                 state.transition(),
@@ -875,18 +875,18 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position(q = "bar")
+            val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
                 on { parseUri(any()) } doReturn
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
                 stateContext, inputUriString, mockGoogleMapsInput, uri, Permission.NEVER
             )
             Assert.assertEquals(
-                ParseHtmlFailed(stateContext, inputUriString, position),
+                ParseHtmlFailed(stateContext, inputUriString, points),
                 state.transition(),
             )
         }
@@ -896,11 +896,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position(q = "bar")
+            val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
                 on { parseUri(any()) } doReturn
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.ALWAYS
@@ -916,7 +916,7 @@ class ConversionStateTest {
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
-                    position,
+                    points,
                     htmlUriString,
                 ),
                 state.transition(),
@@ -928,11 +928,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position(q = "bar")
+            val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
                 on { parseUri(any()) } doReturn
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.ASK
@@ -948,7 +948,7 @@ class ConversionStateTest {
                     inputUriString,
                     mockGoogleMapsInput,
                     uri,
-                    position,
+                    points,
                     htmlUriString,
                 ),
                 state.transition(),
@@ -960,11 +960,11 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val position = Position(q = "bar")
+            val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
                 on { parseUri(any()) } doReturn
-                    ParseUriResult.SucceededAndSupportsHtmlParsing(position, htmlUriString)
+                    ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.NEVER
@@ -975,7 +975,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
             Assert.assertEquals(
-                ParseHtmlFailed(stateContext, inputUriString, position),
+                ParseHtmlFailed(stateContext, inputUriString, points),
                 state.transition(),
             )
         }
@@ -984,7 +984,7 @@ class ConversionStateTest {
     fun requestedParseHtmlPermission_transition_returnsNull() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val position = Position(q = "bar")
+        val points = persistentListOf(WGS84Point(name = "bar"))
         val htmlUriString = "$inputUriString/foo.html"
         val stateContext = mockStateContext()
         val state = RequestedParseHtmlPermission(
@@ -992,7 +992,7 @@ class ConversionStateTest {
             inputUriString,
             GoogleMapsInput,
             uri,
-            position,
+            points,
             htmlUriString,
         )
         Assert.assertNull(state.transition())
@@ -1003,7 +1003,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
@@ -1014,7 +1014,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1023,7 +1023,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri,
+                    pointsFromUri,
                     htmlUriString,
                 ),
                 state.grant(false),
@@ -1039,7 +1039,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
@@ -1050,7 +1050,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1059,7 +1059,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri,
+                    pointsFromUri,
                     htmlUriString,
                 ),
                 state.grant(true),
@@ -1074,7 +1074,7 @@ class ConversionStateTest {
     fun requestedParseHtmlPermission_denyWithDoNotAskFalse_doesNotSavePreferenceAndReturnsParseHtmlFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
+        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
         val htmlUriString = "$inputUriString/foo.html"
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
@@ -1085,11 +1085,11 @@ class ConversionStateTest {
             inputUriString,
             GoogleMapsInput,
             uri,
-            positionFromUri,
+            pointsFromUri,
             htmlUriString,
         )
         Assert.assertEquals(
-            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, pointsFromUri),
             state.deny(false),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
@@ -1102,7 +1102,7 @@ class ConversionStateTest {
     fun requestedParseHtmlPermission_denyWithDoNotAskTrue_savesPreferenceAndReturnsParseHtmlFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
+        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
         val htmlUriString = "$inputUriString/foo.html"
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
@@ -1113,11 +1113,11 @@ class ConversionStateTest {
             inputUriString,
             GoogleMapsInput,
             uri,
-            positionFromUri,
+            pointsFromUri,
             htmlUriString,
         )
         Assert.assertEquals(
-            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, pointsFromUri),
             state.deny(true),
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -1130,7 +1130,7 @@ class ConversionStateTest {
     fun grantedParseHtmlPermission_parseHtmlReturnsNull_returnsParseHtmlFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
-        val positionFromUri = Position(q = "bar")
+        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
         val htmlUriString = "$inputUriString/foo.html"
         val html = "<html></html>"
         val mockInput = object : Input.HasHtml {
@@ -1143,9 +1143,10 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
+            @Suppress("SameReturnValue")
             override suspend fun parseHtml(
                 channel: ByteReadChannel,
-                positionFromUri: Position,
+                pointsFromUri: ImmutableList<Point>,
                 log: ILog,
             ) = null
         }
@@ -1164,11 +1165,11 @@ class ConversionStateTest {
             inputUriString,
             mockInput,
             uri,
-            positionFromUri,
+            pointsFromUri,
             htmlUriString,
         )
         Assert.assertEquals(
-            ParseHtmlFailed(stateContext, inputUriString, positionFromUri),
+            ParseHtmlFailed(stateContext, inputUriString, pointsFromUri),
             state.transition(),
         )
     }
@@ -1178,7 +1179,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://[invalid:ipv6]/"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val html = "<html></html>"
             val stateContext = mockStateContext(networkTools = object : MockNetworkTools() {
@@ -1193,7 +1194,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1207,7 +1208,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
@@ -1223,7 +1224,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1237,7 +1238,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val tr = NetworkTools.RecoverableException(
                 R.string.network_exception_socket_timeout, SocketTimeoutException(),
@@ -1256,7 +1257,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1265,7 +1266,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri,
+                    pointsFromUri,
                     htmlUriString,
                     NetworkTools.Retry(1, tr),
                 ),
@@ -1278,7 +1279,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val tr = NetworkTools.RecoverableException(
                 R.string.network_exception_socket_timeout, SocketTimeoutException(),
@@ -1297,7 +1298,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
                 retry = NetworkTools.Retry(1, tr),
             )
@@ -1307,7 +1308,7 @@ class ConversionStateTest {
                     inputUriString,
                     GoogleMapsInput,
                     uri,
-                    positionFromUri,
+                    pointsFromUri,
                     htmlUriString,
                     NetworkTools.Retry(2, tr),
                 ),
@@ -1320,7 +1321,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
@@ -1339,7 +1340,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1353,7 +1354,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
@@ -1372,7 +1373,7 @@ class ConversionStateTest {
                 inputUriString,
                 GoogleMapsInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1386,9 +1387,9 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val html = "<html></html>"
-        val positionFromUri = Position(q = "bar")
+        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
         val htmlUriString = "maps.apple.com/foo"
-        val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, name = "fromHtml")
+        val pointsFromHtml = persistentListOf(WGS84Point(1.0, 2.0, name = "fromHtml"))
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
@@ -1401,9 +1402,9 @@ class ConversionStateTest {
 
             override suspend fun parseHtml(
                 channel: ByteReadChannel,
-                positionFromUri: Position,
+                pointsFromUri: ImmutableList<Point>,
                 log: ILog,
-            ) = ParseHtmlResult.Succeeded(positionFromHtml)
+            ) = ParseHtmlResult.Succeeded(pointsFromHtml)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1420,11 +1421,11 @@ class ConversionStateTest {
             inputUriString,
             mockInput,
             uri,
-            positionFromUri,
+            pointsFromUri,
             htmlUriString,
         )
         Assert.assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, positionFromHtml),
+            ConversionSucceeded(stateContext, inputUriString, pointsFromHtml),
             state.transition(),
         )
     }
@@ -1434,9 +1435,9 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val html = "<html></html>"
-        val positionFromUri = Position(q = "bar")
+        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
         val htmlUriString = "https://api.apple.com/foo.json"
-        val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, name = "fromHtml")
+        val pointsFromHtml = persistentListOf(WGS84Point(1.0, 2.0, name = "fromHtml"))
         val mockInput = object : Input.HasHtml {
             override val uriPattern: Pattern = Pattern.compile(".")
             override val documentation =
@@ -1449,9 +1450,9 @@ class ConversionStateTest {
 
             override suspend fun parseHtml(
                 channel: ByteReadChannel,
-                positionFromUri: Position,
+                pointsFromUri: ImmutableList<Point>,
                 log: ILog,
-            ) = ParseHtmlResult.Succeeded(positionFromHtml)
+            ) = ParseHtmlResult.Succeeded(pointsFromHtml)
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -1468,119 +1469,21 @@ class ConversionStateTest {
             inputUriString,
             mockInput,
             uri,
-            positionFromUri,
+            pointsFromUri,
             htmlUriString,
         )
         Assert.assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, positionFromHtml),
+            ConversionSucceeded(stateContext, inputUriString, pointsFromHtml),
             state.transition(),
         )
     }
-
-    @Test
-    fun grantedParseHtmlPermission_parseHtmlReturnsSucceededAndPositionFromUriHasQuery_returnsSucceededWithPointFromHtmlWithNameFromUri() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val html = "<html></html>"
-            val positionFromUri = Position(Srs.WGS84, 3.0, 4.0, q = "fromUri")
-            val htmlUriString = "https://api.apple.com/foo.json"
-            val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0)
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation =
-                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-                override suspend fun parseUri(uri: Uri): ParseUriResult {
-                    throw NotImplementedError()
-                }
-
-                override suspend fun parseHtml(
-                    channel: ByteReadChannel,
-                    positionFromUri: Position,
-                    log: ILog,
-                ) = ParseHtmlResult.from(positionFromUri, positionFromHtml)
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val state = GrantedParseHtmlPermission(
-                stateContext,
-                inputUriString,
-                mockInput,
-                uri,
-                positionFromUri,
-                htmlUriString,
-            )
-            Assert.assertEquals(
-                ConversionSucceeded(stateContext, inputUriString, Position(Srs.WGS84, 1.0, 2.0, name = "fromUri")),
-                state.transition(),
-            )
-        }
-
-    @Test
-    fun grantedParseHtmlPermission_parseHtmlReturnsSucceededAndPositionFromHtmlHasName_returnsSucceededWithPointFromHtmlWithNameFromHtml() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val html = "<html></html>"
-            val positionFromUri = Position(Srs.WGS84, 3.0, 4.0, name = "fromUri")
-            val htmlUriString = "https://api.apple.com/foo.json"
-            val positionFromHtml = Position(Srs.WGS84, 1.0, 2.0, name = "fromHtml")
-            val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
-                override val documentation =
-                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-                override suspend fun parseUri(uri: Uri): ParseUriResult {
-                    throw NotImplementedError()
-                }
-
-                override suspend fun parseHtml(
-                    channel: ByteReadChannel,
-                    positionFromUri: Position,
-                    log: ILog,
-                ) = ParseHtmlResult.from(positionFromUri, positionFromHtml)
-            }
-            val stateContext = mockStateContext(
-                inputs = listOf(mockInput),
-                networkTools = object : MockNetworkTools() {
-                    override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        html
-                    } else {
-                        super.onGetSource(url)
-                    }
-                },
-            )
-            val state = GrantedParseHtmlPermission(
-                stateContext,
-                inputUriString,
-                mockInput,
-                uri,
-                positionFromUri,
-                htmlUriString,
-            )
-            Assert.assertEquals(
-                ConversionSucceeded(stateContext, inputUriString, positionFromHtml),
-                state.transition(),
-            )
-        }
 
     @Test
     fun grantedParseHtmlPermission_parseHtmlReturnsRequiresRedirectWithAbsoluteUrl_returnsReceivedUriWithTheUrlAndPermissionAlways() =
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val redirectUriString = "https://maps.apple.com/foo-redirect"
             val redirectUri = Uri.parse(redirectUriString, uriQuote)
@@ -1596,7 +1499,7 @@ class ConversionStateTest {
 
                 override suspend fun parseHtml(
                     channel: ByteReadChannel,
-                    positionFromUri: Position,
+                    pointsFromUri: ImmutableList<Point>,
                     log: ILog,
                 ) = ParseHtmlResult.RequiresRedirect(redirectUriString)
             }
@@ -1621,7 +1524,7 @@ class ConversionStateTest {
                 inputUriString,
                 mockInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1635,7 +1538,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.apple.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val positionFromUri = Position(q = "bar")
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/foo.html"
             val redirectUriString = "foo-redirect"
             val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
@@ -1652,7 +1555,7 @@ class ConversionStateTest {
 
                 override suspend fun parseHtml(
                     channel: ByteReadChannel,
-                    positionFromUri: Position,
+                    pointsFromUri: ImmutableList<Point>,
                     log: ILog,
                 ) = ParseHtmlResult.RequiresRedirect(redirectUriString)
             }
@@ -1671,7 +1574,7 @@ class ConversionStateTest {
                 inputUriString,
                 mockInput,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
             )
             Assert.assertEquals(
@@ -1683,11 +1586,11 @@ class ConversionStateTest {
     @Test
     fun parseHtmlFailed_positionHasPoint_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val stateContext = mockStateContext()
-        val state = ParseHtmlFailed(stateContext, inputUriString, position)
+        val state = ParseHtmlFailed(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, points),
             state.transition(),
         )
     }
@@ -1695,11 +1598,11 @@ class ConversionStateTest {
     @Test
     fun parseHtmlFailed_positionHasQuery_returnsConversionSucceeded() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val position = Position(q = "bar")
+        val points = persistentListOf(WGS84Point(name = "bar"))
         val stateContext = mockStateContext()
-        val state = ParseHtmlFailed(stateContext, inputUriString, position)
+        val state = ParseHtmlFailed(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ConversionSucceeded(stateContext, inputUriString, position),
+            ConversionSucceeded(stateContext, inputUriString, points),
             state.transition(),
         )
     }
@@ -1707,9 +1610,9 @@ class ConversionStateTest {
     @Test
     fun parseHtmlFailed_positionIsEmpty_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
-        val position = Position()
+        val points = persistentListOf<WGS84Point>()
         val stateContext = mockStateContext()
-        val state = ParseHtmlFailed(stateContext, inputUriString, position)
+        val state = ParseHtmlFailed(stateContext, inputUriString, points)
         Assert.assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),
@@ -1719,20 +1622,20 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsNoop_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = NoopAutomation
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn action
         }
         val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun conversionSucceeded_billingStatusIsLoadingAndCachedProductIdIsNotSet_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
@@ -1747,7 +1650,7 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertNull(state.transition())
         verify(mockUserPreferencesRepository, never()).setValue(
             eq(BillingCachedProductIdPreference),
@@ -1758,7 +1661,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusIsLoadingAndCachedProductIsAnUnknownProduct_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
@@ -1774,7 +1677,7 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertNull(state.transition())
         verify(mockUserPreferencesRepository, never()).setValue(
             eq(BillingCachedProductIdPreference),
@@ -1785,7 +1688,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
@@ -1801,9 +1704,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ActionReady(inputUriString, position, null, action),
+            ActionReady(inputUriString, points, null, action),
             state.transition(),
         )
         verify(mockUserPreferencesRepository, never()).setValue(
@@ -1815,7 +1718,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusDoesNotContainAutomationFeature_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -1835,7 +1738,7 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertNull(state.transition())
         verify(mockUserPreferencesRepository).setValue(
             BillingCachedProductIdPreference,
@@ -1846,7 +1749,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusContainsAutomationFeature_returnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -1865,9 +1768,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ActionReady(inputUriString, position, null, action),
+            ActionReady(inputUriString, points, null, action),
             state.transition(),
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -1879,7 +1782,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
         val mockBilling: Billing = mock {
@@ -1894,7 +1797,7 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position, billingStatusTimeout = 3.seconds)
+        val state = ConversionSucceeded(stateContext, inputUriString, points, billingStatusTimeout = 3.seconds)
         var res: State? = null
         launch {
             res = state.transition()
@@ -1906,7 +1809,7 @@ class ConversionStateTest {
         )
         advanceUntilIdle()
         Assert.assertEquals(
-            ActionReady(inputUriString, position, null, action),
+            ActionReady(inputUriString, points, null, action),
             res,
         )
         verify(mockUserPreferencesRepository).setValue(
@@ -1918,7 +1821,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusIsNotPurchasedAndItBecomesPurchasedWithinTimeout_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
         val mockBilling: Billing = mock {
@@ -1933,7 +1836,7 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position, billingStatusTimeout = 3.seconds)
+        val state = ConversionSucceeded(stateContext, inputUriString, points, billingStatusTimeout = 3.seconds)
         var res: State? = null
         launch {
             res = state.transition()
@@ -1954,7 +1857,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_billingStatusIsLoadingAndItBecomesPurchasedAfterTimeout_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.Loading())
         val mockBilling: Billing = mock {
@@ -1969,7 +1872,7 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position, billingStatusTimeout = 3.seconds)
+        val state = ConversionSucceeded(stateContext, inputUriString, points, billingStatusTimeout = 3.seconds)
         var res: State? = null
         launch {
             res = state.transition()
@@ -1990,7 +1893,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsCopyCoords_returnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -2009,9 +1912,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ActionReady(inputUriString, position, null, action),
+            ActionReady(inputUriString, points, null, action),
             state.transition(),
         )
     }
@@ -2019,7 +1922,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsOpenApp_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
         val delay = 2.seconds
         val mockBilling: Billing = mock {
@@ -2040,9 +1943,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ActionWaiting(stateContext, inputUriString, position, null, action, delay),
+            ActionWaiting(stateContext, inputUriString, points, null, action, delay),
             state.transition(),
         )
     }
@@ -2050,7 +1953,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsSaveGpx_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
@@ -2071,9 +1974,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ActionWaiting(stateContext, inputUriString, position, null, action, delay),
+            ActionWaiting(stateContext, inputUriString, points, null, action, delay),
             state.transition(),
         )
     }
@@ -2081,7 +1984,7 @@ class ConversionStateTest {
     @Test
     fun conversionSucceeded_userPreferenceAutomationIsShare_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriAutomation
         val delay = 2.seconds
         val mockBilling: Billing = mock {
@@ -2102,9 +2005,9 @@ class ConversionStateTest {
             userPreferencesRepository = mockUserPreferencesRepository,
             billing = mockBilling,
         )
-        val state = ConversionSucceeded(stateContext, inputUriString, position)
+        val state = ConversionSucceeded(stateContext, inputUriString, points)
         Assert.assertEquals(
-            ActionWaiting(stateContext, inputUriString, position, null, action, delay),
+            ActionWaiting(stateContext, inputUriString, points, null, action, delay),
             state.transition(),
         )
     }
@@ -2119,13 +2022,13 @@ class ConversionStateTest {
     @Test
     fun actionWaiting_executionIsNotCancelled_waitsAndReturnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
         val stateContext = mockStateContext()
-        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, 3.seconds)
+        val state = ActionWaiting(stateContext, inputUriString, points, 2, action, 3.seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
-                ActionReady(inputUriString, position, 2, action),
+                ActionReady(inputUriString, points, 2, action),
                 state.transition(),
             )
         }
@@ -2135,13 +2038,13 @@ class ConversionStateTest {
     @Test
     fun actionWaiting_delayIsNotPositive_doesNotWaitAndReturnsActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
         val stateContext = mockStateContext()
-        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, (-1).seconds)
+        val state = ActionWaiting(stateContext, inputUriString, points, 2, action, (-1).seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
-                ActionReady(inputUriString, position, 2, action),
+                ActionReady(inputUriString, points, 2, action),
                 state.transition(),
             )
         }
@@ -2151,10 +2054,10 @@ class ConversionStateTest {
     @Test
     fun actionWaiting_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
         val stateContext = mockStateContext()
-        val state = ActionWaiting(stateContext, inputUriString, position, 2, action, 3.seconds)
+        val state = ActionWaiting(stateContext, inputUriString, points, 2, action, 3.seconds)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2168,18 +2071,18 @@ class ConversionStateTest {
         }
         Assert.assertEquals(
             res,
-            ActionFinished(inputUriString, position, action),
+            ActionFinished(inputUriString, points, action),
         )
     }
 
     @Test
     fun actionReady_actionIsCopyAutomation_returnsBasicActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAction()
-        val state = ActionReady(inputUriString, position, 2, action)
+        val state = ActionReady(inputUriString, points, 2, action)
         Assert.assertEquals(
-            BasicActionReady(inputUriString, position, 2, action),
+            BasicActionReady(inputUriString, points, 2, action),
             state.transition(),
         )
     }
@@ -2187,11 +2090,11 @@ class ConversionStateTest {
     @Test
     fun actionReady_actionIsCopyAction_returnsBasicActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
-        val state = ActionReady(inputUriString, position, 2, action)
+        val state = ActionReady(inputUriString, points, 2, action)
         Assert.assertEquals(
-            BasicActionReady(inputUriString, position, 2, action),
+            BasicActionReady(inputUriString, points, 2, action),
             state.transition(),
         )
     }
@@ -2199,11 +2102,11 @@ class ConversionStateTest {
     @Test
     fun actionReady_actionIsShareGpxRouteAutomation_returnsLocationRationaleRequested() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAutomation
-        val state = ActionReady(inputUriString, position, 2, action)
+        val state = ActionReady(inputUriString, points, 2, action)
         Assert.assertEquals(
-            LocationRationaleRequested(inputUriString, position, 2, action),
+            LocationRationaleRequested(inputUriString, points, 2, action),
             state.transition(),
         )
     }
@@ -2211,11 +2114,11 @@ class ConversionStateTest {
     @Test
     fun actionReady_actionIsShareGpxRouteAction_returnsLocationRationaleRequested() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = ActionReady(inputUriString, position, 2, action)
+        val state = ActionReady(inputUriString, points, 2, action)
         Assert.assertEquals(
-            LocationRationaleRequested(inputUriString, position, 2, action),
+            LocationRationaleRequested(inputUriString, points, 2, action),
             state.transition(),
         )
     }
@@ -2223,29 +2126,29 @@ class ConversionStateTest {
     @Test
     fun basicActionReady_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
-        val state = BasicActionReady(inputUriString, position, 2, action)
+        val state = BasicActionReady(inputUriString, points, 2, action)
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun locationActionReady_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationActionReady(inputUriString, position, 2, action, Point(Srs.WGS84, 3.0, 4.0))
+        val state = LocationActionReady(inputUriString, points, 2, action, WGS84Point(3.0, 4.0))
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun actionRan_automationIsNoop_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = NoopAutomation
-        val state = ActionRan(inputUriString, position, action, null)
+        val state = ActionRan(inputUriString, points, action, null)
         Assert.assertEquals(
-            ActionFinished(inputUriString, position, action),
+            ActionFinished(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2253,11 +2156,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsCopyCoordsAndSuccessIsTrue_returnsActionSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = CoordinatesOutput.CopyDecCoordsAutomation
-        val state = ActionRan(inputUriString, position, action, true)
+        val state = ActionRan(inputUriString, points, action, true)
         Assert.assertEquals(
-            ActionSucceeded(inputUriString, position, action),
+            ActionSucceeded(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2265,11 +2168,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsOpenAppAndSuccessIsTrue_returnsActionSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionRan(inputUriString, position, action, true)
+        val state = ActionRan(inputUriString, points, action, true)
         Assert.assertEquals(
-            ActionSucceeded(inputUriString, position, action),
+            ActionSucceeded(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2277,11 +2180,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsOpenAppAndSuccessIsFalse_returnsActionFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionRan(inputUriString, position, action, false)
+        val state = ActionRan(inputUriString, points, action, false)
         Assert.assertEquals(
-            ActionFailed(inputUriString, position, action),
+            ActionFailed(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2289,11 +2192,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsSaveGpxAndSuccessIsTrue_returnsActionSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
-        val state = ActionRan(inputUriString, position, action, true)
+        val state = ActionRan(inputUriString, points, action, true)
         Assert.assertEquals(
-            ActionSucceeded(inputUriString, position, action),
+            ActionSucceeded(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2301,11 +2204,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsSaveGpxAndSuccessIsFalse_returnsActionFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.SaveGpxPointsAutomation
-        val state = ActionRan(inputUriString, position, action, false)
+        val state = ActionRan(inputUriString, points, action, false)
         Assert.assertEquals(
-            ActionFailed(inputUriString, position, action),
+            ActionFailed(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2313,11 +2216,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsShareAndSuccessIsTrue_returnsActionSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriAutomation
-        val state = ActionRan(inputUriString, position, action, true)
+        val state = ActionRan(inputUriString, points, action, true)
         Assert.assertEquals(
-            ActionSucceeded(inputUriString, position, action),
+            ActionSucceeded(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2325,11 +2228,11 @@ class ConversionStateTest {
     @Test
     fun actionRan_automationIsShareAndSuccessIsFalse_returnsActionFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriAutomation
-        val state = ActionRan(inputUriString, position, action, false)
+        val state = ActionRan(inputUriString, points, action, false)
         Assert.assertEquals(
-            ActionFailed(inputUriString, position, action),
+            ActionFailed(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2337,12 +2240,12 @@ class ConversionStateTest {
     @Test
     fun actionSucceeded_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionSucceeded(inputUriString, position, action)
+        val state = ActionSucceeded(inputUriString, points, action)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
-                ActionFinished(inputUriString, position, action),
+                ActionFinished(inputUriString, points, action),
                 state.transition(),
             )
         }
@@ -2352,9 +2255,9 @@ class ConversionStateTest {
     @Test
     fun actionSucceeded_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionSucceeded(inputUriString, position, action)
+        val state = ActionSucceeded(inputUriString, points, action)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2368,19 +2271,19 @@ class ConversionStateTest {
         }
         Assert.assertEquals(
             res,
-            ActionFinished(inputUriString, position, action),
+            ActionFinished(inputUriString, points, action),
         )
     }
 
     @Test
     fun actionFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionFailed(inputUriString, position, action)
+        val state = ActionFailed(inputUriString, points, action)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
-                ActionFinished(inputUriString, position, action),
+                ActionFinished(inputUriString, points, action),
                 state.transition(),
             )
         }
@@ -2390,9 +2293,9 @@ class ConversionStateTest {
     @Test
     fun actionFailed_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionFailed(inputUriString, position, action)
+        val state = ActionFailed(inputUriString, points, action)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2406,36 +2309,36 @@ class ConversionStateTest {
         }
         Assert.assertEquals(
             res,
-            ActionFinished(inputUriString, position, action),
+            ActionFinished(inputUriString, points, action),
         )
     }
 
     @Test
     fun actionFinished_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
-        val state = ActionFinished(inputUriString, position, action)
+        val state = ActionFinished(inputUriString, points, action)
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun locationRationaleRequested_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationRationaleRequested(inputUriString, position, 2, action)
+        val state = LocationRationaleRequested(inputUriString, points, 2, action)
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun locationRationaleShown_grant_returnsLocationRationaleConfirmed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationRationaleShown(inputUriString, position, 2, action)
+        val state = LocationRationaleShown(inputUriString, points, 2, action)
         Assert.assertEquals(
-            LocationRationaleConfirmed(inputUriString, position, 2, action),
+            LocationRationaleConfirmed(inputUriString, points, 2, action),
             state.grant(false),
         )
     }
@@ -2443,11 +2346,11 @@ class ConversionStateTest {
     @Test
     fun locationRationaleShown_deny_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationRationaleShown(inputUriString, position, 2, action)
+        val state = LocationRationaleShown(inputUriString, points, 2, action)
         Assert.assertEquals(
-            ActionFinished(inputUriString, position, action),
+            ActionFinished(inputUriString, points, action),
             state.deny(false),
         )
     }
@@ -2455,29 +2358,29 @@ class ConversionStateTest {
     @Test
     fun locationRationaleConfirmed_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationRationaleConfirmed(inputUriString, position, 2, action)
+        val state = LocationRationaleConfirmed(inputUriString, points, 2, action)
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun locationPermissionReceived_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationPermissionReceived(inputUriString, position, 2, action)
+        val state = LocationPermissionReceived(inputUriString, points, 2, action)
         Assert.assertNull(state.transition())
     }
 
     @Test
     fun locationReceived_locationIsNull_returnsLocationFindingFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationReceived(inputUriString, position, 2, action, null)
+        val state = LocationReceived(inputUriString, points, 2, action, null)
         Assert.assertEquals(
-            LocationFindingFailed(inputUriString, position, action),
+            LocationFindingFailed(inputUriString, points, action),
             state.transition(),
         )
     }
@@ -2485,12 +2388,12 @@ class ConversionStateTest {
     @Test
     fun locationReceived_locationIsNotNull_returnsLocationActionReady() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val location = Point(Srs.WGS84, 3.0, 4.0)
-        val state = LocationReceived(inputUriString, position, 2, action, location)
+        val location = WGS84Point(3.0, 4.0)
+        val state = LocationReceived(inputUriString, points, 2, action, location)
         Assert.assertEquals(
-            LocationActionReady(inputUriString, position, 2, action, location),
+            LocationActionReady(inputUriString, points, 2, action, location),
             state.transition(),
         )
     }
@@ -2498,12 +2401,12 @@ class ConversionStateTest {
     @Test
     fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationFindingFailed(inputUriString, position, action)
+        val state = LocationFindingFailed(inputUriString, points, action)
         val workDuration = testScheduler.timeSource.measureTime {
             Assert.assertEquals(
-                ActionFinished(inputUriString, position, action),
+                ActionFinished(inputUriString, points, action),
                 state.transition(),
             )
         }
@@ -2513,9 +2416,9 @@ class ConversionStateTest {
     @Test
     fun locationFindingFailed_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
-        val position = Position(Srs.WGS84, 1.0, 2.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0))
         val action = GpxOutput.ShareGpxRouteAction()
-        val state = LocationFindingFailed(inputUriString, position, action)
+        val state = LocationFindingFailed(inputUriString, points, action)
         var res: State? = null
         val job = launch {
             res = state.transition()
@@ -2529,7 +2432,7 @@ class ConversionStateTest {
         }
         Assert.assertEquals(
             res,
-            ActionFinished(inputUriString, position, action),
+            ActionFinished(inputUriString, points, action),
         )
     }
 }

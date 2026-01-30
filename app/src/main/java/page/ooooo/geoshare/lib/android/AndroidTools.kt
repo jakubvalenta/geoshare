@@ -34,8 +34,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -253,7 +253,7 @@ object AndroidTools {
                     cancellationSignal,
                     dispatcher.asExecutor(),
                 ) { location: Location? ->
-                    cont.resume(location?.let { Point(Srs.WGS84, it.latitude, it.longitude) })
+                    cont.resume(location?.let { WGS84Point(it.latitude, it.longitude) })
                 }
             } catch (e: Exception) {
                 cont.resumeWithException(e)
@@ -283,11 +283,7 @@ object AndroidTools {
                             // to override onStatusChanged on Android Q and older.
                             override fun onLocationChanged(location: Location) {
                                 cont.resume(location.let {
-                                    Point(
-                                        Srs.WGS84,
-                                        it.latitude,
-                                        it.longitude
-                                    )
+                                    WGS84Point(it.latitude, it.longitude)
                                 })
                             }
                         },
@@ -305,7 +301,7 @@ object AndroidTools {
     private fun getLastKnownLocation(locationManager: LocationManager, maxAge: Duration = 1.minutes): Point? =
         locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             ?.takeIf { (SystemClock.elapsedRealtimeNanos() - it.elapsedRealtimeNanos).nanoseconds <= maxAge }
-            ?.let { Point(Srs.WGS84, it.latitude, it.longitude) }
+            ?.let { WGS84Point(it.latitude, it.longitude) }
 
     suspend fun getLocation(context: Context): Point? {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager

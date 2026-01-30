@@ -3,14 +3,13 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matchLatLonZName
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.extensions.matchZ
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object OsmAndInput : Input {
-    private val srs = Srs.WGS84
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OSM_AND,
@@ -20,14 +19,15 @@ object OsmAndInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["pin"] }
-                setPointIfNull { """$Z/$LAT/$LON.*""" matchLatLonZName fragment }
-                setZIfNull { """$Z/.*""" matchZ fragment }
+                (LAT_LON_PATTERN matchPoint queryParams["pin"])?.also { points.add(it) }
+                    ?: ("""$Z/$LAT/$LON.*""" matchPoint fragment)?.also { points.add(it) }
+
+                ("""$Z/.*""" matchZ fragment)?.also { defaultZ = it }
             }
         }
-        return ParseUriResult.from(position)
-    }
+            .asWGS84()
+            .toParseUriResult()
 }

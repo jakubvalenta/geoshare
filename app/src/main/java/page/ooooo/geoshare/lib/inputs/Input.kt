@@ -2,10 +2,11 @@ package page.ooooo.geoshare.lib.inputs
 
 import com.google.re2j.Pattern
 import io.ktor.utils.io.*
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
 
 interface Input {
 
@@ -29,7 +30,7 @@ interface Input {
 
         suspend fun parseHtml(
             channel: ByteReadChannel,
-            positionFromUri: Position,
+            pointsFromUri: ImmutableList<Point>,
             log: ILog = DefaultLog,
         ): ParseHtmlResult?
     }

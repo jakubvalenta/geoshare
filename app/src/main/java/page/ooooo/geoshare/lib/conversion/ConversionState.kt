@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.conversion
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
@@ -29,8 +30,7 @@ import page.ooooo.geoshare.lib.outputs.BasicAutomation
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.LocationAutomation
 import page.ooooo.geoshare.lib.outputs.NoopAutomation
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
 import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -46,7 +46,7 @@ interface ConversionState : State {
 
     interface HasResult : ConversionState {
         val inputUriString: String
-        val position: Position
+        val points: ImmutableList<Point>
     }
 
     interface HasError : ConversionState {
@@ -211,8 +211,8 @@ data class UnshortenedUrl(
     override suspend fun transition(): State =
         when (val res = input.parseUri(uri)) {
             is ParseUriResult.Succeeded -> {
-                stateContext.log.i(null, "URI Pattern: Converted $uri to ${res.position}")
-                ConversionSucceeded(stateContext, inputUriString, res.position)
+                stateContext.log.i(null, "URI Pattern: Converted $uri to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
             }
 
             is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
@@ -220,17 +220,17 @@ data class UnshortenedUrl(
                     when (permission
                         ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseHtmlPermission(
-                            stateContext, inputUriString, input, uri, res.position, res.htmlUriString
+                            stateContext, inputUriString, input, uri, res.points, res.htmlUriString
                         )
 
                         Permission.ASK -> RequestedParseHtmlPermission(
-                            stateContext, inputUriString, input, uri, res.position, res.htmlUriString
+                            stateContext, inputUriString, input, uri, res.points, res.htmlUriString
                         )
 
-                        Permission.NEVER -> ParseHtmlFailed(stateContext, inputUriString, res.position)
+                        Permission.NEVER -> ParseHtmlFailed(stateContext, inputUriString, res.points)
                     }
                 } else {
-                    ParseHtmlFailed(stateContext, inputUriString, res.position)
+                    ParseHtmlFailed(stateContext, inputUriString, res.points)
                 }
             }
 
@@ -246,7 +246,7 @@ data class RequestedParseHtmlPermission(
     val inputUriString: String,
     val input: Input.HasHtml,
     val uri: Uri,
-    val positionFromUri: Position,
+    val pointsFromUri: ImmutableList<Point>,
     val htmlUriString: String,
 ) : ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
@@ -255,14 +255,14 @@ data class RequestedParseHtmlPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
-        return GrantedParseHtmlPermission(stateContext, inputUriString, input, uri, positionFromUri, htmlUriString)
+        return GrantedParseHtmlPermission(stateContext, inputUriString, input, uri, pointsFromUri, htmlUriString)
     }
 
     override suspend fun deny(doNotAsk: Boolean): State {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
+        return ParseHtmlFailed(stateContext, inputUriString, pointsFromUri)
     }
 }
 
@@ -271,7 +271,7 @@ data class GrantedParseHtmlPermission(
     val inputUriString: String,
     val input: Input.HasHtml,
     val uri: Uri,
-    val positionFromUri: Position,
+    val pointsFromUri: ImmutableList<Point>,
     val htmlUriString: String,
     val retry: NetworkTools.Retry? = null,
 ) : ConversionState.HasLoadingIndicator {
@@ -284,12 +284,12 @@ data class GrantedParseHtmlPermission(
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
             val res = stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
-                input.parseHtml(channel, positionFromUri, stateContext.log)
+                input.parseHtml(channel, pointsFromUri, stateContext.log)
             }
             when (res) {
                 is ParseHtmlResult.Succeeded -> {
-                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to ${res.position}")
-                    ConversionSucceeded(stateContext, inputUriString, res.position)
+                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to ${res.points}")
+                    ConversionSucceeded(stateContext, inputUriString, res.points)
                 }
 
                 is ParseHtmlResult.RequiresRedirect -> {
@@ -302,7 +302,7 @@ data class GrantedParseHtmlPermission(
 
                 null -> {
                     stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
-                    ParseHtmlFailed(stateContext, inputUriString, positionFromUri)
+                    ParseHtmlFailed(stateContext, inputUriString, pointsFromUri)
                 }
             }
         } catch (_: CancellationException) {
@@ -313,7 +313,7 @@ data class GrantedParseHtmlPermission(
                 inputUriString,
                 input,
                 uri,
-                positionFromUri,
+                pointsFromUri,
                 htmlUriString,
                 retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
             )
@@ -344,10 +344,10 @@ data class GrantedParseHtmlPermission(
 data class ParseHtmlFailed(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val position: Position,
+    val points: ImmutableList<Point>,
 ) : ConversionState {
-    override suspend fun transition() = if (!position.points.isNullOrEmpty() || !position.q.isNullOrEmpty()) {
-        ConversionSucceeded(stateContext, inputUriString, position)
+    override suspend fun transition() = if (points.isNotEmpty()) {
+        ConversionSucceeded(stateContext, inputUriString, points)
     } else {
         ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
     }
@@ -356,7 +356,7 @@ data class ParseHtmlFailed(
 data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val billingStatusTimeout: Duration = 3.seconds,
 ) : ConversionState.HasResult {
     @OptIn(FlowPreview::class)
@@ -406,9 +406,9 @@ data class ConversionSucceeded(
         if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
             if (automation is Automation.HasDelay) {
                 val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
-                return ActionWaiting(stateContext, inputUriString, position, null, automation, delay)
+                return ActionWaiting(stateContext, inputUriString, points, null, automation, delay)
             }
-            return ActionReady(inputUriString, position, null, automation)
+            return ActionReady(inputUriString, points, null, automation)
         }
         return null
     }
@@ -422,7 +422,7 @@ data class ConversionFailed(
 data class ActionWaiting(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: Action,
     val delay: Duration,
@@ -431,36 +431,36 @@ data class ActionWaiting(
         if (delay.isPositive()) {
             delay(delay)
         }
-        ActionReady(inputUriString, position, i, action)
+        ActionReady(inputUriString, points, i, action)
     } catch (_: CancellationException) {
-        ActionFinished(inputUriString, position, action)
+        ActionFinished(inputUriString, points, action)
     }
 }
 
 data class ActionReady(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: Action,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State = when (action) {
-        is BasicAutomation -> BasicActionReady(inputUriString, position, i, action)
-        is BasicAction -> BasicActionReady(inputUriString, position, i, action)
-        is LocationAutomation -> LocationRationaleRequested(inputUriString, position, i, action)
-        is LocationAction -> LocationRationaleRequested(inputUriString, position, i, action)
+        is BasicAutomation -> BasicActionReady(inputUriString, points, i, action)
+        is BasicAction -> BasicActionReady(inputUriString, points, i, action)
+        is LocationAutomation -> LocationRationaleRequested(inputUriString, points, i, action)
+        is LocationAction -> LocationRationaleRequested(inputUriString, points, i, action)
     }
 }
 
 data class BasicActionReady(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: BasicAction,
 ) : ConversionState.HasResult
 
 data class LocationActionReady(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: LocationAction,
     val location: Point,
@@ -468,22 +468,22 @@ data class LocationActionReady(
 
 data class ActionRan(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val action: Action,
     val success: Boolean?,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State = when (success) {
-        true -> ActionSucceeded(inputUriString, position, action)
+        true -> ActionSucceeded(inputUriString, points, action)
 
-        false -> ActionFailed(inputUriString, position, action)
+        false -> ActionFailed(inputUriString, points, action)
 
-        else -> ActionFinished(inputUriString, position, action)
+        else -> ActionFinished(inputUriString, points, action)
     }
 }
 
 data class ActionSucceeded(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val action: Action,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State {
@@ -492,13 +492,13 @@ data class ActionSucceeded(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, position, action)
+        return ActionFinished(inputUriString, points, action)
     }
 }
 
 data class ActionFailed(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val action: Action,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State {
@@ -507,26 +507,26 @@ data class ActionFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, position, action)
+        return ActionFinished(inputUriString, points, action)
     }
 }
 
 data class ActionFinished(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val action: Action,
 ) : ConversionState.HasResult
 
 data class LocationRationaleRequested(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: LocationAction,
 ) : ConversionState.HasResult
 
 data class LocationRationaleShown(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: LocationAction,
 ) : ConversionState.HasPermission, ConversionState.HasResult {
@@ -534,21 +534,21 @@ data class LocationRationaleShown(
     override val permissionTitleResId = R.string.conversion_succeeded_location_rationale_dialog_title
 
     override suspend fun grant(doNotAsk: Boolean): State =
-        LocationRationaleConfirmed(inputUriString, position, i, action)
+        LocationRationaleConfirmed(inputUriString, points, i, action)
 
-    override suspend fun deny(doNotAsk: Boolean): State = ActionFinished(inputUriString, position, action)
+    override suspend fun deny(doNotAsk: Boolean): State = ActionFinished(inputUriString, points, action)
 }
 
 data class LocationRationaleConfirmed(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: LocationAction,
 ) : ConversionState.HasResult
 
 data class LocationPermissionReceived(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: LocationAction,
 ) : ConversionState.HasResult, ConversionState.HasLoadingIndicator {
@@ -559,21 +559,21 @@ data class LocationPermissionReceived(
 
 data class LocationReceived(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val i: Int?,
     val action: LocationAction,
     val location: Point?,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(inputUriString, position, action)
+        LocationFindingFailed(inputUriString, points, action)
     } else {
-        LocationActionReady(inputUriString, position, i, action, location)
+        LocationActionReady(inputUriString, points, i, action, location)
     }
 }
 
 data class LocationFindingFailed(
     override val inputUriString: String,
-    override val position: Position,
+    override val points: ImmutableList<Point>,
     val action: LocationAction,
 ) : ConversionState.HasResult {
     override suspend fun transition(): State {
@@ -582,6 +582,6 @@ data class LocationFindingFailed(
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, position, action)
+        return ActionFinished(inputUriString, points, action)
     }
 }

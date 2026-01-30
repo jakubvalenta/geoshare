@@ -4,9 +4,7 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.WGS84Point
 import java.io.File
 import java.nio.file.attribute.PosixFilePermissions
 import kotlin.io.path.createTempDirectory
@@ -16,43 +14,43 @@ class GpxOutputTest {
 
     @Test
     fun writeGpxRoute_locationIsNull_returnsNull() {
-        val position = Position(Srs.WGS84, 1.0, 2.0, name = "My destination")
+        val points = persistentListOf(WGS84Point(1.0, 2.0, name = "My destination"))
         val location = null
         val parentDir = createTempDirectory().toFile()
-        assertNull(output.writeGpxRoute(position, null, location, parentDir))
+        assertNull(output.writeGpxRoute(points, null, location, parentDir))
     }
 
     @Test
-    fun writeGpxRoute_positionHasNoPoints_returnsNull() {
-        val position = Position(points = persistentListOf())
-        val location = Point(Srs.WGS84, 3.0, 4.0)
+    fun writeGpxRoute_pointsHasNoPoints_returnsNull() {
+        val points = persistentListOf<WGS84Point>()
+        val location = WGS84Point(3.0, 4.0)
         val parentDir = createTempDirectory().toFile()
-        assertNull(output.writeGpxRoute(position, null, location, parentDir))
+        assertNull(output.writeGpxRoute(points, null, location, parentDir))
     }
 
     @Test
-    fun writeGpxRoute_positionDoesNotHavePointIndex_returnsNull() {
-        val position = Position(Srs.WGS84, 1.0, 2.0, name = "My destination")
-        val location = Point(Srs.WGS84, 3.0, 4.0)
+    fun writeGpxRoute_pointsDoesNotHavePointIndex_returnsNull() {
+        val points = persistentListOf(WGS84Point(1.0, 2.0, name = "My destination"))
+        val location = WGS84Point(3.0, 4.0)
         val parentDir = createTempDirectory().toFile()
-        assertNull(output.writeGpxRoute(position, 1, location, parentDir))
+        assertNull(output.writeGpxRoute(points, 1, location, parentDir))
     }
 
     @Test
     fun writeGpxRoute_parentDirIsNotWritable_returnsNull() {
-        val position = Position(Srs.WGS84, 1.0, 2.0, name = "My destination")
-        val location = Point(Srs.WGS84, 3.0, 4.0)
+        val points = persistentListOf(WGS84Point(1.0, 2.0, name = "My destination"))
+        val location = WGS84Point(3.0, 4.0)
         val parentDir = createTempDirectory(
             null,
             PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--------")),
         ).toFile()
-        assertNull(output.writeGpxRoute(position, null, location, parentDir))
+        assertNull(output.writeGpxRoute(points, null, location, parentDir))
     }
 
     @Test
-    fun writeGpxRoute_positionHasOnePoint_deletesRoutesDirAndWritesToItAGpxRouteFromLocationToMainPoint() {
-        val position = Position(Srs.WGS84, 1.0, 2.0, name = "My destination")
-        val location = Point(Srs.WGS84, 3.0, 4.0)
+    fun writeGpxRoute_pointsHasOnePoint_deletesRoutesDirAndWritesToItAGpxRouteFromLocationToMainPoint() {
+        val points = persistentListOf(WGS84Point(1.0, 2.0, name = "My destination"))
+        val location = WGS84Point(3.0, 4.0)
         val parentDir = createTempDirectory().toFile()
         val dir = File(parentDir, "routes")
         dir.mkdirs()
@@ -62,7 +60,7 @@ class GpxOutputTest {
             setOf(old.path),
             dir.listFiles()?.map { it.path }?.toSet(),
         )
-        val result = output.writeGpxRoute(position, null, location, parentDir)
+        val result = output.writeGpxRoute(points, null, location, parentDir)
         assertEquals(
             setOf(result?.path),
             dir.listFiles()?.map { it.path }?.toSet(),
@@ -86,14 +84,12 @@ class GpxOutputTest {
     }
 
     @Test
-    fun writeGpxRoute_positionHasTwoPointsAndPointIndexIsNull_writesGpxRouteFromLocationToMainPointViaWaypoint() {
-        val position = Position(
-            points = persistentListOf(
-                Point(Srs.WGS84, 5.0, 6.0, name = "My waypoint"),
-                Point(Srs.WGS84, 1.0, 2.0, name = "My destination"),
-            ),
+    fun writeGpxRoute_pointsHasTwoPointsAndPointIndexIsNull_writesGpxRouteFromLocationToMainPointViaWaypoint() {
+        val points = persistentListOf(
+            WGS84Point(5.0, 6.0, name = "My waypoint"),
+            WGS84Point(1.0, 2.0, name = "My destination"),
         )
-        val location = Point(Srs.WGS84, 3.0, 4.0)
+        val location = WGS84Point(3.0, 4.0)
         val parentDir = createTempDirectory().toFile()
         val dir = File(parentDir, "routes")
         dir.mkdirs()
@@ -103,7 +99,7 @@ class GpxOutputTest {
             setOf(old.path),
             dir.listFiles()?.map { it.path }?.toSet(),
         )
-        val result = output.writeGpxRoute(position, null, location, parentDir)
+        val result = output.writeGpxRoute(points, null, location, parentDir)
         assertEquals(
             setOf(result?.path),
             dir.listFiles()?.map { it.path }?.toSet(),
@@ -130,14 +126,12 @@ class GpxOutputTest {
     }
 
     @Test
-    fun writeGpxRoute_positionHasTwoPointsAndPointIndexIsNotNull_writesGpxRouteFromLocationToPointByIndex() {
-        val position = Position(
-            points = persistentListOf(
-                Point(Srs.WGS84, 5.0, 6.0, name = "My waypoint"),
-                Point(Srs.WGS84, 1.0, 2.0, name = "My destination"),
-            ),
+    fun writeGpxRoute_pointsHasTwoPointsAndPointIndexIsNotNull_writesGpxRouteFromLocationToPointByIndex() {
+        val points = persistentListOf(
+            WGS84Point(5.0, 6.0, name = "My waypoint"),
+            WGS84Point(1.0, 2.0, name = "My destination"),
         )
-        val location = Point(Srs.WGS84, 3.0, 4.0)
+        val location = WGS84Point(3.0, 4.0)
         val parentDir = createTempDirectory().toFile()
         val dir = File(parentDir, "routes")
         dir.mkdirs()
@@ -147,7 +141,7 @@ class GpxOutputTest {
             setOf(old.path),
             dir.listFiles()?.map { it.path }?.toSet(),
         )
-        val result = output.writeGpxRoute(position, 0, location, parentDir)
+        val result = output.writeGpxRoute(points, 0, location, parentDir)
         assertEquals(
             setOf(result?.path),
             dir.listFiles()?.map { it.path }?.toSet(),

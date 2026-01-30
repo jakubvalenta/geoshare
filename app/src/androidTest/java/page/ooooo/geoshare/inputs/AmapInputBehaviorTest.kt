@@ -1,8 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import org.junit.Test
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.GCJ02Point
 
 class AmapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -13,7 +12,7 @@ class AmapInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Short URI
         testUri(
-            Position(Srs.GCJ02, 31.222811749011463, 121.46840706467624),
+            GCJ02Point(31.222811749011463, 121.46840706467624),
             "https://surl.amap.com/4mkKGuyJ2bz",
         )
     }

@@ -4,20 +4,21 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findLatLonZName
+import page.ooooo.geoshare.lib.extensions.findPoint
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchLatLonZName
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.extensions.matchZ
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseHtmlResult
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
-    private val srs = Srs.WGS84
-
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
@@ -52,34 +53,44 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val position = buildPosition(srs) {
+        return buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
-                setPointIfNull { LON_LAT_PATTERN matchLatLonZName queryParams["whatshere[point]"] }
-                setPointIfNull { LON_LAT_PATTERN matchLatLonZName queryParams["ll"] }
+                (LON_LAT_PATTERN matchPoint queryParams["whatshere[point]"])?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN matchPoint queryParams["ll"])?.also { points.add(it) }
+
                 @Suppress("SpellCheckingInspection")
-                setZIfNull { Z_PATTERN matchZ queryParams["whatshere[zoom]"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-                if (!hasPoint() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
+                (Z_PATTERN matchZ queryParams["whatshere[zoom]"])?.also { defaultZ = it }
+                    ?: (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+
+                if (points.isEmpty() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
                     htmlUriString = uri.toString()
                 }
             }
         }
-        return ParseUriResult.from(position, htmlUriString)
+            .asWGS84()
+            .toParseUriResult(htmlUriString)
     }
 
-    override suspend fun parseHtml(channel: ByteReadChannel, positionFromUri: Position, log: ILog): ParseHtmlResult? {
-        val positionFromHtml = buildPosition(srs) {
+    override suspend fun parseHtml(
+        channel: ByteReadChannel,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog,
+    ): ParseHtmlResult? =
+        buildPoints {
+            defaultName = pointsFromUri.lastOrNull()?.name
+
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (setPointIfNull { pattern findLatLonZName line }) {
+                (pattern findPoint line)?.also {
+                    points.add(it)
                     break
                 }
             }
         }
-        return ParseHtmlResult.from(positionFromUri, positionFromHtml)
-    }
+            .asWGS84()
+            .toParseHtmlResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

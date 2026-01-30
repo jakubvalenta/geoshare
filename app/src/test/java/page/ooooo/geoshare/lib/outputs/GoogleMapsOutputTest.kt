@@ -4,10 +4,9 @@ import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Point
+import page.ooooo.geoshare.lib.point.GCJ02Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GoogleMapsOutputTest {
     private var uriQuote: UriQuote = FakeUriQuote()
@@ -22,10 +21,10 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456, z = 3.4).let { position ->
+            persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4)).let { points ->
                 output.getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .map { it.getText(position, null, uriQuote) }
+                    .filter { it.isEnabled(points, null) }
+                    .map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -37,10 +36,10 @@ class GoogleMapsOutputTest {
                 "https://www.google.com/maps?q=foo%20bar&z=3.4",
                 "google.navigation:q=foo+bar",
             ),
-            Position(q = "foo bar", z = 3.4).let { position ->
+            persistentListOf(WGS84Point(name = "foo bar", z = 3.4)).let { points ->
                 output.getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .map { it.getText(position, null, uriQuote) }
+                    .filter { it.isEnabled(points, null) }
+                    .map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -54,10 +53,10 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
-            Position(Srs.WGS84, 50.123456, -11.123456, q = "foo bar", z = 3.4).let { position ->
+            persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4)).let { points ->
                 output.getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .map { it.getText(position, null, uriQuote) }
+                    .filter { it.isEnabled(points, null) }
+                    .map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -71,10 +70,10 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=31.2285067,121.475524",
             ),
-            Position(Srs.WGS84, 31.23044166868017, 121.47099209401793).let { position ->
+            persistentListOf(WGS84Point(31.23044166868017, 121.47099209401793)).let { points ->
                 output.getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .map { it.getText(position, null, uriQuote) }
+                    .filter { it.isEnabled(points, null) }
+                    .map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -88,10 +87,10 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=31.2285069,121.4755246",
             ),
-            Position(Srs.GCJ02, 31.22850685422705, 121.47552456472106).let { position ->
+            persistentListOf(GCJ02Point(31.22850685422705, 121.47552456472106)).let { points ->
                 output.getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .map { it.getText(position, null, uriQuote) }
+                    .filter { it.isEnabled(points, null) }
+                    .map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -103,10 +102,10 @@ class GoogleMapsOutputTest {
                 "https://www.google.com/maps",
                 "google.navigation:q=0,0",
             ),
-            Position().let { position ->
+            persistentListOf<WGS84Point>().let { points ->
                 output.getPositionActions()
-                    .filter { it.isEnabled(position, null) }
-                    .map { it.getText(position, null, uriQuote) }
+                    .filter { it.isEnabled(points, null) }
+                    .map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -123,19 +122,17 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
-            Position(
-                persistentListOf(
-                    Point(Srs.WGS84, 50.12, -11.12),
-                    Point(Srs.WGS84, 50.123456, -11.123456),
-                    Point(Srs.WGS84, 50.12, -11.12),
-                )
-            ).let { position ->
+            persistentListOf(
+                WGS84Point(50.12, -11.12),
+                WGS84Point(50.123456, -11.123456),
+                WGS84Point(50.12, -11.12),
+            ).let { points ->
                 output.getPointActions()
-                    .filter { it.isEnabled(position, 1) }
+                    .filter { it.isEnabled(points, 1) }
                     .map {
                         when (it) {
-                            is CopyAction -> it.getText(position, 1, uriQuote)
-                            is OpenChooserAction -> it.getUriString(position, 1, uriQuote)
+                            is CopyAction -> it.getText(points, 1, uriQuote)
+                            is OpenChooserAction -> it.getUriString(points, 1, uriQuote)
                             else -> ""
                         }
                     }
@@ -155,19 +152,17 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=31.2285067,121.475524",
             ),
-            Position(
-                persistentListOf(
-                    Point(Srs.WGS84, 31.23, 121.47),
-                    Point(Srs.WGS84, 31.23044166868017, 121.47099209401793),
-                    Point(Srs.WGS84, 31.23, 121.47),
-                )
-            ).let { position ->
+            persistentListOf(
+                WGS84Point(31.23, 121.47),
+                WGS84Point(31.23044166868017, 121.47099209401793),
+                WGS84Point(31.23, 121.47),
+            ).let { points ->
                 output.getPointActions()
-                    .filter { it.isEnabled(position, 1) }
+                    .filter { it.isEnabled(points, 1) }
                     .map {
                         when (it) {
-                            is CopyAction -> it.getText(position, 1, uriQuote)
-                            is OpenChooserAction -> it.getUriString(position, 1, uriQuote)
+                            is CopyAction -> it.getText(points, 1, uriQuote)
+                            is OpenChooserAction -> it.getUriString(points, 1, uriQuote)
                             else -> ""
                         }
                     }
@@ -187,23 +182,22 @@ class GoogleMapsOutputTest {
                 @Suppress("SpellCheckingInspection")
                 "google.streetview:cbll=31.2285069,121.4755246",
             ),
-            Position(
-                persistentListOf(
-                    Point(Srs.GCJ02, 31.22, 121.47),
-                    Point(Srs.GCJ02, 31.22850685422705, 121.47552456472106),
-                    Point(Srs.GCJ02, 31.22, 121.47),
-                )
-            ).let { position ->
-                output.getPointActions()
-                    .filter { it.isEnabled(position, 1) }
-                    .map {
-                        when (it) {
-                            is CopyAction -> it.getText(position, 1, uriQuote)
-                            is OpenChooserAction -> it.getUriString(position, 1, uriQuote)
-                            else -> ""
+            persistentListOf(
+                GCJ02Point(31.22, 121.47),
+                GCJ02Point(31.22850685422705, 121.47552456472106),
+                GCJ02Point(31.22, 121.47),
+            )
+                .let { points ->
+                    output.getPointActions()
+                        .filter { it.isEnabled(points, 1) }
+                        .map {
+                            when (it) {
+                                is CopyAction -> it.getText(points, 1, uriQuote)
+                                is OpenChooserAction -> it.getUriString(points, 1, uriQuote)
+                                else -> ""
+                            }
                         }
-                    }
-            },
+                },
         )
     }
 }

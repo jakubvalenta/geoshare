@@ -8,9 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
 
 object NoopAutomation : BasicAutomation {
     override val type = Automation.Type.NOOP
@@ -18,7 +19,7 @@ object NoopAutomation : BasicAutomation {
     override val testTag = null
 
     override suspend fun runAction(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         context: Context,
         clipboard: Clipboard,

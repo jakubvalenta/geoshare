@@ -10,6 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.google.re2j.Pattern
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
@@ -17,9 +18,8 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.AppIcon
 
 object GeoUriOutput : Output {
@@ -28,8 +28,8 @@ object GeoUriOutput : Output {
     private val ZOOM_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""com\.garmin\..+""")
 
     open class CopyGeoUriAction : CopyAction() {
-        override fun getText(position: Position, i: Int?, uriQuote: UriQuote): String =
-            formatUriString(position, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
+        override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String =
+            formatUriString(points, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -42,8 +42,8 @@ object GeoUriOutput : Output {
     }
 
     open class ShareGeoUriAction : OpenChooserAction() {
-        override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
-            formatUriString(position, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
+        override fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
+            formatUriString(points, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -56,9 +56,9 @@ object GeoUriOutput : Output {
     }
 
     open class ShareGeoUriWithAppAction(override val packageName: String) : OpenAppAction(packageName) {
-        override fun getUriString(position: Position, i: Int?, uriQuote: UriQuote) =
+        override fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
             formatUriString(
-                position,
+                points,
                 i,
                 nameDisabled = NAME_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
                 zoomDisabled = ZOOM_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
@@ -189,45 +189,51 @@ object GeoUriOutput : Output {
     }
 
     fun formatUriString(
-        position: Position,
+        points: ImmutableList<Point>,
         i: Int?,
         nameDisabled: Boolean,
         zoomDisabled: Boolean,
         useGCJ02: Boolean = false,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ) = position.getPoint(i).let { point ->
+    ) = points.getOrNull(i)?.run {
         if (useGCJ02) {
-            point?.toGCJ02() ?: Point(Srs.GCJ02)
+            toGCJ02()
         } else {
-            point?.toWGS84() ?: Point(Srs.WGS84)
+            toWGS84()
         }
-    }.run {
+    }?.run {
         // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
         buildString {
-            val coordsStr = "$latStr,$lonStr"
             append("geo:")
-            append(Uri.formatPath(coordsStr, uriQuote = uriQuote))
+            append(
+                Uri.formatPath(
+                    latStr?.let { latStr ->
+                        lonStr?.let { lonStr ->
+                            "$latStr,$lonStr"
+                        }
+                    } ?: "0,0",
+                    uriQuote = uriQuote,
+                )
+            )
             buildMap {
                 // It's important that the z parameter comes before q, because some map apps require the name (which is
                 // part of the q parameter) to be at the very end of the URI.
-                if (!zoomDisabled) {
-                    position.zStr?.let { zStr ->
-                        set("z", zStr)
-                    }
+                zStr?.takeUnless { zoomDisabled }?.let { zStr ->
+                    set("z", zStr)
                 }
-                if (position.q != null) {
-                    set("q", position.q)
-                } else if (lat != 0.0 && lon != 0.0) {
-                    if (!nameDisabled && name != null) {
-                        set("q", "$coordsStr(${name})")
-                    } else {
-                        set("q", coordsStr)
+                latStr?.let { latStr ->
+                    lonStr?.let { lonStr ->
+                        name?.takeUnless { nameDisabled }?.let { name ->
+                            set("q", "$latStr,$lonStr(${name})")
+                        } ?: set("q", "$latStr,$lonStr")
                     }
+                } ?: name?.let { name ->
+                    set("q", name)
                 }
             }
                 .takeIf { it.isNotEmpty() }
                 ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
                 ?.let { append("?$it") }
         }
-    }
+    } ?: "geo:0,0"
 }

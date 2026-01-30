@@ -13,13 +13,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.getOrNull
+import page.ooooo.geoshare.lib.point.toWGS84
+import page.ooooo.geoshare.lib.point.writeGpxRoute
 import page.ooooo.geoshare.ui.components.AppIcon
 import java.io.File
 import java.io.FileNotFoundException
@@ -34,7 +37,7 @@ object GpxOutput : Output {
         Action.HasPackageName {
 
         override suspend fun runAction(
-            position: Position,
+            points: ImmutableList<Point>,
             i: Int?,
             location: Point,
             context: Context,
@@ -43,7 +46,7 @@ object GpxOutput : Output {
             saveGpxLauncher: ActivityResultLauncher<Intent>,
             uriQuote: UriQuote,
         ): Boolean {
-            val file = writeGpxRoute(position, i, location, context.filesDir) ?: return false
+            val file = writeGpxRoute(points, i, location, context.filesDir) ?: return false
             return AndroidTools.openAppFile(context, packageName, file)
         }
 
@@ -73,7 +76,7 @@ object GpxOutput : Output {
 
     open class ShareGpxRouteAction : LocationAction, Action.HasErrorMessage {
         override suspend fun runAction(
-            position: Position,
+            points: ImmutableList<Point>,
             i: Int?,
             location: Point,
             context: Context,
@@ -82,7 +85,7 @@ object GpxOutput : Output {
             saveGpxLauncher: ActivityResultLauncher<Intent>,
             uriQuote: UriQuote,
         ): Boolean {
-            val file = writeGpxRoute(position, i, location, context.filesDir) ?: return false
+            val file = writeGpxRoute(points, i, location, context.filesDir) ?: return false
             return AndroidTools.openChooserFile(context, file)
         }
 
@@ -103,7 +106,7 @@ object GpxOutput : Output {
 
     open class SaveGpxPointsAction : BasicAction, Action.HasErrorMessage {
         override suspend fun runAction(
-            position: Position,
+            points: ImmutableList<Point>,
             i: Int?,
             context: Context,
             clipboard: Clipboard,
@@ -265,15 +268,15 @@ object GpxOutput : Output {
         else -> null
     }
 
-    fun writeGpxRoute(position: Position, i: Int?, location: Point?, parentDir: File): File? {
+    fun writeGpxRoute(points: ImmutableList<Point>, i: Int?, location: Point?, parentDir: File): File? {
         if (location == null) {
             return null
         }
-        val route = if (i == null && position.points?.size != null && position.points.size > 1) {
-            Position(position.points.toMutableList().apply { add(0, location) }.toImmutableList())
+        val route = if (i == null && points.size > 1) {
+            points.toMutableList().apply { add(0, location) }.toImmutableList()
         } else {
-            val point = position.getPoint(i) ?: return null
-            Position(persistentListOf(location, point))
+            val point = points.getOrNull(i) ?: return null
+            persistentListOf(location, point)
         }
         val dir = File(parentDir, "routes")
         dir.deleteRecursively()
@@ -286,7 +289,7 @@ object GpxOutput : Output {
         val file = File(dir, "$timestamp.xml")
         try {
             file.printWriter().use { writer ->
-                route.writeGpxRoute(writer)
+                route.toWGS84().writeGpxRoute(writer)
             }
         } catch (_: FileNotFoundException) {
             return null

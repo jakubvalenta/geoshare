@@ -17,34 +17,34 @@ import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
-import page.ooooo.geoshare.lib.position.Point
-import page.ooooo.geoshare.lib.position.Position
-import page.ooooo.geoshare.lib.position.Srs
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
-    position: Position,
+    points: ImmutableList<Point>,
     onRun: (action: Action, i: Int?) -> Unit,
-    onSelect: (position: Position, i: Int?) -> Unit,
+    onSelect: (points: ImmutableList<Point>, i: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     Column {
         Headline(
-            allOutputs.getName(position, null) ?: stringResource(R.string.conversion_succeeded_title),
+            allOutputs.getName(points, null) ?: stringResource(R.string.conversion_succeeded_title),
             Modifier
                 .testTag("geoShareConversionSuccessPositionName")
                 .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
         )
         ResultCard(
             main = {
-                allOutputs.getText(position, null)?.let { text ->
+                allOutputs.getText(points, null)?.let { text ->
                     SelectionContainer {
                         Text(
                             text,
@@ -66,7 +66,7 @@ fun ResultSuccessCoordinates(
             },
             end = {
                 IconButton(
-                    { onSelect(position, null) },
+                    { onSelect(points, null) },
                     Modifier.testTag("geoShareConversionSuccessPositionMenuButton")
                 ) {
                     Icon(
@@ -75,14 +75,14 @@ fun ResultSuccessCoordinates(
                     )
                 }
             },
-            bottom = position.points?.takeIf { it.size > 1 }?.let { points ->
+            bottom = points.takeIf { it.size > 1 }?.let { points ->
                 {
                     Column(verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive)) {
                         points.indices.forEach { i ->
                             ResultSuccessPoint(
-                                position = position,
+                                points = points,
                                 i = i,
-                                onSelect = { onSelect(position, i) },
+                                onSelect = { onSelect(points, i) },
                             )
                         }
                     }
@@ -90,7 +90,7 @@ fun ResultSuccessCoordinates(
             },
             chips = {
                 allOutputs.getChipActions()
-                    .filter { it.isEnabled(position, null) }
+                    .filter { it.isEnabled(points, null) }
                     .forEach { action ->
                         ResultCardChip({ action.Label() }, icon = action.getIcon()) { onRun(action, null) }
                     }
@@ -110,7 +110,7 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position.example,
+                points = persistentListOf(Point.example),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -127,7 +127,7 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position.example,
+                points = persistentListOf(Point.example),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -144,7 +144,7 @@ private fun DescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, q = "Berlin, Germany", z = 13.0),
+                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -161,7 +161,7 @@ private fun DarkDescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, q = "Berlin, Germany", z = 13.0),
+                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -178,7 +178,7 @@ private fun LabelPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
+                points = persistentListOf(WGS84Point(50.123456, 11.123456, name = "My point")),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -195,7 +195,7 @@ private fun DarkLabelPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(Srs.WGS84, 50.123456, 11.123456, name = "My point"),
+                points = persistentListOf(WGS84Point(50.123456, 11.123456, name = "My point")),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
             )
@@ -212,12 +212,10 @@ private fun PointsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                    ),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
                 ),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
@@ -235,12 +233,10 @@ private fun DarkPointsPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                    ),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
                 ),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
@@ -258,14 +254,10 @@ private fun PointsAndDescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                    ),
-                    q = "Berlin, Germany",
-                    z = 13.0,
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },
@@ -283,14 +275,10 @@ private fun DarkPointsAndDescriptionPreview() {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ) {
             ResultSuccessCoordinates(
-                position = Position(
-                    points = persistentListOf(
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                        Point.genRandomPoint(),
-                    ),
-                    q = "Berlin, Germany",
-                    z = 13.0,
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(),
+                    Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 onRun = { _, _ -> },
                 onSelect = { _, _ -> },

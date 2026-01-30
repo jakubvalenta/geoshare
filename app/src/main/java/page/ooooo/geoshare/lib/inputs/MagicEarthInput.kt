@@ -3,19 +3,20 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
-import page.ooooo.geoshare.lib.position.LatLonZName
-import page.ooooo.geoshare.lib.position.Srs
-import page.ooooo.geoshare.lib.position.buildPosition
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchName
+import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toLat
+import page.ooooo.geoshare.lib.extensions.toLon
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
 object MagicEarthInput : Input {
-    const val NAME = "Magic Earth"
-
-    private val srs = Srs.WGS84
-
     override val uriPattern: Pattern = Pattern.compile("""((https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAGIC_EARTH,
@@ -25,25 +26,24 @@ object MagicEarthInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val position = buildPosition(srs) {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
-                setPointIfNull {
-                    (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
-                        (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
-                            LatLonZName(lat, lon)
-                        }
+                (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
+                    (LON_PATTERN match queryParams["lon"])?.toLon()?.let { lon ->
+                        NaivePoint(lat, lon)
                     }
-                }
-                setPointIfNull { LAT_LON_PATTERN matchLatLonZName queryParams["name"] }
-                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+                }?.also { points.add(it) }
+
                 @Suppress("SpellCheckingInspection")
-                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
-                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
+                listOf("name", "daddr", "q")
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchName queryParams[key] }
+                    ?.also { defaultName = it }
+
+                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                    ?: (Z_PATTERN matchZ queryParams["zoom"])?.also { defaultZ = it }
             }
         }
-        return ParseUriResult.from(position)
-    }
+            .asWGS84()
+            .toParseUriResult()
 }
