@@ -187,4 +187,5 @@
     <string name="network_exception_socket_timeout">délai d’attente de la prise</string>
     <string name="network_exception_unknown">erreur inconnue</string>
     <string name="network_exception_unresolved_address">adresse non résolue</string>
+    <string name="converter_baidu_map_permission_title">Se connecter à Baidu Map ?</string>
 </resources>
