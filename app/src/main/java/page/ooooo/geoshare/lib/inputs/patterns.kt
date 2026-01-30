@@ -1,32 +1,30 @@
 package page.ooooo.geoshare.lib.inputs
 
-import com.google.re2j.Pattern
-
 const val MAX_PRECISION = 17
 const val LAT_NUM = """-?\d{1,2}(\.\d{1,$MAX_PRECISION})?"""
 const val LON_NUM = """-?\d{1,3}(\.\d{1,$MAX_PRECISION})?"""
-const val LAT = """[\+ ]?(?P<lat>$LAT_NUM)"""
-const val LON = """[\+ ]?(?P<lon>$LON_NUM)"""
-const val Z = """(?P<z>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
+const val LAT = """[+ ]?(?<lat>$LAT_NUM)"""
+const val LON = """[+ ]?(?<lon>$LON_NUM)"""
+const val Z = """(?<z>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
 
 /**
  * Name when it appears in URI query param
  *
  * Notice that if it contains LAT,LON, then the group doesn't match.
  */
-const val NAME_PARAM = """$LAT,$LON|(?P<name>.+)"""
+const val NAME_PARAM = """$LAT,$LON|(?<name>.+)"""
 
 /**
  * Name when it appears in URI path
  *
  * Notice that if it contains LAT,LON, then the group doesn't match.
  */
-const val NAME_PATH = """$LAT,$LON|(?P<name>[^/]+)"""
+const val NAME_PATH = """$LAT,$LON|(?<name>[^/]+)"""
 
-val LAT_PATTERN: Pattern = Pattern.compile(LAT)
-val LON_PATTERN: Pattern = Pattern.compile(LON)
-val LAT_LON_PATTERN: Pattern = Pattern.compile("$LAT,$LON")
-val LON_LAT_PATTERN: Pattern = Pattern.compile("$LON,$LAT")
-val Z_PATTERN: Pattern = Pattern.compile(Z)
-val Q_PATH_PATTERN: Pattern = Pattern.compile(NAME_PATH)
-val Q_PARAM_PATTERN: Pattern = Pattern.compile(NAME_PARAM)
+val LAT_PATTERN = LAT.toRegex()
+val LON_PATTERN = LON.toRegex()
+val LAT_LON_PATTERN = "$LAT,$LON".toRegex()
+val LON_LAT_PATTERN = "$LON,$LAT".toRegex()
+val Z_PATTERN = Z.toRegex()
+val Q_PATH_PATTERN = NAME_PATH.toRegex()
+val Q_PARAM_PATTERN = NAME_PARAM.toRegex()
