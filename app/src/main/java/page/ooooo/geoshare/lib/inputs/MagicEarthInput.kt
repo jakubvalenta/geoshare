@@ -4,7 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchName
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.extensions.toLat
 import page.ooooo.geoshare.lib.extensions.toLon
@@ -37,9 +37,9 @@ object MagicEarthInput : Input {
 
                 @Suppress("SpellCheckingInspection")
                 listOf("name", "daddr", "q")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchQ queryParams[key] }
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchName queryParams[key] }
                     ?.also { defaultName = it }
-                
+
                 (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
                     ?: (Z_PATTERN matchZ queryParams["zoom"])?.also { defaultZ = it }
             }

@@ -8,8 +8,8 @@ import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findNaivePoint
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.findPoint
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
@@ -53,11 +53,11 @@ object UrbiInput : Input.HasHtml {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                ("""$LON,$LAT/$Z""" matchNaivePoint queryParams["m"])?.also { points.add(it) }
-                    ?: (""".*/$LON,$LAT/?$""" matchNaivePoint path)?.also { points.add(it) }
-                    ?: (LON_LAT_PATTERN matchNaivePoint queryParams["center"])?.also { points.add(it) }
+                ("""$LON,$LAT/$Z""" matchPoint queryParams["m"])?.also { points.add(it) }
+                    ?: (""".*/$LON,$LAT/?$""" matchPoint path)?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN matchPoint queryParams["center"])?.also { points.add(it) }
 
-                (Z_PATTERN matchZ queryParams["zoom"])?.let { defaultZ = it }
+                (Z_PATTERN matchZ queryParams["zoom"])?.also { defaultZ = it }
             }
         }
             .asWGS84()
@@ -74,7 +74,7 @@ object UrbiInput : Input.HasHtml {
             val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findNaivePoint line)?.also {
+                (pattern findPoint line)?.also {
                     points.add(it)
                     break
                 }

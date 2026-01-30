@@ -9,8 +9,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
-import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchPoint
+import page.ooooo.geoshare.lib.extensions.matchName
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.extensions.toLat
 import page.ooooo.geoshare.lib.extensions.toLon
@@ -39,13 +39,13 @@ object AppleMapsInput : Input.HasHtml {
                 // Notice that we take the search center 'sll' as a normal point
                 @Suppress("SpellCheckingInspection")
                 listOf("ll", "daddr", "coordinate", "q", "sll", "center")
-                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN matchNaivePoint queryParams[key] }
-                    ?.let { points.add(it) }
+                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN matchPoint queryParams[key] }
+                    ?.also { points.add(it) }
 
                 @Suppress("SpellCheckingInspection")
                 listOf("name", "address", "daddr", "q")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchQ queryParams[key] }
-                    ?.let { defaultName = it }
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchName queryParams[key] }
+                    ?.also { defaultName = it }
 
                 (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
 

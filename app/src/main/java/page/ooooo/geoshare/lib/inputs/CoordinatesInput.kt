@@ -15,13 +15,13 @@ object CoordinatesInput : Input {
     private const val CHARS = """[\p{Zs},°'′"″NSWE]"""
     private const val SPACE = """\p{Zs}*"""
     private const val LAT_SIG = """(?P<latSig>-?)"""
-    private const val LAT_DEG = """(?P<latDeg>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
-    private const val LAT_MIN = """(?P<latMin>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
-    private const val LAT_SEC = """(?P<latSec>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+    private const val LAT_DEG = """(?P<latDeg>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
+    private const val LAT_MIN = """(?P<latMin>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
+    private const val LAT_SEC = """(?P<latSec>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
     private const val LON_SIG = """(?P<lonSig>-?)"""
-    private const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,$MAX_COORD_PRECISION})?)"""
-    private const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
-    private const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,$MAX_COORD_PRECISION})?)"""
+    private const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,$MAX_PRECISION})?)"""
+    private const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
+    private const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
 
     @Suppress("SpellCheckingInspection")
     override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")

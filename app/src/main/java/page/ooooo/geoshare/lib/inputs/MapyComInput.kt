@@ -52,7 +52,7 @@ object MapyComInput : Input.HasShortUri {
                         }
                     }?.also { points.add(it) }
 
-                (Z_PATTERN matchZ queryParams["z"])?.let { defaultZ = it }
+                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
             }
         }
             .asWGS84()

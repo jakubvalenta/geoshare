@@ -3,9 +3,9 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findAllNaivePoint
-import page.ooooo.geoshare.lib.extensions.findNaivePoint
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.findAllPoints
+import page.ooooo.geoshare.lib.extensions.findPoint
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
@@ -34,19 +34,19 @@ object BaiduMapInput : Input {
                 if (firstPart.startsWith('@')) {
                     // Center
                     // https://map.baidu.com/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>
-                    (CENTER matchNaivePoint firstPart)?.also { points.add(it) }
+                    (CENTER matchPoint firstPart)?.also { points.add(it) }
 
                 } else if (firstPart == "poi") {
                     // Place
                     // https://map.baidu.com/poi/<NAME>/@<X>,<Y>,<Z>
-                    (CENTER matchNaivePoint parts.getOrNull(2))
+                    (CENTER matchPoint parts.getOrNull(2))
                         ?.also { points.add(it.copy(name = parts.getOrNull(1))) }
 
                 } else if (firstPart == "dir") {
                     // Directions
                     // https://map.baidu.com/dir/...?sn=<START_POINT>&en=<WAYPOINT_POINT>$$1$$%20to:<DEST_POINT>
-                    (WAYPOINT findNaivePoint queryParams["sn"])?.also { points.add(it) }
-                    points.addAll(WAYPOINT findAllNaivePoint queryParams["en"])
+                    (WAYPOINT findPoint queryParams["sn"])?.also { points.add(it) }
+                    points.addAll(WAYPOINT findAllPoints queryParams["en"])
 
                     // Directions without params
                     // https://map.baidu.com/dir/<START_NAME>/<WAYPOINT_NAME>/<DEST_NAME>/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>z

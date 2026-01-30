@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
 import page.ooooo.geoshare.lib.point.toParseUriResult
@@ -28,8 +28,8 @@ object AmapInput : Input.HasShortUri {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                ("""\w+,$LAT,$LON.+""" matchNaivePoint queryParams["p"])?.also { points.add(it) }
-                    ?: ("""$LAT,$LON.+""" matchNaivePoint queryParams["q"])?.also { points.add(it) }
+                ("""\w+,$LAT,$LON.+""" matchPoint queryParams["p"])?.also { points.add(it) }
+                    ?: ("""$LAT,$LON.+""" matchPoint queryParams["q"])?.also { points.add(it) }
             }
         }
             .asGCJ02()

@@ -9,10 +9,10 @@ import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findNaivePoint
+import page.ooooo.geoshare.lib.extensions.findPoint
 import page.ooooo.geoshare.lib.extensions.matchHash
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
-import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchPoint
+import page.ooooo.geoshare.lib.extensions.matchName
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
@@ -52,14 +52,14 @@ object WazeInput : Input.HasHtml {
                     ?.let { hash -> decodeWazeGeoHash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(6), lon.toScale(6), z) }
                     ?.also { points.add(it) }
-                    ?: ("""ll\.$LAT,$LON""" matchNaivePoint queryParams["to"])?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchNaivePoint queryParams["ll"])?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchNaivePoint queryParams[@Suppress("SpellCheckingInspection") "latlng"])
+                    ?: ("""ll\.$LAT,$LON""" matchPoint queryParams["to"])?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchPoint queryParams["ll"])?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchPoint queryParams[@Suppress("SpellCheckingInspection") "latlng"])
                         ?.also { points.add(it) }
 
-                (Q_PARAM_PATTERN matchQ queryParams["q"])?.let { defaultName = it }
+                (Q_PARAM_PATTERN matchName queryParams["q"])?.also { defaultName = it }
 
-                (Z_PATTERN matchZ queryParams["z"])?.let { defaultZ = it }
+                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
 
                 if (points.isEmpty()) {
                     queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
@@ -109,7 +109,7 @@ object WazeInput : Input.HasHtml {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findNaivePoint line)?.also {
+                (pattern findPoint line)?.also {
                     points.add(it)
                     break
                 }

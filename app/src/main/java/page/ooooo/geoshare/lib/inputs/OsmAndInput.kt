@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
@@ -22,8 +22,8 @@ object OsmAndInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (LAT_LON_PATTERN matchNaivePoint queryParams["pin"])?.also { points.add(it) }
-                    ?: ("""$Z/$LAT/$LON.*""" matchNaivePoint fragment)?.also { points.add(it) }
+                (LAT_LON_PATTERN matchPoint queryParams["pin"])?.also { points.add(it) }
+                    ?: ("""$Z/$LAT/$LON.*""" matchPoint fragment)?.also { points.add(it) }
 
                 ("""$Z/.*""" matchZ fragment)?.also { defaultZ = it }
             }

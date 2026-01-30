@@ -4,7 +4,7 @@ import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.matchHash
-import page.ooooo.geoshare.lib.extensions.matchQ
+import page.ooooo.geoshare.lib.extensions.matchName
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
 import page.ooooo.geoshare.lib.point.NaivePoint
@@ -30,12 +30,14 @@ object MapsMeInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (HASH matchHash if (scheme == "ge0") host else pathParts.getOrNull(1))
+                (if (scheme == "ge0") host else pathParts.getOrNull(1))
+                    ?.let { HASH matchHash it }
                     ?.let { hash -> decodeGe0Hash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(7), lon.toScale(7), z) }
                     ?.also { points.add(it) }
 
-                (Q_PATH_PATTERN matchQ if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
+                (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
+                    ?.let { Q_PATH_PATTERN matchName it }
                     ?.replace('_', ' ')
                     ?.also { defaultName = it }
             }

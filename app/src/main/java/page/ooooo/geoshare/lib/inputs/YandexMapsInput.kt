@@ -8,9 +8,9 @@ import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findNaivePoint
+import page.ooooo.geoshare.lib.extensions.findPoint
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
@@ -56,8 +56,8 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         return buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
-                (LON_LAT_PATTERN matchNaivePoint queryParams["whatshere[point]"])?.also { points.add(it) }
-                    ?: (LON_LAT_PATTERN matchNaivePoint queryParams["ll"])?.also { points.add(it) }
+                (LON_LAT_PATTERN matchPoint queryParams["whatshere[point]"])?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN matchPoint queryParams["ll"])?.also { points.add(it) }
 
                 @Suppress("SpellCheckingInspection")
                 (Z_PATTERN matchZ queryParams["whatshere[zoom]"])?.also { defaultZ = it }
@@ -83,7 +83,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findNaivePoint line)?.also {
+                (pattern findPoint line)?.also {
                     points.add(it)
                     break
                 }

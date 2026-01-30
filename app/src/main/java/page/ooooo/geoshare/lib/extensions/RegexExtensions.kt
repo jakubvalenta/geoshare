@@ -20,7 +20,7 @@ infix fun Pattern.find(input: String?): Matcher? = input?.let { input ->
     this.matcher(input).takeIf { it.find() }
 }
 
-infix fun Pattern.findNaivePoint(input: String?): NaivePoint? = input?.let { input ->
+infix fun Pattern.findPoint(input: String?): NaivePoint? = input?.let { input ->
     (this find input)?.let { m ->
         m.toLatLon()?.let { (lat, lon) ->
             NaivePoint(lat, lon, m.toZ(), m.toName())
@@ -28,28 +28,20 @@ infix fun Pattern.findNaivePoint(input: String?): NaivePoint? = input?.let { inp
     }
 }
 
-infix fun Pattern.findUriString(input: String?): String? = input?.let { input ->
-    (this find input)?.toUriString()
-}
-
 infix fun Pattern.findAll(input: String?): Sequence<Matcher> = input?.let { input ->
     this.matcher(input).let { m -> generateSequence { m.takeIf { it.find() } } }
 }.orEmpty()
 
-infix fun Pattern.findAllNaivePoint(input: String?): Sequence<NaivePoint> = input?.let { input ->
-    (this findAll input).mapNotNull { m -> m.toNaivePoint() }
+infix fun Pattern.findAllPoints(input: String?): Sequence<NaivePoint> = input?.let { input ->
+    (this findAll input).mapNotNull { m -> m.toPoint() }
 }.orEmpty()
 
 infix fun Pattern.match(input: String?): Matcher? = input?.let { input ->
     this.matcher(input).takeIf { it.matches() }
 }
 
-infix fun Pattern.matchNaivePoint(input: String?): NaivePoint? = input?.let { input ->
-    (this match input)?.toNaivePoint()
-}
-
-infix fun Pattern.matchQ(input: String?): String? = input?.let { input ->
-    this.matcher(input).takeIf { it.matches() }?.toQ()
+infix fun Pattern.matchPoint(input: String?): NaivePoint? = input?.let { input ->
+    (this match input)?.toPoint()
 }
 
 infix fun Pattern.matchName(input: String?): String? = input?.let { input ->
@@ -68,24 +60,24 @@ infix fun String.find(input: String?): Matcher? = input?.let { input ->
     Pattern.compile(this) find input
 }
 
-infix fun String.findNaivePoint(input: String?): NaivePoint? = input?.let { input ->
-    Pattern.compile(this) findNaivePoint input
+infix fun String.findPoint(input: String?): NaivePoint? = input?.let { input ->
+    Pattern.compile(this) findPoint input
 }
 
 infix fun String.findAll(input: String?): Sequence<Matcher> = input?.let { input ->
     Pattern.compile(this) findAll input
 }.orEmpty()
 
-infix fun String.findAllNaivePoint(input: String?): Sequence<NaivePoint> = input?.let { input ->
-    Pattern.compile(this) findAllNaivePoint input
+infix fun String.findAllPoints(input: String?): Sequence<NaivePoint> = input?.let { input ->
+    Pattern.compile(this) findAllPoints input
 }.orEmpty()
 
 infix fun String.match(input: String?): Matcher? = input?.let { input ->
     Pattern.compile(this) match input
 }
 
-infix fun String.matchNaivePoint(input: String?): NaivePoint? = input?.let { input ->
-    Pattern.compile(this) matchNaivePoint input
+infix fun String.matchPoint(input: String?): NaivePoint? = input?.let { input ->
+    Pattern.compile(this) matchPoint input
 }
 
 infix fun String.matchName(input: String?): String? = input?.let { input ->
@@ -113,7 +105,7 @@ fun Matcher.toLatLon(): Pair<Double, Double>? =
         }
     }
 
-fun Matcher.toNaivePoint(): NaivePoint? =
+fun Matcher.toPoint(): NaivePoint? =
     this.toLatLon()?.let { (lat, lon) ->
         NaivePoint(lat, lon, this.toZ(), this.toName())
     }
@@ -121,14 +113,8 @@ fun Matcher.toNaivePoint(): NaivePoint? =
 fun Matcher.toName(): String? =
     this.groupOrNull("name")
 
-fun Matcher.toQ(): String? =
-    this.groupOrNull("q")
-
 fun Matcher.toZ(): Double? =
     this.groupOrNull("z")?.toDoubleOrNull()
-
-fun Matcher.toUriString(): String? =
-    this.groupOrNull("url")
 
 fun Matcher.toHash(): String? =
     this.groupOrNull("hash")

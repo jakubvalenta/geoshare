@@ -8,11 +8,11 @@ import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findAllNaivePoint
+import page.ooooo.geoshare.lib.extensions.findAllPoints
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.matchHash
-import page.ooooo.geoshare.lib.extensions.matchNaivePoint
+import page.ooooo.geoshare.lib.extensions.matchPoint
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
@@ -48,8 +48,8 @@ object OpenStreetMapInput : Input.HasHtml {
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
                     ?.also { points.add(it) }
-                    ?: ("""map=$Z/$LAT/$LON.*""" matchNaivePoint fragment)?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchNaivePoint queryParams["to"])?.also { points.add(it) }
+                    ?: ("""map=$Z/$LAT/$LON.*""" matchPoint fragment)?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN matchPoint queryParams["to"])?.also { points.add(it) }
                     ?: (ELEMENT_PATH match path)?.let { m ->
                         m.groupOrNull("type")?.let { type ->
                             m.groupOrNull("id")?.let { id ->
@@ -75,7 +75,7 @@ object OpenStreetMapInput : Input.HasHtml {
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                points.addAll(pattern findAllNaivePoint line)
+                points.addAll(pattern findAllPoints line)
             }
         }
             .asWGS84()
