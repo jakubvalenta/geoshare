@@ -181,4 +181,5 @@
     <string name="network_exception_socket_timeout">време на изчакване на сокета</string>
     <string name="network_exception_unknown">неизвестна грешка</string>
     <string name="network_exception_unresolved_address">нерешен адрес</string>
+    <string name="converter_baidu_map_permission_title">Свързване с Baidu Map?</string>
 </resources>
