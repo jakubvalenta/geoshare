@@ -49,57 +49,75 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
         return buildPoints {
             uri.run {
                 // Try query parameters for all URLs
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["destination"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["q"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["query"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["ll"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["viewpoint"] }
-                setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["center"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["destination"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
-                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["query"] }
-                setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
+
+                listOf("destination", "q", "query", "ll", "viewpoint", "center")
+                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN matchNaivePoint queryParams[key] }
+                    ?.let { points.add(it) }
+
+                listOf("destination", "q", "query")
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchQ queryParams[key] }
+                    ?.let { defaultName = it }
+
+                (Z_PATTERN matchZ queryParams["zoom"])?.also { defaultZ = it }
+
+                // Parse path parts
 
                 val parseUriParts = setOf("dir", "place", "search")
                 val parseHtmlParts = setOf("", "@", "d", "placelists")
                 val parseHtmlExcludeParts = setOf("search")
                 val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
                 val firstPart = parts.firstOrNull()
-                when {
-                    firstPart == null || firstPart in parseHtmlParts -> {
-                        // Skip URI parsing and go to HTML parsing
-                        htmlUriString = uri.toString()
-                    }
-
-                    firstPart in parseUriParts || firstPart.startsWith('@') -> {
-                        // Parse URI
-                        var defaultCoords: Pair<Double, Double>? = null
-                        val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
-                        parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
-                            if (part.startsWith("data=")) {
-                                setPointIfNull { """!3d$LAT!4d$LON""" findNaivePoint part }
-                                points.addAll("""!1d$LON!2d$LAT""" findAllNaivePoint part)
-                            } else if (part.startsWith('@') && defaultCoords == null) {
-                                ("""@$LAT,$LON(,${Z}z)?.*""" matchNaivePoint part)?.let { (lat, lon, z) ->
-                                    lat?.let { lat ->
-                                        lon?.let { lon ->
-                                            defaultCoords = lat to lon
-                                            defaultZ = z
-                                        }
+                if (firstPart == null || firstPart in parseHtmlParts) {
+                    // Skip URI parsing and go to HTML parsing
+                    htmlUriString = uri.toString()
+                } else if (firstPart in parseUriParts || firstPart.startsWith('@')) {
+                    // Iterate path parts in reverse order
+                    var centerCoords: Pair<Double, Double>? = null
+                    val pointPattern: Pattern = Pattern.compile("""$LAT,$LON.*""")
+                    parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
+                        if (part.startsWith("data=")) {
+                            // Data
+                            // /data=...!3d44.4490541!4d26.0888398...
+                            ("""!3d$LAT!4d$LON""" findNaivePoint part)?.also { points.add(it) }
+                            // /data=...!1d13.4236883!2d52.4858222...!1d13.4255518!2d52.4881038...
+                            points.addAll("""!1d$LON!2d$LAT""" findAllNaivePoint part)
+                        } else if (part.startsWith('@') && centerCoords == null) {
+                            // Center
+                            // /@52.5067296,13.2599309,6z
+                            ("""@$LAT,$LON(,${Z}z)?.*""" matchNaivePoint part)?.let { (lat, lon, z) ->
+                                lat?.let { lat ->
+                                    lon?.let { lon ->
+                                        centerCoords = lat to lon
+                                        defaultZ = z
                                     }
                                 }
-                            } else {
-                                setPointIfNull { pointPattern matchNaivePoint part }
-                                setNameIfNull { Q_PATH_PATTERN matchQ part }
                             }
+                        } else {
+                            // Coordinates
+                            // /52.492611,13.431726
+                            part
+                                .takeIf { points.isEmpty() } // Only if a point hasn't already been found, e.g. in /data
+                                ?.let { pointPattern matchNaivePoint it }
+                                ?.also { points.add(it) }
+                            // Name
+                            // /Central+Park
+                                ?: part
+                                    .takeIf { defaultName == null } // Use the last name-like path part
+                                    ?.let { (Q_PATH_PATTERN matchQ part) }
+                                    ?.let { defaultName = it }
                         }
-                        if (points.isEmpty()) {
-                            if (defaultCoords != null) {
-                                points.add(NaivePoint(defaultCoords.first, defaultCoords.second))
-                            } else if (firstPart !in parseHtmlExcludeParts) {
-                                // Go to HTML parsing if needed
-                                htmlUriString = uri.toString()
-                            }
+                        // Once we have a point, name, and z, we can stop iterating path parts
+                        if (points.isNotEmpty() && defaultName != null && defaultZ != null) {
+                            return@forEachReversed
+                        }
+                    }
+                    if (points.isEmpty()) {
+                        if (centerCoords != null) {
+                            // Use the center point only if we haven't found another point
+                            points.add(NaivePoint(centerCoords.first, centerCoords.second))
+                        } else if (firstPart !in parseHtmlExcludeParts) {
+                            // Go to HTML parsing if needed
+                            htmlUriString = uri.toString()
                         }
                     }
                 }
@@ -135,7 +153,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                     log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
                     genericMetaTagFound = true
                 }
-                if (addPoints { (pointPattern findAllNaivePoint line) }) {
+                if (points.addAll(pointPattern findAllNaivePoint line)) {
                     log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
                 }
                 if (defaultPoint == null) {

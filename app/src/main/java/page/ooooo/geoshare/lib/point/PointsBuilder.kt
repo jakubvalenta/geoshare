@@ -43,43 +43,6 @@ class PointsBuilder() {
             }
             // Or return empty list
             ?: persistentListOf()
-
-    @Deprecated("Use [points] directly")
-    fun addPoints(block: () -> Sequence<NaivePoint>): Boolean =
-        points.addAll(block().map { (lat, lon, _, name) -> NaivePoint(lat, lon, name = name) })
-
-    @Deprecated("Use [points] directly")
-    fun setPointIfNull(block: () -> NaivePoint?): Boolean =
-        if (points.isEmpty()) {
-            block()?.let { (lat, lon, newZ, name) ->
-                points.add(NaivePoint(lat, lon, newZ, name))
-                true
-            } ?: false
-        } else {
-            false
-        }
-
-    @Deprecated("Use [defaultName] directly")
-    fun setNameIfNull(block: () -> String?): Boolean =
-        if (defaultName == null) {
-            block()?.let { name ->
-                defaultName = name
-                true
-            } ?: false
-        } else {
-            false
-        }
-
-    @Deprecated("Use [defaultZ] directly")
-    fun setZIfNull(block: () -> Double?): Boolean =
-        if (defaultZ == null) {
-            block()?.let { newZ ->
-                defaultZ = newZ
-                true
-            } ?: false
-        } else {
-            false
-        }
 }
 
 suspend fun buildPoints(block: suspend PointsBuilder.() -> Unit): ImmutableList<NaivePoint> =
