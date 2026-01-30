@@ -23,6 +23,15 @@ class GeoUriOutputTest {
     }
 
     @Test
+    fun copyAction_whenPositionHasName_returnsUriWithZeroCoordinatesAndQParam() {
+        assertEquals(
+            "geo:0,0?q=foo%20bar",
+            output.getPositionActions().firstNotNullOf { it as? CopyAction }
+                .getText(persistentListOf(WGS84Point(name = "foo bar")), null, uriQuote),
+        )
+    }
+
+    @Test
     fun copyAction_whenPositionHasCoordinates_returnsUriWithCoordinatesInTheQParam() {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",

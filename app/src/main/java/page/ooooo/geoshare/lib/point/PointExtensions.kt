@@ -52,7 +52,6 @@ fun ImmutableList<Point>.toWGS84(): ImmutableList<WGS84Point> =
     this.map { it.toWGS84() }.toImmutableList()
 
 fun List<WGS84Point>.writeGpxPoints(writer: Appendable) = writeGpx(writer) {
-    // TODO Test points without coordinates
     this@writeGpxPoints.filter { it.lat != null && it.lon != null }.forEach { point ->
         point.toWGS84().run {
             append("<wpt lat=\"$latStr\" lon=\"$lonStr\"")
@@ -69,7 +68,6 @@ fun List<WGS84Point>.writeGpxPoints(writer: Appendable) = writeGpx(writer) {
 
 fun List<WGS84Point>.writeGpxRoute(writer: Appendable) = writeGpx(writer) {
     append("<rte>\n")
-    // TODO Test points without coordinates
     this@writeGpxRoute.filter { it.lat != null && it.lon != null }.forEach { point ->
         point.toWGS84().run {
             @Suppress("SpellCheckingInspection")

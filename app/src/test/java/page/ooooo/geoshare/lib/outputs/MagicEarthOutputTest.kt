@@ -12,6 +12,15 @@ class MagicEarthOutputTest {
     private val output = MagicEarthOutput
 
     @Test
+    fun getPositionActions_pointsIsEmpty_returnsShowOnMapWithZeroLatAndLon() {
+        assertEquals(
+            "magicearth://?show_on_map&lat=0&lon=0",
+            output.getPositionActions().first()
+                .getText(persistentListOf(WGS84Point()), null, uriQuote),
+        )
+    }
+
+    @Test
     fun getPositionActions_pointsHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456",
@@ -35,6 +44,18 @@ class MagicEarthOutputTest {
             "magicearth://?open_search&q=foo%20bar",
             output.getPositionActions().first()
                 .getText(persistentListOf(WGS84Point(name = "foo bar", z = 5.0)), null, uriQuote),
+        )
+    }
+
+    @Test
+    fun getPositionActions_pointsIsEmpty_returnsNavigateToUriWithZeroLatAndLon() {
+        assertEquals(
+            listOf(
+                "magicearth://?get_directions&lat=0&lon=0",
+            ),
+            persistentListOf(WGS84Point()).let { points ->
+                output.getPositionActions().drop(1).map { it.getText(points, null, uriQuote) }
+            },
         )
     }
 

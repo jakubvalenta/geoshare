@@ -20,6 +20,7 @@ class PointExtensionsTest {
             StringBuilder().apply {
                 persistentListOf(
                     WGS84Point(50.123456, -11.123456),
+                    WGS84Point(), // Empty point
                     WGS84Point(52.5067296, 13.2599309),
                 ).writeGpxPoints(this)
             }.toString(),
@@ -79,6 +80,7 @@ class PointExtensionsTest {
             StringBuilder().apply {
                 persistentListOf(
                     WGS84Point(50.123456, -11.123456),
+                    WGS84Point(), // Empty point
                     WGS84Point(52.5067296, 13.2599309),
                     WGS84Point(53.0, 14.0),
                 ).writeGpxRoute(this)

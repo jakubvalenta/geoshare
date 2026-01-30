@@ -521,7 +521,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Open position menu
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click() // FIXME
+        onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
 
         // Swipe the sheet and tap the copy Magic Earth link button
         onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 0.5f)
