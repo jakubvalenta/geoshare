@@ -6,7 +6,7 @@ Partagez un lien de carte avec Geo Share et l'application l'ouvrira dans une aut
 - Apple Maps
 - 2GIS
 - Amap (AutoNavi)
-- Baidu Map (bêta, pas de raccourci)
+- Baidu Map (bêta, sans liens courts)
 - CoMaps
 - HERE WeGo
 - Magic Earth

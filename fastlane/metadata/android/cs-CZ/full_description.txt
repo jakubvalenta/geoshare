@@ -6,6 +6,7 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 - Apple Mapy
 - 2GIS
 - Amap (AutoNavi)
+- Baidu Map (beta, bez krátkých odkazů)
 - CoMaps
 - HERE WeGo
 - Magic Earth
