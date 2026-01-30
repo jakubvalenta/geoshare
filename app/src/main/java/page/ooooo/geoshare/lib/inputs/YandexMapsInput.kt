@@ -15,6 +15,8 @@ import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseHtmlResult
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
@@ -51,7 +53,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val points = buildPoints {
+        return buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
                 setPointIfNull { LON_LAT_PATTERN matchNaivePoint queryParams["whatshere[point]"] }
@@ -59,20 +61,21 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
                 @Suppress("SpellCheckingInspection")
                 setZIfNull { Z_PATTERN matchZ queryParams["whatshere[zoom]"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-                if (!hasPoint() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
+                if (points.isEmpty() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
                     htmlUriString = uri.toString()
                 }
             }
         }
-        return ParseUriResult.from(points.asWGS84(), htmlUriString)
+            .asWGS84()
+            .toParseUriResult(htmlUriString)
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? {
-        val pointsFromHtml = buildPoints {
+    ): ParseHtmlResult? =
+        buildPoints {
             val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
@@ -81,8 +84,8 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
                 }
             }
         }
-        return ParseHtmlResult.from(pointsFromUri, pointsFromHtml.asWGS84())
-    }
+            .asWGS84()
+            .toParseHtmlResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

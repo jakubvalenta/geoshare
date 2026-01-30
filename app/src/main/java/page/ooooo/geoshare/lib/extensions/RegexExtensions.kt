@@ -52,6 +52,10 @@ infix fun Pattern.matchQ(input: String?): String? = input?.let { input ->
     this.matcher(input).takeIf { it.matches() }?.toQ()
 }
 
+infix fun Pattern.matchName(input: String?): String? = input?.let { input ->
+    this.matcher(input).takeIf { it.matches() }?.toName()
+}
+
 infix fun Pattern.matchZ(input: String?): Double? = input?.let { input ->
     this.matcher(input).takeIf { it.matches() }?.toZ()
 }
@@ -82,6 +86,10 @@ infix fun String.match(input: String?): Matcher? = input?.let { input ->
 
 infix fun String.matchNaivePoint(input: String?): NaivePoint? = input?.let { input ->
     Pattern.compile(this) matchNaivePoint input
+}
+
+infix fun String.matchName(input: String?): String? = input?.let { input ->
+    Pattern.compile(this) matchName input
 }
 
 infix fun String.matchZ(input: String?): Double? = input?.let { input ->

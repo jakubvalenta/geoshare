@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toLon
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
@@ -28,8 +29,8 @@ object MagicEarthInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 setPointIfNull {
                     (LAT_PATTERN match queryParams["lat"])?.toLat()?.let { lat ->
@@ -39,14 +40,14 @@ object MagicEarthInput : Input {
                     }
                 }
                 setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["name"] }
-                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["name"] }
+                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["name"] }
                 @Suppress("SpellCheckingInspection")
-                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
-                setQOrNameIfEmpty { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["daddr"] }
+                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["zoom"] }
             }
         }
-        return ParseUriResult.from(points.asWGS84())
-    }
+            .asWGS84()
+            .toParseUriResult()
 }

@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLon
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object MapyComInput : Input.HasShortUri {
     private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
@@ -32,8 +33,8 @@ object MapyComInput : Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.GET
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 setPointIfNull {
                     (COORDS match path)?.let { m ->
@@ -55,8 +56,8 @@ object MapyComInput : Input.HasShortUri {
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
             }
         }
-        return ParseUriResult.from(points.asWGS84())
-    }
+            .asWGS84()
+            .toParseUriResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_mapy_com_permission_title

@@ -21,7 +21,7 @@ object CoordinatesOutput : Output {
 
     open class CopyDecCoordsAction : CopyAction() {
         override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
-            formatDecString(points.getOrNull(i))
+            formatDecString(points.getOrNull(i)) ?: "0,0"
 
         @Composable
         override fun Label() {
@@ -35,7 +35,7 @@ object CoordinatesOutput : Output {
 
     open class CopyDegMinSecCoordsAction : CopyAction() {
         override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
-            formatDegMinSecString(points.getOrNull(i))
+            formatDegMinSecString(points.getOrNull(i)) ?: "0 E, 0 N"
 
         @Composable
         override fun Label() {
@@ -55,7 +55,7 @@ object CoordinatesOutput : Output {
                     stringResource(R.string.conversion_succeeded_copy_coordinates)
                 )
                 Text(
-                    formatDecString(Point.example),
+                    formatDecString(Point.example) ?: "0,0",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -78,7 +78,7 @@ object CoordinatesOutput : Output {
                     stringResource(R.string.conversion_succeeded_copy_coordinates)
                 )
                 Text(
-                    formatDegMinSecString(Point.example),
+                    formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -118,23 +118,23 @@ object CoordinatesOutput : Output {
         else -> null
     }
 
-    private fun formatDecString(point: Point?): String = point?.toWGS84().run {
-        if (this != null && this.lat != null && this.lon != null) {
-            "$latStr, $lonStr"
-        } else {
-            "0, 0"
+    private fun formatDecString(point: Point?): String? = point?.toWGS84()?.run {
+        latStr?.let { latStr ->
+            lonStr?.let { lonStr ->
+                "$latStr, $lonStr"
+            }
         }
     }
 
-    fun formatDegMinSecString(point: Point?): String = point?.toWGS84().run {
-        if (this != null && lat != null && lon != null) {
-            lat.toDegMinSec().let { (deg, min, sec) ->
-                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
-            } + lon.toDegMinSec().let { (deg, min, sec) ->
-                "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
+    fun formatDegMinSecString(point: Point?): String? = point?.toWGS84()?.run {
+        lat?.let { lat ->
+            lon?.let { lon ->
+                lat.toDegMinSec().let { (deg, min, sec) ->
+                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "S" else "N"}, "
+                } + lon.toDegMinSec().let { (deg, min, sec) ->
+                    "${abs(deg)}°\u00a0$min′\u00a0${sec.toScale(5)}″\u00a0${if (deg < 0) "W" else "E"}"
+                }
             }
-        } else {
-            "0 N, 0 E"
         }
     }
 

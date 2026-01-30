@@ -9,6 +9,7 @@ import page.ooooo.geoshare.lib.extensions.matchNaivePoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object BaiduMapInput : Input {
     private const val X = """(?P<lon>\d+(\.\d+)?)"""
@@ -25,8 +26,8 @@ object BaiduMapInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull()
@@ -56,7 +57,7 @@ object BaiduMapInput : Input {
 
                         // Directions without params
                         // https://map.baidu.com/dir/<START_NAME>/<WAYPOINT_NAME>/<DEST_NAME>/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>z
-                        if (!hasPoint()) {
+                        if (points.isEmpty()) {
                             addPoints {
                                 parts
                                     .drop(1)
@@ -69,6 +70,6 @@ object BaiduMapInput : Input {
                 }
             }
         }
-        return ParseUriResult.from(points.asBD09MC())
-    }
+            .asBD09MC()
+            .toParseUriResult()
 }

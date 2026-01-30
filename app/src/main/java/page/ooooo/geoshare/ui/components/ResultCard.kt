@@ -145,7 +145,7 @@ private fun DefaultPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Point.example),
+                    CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -191,7 +191,7 @@ private fun DarkPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Point.example),
+                    CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -252,7 +252,7 @@ private fun DefaultTopAndBottomPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Point.example),
+                    CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -313,7 +313,7 @@ private fun DarkTopAndBottomPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Point.example),
+                    CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -349,7 +349,7 @@ private fun ErrorPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Point.example),
+                    CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -385,7 +385,7 @@ private fun DarkErrorPreview() {
                 },
             ) {
                 Text(
-                    CoordinatesOutput.formatDegMinSecString(Point.example),
+                    CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

@@ -32,24 +32,24 @@ object GeoUriInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 setPointIfNull { """$LAT,$LON$NAME_REGEX?""" matchNaivePoint queryParams["q"] }
-                setQOrNameIfEmpty {
+                setNameIfNull {
                     queryParams.firstNotNullOfOrNull { (key, value) ->
                         if (key != "q" && key != "z" && value.isEmpty()) {
-                            (NAME_REGEX match key)?.groupOrNull("name")
+                            NAME_REGEX matchName key
                         } else {
                             null
                         }
                     }
                 }
-                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setPointIfNull { LAT_LON_PATTERN matchNaivePoint path }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
             }
         }
-        return ParseUriResult.from(points.asWGS84())
-    }
+            .asWGS84()
+            .toParseUriResult()
 }

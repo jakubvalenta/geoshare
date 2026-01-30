@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.matchNaivePoint
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object AmapInput : Input.HasShortUri {
     @Suppress("SpellCheckingInspection")
@@ -24,15 +25,15 @@ object AmapInput : Input.HasShortUri {
     override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 setPointIfNull { """\w+,$LAT,$LON.+""" matchNaivePoint queryParams["p"] }
                 setPointIfNull { """$LAT,$LON.+""" matchNaivePoint queryParams["q"] }
             }
         }
-        return ParseUriResult.from(points.asGCJ02())
-    }
+            .asGCJ02()
+            .toParseUriResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_amap_permission_title

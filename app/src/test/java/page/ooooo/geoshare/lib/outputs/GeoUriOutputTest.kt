@@ -55,19 +55,6 @@ class GeoUriOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndQueryAndZoom_returnsUriWithTheQAndZParams() {
-        assertEquals(
-            "geo:50.123456,-11.123456?z=3.4&q=foo%20bar",
-            output.getPositionActions().firstNotNullOf { it as? CopyAction }
-                .getText(
-                    persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4)),
-                    null,
-                    uriQuote
-                ),
-        )
-    }
-
-    @Test
     fun copyOutput_whenPositionHasZoom_returnsUriWithZParamUnlessThePackageNameHasZoomDisabled() {
         assertEquals(
             listOf(

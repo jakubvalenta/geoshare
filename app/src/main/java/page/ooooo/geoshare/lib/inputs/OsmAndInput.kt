@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.extensions.matchNaivePoint
 import page.ooooo.geoshare.lib.extensions.matchZ
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object OsmAndInput : Input {
     override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?osmand\.net/\S+""")
@@ -18,14 +19,14 @@ object OsmAndInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["pin"] }
                 setPointIfNull { """$Z/$LAT/$LON.*""" matchNaivePoint fragment }
                 setZIfNull { """$Z/.*""" matchZ fragment }
             }
         }
-        return ParseUriResult.from(points.asWGS84())
-    }
+            .asWGS84()
+            .toParseUriResult()
 }

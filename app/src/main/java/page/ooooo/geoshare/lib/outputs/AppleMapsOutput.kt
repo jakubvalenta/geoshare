@@ -89,9 +89,11 @@ object AppleMapsOutput : Output {
         path = "/",
         queryParams = buildMap {
             points.getOrNull(i)?.toWGS84()?.run {
-                if (lat != null && lon != null) {
-                    set("ll", "$latStr,$lonStr")
-                } else if (name != null) {
+                latStr?.let { latStr ->
+                    lonStr?.let { lonStr ->
+                        set("ll", "$latStr,$lonStr")
+                    }
+                } ?: name?.let { name ->
                     set("q", name)
                 }
                 zStr?.let { zStr ->
@@ -108,9 +110,11 @@ object AppleMapsOutput : Output {
         path = "/",
         queryParams = buildMap {
             points.getOrNull(i)?.toWGS84()?.run {
-                if (lat != null && lon != null) {
-                    set(@Suppress("SpellCheckingInspection") "daddr", "$latStr,$lonStr")
-                } else if (name != null) {
+                latStr?.let { latStr ->
+                    lonStr?.let { lonStr ->
+                        set(@Suppress("SpellCheckingInspection") "daddr", "$latStr,$lonStr")
+                    }
+                } ?: name?.let { name ->
                     set(@Suppress("SpellCheckingInspection") "daddr", name)
                 }
             }

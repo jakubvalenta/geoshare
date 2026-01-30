@@ -30,13 +30,13 @@ object CoordinatesInput : Input {
         nameResId = R.string.converter_coordinates_name,
         items = listOf(
             InputDocumentationItem.Text(20) {
-                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Point.example))
+                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N")
             },
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        val points = buildPoints {
+    override suspend fun parseUri(uri: Uri): ParseUriResult? =
+        buildPoints {
             uri.run {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
                 setPointIfNull {
@@ -99,8 +99,8 @@ object CoordinatesInput : Input {
                 }
             }
         }
-        return ParseUriResult.from(points.asWGS84())
-    }
+            .asWGS84()
+            .toParseUriResult()
 
     private fun degToDec(
         southOrWest: Boolean,

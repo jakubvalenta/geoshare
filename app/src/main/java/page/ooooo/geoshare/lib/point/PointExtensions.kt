@@ -3,6 +3,8 @@ package page.ooooo.geoshare.lib.point
 import io.ktor.util.escapeHTML
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
+import page.ooooo.geoshare.lib.inputs.ParseUriResult
 
 fun ImmutableList<Point>.getOrNull(i: Int?): Point? =
     if (i == null) {
@@ -15,18 +17,27 @@ fun ImmutableList<Point>.getOrNull(i: Int?): Point? =
         }
     }
 
-fun <T> List<T>.transformLast(transform: (item: T) -> T?): Collection<T> {
-    if (this.isNotEmpty()) {
-        val lastItem = this.lastOrNull()
-        if (lastItem != null) {
-            val transformedLastItem = transform(lastItem)
-            if (transformedLastItem != null) {
-                return this.dropLast(1) + transformedLastItem
-            }
-        }
+fun ImmutableList<Point>.toParseUriResult(htmlUriString: String? = null): ParseUriResult? =
+    if (this.lastOrNull()?.hasCoordinates() == true) {
+        ParseUriResult.Succeeded(this)
+    } else if (htmlUriString != null) {
+        ParseUriResult.SucceededAndSupportsHtmlParsing(this, htmlUriString)
+    } else if (this.lastOrNull()?.hasName() == true) {
+        ParseUriResult.Succeeded(this)
+    } else {
+        null
     }
-    return this
-}
+
+fun ImmutableList<Point>.toParseHtmlResult(redirectUriString: String? = null): ParseHtmlResult? =
+    if (this.lastOrNull()?.hasCoordinates() == true) {
+        ParseHtmlResult.Succeeded(this)
+    } else if (redirectUriString != null) {
+        ParseHtmlResult.RequiresRedirect(redirectUriString)
+    } else if (this.lastOrNull()?.hasName() == true) {
+        ParseHtmlResult.Succeeded(this)
+    } else {
+        null
+    }
 
 fun ImmutableList<NaivePoint>.asWGS84(): ImmutableList<WGS84Point> =
     this.map { it.asWGS84() }.toImmutableList()

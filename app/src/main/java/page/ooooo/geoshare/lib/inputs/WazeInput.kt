@@ -20,6 +20,8 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseHtmlResult
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -44,7 +46,7 @@ object WazeInput : Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val points = buildPoints {
+        return buildPoints {
             uri.run {
                 setPointIfNull {
                     (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
@@ -55,9 +57,9 @@ object WazeInput : Input.HasHtml {
                 setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["ll"] }
                 @Suppress("SpellCheckingInspection")
                 setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["latlng"] }
-                setQIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
+                setNameIfNull { Q_PARAM_PATTERN matchQ queryParams["q"] }
                 setZIfNull { Z_PATTERN matchZ queryParams["z"] }
-                if (!hasPoint()) {
+                if (points.isEmpty()) {
                     queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
                         // To skip some redirects when downloading HTML, replace this URL:
                         // https://ul.waze.com/ul?venue_id=2884104.28644432.6709020
@@ -90,15 +92,16 @@ object WazeInput : Input.HasHtml {
                 }
             }
         }
-        return ParseUriResult.from(points.asWGS84(), htmlUriString)
+            .asWGS84()
+            .toParseUriResult(htmlUriString)
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? {
-        val pointsFromHtml = buildPoints {
+    ): ParseHtmlResult? =
+        buildPoints {
             val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
@@ -107,8 +110,8 @@ object WazeInput : Input.HasHtml {
                 }
             }
         }
-        return ParseHtmlResult.from(pointsFromUri, pointsFromHtml.asWGS84())
-    }
+            .asWGS84()
+            .toParseHtmlResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title

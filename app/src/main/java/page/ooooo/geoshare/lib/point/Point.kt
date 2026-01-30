@@ -44,9 +44,12 @@ sealed interface Point {
     val zStr: String?
         get() = z?.toScale(7)?.toTrimmedString()
 
-    fun setName(newName: String?): Point
+    fun hasCoordinates(): Boolean = lat != null && lon != null
+
+    fun hasName(): Boolean = !name.isNullOrEmpty()
 
     fun toWGS84(): WGS84Point
+
     fun toGCJ02(): GCJ02Point
 }
 
@@ -57,8 +60,6 @@ data class WGS84Point(
     override val z: Double? = null,
     override val name: String? = null,
 ) : Point {
-    override fun setName(newName: String?) = this.copy(name = newName)
-
     override fun toWGS84() = this
 
     /**
@@ -78,8 +79,6 @@ data class GCJ02Point(
     override val z: Double? = null,
     override val name: String? = null,
 ) : Point {
-    override fun setName(newName: String?) = this.copy(name = newName)
-
     /**
      * Notice that we use a custom check whether a point is in China on top of Evil Transform's check. The reason is
      * that Evil Transform's check is only rough and considers a part of Japan as China, thus using GCJ02 for this part
@@ -107,15 +106,12 @@ data class BD09MCPoint(
     override val z: Double? = null,
     override val name: String? = null,
 ) : Point {
-    override fun setName(newName: String?) = this.copy(name = newName)
-
     override fun toWGS84() = toGCJ02().toWGS84()
 
     override fun toGCJ02() = if (lat == null || lon == null) {
         GCJ02Point(lat, lon, z, name)
     } else {
-        BD09Convertor.convertMC2LL(lat, lon)
-            .let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
+        BD09Convertor.convertMC2LL(lat, lon).let { (bd09Lat, bd09Lon) -> CoordTransform.bd09toGCJ02(bd09Lat, bd09Lon) }
             .let { (gcj02Lat, gcj02Lon) -> GCJ02Point(gcj02Lat, gcj02Lon, z, name) }
     }
 }

@@ -144,14 +144,27 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Suppress("SpellCheckingInspection")
     @Test
-    fun parseUri_parameterAddressTakesPrecedenceOverQAndNameAndDaddr() = runTest {
+    fun parseUri_parameterNameTakesPrecedenceOverQAndAddressAndDaddr() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz"))),
+            parseUri("https://maps.apple.com/?name=Reuterplatz&q=Reuterplatz+3,+12047+Berlin,+Germany"),
+        )
+        assertEquals(
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz"))),
+            parseUri("https://maps.apple.com/?name=Reuterplatz&address=Reuterplatz+3,+12047+Berlin,+Germany"),
+        )
+        assertEquals(
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz"))),
+            parseUri("https://maps.apple.com/?name=Reuterplatz&daddr=Reuterplatz+3,+12047+Berlin,+Germany"),
+        )
+    }
+
+    @Suppress("SpellCheckingInspection")
+    @Test
+    fun parseUri_parameterAddressTakesPrecedenceOverQAndDaddr() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz 3, 12047 Berlin, Germany"))),
             parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"),
-        )
-        assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz 3, 12047 Berlin, Germany"))),
-            parseUri("https://maps.apple.com/?address=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz"),
         )
         assertEquals(
             ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz 3, 12047 Berlin, Germany"))),
@@ -161,23 +174,10 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Suppress("SpellCheckingInspection")
     @Test
-    fun parseUri_parameterDaddrTakesPrecedenceOverQAndName() = runTest {
+    fun parseUri_parameterDaddrTakesPrecedenceOverQ() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz 3, 12047 Berlin, Germany"))),
             parseUri("https://maps.apple.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&q=Reuterplatz"),
-        )
-        assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz 3, 12047 Berlin, Germany"))),
-            parseUri("https://maps.apple.com/?daddr=Reuterplatz+3,+12047+Berlin,+Germany&name=Reuterplatz"),
-        )
-    }
-
-    @Suppress("SpellCheckingInspection")
-    @Test
-    fun parseUri_parameterNameTakesPrecedenceOverQ() = runTest {
-        assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "Reuterplatz"))),
-            parseUri("https://maps.apple.com/?name=Reuterplatz&q=Central%20Park"),
         )
     }
 

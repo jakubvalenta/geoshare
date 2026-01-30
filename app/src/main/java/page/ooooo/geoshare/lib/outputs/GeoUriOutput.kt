@@ -205,29 +205,31 @@ object GeoUriOutput : Output {
         // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
         buildString {
             append("geo:")
-            val coordsStr = if (lat != null && lon != null) {
-                "$latStr,$lonStr"
-            } else {
-                "0,0"
-            }
-            append(Uri.formatPath(coordsStr, uriQuote = uriQuote))
+            append(
+                Uri.formatPath(
+                    latStr?.let { latStr ->
+                        lonStr?.let { lonStr ->
+                            "$latStr,$lonStr"
+                        }
+                    } ?: "0,0",
+                    uriQuote = uriQuote,
+                )
+            )
             buildMap {
                 // It's important that the z parameter comes before q, because some map apps require the name (which is
                 // part of the q parameter) to be at the very end of the URI.
                 zStr?.takeUnless { zoomDisabled }?.let { zStr ->
                     set("z", zStr)
                 }
-                name?.let { name ->
-                    if (lat != null && lon != null) {
-                        if (!nameDisabled) {
-                            set("q", "$coordsStr(${name})")
-                        } else {
-                            null
-                        }
-                    } else {
-                        set("q", name)
+                latStr?.let { latStr ->
+                    lonStr?.let { lonStr ->
+                        name?.takeUnless { nameDisabled }?.let { name ->
+                            set("q", "$latStr,$lonStr(${name})")
+                        } ?: set("q", "$latStr,$lonStr")
                     }
-                } ?: set("q", coordsStr)
+                } ?: name?.let { name ->
+                    set("q", name)
+                }
             }
                 .takeIf { it.isNotEmpty() }
                 ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }

@@ -7,104 +7,76 @@ import kotlin.math.max
 import kotlin.math.min
 
 class PointsBuilder() {
-    private var points: MutableList<NaivePoint> = mutableListOf()
-    private var defaultPoint: NaivePoint? = null  // Used only if points are empty
-    private var q: String? = null // TODO Rename to defaultName
-    private var z: Double? = null // TODO Rename to defaultZ
-    private var name: String? = null // TODO Replace with defaultName
+    var points: MutableList<NaivePoint> = mutableListOf()
 
-    fun toPoints(): ImmutableList<NaivePoint> =
-        (points.takeIf { it.isNotEmpty() } ?: defaultPoint?.let { mutableListOf(it) })?.run {
-            // Set z and name on the last point
-            if (q != null || z != null || name != null) {
-                transformLast { lastPoint ->
-                    lastPoint.copy(
-                        z = lastPoint.z ?: z?.let { max(1.0, min(21.0, it)) },
-                        name = lastPoint.name ?: q ?: name,
-                    )
-                }
-            } else {
-                this
-            }
+    /**
+     * Default z will be used as the z of the last point in [points], unless the point already has a z
+     */
+    var defaultZ: Double? = null
+        set(value) {
+            field = value?.let { max(1.0, min(21.0, it)) }
+        }
+
+    /**
+     * Default name will be used as the name of the last point in [points], unless the point already has a z
+     */
+    var defaultName: String? = null
+
+    fun build(): ImmutableList<NaivePoint> =
+        // Take points and set defaults on the last point
+        points.takeIf { it.isNotEmpty() }?.let { points ->
+            points.lastOrNull()?.let { lastPoint ->
+                lastPoint.setDefaults(defaultZ, defaultName)
+                    .takeIf { newLastPoint -> newLastPoint != lastPoint }
+                    ?.let { newLastPoint ->
+                        points.dropLast(1) + newLastPoint
+                    }
+            } ?: points
         }?.toImmutableList()
-            ?: (q ?: name)?.let { name -> persistentListOf(NaivePoint(z = z, name = name)) }
+        // Or create an empty point with defaults
+            ?: run {
+                if (defaultZ != null || !defaultName.isNullOrEmpty()) {
+                    persistentListOf(NaivePoint(z = defaultZ, name = defaultName))
+                } else {
+                    null
+                }
+            }
+            // Or return empty list
             ?: persistentListOf()
-
-    fun hasPoint(): Boolean = defaultPoint != null || points.isNotEmpty()
-
-    fun setPointIfNull(block: () -> NaivePoint?): Boolean = if (points.isEmpty()) {
-        block()?.let { (lat, lon, newZ, name) ->
-            points.add(NaivePoint(lat, lon, name = name))
-            if (newZ != null) {
-                z = newZ
-            }
-            true
-        } ?: false
-    } else {
-        false
-    }
-
-    fun setDefaultPointIfNull(block: () -> NaivePoint?): Boolean = if (defaultPoint == null) {
-        block()?.let { (lat, lon, newZ, name) ->
-            defaultPoint = NaivePoint(lat, lon, name = name)
-            if (newZ != null) {
-                z = newZ
-            }
-            true
-        } ?: false
-    } else {
-        false
-    }
 
     fun addPoints(block: () -> Sequence<NaivePoint>): Boolean =
         points.addAll(block().map { (lat, lon, _, name) -> NaivePoint(lat, lon, name = name) })
 
-    fun setQIfNull(block: () -> String?): Boolean = if (q == null && defaultPoint == null && points.isEmpty()) {
-        block()?.let { newQ ->
-            q = newQ
-            true
-        } ?: false
-    } else {
-        false
-    }
+    fun setPointIfNull(block: () -> NaivePoint?): Boolean =
+        if (points.isEmpty()) {
+            block()?.let { (lat, lon, newZ, name) ->
+                points.add(NaivePoint(lat, lon, newZ, name))
+                true
+            } ?: false
+        } else {
+            false
+        }
 
-    fun setQOrNameIfEmpty(block: () -> String?): Boolean = if (q == null && defaultPoint == null && points.isEmpty()) {
-        block()?.let { newQ ->
-            q = newQ
-            true
-        } ?: false
-    } else if (name == null) {
-        block()?.let { newName ->
-            name = newName
-            true
-        } ?: false
-    } else {
-        false
-    }
+    fun setNameIfNull(block: () -> String?): Boolean =
+        if (defaultName == null) {
+            block()?.let { name ->
+                defaultName = name
+                true
+            } ?: false
+        } else {
+            false
+        }
 
-    fun setQWithCenterIfNull(block: () -> Triple<String, Double, Double>?): Boolean = if (q == null) {
-        block()?.let { (newQ, lat, lon) ->
-            if (defaultPoint == null && points.isEmpty()) {
-                q = newQ
-                points.add(NaivePoint(lat, lon))
-            } else {
-                name = newQ
-            }
-            true
-        } ?: false
-    } else {
-        false
-    }
-
-    fun setZIfNull(block: () -> Double?): Boolean = if (z == null) {
-        block()?.let { newZ ->
-            z = newZ
-            true
-        } ?: false
-    } else {
-        false
-    }
+    fun setZIfNull(block: () -> Double?): Boolean =
+        if (defaultZ == null) {
+            block()?.let { newZ ->
+                defaultZ = newZ
+                true
+            } ?: false
+        } else {
+            false
+        }
 }
 
 suspend fun buildPoints(block: suspend PointsBuilder.() -> Unit): ImmutableList<NaivePoint> =
-    PointsBuilder().apply { this.block() }.toPoints()
+    PointsBuilder().apply { this.block() }.build()

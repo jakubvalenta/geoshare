@@ -212,26 +212,21 @@ object MagicEarthOutput : Output {
         scheme = "magicearth",
         path = "//",
         queryParams = buildMap {
-            points.getOrNull(i)?.toWGS84().run {
-                if (this != null && lat != null && lon != null) {
-                    set("show_on_map", "")
-                    latStr?.let { latStr ->
-                        set("lat", latStr)
-                    }
+            points.getOrNull(i)?.toWGS84()?.run {
+                latStr?.let { latStr ->
                     lonStr?.let { lonStr ->
+                        set("show_on_map", "")
+                        set("lat", latStr)
                         set("lon", lonStr)
+                        name?.let { name ->
+                            set("name", name)
+                        }
+                        Unit
                     }
-                    name?.let { name ->
-                        set("name", name)
-                    }
-                } else if (this != null && name != null) {
+                } ?: name?.let { name ->
                     set("open_search", "")
                     set("q", name)
-                    // TODO Add support for search around
-                    // set("search_around", "")
-                    // set("lat", latStr)
-                    // set("lon", lonStr)
-                } else {
+                } ?: run {
                     set("show_on_map", "")
                     set("lat", "0")
                     set("lon", "0")
@@ -246,17 +241,15 @@ object MagicEarthOutput : Output {
         path = "//",
         queryParams = buildMap {
             set("get_directions", "")
-            points.getOrNull(i)?.toWGS84().run {
-                if (this != null && lat != null && lon != null) {
-                    latStr?.let { latStr ->
-                        set("lat", latStr)
-                    }
+            points.getOrNull(i)?.toWGS84()?.run {
+                latStr?.let { latStr ->
                     lonStr?.let { lonStr ->
+                        set("lat", latStr)
                         set("lon", lonStr)
                     }
-                } else if (this != null && name != null) {
+                } ?: name?.let { name ->
                     set("q", name)
-                } else {
+                } ?: run {
                     set("lat", "0")
                     set("lon", "0")
                 }

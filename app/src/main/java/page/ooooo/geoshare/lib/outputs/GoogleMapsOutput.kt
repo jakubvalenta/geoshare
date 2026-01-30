@@ -56,8 +56,7 @@ object GoogleMapsOutput : Output {
             Text(stringResource(R.string.conversion_succeeded_copy_link_street_view, GoogleMapsInput.NAME))
         }
 
-        override fun isEnabled(points: ImmutableList<Point>, i: Int?) =
-            points.getOrNull(i).run { this != null && lat != null && lon != null }
+        override fun isEnabled(points: ImmutableList<Point>, i: Int?) = points.getOrNull(i)?.hasCoordinates() == true
     }
 
     object CopyLinkChipAction : CopyLinkAction() {
@@ -98,8 +97,7 @@ object GoogleMapsOutput : Output {
             )
         }
 
-        override fun isEnabled(points: ImmutableList<Point>, i: Int?) =
-            points.getOrNull(i).run { this != null && lat != null && lon != null }
+        override fun isEnabled(points: ImmutableList<Point>, i: Int?) = points.getOrNull(i)?.hasCoordinates() == true
     }
 
     object CopyLinkAutomation : CopyLinkAction(), BasicAutomation {
@@ -129,12 +127,8 @@ object GoogleMapsOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    data class ShareNavigateToWithAppAutomation(override val packageName: String) :
-        OpenAppAction(packageName),
-        Action.HasSuccessMessage,
-        Action.HasErrorMessage,
-        BasicAutomation,
-        Automation.HasDelay {
+    data class ShareNavigateToWithAppAutomation(override val packageName: String) : OpenAppAction(packageName),
+        Action.HasSuccessMessage, Action.HasErrorMessage, BasicAutomation, Automation.HasDelay {
 
         override val type = Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO
         override val testTag = null
@@ -178,12 +172,8 @@ object GoogleMapsOutput : Output {
         )
     }
 
-    data class ShareStreetViewWithAppAutomation(override val packageName: String) :
-        OpenAppAction(packageName),
-        Action.HasSuccessMessage,
-        Action.HasErrorMessage,
-        BasicAutomation,
-        Automation.HasDelay {
+    data class ShareStreetViewWithAppAutomation(override val packageName: String) : OpenAppAction(packageName),
+        Action.HasSuccessMessage, Action.HasErrorMessage, BasicAutomation, Automation.HasDelay {
 
         override val type = Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW
         override val testTag = null
@@ -285,20 +275,19 @@ object GoogleMapsOutput : Output {
     }
 
     override fun findAutomation(type: Automation.Type, packageName: String?): Automation? = when (type) {
-        Automation.Type.COPY_GOOGLE_MAPS_URI ->
-            CopyLinkAutomation
+        Automation.Type.COPY_GOOGLE_MAPS_URI -> CopyLinkAutomation
 
-        Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI ->
-            CopyNavigateToAutomation
+        Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> CopyNavigateToAutomation
 
-        Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI ->
-            CopyStreetViewAutomation
+        Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> CopyStreetViewAutomation
 
-        Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO if packageName != null ->
-            ShareNavigateToWithAppAutomation(packageName)
+        Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO if packageName != null -> ShareNavigateToWithAppAutomation(
+            packageName
+        )
 
-        Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW if packageName != null ->
-            ShareStreetViewWithAppAutomation(packageName)
+        Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW if packageName != null -> ShareStreetViewWithAppAutomation(
+            packageName
+        )
 
         else -> null
     }
@@ -309,9 +298,11 @@ object GoogleMapsOutput : Output {
         path = "/maps",
         queryParams = buildMap {
             points.getOrNull(i)?.toGCJ02()?.run {
-                if (lat != null && lon != null) {
-                    set("q", "$latStr,$lonStr")
-                } else if (name != null) {
+                latStr?.let { latStr ->
+                    lonStr?.let { lonStr ->
+                        set("q", "$latStr,$lonStr")
+                    }
+                } ?: name?.let { name ->
                     set("q", name)
                 }
                 zStr?.let { zStr ->
@@ -324,27 +315,25 @@ object GoogleMapsOutput : Output {
 
     private fun formatNavigateToUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String = Uri(
         scheme = "google.navigation",
-        path = points.getOrNull(i)?.toGCJ02().run {
-            if (this != null && this.lat != null && this.lon != null) {
-                "$latStr,$lonStr"
-            } else if (this != null && name != null) {
-                name
-            } else {
-                "0,0"
-            }
-        }.let { "q=$it" },
+        path = (points.getOrNull(i)?.toGCJ02()?.run {
+            latStr?.let { latStr ->
+                lonStr?.let { lonStr ->
+                    "$latStr,$lonStr"
+                }
+            } ?: name
+        } ?: "0,0").let { "q=$it" },
         uriQuote = uriQuote,
     ).toString()
 
     private fun formatStreetViewUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String = Uri(
         scheme = "google.streetview",
-        path = points.getOrNull(i)?.toGCJ02().run {
-            if (this != null && this.lat != null && this.lon != null) {
-                "$latStr,$lonStr"
-            } else {
-                "0,0"
+        path = (points.getOrNull(i)?.toGCJ02()?.run {
+            latStr?.let { latStr ->
+                lonStr?.let { lonStr ->
+                    "$latStr,$lonStr"
+                }
             }
-        }.let { @Suppress("SpellCheckingInspection") "cbll=$it" },
+        } ?: "0,0").let { @Suppress("SpellCheckingInspection") "cbll=$it" },
         uriQuote = uriQuote,
     ).toString()
 }

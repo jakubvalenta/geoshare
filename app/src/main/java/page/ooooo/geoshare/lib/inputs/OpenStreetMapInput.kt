@@ -18,6 +18,8 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseHtmlResult
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object OpenStreetMapInput : Input.HasHtml {
     private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
@@ -40,7 +42,7 @@ object OpenStreetMapInput : Input.HasHtml {
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
         var htmlUriString: String? = null
-        val points = buildPoints {
+        return buildPoints {
             uri.run {
                 setPointIfNull {
                     ("""/go/$HASH""" matchHash path)
@@ -49,7 +51,7 @@ object OpenStreetMapInput : Input.HasHtml {
                 }
                 setPointIfNull { """map=$Z/$LAT/$LON.*""" matchNaivePoint fragment }
                 setPointIfNull { LAT_LON_PATTERN matchNaivePoint queryParams["to"] }
-                if (!hasPoint()) {
+                if (points.isEmpty()) {
                     (ELEMENT_PATH match path)?.let { m ->
                         m.groupOrNull("type")?.let { type ->
                             m.groupOrNull("id")?.let { id ->
@@ -61,23 +63,25 @@ object OpenStreetMapInput : Input.HasHtml {
                 }
             }
         }
-        return ParseUriResult.from(points.asWGS84(), htmlUriString)
+            .asWGS84()
+            .toParseUriResult(htmlUriString)
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? {
-        val pointsFromHtml = buildPoints {
+    ): ParseHtmlResult? =
+        buildPoints {
+            defaultName = pointsFromUri.lastOrNull()?.name
             val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
                 addPoints { pattern findAllNaivePoint line }
             }
         }
-        return ParseHtmlResult.from(pointsFromUri, pointsFromHtml.asWGS84())
-    }
+            .asWGS84()
+            .toParseHtmlResult()
 
     @StringRes
     override val permissionTitleResId = R.string.converter_open_street_map_permission_title
