@@ -1,25 +1,20 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchZ
-import page.ooooo.geoshare.lib.extensions.toLat
-import page.ooooo.geoshare.lib.extensions.toLatLon
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object MapyComInput : Input.HasShortUri {
-    private const val COORDS = """(?P<lat>\d{1,2}(\.\d{1,16})?)[NS], (?P<lon>\d{1,3}(\.\d{1,16})?)[WE]"""
+    private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
 
-    @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern =
-        Pattern.compile("""$COORDS|(https?://)?((hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
+    override val uriPattern =
+        Regex("""$COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPY_COM,
         nameResId = R.string.converter_mapy_com_name,
@@ -30,29 +25,32 @@ object MapyComInput : Input.HasShortUri {
             InputDocumentationItem.Url(23, "https://www.mapy.cz"),
         ),
     )
-    override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?mapy\.[a-z]{2,3}/s/\S+""")
+    override val shortUriPattern = Regex("""(?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.GET
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (COORDS match path)
+                (Regex(COORDS) match path)
                     ?.let { m ->
-                        m.toLatLon()?.let { (lat, lon) ->
-                            val wholeMatch = m.groupOrNull()
-                            val latSig = if (wholeMatch?.contains('S') == true) -1 else 1
-                            val lonSig = if (wholeMatch?.contains('W') == true) -1 else 1
-                            NaivePoint(latSig * lat, lonSig * lon)
+                        m.groupValues[0].let { entireMatch ->
+                            m.doubleGroupOrNull(1)?.let { lat ->
+                                m.doubleGroupOrNull(2)?.let { lon ->
+                                    val latSig = if (entireMatch.contains('S')) -1 else 1
+                                    val lonSig = if (entireMatch.contains('W')) -1 else 1
+                                    NaivePoint(latSig * lat, lonSig * lon)
+                                }
+                            }
                         }
                     }
                     ?.also { points.add(it) }
-                    ?: (LAT_PATTERN match queryParams["y"])?.toLat()?.let { lat ->
-                        (LAT_PATTERN match queryParams["x"])?.toLat()?.let { lon ->
+                    ?: (LAT_PATTERN match queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
+                        (LAT_PATTERN match queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
                             NaivePoint(lat, lon)
                         }
                     }?.also { points.add(it) }
 
-                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()

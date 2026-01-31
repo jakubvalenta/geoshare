@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
-import com.google.re2j.Pattern
-import io.ktor.utils.io.*
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.ILog
@@ -12,13 +11,13 @@ interface Input {
 
     enum class ShortUriMethod { GET, HEAD }
 
-    val uriPattern: Pattern
+    val uriPattern: Regex
     val documentation: InputDocumentation
 
     suspend fun parseUri(uri: Uri): ParseUriResult?
 
     interface HasShortUri : Input {
-        val shortUriPattern: Pattern
+        val shortUriPattern: Regex
         val shortUriMethod: ShortUriMethod
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int

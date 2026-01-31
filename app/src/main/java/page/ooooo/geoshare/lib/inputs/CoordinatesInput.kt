@@ -1,30 +1,32 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
-import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
-import page.ooooo.geoshare.lib.point.*
+import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object CoordinatesInput : Input {
     @Suppress("SpellCheckingInspection")
     private const val CHARS = """[\p{Zs},°'′"″NSWE]"""
     private const val SPACE = """\p{Zs}*"""
-    private const val LAT_SIG = """(?P<latSig>-?)"""
-    private const val LAT_DEG = """(?P<latDeg>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_MIN = """(?P<latMin>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
-    private const val LAT_SEC = """(?P<latSec>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SIG = """(?P<lonSig>-?)"""
-    private const val LON_DEG = """(?P<lonDeg>\d{1,3}(\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_MIN = """(?P<lonMin>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
-    private const val LON_SEC = """(?P<lonSec>\d{1,2}(\.\d{1,$MAX_PRECISION})?)"""
+    private const val LAT_SIG = """(-?)"""
+    private const val LAT_DEG = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    private const val LAT_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    private const val LAT_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    private const val LON_SIG = """(-?)"""
+    private const val LON_DEG = """(\d{1,3}(?:\.\d{1,$MAX_PRECISION})?)"""
+    private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
+    private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
 
-    @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""[\d\.\-\p{Zs},°'′"″NSWE]+""")
+    override val uriPattern = Regex("""[\d.\-\p{Zs},°'′"″NSWE]+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.COORDINATES,
         nameResId = R.string.converter_coordinates_name,
@@ -39,18 +41,18 @@ object CoordinatesInput : Input {
         buildPoints {
             uri.run {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
-                ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""" match path)?.let { m ->
+                (Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") match path)?.let { m ->
                     points.add(
                         NaivePoint(
                             degToDec(
-                                m.groupOrNull()?.contains('S') == true,
-                                m.groupOrNull("latSig"),
-                                m.groupOrNull("latDeg"),
+                                m.value.contains('S'),
+                                m.groupOrNull(1),
+                                m.groupOrNull(2),
                             ),
                             degToDec(
-                                m.groupOrNull()?.contains('W') == true,
-                                m.groupOrNull("lonSig"),
-                                m.groupOrNull("lonDeg"),
+                                m.value.contains('W'),
+                                m.groupOrNull(3),
+                                m.groupOrNull(4),
                             ),
                         )
                     )
@@ -58,22 +60,22 @@ object CoordinatesInput : Input {
                 }
 
                 // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-                ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""" match path)?.let { m ->
+                (Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") match path)?.let { m ->
                     points.add(
                         NaivePoint(
                             degToDec(
-                                m.groupOrNull()?.contains('S') == true,
-                                m.groupOrNull("latSig"),
-                                m.groupOrNull("latDeg"),
-                                m.groupOrNull("latMin"),
-                                m.groupOrNull("latSec"),
+                                m.value.contains('S'),
+                                m.groupOrNull(1),
+                                m.groupOrNull(2),
+                                m.groupOrNull(3),
+                                m.groupOrNull(4),
                             ),
                             degToDec(
-                                m.groupOrNull()?.contains('W') == true,
-                                m.groupOrNull("lonSig"),
-                                m.groupOrNull("lonDeg"),
-                                m.groupOrNull("lonMin"),
-                                m.groupOrNull("lonSec"),
+                                m.value.contains('W'),
+                                m.groupOrNull(5),
+                                m.groupOrNull(6),
+                                m.groupOrNull(7),
+                                m.groupOrNull(8),
                             ),
                         )
                     )
@@ -81,20 +83,20 @@ object CoordinatesInput : Input {
                 }
 
                 // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-                ("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""" match path)?.let { m ->
+                (Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") match path)?.let { m ->
                     points.add(
                         NaivePoint(
                             degToDec(
-                                m.groupOrNull()?.contains('S') == true,
-                                m.groupOrNull("latSig"),
-                                m.groupOrNull("latDeg"),
-                                m.groupOrNull("latMin"),
+                                m.value.contains('S'),
+                                m.groupOrNull(1),
+                                m.groupOrNull(2),
+                                m.groupOrNull(3),
                             ),
                             degToDec(
-                                m.groupOrNull()?.contains('W') == true,
-                                m.groupOrNull("lonSig"),
-                                m.groupOrNull("lonDeg"),
-                                m.groupOrNull("lonMin"),
+                                m.value.contains('W'),
+                                m.groupOrNull(4),
+                                m.groupOrNull(5),
+                                m.groupOrNull(6),
                             ),
                         )
                     )

@@ -1,19 +1,17 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.matchPoint
-import page.ooooo.geoshare.lib.extensions.matchName
-import page.ooooo.geoshare.lib.extensions.matchZ
-import page.ooooo.geoshare.lib.extensions.toLat
-import page.ooooo.geoshare.lib.extensions.toLon
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
@@ -22,7 +20,7 @@ import page.ooooo.geoshare.lib.point.toParseHtmlResult
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object AppleMapsInput : Input.HasHtml {
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?maps\.apple(\.com)?[/?#]\S+""")
+    override val uriPattern = Regex("""(?:https?://)?maps\.apple(\.com)?[/?#]\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.APPLE_MAPS,
         nameResId = R.string.converter_apple_maps_name,
@@ -39,15 +37,17 @@ object AppleMapsInput : Input.HasHtml {
                 // Notice that we take the search center 'sll' as a normal point
                 @Suppress("SpellCheckingInspection")
                 listOf("ll", "daddr", "coordinate", "q", "sll", "center")
-                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN matchPoint queryParams[key] }
+                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN match queryParams[key] }
+                    ?.toLatLonPoint()
                     ?.also { points.add(it) }
 
                 @Suppress("SpellCheckingInspection")
                 listOf("name", "address", "daddr", "q")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN matchName queryParams[key] }
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN match queryParams[key] }
+                    ?.groupOrNull()
                     ?.also { defaultName = it }
 
-                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
                 if (
                     points.isEmpty() && (
@@ -72,17 +72,17 @@ object AppleMapsInput : Input.HasHtml {
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
-            val latPattern = Pattern.compile("""<meta property="place:location:latitude" content="$LAT"""")
-            val lonPattern = Pattern.compile("""<meta property="place:location:longitude" content="$LON"""")
+            val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
+            val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
             var lat: Double? = null
             var lon: Double? = null
             while (true) {
                 val line = channel.readUTF8Line() ?: break
                 if (lat == null) {
-                    (latPattern find line)?.toLat()?.let { lat = it }
+                    (latPattern find line)?.doubleGroupOrNull()?.let { lat = it }
                 }
                 if (lon == null) {
-                    (lonPattern find line)?.toLon()?.let { lon = it }
+                    (lonPattern find line)?.doubleGroupOrNull()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
                     points.add(NaivePoint(lat, lon))

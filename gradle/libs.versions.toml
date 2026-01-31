@@ -24,7 +24,6 @@ kotlinxSerializationJson = "1.10.0"
 ksp = "2.3.4"
 ktor = "3.4.0"
 mockitoKotlin = "6.2.3"
-re2j = "1.8"
 
 [libraries]
 accompanist-drawableplainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablePainter" }
@@ -57,7 +56,6 @@ kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collec
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
-re2j = { group = "com.google.re2j", name = "re2j", version.ref = "re2j" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

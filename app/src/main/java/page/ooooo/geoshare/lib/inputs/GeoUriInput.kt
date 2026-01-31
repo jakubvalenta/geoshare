@@ -1,19 +1,25 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
-import com.google.re2j.Pattern
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.*
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
+import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
-import page.ooooo.geoshare.lib.point.*
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.asWGS84
+import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object GeoUriInput : Input {
-    private const val NAME_REGEX = """(\((?P<name>.+)\))"""
+    private const val NAME_REGEX = """\((.+)\)"""
 
-    override val uriPattern: Pattern =
-        Pattern.compile("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:\S+""")
+    override val uriPattern =
+        Regex("""geo:$LAT_NUM,$LON_NUM\?q=$LAT_NUM,\s*$LON_NUM|geo:\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GEO_URI,
         nameResId = R.string.converter_geo_name,
@@ -35,16 +41,18 @@ object GeoUriInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                ("""$LAT,$LON$NAME_REGEX?""" matchPoint queryParams["q"])?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchPoint path)?.also { points.add(it) }
+                (Regex("""$LAT,$LON(?:$NAME_REGEX)?""") match queryParams["q"])
+                    ?.toLatLonNamePoint()
+                    ?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN match path)?.toLatLonPoint()?.also { points.add(it) }
 
                 queryParams
                     .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
-                    .firstNotNullOfOrNull { (key) -> NAME_REGEX matchName key }
+                    .firstNotNullOfOrNull { (key) -> (Regex(NAME_REGEX) match key)?.groupOrNull() }
                     ?.also { defaultName = it }
-                    ?: (Q_PARAM_PATTERN matchName queryParams["q"])?.also { defaultName = it }
+                    ?: (Q_PARAM_PATTERN match queryParams["q"])?.groupOrNull()?.also { defaultName = it }
 
-                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()

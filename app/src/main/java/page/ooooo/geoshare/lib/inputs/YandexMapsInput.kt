@@ -1,17 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findPoint
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchPoint
-import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
@@ -19,7 +18,7 @@ import page.ooooo.geoshare.lib.point.toParseHtmlResult
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
         nameResId = R.string.converter_yandex_maps_name,
@@ -47,8 +46,8 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
             InputDocumentationItem.Url(22, "https://yandex.uz/maps"),
         ),
     )
-    override val shortUriPattern: Pattern =
-        Pattern.compile("""(https?://)?yandex(\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val shortUriPattern =
+        Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? {
@@ -56,14 +55,14 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         return buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
-                (LON_LAT_PATTERN matchPoint queryParams["whatshere[point]"])?.also { points.add(it) }
-                    ?: (LON_LAT_PATTERN matchPoint queryParams["ll"])?.also { points.add(it) }
+                (LON_LAT_PATTERN match queryParams["whatshere[point]"])?.toLonLatPoint()?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN match queryParams["ll"])?.toLonLatPoint()?.also { points.add(it) }
 
                 @Suppress("SpellCheckingInspection")
-                (Z_PATTERN matchZ queryParams["whatshere[zoom]"])?.also { defaultZ = it }
-                    ?: (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                (Z_PATTERN match queryParams["whatshere[zoom]"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                    ?: (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
-                if (points.isEmpty() && ("""/maps/org/\d+([/?#].*|$)""" match path) != null) {
+                if (points.isEmpty() && Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
                     htmlUriString = uri.toString()
                 }
             }
@@ -80,10 +79,10 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
-            val pattern = Pattern.compile("""ll=$LON%2C$LAT""")
+            val pattern = Regex("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findPoint line)?.also {
+                (pattern find line)?.toLonLatPoint()?.also {
                     points.add(it)
                     break
                 }

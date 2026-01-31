@@ -16,12 +16,12 @@ abstract class BaseInputTest() {
     protected var log: ILog = FakeLog
     protected var uriQuote: UriQuote = FakeUriQuote()
 
-    fun getUri(uriString: String): String? = (input.uriPattern find uriString)?.group()
+    fun getUri(uriString: String): String? = (input.uriPattern find uriString)?.value
 
     fun doesUriPatternMatch(uriString: String): Boolean = input.uriPattern.matches(uriString)
 
     fun getShortUri(uriString: String): String? =
-        ((input as Input.HasShortUri).shortUriPattern match uriString)?.group()
+        ((input as Input.HasShortUri).shortUriPattern match uriString)?.value
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 

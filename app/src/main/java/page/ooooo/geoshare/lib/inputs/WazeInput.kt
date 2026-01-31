@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.collections.immutable.ImmutableList
@@ -9,11 +8,11 @@ import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findPoint
-import page.ooooo.geoshare.lib.extensions.matchHash
-import page.ooooo.geoshare.lib.extensions.matchPoint
-import page.ooooo.geoshare.lib.extensions.matchName
-import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.groupOrNull
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
 import page.ooooo.geoshare.lib.point.NaivePoint
@@ -28,9 +27,9 @@ import page.ooooo.geoshare.lib.point.toParseUriResult
  */
 object WazeInput : Input.HasHtml {
     @Suppress("SpellCheckingInspection")
-    private const val HASH = """(?P<hash>[0-9bcdefghjkmnpqrstuvwxyz]+)"""
+    private const val HASH = """[0-9bcdefghjkmnpqrstuvwxyz]+"""
 
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?((www|ul)\.)?waze\.com/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:(?:www|ul)\.)?waze\.com/\S+""")
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.WAZE,
@@ -48,18 +47,22 @@ object WazeInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                (("""/ul/h$HASH""" matchHash path) ?: (HASH matchHash queryParams["h"]))
+                ((Regex("""/ul/h($HASH)""") match path) ?: (Regex("($HASH)") match queryParams["h"]))
+                    ?.groupOrNull()
                     ?.let { hash -> decodeWazeGeoHash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(6), lon.toScale(6), z) }
                     ?.also { points.add(it) }
-                    ?: ("""ll\.$LAT,$LON""" matchPoint queryParams["to"])?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchPoint queryParams["ll"])?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchPoint queryParams[@Suppress("SpellCheckingInspection") "latlng"])
+                    ?: (Regex("""ll\.$LAT,$LON""") match queryParams["to"])?.toLatLonPoint()?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN match queryParams["ll"])
+                        ?.toLatLonPoint()
+                        ?.also { points.add(it) }
+                    ?: (LAT_LON_PATTERN match queryParams[@Suppress("SpellCheckingInspection") "latlng"])
+                        ?.toLatLonPoint()
                         ?.also { points.add(it) }
 
-                (Q_PARAM_PATTERN matchName queryParams["q"])?.also { defaultName = it }
+                (Q_PARAM_PATTERN match queryParams["q"])?.groupOrNull()?.also { defaultName = it }
 
-                (Z_PATTERN matchZ queryParams["z"])?.also { defaultZ = it }
+                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
                 if (points.isEmpty()) {
                     queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
@@ -106,10 +109,10 @@ object WazeInput : Input.HasHtml {
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
-            val pattern = Pattern.compile(""""latLng":{"lat":$LAT,"lng":$LON}""")
+            val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findPoint line)?.also {
+                (pattern find line)?.toLatLonPoint()?.also {
                     points.add(it)
                     break
                 }

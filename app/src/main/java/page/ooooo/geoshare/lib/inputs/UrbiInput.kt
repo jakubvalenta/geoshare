@@ -1,16 +1,18 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findPoint
-import page.ooooo.geoshare.lib.extensions.matchPoint
-import page.ooooo.geoshare.lib.extensions.matchZ
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.find
+import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
+import page.ooooo.geoshare.lib.extensions.toZLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
@@ -18,8 +20,8 @@ import page.ooooo.geoshare.lib.point.toParseHtmlResult
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object UrbiInput : Input.HasHtml {
-    override val uriPattern: Pattern =
-        Pattern.compile("""(https?://)?(www\.)?((go|maps)\.)?(2gis|urbi|urbi-[a-z]{2})(\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
+    override val uriPattern =
+        Regex("""(?:https?://)?(?:www\.)?(?:(?:go|maps)\.)?(?:2gis|urbi|urbi-[a-z]{2})(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.URBI,
         nameResId = R.string.converter_urbi_name,
@@ -53,11 +55,11 @@ object UrbiInput : Input.HasHtml {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                ("""$LON,$LAT/$Z""" matchPoint queryParams["m"])?.also { points.add(it) }
-                    ?: (""".*/$LON,$LAT/?$""" matchPoint path)?.also { points.add(it) }
-                    ?: (LON_LAT_PATTERN matchPoint queryParams["center"])?.also { points.add(it) }
+                (Regex("""$LON,$LAT/$Z""") match queryParams["m"])?.toLonLatZPoint()?.also { points.add(it) }
+                    ?: (Regex(""".*/$LON,$LAT/?$""") match path)?.toLonLatPoint()?.also { points.add(it) }
+                    ?: (LON_LAT_PATTERN match queryParams["center"])?.toLonLatPoint()?.also { points.add(it) }
 
-                (Z_PATTERN matchZ queryParams["zoom"])?.also { defaultZ = it }
+                (Z_PATTERN match queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()
@@ -71,10 +73,10 @@ object UrbiInput : Input.HasHtml {
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
-            val pattern = Pattern.compile("""zoom=$Z&amp;center=$LON%2C$LAT""")
+            val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern findPoint line)?.also {
+                (pattern find line)?.toZLonLatPoint()?.also {
                     points.add(it)
                     break
                 }

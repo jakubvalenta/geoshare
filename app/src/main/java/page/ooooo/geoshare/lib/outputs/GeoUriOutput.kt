@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.google.re2j.Pattern
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
@@ -23,9 +22,8 @@ import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.AppIcon
 
 object GeoUriOutput : Output {
-    @Suppress("SpellCheckingInspection")
-    private val NAME_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""de\.schildbach\.oeffi""")
-    private val ZOOM_DISABLED_PACKAGE_NAME_PATTERN = Pattern.compile("""com\.garmin\..+""")
+    private val NAME_DISABLED_PACKAGE_NAME_PATTERN = Regex("""de\.schildbach\.oeffi""")
+    private val ZOOM_DISABLED_PACKAGE_NAME_PATTERN = Regex("""com\.garmin\..+""")
 
     open class CopyGeoUriAction : CopyAction() {
         override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String =

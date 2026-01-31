@@ -20,6 +20,7 @@ import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
@@ -66,9 +67,8 @@ data class ReceivedUriString(
             return ConversionFailed(R.string.conversion_failed_missing_url, "")
         }
         for (input in stateContext.inputs) {
-            val m = input.uriPattern.matcher(inputUriString)
-            if (m.find()) {
-                val uri = Uri.parse(m.group(), stateContext.uriQuote)
+            (input.uriPattern find inputUriString)?.value?.let { uriString ->
+                val uri = Uri.parse(uriString, stateContext.uriQuote)
                 return ReceivedUri(stateContext, inputUriString, input, uri, null)
             }
         }
@@ -85,9 +85,8 @@ data class ReceivedUri(
 ) : ConversionState {
     override suspend fun transition(): State {
         if (input is Input.HasShortUri) {
-            val m = input.shortUriPattern.matcher(uri.toString())
-            if (m.matches()) {
-                val uri = Uri.parse(m.group(), stateContext.uriQuote)
+            (input.shortUriPattern find uri.toString())?.value?.let { uriString ->
+                val uri = Uri.parse(uriString, stateContext.uriQuote)
                 return when (permission ?: stateContext.userPreferencesRepository.getValue(
                     ConnectionPermissionPreference
                 )) {

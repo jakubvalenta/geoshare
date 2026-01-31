@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.conversion
 
-import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import kotlinx.collections.immutable.ImmutableList
@@ -240,7 +239,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.app.goo.gl/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockInput = object : Input {
-            override val uriPattern: Pattern = Pattern.compile(".")
+            override val uriPattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -713,10 +712,10 @@ class ConversionStateTest {
         val redirectUriString = "https://maps.google.com/foo-redirect"
         val redirectUri = Uri.parse(redirectUriString, uriQuote)
         val mockInput = object : Input.HasShortUri {
-            override val uriPattern: Pattern = Pattern.compile(".")
+            override val uriPattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
-            override val shortUriPattern: Pattern = Pattern.compile(".")
+            override val shortUriPattern = Regex(".")
             override val shortUriMethod = Input.ShortUriMethod.GET
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
@@ -797,7 +796,7 @@ class ConversionStateTest {
             val points = persistentListOf<WGS84Point>()
             val htmlUriString = "$inputUriString/foo.html"
             val mockInput = object : Input {
-                override val uriPattern: Pattern = Pattern.compile(".")
+                override val uriPattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
@@ -1134,7 +1133,7 @@ class ConversionStateTest {
         val htmlUriString = "$inputUriString/foo.html"
         val html = "<html></html>"
         val mockInput = object : Input.HasHtml {
-            override val uriPattern: Pattern = Pattern.compile(".")
+            override val uriPattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
@@ -1391,7 +1390,7 @@ class ConversionStateTest {
         val htmlUriString = "maps.apple.com/foo"
         val pointsFromHtml = persistentListOf(WGS84Point(1.0, 2.0, name = "fromHtml"))
         val mockInput = object : Input.HasHtml {
-            override val uriPattern: Pattern = Pattern.compile(".")
+            override val uriPattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
@@ -1439,7 +1438,7 @@ class ConversionStateTest {
         val htmlUriString = "https://api.apple.com/foo.json"
         val pointsFromHtml = persistentListOf(WGS84Point(1.0, 2.0, name = "fromHtml"))
         val mockInput = object : Input.HasHtml {
-            override val uriPattern: Pattern = Pattern.compile(".")
+            override val uriPattern = Regex(".")
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
@@ -1488,7 +1487,7 @@ class ConversionStateTest {
             val redirectUriString = "https://maps.apple.com/foo-redirect"
             val redirectUri = Uri.parse(redirectUriString, uriQuote)
             val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
+                override val uriPattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
@@ -1544,7 +1543,7 @@ class ConversionStateTest {
             val redirectUri = Uri.parse("$inputUriString/$redirectUriString", uriQuote)
             val html = "<html></html>"
             val mockInput = object : Input.HasHtml {
-                override val uriPattern: Pattern = Pattern.compile(".")
+                override val uriPattern = Regex(".")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
