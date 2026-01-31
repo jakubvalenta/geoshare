@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.lib.extensions
 
-fun <K, V> Collection<Pair<K, V>>.group(): Map<K, List<V>> = buildMap<K, MutableList<V>> {
-    for ((key, value) in this@group) {
+fun <K, V> Collection<Pair<K, V>>.groupOrNull(): Map<K, List<V>> = buildMap<K, MutableList<V>> {
+    for ((key, value) in this@groupOrNull) {
         this.getOrPut(key) { mutableListOf() }.add(value)
     }
 }

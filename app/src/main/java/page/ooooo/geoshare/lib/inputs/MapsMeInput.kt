@@ -1,10 +1,8 @@
 package page.ooooo.geoshare.lib.inputs
 
-import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matchHash
-import page.ooooo.geoshare.lib.extensions.matchName
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
 import page.ooooo.geoshare.lib.point.NaivePoint
@@ -13,10 +11,9 @@ import page.ooooo.geoshare.lib.point.buildPoints
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object MapsMeInput : Input {
-    private const val HASH = """(?P<hash>[A-Za-z0-9\-_]{2,})"""
+    private const val HASH = """[A-Za-z0-9\-_]{2,}"""
 
-    @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""((https?://)?(comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
+    override val uriPattern = Regex("""(?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPS_ME,
         nameResId = R.string.converter_ge0_name,
@@ -31,13 +28,15 @@ object MapsMeInput : Input {
         buildPoints {
             uri.run {
                 (if (scheme == "ge0") host else pathParts.getOrNull(1))
-                    ?.let { HASH matchHash it }
+                    ?.let { Regex(HASH).matchEntire(it) }
+                    ?.value
                     ?.let { hash -> decodeGe0Hash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(7), lon.toScale(7), z) }
                     ?.also { points.add(it) }
 
                 (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
-                    ?.let { Q_PATH_PATTERN matchName it }
+                    ?.let { Q_PATH_PATTERN.matchEntire(it) }
+                    ?.groupOrNull()
                     ?.replace('_', ' ')
                     ?.also { defaultName = it }
             }

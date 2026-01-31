@@ -1,17 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.matchPoint
+import page.ooooo.geoshare.lib.extensions.matchEntire
+import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object AmapInput : Input.HasShortUri {
-    @Suppress("SpellCheckingInspection")
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(surl|wb)\.amap\.com/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.AMAP,
         nameResId = R.string.converter_amap_name,
@@ -21,15 +20,14 @@ object AmapInput : Input.HasShortUri {
         ),
     )
 
-    @Suppress("SpellCheckingInspection")
-    override val shortUriPattern: Pattern = Pattern.compile("""(https?://)?surl\.amap\.com/\S+""")
+    override val shortUriPattern = Regex("""(?:https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                ("""\w+,$LAT,$LON.+""" matchPoint queryParams["p"])?.also { points.add(it) }
-                    ?: ("""$LAT,$LON.+""" matchPoint queryParams["q"])?.also { points.add(it) }
+                Regex("""\w+,$LAT,$LON.+""").matchEntire(queryParams["p"])?.toLatLonPoint()?.also { points.add(it) }
+                    ?: Regex("""$LAT,$LON.+""").matchEntire(queryParams["q"])?.toLatLonPoint()?.also { points.add(it) }
             }
         }
             .asGCJ02()

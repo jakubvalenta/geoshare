@@ -1,18 +1,16 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
-import com.google.re2j.Pattern
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findAllPoints
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
-import page.ooooo.geoshare.lib.extensions.matchHash
-import page.ooooo.geoshare.lib.extensions.matchPoint
+import page.ooooo.geoshare.lib.extensions.matchEntire
+import page.ooooo.geoshare.lib.extensions.toLatLonPoint
+import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
@@ -22,10 +20,10 @@ import page.ooooo.geoshare.lib.point.toParseHtmlResult
 import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object OpenStreetMapInput : Input.HasHtml {
-    private const val ELEMENT_PATH = """/(?P<type>node|relation|way)/(?P<id>\d+)([/?#].*|$)"""
-    private const val HASH = """(?P<hash>[A-Za-z0-9_~]+-+)"""
+    private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
+    private const val HASH = """[A-Za-z0-9_~]+-+"""
 
-    override val uriPattern: Pattern = Pattern.compile("""(https?://)?(www\.)?(openstreetmap|osm)\.org/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OPEN_STREET_MAP,
         nameResId = R.string.converter_open_street_map_name,
@@ -44,15 +42,16 @@ object OpenStreetMapInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                ("""/go/$HASH""" matchHash path)
+                Regex("""/go/($HASH)""").matchEntire(path)
+                    ?.groupOrNull()
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
                     ?.also { points.add(it) }
-                    ?: ("""map=$Z/$LAT/$LON.*""" matchPoint fragment)?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN matchPoint queryParams["to"])?.also { points.add(it) }
-                    ?: (ELEMENT_PATH match path)?.let { m ->
-                        m.groupOrNull("type")?.let { type ->
-                            m.groupOrNull("id")?.let { id ->
+                    ?: Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also { points.add(it) }
+                    ?: LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.also { points.add(it) }
+                    ?: Regex(ELEMENT_PATH).matchEntire(path)?.let { m ->
+                        m.groupOrNull(1)?.let { type ->
+                            m.groupOrNull(2)?.let { id ->
                                 htmlUriString =
                                     "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
                             }
@@ -72,10 +71,10 @@ object OpenStreetMapInput : Input.HasHtml {
         buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
-            val pattern = Pattern.compile(""""lat":$LAT,"lon":$LON""")
+            val pattern = Regex(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                points.addAll(pattern findAllPoints line)
+                points.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint() })
             }
         }
             .asWGS84()

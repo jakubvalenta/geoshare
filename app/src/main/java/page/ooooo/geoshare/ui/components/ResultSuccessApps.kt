@@ -26,7 +26,7 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AndroidTools.AppType
-import page.ooooo.geoshare.lib.extensions.group
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -61,7 +61,7 @@ fun ResultSuccessApps(
     }
     val apps = onQueryApps(context.packageManager)
     val actionsByAppDetails: Map<AndroidTools.AppDetails, List<Action>> = allOutputs.getAppActions(apps)
-        .group()
+        .groupOrNull()
         .mapNotNull { (packageName, actions) ->
             onQueryAppDetails(context.packageManager, packageName)?.let { app -> app to actions }
         }
