@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
@@ -26,8 +26,8 @@ object AmapInput : Input.HasShortUri {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (Regex("""\w+,$LAT,$LON.+""") match queryParams["p"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: (Regex("""$LAT,$LON.+""") match queryParams["q"])?.toLatLonPoint()?.also { points.add(it) }
+                Regex("""\w+,$LAT,$LON.+""").matchEntire(queryParams["p"])?.toLatLonPoint()?.also { points.add(it) }
+                    ?: Regex("""$LAT,$LON.+""").matchEntire(queryParams["q"])?.toLatLonPoint()?.also { points.add(it) }
             }
         }
             .asGCJ02()

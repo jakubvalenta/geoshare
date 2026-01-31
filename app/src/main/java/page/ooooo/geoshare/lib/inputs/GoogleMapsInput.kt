@@ -8,11 +8,9 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.forEachReversed
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -51,16 +49,16 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                 // Try query parameters for all URLs
 
                 listOf("destination", "q", "query", "ll", "viewpoint", "center")
-                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN match queryParams[key] }
+                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key]) }
                     ?.toLatLonPoint()
                     ?.also { points.add(it) }
 
                 listOf("destination", "q", "query")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN match queryParams[key] }
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]) }
                     ?.groupOrNull()
                     ?.also { defaultName = it }
 
-                (Z_PATTERN match queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
                 // Parse path parts
 
@@ -80,13 +78,13 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                         if (part.startsWith("data=")) {
                             // Data
                             // /data=...!3d44.4490541!4d26.0888398...
-                            (Regex("""!3d$LAT!4d$LON""") find part)?.toLatLonPoint()?.also { points.add(it) }
+                            Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()?.also { points.add(it) }
                             // /data=...!1d13.4236883!2d52.4858222...!1d13.4255518!2d52.4881038...
-                            points.addAll((Regex("""!1d$LON!2d$LAT""") findAll part).mapNotNull { it.toLonLatPoint() })
+                            points.addAll((Regex("""!1d$LON!2d$LAT""").findAll(part)).mapNotNull { it.toLonLatPoint() })
                         } else if (part.startsWith('@') && centerCoords == null) {
                             // Center
                             // /@52.5067296,13.2599309,6z
-                            (Regex("""@$LAT,$LON(?:,${Z}z)?.*""") match part)?.toLatLonZPoint()?.let { point ->
+                            Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint()?.let { point ->
                                 if (point.lat != null && point.lon != null) {
                                     centerCoords = point.lat to point.lon
                                 }
@@ -97,14 +95,14 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                             // /52.492611,13.431726
                             part
                                 .takeIf { points.isEmpty() } // Only if a point hasn't already been found, e.g. in /data
-                                ?.let { pointPattern match it }
+                                ?.let { pointPattern.matchEntire(it) }
                                 ?.toLatLonPoint()
                                 ?.also { points.add(it) }
                             // Name
                             // /Central+Park
                                 ?: part
                                     .takeIf { defaultName == null } // Use the last name-like path part
-                                    ?.let { Q_PATH_PATTERN match part }
+                                    ?.let { Q_PATH_PATTERN.matchEntire(part) }
                                     ?.groupOrNull()
                                     ?.also { defaultName = it }
                         }
@@ -151,15 +149,15 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
 
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                if (!genericMetaTagFound && (genericMetaTagPattern find line) != null) {
+                if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
                     log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
                     genericMetaTagFound = true
                 }
-                if (points.addAll((pointPattern findAll line).mapNotNull { it.toLatLonPoint() })) {
+                if (points.addAll((pointPattern.findAll(line).mapNotNull { it.toLatLonPoint() }))) {
                     log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
                 }
                 if (defaultPoint == null) {
-                    (defaultPointLinkPattern find line)?.toLatLonPoint()?.let {
+                    defaultPointLinkPattern.find(line)?.toLatLonPoint()?.let {
                         log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
                         defaultPoint = it
                     }
@@ -169,13 +167,13 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                     // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE contains coordinates of the
                     // IP address that the HTTP request came from, instead of correct coordinates. So let's ignore the
                     // coordinates.
-                    (defaultPointAppInitStatePattern find line)?.toLonLatPoint()?.let {
+                    defaultPointAppInitStatePattern.find(line)?.toLonLatPoint()?.let {
                         log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
                         defaultPoint = it
                     }
                 }
                 if (redirectUriString == null) {
-                    (uriPattern find line)?.groupOrNull()?.let {
+                    uriPattern.find(line)?.groupOrNull()?.let {
                         log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
                         redirectUriString = it
                     }

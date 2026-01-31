@@ -8,9 +8,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
@@ -37,17 +36,17 @@ object AppleMapsInput : Input.HasHtml {
                 // Notice that we take the search center 'sll' as a normal point
                 @Suppress("SpellCheckingInspection")
                 listOf("ll", "daddr", "coordinate", "q", "sll", "center")
-                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN match queryParams[key] }
+                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key]) }
                     ?.toLatLonPoint()
                     ?.also { points.add(it) }
 
                 @Suppress("SpellCheckingInspection")
                 listOf("name", "address", "daddr", "q")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN match queryParams[key] }
+                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]) }
                     ?.groupOrNull()
                     ?.also { defaultName = it }
 
-                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
                 if (
                     points.isEmpty() && (
@@ -79,10 +78,10 @@ object AppleMapsInput : Input.HasHtml {
             while (true) {
                 val line = channel.readUTF8Line() ?: break
                 if (lat == null) {
-                    (latPattern find line)?.doubleGroupOrNull()?.let { lat = it }
+                    latPattern.find(line)?.doubleGroupOrNull()?.let { lat = it }
                 }
                 if (lon == null) {
-                    (lonPattern find line)?.doubleGroupOrNull()?.let { lon = it }
+                    lonPattern.find(line)?.doubleGroupOrNull()?.let { lon = it }
                 }
                 if (lat != null && lon != null) {
                     points.add(NaivePoint(lat, lon))

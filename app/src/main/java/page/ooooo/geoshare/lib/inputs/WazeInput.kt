@@ -9,9 +9,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
@@ -47,22 +46,23 @@ object WazeInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                ((Regex("""/ul/h($HASH)""") match path) ?: (Regex("($HASH)") match queryParams["h"]))
+                (Regex("""/ul/h($HASH)""").matchEntire(path) ?: Regex("($HASH)").matchEntire(queryParams["h"]))
                     ?.groupOrNull()
                     ?.let { hash -> decodeWazeGeoHash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(6), lon.toScale(6), z) }
                     ?.also { points.add(it) }
-                    ?: (Regex("""ll\.$LAT,$LON""") match queryParams["to"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN match queryParams["ll"])
+                    ?: Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"])?.toLatLonPoint()
+                        ?.also { points.add(it) }
+                    ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
                         ?.toLatLonPoint()
                         ?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN match queryParams[@Suppress("SpellCheckingInspection") "latlng"])
+                    ?: LAT_LON_PATTERN.matchEntire(queryParams[@Suppress("SpellCheckingInspection") "latlng"])
                         ?.toLatLonPoint()
                         ?.also { points.add(it) }
 
-                (Q_PARAM_PATTERN match queryParams["q"])?.groupOrNull()?.also { defaultName = it }
+                Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.also { defaultName = it }
 
-                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
                 if (points.isEmpty()) {
                     queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
@@ -112,7 +112,7 @@ object WazeInput : Input.HasHtml {
             val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern find line)?.toLatLonPoint()?.also {
+                pattern.find(line)?.toLatLonPoint()?.also {
                     points.add(it)
                     break
                 }

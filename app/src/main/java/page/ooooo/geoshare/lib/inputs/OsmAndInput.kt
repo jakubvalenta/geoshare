@@ -3,7 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.point.asWGS84
@@ -23,11 +23,11 @@ object OsmAndInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (LAT_LON_PATTERN match queryParams["pin"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: (Regex("""$Z/$LAT/$LON.*""") match fragment)?.toZLatLonPoint()
+                LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint()?.also { points.add(it) }
+                    ?: Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()
                         ?.also { points.add(it) }
 
-                (Regex("""$Z/.*""") match fragment)?.doubleGroupOrNull()?.also { defaultZ = it }
+                Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()

@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
@@ -31,7 +31,7 @@ object MapyComInput : Input.HasShortUri {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (Regex(COORDS) match path)
+                Regex(COORDS).matchEntire(path)
                     ?.let { m ->
                         m.groupValues[0].let { entireMatch ->
                             m.doubleGroupOrNull(1)?.let { lat ->
@@ -44,13 +44,13 @@ object MapyComInput : Input.HasShortUri {
                         }
                     }
                     ?.also { points.add(it) }
-                    ?: (LAT_PATTERN match queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
-                        (LAT_PATTERN match queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
+                    ?: LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
+                        LAT_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
                             NaivePoint(lat, lon)
                         }
                     }?.also { points.add(it) }
 
-                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()

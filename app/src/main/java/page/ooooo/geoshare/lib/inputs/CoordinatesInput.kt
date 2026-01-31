@@ -4,7 +4,6 @@ import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
 import page.ooooo.geoshare.lib.point.NaivePoint
@@ -41,7 +40,7 @@ object CoordinatesInput : Input {
         buildPoints {
             uri.run {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
-                (Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""") match path)?.let { m ->
+                Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""").matchEntire(path)?.let { m ->
                     points.add(
                         NaivePoint(
                             degToDec(
@@ -60,7 +59,9 @@ object CoordinatesInput : Input {
                 }
 
                 // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
-                (Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""") match path)?.let { m ->
+                Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""").matchEntire(
+                    path
+                )?.let { m ->
                     points.add(
                         NaivePoint(
                             degToDec(
@@ -83,7 +84,9 @@ object CoordinatesInput : Input {
                 }
 
                 // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
-                (Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""") match path)?.let { m ->
+                Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""").matchEntire(
+                    path
+                )?.let { m ->
                     points.add(
                         NaivePoint(
                             degToDec(

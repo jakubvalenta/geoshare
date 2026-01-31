@@ -6,7 +6,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.outputs.GeoUriOutput
@@ -41,18 +41,18 @@ object GeoUriInput : Input {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (Regex("""$LAT,$LON(?:$NAME_REGEX)?""") match queryParams["q"])
+                Regex("""$LAT,$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])
                     ?.toLatLonNamePoint()
                     ?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN match path)?.toLatLonPoint()?.also { points.add(it) }
+                    ?: LAT_LON_PATTERN.matchEntire(path)?.toLatLonPoint()?.also { points.add(it) }
 
                 queryParams
                     .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
-                    .firstNotNullOfOrNull { (key) -> (Regex(NAME_REGEX) match key)?.groupOrNull() }
+                    .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
                     ?.also { defaultName = it }
-                    ?: (Q_PARAM_PATTERN match queryParams["q"])?.groupOrNull()?.also { defaultName = it }
+                    ?: Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.also { defaultName = it }
 
-                (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()

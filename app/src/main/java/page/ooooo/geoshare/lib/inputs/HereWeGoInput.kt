@@ -3,9 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
@@ -37,21 +36,21 @@ object HereWeGoInput : Input {
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull() ?: return@run
                 if (firstPart == "") {
-                    (Regex("""$LAT,$LON,$Z""") match queryParams["map"])?.toLatLonZPoint()?.also { points.add(it) }
+                    Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint()?.also { points.add(it) }
                 } else {
                     val secondPart = parts.getOrNull(1)
                     if (secondPart != null) {
                         if (firstPart == "l") {
-                            (LAT_LON_PATTERN match secondPart)?.toLatLonPoint()?.also { points.add(it) }
+                            LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint()?.also { points.add(it) }
                         } else if (firstPart == "p") {
-                            (Regex("""[a-z]-($SIMPLIFIED_BASE64)""") match secondPart)
+                            Regex("""[a-z]-($SIMPLIFIED_BASE64)""").matchEntire(secondPart)
                                 ?.groupOrNull()
                                 ?.let { encoded -> Base64.decode(encoded).decodeToString() }
                                 ?.let { decoded ->
-                                    (Regex("""(?:lat=|"latitude":)$LAT""") find decoded)
+                                    Regex("""(?:lat=|"latitude":)$LAT""").find(decoded)
                                         ?.doubleGroupOrNull()
                                         ?.let { lat ->
-                                            (Regex("""(?:lon=|"longitude":)$LON""") find decoded)
+                                            Regex("""(?:lon=|"longitude":)$LON""").find(decoded)
                                                 ?.doubleGroupOrNull()
                                                 ?.let { lon ->
                                                     NaivePoint(lat, lon)
@@ -63,7 +62,7 @@ object HereWeGoInput : Input {
                     }
                 }
 
-                (Regex(""".*,$Z""") match queryParams["map"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()

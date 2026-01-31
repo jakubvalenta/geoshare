@@ -4,7 +4,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.findAll
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
@@ -35,12 +35,12 @@ object BaiduMapInput : Input {
                 if (firstPart.startsWith('@')) {
                     // Center
                     // https://map.baidu.com/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>
-                    (Regex(CENTER) match firstPart)?.toLonLatZPoint()?.also { points.add(it) }
+                    Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.also { points.add(it) }
 
                 } else if (firstPart == "poi") {
                     // Place
                     // https://map.baidu.com/poi/<NAME>/@<X>,<Y>,<Z>
-                    (Regex(CENTER) match parts.getOrNull(2))
+                    Regex(CENTER).matchEntire(parts.getOrNull(2))
                         ?.toLonLatZPoint()
                         ?.also { points.add(it.copy(name = parts.getOrNull(1))) }
 
@@ -48,8 +48,8 @@ object BaiduMapInput : Input {
                     // Directions
                     // https://map.baidu.com/dir/...?sn=<START_POINT>&en=<WAYPOINT_POINT>$$1$$%20to:<DEST_POINT>
                     val pattern = Regex(WAYPOINT)
-                    (pattern find queryParams["sn"])?.toLonLatNamePoint()?.also { points.add(it) }
-                    points.addAll((pattern findAll queryParams["en"]).mapNotNull { it.toLonLatNamePoint() })
+                    pattern.find(queryParams["sn"])?.toLonLatNamePoint()?.also { points.add(it) }
+                    points.addAll((pattern.findAll(queryParams["en"])).mapNotNull { it.toLonLatNamePoint() })
 
                     // Directions without params
                     // https://map.baidu.com/dir/<START_NAME>/<WAYPOINT_NAME>/<DEST_NAME>/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>z

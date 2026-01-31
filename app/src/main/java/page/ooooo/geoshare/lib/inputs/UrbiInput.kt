@@ -8,8 +8,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.extensions.toZLonLatPoint
@@ -55,11 +54,11 @@ object UrbiInput : Input.HasHtml {
     override suspend fun parseUri(uri: Uri): ParseUriResult? =
         buildPoints {
             uri.run {
-                (Regex("""$LON,$LAT/$Z""") match queryParams["m"])?.toLonLatZPoint()?.also { points.add(it) }
-                    ?: (Regex(""".*/$LON,$LAT/?$""") match path)?.toLonLatPoint()?.also { points.add(it) }
-                    ?: (LON_LAT_PATTERN match queryParams["center"])?.toLonLatPoint()?.also { points.add(it) }
+                Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.also { points.add(it) }
+                    ?: Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.also { points.add(it) }
+                    ?: LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.also { points.add(it) }
 
-                (Z_PATTERN match queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }
             .asWGS84()
@@ -76,7 +75,7 @@ object UrbiInput : Input.HasHtml {
             val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern find line)?.toZLonLatPoint()?.also {
+                pattern.find(line)?.toZLonLatPoint()?.also {
                     points.add(it)
                     break
                 }

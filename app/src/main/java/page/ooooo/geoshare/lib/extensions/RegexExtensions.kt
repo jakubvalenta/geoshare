@@ -5,11 +5,11 @@ import kotlin.text.Regex
 
 import page.ooooo.geoshare.lib.point.NaivePoint
 
-infix fun Regex.find(input: String?): MatchResult? = input?.let { this.find(it) }
+fun Regex.find(input: CharSequence?): MatchResult? = input?.let { this.find(it) }
 
-infix fun Regex.findAll(input: String?): Sequence<MatchResult> = input?.let { this.findAll(it) }.orEmpty()
+fun Regex.findAll(input: CharSequence?): Sequence<MatchResult> = input?.let { this.findAll(it) }.orEmpty()
 
-infix fun Regex.match(input: String?): MatchResult? = input?.let { this.matchEntire(it) }
+fun Regex.matchEntire(input: CharSequence?): MatchResult? = input?.let { this.matchEntire(it) }
 
 fun MatchResult.groupOrNull(index: Int = 1): String? = this.groupValues[index].takeIf { it.isNotEmpty() }
 

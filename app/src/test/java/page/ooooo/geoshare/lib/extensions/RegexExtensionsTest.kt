@@ -8,7 +8,7 @@ class RegexExtensionsTest {
     fun findAll() {
         assertEquals(
             listOf("a", "b", "c"),
-            (Regex(".") findAll "abc").map { it.groupOrNull(0) }.toList(),
+            Regex(".").findAll("abc").map { it.value }.toList(),
         )
     }
 }

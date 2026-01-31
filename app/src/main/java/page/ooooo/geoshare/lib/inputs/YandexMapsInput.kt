@@ -8,8 +8,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.find
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
@@ -55,12 +54,12 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         return buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
-                (LON_LAT_PATTERN match queryParams["whatshere[point]"])?.toLonLatPoint()?.also { points.add(it) }
-                    ?: (LON_LAT_PATTERN match queryParams["ll"])?.toLonLatPoint()?.also { points.add(it) }
+                LON_LAT_PATTERN.matchEntire(queryParams["whatshere[point]"])?.toLonLatPoint()?.also { points.add(it) }
+                    ?: LON_LAT_PATTERN.matchEntire(queryParams["ll"])?.toLonLatPoint()?.also { points.add(it) }
 
                 @Suppress("SpellCheckingInspection")
-                (Z_PATTERN match queryParams["whatshere[zoom]"])?.doubleGroupOrNull()?.also { defaultZ = it }
-                    ?: (Z_PATTERN match queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                Z_PATTERN.matchEntire(queryParams["whatshere[zoom]"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                    ?: Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
                 if (points.isEmpty() && Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
                     htmlUriString = uri.toString()
@@ -82,7 +81,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
             val pattern = Regex("""ll=$LON%2C$LAT""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                (pattern find line)?.toLonLatPoint()?.also {
+                pattern.find(line)?.toLonLatPoint()?.also {
                     points.add(it)
                     break
                 }

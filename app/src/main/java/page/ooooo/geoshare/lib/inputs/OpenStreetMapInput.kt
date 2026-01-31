@@ -7,9 +7,8 @@ import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.extensions.match
+import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
@@ -43,14 +42,14 @@ object OpenStreetMapInput : Input.HasHtml {
         var htmlUriString: String? = null
         return buildPoints {
             uri.run {
-                (Regex("""/go/($HASH)""") match path)
+                Regex("""/go/($HASH)""").matchEntire(path)
                     ?.groupOrNull()
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                     ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
                     ?.also { points.add(it) }
-                    ?: (Regex("""map=$Z/$LAT/$LON.*""") match fragment)?.toZLatLonPoint()?.also { points.add(it) }
-                    ?: (LAT_LON_PATTERN match queryParams["to"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: (Regex(ELEMENT_PATH) match path)?.let { m ->
+                    ?: Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also { points.add(it) }
+                    ?: LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.also { points.add(it) }
+                    ?: Regex(ELEMENT_PATH).matchEntire(path)?.let { m ->
                         m.groupOrNull(1)?.let { type ->
                             m.groupOrNull(2)?.let { id ->
                                 htmlUriString =
@@ -75,7 +74,7 @@ object OpenStreetMapInput : Input.HasHtml {
             val pattern = Regex(""""lat":$LAT,"lon":$LON""")
             while (true) {
                 val line = channel.readUTF8Line() ?: break
-                points.addAll((pattern findAll line).mapNotNull { it.toLatLonPoint() })
+                points.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint() })
             }
         }
             .asWGS84()
