@@ -78,8 +78,33 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             WGS84Point(52.5067296, 13.2599309),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
+    }
 
-        // Place list (sometimes fails, probably due to IP address blocking)
+    @Test
+    // This test fails now, because Google returns a captcha, even though we only run the test on a real device
+    @NotEmulator
+    fun testSearch() {
+        // Launch app and set connection permission to Always
+        launchApplication()
+        closeIntro()
+        setUserPreferenceConnectionPermissionToAlways()
+
+        // Google Search
+        testUri(
+            WGS84Point(27.765028, -15.600889),
+            "https://g.co/kgs/91UYXud",
+        )
+    }
+
+    @Test
+    // This test fails now, because Google changed their HTML
+    fun testPlaceList() {
+        // Launch app and set connection permission to Always
+        launchApplication()
+        closeIntro()
+        setUserPreferenceConnectionPermissionToAlways()
+
+        // Place list
         testUri(
             persistentListOf(
                 GCJ02Point(59.1293656, 11.4585672),
@@ -92,22 +117,6 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
                 GCJ02Point(59.147731699999994, 11.550661199999999),
             ),
             "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
-        )
-    }
-
-    @Test
-    // Require that the device is not an emulator, because Google recognizes an emulator and returns a captcha
-    @NotEmulator
-    fun testSearch() {
-        // Launch app and set connection permission to Always
-        launchApplication()
-        closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
-
-        // Google Search
-        testUri(
-            WGS84Point(27.765028, -15.600889),
-            "https://g.co/kgs/91UYXud",
         )
     }
 }

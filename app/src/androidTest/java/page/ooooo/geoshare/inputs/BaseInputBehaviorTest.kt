@@ -67,10 +67,11 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 
         // Set main input
         onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }.setText(unsafeText)
-        waitForStableInActiveWindow()
 
-        // Submit and confirm permission dialog
-        onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
+        // Submit by pressing Enter, because the submit button can be covered by IME on a small screen
+        pressEnter()
+
+        // Confirm permission dialog
         confirmDialogIfItIsVisible()
 
         // Shows position
