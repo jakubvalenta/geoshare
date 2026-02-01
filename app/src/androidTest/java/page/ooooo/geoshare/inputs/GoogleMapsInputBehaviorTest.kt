@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.lib.point.GCJ02Point
@@ -81,9 +82,13 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    // This test fails now, because Google returns a captcha, even though we only run the test on a real device
     @NotEmulator
     fun testSearch() {
+        assumeTrue(
+            "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
+            false,
+        )
+
         // Launch app and set connection permission to Always
         launchApplication()
         closeIntro()
@@ -97,8 +102,9 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    // This test fails now, because Google changed their HTML
     fun testPlaceList() {
+        assumeTrue("This test currently fails, because Google changed their HTML", false)
+
         // Launch app and set connection permission to Always
         launchApplication()
         closeIntro()
