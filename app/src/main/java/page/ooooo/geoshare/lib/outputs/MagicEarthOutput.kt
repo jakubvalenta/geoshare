@@ -92,7 +92,7 @@ object MagicEarthOutput : Output {
         }
     }
 
-    open class ShareDisplayUriWithAppAction(override val packageName: String) : OpenAppAction(packageName) {
+    class ShareDisplayUriWithAppAction(override val packageName: String) : OpenAppAction(packageName) {
         override fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
             formatDisplayUriString(points, i, uriQuote)
 

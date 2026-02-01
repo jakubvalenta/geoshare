@@ -37,17 +37,17 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 
     protected fun testUri(expectedPoints: ImmutableList<Point>, unsafeUriString: String) = uiAutomator {
         goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        waitAndAssertPositionIsVisible(expectedPoints)
+        assertConversionSucceeded(expectedPoints)
     }
 
     protected fun testUri(expectedPoint: Point, unsafeUriString: String) = uiAutomator {
         goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        waitAndAssertPositionIsVisible(expectedPoint)
+        assertConversionSucceeded(expectedPoint)
     }
 
     protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point) = uiAutomator {
         goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        waitAndAssertPositionIsVisible(expectedPoint, fallbackPoint)
+        assertConversionSucceeded(expectedPoint, fallbackPoint)
     }
 
     protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
@@ -76,7 +76,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         confirmDialogIfItIsVisible()
 
         // Shows position
-        waitAndAssertPositionIsVisible(expectedPoints)
+        assertConversionSucceeded(expectedPoints)
     }
 
     protected fun testTextUri(expectedPoint: Point, unsafeText: String) =

@@ -20,7 +20,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        waitAndAssertPositionIsVisible(WGS84Point(52.5067296, 13.2599309, z = 11.0))
+        assertConversionSucceeded(WGS84Point(52.5067296, 13.2599309, z = 11.0))
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareResultCardApp_${PackageNames.GOOGLE_MAPS}" }.click()
@@ -43,7 +43,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
             // Shows precise location in WGS 84
-            waitAndAssertPositionIsVisible(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
+            assertConversionSucceeded(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
 
             // Open position menu
             onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
@@ -74,7 +74,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
                 WGS84Point(
                     52.4842015,
@@ -104,7 +104,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
                 WGS84Point(
                     52.4842015,
@@ -118,7 +118,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098"),
                 WGS84Point(
                     44.4490541,
@@ -204,7 +204,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(WGS84Point(52.4697882, 13.4257989))
+            assertConversionSucceeded(WGS84Point(52.4697882, 13.4257989))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
@@ -227,14 +227,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(WGS84Point(52.4778665, 13.426398))
+            assertConversionSucceeded(WGS84Point(52.4778665, 13.426398))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(WGS84Point(52.4820815, 13.4338421))
+            assertConversionSucceeded(WGS84Point(52.4820815, 13.4338421))
         }
 
     @Test
@@ -298,7 +298,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 10, Berlin"),
                 WGS84Point(
                     52.4848232,
@@ -328,7 +328,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin"),
                 WGS84Point(
                     52.4834254,
@@ -342,7 +342,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 21, Berlin"),
                 WGS84Point(
                     52.4832988,
@@ -364,7 +364,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows location search
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin")
             )
 
@@ -388,7 +388,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows location search
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin")
             )
 
@@ -397,7 +397,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             waitForStableInActiveWindow()
 
             // Shows location search
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin")
             )
         }
@@ -414,7 +414,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            waitAndAssertPositionIsVisible(
+            assertConversionSucceeded(
                 WGS84Point(name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
                 WGS84Point(
                     51.1982447,

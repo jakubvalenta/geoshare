@@ -158,7 +158,7 @@ abstract class BaseActivityBehaviorTest {
         )
     }
 
-    protected fun waitAndAssertPositionIsVisible(expectedPoints: ImmutableList<Point>) = uiAutomator {
+    protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>) = uiAutomator {
         onElement(NETWORK_TIMEOUT) {
             when (viewIdResourceName) {
                 "geoShareConversionSuccessPositionName" -> true
@@ -201,21 +201,21 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun waitAndAssertPositionIsVisible(
+    protected fun assertConversionSucceeded(
         expectedPoints: ImmutableList<Point>,
         fallbackPoints: ImmutableList<Point>,
     ) =
         try {
-            waitAndAssertPositionIsVisible(expectedPoints)
+            assertConversionSucceeded(expectedPoints)
         } catch (_: ElementNotFoundException) {
-            waitAndAssertPositionIsVisible(fallbackPoints)
+            assertConversionSucceeded(fallbackPoints)
         }
 
-    protected fun waitAndAssertPositionIsVisible(expectedPoint: Point) =
-        waitAndAssertPositionIsVisible(persistentListOf(expectedPoint))
+    protected fun assertConversionSucceeded(expectedPoint: Point) =
+        assertConversionSucceeded(persistentListOf(expectedPoint))
 
-    protected fun waitAndAssertPositionIsVisible(expectedPoint: Point, fallbackPoint: Point) =
-        waitAndAssertPositionIsVisible(persistentListOf(expectedPoint), persistentListOf(fallbackPoint))
+    protected fun assertConversionSucceeded(expectedPoint: Point, fallbackPoint: Point) =
+        assertConversionSucceeded(persistentListOf(expectedPoint), persistentListOf(fallbackPoint))
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps

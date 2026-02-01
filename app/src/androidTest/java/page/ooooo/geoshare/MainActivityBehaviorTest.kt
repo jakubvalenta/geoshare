@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 
 @RunWith(AndroidJUnit4::class)
-open class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
+class MainActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     @NotXiaomi
