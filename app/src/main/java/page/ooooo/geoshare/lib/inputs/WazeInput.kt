@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
@@ -111,7 +111,7 @@ object WazeInput : Input.HasHtml {
 
             val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
             while (true) {
-                val line = channel.readUTF8Line() ?: break
+                val line = channel.readLine() ?: break
                 pattern.find(line)?.toLatLonPoint()?.also {
                     points.add(it)
                     break

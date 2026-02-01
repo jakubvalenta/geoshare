@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
@@ -76,7 +76,7 @@ object AppleMapsInput : Input.HasHtml {
             var lat: Double? = null
             var lon: Double? = null
             while (true) {
-                val line = channel.readUTF8Line() ?: break
+                val line = channel.readLine() ?: break
                 if (lat == null) {
                     latPattern.find(line)?.doubleGroupOrNull()?.let { lat = it }
                 }

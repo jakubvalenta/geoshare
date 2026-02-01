@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readUTF8Line
+import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
@@ -80,7 +80,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
 
             val pattern = Regex("""ll=$LON%2C$LAT""")
             while (true) {
-                val line = channel.readUTF8Line() ?: break
+                val line = channel.readLine() ?: break
                 pattern.find(line)?.toLonLatPoint()?.also {
                     points.add(it)
                     break
