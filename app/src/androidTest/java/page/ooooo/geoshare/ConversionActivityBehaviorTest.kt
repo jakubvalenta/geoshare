@@ -523,12 +523,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Open position menu
         onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
 
-        // Swipe the sheet
-        onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 0.5f)
-        // Use device.swipe() instead of element.swipe(), because it's more reliable on Nexus 5
-        device.apply { swipe(displayWidth / 2, displayHeight / 2, displayWidth / 2, 0, 10) }
+        // Swipe the sheet to reveal "Copy Magic Earth link"
+        onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 1f)
 
-        // Tap the "Copy Magic Earth link" button
+        // Tap "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareOutputMagicEarthCopyNavigateToUri" }.click()
 
         // Shows success message
