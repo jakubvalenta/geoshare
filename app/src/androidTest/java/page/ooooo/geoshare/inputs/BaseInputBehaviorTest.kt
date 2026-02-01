@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.inputs
 
-import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -27,33 +26,29 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    protected fun testUri(
-        expectedPoints: ImmutableList<Point>,
-        unsafeUriString: String,
-        fallbackPoints: ImmutableList<Point>? = null,
-    ) =
-        uiAutomator {
-            // Go to main form
-            goToMainForm()
+    private fun goToMainFormShareUriAndConfirmDialog(unsafeUriString: String) = uiAutomator {
+        // Go to main form
+        goToMainForm()
 
-            // Share URI and confirm permission dialog
-            shareUri(unsafeUriString)
-            confirmDialogIfItIsVisible()
+        // Share URI and confirm permission dialog
+        shareUri(unsafeUriString)
+        confirmDialogIfItIsVisible()
+    }
 
-            // Shows position
-            try {
-                waitAndAssertPositionIsVisible(expectedPoints)
-            } catch (e: ElementNotFoundException) {
-                if (fallbackPoints != null) {
-                    waitAndAssertPositionIsVisible(fallbackPoints)
-                } else {
-                    throw e
-                }
-            }
-        }
+    protected fun testUri(expectedPoints: ImmutableList<Point>, unsafeUriString: String) = uiAutomator {
+        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        waitAndAssertPositionIsVisible(expectedPoints)
+    }
 
-    protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point? = null) =
-        testUri(persistentListOf(expectedPoint), unsafeUriString, fallbackPoint?.let { persistentListOf(it) })
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String) = uiAutomator {
+        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        waitAndAssertPositionIsVisible(expectedPoint)
+    }
+
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point) = uiAutomator {
+        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        waitAndAssertPositionIsVisible(expectedPoint, fallbackPoint)
+    }
 
     protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
@@ -200,8 +201,21 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
+    protected fun waitAndAssertPositionIsVisible(
+        expectedPoints: ImmutableList<Point>,
+        fallbackPoints: ImmutableList<Point>,
+    ) =
+        try {
+            waitAndAssertPositionIsVisible(expectedPoints)
+        } catch (_: ElementNotFoundException) {
+            waitAndAssertPositionIsVisible(fallbackPoints)
+        }
+
     protected fun waitAndAssertPositionIsVisible(expectedPoint: Point) =
         waitAndAssertPositionIsVisible(persistentListOf(expectedPoint))
+
+    protected fun waitAndAssertPositionIsVisible(expectedPoint: Point, fallbackPoint: Point) =
+        waitAndAssertPositionIsVisible(persistentListOf(expectedPoint), persistentListOf(fallbackPoint))
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps

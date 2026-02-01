@@ -2,7 +2,6 @@ package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
-import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
@@ -75,21 +74,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(
-                        52.4842015,
-                        13.4167277,
-                        name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                    )
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany")
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
+                WGS84Point(
+                    52.4842015,
+                    13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                ),
+            )
 
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
@@ -112,42 +104,28 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(
-                        52.4842015,
-                        13.4167277,
-                        name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                    ),
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
+                WGS84Point(
+                    52.4842015,
+                    13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                ),
+            )
 
             // Share another Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA")
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(
-                        44.4490541,
-                        26.0888398,
-                        name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                    ),
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098"),
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098"),
+                WGS84Point(
+                    44.4490541,
+                    26.0888398,
+                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                ),
+            )
         }
 
     @Test
@@ -320,17 +298,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(52.4848232, 13.4240791, name = "Hermannstr. 10, Berlin"),
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "Hermannstr. 10, Berlin"),
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 10, Berlin"),
+                WGS84Point(
+                    52.4848232,
+                    13.4240791,
+                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 10, Berlin",
+                ),
+            )
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+11,+Berlin/")
@@ -353,34 +328,28 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(52.4834254, 13.4245399, name = "Hermannstr. 20, Berlin"),
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "Hermannstr. 20, Berlin"),
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin"),
+                WGS84Point(
+                    52.4834254,
+                    13.4245399,
+                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin",
+                ),
+            )
 
             // Share another Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+21,+Berlin/")
             waitForStableInActiveWindow()
 
             // Shows precise location again
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(52.4832988, 13.4245179, name = "Hermannstr. 21, Berlin"),
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "Hermannstr. 21, Berlin"),
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 21, Berlin"),
+                WGS84Point(
+                    52.4832988,
+                    13.4245179,
+                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 21, Berlin",
+                ),
+            )
         }
 
     @Test
@@ -396,8 +365,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows location search
             waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                WGS84Point(name = "Hermannstr. 30, Berlin")
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin")
             )
 
             // Share another Google Maps place link with the app
@@ -421,8 +389,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows location search
             waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                WGS84Point(name = "Hermannstr. 40, Berlin")
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin")
             )
 
             // Share another Google Maps place link with the app
@@ -431,8 +398,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows location search
             waitAndAssertPositionIsVisible(
-                @Suppress("SpellCheckingInspection")
-                WGS84Point(name = "Hermannstr. 41, Berlin")
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin")
             )
         }
 
@@ -448,21 +414,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Shows precise location
-            try {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(
-                        51.1982447,
-                        6.4389493,
-                        name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
-                    ),
-                )
-            } catch (_: ElementNotFoundException) {
-                waitAndAssertPositionIsVisible(
-                    @Suppress("SpellCheckingInspection")
-                    WGS84Point(name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
-                )
-            }
+            waitAndAssertPositionIsVisible(
+                WGS84Point(name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
+                WGS84Point(
+                    51.1982447,
+                    6.4389493,
+                    name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                ),
+            )
         }
 
     @Test
