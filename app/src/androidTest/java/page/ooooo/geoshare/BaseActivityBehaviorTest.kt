@@ -2,6 +2,7 @@ package page.ooooo.geoshare
 
 import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
@@ -157,7 +158,7 @@ abstract class BaseActivityBehaviorTest {
         )
     }
 
-    protected fun waitAndAssertPositionIsVisible(expectedPoints: ImmutableList<Point>) = uiAutomator {
+    protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>) = uiAutomator {
         onElement(NETWORK_TIMEOUT) {
             when (viewIdResourceName) {
                 "geoShareConversionSuccessPositionName" -> true
@@ -200,8 +201,21 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun waitAndAssertPositionIsVisible(expectedPoint: Point) =
-        waitAndAssertPositionIsVisible(persistentListOf(expectedPoint))
+    protected fun assertConversionSucceeded(
+        expectedPoints: ImmutableList<Point>,
+        fallbackPoints: ImmutableList<Point>,
+    ) =
+        try {
+            assertConversionSucceeded(expectedPoints)
+        } catch (_: ElementNotFoundException) {
+            assertConversionSucceeded(fallbackPoints)
+        }
+
+    protected fun assertConversionSucceeded(expectedPoint: Point) =
+        assertConversionSucceeded(persistentListOf(expectedPoint))
+
+    protected fun assertConversionSucceeded(expectedPoint: Point, fallbackPoint: Point) =
+        assertConversionSucceeded(persistentListOf(expectedPoint), persistentListOf(fallbackPoint))
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps

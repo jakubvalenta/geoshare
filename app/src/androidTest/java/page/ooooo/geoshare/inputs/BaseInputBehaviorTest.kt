@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.inputs
 
-import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -27,33 +26,29 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    protected fun testUri(
-        expectedPoints: ImmutableList<Point>,
-        unsafeUriString: String,
-        fallbackPoints: ImmutableList<Point>? = null,
-    ) =
-        uiAutomator {
-            // Go to main form
-            goToMainForm()
+    private fun goToMainFormShareUriAndConfirmDialog(unsafeUriString: String) = uiAutomator {
+        // Go to main form
+        goToMainForm()
 
-            // Share URI and confirm permission dialog
-            shareUri(unsafeUriString)
-            confirmDialogIfItIsVisible()
+        // Share URI and confirm permission dialog
+        shareUri(unsafeUriString)
+        confirmDialogIfItIsVisible()
+    }
 
-            // Shows position
-            try {
-                waitAndAssertPositionIsVisible(expectedPoints)
-            } catch (e: ElementNotFoundException) {
-                if (fallbackPoints != null) {
-                    waitAndAssertPositionIsVisible(fallbackPoints)
-                } else {
-                    throw e
-                }
-            }
-        }
+    protected fun testUri(expectedPoints: ImmutableList<Point>, unsafeUriString: String) = uiAutomator {
+        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        assertConversionSucceeded(expectedPoints)
+    }
 
-    protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point? = null) =
-        testUri(persistentListOf(expectedPoint), unsafeUriString, fallbackPoint?.let { persistentListOf(it) })
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String) = uiAutomator {
+        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        assertConversionSucceeded(expectedPoint)
+    }
+
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point) = uiAutomator {
+        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        assertConversionSucceeded(expectedPoint, fallbackPoint)
+    }
 
     protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
@@ -66,15 +61,22 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         goToMainForm()
 
         // Set main input
-        onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }.setText(unsafeText)
-        waitForStableInActiveWindow()
+        val mainInput = onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
+        mainInput.setText(unsafeText)
+        if (mainInput.isFocused) {
+            // If the field is focused, the submit button can be covered by IME, so submit by pressing Enter
+            pressEnter()
+        } else {
+            // If the field is not focused (for some reason), then pressing Enter doesn't submit, so submit by
+            // clicking the submit button instead
+            onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
+        }
 
-        // Submit and confirm permission dialog
-        onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
+        // Confirm permission dialog
         confirmDialogIfItIsVisible()
 
         // Shows position
-        waitAndAssertPositionIsVisible(expectedPoints)
+        assertConversionSucceeded(expectedPoints)
     }
 
     protected fun testTextUri(expectedPoint: Point, unsafeText: String) =

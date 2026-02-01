@@ -191,6 +191,22 @@ class ConversionViewModel @Inject constructor(
         transition()
     }
 
+    private fun transition() {
+        transitionJob?.cancel()
+        transitionJob = viewModelScope.launch {
+            try {
+                stateContext.transition()
+            } catch (tr: Exception) {
+                stateContext.log.e(null, "Exception while transitioning state", tr)
+                stateContext.log.e(null, tr.stackTraceToString())
+                stateContext.currentState = ConversionFailed(
+                    R.string.conversion_failed_parse_url_error,
+                    inputUriString,
+                )
+            }
+        }
+    }
+
     fun grant(doNotAsk: Boolean) {
         (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
             transitionJob?.cancel()
@@ -200,6 +216,7 @@ class ConversionViewModel @Inject constructor(
                     stateContext.transition()
                 } catch (tr: Exception) {
                     stateContext.log.e(null, "Exception while transitioning state", tr)
+                    stateContext.log.e(null, tr.stackTraceToString())
                     stateContext.currentState = ConversionFailed(
                         R.string.conversion_failed_parse_url_error,
                         inputUriString,
@@ -218,6 +235,7 @@ class ConversionViewModel @Inject constructor(
                     stateContext.transition()
                 } catch (tr: Exception) {
                     stateContext.log.e(null, "Exception while transitioning state", tr)
+                    stateContext.log.e(null, tr.stackTraceToString())
                     stateContext.currentState = ConversionFailed(
                         R.string.conversion_failed_parse_url_error,
                         inputUriString,
@@ -311,21 +329,6 @@ class ConversionViewModel @Inject constructor(
 
     fun manageBillingProduct(product: BillingProduct) {
         billing.manageProduct(product)
-    }
-
-    private fun transition() {
-        transitionJob?.cancel()
-        transitionJob = viewModelScope.launch {
-            try {
-                stateContext.transition()
-            } catch (tr: Exception) {
-                stateContext.log.e(null, "Exception while transitioning state", tr)
-                stateContext.currentState = ConversionFailed(
-                    R.string.conversion_failed_parse_url_error,
-                    inputUriString,
-                )
-            }
-        }
     }
 
     fun cancel() {
