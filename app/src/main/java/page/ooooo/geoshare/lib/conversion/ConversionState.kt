@@ -421,6 +421,7 @@ data class GrantedParseWebPermission(
     override suspend fun transition(): State? =
         if (
             try {
+                // Fail the conversion unless the URL change callback is called within timeout
                 delay(timeout)
                 true
             } catch (_: CancellationException) {
@@ -569,9 +570,7 @@ data class ActionRan(
 ) : ConversionState.HasResult {
     override suspend fun transition(): State = when (success) {
         true -> ActionSucceeded(inputUriString, points, action)
-
         false -> ActionFailed(inputUriString, points, action)
-
         else -> ActionFinished(inputUriString, points, action)
     }
 }
