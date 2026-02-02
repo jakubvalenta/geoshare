@@ -68,9 +68,7 @@ sealed interface ParseWebResult {
         lateinit var points: ImmutableList<Point>
 
         fun build(): ParseWebResult =
-            points.takeIf { it.lastOrNull()?.hasCoordinates() == true }?.let {
-                Succeeded(points)
-            } ?: points.takeIf { it.lastOrNull()?.hasName() == true }?.let {
+            points.lastOrNull()?.takeIf { it.hasCoordinates() || it.hasName() }?.let {
                 Succeeded(points)
             } ?: Failed()
     }

@@ -63,6 +63,7 @@ object UrbiInput : Input.HasHtml {
     }
 
     override suspend fun parseHtml(
+        htmlUrlString: String,
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,

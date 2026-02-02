@@ -32,10 +32,6 @@ fun InvisibleWebView(
         factory = {
             WebView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(1080, 1920)
-                if (!BuildConfig.DEBUG) {
-                    translationX = -3000f
-                    translationY = -3000f
-                }
 
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
@@ -43,15 +39,16 @@ fun InvisibleWebView(
 
                 settings.javaScriptEnabled = true
 
-
+                // TODO Security
                 addJavascriptInterface(
                     object {
                         @Suppress("unused")
                         @JavascriptInterface
                         fun onUrlChange(urlString: String) {
-                            // TODO runOnUiThread
-                            Log.d(TAG, "URL changed to $url")
+                            Log.d(TAG, "URL changed to $urlString")
                             onUrlChange(urlString)
+                            // TODO Two onUrlChange emissions in short sequence cancel transition
+                            // TODO Fix first onUrlChange emission being user's coordinates and only the second one the real ones
                         }
                     },
                     "Android",
@@ -93,16 +90,18 @@ fun InvisibleWebView(
                     ): WebResourceResponse? {
                         request?.url?.toString()?.let { requestUrlString ->
                             if (shouldInterceptRequest(requestUrlString)) {
-                                Log.d(TAG, "Cancelled request to $url")
+                                Log.d(TAG, "Cancelled request to $requestUrlString")
                                 return WebResourceResponse("text/plain", "utf-8", null)
                             }
-                            Log.d(TAG, "Allowed request to $url")
+                            Log.d(TAG, "Allowed request to $requestUrlString")
                         }
                         return super.shouldInterceptRequest(view, request)
                     }
                 }
             }
         },
+        // TODO Fix white full screen box before WebView URL starts loading
+        modifier = Modifier.offset((-3000).dp, (-3000).dp),
         update = { webView -> webView.loadUrl(url) },
         onReset = { webView ->
             webView.stopLoading()

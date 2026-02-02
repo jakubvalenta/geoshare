@@ -9,7 +9,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.point.Point
 
 object ExampleInput : Input.HasWeb {
-    override val uriPattern = Regex("""https?://(?:www\.)?example\.com(?:/\S+|$)""")
+    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?example\.com(?:/\S+|$)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.EXAMPLE,
         nameResId = R.string.converter_example_name,
@@ -20,7 +20,7 @@ object ExampleInput : Input.HasWeb {
         webUriString = uri.toString()
     }
 
-    override fun onUrlChange(
+    override suspend fun onUrlChange(
         urlString: String,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,

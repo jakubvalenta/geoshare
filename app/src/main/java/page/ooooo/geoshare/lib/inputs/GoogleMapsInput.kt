@@ -20,6 +20,7 @@ import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
 
 object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
+    private const val TAG = "GoogleMapsInput"
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
 
     override val uriPattern =
@@ -126,6 +127,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
     }
 
     override suspend fun parseHtml(
+        htmlUrlString: String,
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
@@ -177,26 +179,52 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
                 }
             }
 
-            if (points.isEmpty() && defaultPoint != null) {
-                points.add(defaultPoint)
+            if (points.isEmpty()) {
+                if (defaultPoint != null) {
+                    points.add(defaultPoint)
+                } else {
+                    webUriString = htmlUrlString
+                }
             }
         }.asGCJ02()
     }
 
-    override fun onUrlChange(
+    override suspend fun onUrlChange(
         urlString: String,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseWebResult? {
-        return null // TODO
+    ) = buildParseWebResult {
+        val parseUriResult = parseUri(Uri.parse(urlString))
+        if (parseUriResult is ParseUriResult.Succeeded) {
+            log.i(TAG, "Parsed web URL $urlString to ${parseUriResult.points}")
+            points = parseUriResult.points
+        } else {
+            log.i(TAG, "Failed to parse web URL $urlString")
+        }
     }
 
     override fun shouldInterceptRequest(
         requestUrlString: String,
         log: ILog,
-    ): Boolean {
-        return false // TODO
-    }
+    ) =
+        // Assets
+        requestUrlString.contains(".css")
+            || requestUrlString.endsWith(".gif")
+            || requestUrlString.endsWith(".ico")
+            || requestUrlString.endsWith(".png")
+            || requestUrlString.endsWith(".svg")
+            || requestUrlString.startsWith("https://fonts.gstatic.com/")
+            || requestUrlString.startsWith("https://maps.gstatic.com/")
+            || requestUrlString.startsWith("https://www.google.com/maps/vt/icon/")
+
+            // Satellite tiles
+            || requestUrlString.contains("https://khms")
+            // TODO Try intercepting regular tiles too
+
+            // Tracking
+            || requestUrlString.contains("google.com/log")
+            || requestUrlString.contains("google.com/gen")
+            || requestUrlString.startsWith("https://tpc.googlesyndication.com/")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title

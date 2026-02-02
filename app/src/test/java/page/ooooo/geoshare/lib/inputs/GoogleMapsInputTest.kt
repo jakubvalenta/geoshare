@@ -669,11 +669,13 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNull() = runTest {
-        assertTrue(
+        assertEquals(
+            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml(
                 @Suppress("SpellCheckingInspection") """<head><meta content="Google Maps" itemprop="name">
-    <script>window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0, 0, 0],[1024, 768],13.1]"""
-            ) is ParseHtmlResult.Failed,
+    <script>window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0, 0, 0],[1024, 768],13.1]""",
+                "https://www.google.com/maps/place/Berlin,+Germany/"
+            ),
         )
     }
 
@@ -762,12 +764,18 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_failure() = runTest {
-        assertTrue(parseHtml("spam") is ParseHtmlResult.Failed)
+        assertEquals(
+            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            parseHtml("spam", "https://www.google.com/maps/place/Berlin,+Germany/")
+        )
     }
 
     @Test
     fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() = runTest {
-        assertTrue(parseHtml("<html></html>") is ParseHtmlResult.Failed)
+        assertEquals(
+            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            parseHtml("<html></html>", "https://www.google.com/maps/place/Berlin,+Germany/"),
+        )
     }
 
     @Test

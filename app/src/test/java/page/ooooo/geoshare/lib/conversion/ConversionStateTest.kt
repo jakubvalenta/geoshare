@@ -789,7 +789,7 @@ class ConversionStateTest {
     }
 
     @Test
-    fun unshortenedUrl_parseUriReturnsSucceededAndSupportsHtmlParsingButInputDoesNotSupportHtmlParsing_returnsParseHtmlFailed() =
+    fun unshortenedUrl_parseUriReturnsSucceededAndSupportsHtmlParsingButInputDoesNotSupportHtmlParsing_returnsDeniedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -808,7 +808,7 @@ class ConversionStateTest {
                 stateContext, inputUriString, mockInput, uri, Permission.ALWAYS
             )
             Assert.assertEquals(
-                ParseHtmlFailed(stateContext, inputUriString, points),
+                DeniedParseHtmlPermission(stateContext, inputUriString, points),
                 state.transition(),
             )
         }
@@ -870,7 +870,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parseUriReturnsSucceededAndSupportsHtmlParsingAndPermissionIsNever_returnsParseHtmlFailed() =
+    fun unshortenedUrl_parseUriReturnsSucceededAndSupportsHtmlParsingAndPermissionIsNever_returnsDeniedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -885,7 +885,7 @@ class ConversionStateTest {
                 stateContext, inputUriString, mockGoogleMapsInput, uri, Permission.NEVER
             )
             Assert.assertEquals(
-                ParseHtmlFailed(stateContext, inputUriString, points),
+                DeniedParseHtmlPermission(stateContext, inputUriString, points),
                 state.transition(),
             )
         }
@@ -955,7 +955,7 @@ class ConversionStateTest {
         }
 
     @Test
-    fun unshortenedUrl_parseUriSucceededAndSupportsHtmlParsingAndUrlAndPermissionIsNullAndPreferencePermissionIsNever_returnsParseHtmlFailed() =
+    fun unshortenedUrl_parseUriSucceededAndSupportsHtmlParsingAndUrlAndPermissionIsNullAndPreferencePermissionIsNever_returnsDeniedParseHtmlPermission() =
         runTest {
             val inputUriString = "https://maps.google.com/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
@@ -974,7 +974,7 @@ class ConversionStateTest {
             )
             val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
             Assert.assertEquals(
-                ParseHtmlFailed(stateContext, inputUriString, points),
+                DeniedParseHtmlPermission(stateContext, inputUriString, points),
                 state.transition(),
             )
         }
@@ -1070,63 +1070,65 @@ class ConversionStateTest {
         }
 
     @Test
-    fun requestedParseHtmlPermission_denyWithDoNotAskFalse_doesNotSavePreferenceAndReturnsParseHtmlFailed() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
-        val htmlUriString = "$inputUriString/foo.html"
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
+    fun requestedParseHtmlPermission_denyWithDoNotAskFalse_doesNotSavePreferenceAndReturnsDeniedParseHtmlPermission() =
+        runTest {
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
+            val htmlUriString = "$inputUriString/foo.html"
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = RequestedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                GoogleMapsInput,
+                uri,
+                pointsFromUri,
+                htmlUriString,
+            )
+            Assert.assertEquals(
+                DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri),
+                state.deny(false),
+            )
+            verify(mockUserPreferencesRepository, never()).setValue(
+                eq(ConnectionPermissionPreference),
+                any<Permission>(),
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val state = RequestedParseHtmlPermission(
-            stateContext,
-            inputUriString,
-            GoogleMapsInput,
-            uri,
-            pointsFromUri,
-            htmlUriString,
-        )
-        Assert.assertEquals(
-            ParseHtmlFailed(stateContext, inputUriString, pointsFromUri),
-            state.deny(false),
-        )
-        verify(mockUserPreferencesRepository, never()).setValue(
-            eq(ConnectionPermissionPreference),
-            any<Permission>(),
-        )
-    }
 
     @Test
-    fun requestedParseHtmlPermission_denyWithDoNotAskTrue_savesPreferenceAndReturnsParseHtmlFailed() = runTest {
-        val inputUriString = "https://maps.apple.com/foo"
-        val uri = Uri.parse(inputUriString, uriQuote)
-        val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
-        val htmlUriString = "$inputUriString/foo.html"
-        val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
-            on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
+    fun requestedParseHtmlPermission_denyWithDoNotAskTrue_savesPreferenceAndReturnsDeniedParseHtmlPermission() =
+        runTest {
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
+            val htmlUriString = "$inputUriString/foo.html"
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                on { setValue(eq(ConnectionPermissionPreference), any()) } doReturn Unit
+            }
+            val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
+            val state = RequestedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                GoogleMapsInput,
+                uri,
+                pointsFromUri,
+                htmlUriString,
+            )
+            Assert.assertEquals(
+                DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri),
+                state.deny(true),
+            )
+            verify(mockUserPreferencesRepository).setValue(
+                ConnectionPermissionPreference,
+                Permission.NEVER,
+            )
         }
-        val stateContext = mockStateContext(userPreferencesRepository = mockUserPreferencesRepository)
-        val state = RequestedParseHtmlPermission(
-            stateContext,
-            inputUriString,
-            GoogleMapsInput,
-            uri,
-            pointsFromUri,
-            htmlUriString,
-        )
-        Assert.assertEquals(
-            ParseHtmlFailed(stateContext, inputUriString, pointsFromUri),
-            state.deny(true),
-        )
-        verify(mockUserPreferencesRepository).setValue(
-            ConnectionPermissionPreference,
-            Permission.NEVER,
-        )
-    }
 
     @Test
-    fun grantedParseHtmlPermission_parseHtmlReturnsNull_returnsParseHtmlFailed() = runTest {
+    fun grantedParseHtmlPermission_parseHtmlReturnsFailed_returnsConversionFailed() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
@@ -1142,8 +1144,8 @@ class ConversionStateTest {
                 throw NotImplementedError()
             }
 
-            @Suppress("SameReturnValue")
             override suspend fun parseHtml(
+                htmlUrlString: String,
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
                 log: ILog,
@@ -1168,7 +1170,7 @@ class ConversionStateTest {
             htmlUriString,
         )
         Assert.assertEquals(
-            ParseHtmlFailed(stateContext, inputUriString, pointsFromUri),
+            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),
         )
     }
@@ -1400,6 +1402,7 @@ class ConversionStateTest {
             }
 
             override suspend fun parseHtml(
+                htmlUrlString: String,
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
                 log: ILog,
@@ -1448,6 +1451,7 @@ class ConversionStateTest {
             }
 
             override suspend fun parseHtml(
+                htmlUrlString: String,
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
                 log: ILog,
@@ -1497,6 +1501,7 @@ class ConversionStateTest {
                 }
 
                 override suspend fun parseHtml(
+                    htmlUrlString: String,
                     channel: ByteReadChannel,
                     pointsFromUri: ImmutableList<Point>,
                     log: ILog,
@@ -1553,6 +1558,7 @@ class ConversionStateTest {
                 }
 
                 override suspend fun parseHtml(
+                    htmlUrlString: String,
                     channel: ByteReadChannel,
                     pointsFromUri: ImmutableList<Point>,
                     log: ILog,
@@ -1587,7 +1593,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
         val stateContext = mockStateContext()
-        val state = ParseHtmlFailed(stateContext, inputUriString, points)
+        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
         Assert.assertEquals(
             ConversionSucceeded(stateContext, inputUriString, points),
             state.transition(),
@@ -1599,7 +1605,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val points = persistentListOf(WGS84Point(name = "bar"))
         val stateContext = mockStateContext()
-        val state = ParseHtmlFailed(stateContext, inputUriString, points)
+        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
         Assert.assertEquals(
             ConversionSucceeded(stateContext, inputUriString, points),
             state.transition(),
@@ -1611,7 +1617,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.apple.com/foo"
         val points = persistentListOf<WGS84Point>()
         val stateContext = mockStateContext()
-        val state = ParseHtmlFailed(stateContext, inputUriString, points)
+        val state = DeniedParseHtmlPermission(stateContext, inputUriString, points)
         Assert.assertEquals(
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
             state.transition(),

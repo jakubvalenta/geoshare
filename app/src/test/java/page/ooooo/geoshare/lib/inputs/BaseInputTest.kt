@@ -25,9 +25,11 @@ abstract class BaseInputTest() {
 
     suspend fun parseUri(uriString: String) = input.parseUri(Uri.parse(uriString, uriQuote))
 
-    suspend fun parseHtml(html: String) = (input as Input.HasHtml).parseHtml(
-        channel = html.byteInputStream().toByteReadChannel(),
-        pointsFromUri = persistentListOf(),
-        log = log,
-    )
+    suspend fun parseHtml(html: String, htmlUrlString: String = "https://example.com/") =
+        (input as Input.HasHtml).parseHtml(
+            htmlUrlString = htmlUrlString,
+            channel = html.byteInputStream().toByteReadChannel(),
+            pointsFromUri = persistentListOf(),
+            log = log,
+        )
 }

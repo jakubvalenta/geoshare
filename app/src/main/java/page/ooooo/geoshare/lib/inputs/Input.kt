@@ -30,6 +30,7 @@ interface Input {
         val loadingIndicatorTitleResId: Int
 
         suspend fun parseHtml(
+            htmlUrlString: String,
             channel: ByteReadChannel,
             pointsFromUri: ImmutableList<Point>,
             log: ILog = DefaultLog,
@@ -40,7 +41,7 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
-        fun onUrlChange(
+        suspend fun onUrlChange(
             urlString: String,
             pointsFromUri: ImmutableList<Point>,
             log: ILog = DefaultLog,
