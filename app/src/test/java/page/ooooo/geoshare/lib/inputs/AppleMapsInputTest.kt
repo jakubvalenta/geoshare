@@ -40,7 +40,10 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_unknownScheme() {
-        assertFalse(doesUriPatternMatch("ftp://maps.apple.com/?ll=50.894967,4.341626"))
+        assertEquals(
+            "maps.apple.com/?ll=50.894967,4.341626",
+            input.uriPattern.find("ftp://maps.apple.com/?ll=50.894967,4.341626")?.value,
+        )
     }
 
     @Test

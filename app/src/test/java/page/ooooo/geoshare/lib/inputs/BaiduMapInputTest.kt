@@ -25,8 +25,8 @@ class BaiduMapInputTest : BaseInputTest() {
     }
 
     @Test
-    fun uriPattern_shortUrl_notSupportedYet() {
-        assertFalse(doesUriPatternMatch("https://j.map.baidu.com/0f/tbWk"))
+    fun uriPattern_shortUrl() {
+        assertTrue(doesUriPatternMatch("https://j.map.baidu.com/0f/tbWk"))
     }
 
     @Test
@@ -36,7 +36,10 @@ class BaiduMapInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_unknownScheme() {
-        assertFalse(doesUriPatternMatch("ftp://map.baidu.com/@13520653,3317203,13z"))
+        assertEquals(
+            "map.baidu.com/@13520653,3317203,13z",
+            input.uriPattern.find("ftp://map.baidu.com/@13520653,3317203,13z")?.value,
+        )
     }
 
     @Test
