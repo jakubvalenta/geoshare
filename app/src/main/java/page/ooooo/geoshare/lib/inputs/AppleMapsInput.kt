@@ -15,8 +15,6 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseHtmlResult
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object AppleMapsInput : Input.HasHtml {
     override val uriPattern = Regex("""(?:https?://)?maps\.apple(\.com)?[/?#]\S+""")
@@ -29,46 +27,43 @@ object AppleMapsInput : Input.HasHtml {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        var htmlUriString: String? = null
-        return buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 // Notice that we take the search center 'sll' as a normal point
-                @Suppress("SpellCheckingInspection")
-                listOf("ll", "daddr", "coordinate", "q", "sll", "center")
-                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key]) }
-                    ?.toLatLonPoint()
+                @Suppress("SpellCheckingInspection") listOf(
+                    "ll",
+                    "daddr",
+                    "coordinate",
+                    "q",
+                    "sll",
+                    "center"
+                ).firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key]) }?.toLatLonPoint()
                     ?.also { points.add(it) }
 
-                @Suppress("SpellCheckingInspection")
-                listOf("name", "address", "daddr", "q")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]) }
-                    ?.groupOrNull()
+                @Suppress("SpellCheckingInspection") listOf(
+                    "name",
+                    "address",
+                    "daddr",
+                    "q"
+                ).firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]) }?.groupOrNull()
                     ?.also { defaultName = it }
 
                 Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
-                if (
-                    points.isEmpty() && (
-                        host == "maps.apple" && path.startsWith("/p/") ||
-                            @Suppress("SpellCheckingInspection")
-                            !queryParams["auid"].isNullOrEmpty() ||
-                            !queryParams["place-id"].isNullOrEmpty())
-                ) {
+                if (points.isEmpty() && (host == "maps.apple" && path.startsWith("/p/") || @Suppress("SpellCheckingInspection") !queryParams["auid"].isNullOrEmpty() || !queryParams["place-id"].isNullOrEmpty())) {
                     htmlUriString = uri.toString()
                 }
             }
-        }
-            .asWGS84()
-            .toParseUriResult(htmlUriString)
+        }.asWGS84()
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? =
-        buildPoints {
+    ) = buildParseHtmlResult {
+        points = buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
             val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
@@ -88,9 +83,8 @@ object AppleMapsInput : Input.HasHtml {
                     break
                 }
             }
-        }
-            .asWGS84()
-            .toParseHtmlResult()
+        }.asWGS84()
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_apple_maps_permission_title

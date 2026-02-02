@@ -47,9 +47,9 @@ class AmapInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("https://wb.amap.com"))
-        assertNull(parseUri("https://wb.amap.com/"))
-        assertNull(parseUri("https://wb.amap.com/?spam=1"))
+        assertTrue(parseUri("https://wb.amap.com") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://wb.amap.com/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://wb.amap.com/?spam=1") is ParseUriResult.Failed)
     }
 
     @Test

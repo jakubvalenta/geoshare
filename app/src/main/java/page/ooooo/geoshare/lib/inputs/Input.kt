@@ -14,7 +14,7 @@ interface Input {
     val uriPattern: Regex
     val documentation: InputDocumentation
 
-    suspend fun parseUri(uri: Uri): ParseUriResult?
+    suspend fun parseUri(uri: Uri): ParseUriResult
 
     interface HasShortUri : Input {
         val shortUriPattern: Regex
@@ -31,13 +31,22 @@ interface Input {
             channel: ByteReadChannel,
             pointsFromUri: ImmutableList<Point>,
             log: ILog = DefaultLog,
-        ): ParseHtmlResult?
+        ): ParseHtmlResult
     }
 
-    interface HasWebView : Input {
+    interface HasWeb : Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
+        fun onUrlChange(
+            urlString: String,
+            pointsFromUri: ImmutableList<Point>,
+            log: ILog = DefaultLog,
+        )
 
+        fun shouldInterceptRequest(
+            requestUrlString: String,
+            log: ILog = DefaultLog,
+        ): Boolean
     }
 }

@@ -57,8 +57,8 @@ class GeoUriInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("geo:"))
-        assertNull(parseUri("geo:?spam=1"))
+        assertTrue(parseUri("geo:") is ParseUriResult.Failed)
+        assertTrue(parseUri("geo:?spam=1") is ParseUriResult.Failed)
     }
 
     @Test

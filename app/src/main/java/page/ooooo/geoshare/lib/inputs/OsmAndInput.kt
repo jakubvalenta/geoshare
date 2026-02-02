@@ -8,7 +8,6 @@ import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object OsmAndInput : Input {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/\S+""")
@@ -20,8 +19,8 @@ object OsmAndInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint()?.also { points.add(it) }
                     ?: Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()
@@ -29,7 +28,6 @@ object OsmAndInput : Input {
 
                 Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()?.also { defaultZ = it }
             }
-        }
-            .asWGS84()
-            .toParseUriResult()
+        }.asWGS84()
+    }
 }

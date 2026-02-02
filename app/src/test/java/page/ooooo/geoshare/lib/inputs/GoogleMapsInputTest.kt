@@ -80,7 +80,7 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_unknownPath() = runTest {
-        assertNull(parseUri("https://maps.google.com/spam"))
+        assertTrue(parseUri("https://maps.google.com/spam") is ParseUriResult.Failed)
     }
 
     @Test
@@ -591,7 +591,7 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_googleSearch() = runTest {
-        assertNull(parseUri("https://www.google.com/search?sca_esv=123&hl=en"))
+        assertTrue(parseUri("https://www.google.com/search?sca_esv=123&hl=en") is ParseUriResult.Failed)
     }
 
     @Test
@@ -670,11 +670,11 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNull() = runTest {
-        assertNull(
+        assertTrue(
             parseHtml(
                 @Suppress("SpellCheckingInspection") """<head><meta content="Google Maps" itemprop="name">
     <script>window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0, 0, 0],[1024, 768],13.1]"""
-            ),
+            ) is ParseHtmlResult.Failed,
         )
     }
 
@@ -763,12 +763,12 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_failure() = runTest {
-        assertNull(parseHtml("spam"))
+        assertTrue(parseHtml("spam") is ParseHtmlResult.Failed)
     }
 
     @Test
     fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() = runTest {
-        assertNull(parseHtml("<html></html>"))
+        assertTrue(parseHtml("<html></html>") is ParseHtmlResult.Failed)
     }
 
     @Test

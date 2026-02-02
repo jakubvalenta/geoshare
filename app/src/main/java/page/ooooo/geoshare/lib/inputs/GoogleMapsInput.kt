@@ -18,10 +18,8 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseHtmlResult
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
-object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
+object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
 
     override val uriPattern =
@@ -42,9 +40,8 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
     override val shortUriPattern = Regex("""(?:https?://)?$SHORT_URL""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        var htmlUriString: String? = null
-        return buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 // Try query parameters for all URLs
 
@@ -62,19 +59,16 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
 
                 // Parse path parts
 
-                val parseUriParts = setOf("dir", "place", "search")
-                val parseHtmlParts = setOf("", "@", "d", "placelists")
-                val parseHtmlExcludeParts = setOf("search")
+                val partsThatSupportUriParsing = setOf("dir", "place", "search")
+                val partsThatSupportHtmlParsing = setOf(null, "", "@", "d", "dir", "place", "placelists")
+                val partsThatSupportWebParsing = setOf("place")
                 val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
                 val firstPart = parts.firstOrNull()
-                if (firstPart == null || firstPart in parseHtmlParts) {
-                    // Skip URI parsing and go to HTML parsing
-                    htmlUriString = uri.toString()
-                } else if (firstPart in parseUriParts || firstPart.startsWith('@')) {
+                if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
                     // Iterate path parts in reverse order
                     var centerCoords: Pair<Double, Double>? = null
                     val pointPattern = Regex("""$LAT,$LON.*""")
-                    parts.dropWhile { it in parseUriParts }.forEachReversed { part ->
+                    parts.dropWhile { it in partsThatSupportUriParsing }.forEachReversed { part ->
                         if (part.startsWith("data=")) {
                             // Data
                             // /data=...!3d44.4490541!4d26.0888398...
@@ -115,25 +109,28 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
                         if (centerCoords != null) {
                             // Use the center point only if we haven't found another point
                             points.add(NaivePoint(centerCoords.first, centerCoords.second))
-                        } else if (firstPart !in parseHtmlExcludeParts) {
+                        } else if (firstPart in partsThatSupportHtmlParsing) {
                             // Go to HTML parsing if needed
                             htmlUriString = uri.toString()
                         }
                     }
+                } else if (firstPart in partsThatSupportHtmlParsing) {
+                    // Go to HTML parsing if needed
+                    htmlUriString = uri.toString()
+                } else if (firstPart in partsThatSupportWebParsing) {
+                    // Go to web parsing
+                    webUriString = uri.toString()
                 }
             }
-        }
-            .asGCJ02()
-            .toParseUriResult(htmlUriString)
+        }.asGCJ02()
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? {
-        var redirectUriString: String? = null
-        return buildPoints {
+    ) = buildParseHtmlResult {
+        points = buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
             var defaultPoint: NaivePoint? = null
@@ -183,9 +180,22 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml {
             if (points.isEmpty() && defaultPoint != null) {
                 points.add(defaultPoint)
             }
-        }
-            .asGCJ02()
-            .toParseHtmlResult(redirectUriString)
+        }.asGCJ02()
+    }
+
+    override fun onUrlChange(
+        urlString: String,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun shouldInterceptRequest(
+        requestUrlString: String,
+        log: ILog,
+    ): Boolean {
+        TODO("Not yet implemented")
     }
 
     @StringRes

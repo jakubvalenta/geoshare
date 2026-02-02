@@ -776,7 +776,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockGoogleMapsInput: GoogleMapsInput = mock {
-            on { parseUri(any()) } doReturn null
+            on { parseUri(any()) } doReturn ParseUriResult.Failed()
         }
         val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
         val state = UnshortenedUrl(
@@ -1147,7 +1147,7 @@ class ConversionStateTest {
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
                 log: ILog,
-            ) = null
+            ) = ParseHtmlResult.Failed()
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),

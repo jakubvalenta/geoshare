@@ -34,8 +34,8 @@ class MagicEarthInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("https://magicearth.com/"))
-        assertNull(parseUri("https://magicearth.com/?spam=1"))
+        assertTrue(parseUri("https://magicearth.com/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://magicearth.com/?spam=1") is ParseUriResult.Failed)
     }
 
     @Test

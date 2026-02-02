@@ -56,12 +56,12 @@ class WazeInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("https://waze.com"))
-        assertNull(parseUri("https://waze.com/"))
-        assertNull(parseUri("https://waze.com/ul"))
-        assertNull(parseUri("https://waze.com/ul/?spam=1"))
-        assertNull(parseUri("https://waze.com/live-map"))
-        assertNull(parseUri("https://waze.com/live-map/?spam=1"))
+        assertTrue(parseUri("https://waze.com") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://waze.com/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://waze.com/ul") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://waze.com/ul/?spam=1") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://waze.com/live-map") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://waze.com/live-map/?spam=1") is ParseUriResult.Failed)
     }
 
     @Test
@@ -194,11 +194,11 @@ class WazeInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_containsInvalidDataCoordinates_returnsNull() = runTest {
-        assertNull(parseHtml("""<html><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>"""))
+        assertTrue(parseHtml("""<html><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>""") is ParseHtmlResult.Failed)
     }
 
     @Test
     fun parseHtml_doesNotContainCoordinates_returnsNull() = runTest {
-        assertNull(parseHtml("""<html></html>"""))
+        assertTrue(parseHtml("""<html></html>""") is ParseHtmlResult.Failed)
     }
 }

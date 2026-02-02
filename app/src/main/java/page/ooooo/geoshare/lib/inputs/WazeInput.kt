@@ -18,8 +18,6 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseHtmlResult
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 /**
  * See https://developers.google.com/waze/deeplinks/
@@ -42,9 +40,8 @@ object WazeInput : Input.HasHtml {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        var htmlUriString: String? = null
-        return buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 (Regex("""/ul/h($HASH)""").matchEntire(path) ?: Regex("($HASH)").matchEntire(queryParams["h"]))
                     ?.groupOrNull()
@@ -96,17 +93,15 @@ object WazeInput : Input.HasHtml {
                     }
                 }
             }
-        }
-            .asWGS84()
-            .toParseUriResult(htmlUriString)
+        }.asWGS84()
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? =
-        buildPoints {
+    ) = buildParseHtmlResult {
+        points = buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
             val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
@@ -117,9 +112,8 @@ object WazeInput : Input.HasHtml {
                     break
                 }
             }
-        }
-            .asWGS84()
-            .toParseHtmlResult()
+        }.asWGS84()
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_waze_permission_title

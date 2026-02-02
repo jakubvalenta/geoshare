@@ -13,8 +13,6 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseHtmlResult
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
@@ -49,9 +47,8 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
         Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? {
-        var htmlUriString: String? = null
-        return buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 @Suppress("SpellCheckingInspection")
                 LON_LAT_PATTERN.matchEntire(queryParams["whatshere[point]"])?.toLonLatPoint()?.also { points.add(it) }
@@ -65,17 +62,15 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
                     htmlUriString = uri.toString()
                 }
             }
-        }
-            .asWGS84()
-            .toParseUriResult(htmlUriString)
+        }.asWGS84()
     }
 
     override suspend fun parseHtml(
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? =
-        buildPoints {
+    ) = buildParseHtmlResult {
+        points = buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
             val pattern = Regex("""ll=$LON%2C$LAT""")
@@ -86,9 +81,8 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
                     break
                 }
             }
-        }
-            .asWGS84()
-            .toParseHtmlResult()
+        }.asWGS84()
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_yandex_maps_permission_title

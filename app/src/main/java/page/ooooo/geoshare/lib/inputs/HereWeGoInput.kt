@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseUriResult
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -30,8 +29,8 @@ object HereWeGoInput : Input {
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull() ?: return@run
@@ -64,7 +63,6 @@ object HereWeGoInput : Input {
 
                 Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
-        }
-            .asWGS84()
-            .toParseUriResult()
+        }.asWGS84()
+    }
 }

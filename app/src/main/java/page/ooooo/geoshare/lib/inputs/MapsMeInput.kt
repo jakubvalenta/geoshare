@@ -8,7 +8,6 @@ import page.ooooo.geoshare.lib.geo.decodeGe0Hash
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object MapsMeInput : Input {
     private const val HASH = """[A-Za-z0-9\-_]{2,}"""
@@ -24,8 +23,8 @@ object MapsMeInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 (if (scheme == "ge0") host else pathParts.getOrNull(1))
                     ?.let { Regex(HASH).matchEntire(it) }
@@ -40,7 +39,6 @@ object MapsMeInput : Input {
                     ?.replace('_', ' ')
                     ?.also { defaultName = it }
             }
-        }
-            .asWGS84()
-            .toParseUriResult()
+        }.asWGS84()
+    }
 }

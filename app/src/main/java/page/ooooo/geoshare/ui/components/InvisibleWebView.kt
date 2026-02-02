@@ -1,31 +1,32 @@
 package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
-import android.view.ViewGroup
+import android.util.Log
 import android.webkit.CookieManager
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+
+private const val TAG = "InvisibleWebView"
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun InvisibleWebView(
     url: String,
-    shouldInterceptRequest: ((String) -> Boolean)? = null,
+    onUrlChange: (urlString: String) -> Unit,
+    shouldInterceptRequest: (requestUrlString: String) -> Boolean,
 ) {
     val context = LocalContext.current
 
     AndroidView(
         factory = {
             WebView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(1080, 1920)
+                // TODO layoutParams = ViewGroup.LayoutParams(1080, 1920)
 
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = false
@@ -34,25 +35,66 @@ fun InvisibleWebView(
                 cookieManager.setAcceptCookie(false)
                 cookieManager.setAcceptThirdPartyCookies(this, false)
 
+                addJavascriptInterface(
+                    object {
+                        @Suppress("unused")
+                        @JavascriptInterface
+                        fun onUrlChange(urlString: String) {
+                            // TODO runOnUiThread
+                            Log.d(TAG, "URL changed to $url")
+                            onUrlChange(urlString)
+                        }
+                    },
+                    "Android",
+                )
+
                 webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+
+                        view?.evaluateJavascript(
+                            @Suppress("SpellCheckingInspection")
+                            """
+                                (function () {
+                                    const origPushState = history.pushState;
+                                    const origReplaceState = history.replaceState;
+
+                                    history.pushState = function() {
+                                        origPushState.apply(this, arguments);
+                                        Android.onUrlChange(window.location.href);
+                                    };
+
+                                    history.replaceState = function() {
+                                        origReplaceState.apply(this, arguments);
+                                        Android.onUrlChange(window.location.href);
+                                    };
+
+                                    window.addEventListener('popstate', function() {
+                                        Android.onUrlChange(window.location.href);
+                                    });
+                                })();
+                            """.trimIndent(),
+                            null,
+                        )
+                    }
+
                     override fun shouldInterceptRequest(
                         view: WebView?,
                         request: WebResourceRequest?,
                     ): WebResourceResponse? {
-                        request?.url?.toString()?.let { requestUrl ->
-                            shouldInterceptRequest?.let { interceptor ->
-                                if (!interceptor(requestUrl)) {
-                                    // Return empty response to cancel the request
-                                    return WebResourceResponse("text/plain", "utf-8", null)
-                                }
+                        request?.url?.toString()?.let { requestUrlString ->
+                            if (shouldInterceptRequest(requestUrlString)) {
+                                Log.d(TAG, "Cancelled request to $url")
+                                return WebResourceResponse("text/plain", "utf-8", null)
                             }
+                            Log.d(TAG, "Allowed request to $url")
                         }
                         return super.shouldInterceptRequest(view, request)
                     }
                 }
             }
         },
-        modifier = Modifier.offset((-3000).dp, (-3000).dp),
+        // TODO modifier = Modifier.offset((-3000).dp, (-3000).dp),
         update = { webView -> webView.loadUrl(url) },
         onReset = { webView ->
             webView.stopLoading()

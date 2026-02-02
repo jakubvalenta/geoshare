@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object BaiduMapInput : Input {
     private const val X = """(\d+(?:\.\d+)?)"""
@@ -27,8 +26,8 @@ object BaiduMapInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull() ?: return@run
@@ -62,7 +61,6 @@ object BaiduMapInput : Input {
                     }
                 }
             }
-        }
-            .asBD09MC()
-            .toParseUriResult()
+        }.asBD09MC()
+    }
 }

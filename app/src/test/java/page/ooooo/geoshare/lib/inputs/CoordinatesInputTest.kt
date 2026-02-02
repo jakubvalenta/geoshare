@@ -27,8 +27,8 @@ class CoordinatesInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_unknownPath() = runTest {
-        assertNull(parseUri(""))
-        assertNull(parseUri("spam"))
+        assertTrue(parseUri("") is ParseUriResult.Failed)
+        assertTrue(parseUri("spam") is ParseUriResult.Failed)
     }
 
     @Test
