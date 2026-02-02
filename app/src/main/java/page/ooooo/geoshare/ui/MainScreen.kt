@@ -7,7 +7,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -94,6 +93,7 @@ import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.conversion.LocationRationaleRequested
 import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
 import page.ooooo.geoshare.lib.conversion.RequestedParseHtmlPermission
+import page.ooooo.geoshare.lib.conversion.RequestedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
@@ -317,140 +317,138 @@ private fun MainScreen(
         onReset()
     }
 
-    Box {
-        if (currentState is GrantedParseWebPermission) {
-            InvisibleWebView(
-                url = currentState.webUrlString,
-                onUrlChange = onUrlChange,
-                shouldInterceptRequest = shouldInterceptRequest,
-                modifier = Modifier.background(Color.Red),
-            )
-        }
-        BasicSupportingPaneScaffold(
-            navigationIcon = {
-                if (currentState !is Initial) {
-                    IconButton(
-                        onReset,
-                        Modifier.testTag("geoShareMainBackButton"),
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Default.ArrowBack,
-                            stringResource(R.string.nav_back_content_description)
-                        )
-                    }
+    BasicSupportingPaneScaffold(
+        navigationIcon = {
+            if (currentState !is Initial) {
+                IconButton(
+                    onReset,
+                    Modifier.testTag("geoShareMainBackButton"),
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Default.ArrowBack,
+                        stringResource(R.string.nav_back_content_description)
+                    )
                 }
-            },
-            actions = {
-                MainMenu(
+            }
+        },
+        actions = {
+            MainMenu(
+                currentState = currentState,
+                billingAppNameResId = billingAppNameResId,
+                billingStatus = billingStatus,
+                changelogShown = changelogShown,
+                onNavigateToAboutScreen = onNavigateToAboutScreen,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+            )
+        },
+        mainPane = { innerPadding, wide ->
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                MainMainPane(
                     currentState = currentState,
                     billingAppNameResId = billingAppNameResId,
                     billingStatus = billingStatus,
-                    changelogShown = changelogShown,
-                    onNavigateToAboutScreen = onNavigateToAboutScreen,
-                    onNavigateToBillingScreen = onNavigateToBillingScreen,
-                    onNavigateToFaqScreen = onNavigateToFaqScreen,
+                    errorMessageResId = errorMessageResId,
+                    inputUriString = inputUriString,
+                    loadingIndicator = loadingIndicator,
+                    onCancel = onCancel,
+                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                    onRun = onRun,
+                    onSelect = { position, i ->
+                        onCancel()
+                        setSelectedPositionAndIndex(position to i)
+                    },
+                    onSetErrorMessageResId = setErrorMessageResId,
+                    onStart = onStart,
+                    onUpdateInput = onUpdateInput,
+                )
+                if (!wide) {
+                    Column(
+                        Modifier
+                            .background(containerColor)
+                            .fillMaxWidth()
+                            .padding(top = spacing.largeAdaptive)
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides contentColor) {
+                            MainSupportingPane(
+                                automationFeatureStatus = automationFeatureStatus,
+                                currentState = currentState,
+                                loadingIndicator = loadingIndicator,
+                                onCancel = onCancel,
+                                onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                onRun = onRun,
+                                onSetErrorMessageResId = setErrorMessageResId,
+                                onUpdateInput = onUpdateInput,
+                            )
+                        }
+                    }
+                    Spacer(
+                        Modifier
+                            .background(containerColor)
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
+            }
+            MainBottomBar(
+                currentState,
+                loadingIndicator,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+                containerColor = if (wide) Color.Transparent else containerColor,
+                contentColor = if (wide) LocalContentColor.current else contentColor,
+            )
+        },
+        supportingPane = {
+            Column(
+                Modifier
+                    .weight(1f)
+                    .padding(top = spacing.headlineTopAdaptive)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                MainSupportingPane(
+                    automationFeatureStatus = automationFeatureStatus,
+                    currentState = currentState,
+                    loadingIndicator = loadingIndicator,
+                    onCancel = onCancel,
                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                     onNavigateToIntroScreen = onNavigateToIntroScreen,
-                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                    onRun = onRun,
+                    onSetErrorMessageResId = setErrorMessageResId,
+                    onUpdateInput = onUpdateInput,
                 )
-            },
-            mainPane = { innerPadding, wide ->
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    MainMainPane(
-                        currentState = currentState,
-                        billingAppNameResId = billingAppNameResId,
-                        billingStatus = billingStatus,
-                        errorMessageResId = errorMessageResId,
-                        inputUriString = inputUriString,
-                        loadingIndicator = loadingIndicator,
-                        onCancel = onCancel,
-                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                        onRun = onRun,
-                        onSelect = { position, i ->
-                            onCancel()
-                            setSelectedPositionAndIndex(position to i)
-                        },
-                        onSetErrorMessageResId = setErrorMessageResId,
-                        onStart = onStart,
-                        onUpdateInput = onUpdateInput,
-                    )
-                    if (!wide) {
-                        Column(
-                            Modifier
-                                .background(containerColor)
-                                .fillMaxWidth()
-                                .padding(top = spacing.largeAdaptive)
-                        ) {
-                            CompositionLocalProvider(LocalContentColor provides contentColor) {
-                                MainSupportingPane(
-                                    automationFeatureStatus = automationFeatureStatus,
-                                    currentState = currentState,
-                                    loadingIndicator = loadingIndicator,
-                                    onCancel = onCancel,
-                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                    onRun = onRun,
-                                    onSetErrorMessageResId = setErrorMessageResId,
-                                    onUpdateInput = onUpdateInput,
-                                )
-                            }
-                        }
-                        Spacer(
-                            Modifier
-                                .background(containerColor)
-                                .weight(1f)
-                                .fillMaxWidth()
-                        )
-                    }
-                }
-                MainBottomBar(
-                    currentState,
-                    loadingIndicator,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .consumeWindowInsets(innerPadding),
-                    containerColor = if (wide) Color.Transparent else containerColor,
-                    contentColor = if (wide) LocalContentColor.current else contentColor,
-                )
-            },
-            supportingPane = {
-                Column(
-                    Modifier
-                        .weight(1f)
-                        .padding(top = spacing.headlineTopAdaptive)
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    MainSupportingPane(
-                        automationFeatureStatus = automationFeatureStatus,
-                        currentState = currentState,
-                        loadingIndicator = loadingIndicator,
-                        onCancel = onCancel,
-                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                        onNavigateToIntroScreen = onNavigateToIntroScreen,
-                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                        onRun = onRun,
-                        onSetErrorMessageResId = setErrorMessageResId,
-                        onUpdateInput = onUpdateInput,
-                    )
-                }
-            },
-            mainContainerColor = when {
-                loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
-                currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-                currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-                else -> containerColor
-            },
-            mainContentColor = when {
-                loadingIndicator is LoadingIndicator.Large -> contentColor
-                currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-                currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-                else -> contentColor
-            },
+            }
+        },
+        mainContainerColor = when {
+            loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
+            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+            else -> containerColor
+        },
+        mainContentColor = when {
+            loadingIndicator is LoadingIndicator.Large -> contentColor
+            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+            else -> contentColor
+        },
+    )
+
+    if (currentState is GrantedParseWebPermission) {
+        InvisibleWebView(
+            url = currentState.webUrlString,
+            onUrlChange = onUrlChange,
+            shouldInterceptRequest = shouldInterceptRequest,
         )
     }
 
@@ -508,6 +506,30 @@ private fun MainScreen(
         }
 
         currentState is RequestedParseHtmlPermission -> {
+            PermissionDialog(
+                title = stringResource(currentState.permissionTitleResId),
+                confirmText = stringResource(R.string.conversion_permission_common_grant),
+                dismissText = stringResource(R.string.conversion_permission_common_deny),
+                onConfirmation = onGrant,
+                onDismissRequest = onDeny,
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareParseHtmlPermissionDialog"),
+            ) {
+                Text(
+                    AnnotatedString.fromHtml(
+                        stringResource(
+                            R.string.conversion_permission_common_text,
+                            currentState.uri.toString().truncateMiddle(),
+                            appName,
+                        )
+                    ),
+                    style = TextStyle(lineBreak = LineBreak.Paragraph),
+                )
+            }
+        }
+
+        currentState is RequestedParseWebPermission -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),

@@ -2,14 +2,14 @@ package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.ImmutableList
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.point.Point
 
-// TODO Enable example input only in debug mode
 object ExampleInput : Input.HasWeb {
-    override val uriPattern = Regex("""https?://(?:www\.)?example\.com/\S+""")
+    override val uriPattern = Regex("""https?://(?:www\.)?example\.com(?:/\S+|$)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.EXAMPLE,
         nameResId = R.string.converter_example_name,
@@ -38,4 +38,6 @@ object ExampleInput : Input.HasWeb {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_example_loading_indicator_title
+
+    override fun enabled() = BuildConfig.DEBUG
 }

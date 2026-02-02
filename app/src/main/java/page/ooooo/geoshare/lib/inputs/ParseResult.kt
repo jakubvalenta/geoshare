@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.point.Point
 
 sealed interface ParseUriResult {
 
     class Builder {
-        lateinit var points: ImmutableList<Point>
+        var points: ImmutableList<Point> = persistentListOf()
         var htmlUriString: String? = null
         var webUriString: String? = null
 

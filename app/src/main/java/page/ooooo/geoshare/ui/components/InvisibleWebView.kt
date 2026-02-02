@@ -2,16 +2,20 @@ package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import page.ooooo.geoshare.BuildConfig
 
 private const val TAG = "InvisibleWebView"
 
@@ -21,20 +25,24 @@ fun InvisibleWebView(
     url: String,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
-    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
     AndroidView(
         factory = {
             WebView(context).apply {
-                // TODO layoutParams = ViewGroup.LayoutParams(1080, 1920)
+                layoutParams = ViewGroup.LayoutParams(1080, 1920)
+                if (!BuildConfig.DEBUG) {
+                    translationX = -3000f
+                    translationY = -3000f
+                }
 
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
                 cookieManager.setAcceptThirdPartyCookies(this, false)
 
                 settings.javaScriptEnabled = true
+
 
                 addJavascriptInterface(
                     object {
@@ -95,7 +103,6 @@ fun InvisibleWebView(
                 }
             }
         },
-        modifier = modifier, // TODO modifier.offset((-3000).dp, (-3000).dp),
         update = { webView -> webView.loadUrl(url) },
         onReset = { webView ->
             webView.stopLoading()

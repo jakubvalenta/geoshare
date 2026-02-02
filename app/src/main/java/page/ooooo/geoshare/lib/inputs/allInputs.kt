@@ -15,6 +15,6 @@ val allInputs: List<Input> = listOf(
     UrbiInput,
     WazeInput,
     YandexMapsInput,
+    ExampleInput, // TODO Move to last position when CoordinatesInput is fixed and doesn't match a dot
     CoordinatesInput,
-    ExampleInput,
 )

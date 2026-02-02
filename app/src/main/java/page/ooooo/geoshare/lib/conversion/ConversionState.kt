@@ -36,6 +36,8 @@ import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private const val TAG = "ConversionState"
+
 interface ConversionState : State {
     override suspend fun transition(): State? = null
 
@@ -67,9 +69,11 @@ data class ReceivedUriString(
             return ConversionFailed(R.string.conversion_failed_missing_url, "")
         }
         for (input in stateContext.inputs) {
-            input.uriPattern.find(inputUriString)?.value?.let { uriString ->
-                val uri = Uri.parse(uriString, stateContext.uriQuote)
-                return ReceivedUri(stateContext, inputUriString, input, uri, null)
+            if (input.enabled()) { // TODO Test not enabled input
+                input.uriPattern.find(inputUriString)?.value?.let { uriString ->
+                    val uri = Uri.parse(uriString, stateContext.uriQuote)
+                    return ReceivedUri(stateContext, inputUriString, input, uri, null)
+                }
             }
         }
         return ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString)
@@ -428,6 +432,7 @@ data class GrantedParseWebPermission(
                 false
             }
         ) {
+            stateContext.log.e(TAG, "Parse web: Timed out")
             ParseHtmlFailed(stateContext, inputUriString, pointsFromUri)
         } else {
             null

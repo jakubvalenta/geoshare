@@ -16,6 +16,8 @@ interface Input {
 
     suspend fun parseUri(uri: Uri): ParseUriResult
 
+    fun enabled(): Boolean = true
+
     interface HasShortUri : Input {
         val shortUriPattern: Regex
         val shortUriMethod: ShortUriMethod
