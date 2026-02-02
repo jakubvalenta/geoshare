@@ -351,6 +351,19 @@ data class ParseHtmlFailed(
     }
 }
 
+data class RequestedWebView(
+    val url: String,
+    val shouldInterceptRequest: (url: String) -> Boolean = { requestUrl ->
+        // Block tracking scripts and ads
+        when {
+            requestUrl.contains("analytics") -> false
+            requestUrl.contains("ads") -> false
+            requestUrl.contains("tracking") -> false
+            else -> true // Allow all other requests
+        }
+    },
+) : ConversionState
+
 data class ConversionSucceeded(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,

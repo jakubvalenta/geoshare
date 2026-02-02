@@ -33,4 +33,11 @@ interface Input {
             log: ILog = DefaultLog,
         ): ParseHtmlResult?
     }
+
+    interface HasWebView : Input {
+        val permissionTitleResId: Int
+        val loadingIndicatorTitleResId: Int
+
+
+    }
 }
