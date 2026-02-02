@@ -42,7 +42,7 @@ interface Input {
             urlString: String,
             pointsFromUri: ImmutableList<Point>,
             log: ILog = DefaultLog,
-        )
+        ): ParseWebResult?
 
         fun shouldInterceptRequest(
             requestUrlString: String,

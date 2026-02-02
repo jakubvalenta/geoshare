@@ -23,6 +23,7 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
+import page.ooooo.geoshare.lib.inputs.ParseWebResult
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.BasicAction
@@ -430,6 +431,16 @@ data class GrantedParseWebPermission(
         } else {
             null
         }
+
+    fun onUrlChange(urlString: String): State? =
+        when (val res = input.onUrlChange(urlString, pointsFromUri, stateContext.log)) {
+            is ParseWebResult.Failed -> ParseHtmlFailed(stateContext, inputUriString, pointsFromUri)
+            is ParseWebResult.Succeeded -> ConversionSucceeded(stateContext, inputUriString, res.points)
+            null -> null
+        }
+
+    fun shouldInterceptRequest(requestUrlString: String): Boolean =
+        input.shouldInterceptRequest(requestUrlString, stateContext.log)
 
     override val loadingIndicator = LoadingIndicator.Large(
         titleResId = input.loadingIndicatorTitleResId,

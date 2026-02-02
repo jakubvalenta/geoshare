@@ -9,6 +9,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -20,6 +21,7 @@ fun InvisibleWebView(
     url: String,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -28,12 +30,11 @@ fun InvisibleWebView(
             WebView(context).apply {
                 // TODO layoutParams = ViewGroup.LayoutParams(1080, 1920)
 
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = false
-
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
                 cookieManager.setAcceptThirdPartyCookies(this, false)
+
+                settings.javaScriptEnabled = true
 
                 addJavascriptInterface(
                     object {
@@ -94,7 +95,7 @@ fun InvisibleWebView(
                 }
             }
         },
-        // TODO modifier = Modifier.offset((-3000).dp, (-3000).dp),
+        modifier = modifier, // TODO modifier.offset((-3000).dp, (-3000).dp),
         update = { webView -> webView.loadUrl(url) },
         onReset = { webView ->
             webView.stopLoading()

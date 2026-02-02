@@ -187,15 +187,15 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
         urlString: String,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ) {
-        TODO("Not yet implemented")
+    ): ParseWebResult? {
+        return null // TODO
     }
 
     override fun shouldInterceptRequest(
         requestUrlString: String,
         log: ILog,
     ): Boolean {
-        TODO("Not yet implemented")
+        return false // TODO
     }
 
     @StringRes

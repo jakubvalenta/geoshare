@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -69,9 +70,9 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -83,6 +84,7 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.GrantedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.GrantedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
@@ -103,6 +105,7 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.Headline
+import page.ooooo.geoshare.ui.components.InvisibleWebView
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainFormLinks
 import page.ooooo.geoshare.ui.components.MainMenu
@@ -265,7 +268,10 @@ fun MainScreen(
             viewModel.runAction(action, i)
         },
         onStart = { viewModel.start() },
-        onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) })
+        onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) },
+        onUrlChange = { urlString -> viewModel.onUrlChange(urlString) },
+        shouldInterceptRequest = { requestUrlString -> viewModel.shouldInterceptRequest(requestUrlString) },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -292,6 +298,8 @@ private fun MainScreen(
     onRun: (action: Action, i: Int?) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
+    onUrlChange: (urlString: String) -> Unit,
+    shouldInterceptRequest: (requestUrlString: String) -> Boolean,
 ) {
     val appName = stringResource(R.string.app_name)
     val containerColor = MaterialTheme.colorScheme.surface
@@ -309,132 +317,142 @@ private fun MainScreen(
         onReset()
     }
 
-    BasicSupportingPaneScaffold(
-        navigationIcon = {
-            if (currentState !is Initial) {
-                IconButton(
-                    onReset,
-                    Modifier.testTag("geoShareMainBackButton"),
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Default.ArrowBack,
-                        stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            }
-        },
-        actions = {
-            MainMenu(
-                currentState = currentState,
-                billingAppNameResId = billingAppNameResId,
-                billingStatus = billingStatus,
-                changelogShown = changelogShown,
-                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
+    Box {
+        if (currentState is GrantedParseWebPermission) {
+            InvisibleWebView(
+                url = currentState.webUrlString,
+                onUrlChange = onUrlChange,
+                shouldInterceptRequest = shouldInterceptRequest,
+                modifier = Modifier.background(Color.Red),
             )
-        },
-        mainPane = { innerPadding, wide ->
-            Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                MainMainPane(
+        }
+        BasicSupportingPaneScaffold(
+            navigationIcon = {
+                if (currentState !is Initial) {
+                    IconButton(
+                        onReset,
+                        Modifier.testTag("geoShareMainBackButton"),
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Default.ArrowBack,
+                            stringResource(R.string.nav_back_content_description)
+                        )
+                    }
+                }
+            },
+            actions = {
+                MainMenu(
                     currentState = currentState,
                     billingAppNameResId = billingAppNameResId,
                     billingStatus = billingStatus,
-                    errorMessageResId = errorMessageResId,
-                    inputUriString = inputUriString,
-                    loadingIndicator = loadingIndicator,
-                    onCancel = onCancel,
-                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                    onRun = onRun,
-                    onSelect = { position, i ->
-                        onCancel()
-                        setSelectedPositionAndIndex(position to i)
-                    },
-                    onSetErrorMessageResId = setErrorMessageResId,
-                    onStart = onStart,
-                    onUpdateInput = onUpdateInput,
-                )
-                if (!wide) {
-                    Column(
-                        Modifier
-                            .background(containerColor)
-                            .fillMaxWidth()
-                            .padding(top = spacing.largeAdaptive)
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides contentColor) {
-                            MainSupportingPane(
-                                automationFeatureStatus = automationFeatureStatus,
-                                currentState = currentState,
-                                loadingIndicator = loadingIndicator,
-                                onCancel = onCancel,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                onRun = onRun,
-                                onSetErrorMessageResId = setErrorMessageResId,
-                                onUpdateInput = onUpdateInput,
-                            )
-                        }
-                    }
-                    Spacer(
-                        Modifier
-                            .background(containerColor)
-                            .weight(1f)
-                            .fillMaxWidth()
-                    )
-                }
-            }
-            MainBottomBar(
-                currentState,
-                loadingIndicator,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
-                containerColor = if (wide) Color.Transparent else containerColor,
-                contentColor = if (wide) LocalContentColor.current else contentColor,
-            )
-        },
-        supportingPane = {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .padding(top = spacing.headlineTopAdaptive)
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                MainSupportingPane(
-                    automationFeatureStatus = automationFeatureStatus,
-                    currentState = currentState,
-                    loadingIndicator = loadingIndicator,
-                    onCancel = onCancel,
+                    changelogShown = changelogShown,
+                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                    onNavigateToFaqScreen = onNavigateToFaqScreen,
                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                     onNavigateToIntroScreen = onNavigateToIntroScreen,
-                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                    onRun = onRun,
-                    onSetErrorMessageResId = setErrorMessageResId,
-                    onUpdateInput = onUpdateInput,
+                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                 )
-            }
-        },
-        mainContainerColor = when {
-            loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
-            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-            else -> containerColor
-        },
-        mainContentColor = when {
-            loadingIndicator is LoadingIndicator.Large -> contentColor
-            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-            else -> contentColor
-        },
-    )
+            },
+            mainPane = { innerPadding, wide ->
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    MainMainPane(
+                        currentState = currentState,
+                        billingAppNameResId = billingAppNameResId,
+                        billingStatus = billingStatus,
+                        errorMessageResId = errorMessageResId,
+                        inputUriString = inputUriString,
+                        loadingIndicator = loadingIndicator,
+                        onCancel = onCancel,
+                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                        onRun = onRun,
+                        onSelect = { position, i ->
+                            onCancel()
+                            setSelectedPositionAndIndex(position to i)
+                        },
+                        onSetErrorMessageResId = setErrorMessageResId,
+                        onStart = onStart,
+                        onUpdateInput = onUpdateInput,
+                    )
+                    if (!wide) {
+                        Column(
+                            Modifier
+                                .background(containerColor)
+                                .fillMaxWidth()
+                                .padding(top = spacing.largeAdaptive)
+                        ) {
+                            CompositionLocalProvider(LocalContentColor provides contentColor) {
+                                MainSupportingPane(
+                                    automationFeatureStatus = automationFeatureStatus,
+                                    currentState = currentState,
+                                    loadingIndicator = loadingIndicator,
+                                    onCancel = onCancel,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                    onRun = onRun,
+                                    onSetErrorMessageResId = setErrorMessageResId,
+                                    onUpdateInput = onUpdateInput,
+                                )
+                            }
+                        }
+                        Spacer(
+                            Modifier
+                                .background(containerColor)
+                                .weight(1f)
+                                .fillMaxWidth()
+                        )
+                    }
+                }
+                MainBottomBar(
+                    currentState,
+                    loadingIndicator,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .consumeWindowInsets(innerPadding),
+                    containerColor = if (wide) Color.Transparent else containerColor,
+                    contentColor = if (wide) LocalContentColor.current else contentColor,
+                )
+            },
+            supportingPane = {
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .padding(top = spacing.headlineTopAdaptive)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    MainSupportingPane(
+                        automationFeatureStatus = automationFeatureStatus,
+                        currentState = currentState,
+                        loadingIndicator = loadingIndicator,
+                        onCancel = onCancel,
+                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                        onRun = onRun,
+                        onSetErrorMessageResId = setErrorMessageResId,
+                        onUpdateInput = onUpdateInput,
+                    )
+                }
+            },
+            mainContainerColor = when {
+                loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
+                currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+                currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+                else -> containerColor
+            },
+            mainContentColor = when {
+                loadingIndicator is LoadingIndicator.Large -> contentColor
+                currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+                currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+                else -> contentColor
+            },
+        )
+    }
 
     selectedPositionAndIndex?.let { (position, i) ->
         ModalBottomSheet(
@@ -766,6 +784,8 @@ private fun DefaultPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -796,6 +816,8 @@ private fun DarkPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -826,6 +848,8 @@ private fun TabletPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -863,6 +887,8 @@ private fun SucceededPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -900,6 +926,8 @@ private fun DarkSucceededPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -937,6 +965,8 @@ private fun TabletSucceededPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -945,11 +975,10 @@ private fun TabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
-        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
-                    userPreferencesRepository = userPreferencesRepository,
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -981,6 +1010,8 @@ private fun AutomationPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -989,11 +1020,10 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
-        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
-                    userPreferencesRepository = userPreferencesRepository,
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -1025,6 +1055,8 @@ private fun DarkAutomationPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1033,11 +1065,10 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
-        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
-                    userPreferencesRepository = userPreferencesRepository,
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -1069,6 +1100,143 @@ private fun TabletAutomationPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WebViewPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = GrantedParseWebPermission(
+                stateContext = ConversionStateContext(
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
+                    billing = BillingImpl(LocalContext.current),
+                ),
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                input = GoogleMapsInput,
+                uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                pointsFromUri = persistentListOf(),
+                webUrlString = "https://www.example.com/",
+            ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                refundable = true,
+            ),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            changelogShown = true,
+            inputUriString = "",
+            loadingIndicator = null,
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onReset = {},
+            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkWebViewPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = GrantedParseWebPermission(
+                stateContext = ConversionStateContext(
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
+                    billing = BillingImpl(LocalContext.current),
+                ),
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                input = GoogleMapsInput,
+                uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                pointsFromUri = persistentListOf(),
+                webUrlString = "https://www.example.com/",
+            ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                refundable = true,
+            ),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            changelogShown = true,
+            inputUriString = "",
+            loadingIndicator = null,
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onReset = {},
+            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletWebViewPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = GrantedParseWebPermission(
+                stateContext = ConversionStateContext(
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
+                    billing = BillingImpl(LocalContext.current),
+                ),
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                input = GoogleMapsInput,
+                uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                pointsFromUri = persistentListOf(),
+                webUrlString = "https://www.example.com/",
+            ),
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                refundable = true,
+            ),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            changelogShown = true,
+            inputUriString = "",
+            loadingIndicator = null,
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onReset = {},
+            onRun = { _, _ -> },
+            onStart = {},
+            onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1105,6 +1273,8 @@ private fun ErrorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1141,6 +1311,8 @@ private fun DarkErrorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1177,6 +1349,8 @@ private fun TabletErrorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1185,13 +1359,12 @@ private fun TabletErrorPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
-        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
                     NetworkTools(),
-                    userPreferencesRepository = userPreferencesRepository,
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -1228,6 +1401,8 @@ private fun LoadingIndicatorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1236,13 +1411,12 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
-        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
                     NetworkTools(),
-                    userPreferencesRepository = userPreferencesRepository,
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -1279,6 +1453,8 @@ private fun DarkLoadingIndicatorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1287,13 +1463,12 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
-        val userPreferencesRepository = FakeUserPreferencesRepository()
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
                     listOf(),
                     NetworkTools(),
-                    userPreferencesRepository = userPreferencesRepository,
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
@@ -1330,6 +1505,8 @@ private fun TabletLoadingIndicatorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
+            onUrlChange = {},
+            shouldInterceptRequest = { false },
         )
     }
 }
