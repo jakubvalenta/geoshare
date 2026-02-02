@@ -16,4 +16,5 @@ val allInputs: List<Input> = listOf(
     WazeInput,
     YandexMapsInput,
     CoordinatesInput,
+    ExampleInput,
 )
