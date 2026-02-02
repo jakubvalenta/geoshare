@@ -36,7 +36,7 @@ class MapyComInputTest : BaseInputTest() {
     @Test
     fun uriPattern_unknownScheme() {
         assertEquals(
-            "mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
+            @Suppress("SpellCheckingInspection") "mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
             input.uriPattern.find("ftp://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")?.value,
         )
     }
