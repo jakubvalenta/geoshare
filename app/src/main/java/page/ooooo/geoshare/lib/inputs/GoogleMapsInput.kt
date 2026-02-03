@@ -212,16 +212,15 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
             || requestUrlString.endsWith(".svg")
             || requestUrlString.startsWith("https://fonts.gstatic.com/")
             || requestUrlString.startsWith("https://maps.gstatic.com/")
-            || requestUrlString.startsWith("https://www.google.com/maps/vt/icon/")
 
-            // Satellite tiles
-            || requestUrlString.contains("https://khms")
-            // TODO Try intercepting regular tiles too
+            // Map tiles
+            || requestUrlString.startsWith("https://khms")
+            || requestUrlString.startsWith("https://www.google.com/maps/vt/")
 
             // Tracking
             || requestUrlString.contains("google.com/log")
             || requestUrlString.contains("google.com/gen")
-            || requestUrlString.startsWith("https://tpc.googlesyndication.com/")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googlesyndication.com/")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_google_maps_permission_title
