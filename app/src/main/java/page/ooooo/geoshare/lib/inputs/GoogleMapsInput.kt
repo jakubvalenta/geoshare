@@ -218,8 +218,10 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
             || requestUrlString.startsWith("https://www.google.com/maps/vt/")
 
             // Tracking
+            || requestUrlString.contains("/generate_204")
+            || requestUrlString.contains("/log204")
+            || requestUrlString.contains("google.com/gen_204")
             || requestUrlString.contains("google.com/log")
-            || requestUrlString.contains("google.com/gen")
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googlesyndication.com/")
 
     @StringRes
