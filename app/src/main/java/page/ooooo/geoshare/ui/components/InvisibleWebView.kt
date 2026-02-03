@@ -11,22 +11,49 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import page.ooooo.geoshare.BuildConfig
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 private const val TAG = "InvisibleWebView"
 
+@OptIn(FlowPreview::class)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun InvisibleWebView(
     url: String,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
+    urlChangeDebounceTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
+
+    val currentUrlStringFlow = remember(url) { MutableStateFlow<String?>(null) }
+
+    // Call URL change callback if the URL hasn't changed for a while, because:
+    // 1. First URL change is often not the final URL and we don't want to start parsing an intermediate URL.
+    // 2. Quick URL changes cause ConversionState transition to crash, because each new transition cancels any running
+    //    transition.
+    LaunchedEffect(currentUrlStringFlow) {
+        currentUrlStringFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .debounce(urlChangeDebounceTimeout)
+            .collect { urlString ->
+                Log.d(TAG, "URL hasn't changed in $urlChangeDebounceTimeout, calling callback")
+                onUrlChange(urlString)
+            }
+    }
 
     AndroidView(
         factory = {
@@ -38,6 +65,8 @@ fun InvisibleWebView(
                 cookieManager.setAcceptCookie(false)
                 cookieManager.setAcceptThirdPartyCookies(this, false)
 
+                settings.allowContentAccess = false
+                settings.allowFileAccess = false
                 settings.javaScriptEnabled = true
 
                 // TODO Security
@@ -47,9 +76,7 @@ fun InvisibleWebView(
                         @JavascriptInterface
                         fun onUrlChange(urlString: String) {
                             Log.d(TAG, "URL changed to $urlString")
-                            onUrlChange(urlString)
-                            // TODO Two onUrlChange emissions in short sequence cancel transition
-                            // TODO Fix first onUrlChange emission being user's coordinates and only the second one the real ones
+                            currentUrlStringFlow.value = urlString
                         }
                     },
                     "Android",
