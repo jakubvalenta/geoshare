@@ -39,15 +39,6 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
-        suspend fun onUrlChange(
-            urlString: String,
-            pointsFromUri: ImmutableList<Point>,
-            log: ILog = DefaultLog,
-        ): ParseWebResult?
-
-        fun shouldInterceptRequest(
-            requestUrlString: String,
-            log: ILog = DefaultLog,
-        ): Boolean
+        fun shouldInterceptRequest(requestUrlString: String): Boolean = false
     }
 }

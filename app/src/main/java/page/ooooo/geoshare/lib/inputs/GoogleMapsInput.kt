@@ -20,7 +20,6 @@ import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
 
 object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
-    private const val TAG = "GoogleMapsInput"
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
 
     override val uriPattern =
@@ -189,33 +188,22 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
         }.asGCJ02()
     }
 
-    override suspend fun onUrlChange(
-        urlString: String,
-        pointsFromUri: ImmutableList<Point>,
-        log: ILog,
-    ) = buildParseWebResult {
-        val parseUriResult = parseUri(Uri.parse(urlString))
-        if (parseUriResult is ParseUriResult.Succeeded) {
-            log.i(TAG, "Parsed web URL $urlString to ${parseUriResult.points}")
-            points = parseUriResult.points
-        } else {
-            log.i(TAG, "Failed to parse web URL $urlString")
-        }
-    }
-
-    override fun shouldInterceptRequest(requestUrlString: String, log: ILog) =
+    override fun shouldInterceptRequest(requestUrlString: String) =
         // Assets
-        requestUrlString.contains(".css")
-            || requestUrlString.endsWith(".gif")
+        requestUrlString.endsWith(".gif")
             || requestUrlString.endsWith(".ico")
             || requestUrlString.endsWith(".png")
             || requestUrlString.endsWith(".svg")
-            || requestUrlString.startsWith("https://fonts.gstatic.com/")
-            || requestUrlString.startsWith("https://maps.gstatic.com/")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "fonts.gstatic.com/")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "maps.gstatic.com/")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "googleusercontent.com/")
+            || requestUrlString.contains("/gps-cs-s/")
+            || requestUrlString.contains("/ss/")
+            || requestUrlString.contains("/thumbnail")
 
             // Map tiles
-            || requestUrlString.startsWith("https://khms")
-            || requestUrlString.startsWith("https://www.google.com/maps/vt/")
+            || requestUrlString.contains("/kh/")
+            || requestUrlString.contains("/maps/vt")
 
             // Tracking
             || requestUrlString.contains("/generate_204")

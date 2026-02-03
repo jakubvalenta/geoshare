@@ -23,7 +23,6 @@ import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
-import page.ooooo.geoshare.lib.inputs.ParseWebResult
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.BasicAction
@@ -437,15 +436,19 @@ data class GrantedParseWebPermission(
             null
         }
 
-    suspend fun onUrlChange(urlString: String): State? =
-        when (val res = input.onUrlChange(urlString, pointsFromUri, stateContext.log)) {
-            is ParseWebResult.Failed -> ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-            is ParseWebResult.Succeeded -> ConversionSucceeded(stateContext, inputUriString, res.points)
-            null -> null
+    suspend fun onUrlChange(urlString: String): State =
+        input.uriPattern.find(urlString)?.value?.let { uriString ->
+            (input.parseUri(Uri.parse(uriString)) as? ParseUriResult.Succeeded)?.let { res ->
+                stateContext.log.i(TAG, "Parsed web URL $uriString to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
+            }
+        } ?: run {
+            stateContext.log.w(TAG, "Failed to parse web URL $webUrlString")
+            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
 
     fun shouldInterceptRequest(requestUrlString: String): Boolean =
-        input.shouldInterceptRequest(requestUrlString, stateContext.log)
+        input.shouldInterceptRequest(requestUrlString)
 
     override val loadingIndicator = LoadingIndicator.Large(
         titleResId = input.loadingIndicatorTitleResId,

@@ -446,7 +446,7 @@ private fun MainScreen(
 
     if (currentState is GrantedParseWebPermission) {
         InvisibleWebView(
-            url = currentState.webUrlString,
+            unsafeUrl = currentState.webUrlString,
             onUrlChange = onUrlChange,
             shouldInterceptRequest = shouldInterceptRequest,
         )

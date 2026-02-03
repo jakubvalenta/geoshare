@@ -31,19 +31,27 @@ private const val TAG = "InvisibleWebView"
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun InvisibleWebView(
-    url: String,
+    unsafeUrl: String,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     urlChangeDebounceTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
 
-    val currentUrlStringFlow = remember(url) { MutableStateFlow<String?>(null) }
+    // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
+    // strict than the patterns in Input (for example only HTTPS should be allowed) and they should not change often.
+    val googleHostPattern = """(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}"""
+    val baiduHostPattern = """map\.baidu\.com"""
+    val allowUrlPattern = Regex("""^https://(?:$googleHostPattern|$baiduHostPattern)[/?#]\S+$""")
+    val safeUrl = remember(unsafeUrl) {
+        allowUrlPattern.matchEntire(unsafeUrl)?.value
+    }
 
     // Call URL change callback if the URL hasn't changed for a while, because:
     // 1. First URL change is often not the final URL and we don't want to start parsing an intermediate URL.
     // 2. Quick URL changes cause ConversionState transition to crash, because each new transition cancels any running
     //    transition.
+    val currentUrlStringFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
     LaunchedEffect(currentUrlStringFlow) {
         currentUrlStringFlow
             .filterNotNull()
@@ -69,7 +77,6 @@ fun InvisibleWebView(
                 settings.allowFileAccess = false
                 settings.javaScriptEnabled = true
 
-                // TODO Security
                 addJavascriptInterface(
                     object {
                         @Suppress("unused")
@@ -129,7 +136,11 @@ fun InvisibleWebView(
             }
         },
         modifier = Modifier.offset((-3000).dp, (-3000).dp),
-        update = { webView -> webView.loadUrl(url) },
+        update = { webView ->
+            if (safeUrl != null) {
+                webView.loadUrl(safeUrl)
+            }
+        },
         onReset = { webView ->
             webView.stopLoading()
             webView.loadUrl("about:blank")

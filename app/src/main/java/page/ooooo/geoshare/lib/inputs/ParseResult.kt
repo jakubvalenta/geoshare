@@ -62,27 +62,8 @@ sealed interface ParseHtmlResult {
     class Failed : ParseHtmlResult
 }
 
-sealed interface ParseWebResult {
-
-    class Builder {
-        lateinit var points: ImmutableList<Point>
-
-        fun build(): ParseWebResult =
-            points.lastOrNull()?.takeIf { it.hasCoordinates() || it.hasName() }?.let {
-                Succeeded(points)
-            } ?: Failed()
-    }
-
-    data class Succeeded(val points: ImmutableList<Point>) : ParseWebResult
-
-    class Failed : ParseWebResult
-}
-
 suspend fun buildParseUriResult(block: suspend ParseUriResult.Builder.() -> Unit): ParseUriResult =
     ParseUriResult.Builder().apply { this.block() }.build()
 
 suspend fun buildParseHtmlResult(block: suspend ParseHtmlResult.Builder.() -> Unit): ParseHtmlResult =
     ParseHtmlResult.Builder().apply { this.block() }.build()
-
-suspend fun buildParseWebResult(block: suspend ParseWebResult.Builder.() -> Unit): ParseWebResult =
-    ParseWebResult.Builder().apply { this.block() }.build()
