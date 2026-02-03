@@ -24,7 +24,7 @@ data class TextListScope(val bulletSpace: Dp, val bulletWidth: Dp)
 fun TextList(
     modifier: Modifier = Modifier,
     bulletSpace: Dp = 6.dp,
-    bulletWidth: Dp = 12.dp,
+    bulletWidth: Dp = 4.dp,
     verticalSpace: Dp = 0.dp,
     content: @Composable TextListScope.() -> Unit,
 ) {

@@ -103,49 +103,20 @@ coordinates are required. Geo Share extracts them from the map URL.
 
 However, not all map URLs include coordinates. In such cases, Geo Share will
 **prompt you for permission to connect to the map service (Google Maps, Apple
-Maps etc.)** and retrieve the coordinates from either HTTP headers or the HTML
-document of the link.
+Maps etc.)** and retrieve the coordinates from:
 
-More precisely, there are three scenarios how Geo Share converts a map URL into
-a geo: URI:
+- either HTTP headers, e.g. `Location: https://maps.google.com/...`
+- or HTML document, e.g. `<meta property="place:location:latitude" content=...`
+- or the whole web page with running JavaScript.
 
-1. If the map URL already contains geographic coordinates (for example
-   `https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398`),
-   then it’s parsed and no request to the map service’s servers is made.
-
-2. If the map URL doesn’t contain geographic coordinates (for example
-   `https://www.google.com/maps/place/Central+Park/`), then Geo Share asks you
-   if it can connect to the map service.
-
-   If you allow connecting to the map service, then Geo Share makes an **HTTP
-   GET request** to Google Maps (or Apple Maps etc.) and parses the coordinates
-   from the HTML response. You can imagine it as `curl
-   https://www.google.com/maps/place/Central+Park/ | grep -E '/@[0-9.,-]+'`.
-
-   If you don’t allow connecting to the map service, then Geo Share creates a
-   geo: link with a place search term (for example `geo:0,0?q=Central%%20Park`).
-
-3. If the map URL is a short link (for example
-   `https://maps.app.goo.gl/TmbeHMiLEfTBws9EA`), then Geo Share asks you if it
-   can connect to the map service.
-
-   If you allow connecting to the map service, then Geo Share makes an **HTTP
-   HEAD request** to the short link and reads the full link from the response
-   headers. You can imagine it as `curl --head
-   https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:`. Then Geo Share
-   continues with scenario 1 or 2, depending on whether the full link contains
-   coordinates or not. In case of scenario 2, another connection to the map
-   service will be made, but this time without asking.
-
-   If you don’t allow connecting to the map service, then Geo Share cancels the
-   creation of the geo: link.
+If you don’t allow connecting to the map service, then Geo Share creates a geo:
+link with a search term instead of coordinates, or it stops. It depends on the
+particular link.
 
 To permanently allow or deny connecting to the map service instead of always
-asking (the default), go to the app’s Preferences.
+asking (the default), go to the app’s preferences.
 
-Note that even with the need for Geo Share to connect to the internet in such
-situations, it may be considered a more private and secure approach as it
-wouldn’t allow JavaScript-based fingerprinting or code execution.
+TODO faq_how_it_works_text_5
 
 ## Location permission
 

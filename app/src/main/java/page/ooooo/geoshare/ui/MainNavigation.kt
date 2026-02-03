@@ -58,6 +58,9 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
         composable<FaqRoute> {
             FaqScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                onNavigateToUserPreferencesConnectionPermissionScreen = {
+                    navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.CONNECTION_PERMISSION))
+                },
             )
         }
         composable<IntroRoute> {
