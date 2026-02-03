@@ -32,6 +32,7 @@ fun InvisibleWebView(
         factory = {
             WebView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(1080, 1920)
+                setBackgroundColor(0x00000000) // Prevent a visible white rectangle before the URL loads
 
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
@@ -100,7 +101,6 @@ fun InvisibleWebView(
                 }
             }
         },
-        // TODO Fix white full screen box before WebView URL starts loading
         modifier = Modifier.offset((-3000).dp, (-3000).dp),
         update = { webView -> webView.loadUrl(url) },
         onReset = { webView ->
