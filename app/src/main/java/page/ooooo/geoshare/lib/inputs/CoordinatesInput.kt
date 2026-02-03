@@ -25,7 +25,7 @@ object CoordinatesInput : Input {
     private const val LON_MIN = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
     private const val LON_SEC = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
 
-    override val uriPattern = Regex("""[\d.\-\p{Zs},°'′"″NSWE]+""")
+    override val uriPattern = Regex("""[\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.COORDINATES,
         nameResId = R.string.converter_coordinates_name,

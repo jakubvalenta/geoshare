@@ -40,7 +40,10 @@ class WazeInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_unknownScheme() {
-        assertFalse(doesUriPatternMatch("ftp://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
+        assertEquals(
+            "waze.com/ul?ll=45.6906304,-120.810983&z=10",
+            input.uriPattern.find("ftp://waze.com/ul?ll=45.6906304,-120.810983&z=10")?.value,
+        )
     }
 
     @Test

@@ -24,7 +24,10 @@ class OsmAndInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_unknownScheme() {
-        assertFalse(doesUriPatternMatch("ftp://osmand.net/map?pin=52.51628,13.37771"))
+        assertEquals(
+            "osmand.net/map?pin=52.51628,13.37771",
+            input.uriPattern.find("ftp://osmand.net/map?pin=52.51628,13.37771")?.value,
+        )
     }
 
     @Test

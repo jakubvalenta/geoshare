@@ -21,6 +21,11 @@ class CoordinatesInputTest : BaseInputTest() {
     }
 
     @Test
+    fun uriPattern_exampleUrl() {
+        assertFalse(doesUriPatternMatch("https://example.com/"))
+    }
+
+    @Test
     fun parseUri_unknownPath() = runTest {
         assertNull(parseUri(""))
         assertNull(parseUri("spam"))
