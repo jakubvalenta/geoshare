@@ -329,9 +329,9 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun setChangelogShown() {
-        val newestInputAddedInVersionCode = allInputs.maxOf { input ->
-            input.documentation.items.maxOf { it.addedInVersionCode }
-        }
+        val newestInputAddedInVersionCode = allInputs.maxOfOrNull { input ->
+            input.documentation.items.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE
+        } ?: BuildConfig.VERSION_CODE
         setUserPreferenceValue(ChangelogShownForVersionCodePreference, newestInputAddedInVersionCode)
     }
 
