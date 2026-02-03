@@ -203,10 +203,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
         }
     }
 
-    override fun shouldInterceptRequest(
-        requestUrlString: String,
-        log: ILog,
-    ) =
+    override fun shouldInterceptRequest(requestUrlString: String, log: ILog) =
         // Assets
         requestUrlString.contains(".css")
             || requestUrlString.endsWith(".gif")

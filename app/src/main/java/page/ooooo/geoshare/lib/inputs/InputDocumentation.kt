@@ -9,7 +9,7 @@ enum class InputDocumentationId {
     APPLE_MAPS,
     BAIDU_MAP,
     COORDINATES,
-    EXAMPLE,
+    DEBUG,
     GEO_URI,
     GOOGLE_MAPS,
     HERE_WEGO,

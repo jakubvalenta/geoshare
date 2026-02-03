@@ -69,11 +69,9 @@ data class ReceivedUriString(
             return ConversionFailed(R.string.conversion_failed_missing_url, "")
         }
         for (input in stateContext.inputs) {
-            if (input.enabled()) { // TODO Test not enabled input
-                input.uriPattern.find(inputUriString)?.value?.let { uriString ->
-                    val uri = Uri.parse(uriString, stateContext.uriQuote)
-                    return ReceivedUri(stateContext, inputUriString, input, uri, null)
-                }
+            input.uriPattern.find(inputUriString)?.value?.let { uriString ->
+                val uri = Uri.parse(uriString, stateContext.uriQuote)
+                return ReceivedUri(stateContext, inputUriString, input, uri, null)
             }
         }
         return ConversionFailed(R.string.conversion_failed_unsupported_service, inputUriString)

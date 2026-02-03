@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
+import page.ooooo.geoshare.BuildConfig
+
 val allInputs: List<Input> = listOf(
     GeoUriInput,
     GoogleMapsInput,
@@ -15,6 +17,11 @@ val allInputs: List<Input> = listOf(
     UrbiInput,
     WazeInput,
     YandexMapsInput,
-    ExampleInput, // TODO Move to last position when CoordinatesInput is fixed and doesn't match a dot
     CoordinatesInput,
-)
+).run {
+    if (BuildConfig.DEBUG) {
+        this + DebugInput
+    } else {
+        this
+    }
+}
