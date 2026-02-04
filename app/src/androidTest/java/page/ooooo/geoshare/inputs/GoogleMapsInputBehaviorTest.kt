@@ -57,9 +57,8 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place
         testUri(
-            WGS84Point(52.5068441, 13.42473175, name = "Berlin, Germany"),
+            WGS84Point(52.5200066, 13.404954, name = "Berlin"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
-            WGS84Point(name = "Berlin, Germany"),
         )
 
         // Map view
