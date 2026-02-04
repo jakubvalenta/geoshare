@@ -446,7 +446,7 @@ private fun MainScreen(
 
     if (currentState is GrantedParseWebPermission) {
         InvisibleWebView(
-            unsafeUrl = currentState.webUrlString,
+            unsafeUrl = currentState.webUriString,
             onUrlChange = onUrlChange,
             shouldInterceptRequest = shouldInterceptRequest,
         )
@@ -1142,7 +1142,7 @@ private fun WebViewPreview() {
                 input = GoogleMapsInput,
                 uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 pointsFromUri = persistentListOf(),
-                webUrlString = "https://www.example.com/",
+                webUriString = "https://www.example.com/",
             ),
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -1187,7 +1187,7 @@ private fun DarkWebViewPreview() {
                 input = GoogleMapsInput,
                 uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 pointsFromUri = persistentListOf(),
-                webUrlString = "https://www.example.com/",
+                webUriString = "https://www.example.com/",
             ),
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -1232,7 +1232,7 @@ private fun TabletWebViewPreview() {
                 input = GoogleMapsInput,
                 uri = Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 pointsFromUri = persistentListOf(),
-                webUrlString = "https://www.example.com/",
+                webUriString = "https://www.example.com/",
             ),
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(

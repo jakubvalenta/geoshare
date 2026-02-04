@@ -28,7 +28,7 @@ sealed interface ParseUriResult {
     data class SucceededAndSupportsHtmlParsing(val points: ImmutableList<Point>, val htmlUriString: String) :
         ParseUriResult
 
-    data class SucceededAndSupportsWebParsing(val points: ImmutableList<Point>, val webUrlString: String) :
+    data class SucceededAndSupportsWebParsing(val points: ImmutableList<Point>, val webUriString: String) :
         ParseUriResult
 
     class Failed : ParseUriResult
@@ -57,7 +57,7 @@ sealed interface ParseHtmlResult {
 
     data class RequiresRedirect(val redirectUriString: String) : ParseHtmlResult
 
-    data class RequiresWebParsing(val webUrlString: String) : ParseHtmlResult
+    data class RequiresWebParsing(val webUriString: String) : ParseHtmlResult
 
     class Failed : ParseHtmlResult
 }
