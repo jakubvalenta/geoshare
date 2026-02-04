@@ -133,7 +133,7 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
 
         // Shows automation success message
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessMessage" }
+        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultSuccessMessage" }
     }
 
     private fun goToBillingScreen() {

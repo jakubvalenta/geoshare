@@ -95,7 +95,7 @@ object CoordinatesOutput : Output {
     @Composable
     override fun getName(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) = name(points, i)
 
-    override fun getPositionActions(): List<BasicAction> = listOf(
+    override fun getPointsActions(): List<BasicAction> = listOf(
         CopyDecCoordsAction(),
         CopyDegMinSecCoordsAction(),
     )

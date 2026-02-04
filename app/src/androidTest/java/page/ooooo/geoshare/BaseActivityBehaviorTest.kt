@@ -161,13 +161,13 @@ abstract class BaseActivityBehaviorTest {
     protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>) = uiAutomator {
         onElement(NETWORK_TIMEOUT) {
             when (viewIdResourceName) {
-                "geoShareConversionSuccessPositionName" -> true
+                "geoShareResultSuccessLastPointName" -> true
                 "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
                 else -> false
             }
         }
         onElement {
-            if (viewIdResourceName == "geoShareConversionSuccessPositionName") {
+            if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
                 if (expectedPoints.lastOrNull()?.name?.isNotEmpty() == true) {
                     assertEquals(
                         expectedPoints.lastOrNull()?.name?.replace('+', ' '),
@@ -191,7 +191,7 @@ abstract class BaseActivityBehaviorTest {
         val expectedText = allOutputs.getText(expectedPoints, null)
         if (expectedText != null) {
             onElement {
-                if (viewIdResourceName == "geoShareConversionSuccessPositionCoordinates") {
+                if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                     assertEquals(expectedText, textAsString())
                     true
                 } else {

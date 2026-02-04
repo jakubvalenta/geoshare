@@ -12,7 +12,7 @@ interface Output {
     @Composable
     fun getName(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String? = null
 
-    fun getPositionActions(): List<Action> = emptyList()
+    fun getPointsActions(): List<Action> = emptyList()
 
     fun getPointActions(): List<Action> = emptyList()
 

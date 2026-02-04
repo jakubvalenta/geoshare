@@ -238,7 +238,7 @@ object GpxOutput : Output {
             pluralStringResource(R.plurals.conversion_automation_save_gpx_waiting, counterSec, counterSec)
     }
 
-    override fun getPositionActions(): List<Action> = listOf(
+    override fun getPointsActions(): List<Action> = listOf(
         ShareGpxRouteAction(),
         SaveGpxPointsAction(),
     )

@@ -79,7 +79,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         // Confirm permission dialog
         confirmDialogIfItIsVisible()
 
-        // Shows position
+        // Shows points
         assertConversionSucceeded(expectedPoints)
     }
 

@@ -184,7 +184,7 @@ object MagicEarthOutput : Output {
         )
     }
 
-    override fun getPositionActions() = listOf(
+    override fun getPointsActions() = listOf(
         CopyDisplayUriAction(),
         CopyNavigateToUriAction(),
     )

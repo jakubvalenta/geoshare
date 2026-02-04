@@ -61,7 +61,6 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
 
                 val partsThatSupportUriParsing = setOf("dir", "place", "search")
                 val partsThatSupportHtmlParsing = setOf(null, "", "@", "d", "dir", "place", "placelists")
-                val partsThatSupportWebParsing = setOf("place")
                 val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
                 val firstPart = parts.firstOrNull()
                 if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
@@ -117,9 +116,6 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
                 } else if (firstPart in partsThatSupportHtmlParsing) {
                     // Go to HTML parsing if needed
                     htmlUriString = uri.toString()
-                } else if (firstPart in partsThatSupportWebParsing) {
-                    // Go to web parsing
-                    webUriString = uri.toString()
                 }
             }
         }.asGCJ02()

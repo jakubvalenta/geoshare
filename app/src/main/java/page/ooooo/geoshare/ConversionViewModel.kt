@@ -230,7 +230,7 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun shouldInterceptRequest(requestUrlString: String): Boolean =
-        (stateContext.currentState as? GrantedParseWebPermission)?.shouldInterceptRequest(requestUrlString)
+        (stateContext.currentState as? GrantedParseWebPermission)?.input?.shouldInterceptRequest(requestUrlString)
         // Return true by default, so that when conversion state changes but a WebView is still in composition, all
         // request inside this WebView are cancelled
             ?: true

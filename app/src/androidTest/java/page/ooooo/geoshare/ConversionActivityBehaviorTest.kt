@@ -13,7 +13,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
-    fun mainScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
+    fun mainScreen_whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps coordinates link with the app
@@ -35,7 +35,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun mainScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
+    fun mainScreen_whenLinkWithCoordinatesInChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
             assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
@@ -45,12 +45,12 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             // Shows precise location in WGS 84
             assertConversionSucceeded(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
 
-            // Open position menu
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+            // Open copy menu
+            onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
 
             // Shows copy link in GCJ-02
             onElement {
-                viewIdResourceName == "geoShareConversionSuccessSheetItemDescription" &&
+                viewIdResourceName == "geoShareResultSuccessSheetItemDescription" &&
                     textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
             }
             pressBack()
@@ -63,7 +63,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPointAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -92,7 +92,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_showsPointAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -287,7 +287,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPointAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
@@ -316,7 +316,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_showsPointAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
@@ -479,8 +479,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
-        // Open position menu
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+        // Open copy menu
+        onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
 
         // Swipe the sheet to reveal "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 1f)
@@ -489,6 +489,6 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareOutputMagicEarthCopyNavigateToUri" }.click()
 
         // Shows success message
-        onElement { viewIdResourceName == "geoShareConversionSuccessMessage" }
+        onElement { viewIdResourceName == "geoShareResultSuccessMessage" }
     }
 }

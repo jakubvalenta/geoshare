@@ -132,7 +132,7 @@ fun ResultSuccessMessage(
         when {
             targetState is ActionWaiting && targetState.action is Automation.HasDelay ->
                 ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessAutomationCounter")) {
+                    ResultMessageText(Modifier.testTag("geoShareResultSuccessAutomationCounter")) {
                         LaunchedEffect(targetState.action) {
                             counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
                             while (counterSec > 0) {
@@ -158,7 +158,7 @@ fun ResultSuccessMessage(
 
             targetState is ActionSucceeded && targetState.action is Action.HasSuccessMessage ->
                 ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessMessage")) {
+                    ResultMessageText(Modifier.testTag("geoShareResultSuccessMessage")) {
                         targetState.action.successText()
                     }
                 }
@@ -186,7 +186,7 @@ fun ResultSuccessMessage(
 
             loadingIndicator is LoadingIndicator.Small ->
                 ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareConversionSuccessSmallLoadingIndicatorMessage")) {
+                    ResultMessageText(Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage")) {
                         stringResource(loadingIndicator.messageResId)
                     }
                     FilledIconButton(

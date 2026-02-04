@@ -269,7 +269,7 @@ fun MainScreen(
         },
         onStart = { viewModel.start() },
         onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) },
-        onUrlChange = { urlString -> viewModel.onUrlChange(urlString) },
+        onUrlChange = { pageUrlString -> viewModel.onUrlChange(pageUrlString) },
         shouldInterceptRequest = { requestUrlString -> viewModel.shouldInterceptRequest(requestUrlString) },
     )
 }
@@ -308,7 +308,7 @@ private fun MainScreen(
     val spacing = LocalSpacing.current
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
-    val (selectedPositionAndIndex, setSelectedPositionAndIndex) = retain {
+    val (selectedPointsAndIndex, setSelectedPointsAndIndex) = retain {
         mutableStateOf<Pair<ImmutableList<Point>, Int?>?>(null)
     }
     val sheetState = rememberModalBottomSheetState()
@@ -361,9 +361,9 @@ private fun MainScreen(
                     onCancel = onCancel,
                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                     onRun = onRun,
-                    onSelect = { position, i ->
+                    onSelect = { points, i ->
                         onCancel()
-                        setSelectedPositionAndIndex(position to i)
+                        setSelectedPointsAndIndex(points to i)
                     },
                     onSetErrorMessageResId = setErrorMessageResId,
                     onStart = onStart,
@@ -452,9 +452,9 @@ private fun MainScreen(
         )
     }
 
-    selectedPositionAndIndex?.let { (position, i) ->
+    selectedPointsAndIndex?.let { (points, i) ->
         ModalBottomSheet(
-            onDismissRequest = { setSelectedPositionAndIndex(null) },
+            onDismissRequest = { setSelectedPointsAndIndex(null) },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareConversionSheet")
@@ -464,12 +464,12 @@ private fun MainScreen(
             sheetState = sheetState,
         ) {
             ResultSuccessSheetContent(
-                points = position,
+                points = points,
                 i = i,
                 onHide = {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
-                            setSelectedPositionAndIndex(null)
+                            setSelectedPointsAndIndex(null)
                         }
                     }
                 },

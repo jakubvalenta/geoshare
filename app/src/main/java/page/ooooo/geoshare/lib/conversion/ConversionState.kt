@@ -235,6 +235,7 @@ data class UnshortenedUrl(
                 }
             }
 
+            // TODO Test
             is ParseUriResult.SucceededAndSupportsWebParsing -> {
                 if (input is Input.HasWeb) {
                     when (permission
@@ -436,19 +437,35 @@ data class GrantedParseWebPermission(
             null
         }
 
-    suspend fun onUrlChange(urlString: String): State =
-        input.uriPattern.find(urlString)?.value?.let { uriString ->
-            (input.parseUri(Uri.parse(uriString)) as? ParseUriResult.Succeeded)?.let { res ->
-                stateContext.log.i(TAG, "Parsed web URL $uriString to ${res.points}")
+    suspend fun onUrlChange(urlString: String): State {
+        val matchingUriString = input.uriPattern.find(urlString)?.value
+        return when (
+            val res = matchingUriString?.let { uriString ->
+                input.parseUri(Uri.parse(uriString, stateContext.uriQuote))
+            }
+        ) {
+            is ParseUriResult.Succeeded -> {
+                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
                 ConversionSucceeded(stateContext, inputUriString, res.points)
             }
-        } ?: run {
-            stateContext.log.w(TAG, "Failed to parse web URL $webUrlString")
-            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-        }
 
-    fun shouldInterceptRequest(requestUrlString: String): Boolean =
-        input.shouldInterceptRequest(requestUrlString)
+            is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
+                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
+            }
+
+            is ParseUriResult.SucceededAndSupportsWebParsing,
+                -> {
+                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
+            }
+
+            is ParseUriResult.Failed, null -> {
+                stateContext.log.w(TAG, "Failed to parse web URL $webUrlString")
+                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+            }
+        }
+    }
 
     override val loadingIndicator = LoadingIndicator.Large(
         titleResId = input.loadingIndicatorTitleResId,
