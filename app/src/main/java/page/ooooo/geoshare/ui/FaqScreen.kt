@@ -52,6 +52,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 enum class FaqItemId {
     HOW_IT_WORKS,
+    PRIVACY,
     LOCATION_PERMISSION,
 }
 
@@ -100,7 +101,7 @@ fun FaqScreen(
                     stringResource(R.string.faq_how_it_works_text_1, appName)
                 )
                 ParagraphText(
-                    stringResource(R.string.faq_how_it_works_text_2)
+                    stringResource(R.string.faq_how_it_works_text_2, appName)
                 )
                 CompositionLocalProvider(
                     LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
@@ -157,8 +158,15 @@ fun FaqScreen(
                         }
                     }
                 )
+            }
+            FaqItem(
+                itemId = FaqItemId.PRIVACY,
+                expandedItemId = expandedItemId,
+                onSetExpandedItemId = { expandedItemId = it },
+                stringResource(R.string.faq_privacy_headline),
+            ) {
                 ParagraphText(
-                    stringResource(R.string.faq_how_it_works_text_5, appName)
+                    stringResource(R.string.faq_privacy_text, appName)
                 )
             }
             FaqItem(
@@ -247,6 +255,22 @@ private fun HowItWorksPreview() {
 private fun DarkHowItWorksPreview() {
     AppTheme {
         FaqScreen(initialExpandedItemId = FaqItemId.HOW_IT_WORKS)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PrivacyPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.PRIVACY)
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPrivacyPreview() {
+    AppTheme {
+        FaqScreen(initialExpandedItemId = FaqItemId.PRIVACY)
     }
 }
 
