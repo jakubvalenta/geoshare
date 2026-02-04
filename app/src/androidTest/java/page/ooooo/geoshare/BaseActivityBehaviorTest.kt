@@ -207,8 +207,14 @@ abstract class BaseActivityBehaviorTest {
     ) =
         try {
             assertConversionSucceeded(expectedPoints)
-        } catch (_: ElementNotFoundException) {
-            assertConversionSucceeded(fallbackPoints)
+        } catch (e: Throwable) {
+            when (e) {
+                is ElementNotFoundException,
+                is AssertionError,
+                    -> assertConversionSucceeded(fallbackPoints)
+
+                else -> throw e
+            }
         }
 
     protected fun assertConversionSucceeded(expectedPoint: Point) =

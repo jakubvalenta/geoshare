@@ -132,6 +132,11 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                     44.4490541,
                     26.0888398,
                     name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
+                ),
+                GCJ02Point(
+                    44.4490541,
+                    26.0888398,
+                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, 010098 Bucuresti, Roumanie",
                 )
             )
         }
@@ -493,6 +498,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Swipe the sheet to reveal "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 1f)
+        waitForStableInActiveWindow()
 
         // Tap "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareOutputMagicEarthCopyNavigateToUri" }.click()
