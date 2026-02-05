@@ -123,6 +123,7 @@ fun FaqScreen(
                                             stringResource(R.string.example, stringResource(exampleResId)),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontStyle = FontStyle.Italic,
+                                            style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
                                 }

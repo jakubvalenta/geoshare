@@ -95,7 +95,7 @@ grayed out, other Google apps are set to open them by default. You can find
 these apps and turn off the opening of links for them, like we did for Google
 Maps.
 
-## How it works and privacy considerations
+## How it works
 
 Geo Share converts map links (e.g. https://maps.app.goo.gl/...) into geo: links
 that can be opened by other map apps. To create a geo: link, geographic
@@ -105,18 +105,28 @@ However, not all map URLs include coordinates. In such cases, Geo Share will
 **prompt you for permission to connect to the map service (Google Maps, Apple
 Maps etc.)** and retrieve the coordinates from:
 
-- either HTTP headers, e.g. `Location: https://maps.google.com/...`
-- or HTML document, e.g. `<meta property="place:location:latitude" content=...`
+- either HTTP headers, e.g.
+  `Location: https://google.com/maps/@40.78,-73.96,19z`
+- or HTML document, e.g.
+  `<meta property="place:location:latitude" content="40.78">`
 - or the whole web page with running JavaScript.
 
 If you don’t allow connecting to the map service, then Geo Share creates a geo:
-link with a search term instead of coordinates, or it stops. It depends on the
+link with a search term instead of coordinates or it stops, depending on the
 particular link.
 
 To permanently allow or deny connecting to the map service instead of always
 asking (the default), go to the app’s preferences.
 
-TODO faq_how_it_works_text_5
+## Privacy considerations
+
+When possible, Geo Share converts map links offline. If the map link requires
+online conversion, the app will ask you before connecting to the map service (
+Google Maps, Apple Maps, etc.). If you allow the connection, the map service
+will receive the map link, it will be able to read your IP address, and in some
+cases Geo Share will load the live web page of the map service and execute its
+JavaScript. This happens in a restricted environment, which blocks tracking
+scripts and doesn’t store cookies.
 
 ## Location permission
 
