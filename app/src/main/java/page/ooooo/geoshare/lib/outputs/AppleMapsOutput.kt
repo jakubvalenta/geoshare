@@ -70,7 +70,7 @@ object AppleMapsOutput : Output {
         override fun successText() = stringResource(R.string.conversion_automation_copy_link_succeeded)
     }
 
-    override fun getPositionActions() = listOf(
+    override fun getPointsActions() = listOf(
         CopyDisplayLinkAction(),
         CopyNavigateToLinkAction(),
     )

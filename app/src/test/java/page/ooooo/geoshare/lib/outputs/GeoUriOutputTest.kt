@@ -14,47 +14,47 @@ class GeoUriOutputTest {
     private val output = GeoUriOutput
 
     @Test
-    fun copyAction_whenPositionDoesNotHaveCoordinates_returnsUriWithZeroCoordinatesInPath() {
+    fun copyAction_whenLastPointDoesNotHaveCoordinates_returnsUriWithZeroCoordinatesInPath() {
         assertEquals(
             "geo:0,0",
-            output.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPointsActions().firstNotNullOf { it as? CopyAction }
                 .getText(persistentListOf(), null, uriQuote),
         )
     }
 
     @Test
-    fun copyAction_whenPositionHasName_returnsUriWithZeroCoordinatesAndQParam() {
+    fun copyAction_whenLastPointHasName_returnsUriWithZeroCoordinatesAndQParam() {
         assertEquals(
             "geo:0,0?q=foo%20bar",
-            output.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPointsActions().firstNotNullOf { it as? CopyAction }
                 .getText(persistentListOf(WGS84Point(name = "foo bar")), null, uriQuote),
         )
     }
 
     @Test
-    fun copyAction_whenPositionHasCoordinates_returnsUriWithCoordinatesInTheQParam() {
+    fun copyAction_whenLastPointHasCoordinates_returnsUriWithCoordinatesInTheQParam() {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456",
-            output.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPointsActions().firstNotNullOf { it as? CopyAction }
                 .getText(persistentListOf(WGS84Point(50.123456, -11.123456)), null, uriQuote),
         )
     }
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameInTheQParam() {
+    fun copyAction_whenLastPointHasCoordinatesAndName_returnsUriWithCoordinatesAndNameInTheQParam() {
         assertEquals(
             "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)",
-            output.getPositionActions().firstNotNullOf { it as? CopyAction }
+            output.getPointsActions().firstNotNullOf { it as? CopyAction }
                 .getText(persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar")), null, uriQuote),
         )
     }
 
     @Test
-    fun copyOutput_whenPositionHasCoordinatesAndNameAndZoom_returnsUriWithCoordinatesAndNameInTheQParamAndTheZParam() {
+    fun copyOutput_whenLastPointHasCoordinatesAndNameAndZoom_returnsUriWithCoordinatesAndNameInTheQParamAndTheZParam() {
         assertEquals(
             "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456(foo%20bar)",
             output
-                .getPositionActions().firstNotNullOf { it as? CopyAction }
+                .getPointsActions().firstNotNullOf { it as? CopyAction }
                 .getText(
                     persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4, name = "foo bar")),
                     null,
@@ -64,7 +64,7 @@ class GeoUriOutputTest {
     }
 
     @Test
-    fun copyOutput_whenPositionHasZoom_returnsUriWithZParamUnlessThePackageNameHasZoomDisabled() {
+    fun copyOutput_whenLastPointHasZoom_returnsUriWithZParamUnlessThePackageNameHasZoomDisabled() {
         assertEquals(
             listOf(
                 "com.example.test" to "geo:50.123456,-11.123456?z=3.4&q=50.123456,-11.123456",
@@ -86,7 +86,7 @@ class GeoUriOutputTest {
     }
 
     @Test
-    fun appAction_whenPositionHasCoordinatesAndName_returnsUriWithCoordinatesAndNameUnlessThePackageNameHasNameDisabled() {
+    fun appAction_whenLastPointHasCoordinatesAndName_returnsUriWithCoordinatesAndNameUnlessThePackageNameHasNameDisabled() {
         assertEquals(
             listOf(
                 "com.example.test" to "geo:50.123456,-11.123456?q=50.123456,-11.123456(foo%20bar)",
@@ -110,7 +110,7 @@ class GeoUriOutputTest {
     }
 
     @Test
-    fun appOutput_whenPositionIsInGCJ02AndIsInJapan_returnsUriWithCoordinatesUnchanged() {
+    fun appOutput_whenLastPointIsInGCJ02AndIsInJapan_returnsUriWithCoordinatesUnchanged() {
         assertEquals(
             "geo:34.5945482,133.7583428?q=34.5945482,133.7583428",
             persistentListOf(GCJ02Point(34.5945482, 133.7583428)).let { points ->
@@ -127,7 +127,7 @@ class GeoUriOutputTest {
     }
 
     @Test
-    fun appOutput_whenPositionIsInGCJ02AndIsInChina_returnsUriWithCoordinatesConvertedToWGS84() {
+    fun appOutput_whenLastPointIsInGCJ02AndIsInChina_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
             persistentListOf(GCJ02Point(39.920439, 116.331538)).let { points ->
@@ -144,7 +144,7 @@ class GeoUriOutputTest {
     }
 
     @Test
-    fun appOutput_whenPositionIsInWGS84AndPackageNameRequiresGCJ02_returnsUriWithCoordinatesConvertedToGCJ02() {
+    fun appOutput_whenLastPointIsInWGS84AndPackageNameRequiresGCJ02_returnsUriWithCoordinatesConvertedToGCJ02() {
         assertEquals(
             @Suppress("SpellCheckingInspection")
             listOf(

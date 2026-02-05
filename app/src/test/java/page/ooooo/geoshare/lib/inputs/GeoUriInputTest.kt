@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
@@ -57,8 +56,8 @@ class GeoUriInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("geo:"))
-        assertNull(parseUri("geo:?spam=1"))
+        assertTrue(parseUri("geo:") is ParseUriResult.Failed)
+        assertTrue(parseUri("geo:?spam=1") is ParseUriResult.Failed)
     }
 
     @Test

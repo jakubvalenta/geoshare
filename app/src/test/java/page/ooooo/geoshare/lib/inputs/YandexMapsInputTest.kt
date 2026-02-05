@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
@@ -40,10 +39,10 @@ class YandexMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("https://yandex.com"))
-        assertNull(parseUri("https://yandex.com/"))
-        assertNull(parseUri("https://yandex.com/maps"))
-        assertNull(parseUri("https://yandex.com/maps/?spam=1"))
+        assertTrue(parseUri("https://yandex.com") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://yandex.com/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://yandex.com/maps") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://yandex.com/maps/?spam=1") is ParseUriResult.Failed)
     }
 
     @Test
@@ -132,7 +131,7 @@ class YandexMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_doesNotContainCoordinates_returnsNull() = runTest {
-        assertNull(parseHtml("""<html></html>"""))
+        assertTrue(parseHtml("""<html></html>""") is ParseHtmlResult.Failed)
     }
 
     @Test

@@ -41,6 +41,7 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.GrantedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
@@ -191,10 +192,13 @@ class ConversionViewModel @Inject constructor(
         transition()
     }
 
-    private fun transition() {
+    private fun transition(initialState: (suspend () -> State?)? = null) {
         transitionJob?.cancel()
         transitionJob = viewModelScope.launch {
             try {
+                if (initialState != null) {
+                    stateContext.currentState = initialState() ?: return@launch
+                }
                 stateContext.transition()
             } catch (tr: Exception) {
                 stateContext.log.e(null, "Exception while transitioning state", tr)
@@ -209,111 +213,91 @@ class ConversionViewModel @Inject constructor(
 
     fun grant(doNotAsk: Boolean) {
         (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
-            transitionJob?.cancel()
-            transitionJob = viewModelScope.launch {
-                try {
-                    stateContext.currentState = currentState.grant(doNotAsk)
-                    stateContext.transition()
-                } catch (tr: Exception) {
-                    stateContext.log.e(null, "Exception while transitioning state", tr)
-                    stateContext.log.e(null, tr.stackTraceToString())
-                    stateContext.currentState = ConversionFailed(
-                        R.string.conversion_failed_parse_url_error,
-                        inputUriString,
-                    )
-                }
-            }
+            transition { currentState.grant(doNotAsk) }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
         (stateContext.currentState as? ConversionState.HasPermission)?.let { currentState ->
-            transitionJob?.cancel()
-            transitionJob = viewModelScope.launch {
-                try {
-                    stateContext.currentState = currentState.deny(doNotAsk)
-                    stateContext.transition()
-                } catch (tr: Exception) {
-                    stateContext.log.e(null, "Exception while transitioning state", tr)
-                    stateContext.log.e(null, tr.stackTraceToString())
-                    stateContext.currentState = ConversionFailed(
-                        R.string.conversion_failed_parse_url_error,
-                        inputUriString,
-                    )
-                }
-            }
+            transition { currentState.deny(doNotAsk) }
         }
     }
 
+    fun onUrlChange(urlString: String) {
+        (stateContext.currentState as? GrantedParseWebPermission)?.let { currentState ->
+            transition { currentState.onUrlChange(urlString) }
+        }
+    }
+
+    fun shouldInterceptRequest(requestUrlString: String): Boolean =
+        (stateContext.currentState as? GrantedParseWebPermission)?.input?.shouldInterceptRequest(requestUrlString)
+        // Return true by default, so that when conversion state changes but a WebView is still in composition, all
+        // request inside this WebView are cancelled
+            ?: true
+
     fun showLocationRationale(action: LocationAction, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            stateContext.currentState = LocationRationaleShown(
-                currentState.inputUriString, currentState.points, i, action
-            )
-            transition()
+            transition {
+                LocationRationaleShown(currentState.inputUriString, currentState.points, i, action)
+            }
         }
     }
 
     fun skipLocationRationale(action: LocationAction, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            stateContext.currentState = LocationPermissionReceived(
-                currentState.inputUriString, currentState.points, i, action
-            )
-            transition()
+            transition {
+                LocationPermissionReceived(currentState.inputUriString, currentState.points, i, action)
+            }
         }
     }
 
     fun receiveLocationPermission() {
         (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
-            stateContext.currentState = LocationPermissionReceived(
-                currentState.inputUriString, currentState.points, currentState.i, currentState.action
-            )
-            transition()
+            transition {
+                LocationPermissionReceived(
+                    currentState.inputUriString, currentState.points, currentState.i, currentState.action
+                )
+            }
         }
     }
 
     fun receiveLocation(action: LocationAction, i: Int?, location: Point?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            stateContext.currentState = LocationReceived(
-                currentState.inputUriString, currentState.points, i, action, location
-            )
-            transition()
+            transition {
+                LocationReceived(currentState.inputUriString, currentState.points, i, action, location)
+            }
         }
     }
 
     fun cancelLocationFinding() {
         (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
-            stateContext.currentState = ActionFinished(
-                currentState.inputUriString, currentState.points, currentState.action
-            )
-            transition()
+            transition {
+                ActionFinished(currentState.inputUriString, currentState.points, currentState.action)
+            }
         }
     }
 
     fun runAction(action: Action, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            stateContext.currentState = ActionReady(
-                currentState.inputUriString, currentState.points, i, action
-            )
-            transition()
+            transition {
+                ActionReady(currentState.inputUriString, currentState.points, i, action)
+            }
         }
     }
 
     fun finishBasicAction(success: Boolean?) {
         (stateContext.currentState as? BasicActionReady)?.let { currentState ->
-            stateContext.currentState = ActionRan(
-                currentState.inputUriString, currentState.points, currentState.action, success
-            )
-            transition()
+            transition {
+                ActionRan(currentState.inputUriString, currentState.points, currentState.action, success)
+            }
         }
     }
 
     fun finishLocationAction(success: Boolean?) {
         (stateContext.currentState as? LocationActionReady)?.let { currentState ->
-            stateContext.currentState = ActionRan(
-                currentState.inputUriString, currentState.points, currentState.action, success
-            )
-            transition()
+            transition {
+                ActionRan(currentState.inputUriString, currentState.points, currentState.action, success)
+            }
         }
     }
 
@@ -348,9 +332,9 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun setChangelogShown() {
-        val newestInputAddedInVersionCode = allInputs.maxOf { input ->
-            input.documentation.items.maxOf { it.addedInVersionCode }
-        }
+        val newestInputAddedInVersionCode = allInputs.maxOfOrNull { input ->
+            input.documentation.items.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE
+        } ?: BuildConfig.VERSION_CODE
         setUserPreferenceValue(ChangelogShownForVersionCodePreference, newestInputAddedInVersionCode)
     }
 

@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
@@ -51,15 +50,15 @@ class MapsMeInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPath() = runTest {
-        assertNull(parseUri("ge0:"))
-        assertNull(parseUri("http://ge0.me"))
-        assertNull(parseUri("https://omaps.app"))
-        assertNull(parseUri("https://comaps.at"))
-        assertNull(parseUri("ge0:/"))
-        assertNull(parseUri("ge0://"))
-        assertNull(parseUri("http://ge0.me/"))
-        assertNull(parseUri("https://omaps.app/"))
-        assertNull(parseUri("https://comaps.at/"))
+        assertTrue(parseUri("ge0:") is ParseUriResult.Failed)
+        assertTrue(parseUri("http://ge0.me") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://omaps.app") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://comaps.at") is ParseUriResult.Failed)
+        assertTrue(parseUri("ge0:/") is ParseUriResult.Failed)
+        assertTrue(parseUri("ge0://") is ParseUriResult.Failed)
+        assertTrue(parseUri("http://ge0.me/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://omaps.app/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://comaps.at/") is ParseUriResult.Failed)
     }
 
     @Test
@@ -112,6 +111,6 @@ class MapsMeInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_hostThatLooksLikeHash() = runTest {
-        assertNull(parseUri("https://ApYSV0YTAl/"))
+        assertTrue(parseUri("https://ApYSV0YTAl/") is ParseUriResult.Failed)
     }
 }

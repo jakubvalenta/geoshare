@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
@@ -48,9 +47,9 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("https://maps.apple.com"))
-        assertNull(parseUri("https://maps.apple.com/"))
-        assertNull(parseUri("https://maps.apple.com/?spam=1"))
+        assertTrue(parseUri("https://maps.apple.com") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://maps.apple.com/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://maps.apple.com/?spam=1") is ParseUriResult.Failed)
     }
 
     @Test
@@ -247,6 +246,6 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_failure() = runTest {
-        assertNull(parseHtml("spam"))
+        assertTrue(parseHtml("spam") is ParseHtmlResult.Failed)
     }
 }

@@ -114,6 +114,9 @@
     <string name="converter_baidu_map_permission_title">Connect to Baidu Map?</string>
     <string name="converter_coordinates_name">coordinates</string>
     <string name="example">e.g. %1$s</string>
+    <string name="converter_debug_name" translatable="false">Debug Input</string>
+    <string name="converter_debug_permission_title" translatable="false">Connect to Debug Input?</string>
+    <string name="converter_debug_loading_indicator_title" translatable="false">Connecting to Debug Input…</string>
     <string name="converter_ge0_name" translatable="false">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
@@ -172,12 +175,26 @@
     <string name="about_text_google_play" translatable="false">If you’d like to help getting the app published on Google Play, write me an email to the above address, and I’ll invite you to the testing program.</string>
     <string name="permission_do_not_ask">Don’t ask me again</string>
     <string name="faq_title">FAQ</string>
+    <string name="faq_how_headline">How it works</string>
+    <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</string>
+    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:
+</string>
+    <string name="faq_how_text_2_item_http">either HTTP headers,</string>
+    <string name="faq_how_text_2_item_http_example" translatable="false">Location: https://google.com/maps/@40.78,-73.96,19z</string>
+    <string name="faq_how_text_2_item_html">or HTML document,</string>
+    <string name="faq_how_text_2_item_html_example" translatable="false">&lt;meta property=&quot;place:location:latitude&quot; content=&quot;40.78&quot;&gt;</string>
+    <string name="faq_how_text_2_item_web">or the live web page including JavaScript.</string>
+    <string name="faq_how_text_3">If you don’t allow connecting to the map service, then %1$s creates a geo: link with a search term instead of coordinates or it stops, depending on the particular link.</string>
+    <string name="faq_how_text_4">To permanently allow or deny connecting to the map service instead of always asking (the default), go to the app’s %1$s.</string>
+    <string name="faq_how_text_4_preferences_button">preferences</string>
     <string name="faq_how_it_works_headline">How it works and privacy considerations</string>
     <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</p><br><p>However, not all map URLs include coordinates. In such cases, %1$s will <b>prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.)</b> and retrieve the coordinates from either HTTP headers or the HTML document of the link.</p><br><p>More precisely, there are three scenarios how %1$s converts a map URL into a geo: URI:</p><br><p><b>1.</b></p><br><p>If the map URL already contains geographic coordinates (for example <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), then it’s parsed and no request to the map service’s servers is made.</p><br><p><b>2.</b></p><br><p>If the map URL doesn’t contain geographic coordinates (for example <tt>https://www.google.com/maps/place/Central+Park/</tt>), then %1$s asks you if it can connect to the map service.</p><br><p>If you allow connecting to the map service, then %1$s makes an <b>HTTP GET request</b> to Google Maps (or Apple Maps etc.) and parses the coordinates from the HTML response. You can imagine it as <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>If you don’t allow connecting to the map service, then %1$s creates a geo: link with a place search term (for example <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>If the map URL is a short link (for example <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), then %1$s asks you if it can connect to the map service.</p><br><p>If you allow connecting to the map service, then %1$s makes an <b>HTTP HEAD request</b> to the short link and reads the full link from the response headers. You can imagine it as <tt>curl -I https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. Then %1$s continues with scenario 1 or 2, depending on whether the full link contains coordinates or not. In case of scenario 2, another connection to the map service will be made, but this time without asking.</p><br><p>If you don’t allow connecting to the map service, then %1$s cancels the creation of the geo: link.</p><br><br><p>To permanently allow or deny connecting to the map service instead of always asking (the default), go to the app’s Preferences.</p>]]></string>
     <string name="faq_item_collapse">Collapse section</string>
     <string name="faq_item_expand">Expand section</string>
     <string name="faq_location_permission_headline">Location permission</string>
     <string name="faq_location_permission_text">%1$s asks for location permission when launching the TomTom navigation and when sharing a GPX route, because in these cases the app needs to create a GPX route that starts at your current location. The location information is discarded immediately after the creation of the route.</string>
+    <string name="faq_privacy_headline">Privacy considerations</string>
+    <string name="faq_privacy_text">When possible, %1$s converts map links offline. If the map link requires online conversion, the app will ask you before connecting to the map service (Google Maps, Apple Maps, etc.). If you allow the connection, the map service will receive the map link, it will be able to read your IP address, and in some cases %1$s will load the live web page of the map service and execute its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
     <string name="user_preferences_title">Preferences</string>
     <string name="user_preferences_automation_description">Choose an action to perform automatically when a map link is converted to coordinates.</string>
     <string name="user_preferences_automation_nothing">Nothing</string>

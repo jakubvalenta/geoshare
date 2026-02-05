@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
+import page.ooooo.geoshare.BuildConfig
+
 val allInputs: List<Input> = listOf(
     GeoUriInput,
     GoogleMapsInput,
@@ -16,4 +18,10 @@ val allInputs: List<Input> = listOf(
     WazeInput,
     YandexMapsInput,
     CoordinatesInput,
-)
+).run {
+    if (BuildConfig.DEBUG) {
+        this + DebugInput
+    } else {
+        this
+    }
+}

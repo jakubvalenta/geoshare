@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 
 @Composable
@@ -17,6 +18,7 @@ fun ParagraphText(
         modifier = modifier,
         style = MaterialTheme.typography.bodyMedium.copy(
             lineBreak = LineBreak.Paragraph,
+            hyphens = Hyphens.Auto,
         ),
     )
 }
@@ -31,6 +33,7 @@ fun ParagraphText(
         modifier = modifier,
         style = MaterialTheme.typography.bodyMedium.copy(
             lineBreak = LineBreak.Paragraph,
+            hyphens = Hyphens.Auto,
         ),
     )
 }

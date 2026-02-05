@@ -13,7 +13,7 @@ class GoogleMapsOutputTest {
     private val output = GoogleMapsOutput
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
+    fun copyAction_whenLastPointHasCoordinatesAndZoom_returnsLinkWithCoordinatesAsQueryAndZoom() {
         assertEquals(
             listOf(
                 "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
@@ -22,7 +22,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
             persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4)).let { points ->
-                output.getPositionActions()
+                output.getPointsActions()
                     .filter { it.isEnabled(points, null) }
                     .map { it.getText(points, null, uriQuote) }
             },
@@ -30,14 +30,14 @@ class GoogleMapsOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasQueryAndZoom_returnsLinkWithQueryAndZoomAndNoStreetView() {
+    fun copyAction_whenLastPointHasQueryAndZoom_returnsLinkWithQueryAndZoomAndNoStreetView() {
         assertEquals(
             listOf(
                 "https://www.google.com/maps?q=foo%20bar&z=3.4",
                 "google.navigation:q=foo+bar",
             ),
             persistentListOf(WGS84Point(name = "foo bar", z = 3.4)).let { points ->
-                output.getPositionActions()
+                output.getPointsActions()
                     .filter { it.isEnabled(points, null) }
                     .map { it.getText(points, null, uriQuote) }
             },
@@ -45,7 +45,7 @@ class GoogleMapsOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
+    fun copyAction_whenLastPointHasCoordinatesAndQueryAndZoom_returnsLinkWithCoordinatesAndZoom() {
         assertEquals(
             listOf(
                 "https://www.google.com/maps?q=50.123456,-11.123456&z=3.4",
@@ -54,7 +54,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=50.123456,-11.123456",
             ),
             persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4)).let { points ->
-                output.getPositionActions()
+                output.getPointsActions()
                     .filter { it.isEnabled(points, null) }
                     .map { it.getText(points, null, uriQuote) }
             },
@@ -62,7 +62,7 @@ class GoogleMapsOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionIsInChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
+    fun copyAction_whenLastPointIsInChinaAndInWGS84_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             listOf(
                 "https://www.google.com/maps?q=31.2285067,121.475524",
@@ -71,7 +71,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=31.2285067,121.475524",
             ),
             persistentListOf(WGS84Point(31.23044166868017, 121.47099209401793)).let { points ->
-                output.getPositionActions()
+                output.getPointsActions()
                     .filter { it.isEnabled(points, null) }
                     .map { it.getText(points, null, uriQuote) }
             },
@@ -79,7 +79,7 @@ class GoogleMapsOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
+    fun copyAction_whenLastPointIsInChinaAndInGCJ02_returnsLinkWithCoordinatesInGCJ02() {
         assertEquals(
             listOf(
                 "https://www.google.com/maps?q=31.2285069,121.4755246",
@@ -88,7 +88,7 @@ class GoogleMapsOutputTest {
                 "google.streetview:cbll=31.2285069,121.4755246",
             ),
             persistentListOf(GCJ02Point(31.22850685422705, 121.47552456472106)).let { points ->
-                output.getPositionActions()
+                output.getPointsActions()
                     .filter { it.isEnabled(points, null) }
                     .map { it.getText(points, null, uriQuote) }
             },
@@ -96,14 +96,14 @@ class GoogleMapsOutputTest {
     }
 
     @Test
-    fun copyAction_whenPositionHasNeitherPointNorQuery_returnsEmptyLinks() {
+    fun copyAction_whenLastPointHasNeitherPointNorQuery_returnsEmptyLinks() {
         assertEquals(
             listOf(
                 "https://www.google.com/maps",
                 "google.navigation:q=0,0",
             ),
             persistentListOf<WGS84Point>().let { points ->
-                output.getPositionActions()
+                output.getPointsActions()
                     .filter { it.isEnabled(points, null) }
                     .map { it.getText(points, null, uriQuote) }
             },

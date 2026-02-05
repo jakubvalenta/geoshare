@@ -20,7 +20,7 @@ import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.CopyAction
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getPointActions
-import page.ooooo.geoshare.lib.outputs.getPositionActions
+import page.ooooo.geoshare.lib.outputs.getPointsActions
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -37,7 +37,7 @@ fun ResultSuccessSheetContent(
     val (copyActions, otherActions) = allOutputs
         .run {
             if (i == null) {
-                getPositionActions()
+                getPointsActions()
             } else {
                 getPointActions()
             }
@@ -99,7 +99,7 @@ private fun ResultSuccessSheetItem(
             {
                 Text(
                     text,
-                    Modifier.testTag("geoShareConversionSuccessSheetItemDescription"),
+                    Modifier.testTag("geoShareResultSuccessSheetItemDescription"),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

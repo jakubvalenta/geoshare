@@ -12,73 +12,73 @@ class MagicEarthOutputTest {
     private val output = MagicEarthOutput
 
     @Test
-    fun getPositionActions_pointsIsEmpty_returnsShowOnMapWithZeroLatAndLon() {
+    fun getPointsActions_pointsIsEmpty_returnsShowOnMapWithZeroLatAndLon() {
         assertEquals(
             "magicearth://?show_on_map&lat=0&lon=0",
-            output.getPositionActions().first()
+            output.getPointsActions().first()
                 .getText(persistentListOf(WGS84Point()), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_pointsHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
+    fun getPointsActions_pointsHasCoordinatesAndZoom_returnsShowOnMapUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456",
-            output.getPositionActions().first()
+            output.getPointsActions().first()
                 .getText(persistentListOf(WGS84Point(50.123456, -11.123456, z = 5.0)), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_pointsHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
+    fun getPointsActions_pointsHasCoordinatesAndName_returnsShowOnMapUriWithNameParam() {
         assertEquals(
             "magicearth://?show_on_map&lat=50.123456&lon=-11.123456&name=foo%20bar",
-            output.getPositionActions().first()
+            output.getPointsActions().first()
                 .getText(persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar")), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_pointsHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
+    fun getPointsActions_pointsHasQueryAndZoom_returnsOpenSearchUriAndIgnoresZoom() {
         assertEquals(
             "magicearth://?open_search&q=foo%20bar",
-            output.getPositionActions().first()
+            output.getPointsActions().first()
                 .getText(persistentListOf(WGS84Point(name = "foo bar", z = 5.0)), null, uriQuote),
         )
     }
 
     @Test
-    fun getPositionActions_pointsIsEmpty_returnsNavigateToUriWithZeroLatAndLon() {
+    fun getPointsActions_pointsIsEmpty_returnsNavigateToUriWithZeroLatAndLon() {
         assertEquals(
             listOf(
                 "magicearth://?get_directions&lat=0&lon=0",
             ),
             persistentListOf(WGS84Point()).let { points ->
-                output.getPositionActions().drop(1).map { it.getText(points, null, uriQuote) }
+                output.getPointsActions().drop(1).map { it.getText(points, null, uriQuote) }
             },
         )
     }
 
     @Test
-    fun getPositionActions_pointsHasCoordinates_returnsNavigateToUriWithLatAndLonParameters() {
+    fun getPointsActions_pointsHasCoordinates_returnsNavigateToUriWithLatAndLonParameters() {
         assertEquals(
             listOf(
                 "magicearth://?get_directions&lat=50.123456&lon=-11.123456",
             ),
             persistentListOf(WGS84Point(50.123456, -11.123456)).let { points ->
-                output.getPositionActions().drop(1).map { it.getText(points, null, uriQuote) }
+                output.getPointsActions().drop(1).map { it.getText(points, null, uriQuote) }
             },
         )
     }
 
     @Test
-    fun getPositionActions_pointsHasCoordinates_returnsNavigateToUrWithQParameter() {
+    fun getPointsActions_pointsHasCoordinates_returnsNavigateToUrWithQParameter() {
         assertEquals(
             listOf(
                 "magicearth://?get_directions&q=foo%20bar",
             ),
             persistentListOf(WGS84Point(name = "foo bar")).let { points ->
-                output.getPositionActions().drop(1).map { it.getText(points, null, uriQuote) }
+                output.getPointsActions().drop(1).map { it.getText(points, null, uriQuote) }
             },
         )
     }

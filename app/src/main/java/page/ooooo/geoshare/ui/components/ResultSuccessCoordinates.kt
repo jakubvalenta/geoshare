@@ -39,7 +39,7 @@ fun ResultSuccessCoordinates(
         Headline(
             allOutputs.getName(points, null) ?: stringResource(R.string.conversion_succeeded_title),
             Modifier
-                .testTag("geoShareConversionSuccessPositionName")
+                .testTag("geoShareResultSuccessLastPointName")
                 .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
         )
         ResultCard(
@@ -48,14 +48,14 @@ fun ResultSuccessCoordinates(
                     SelectionContainer {
                         Text(
                             text,
-                            Modifier.testTag("geoShareConversionSuccessPositionCoordinates"),
+                            Modifier.testTag("geoShareResultSuccessLastPointCoordinates"),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 } ?: Text(
                     stringResource(R.string.conversion_succeeded_description_q_only),
                     Modifier
-                        .testTag("geoShareConversionSuccessPositionDescription")
+                        .testTag("geoShareResultSuccessLastPointDescription")
                         .fillMaxWidth(),
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.bodySmall.copy(
@@ -67,7 +67,7 @@ fun ResultSuccessCoordinates(
             end = {
                 IconButton(
                     { onSelect(points, null) },
-                    Modifier.testTag("geoShareConversionSuccessPositionMenuButton")
+                    Modifier.testTag("geoShareResultSuccessCopyMenuButton")
                 ) {
                     Icon(
                         painterResource(R.drawable.content_copy_24px),

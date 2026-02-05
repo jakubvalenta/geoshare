@@ -45,7 +45,11 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         assertConversionSucceeded(expectedPoint)
     }
 
-    protected fun testUri(expectedPoint: Point, unsafeUriString: String, fallbackPoint: Point) = uiAutomator {
+    protected fun testUri(
+        expectedPoint: Point,
+        @Suppress("SameParameterValue") unsafeUriString: String,
+        fallbackPoint: Point,
+    ) = uiAutomator {
         goToMainFormShareUriAndConfirmDialog(unsafeUriString)
         assertConversionSucceeded(expectedPoint, fallbackPoint)
     }
@@ -75,7 +79,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         // Confirm permission dialog
         confirmDialogIfItIsVisible()
 
-        // Shows position
+        // Shows points
         assertConversionSucceeded(expectedPoints)
     }
 

@@ -15,8 +15,6 @@ import page.ooooo.geoshare.lib.extensions.toZLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseHtmlResult
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object UrbiInput : Input.HasHtml {
     override val uriPattern =
@@ -51,8 +49,9 @@ object UrbiInput : Input.HasHtml {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        htmlUriString = uri.toString()
+        points = buildPoints {
             uri.run {
                 Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.also { points.add(it) }
                     ?: Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.also { points.add(it) }
@@ -60,16 +59,16 @@ object UrbiInput : Input.HasHtml {
 
                 Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
-        }
-            .asWGS84()
-            .toParseUriResult(uri.toString())
+        }.asWGS84()
+    }
 
     override suspend fun parseHtml(
+        htmlUrlString: String,
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
-    ): ParseHtmlResult? =
-        buildPoints {
+    ) = buildParseHtmlResult {
+        points = buildPoints {
             defaultName = pointsFromUri.lastOrNull()?.name
 
             val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
@@ -80,9 +79,8 @@ object UrbiInput : Input.HasHtml {
                     break
                 }
             }
-        }
-            .asWGS84()
-            .toParseHtmlResult()
+        }.asWGS84()
+    }
 
     @StringRes
     override val permissionTitleResId = R.string.converter_urbi_permission_title

@@ -25,7 +25,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows automation success message
-        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareConversionSuccessMessage" }
+        onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultSuccessMessage" }
 
         // Shows automation preferences button
         onElement { viewIdResourceName == "geoShareResultAutomationButton" }
@@ -47,7 +47,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows automation counter
-        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
+        onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
         // Google Maps doesn't open while the counter is running
         assertNull(onElementOrNull(3_000L) { packageName == PackageNames.GOOGLE_MAPS })
@@ -80,7 +80,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         shareUri("geo:52.47254,13.4345")
 
         // Shows automation counter
-        onElement { viewIdResourceName == "geoShareConversionSuccessAutomationCounter" }
+        onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
         // Confirm location rationale
         onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {

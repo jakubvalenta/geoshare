@@ -3,21 +3,8 @@ package page.ooooo.geoshare.lib.point
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 
 class PointExtensionsTest {
-
-    @Test
-    fun toParseHtmlResult_lastPointHasNameOnlyAndRedirectUriStringIsNull_returnsSucceeded() {
-        val points = persistentListOf(
-            WGS84Point(1.0, 2.0),
-            WGS84Point(name = "foo bar"),
-        )
-        assertEquals(
-            ParseHtmlResult.Succeeded(points),
-            points.toParseHtmlResult(),
-        )
-    }
 
     @Test
     fun writeGpxPoints() {

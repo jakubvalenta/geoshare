@@ -13,7 +13,6 @@ import page.ooooo.geoshare.lib.outputs.GeoUriOutput
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object GeoUriInput : Input {
     private const val NAME_REGEX = """\((.+)\)"""
@@ -38,8 +37,8 @@ object GeoUriInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 Regex("""$LAT,$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])
                     ?.toLatLonNamePoint()
@@ -54,7 +53,6 @@ object GeoUriInput : Input {
 
                 Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
-        }
-            .asWGS84()
-            .toParseUriResult()
+        }.asWGS84()
+    }
 }

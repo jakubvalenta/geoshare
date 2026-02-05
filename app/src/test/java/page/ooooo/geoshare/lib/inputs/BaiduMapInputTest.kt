@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.BD09MCPoint
@@ -62,7 +61,7 @@ class BaiduMapInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_placeShare_notSupportedYet() = runTest {
-        assertNull(parseUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"))
+        assertTrue(parseUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999") is ParseUriResult.Failed)
     }
 
     @Test

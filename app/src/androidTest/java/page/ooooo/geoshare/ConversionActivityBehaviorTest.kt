@@ -7,20 +7,21 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 @RunWith(AndroidJUnit4::class)
 class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
-    fun mainScreen_whenFullUriIsShared_showsPositionAndAllowsOpeningGoogleMaps() = uiAutomator {
+    fun mainScreen_whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Shows precise location
-        assertConversionSucceeded(WGS84Point(52.5067296, 13.2599309, z = 11.0))
+        assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0))
 
         // Tap the Google Maps icon
         onElement { viewIdResourceName == "geoShareResultCardApp_${PackageNames.GOOGLE_MAPS}" }.click()
@@ -35,7 +36,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
     }
 
     @Test
-    fun mainScreen_whenLinkWithCoordinatesInChinaIsShared_showsPositionAndAllowsOpeningGoogleMapsInGCJ02() =
+    fun mainScreen_whenLinkWithCoordinatesInChinaIsShared_showsPointAndAllowsOpeningGoogleMapsInGCJ02() =
         uiAutomator {
             assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
@@ -43,14 +44,14 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
             // Shows precise location in WGS 84
-            assertConversionSucceeded(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
+            assertConversionSucceeded(GCJ02Point(31.23044166868017, 121.47099209401793, z = 11.0))
 
-            // Open position menu
-            onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+            // Open copy menu
+            onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
 
             // Shows copy link in GCJ-02
             onElement {
-                viewIdResourceName == "geoShareConversionSuccessSheetItemDescription" &&
+                viewIdResourceName == "geoShareResultSuccessSheetItemDescription" &&
                     textAsString()?.startsWith("https://www.google.com/maps?q=31.2285069,121.4") == true
             }
             pressBack()
@@ -63,7 +64,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionDialogIsConfirmedWithoutDoNotAsk_showsPointAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -75,11 +76,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
-                WGS84Point(
+                GCJ02Point(
                     52.4842015,
                     13.4167277,
                     name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                ),
+                GCJ02Point(
+                    52.4842015,
+                    13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide, Columbiadamm 160, 12049 Berlin",
                 ),
             )
 
@@ -92,7 +97,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenShortUriIsSharedAndUnshortenPermissionIsConfirmedWithDoNotAsk_showsPointAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps short link with the app
             shareUri("https://maps.app.goo.gl/2ZjYqkBPrcgeVoJS6")
@@ -105,11 +110,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany"),
-                WGS84Point(
+                GCJ02Point(
                     52.4842015,
                     13.4167277,
                     name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
+                ),
+                GCJ02Point(
+                    52.4842015,
+                    13.4167277,
+                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide, Columbiadamm 160, 12049 Berlin",
                 ),
             )
 
@@ -119,12 +128,16 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location again
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098"),
-                WGS84Point(
+                GCJ02Point(
                     44.4490541,
                     26.0888398,
                     name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                 ),
+                GCJ02Point(
+                    44.4490541,
+                    26.0888398,
+                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, 010098 Bucuresti, Roumanie",
+                )
             )
         }
 
@@ -287,7 +300,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPositionAndShowsTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionDialogIsConfirmedWithoutDoNotAsk_showsPointAndShowsTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
@@ -299,11 +312,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 10, Berlin"),
-                WGS84Point(
+                GCJ02Point(
                     52.4848232,
                     13.4240791,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 10, Berlin",
+                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
                 ),
             )
 
@@ -316,7 +328,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         }
 
     @Test
-    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_showsPositionAndDoesNotShowTheDialogTheSecondTime() =
+    fun mainScreen_whenLinkWithPlaceOnlyIsSharedAndParseHtmlPermissionIsConfirmedWithDoNotAsk_showsPointAndDoesNotShowTheDialogTheSecondTime() =
         uiAutomator {
             // Share a Google Maps place link with the app
             shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
@@ -329,11 +341,10 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin"),
-                WGS84Point(
+                GCJ02Point(
                     52.4834254,
                     13.4245399,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 20, Berlin",
+                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
                 ),
             )
 
@@ -343,12 +354,11 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location again
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 21, Berlin"),
-                WGS84Point(
+                GCJ02Point(
                     52.4832988,
                     13.4245179,
-                    name = @Suppress("SpellCheckingInspection") "Hermannstr. 21, Berlin",
-                ),
+                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
+                )
             )
         }
 
@@ -365,7 +375,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows location search
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin")
+                GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 30, Berlin")
             )
 
             // Share another Google Maps place link with the app
@@ -389,7 +399,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows location search
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin")
+                GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 40, Berlin")
             )
 
             // Share another Google Maps place link with the app
@@ -398,7 +408,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows location search
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin")
+                GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstr. 41, Berlin")
             )
         }
 
@@ -415,11 +425,15 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
             // Shows precise location
             assertConversionSucceeded(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach"),
-                WGS84Point(
+                GCJ02Point(
                     51.1982447,
                     6.4389493,
                     name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                ),
+                GCJ02Point(
+                    51.1982447,
+                    6.4389493,
+                    name = @Suppress("SpellCheckingInspection") "Konditorei Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                 ),
             )
         }
@@ -479,16 +493,17 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
-        // Open position menu
-        onElement { viewIdResourceName == "geoShareConversionSuccessPositionMenuButton" }.click()
+        // Open copy menu
+        onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
 
         // Swipe the sheet to reveal "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 1f)
+        waitForStableInActiveWindow()
 
         // Tap "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareOutputMagicEarthCopyNavigateToUri" }.click()
 
         // Shows success message
-        onElement { viewIdResourceName == "geoShareConversionSuccessMessage" }
+        onElement { viewIdResourceName == "geoShareResultSuccessMessage" }
     }
 }

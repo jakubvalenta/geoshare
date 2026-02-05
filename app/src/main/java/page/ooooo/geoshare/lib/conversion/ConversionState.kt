@@ -35,6 +35,8 @@ import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private const val TAG = "ConversionState"
+
 interface ConversionState : State {
     override suspend fun transition(): State? = null
 
@@ -225,14 +227,35 @@ data class UnshortenedUrl(
                             stateContext, inputUriString, input, uri, res.points, res.htmlUriString
                         )
 
-                        Permission.NEVER -> ParseHtmlFailed(stateContext, inputUriString, res.points)
+                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
                     }
                 } else {
-                    ParseHtmlFailed(stateContext, inputUriString, res.points)
+                    stateContext.log.e(null, "URI Pattern: Input doesn't support HTML parsing")
+                    DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
                 }
             }
 
-            null -> {
+            is ParseUriResult.SucceededAndSupportsWebParsing -> {
+                if (input is Input.HasWeb) {
+                    when (permission
+                        ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
+                        Permission.ALWAYS -> GrantedParseWebPermission(
+                            stateContext, inputUriString, input, uri, res.points, res.webUriString
+                        )
+
+                        Permission.ASK -> RequestedParseWebPermission(
+                            stateContext, inputUriString, input, uri, res.points, res.webUriString
+                        )
+
+                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
+                    }
+                } else {
+                    stateContext.log.e(null, "URI Pattern: Input doesn't support web parsing")
+                    DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
+                }
+            }
+
+            is ParseUriResult.Failed -> {
                 stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
                 ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
             }
@@ -260,7 +283,7 @@ data class RequestedParseHtmlPermission(
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
-        return ParseHtmlFailed(stateContext, inputUriString, pointsFromUri)
+        return DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri)
     }
 }
 
@@ -282,7 +305,7 @@ data class GrantedParseHtmlPermission(
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
             val res = stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
-                input.parseHtml(channel, pointsFromUri, stateContext.log)
+                input.parseHtml(htmlUrl.toString(), channel, pointsFromUri, stateContext.log)
             }
             when (res) {
                 is ParseHtmlResult.Succeeded -> {
@@ -292,15 +315,27 @@ data class GrantedParseHtmlPermission(
 
                 is ParseHtmlResult.RequiresRedirect -> {
                     stateContext.log.i(
-                        null, "HTML Redirect Pattern: Parsed $htmlUrl to redirect URI ${res.redirectUriString}"
+                        null, "HTML Pattern: Parsed $htmlUrl to redirect URI ${res.redirectUriString}"
                     )
                     val redirectUri = Uri.parse(res.redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                     ReceivedUri(stateContext, inputUriString, input, redirectUri, Permission.ALWAYS)
                 }
 
-                null -> {
+                is ParseHtmlResult.RequiresWebParsing -> {
+                    if (input is Input.HasWeb) {
+                        stateContext.log.i(null, "HTML Pattern: URI $htmlUrl requires web parsing")
+                        GrantedParseWebPermission(
+                            stateContext, inputUriString, input, uri, pointsFromUri, res.webUriString
+                        )
+                    } else {
+                        stateContext.log.e(null, "HTML Pattern: Input doesn't support web parsing")
+                        ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+                    }
+                }
+
+                is ParseHtmlResult.Failed -> {
                     stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
-                    ParseHtmlFailed(stateContext, inputUriString, pointsFromUri)
+                    ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
                 }
             }
         } catch (_: CancellationException) {
@@ -339,16 +374,102 @@ data class GrantedParseHtmlPermission(
     )
 }
 
-data class ParseHtmlFailed(
+data class DeniedParseHtmlPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
     val points: ImmutableList<Point>,
 ) : ConversionState {
-    override suspend fun transition() = if (points.isNotEmpty()) {
+    override suspend fun transition() = if (points.lastOrNull()?.let { it.hasCoordinates() || it.hasName() } == true) {
         ConversionSucceeded(stateContext, inputUriString, points)
     } else {
         ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
     }
+}
+
+data class RequestedParseWebPermission(
+    val stateContext: ConversionStateContext,
+    val inputUriString: String,
+    val input: Input.HasWeb,
+    val uri: Uri,
+    val pointsFromUri: ImmutableList<Point>,
+    val webUriString: String,
+) : ConversionState.HasPermission {
+    override val permissionTitleResId: Int = input.permissionTitleResId
+
+    override suspend fun grant(doNotAsk: Boolean): State {
+        if (doNotAsk) {
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
+        }
+        return GrantedParseWebPermission(stateContext, inputUriString, input, uri, pointsFromUri, webUriString)
+    }
+
+    override suspend fun deny(doNotAsk: Boolean): State {
+        if (doNotAsk) {
+            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
+        }
+        return DeniedParseHtmlPermission(stateContext, inputUriString, pointsFromUri)
+    }
+}
+
+data class GrantedParseWebPermission(
+    val stateContext: ConversionStateContext,
+    val inputUriString: String,
+    val input: Input.HasWeb,
+    val uri: Uri,
+    val pointsFromUri: ImmutableList<Point>,
+    val webUriString: String,
+    val timeout: Duration = 30.seconds,
+) : ConversionState.HasLoadingIndicator {
+    override suspend fun transition(): State? =
+        if (
+            try {
+                // Fail the conversion unless the URL change callback is called within timeout
+                delay(timeout)
+                true
+            } catch (_: CancellationException) {
+                false
+            }
+        ) {
+            stateContext.log.e(TAG, "Parse web: Timed out")
+            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+        } else {
+            null
+        }
+
+    suspend fun onUrlChange(urlString: String): State {
+        val matchingUriString = input.uriPattern.find(urlString)?.value
+        return when (
+            val res = matchingUriString?.let { uriString ->
+                input.parseUri(Uri.parse(uriString, stateContext.uriQuote))
+            }
+        ) {
+            is ParseUriResult.Succeeded -> {
+                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
+            }
+
+            is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
+                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
+            }
+
+            is ParseUriResult.SucceededAndSupportsWebParsing,
+                -> {
+                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                ConversionSucceeded(stateContext, inputUriString, res.points)
+            }
+
+            is ParseUriResult.Failed, null -> {
+                stateContext.log.w(TAG, "Failed to parse web URL $webUriString")
+                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+            }
+        }
+    }
+
+    override val loadingIndicator = LoadingIndicator.Large(
+        titleResId = input.loadingIndicatorTitleResId,
+        description = { null },
+    )
 }
 
 data class ConversionSucceeded(
@@ -472,9 +593,7 @@ data class ActionRan(
 ) : ConversionState.HasResult {
     override suspend fun transition(): State = when (success) {
         true -> ActionSucceeded(inputUriString, points, action)
-
         false -> ActionFailed(inputUriString, points, action)
-
         else -> ActionFinished(inputUriString, points, action)
     }
 }

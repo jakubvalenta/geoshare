@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.GCJ02Point
@@ -80,7 +79,7 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_unknownPath() = runTest {
-        assertNull(parseUri("https://maps.google.com/spam"))
+        assertTrue(parseUri("https://maps.google.com/spam") is ParseUriResult.Failed)
     }
 
     @Test
@@ -591,7 +590,7 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_googleSearch() = runTest {
-        assertNull(parseUri("https://www.google.com/search?sca_esv=123&hl=en"))
+        assertTrue(parseUri("https://www.google.com/search?sca_esv=123&hl=en") is ParseUriResult.Failed)
     }
 
     @Test
@@ -670,10 +669,12 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNull() = runTest {
-        assertNull(
+        assertEquals(
+            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml(
                 @Suppress("SpellCheckingInspection") """<head><meta content="Google Maps" itemprop="name">
-    <script>window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0, 0, 0],[1024, 768],13.1]"""
+    <script>window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0, 0, 0],[1024, 768],13.1]""",
+                "https://www.google.com/maps/place/Berlin,+Germany/"
             ),
         )
     }
@@ -763,12 +764,18 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseHtml_failure() = runTest {
-        assertNull(parseHtml("spam"))
+        assertEquals(
+            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            parseHtml("spam", "https://www.google.com/maps/place/Berlin,+Germany/")
+        )
     }
 
     @Test
     fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() = runTest {
-        assertNull(parseHtml("<html></html>"))
+        assertEquals(
+            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            parseHtml("<html></html>", "https://www.google.com/maps/place/Berlin,+Germany/"),
+        )
     }
 
     @Test

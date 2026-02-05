@@ -19,7 +19,7 @@ class AppleMapsOutputTest {
                 "https://maps.apple.com/?daddr=50.123456,-11.123456",
             ),
             persistentListOf(WGS84Point(50.123456, -11.123456, z = 3.4)).let { points ->
-                output.getPositionActions().map { it.getText(points, null, uriQuote) }
+                output.getPointsActions().map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -32,7 +32,7 @@ class AppleMapsOutputTest {
                 "https://maps.apple.com/?daddr=50.123456,-11.123456",
             ),
             persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4)).let { points ->
-                output.getPositionActions().map { it.getText(points, null, uriQuote) }
+                output.getPointsActions().map { it.getText(points, null, uriQuote) }
             },
         )
     }
@@ -45,7 +45,7 @@ class AppleMapsOutputTest {
                 "https://maps.apple.com/?daddr=foo%20bar",
             ),
             persistentListOf(WGS84Point(name = "foo bar", z = 3.4)).let { points ->
-                output.getPositionActions().map { it.getText(points, null, uriQuote) }
+                output.getPointsActions().map { it.getText(points, null, uriQuote) }
             },
         )
     }

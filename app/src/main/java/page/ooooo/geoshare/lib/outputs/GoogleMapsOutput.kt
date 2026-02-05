@@ -261,7 +261,7 @@ object GoogleMapsOutput : Output {
         }
     }
 
-    override fun getPositionActions() = listOf(
+    override fun getPointsActions() = listOf(
         CopyLinkAction(),
         CopyNavigateToAction(),
         CopyStreetViewAction(),

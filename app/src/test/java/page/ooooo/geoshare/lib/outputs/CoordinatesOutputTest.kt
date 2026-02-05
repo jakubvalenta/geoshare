@@ -19,7 +19,7 @@ class CoordinatesOutputTest {
                 "17°\u00a012′\u00a059.65956″\u00a0S, 149°\u00a056′\u00a049.30584″\u00a0W",
             ),
             persistentListOf(WGS84Point(-17.2165721, -149.9470294)).let { points ->
-                output.getPositionActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
+                output.getPointsActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
             },
         )
     }
@@ -32,7 +32,7 @@ class CoordinatesOutputTest {
                 "52°\u00a030′\u00a024.22656″\u00a0N, 13°\u00a015′\u00a035.75124″\u00a0E",
             ),
             persistentListOf(WGS84Point(52.5067296, 13.2599309)).let { points ->
-                output.getPositionActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
+                output.getPointsActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
             },
         )
     }
@@ -45,7 +45,7 @@ class CoordinatesOutputTest {
                 "0°\u00a00′\u00a00.0″\u00a0N, 0°\u00a00′\u00a00.0″\u00a0E",
             ),
             persistentListOf(WGS84Point(0.0, 0.0)).let { points ->
-                output.getPositionActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
+                output.getPointsActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
             },
         )
     }
@@ -58,7 +58,7 @@ class CoordinatesOutputTest {
                 "0°\u00a030′\u00a00.0″\u00a0N, 0°\u00a030′\u00a00.0″\u00a0E",
             ),
             persistentListOf(WGS84Point(0.5, 0.5)).let { points ->
-                output.getPositionActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
+                output.getPointsActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
             },
         )
     }
@@ -71,7 +71,7 @@ class CoordinatesOutputTest {
                 "10°\u00a00′\u00a00.0″\u00a0S, 20°\u00a00′\u00a00.0″\u00a0W",
             ),
             persistentListOf(WGS84Point(-10.0, -20.0)).let { points ->
-                output.getPositionActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
+                output.getPointsActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
             },
         )
     }
@@ -84,7 +84,7 @@ class CoordinatesOutputTest {
                 "10°\u00a030′\u00a00.0″\u00a0S, 20°\u00a030′\u00a00.0″\u00a0W",
             ),
             persistentListOf(WGS84Point(-10.5, -20.5)).let { points ->
-                output.getPositionActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
+                output.getPointsActions().map { (it as? CopyAction)?.getText(points, null, uriQuote) }
             },
         )
     }

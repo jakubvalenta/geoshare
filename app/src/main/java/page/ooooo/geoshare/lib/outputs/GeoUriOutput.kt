@@ -152,7 +152,7 @@ object GeoUriOutput : Output {
         )
     }
 
-    override fun getPositionActions() = listOf(
+    override fun getPointsActions() = listOf(
         CopyGeoUriAction(),
         ShareGeoUriAction(),
     )

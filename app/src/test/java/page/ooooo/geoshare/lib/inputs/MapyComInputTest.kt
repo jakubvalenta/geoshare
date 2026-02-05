@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
@@ -51,11 +50,11 @@ class MapyComInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertNull(parseUri("https://mapy.com"))
-        assertNull(parseUri("https://mapy.com/en"))
-        assertNull(parseUri("https://mapy.com/en/"))
-        assertNull(parseUri("https://mapy.com/en/zakladni"))
-        assertNull(parseUri("https://mapy.com/en/zakladni?spam=1"))
+        assertTrue(parseUri("https://mapy.com") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://mapy.com/en") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://mapy.com/en/") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://mapy.com/en/zakladni") is ParseUriResult.Failed)
+        assertTrue(parseUri("https://mapy.com/en/zakladni?spam=1") is ParseUriResult.Failed)
     }
 
     @Test

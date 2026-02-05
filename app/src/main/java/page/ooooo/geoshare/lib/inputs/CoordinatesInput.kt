@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
-import page.ooooo.geoshare.lib.point.toParseUriResult
 
 object CoordinatesInput : Input {
     @Suppress("SpellCheckingInspection")
@@ -36,8 +35,8 @@ object CoordinatesInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri): ParseUriResult? =
-        buildPoints {
+    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+        points = buildPoints {
             uri.run {
                 // Decimal, e.g. `N 41.40338, E 2.17403`
                 Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""").matchEntire(path)?.let { m ->
@@ -106,9 +105,8 @@ object CoordinatesInput : Input {
                     return@run
                 }
             }
-        }
-            .asWGS84()
-            .toParseUriResult()
+        }.asWGS84()
+    }
 
     private fun degToDec(
         southOrWest: Boolean,

@@ -21,8 +21,8 @@ fun List<Output>.getAppActions(apps: List<AndroidTools.App>) =
 fun List<Output>.getChipActions() =
     this.flatMap { it.getChipActions() }
 
-fun List<Output>.getPositionActions() =
-    this.flatMap { it.getPositionActions() }
+fun List<Output>.getPointsActions() =
+    this.flatMap { it.getPointsActions() }
 
 fun List<Output>.getPointActions() =
     this.flatMap { it.getPointActions() }
