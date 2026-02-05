@@ -95,7 +95,7 @@ fun FaqScreen(
                 itemId = FaqItemId.HOW_IT_WORKS,
                 expandedItemId = expandedItemId,
                 onSetExpandedItemId = { expandedItemId = it },
-                stringResource(R.string.faq_how_it_works_headline),
+                stringResource(R.string.faq_how_headline),
             ) {
                 ParagraphText(
                     stringResource(R.string.faq_how_text_1, appName)
