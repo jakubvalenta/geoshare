@@ -2106,14 +2106,14 @@ class ConversionStateTest {
             val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val resPoints = persistentListOf(WGS84Point(3.0, 4.0))
             val webUriString = "$inputUriString/web"
-            val currentwebUriString = "$webUriString/current"
+            val currentWebUriString = "$webUriString/current"
             val mockInput = object : Input.HasWeb {
                 override val uriPattern = Regex("""^https://maps\.apple\.com/\S*""")
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
                 override suspend fun parseUri(uri: Uri) =
-                    if (uri.toString() == currentwebUriString) {
+                    if (uri.toString() == currentWebUriString) {
                         ParseUriResult.Succeeded(resPoints)
                     } else {
                         throw NotImplementedError()
@@ -2128,7 +2128,7 @@ class ConversionStateTest {
             )
             assertEquals(
                 ConversionSucceeded(stateContext, inputUriString, resPoints),
-                state.onUrlChange(currentwebUriString),
+                state.onUrlChange(currentWebUriString),
             )
         }
 
