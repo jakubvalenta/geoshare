@@ -41,4 +41,4 @@ When you like Google Maps for finding places, but you prefer a different app for
 
 Geo Share converts map links (e.g. https://maps.app.goo.gl/...) into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. Geo Share extracts them from the map URL.
 
-However, not all map URLs include coordinates. In such cases, Geo Share will <b>prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.)</b> and retrieve the coordinates from either HTTP headers or the HTML document of the link.
+However, not all map URLs include coordinates. In such cases, Geo Share will <b>prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.)</b> and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app’s FAQ screen.

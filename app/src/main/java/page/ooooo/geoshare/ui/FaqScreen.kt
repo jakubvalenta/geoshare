@@ -98,10 +98,10 @@ fun FaqScreen(
                 stringResource(R.string.faq_how_it_works_headline),
             ) {
                 ParagraphText(
-                    stringResource(R.string.faq_how_it_works_text_1, appName)
+                    stringResource(R.string.faq_how_text_1, appName)
                 )
                 ParagraphText(
-                    stringResource(R.string.faq_how_it_works_text_2, appName)
+                    stringResource(R.string.faq_how_text_2, appName)
                 )
                 CompositionLocalProvider(
                     LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
@@ -111,9 +111,9 @@ fun FaqScreen(
                 ) {
                     TextList(verticalSpace = spacing.tiny) {
                         listOf(
-                            R.string.faq_how_it_works_text_2_item_http to R.string.faq_how_it_works_text_2_item_http_example,
-                            R.string.faq_how_it_works_text_2_item_html to R.string.faq_how_it_works_text_2_item_html_example,
-                            R.string.faq_how_it_works_text_2_item_web to null,
+                            R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
+                            R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
+                            R.string.faq_how_text_2_item_web to null,
                         ).forEach { (textResId, exampleResId) ->
                             TextListItem(bullet = { TextListBullet() }) {
                                 Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)) {
@@ -131,11 +131,11 @@ fun FaqScreen(
                     }
                 }
                 ParagraphText(
-                    stringResource(R.string.faq_how_it_works_text_3, appName)
+                    stringResource(R.string.faq_how_text_3, appName)
                 )
                 ParagraphText(
                     buildAnnotatedString {
-                        val parts = stringResource(R.string.faq_how_it_works_text_4).split($$"%1$s")
+                        val parts = stringResource(R.string.faq_how_text_4).split($$"%1$s")
                         parts.forEachIndexed { i, part ->
                             append(part)
                             if (i < parts.size - 1) {
@@ -152,7 +152,7 @@ fun FaqScreen(
                                         onNavigateToUserPreferencesConnectionPermissionScreen()
                                     }
                                 ) {
-                                    append(stringResource(R.string.faq_how_it_works_text_4_preferences_button))
+                                    append(stringResource(R.string.faq_how_text_4_preferences_button))
                                 }
                             }
                         }
