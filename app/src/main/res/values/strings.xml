@@ -104,41 +104,41 @@
         <item quantity="one">Automatically sharing GPX route in %1$ds</item>
         <item quantity="other">Automatically sharing GPX route in %1$ds</item>
     </plurals>
-    <string name="converter_amap_name" translatable="false">Amap (AutoNavi)</string>
+    <string name="converter_amap_name">Amap (AutoNavi)</string>
     <string name="converter_amap_loading_indicator_title">Connecting to Amap…</string>
     <string name="converter_amap_permission_title">Connect to Amap?</string>
     <string name="converter_apple_maps_loading_indicator_title">Connecting to Apple…</string>
-    <string name="converter_apple_maps_name" translatable="false">Apple Maps</string>
+    <string name="converter_apple_maps_name">Apple Maps</string>
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
-    <string name="converter_baidu_map_name" translatable="false">百度地图 (Baidu Map)</string>
+    <string name="converter_baidu_map_name">Baidu Map</string>
     <string name="converter_baidu_map_permission_title">Connect to Baidu Map?</string>
     <string name="converter_coordinates_name">coordinates</string>
     <string name="example">e.g. %1$s</string>
     <string name="converter_debug_name" translatable="false">Debug Input</string>
     <string name="converter_debug_permission_title" translatable="false">Connect to Debug Input?</string>
     <string name="converter_debug_loading_indicator_title" translatable="false">Connecting to Debug Input…</string>
-    <string name="converter_ge0_name" translatable="false">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_google_maps_loading_indicator_title">Connecting to Google…</string>
-    <string name="converter_google_maps_name" translatable="false">Google Maps</string>
+    <string name="converter_google_maps_name">Google Maps</string>
     <string name="converter_google_maps_permission_title">Connect to Google?</string>
-    <string name="converter_here_wego_name" translatable="false">HERE WeGo</string>
-    <string name="converter_magic_earth_name" translatable="false">Magic Earth</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
     <string name="converter_mapy_com_loading_indicator_title">Connecting to Mapy.com…</string>
-    <string name="converter_mapy_com_name" translatable="false">Mapy.com</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
     <string name="converter_mapy_com_permission_title">Connect to Mapy.com?</string>
     <string name="converter_open_street_map_loading_indicator_title">Connecting to OpenStreetMap…</string>
-    <string name="converter_open_street_map_name" translatable="false">OpenStreetMap</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
     <string name="converter_open_street_map_permission_title">Connect to OpenStreetMap?</string>
-    <string name="converter_osm_and_name" translatable="false">OsmAnd</string>
-    <string name="converter_urbi_name" translatable="false">2GIS / Urbi</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
     <string name="converter_urbi_permission_title">Connect to 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Connecting to 2GIS / Urbi…</string>
     <string name="converter_waze_loading_indicator_title">Connecting to Waze…</string>
-    <string name="converter_waze_name" translatable="false">Waze</string>
+    <string name="converter_waze_name">Waze</string>
     <string name="converter_waze_permission_title">Connect to Waze?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Connecting to Yandex…</string>
-    <string name="converter_yandex_maps_name" translatable="false">Yandex Maps</string>
+    <string name="converter_yandex_maps_name">Yandex Maps</string>
     <string name="converter_yandex_maps_permission_title">Connect to Yandex?</string>
     <string name="conversion_succeeded_title">Coordinates</string>
     <string name="conversion_automation_copy_link_succeeded">Automatically copied link</string>
