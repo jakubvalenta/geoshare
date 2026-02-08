@@ -6,6 +6,7 @@ Comparte un enlace de mapa con Geo Share y la aplicación lo abrirá en otra apl
 - Apple Maps
 - 2GIS
 - Amap (AutoNavi)
+- Baidu Map (beta, no enlaces cortos)
 - CoMaps
 - HERE WeGo
 - Magic Earth
