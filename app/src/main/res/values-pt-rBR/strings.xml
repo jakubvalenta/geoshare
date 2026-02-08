@@ -182,7 +182,7 @@
     <string name="converter_baidu_map_permission_title">Conectar ao Baidu Map?</string>
     <string name="faq_how_headline">Como funciona</string>
     <string name="faq_how_text_1">O %1$s converte links de mapa em links geo: que podem ser abertos por qualquer apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</string>
-    <string name="faq_how_text_2">Entretando, nem todos as URLs de mapa incluem coordenadas. Nesses casos, o %1$s te pedirá para conectar ao serviço de mapa (Google Maps, Apple Maps, etc.) e obter as coordenadas de:</string>
+    <string name="faq_how_text_2">Entretanto, nem todos as URLs de mapa incluem coordenadas. Nesses casos, o %1$s te pedirá para conectar ao serviço de mapa (Google Maps, Apple Maps, etc.) e obter as coordenadas de:</string>
     <string name="faq_how_text_2_item_http">cabeçalhos HTTP,</string>
     <string name="faq_how_text_2_item_html">documento HTML,</string>
     <string name="faq_how_text_2_item_web">ou da página ativa incluindo JavaScript.</string>
