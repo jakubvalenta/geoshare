@@ -206,4 +206,15 @@
     <string name="network_exception_unknown">خطأ غير معروف</string>
     <string name="network_exception_unresolved_address">عنوان غير محلول</string>
     <string name="converter_baidu_map_permission_title">اتصل ب Baidu Map؟</string>
+    <string name="faq_how_headline">كيف يعمل</string>
+    <string name="faq_how_text_1">يقوم %1$s بتحويل روابط الخرائط إلى روابط geo: يمكن فتحها بواسطة تطبيقات الخرائط الأخرى. لإنشاء رابط geo:، يلزم توفّر إحداثيات جغرافية، حيث يستخرجها %1$s من عنوان URL الخاص بالخريطة.</string>
+    <string name="faq_how_text_2">ومع ذلك، لا تتضمن جميع عناوين URL للخرائط إحداثيات. في مثل هذه الحالات، سيطلب منك %1$s الإذن للاتصال بخدمة الخرائط (خرائط Google، أو خرائط Apple، إلخ) واسترداد الإحداثيات من:</string>
+    <string name="faq_how_text_2_item_http">إما ترويسات HTTP،</string>
+    <string name="faq_how_text_2_item_html">أو مستند HTML،</string>
+    <string name="faq_how_text_2_item_web">أو صفحة الويب المباشرة بما في ذلك جافا سكريبت.</string>
+    <string name="faq_how_text_3">إذا لم تسمح بالاتصال بخدمة الخرائط، فسيقوم %1$s بإنشاء رابط geo: باستخدام مصطلح بحث بدلاً من الإحداثيات أو سيتوقف عن العمل، وذلك حسب الرابط المعني.</string>
+    <string name="faq_how_text_4">للسماح بالاتصال بخدمة الخرائط أو رفضه بشكل دائم بدلاً من السؤال في كل مرة (الخيار الافتراضي)، انتقل إلى %1$s الخاص بالتطبيق.</string>
+    <string name="faq_how_text_4_preferences_button">التفضيلات</string>
+    <string name="faq_privacy_headline">اعتبارات الخصوصية</string>
+    <string name="faq_privacy_text">يقوم %1$s بتحويل روابط الخرائط دون اتصال بالإنترنت كلما أمكن ذلك. وإذا كان رابط الخريطة يتطلب تحويلاً عبر الإنترنت، فسوف يسألك التطبيق قبل الاتصال بخدمة الخرائط (مثل خرائط جوجل أو خرائط Apple، إلخ). وفي حال سمحت بالاتصال، ستتلقى خدمة الخرائط رابط الخريطة، وستتمكن من قراءة عنوان IP الخاص بك، وفي بعض الحالات سيقوم %1$s بتحميل صفحة الويب المباشرة لخدمة الخرائط وتشغيل ملفات الجافا سكريبت الخاصة بها. يحدث هذا في بيئة مقيدة تحظر نصوص التتبع البرمجية ولا تخزن ملفات تعريف الارتباط.</string>
 </resources>
