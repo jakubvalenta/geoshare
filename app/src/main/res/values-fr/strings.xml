@@ -189,8 +189,8 @@
     <string name="network_exception_unresolved_address">adresse non résolue</string>
     <string name="converter_baidu_map_permission_title">Se connecter à Baidu Map ?</string>
     <string name="faq_how_headline">Comment ça marche</string>
-    <string name="faq_how_text_1">%1$s convertit les liens de carte en liens geo: pouvant être ouverts par d\'autres applications de cartographie. La création d\'un lien geo: nécessite des coordonnées géographiques. %1$s les extrait de l\'URL de la carte.</string>
-    <string name="faq_how_text_2">Cependant, toutes les URL de cartes ne contiennent pas de coordonnées. Dans ce cas, %1$s vous demandera l\'autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.) et de récupérer les coordonnées depuis :</string>
+    <string name="faq_how_text_1">%1$s convertit les liens de carte en liens geo: pouvant être ouverts par d’autres applications de cartographie. La création d’un lien geo: nécessite des coordonnées géographiques. %1$s les extrait de l’URL de la carte.</string>
+    <string name="faq_how_text_2">Cependant, toutes les URL de cartes ne contiennent pas de coordonnées. Dans ce cas, %1$s vous demandera l’autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.) et de récupérer les coordonnées depuis :</string>
     <string name="faq_how_text_2_item_http">soit les en-têtes HTTP,</string>
     <string name="faq_how_text_2_item_html">ou document HTML,</string>
     <string name="faq_how_text_2_item_web">ou la page web en direct, y compris JavaScript.</string>
@@ -198,5 +198,5 @@
     <string name="faq_how_text_4">Pour autoriser ou refuser définitivement la connexion au service de carte au lieu de toujours demander (comportement par défaut), accédez aux %1$s de l’application.</string>
     <string name="faq_how_text_4_preferences_button">préférences</string>
     <string name="faq_privacy_headline">Considérations relatives à la confidentialité</string>
-    <string name="faq_privacy_text">Lorsque cela est possible, %1$s convertit les liens cartographiques hors ligne. Si le lien nécessite une conversion en ligne, l\'application vous demandera l\'autorisation avant de se connecter au service cartographique (Google Maps, Apple Maps, etc.). Si vous autorisez la connexion, le service cartographique recevra le lien, pourra lire votre adresse IP et, dans certains cas, %1$s chargera la page web du service cartographique et exécutera son code JavaScript. Cette opération se déroule dans un environnement restreint, qui bloque les scripts de suivi et ne stocke pas de cookies.</string>
+    <string name="faq_privacy_text">Lorsque cela est possible, %1$s convertit les liens cartographiques hors ligne. Si le lien nécessite une conversion en ligne, l’application vous demandera l’autorisation avant de se connecter au service cartographique (Google Maps, Apple Maps, etc.). Si vous autorisez la connexion, le service cartographique recevra le lien, pourra lire votre adresse IP et, dans certains cas, %1$s chargera la page web du service cartographique et exécutera son code JavaScript. Cette opération se déroule dans un environnement restreint, qui bloque les scripts de suivi et ne stocke pas de cookies.</string>
 </resources>
