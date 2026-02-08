@@ -179,4 +179,24 @@
         <item quantity="many">%1$d segundos</item>
         <item quantity="other">%1$d segundos</item>
     </plurals>
+    <string name="converter_baidu_map_permission_title">¿Conectarse a Baidu Map?</string>
+    <string name="faq_how_headline">Cómo funciona</string>
+    <string name="faq_how_text_1">%1$s convierte enlaces de mapa a enlaces geo: que pueden ser abiertos por otras aplicaciones de mapa. Para crear un enlace geo:, coordenadas geográficas son requeridas. %1$s las extrae del URL del mapa.</string>
+    <string name="faq_how_text_2">Sin embargo, no todos los URLs de mapa incluyen coordenadas. En estos casos, %1$s pedirá permiso para conectarse al servicio de mapa (Google Maps, Apple Maps, etc.) y recibir las coordenadas desde:</string>
+    <string name="faq_how_text_2_item_http">ya sean encabezados HTTP,</string>
+    <string name="faq_how_text_2_item_html">o documento HTML,</string>
+    <string name="faq_how_text_2_item_web">o la página web en vivo incluyendo JavaScript.</string>
+    <string name="faq_how_text_3">Si no permites conectarse al servicio de mapa, entonces %1$s creará un enlace geo: con un término de búsqueda en vez de coordenadas o se detiene, dependiendo del enlace en particular.</string>
+    <string name="faq_how_text_4">Para permitir o denegar permanentemente conectarse al servicio de mapa en vez de siempre preguntar (la opción por defecto), ve al %1$s de la aplicación.</string>
+    <string name="faq_how_text_4_preferences_button">preferencias</string>
+    <string name="faq_privacy_headline">Consideraciones de privacidad</string>
+    <string name="faq_privacy_text">Cuando sea posible, %1$s convierte enlaces de mapa sin necesitar conexión al internet. Si el enlace de mapa requiere conectarse al internet para la conversión, la aplicación preguntará antes de conectarse al servicio de mapa (Google Maps, Apple Maps, etc.). Si permites la conexión, el servicio de mapa recibirá el enlace de mapa, leerá tu dirección IP, y en algunos casos %1$s cargará la página web en vivo del servicio de mapa y ejecutará su JavaScript. Esto sucede en un ambiente restringido, el cual bloquea scripts de rastreo y no guarda cookies.</string>
+    <string name="network_exception_connect_timeout">tiempo de espera de conexión</string>
+    <string name="network_exception_eof">conexión cerrada</string>
+    <string name="network_exception_request_timeout">tiempo de espera de solicitud</string>
+    <string name="network_exception_response_error">error de respuesta</string>
+    <string name="network_exception_server_response_error">error de respuesta del servidor</string>
+    <string name="network_exception_socket_timeout">tiempo de espera del socket</string>
+    <string name="network_exception_unknown">error desconocido</string>
+    <string name="network_exception_unresolved_address">dirección sin resolver</string>
 </resources>
