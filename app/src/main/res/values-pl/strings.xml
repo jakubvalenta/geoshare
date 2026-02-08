@@ -55,4 +55,21 @@
     <string name="conversion_succeeded_apps_not_found">Nie zainstalowano żadnej aplikacji, która może otwierać linki geo:</string>
     <string name="conversion_failed_parse_html_error">Nie udało się pobrać strony Map Google</string>
     <string name="copying_finished">Skopiowano link geo: do schowka</string>
+    <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
+    <string name="donation_button">Wesprzyj na Ko-fi</string>
+    <string name="donation_description">Czy ta aplikacja pozwala tobie zaoszczędzić czas?</string>
+    <string name="conversion_succeeded_skip">Skopiuj oryginalny link</string>
+    <string name="conversion_succeeded_share">Udostępnij</string>
+    <string name="conversion_succeeded_save_gpx_failed">Nie udało się zapisać GPX</string>
+    <string name="conversion_succeeded_save_gpx">Zapisz GPX</string>
+    <string name="conversion_succeeded_open_app_street_view">Pokaż widok ulicy w %1$s</string>
+    <string name="conversion_succeeded_open_app_navigate_to">Nawiguj w %1$s</string>
+    <string name="conversion_succeeded_open_app_failed">Nie udało się otworzyć %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Pokaż mapę w %1$s</string>
+    <string name="conversion_succeeded_open_app">Otwórz %1$s</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">Zezwolić na dostęp do lokalizacji?</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">Wyszukiwanie twojej lokalizacji…</string>
+    <string name="conversion_succeeded_location_failed">Nie udało się znaleźć lokalizacji</string>
+    <string name="conversion_succeeded_description_q_only">Oryginalny link nie zawiera współrzędnych, a jedynie nazwę miejsca. Po otwarciu tej lokalizacji w innej aplikacji może ona znaleźć inne miejsce niż oryginalny link.</string>
+    <string name="conversion_succeeded_copy_link_street_view">Skopiuj link do widoku ulicy w %1$s</string>
 </resources>
