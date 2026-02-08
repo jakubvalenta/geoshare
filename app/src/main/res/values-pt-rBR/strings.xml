@@ -179,4 +179,24 @@
     <string name="conversion_succeeded_description_q_only">O link original não contém coordenadas, somente o nome do lugar. Quando você abrir esta localização em outro app, ele pode encontrar um lugar diferente do que o link original.</string>
     <string name="donation_button">Doar no Ko-fi</string>
     <string name="donation_description">Esse app otimiza seu tempo?</string>
+    <string name="converter_baidu_map_permission_title">Conectar ao Baidu Map?</string>
+    <string name="faq_how_headline">Como funciona</string>
+    <string name="faq_how_text_1">O %1$s converte links de mapa em links geo: que podem ser abertos por qualquer apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</string>
+    <string name="faq_how_text_2">Entretando, nem todos as URLs de mapa incluem coordenadas. Nesses casos, o %1$s te pedirá para conectar ao serviço de mapa (Google Maps, Apple Maps, etc.) e obter as coordenadas de:</string>
+    <string name="faq_how_text_2_item_http">cabeçalhos HTTP,</string>
+    <string name="faq_how_text_2_item_html">documento HTML,</string>
+    <string name="faq_how_text_2_item_web">ou da página ativa incluindo JavaScript.</string>
+    <string name="faq_how_text_3">Se não permitir a conexão ao serviço de mapas, então o %1$s criará um link geo: com o termo de busca em vez das coordenadas, ou para, dependendo do link.</string>
+    <string name="faq_how_text_4">Para sempre permitir ou bloquear a conexão com o serviço de mapas, em vez de sempre perguntar (o padrão), vá às %1$s do app.</string>
+    <string name="faq_how_text_4_preferences_button">preferências</string>
+    <string name="faq_privacy_headline">Considerações de privacidade</string>
+    <string name="faq_privacy_text">Quando possível, o %1$s converte os links de mapas de forma off-line. Se o link precisa de conversão on-line, o app te perguntará antes de se conectar. Se permitir, o serviço de mapas receberá o link de mapa, e poderá ver seu endereço de IP, e em alguns casos, o %1$s carregará a página viva do serviço e executar seu JavaScript. Isso acontece em um ambiente restrito, que bloqueia scripts de rastreamento e não armazena cookies.</string>
+    <string name="network_exception_connect_timeout">tempo limite da conexão esgotado</string>
+    <string name="network_exception_eof">conexão fechada</string>
+    <string name="network_exception_request_timeout">tempo limite da solicitação esgotado</string>
+    <string name="network_exception_response_error">erro de resposta</string>
+    <string name="network_exception_server_response_error">erro da resposta do servidor</string>
+    <string name="network_exception_socket_timeout">tempo limite do soquete esgotado</string>
+    <string name="network_exception_unknown">erro desconhecido</string>
+    <string name="network_exception_unresolved_address">endereço não traduzido</string>
 </resources>
