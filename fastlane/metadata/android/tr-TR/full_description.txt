@@ -1,0 +1,44 @@
+Geo Share ile bir harita bağlantısı paylaşın ve uygulama bunu yüklü başka bir harita uygulamasında açacaktır.
+
+<b>Desteklenen harita bağlantıları</b>
+
+- Google Haritalar
+- Apple Haritalar
+- 2GIS
+- Amap (AutoNavi)
+- Baidu Harita (beta, kısa bağlantılar yok)
+- CoMaps
+- HERE WeGo
+- Magic Earth
+- Maps.me
+- Mapy.com
+- OpenStreetMap
+- Organic Maps
+- OsmAnd
+- Urbi
+- Waze
+- Yandex Haritalar
+- koordinatlar
+
+<b>Örnek kullanım durumları</b>
+
+Birisi size Google Haritalar bağlantısı gönderdiğinde, ancak siz OpenStreetMap kullanmayı tercih ediyorsanız, OsmAnd veya Organic Haritalar'da hızlıca <b>aynı konumu açabilirsiniz</b>.
+
+Yer bulmak için Google Haritalar'ı seviyorsanız ancak navigasyon için farklı bir uygulamayı tercih ediyorsanız, Google Haritalar'dan favori <b>navigasyon uygulamanıza</b> kolayca geçiş yapabilirsiniz.
+
+<b>Diğer özellikler</b>
+
+- Bir harita bağlantısının <b>coğrafi koordinatlarını</b> gösterir ve bunları çeşitli formatlarda, örneğin geo: bağlantısı olarak panoya kopyalamanıza olanak tanır.
+- Bir <b>yer listesi</b> bağlantısının tüm noktalarını gösterir.
+- Bir harita bağlantısı işlendiğinde <b>otomatik olarak</b> bir işlem gerçekleştirmenize olanak tanır.
+- TomTom, Waze, Magic Earth gibi uygulamalarda navigasyon başlatmanıza olanak tanır.
+- Bir konumu <b>GPX dosyası</b> olarak kaydetmenize <b>olanak tanır</b>.
+-<b>Kesintili internet bağlantısında</b> yeniden deneme yapar.
+- Harita bağlantılarını uygulamayla paylaşmak yerine doğrudan uygulamaya <b>harita bağlantılarını yapıştırmanıza</b> olanak tanır.
+- Arayüz, <b>tabletlere</b> uyarlanmıştır.
+
+<b>Nasıl çalışır ve gizlilik hususları</b>
+
+Geo Share, harita bağlantılarını (örneğin, https://maps.app.goo.gl/...) diğer harita uygulamaları tarafından açılabilecek geo: bağlantılarına dönüştürür. Bir geo: bağlantısı oluşturmak için coğrafi koordinatlar gereklidir. Geo Share bunları harita URL'sinden çıkarır.
+
+Ancak, tüm harita URL'leri koordinat içermez. Bu gibi durumlarda, Geo Share <b>harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanmak için sizden izin isteyecektir</b> ve koordinatları HTTP başlıklarından veya bağlantının HTML belgesinden alacaktır. Daha ayrıntılı bilgi için uygulamanın SSS ekranına bakın.
