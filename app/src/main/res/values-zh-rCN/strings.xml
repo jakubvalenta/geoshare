@@ -176,4 +176,15 @@
     <string name="network_exception_unknown">未知错误</string>
     <string name="network_exception_unresolved_address">无法解析的地址</string>
     <string name="converter_baidu_map_permission_title">连接到百度地图？</string>
+    <string name="faq_how_headline">工作原理</string>
+    <string name="faq_how_text_4_preferences_button">偏好设置</string>
+    <string name="faq_how_text_1">%1$s 将地图链接转换为其他地图应用可以打开的 geo: 链接。要创建 geo: 链接，需要地理坐标。%1$s 从地图 URL 中提取它们。</string>
+    <string name="faq_how_text_2">然而，并非所有地图 URL 都包含坐标。在这种情况下，%1$s 将提示您获得连接到地图服务（Google 地图、Apple 地图等）的权限并从以下位置检索坐标：</string>
+    <string name="faq_how_text_2_item_http">HTTP 标头，</string>
+    <string name="faq_how_text_2_item_html">HTML 文档，</string>
+    <string name="faq_how_text_2_item_web">包含 JavaScript 的实时网页。</string>
+    <string name="faq_how_text_3">如果您拒绝连接到地图服务，%1$s 会根据具体链接类型，要么创建包含搜索词而非坐标的 geo: 链接，要么直接停止转换。</string>
+    <string name="faq_how_text_4">如需永久允许或拒绝连接到地图服务（替代默认的始终询问），请前往应用的%1$s。</string>
+    <string name="faq_privacy_headline">隐私考量</string>
+    <string name="faq_privacy_text">%1$s 会在可能的情况下离线转换地图链接。如果地图链接需要在线转换，应用会在连接到地图服务（例如 Google 地图、Apple 地图等）之前询问您。如果您允许连接，地图服务将接收到地图链接，并能够读取您的 IP 地址。在某些情况下，%1$s 将加载地图服务的实时网页并执行其 JavaScript。此操作在受限环境中进行，该环境会阻止跟踪脚本，并且不会存储 Cookie。</string>
 </resources>
