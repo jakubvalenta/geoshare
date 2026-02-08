@@ -182,4 +182,15 @@
     <string name="network_exception_unknown">неизвестна грешка</string>
     <string name="network_exception_unresolved_address">нерешен адрес</string>
     <string name="converter_baidu_map_permission_title">Свързване с Baidu Map?</string>
+    <string name="faq_how_headline">Как работи</string>
+    <string name="faq_how_text_1">%1$s преобразува връзките към картите в geo: връзки, които могат да се отварят от други приложения за карти. За да се създаде гео: връзка, са необходими географски координати. %1$s ги извлича от URL адреса на картата.</string>
+    <string name="faq_how_text_2">Въпреки това, не всички URL адреси на картите съдържат координати. В такива случаи %1$s ще ви поиска разрешение да се свържете с картата (Google Maps, Apple Maps и др.) и да получите координатите от:</string>
+    <string name="faq_how_text_2_item_http">или HTTP заглавия,</string>
+    <string name="faq_how_text_2_item_html">или HTML документ,</string>
+    <string name="faq_how_text_2_item_web">или на живо уеб страница, включваща JavaScript.</string>
+    <string name="faq_how_text_3">Ако не позволиш свързване към картата, тогава %1$s създава geo: връзка с търсене вместо координати или спира, в зависимост от конкретния връзка.</string>
+    <string name="faq_how_text_4">За да разрешите или откажете постоянно свързване с картографската услуга, вместо винаги да питате (по подразбиране), отидете в %1$s на приложението.</string>
+    <string name="faq_how_text_4_preferences_button">предпочитания</string>
+    <string name="faq_privacy_headline">Съображения за поверителност</string>
+    <string name="faq_privacy_text">Когато е възможно, %1$s конвертира връзките към картата офлайн. Ако връзката към картата изисква онлайн конвертиране, приложението ще ви попита преди да се свърже с картографската услуга (Google Maps, Apple Maps и др.). Ако разрешите връзката, картографската услуга ще получи връзката към картата, ще може да прочете вашия IP адрес и в някои случаи %1$s ще зареди уеб страницата на картографската услуга и ще изпълни нейния JavaScript. Това се случва в ограничена среда, която блокира скриптовете за проследяване и не съхранява „бисквитки“.</string>
 </resources>
