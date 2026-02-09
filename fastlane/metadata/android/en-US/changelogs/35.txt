@@ -1,0 +1,1 @@
+- Added Google Maps waypoint names support.
