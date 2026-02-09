@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
@@ -11,7 +12,7 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object BaiduMapInput : Input {
+object BaiduMapInput : Input.HasWeb {
     private const val X = """(\d+(?:\.\d+)?)"""
     private const val Y = """(\d+(?:\.\d+)?)"""
     private const val CENTER = """@$X,$Y,${Z}z.*"""
@@ -70,4 +71,20 @@ object BaiduMapInput : Input {
             }
         }.asBD09MC()
     }
+
+    override fun shouldInterceptRequest(requestUrlString: String) =
+        // Assets
+        requestUrlString.endsWith(".xxx") // TODO
+
+            // Map tiles
+            || requestUrlString.contains("/xxx/") // TODO
+
+            // Tracking
+            || requestUrlString.contains("/xxx") // TODO
+
+    @StringRes
+    override val permissionTitleResId = R.string.converter_baidu_map_permission_title
+
+    @StringRes
+    override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
 }
