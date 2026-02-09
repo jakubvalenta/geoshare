@@ -187,4 +187,17 @@
     <string name="faq_how_text_4">如需永久允许或拒绝连接到地图服务（替代默认的始终询问），请前往应用的%1$s。</string>
     <string name="faq_privacy_headline">隐私考量</string>
     <string name="faq_privacy_text">%1$s 会在可能的情况下离线转换地图链接。如果地图链接需要在线转换，应用会在连接到地图服务（例如 Google 地图、Apple 地图等）之前询问您。如果您允许连接，地图服务将接收到地图链接，并能够读取您的 IP 地址。在某些情况下，%1$s 将加载地图服务的实时网页并执行其 JavaScript。此操作在受限环境中进行，该环境会阻止跟踪脚本，并且不会存储 Cookie。</string>
+    <string name="converter_amap_name">高德地图</string>
+    <string name="converter_apple_maps_name">Apple 地图</string>
+    <string name="converter_baidu_map_name">百度地图</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_google_maps_name">Google 地图</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_waze_name">Waze</string>
+    <string name="converter_yandex_maps_name">Yandex Maps</string>
 </resources>
