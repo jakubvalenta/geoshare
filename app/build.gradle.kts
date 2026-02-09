@@ -20,8 +20,8 @@ android {
         minSdk = 25
         // noinspection EditedTargetSdkVersion
         targetSdk = 36
-        versionCode = 33
-        versionName = "5.14.0"
+        versionCode = 34
+        versionName = "5.15.0"
 
         androidResources {
             @Suppress("UnstableApiUsage")
