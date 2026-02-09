@@ -158,9 +158,9 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
                 }
                 if (defaultPoint == null && !genericMetaTagFound) {
                     // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
-                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE contains coordinates of the
-                    // IP address that the HTTP request came from, instead of correct coordinates. So let's ignore the
-                    // coordinates.
+                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
+                    // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
+                    // ignore these coordinates.
                     defaultPointAppInitStatePattern.find(line)?.toLonLatPoint()?.let {
                         log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
                         defaultPoint = it
