@@ -184,7 +184,7 @@
     <string name="faq_how_text_2_item_html">or HTML document,</string>
     <string name="faq_how_text_2_item_html_example" translatable="false">&lt;meta property=&quot;place:location:latitude&quot; content=&quot;40.78&quot;&gt;</string>
     <string name="faq_how_text_2_item_web">or the live web page including JavaScript.</string>
-    <string name="faq_how_text_3">If you don’t allow connecting to the map service, then %1$s creates a geo: link with a search term instead of coordinates or it stops, depending on the particular link.</string>
+    <string name="faq_how_text_3">If you don’t allow connecting to the map service, then %1$s creates a geo: link with a search term instead of coordinates, or it stops, depending on the particular link.</string>
     <string name="faq_how_text_4">To permanently allow or deny connecting to the map service instead of always asking (the default), go to the app’s %1$s.</string>
     <string name="faq_how_text_4_preferences_button">preferences</string>
     <string name="faq_how_it_works_headline">How it works and privacy considerations</string>

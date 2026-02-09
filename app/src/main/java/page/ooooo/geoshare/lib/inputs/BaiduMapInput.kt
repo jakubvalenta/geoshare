@@ -57,7 +57,7 @@ object BaiduMapInput : Input {
                             .drop(1)
                             .filterNot { it.startsWith('@') }
                             .map { NaivePoint(0.0, 0.0, name = it) }
-                            .map { points.add(it) }
+                            .forEach { points.add(it) }
                     }
                 }
             }

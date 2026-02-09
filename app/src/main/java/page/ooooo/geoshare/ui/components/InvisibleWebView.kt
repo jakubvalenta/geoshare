@@ -48,7 +48,7 @@ fun InvisibleWebView(
     }
 
     // Call URL change callback if the URL hasn't changed for a while, because:
-    // 1. First URL change is often not the final URL and we don't want to start parsing an intermediate URL.
+    // 1. First URL change is often not the final URL, and we don't want to start parsing an intermediate URL.
     // 2. Quick URL changes cause ConversionState transition to crash, because each new transition cancels any running
     //    transition.
     val currentUrlStringFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
