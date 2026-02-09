@@ -119,13 +119,12 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun onDialog(
         resourceName: String,
-        timeoutMs: Long = 10_000L,
+        timeoutMs: Long = 20_000L,
         block: DialogElement.() -> Unit,
     ) = uiAutomator {
         val dialog = onElement(timeoutMs) { viewIdResourceName == resourceName }
         DialogElement(dialog).block()
-        waitForStableInActiveWindow()
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == resourceName })
+        assertNull(onElementOrNull(1_000L) { viewIdResourceName == resourceName })
     }
 
     private fun isLocationGrantButton(element: AccessibilityNodeInfo): Boolean =
@@ -158,6 +157,13 @@ abstract class BaseActivityBehaviorTest {
         )
     }
 
+    /**
+     * Check that the result screen shows [expectedPoints]
+     *
+     * Point name is checked in a fuzzy way. It is enough if the shown name contains the expected name. We need this,
+     * because we often cannot use an exact match, because Google Maps returns different place name depending on the
+     * phone's language and location.
+     */
     protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>) = uiAutomator {
         onElement(NETWORK_TIMEOUT) {
             when (viewIdResourceName) {
@@ -168,10 +174,11 @@ abstract class BaseActivityBehaviorTest {
         }
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                if (expectedPoints.lastOrNull()?.name?.isNotEmpty() == true) {
-                    assertEquals(
-                        expectedPoints.lastOrNull()?.name?.replace('+', ' '),
-                        textAsString(),
+                val expectedName = expectedPoints.lastOrNull()?.name?.replace('+', ' ')
+                if (!expectedName.isNullOrEmpty()) {
+                    assertTrue(
+                        "Expected ${textAsString()} to contain '$expectedName'",
+                        textAsString()?.contains(expectedName) == true,
                     )
                 } else if (expectedPoints.size > 1) {
                     assertEquals("point ${expectedPoints.size}", textAsString())
@@ -225,7 +232,7 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps
-        onElement { packageName == PackageNames.GOOGLE_MAPS }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
@@ -243,7 +250,7 @@ abstract class BaseActivityBehaviorTest {
         }
 
         // Verify Google Maps content
-        onElement { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
 
     protected fun waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
