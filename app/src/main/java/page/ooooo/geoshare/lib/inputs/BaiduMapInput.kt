@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object BaiduMapInput : Input.HasWeb {
+object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
     private const val X = """(\d+(?:\.\d+)?)"""
     private const val Y = """(\d+(?:\.\d+)?)"""
     private const val CENTER = """@$X,$Y,${Z}z.*"""
@@ -23,9 +23,12 @@ object BaiduMapInput : Input.HasWeb {
         id = InputDocumentationId.BAIDU_MAP,
         nameResId = R.string.converter_baidu_map_name,
         items = listOf(
+            InputDocumentationItem.Url(35, "https://j.map.baidu.com"),
             InputDocumentationItem.Url(33, "https://map.baidu.com"),
         ),
     )
+    override val shortUriPattern = Regex("""(?:https?://)?j\.map\.baidu\.com/\S+""")
+    override val shortUriMethod = Input.ShortUriMethod.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {

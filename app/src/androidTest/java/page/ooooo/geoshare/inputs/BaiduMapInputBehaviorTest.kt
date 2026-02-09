@@ -11,6 +11,12 @@ class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
         launchApplication()
         closeIntro()
 
+        // Shared place
+        testUri(
+            BD09MCPoint(0.0, 0.0), // TODO
+            "https://j.map.baidu.com/44/lth",
+        )
+
         // Center
         testUri(
             BD09MCPoint(3317203.0, 13520653.0, z = 13.0),
