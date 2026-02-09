@@ -29,6 +29,13 @@ object BaiduMapInput : Input {
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
+                if (!queryParams["poiShareUid"].isNullOrEmpty()) {
+                    // Shared place
+                    // https://map.baidu.com/?shareurl=1&poiShareUid=<UID>
+                    webUriString = uri.toString()
+                    return@run
+                }
+
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull() ?: return@run
                 if (firstPart.startsWith('@')) {

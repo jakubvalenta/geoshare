@@ -60,8 +60,14 @@ class BaiduMapInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_placeShare_notSupportedYet() = runTest {
-        assertTrue(parseUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999") is ParseUriResult.Failed)
+    fun parseUri_sharedPlace_returnsSupportsWebParsing() = runTest {
+        assertEquals(
+            ParseUriResult.SucceededAndSupportsWebParsing(
+                persistentListOf(),
+                "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999",
+            ),
+            parseUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"),
+        )
     }
 
     @Test
