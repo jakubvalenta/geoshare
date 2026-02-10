@@ -41,13 +41,12 @@ fun ResultSuccessPoint(
             verticalArrangement = Arrangement.spacedBy(1.dp),
             itemVerticalAlignment = Alignment.CenterVertically,
         ) {
-            points.getOrNull(i)?.cleanName?.let { text ->
-                Text(
-                    text,
-                    fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
+            Text(
+                points.getOrNull(i)?.cleanName
+                    ?: stringResource(R.string.conversion_succeeded_point_number, i + 1),
+                fontStyle = FontStyle.Italic,
+                style = MaterialTheme.typography.bodySmall,
+            )
             SelectionContainer {
                 allOutputs.getText(points, i)?.let { text ->
                     Text(text, style = MaterialTheme.typography.bodySmall)

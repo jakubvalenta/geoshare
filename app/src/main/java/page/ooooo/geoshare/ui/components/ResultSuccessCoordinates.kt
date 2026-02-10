@@ -127,7 +127,7 @@ fun ResultSuccessCoordinates(
                 ) {
                     ExpandablePane(
                         expanded = expanded,
-                        headline = stringResource(R.string.conversion_succeeded_point_all),
+                        headline = stringResource(R.string.conversion_succeeded_point_all, points.size),
                         onSetExpanded = { expanded = it },
                         modifier = Modifier.padding(
                             start = spacing.windowPadding,
@@ -136,8 +136,8 @@ fun ResultSuccessCoordinates(
                     ) {
                         Column(
                             Modifier.padding(
-                                top = spacing.smallAdaptive,
-                                end = 10.dp, // Align with expandable pane icon
+                                top = spacing.mediumAdaptive,
+                                end = 10.dp, // Align with expand/collapse icon
                             ),
                             verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
                         ) {

@@ -43,7 +43,7 @@
     <string name="conversion_succeeded_open_app_failed">Failed to open %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navigate in %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Show street view in %1$s</string>
-    <string name="conversion_succeeded_point_all">All points</string>
+    <string name="conversion_succeeded_point_all">All points (%1$d)</string>
     <string name="conversion_succeeded_point_last">Last point</string>
     <string name="conversion_succeeded_point_number">point %1$d</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
