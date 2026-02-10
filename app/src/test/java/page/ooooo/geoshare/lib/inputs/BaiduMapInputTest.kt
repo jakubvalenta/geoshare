@@ -44,8 +44,29 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_center() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, z = 13.0))),
+            ParseUriResult.Succeeded(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0))),
             parseUri("https://map.baidu.com/@13520653,3317203,13z"),
+        )
+    }
+
+    @Test
+    fun parseUri_point() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                persistentListOf(BD09MCPoint(3619117.0, 13392211.0, 17.0, name = "地图上的点"))
+            ),
+            parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z?querytype=share&poiShareId=p8cdf0522067cf66173901fc9e4&da_src=shareurl"),
+        )
+    }
+
+    @Test
+    fun parseUri_sharedPoint() = runTest {
+        assertEquals(
+            ParseUriResult.SucceededAndSupportsWebParsing(
+                persistentListOf(),
+                "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4",
+            ),
+            parseUri("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
         )
     }
 
@@ -53,7 +74,7 @@ class BaiduMapInputTest : BaseInputTest() {
     fun parseUri_place() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(
-                persistentListOf(BD09MCPoint(3315902.2199999997, 13502918.375, z = 16.0, name = "黄岩客运中心"))
+                persistentListOf(BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心"))
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"),
         )
