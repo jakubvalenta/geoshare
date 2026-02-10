@@ -92,9 +92,6 @@ object CoordinatesOutput : Output {
     override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
         points.getOrNull(i)?.let { point -> formatDegMinSecString(point) }
 
-    @Composable
-    override fun getName(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) = name(points, i)
-
     override fun getPointsActions(): List<BasicAction> = listOf(
         CopyDecCoordsAction(),
         CopyDegMinSecCoordsAction(),
@@ -137,13 +134,4 @@ object CoordinatesOutput : Output {
             }
         }
     }
-
-    @Composable
-    private fun name(points: ImmutableList<Point>, i: Int?): String? =
-        points.getOrNull(i)?.let { point ->
-            point.name.takeUnless { it.isNullOrEmpty() }?.replace('+', ' ')
-                ?: points.size.takeIf { it > 1 }?.let { size ->
-                    stringResource(R.string.conversion_succeeded_point_number, if (i == null) size else i + 1)
-                }
-        }
 }

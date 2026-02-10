@@ -174,14 +174,17 @@ abstract class BaseActivityBehaviorTest {
         }
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                val expectedName = expectedPoints.lastOrNull()?.name?.replace('+', ' ')
+                val expectedName = expectedPoints.lastOrNull()?.cleanName
                 if (!expectedName.isNullOrEmpty()) {
                     assertTrue(
                         "Expected ${textAsString()} to contain '$expectedName'",
                         textAsString()?.contains(expectedName) == true,
                     )
                 } else if (expectedPoints.size > 1) {
-                    assertEquals("point ${expectedPoints.size}", textAsString())
+                    assertTrue(
+                        "Expected ${textAsString()} to equal 'Last point' (or a translation)",
+                        textAsString() in setOf("Last point", "Dernier point"),
+                    )
                 } else {
                     assertTrue(
                         "Expected ${textAsString()} to equal 'Coordinates' (or a translation)",

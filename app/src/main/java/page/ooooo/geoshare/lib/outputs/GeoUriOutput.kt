@@ -166,7 +166,7 @@ object GeoUriOutput : Output {
         apps.filter { it.type == AndroidTools.AppType.GEO_URI }
             .map { it.packageName to ShareGeoUriWithAppAction(it.packageName) }
 
-    override fun getChipActions() = listOf(CopyGeoUriAction())
+    override fun getLastPointChipActions() = listOf(CopyGeoUriAction())
 
     override fun getChooserAction() = ShareGeoUriAction()
 

@@ -1,11 +1,8 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,8 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
@@ -42,7 +36,9 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.ui.components.ExpandablePane
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
@@ -55,6 +51,8 @@ enum class FaqItemId {
     PRIVACY,
     LOCATION_PERMISSION,
 }
+
+private val endOffset = 8.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +84,7 @@ fun FaqScreen(
             Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(horizontal = spacing.windowPadding)
+                .padding(start = spacing.windowPadding, end = spacing.windowPadding - endOffset)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
@@ -193,34 +191,17 @@ fun FaqItem(
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val expanded = itemId == expandedItemId
-    Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = spacing.tinyAdaptive)
-                .clickable(
-                    onClickLabel = stringResource(if (expanded) R.string.faq_item_collapse else R.string.faq_item_expand),
-                    onClick = { onSetExpandedItemId(if (expanded) null else itemId) },
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+
+    ExpandablePane(
+        expanded = expandedItemId == itemId,
+        headline = headline,
+        onSetExpanded = { onSetExpandedItemId(itemId) },
+    ) {
+        Column(
+            Modifier.padding(end = endOffset),
+            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
         ) {
-            Text(
-                headline,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.weight(9f),
-            )
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        AnimatedVisibility(expanded) {
-            Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
-                content()
-            }
+            content()
         }
     }
 }

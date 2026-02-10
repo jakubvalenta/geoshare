@@ -252,7 +252,7 @@ object GpxOutput : Output {
         apps.filter { it.type == AndroidTools.AppType.GPX }
             .map { it.packageName to ShareGpxRouteWithAppAction(it.packageName) }
 
-    override fun getChipActions() = listOf(SaveGpxPointsAction())
+    override fun getAllPointsChipActions() = listOf(SaveGpxPointsAction())
 
     override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
         add(ShareGpxRouteAutomation)

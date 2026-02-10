@@ -43,6 +43,9 @@
     <string name="conversion_succeeded_open_app_failed">Failed to open %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navigate in %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Show street view in %1$s</string>
+    <string name="conversion_succeeded_point_all">All points</string>
+    <string name="conversion_succeeded_point_last">Last point</string>
+    <string name="conversion_succeeded_point_number">point %1$d</string>
     <string name="conversion_succeeded_save_gpx">Save GPX</string>
     <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
@@ -222,7 +225,6 @@
     <string name="conversion_failed_parse_html_connection_error">Connection error when fetching web page from the map service</string>
     <string name="conversion_failed_unsupported_service">Unsupported map service</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
-    <string name="conversion_succeeded_point_number">point %1$d</string>
     <string name="inputs_all">All map services</string>
     <string name="inputs_default_handler">Opens by default in %1$s</string>
     <string name="inputs_detail_text">You can share the following map links with %1$s or paste them in the app.</string>

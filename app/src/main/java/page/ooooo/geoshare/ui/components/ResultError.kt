@@ -3,8 +3,10 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -28,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -39,18 +42,51 @@ fun ResultError(
     onRetry: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val spacing = LocalSpacing.current
     val uriHandler = LocalUriHandler.current
+
     val (retryLoadingIndicatorVisible, setRetryLoadingIndicatorVisible) = retain {
         mutableStateOf(initialRetryLoadingIndicatorVisible)
     }
 
-    ResultCard(
+    Column(
         modifier = Modifier
             .testTag("geoShareConversionError")
             .fillMaxWidth(),
-        chips = {
-            if (!retryLoadingIndicatorVisible) {
-                ResultCardChip(
+    ) {
+        if (!retryLoadingIndicatorVisible) {
+            Column(
+                Modifier.padding(horizontal = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
+            ) {
+                SelectionContainer {
+                    Text(
+                        stringResource(errorMessageResId),
+                        Modifier.testTag("geoShareConversionErrorMessage"),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+                if (inputUriString.isNotEmpty()) {
+                    SelectionContainer {
+                        if (inputUriString.startsWith("https://")) {
+                            Text(
+                                inputUriString,
+                                modifier = Modifier.clickable { uriHandler.openUri(inputUriString) },
+                                textDecoration = TextDecoration.Underline,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        } else {
+                            Text(
+                                inputUriString,
+                                fontStyle = FontStyle.Italic,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    }
+                }
+            }
+            ResultChips {
+                ResultChip(
                     { Text(stringResource(R.string.conversion_error_retry)) },
                     icon = {
                         Icon(Icons.Default.Refresh, null)
@@ -64,46 +100,18 @@ fun ResultError(
                         }
                     },
                 )
-                ResultCardChip(
+                ResultChip(
                     { Text(stringResource(R.string.conversion_error_report)) },
                 ) {
                     uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
                 }
-                ResultCardChip(
+                ResultChip(
                     { Text(stringResource(R.string.inputs_title)) },
                     icon = {
                         Icon(Icons.Outlined.Info, null)
                     },
                 ) {
                     onNavigateToInputsScreen()
-                }
-            }
-        },
-    ) {
-        if (!retryLoadingIndicatorVisible) {
-            SelectionContainer {
-                Text(
-                    stringResource(errorMessageResId),
-                    Modifier.testTag("geoShareConversionErrorMessage"),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-            if (inputUriString.isNotEmpty()) {
-                SelectionContainer {
-                    if (inputUriString.startsWith("https://")) {
-                        Text(
-                            inputUriString,
-                            modifier = Modifier.clickable { uriHandler.openUri(inputUriString) },
-                            textDecoration = TextDecoration.Underline,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    } else {
-                        Text(
-                            inputUriString,
-                            fontStyle = FontStyle.Italic,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
                 }
             }
         } else {

@@ -48,7 +48,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             assertConversionSucceeded(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
 
             // Open copy menu
-            onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
+            onElement { viewIdResourceName == "geoShareResultSuccessLastPointMenu" }.click()
 
             // Shows copy link in GCJ-02
             onElement {
@@ -478,7 +478,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         assertConversionSucceeded(persistentListOf(WGS84Point(52.5067296, 13.2599309, 11.0)))
 
         // Open copy menu
-        onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
+        onElement { viewIdResourceName == "geoShareResultSuccessLastPointMenu" }.click()
 
         // Swipe the sheet to reveal "Copy Magic Earth link"
         onElement { viewIdResourceName == "geoShareConversionSheet" }.swipe(Direction.UP, 1f)
