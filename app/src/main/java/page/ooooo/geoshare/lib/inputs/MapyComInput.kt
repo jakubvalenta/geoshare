@@ -30,26 +30,30 @@ object MapyComInput : Input.HasShortUri {
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
-                Regex(COORDS).matchEntire(path)
-                    ?.let { m ->
-                        m.groupValues[0].let { entireMatch ->
-                            m.doubleGroupOrNull(1)?.let { lat ->
-                                m.doubleGroupOrNull(2)?.let { lon ->
-                                    val latSig = if (entireMatch.contains('S')) -1 else 1
-                                    val lonSig = if (entireMatch.contains('W')) -1 else 1
-                                    NaivePoint(latSig * lat, lonSig * lon)
-                                }
+                // Coordinates -- use this part of the text, because it's more precise than the URL
+                // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`
+                Regex(COORDS).matchEntire(path)?.let { m ->
+                    m.groupValues[0].let { entireMatch ->
+                        m.doubleGroupOrNull(1)?.let { lat ->
+                            m.doubleGroupOrNull(2)?.let { lon ->
+                                val latSig = if (entireMatch.contains('S')) -1 else 1
+                                val lonSig = if (entireMatch.contains('W')) -1 else 1
+                                points.add(NaivePoint(latSig * lat, lonSig * lon))
+                                return@run
                             }
                         }
                     }
-                    ?.also { points.add(it) }
-                    ?: LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
-                        LAT_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
-                            NaivePoint(lat, lon)
-                        }
-                    }?.also { points.add(it) }
+                }
 
-                Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
+                // Query params
+                // https://mapy.com/...?x=<LON>&y=<LAT>&z=<Z>
+                LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
+                    LON_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
+                        Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull().let { z ->
+                            points.add(NaivePoint(lat, lon, z))
+                        }
+                    }
+                }
             }
         }.asWGS84()
     }

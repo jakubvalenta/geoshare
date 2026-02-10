@@ -38,7 +38,8 @@ object CoordinatesInput : Input {
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
-                // Decimal, e.g. `N 41.40338, E 2.17403`
+                // Decimal
+                // e.g. `N 41.40338, E 2.17403`
                 Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""").matchEntire(path)?.let { m ->
                     points.add(
                         NaivePoint(
@@ -57,7 +58,8 @@ object CoordinatesInput : Input {
                     return@run
                 }
 
-                // Degrees minutes seconds, e.g. `41°24'12.2"N 2°10'26.5"E`
+                // Degrees minutes seconds
+                // e.g. `41°24'12.2"N 2°10'26.5"E`
                 Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""").matchEntire(
                     path
                 )?.let { m ->
@@ -82,7 +84,8 @@ object CoordinatesInput : Input {
                     return@run
                 }
 
-                // Degrees minutes, e.g. `41 24.2028, 2 10.4418`
+                // Degrees minutes
+                // e.g. `41 24.2028, 2 10.4418`
                 Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""").matchEntire(
                     path
                 )?.let { m ->
