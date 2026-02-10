@@ -217,4 +217,17 @@
     <string name="faq_how_text_4_preferences_button">التفضيلات</string>
     <string name="faq_privacy_headline">اعتبارات الخصوصية</string>
     <string name="faq_privacy_text">يقوم %1$s بتحويل روابط الخرائط دون اتصال بالإنترنت كلما أمكن ذلك. وإذا كان رابط الخريطة يتطلب تحويلاً عبر الإنترنت، فسوف يسألك التطبيق قبل الاتصال بخدمة الخرائط (مثل خرائط جوجل أو خرائط Apple، إلخ). وفي حال سمحت بالاتصال، ستتلقى خدمة الخرائط رابط الخريطة، وستتمكن من قراءة عنوان IP الخاص بك، وفي بعض الحالات سيقوم %1$s بتحميل صفحة الويب المباشرة لخدمة الخرائط وتشغيل ملفات الجافا سكريبت الخاصة بها. يحدث هذا في بيئة مقيدة تحظر نصوص التتبع البرمجية ولا تخزن ملفات تعريف الارتباط.</string>
+    <string name="converter_amap_name">Amap (AutoNavi)</string>
+    <string name="converter_apple_maps_name">خرائط Apple</string>
+    <string name="converter_baidu_map_name">خريطة Baidu</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_google_maps_name">خرائط Google</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_waze_name">Waze</string>
+    <string name="converter_yandex_maps_name">خرائط Yandex</string>
 </resources>
