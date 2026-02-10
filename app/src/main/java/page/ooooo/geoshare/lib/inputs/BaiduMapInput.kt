@@ -33,16 +33,18 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
-                if (!queryParams["poiShareUid"].isNullOrEmpty()) {
-                    // Shared place
-                    // https://map.baidu.com/?shareurl=1&poiShareUid=<UID>
-                    webUriString = uri.toString()
-                    return@run
-                }
-
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull() ?: return@run
-                if (firstPart.startsWith('@')) {
+
+                if (firstPart == "") {
+                    if (!queryParams["poiShareId"].isNullOrEmpty() || !queryParams["poiShareUid"].isNullOrEmpty()) {
+                        // Shared point or shared place
+                        // https://map.baidu.com/?poiShareId=<ID>
+                        // https://map.baidu.com/?shareurl=1&poiShareUid=<UID>
+                        webUriString = uri.toString()
+                    }
+
+                } else if (firstPart.startsWith('@')) {
                     // Center
                     // https://map.baidu.com/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>
                     Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.also { points.add(it) }
