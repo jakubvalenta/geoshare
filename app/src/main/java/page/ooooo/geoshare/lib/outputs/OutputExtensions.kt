@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.lib.outputs
 
-import androidx.compose.runtime.Composable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.DefaultUriQuote
@@ -11,15 +10,14 @@ import page.ooooo.geoshare.lib.point.Point
 fun List<Output>.getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote = DefaultUriQuote()) =
     this.firstNotNullOfOrNull { it.getText(points, i, uriQuote) }
 
-@Composable
-fun List<Output>.getName(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote = DefaultUriQuote()) =
-    this.firstNotNullOfOrNull { it.getName(points, i, uriQuote) }
-
 fun List<Output>.getAppActions(apps: List<AndroidTools.App>) =
     this.flatMap { it.getAppActions(apps) }
 
-fun List<Output>.getChipActions() =
-    this.flatMap { it.getChipActions() }
+fun List<Output>.getAllPointsChipActions() =
+    this.flatMap { it.getAllPointsChipActions() }
+
+fun List<Output>.getLastPointChipActions() =
+    this.flatMap { it.getLastPointChipActions() }
 
 fun List<Output>.getPointsActions() =
     this.flatMap { it.getPointsActions() }

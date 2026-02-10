@@ -2,7 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="conversion_succeeded_copy_geo">Копировать как geo:</string>
     <string name="nav_menu_content_description">Меню</string>
-    <string name="conversion_succeeded_copy_content_description">Копировать</string>
     <string name="conversion_failed_parse_html_connection_error">Ошибка подключения при получении веб-страницы из картографического сервиса</string>
     <string name="main_create_geo_uri">Показать координаты</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Отменить</string>

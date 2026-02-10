@@ -8,7 +8,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
-import page.ooooo.geoshare.lib.extensions.forEachReversed
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -45,17 +44,22 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
             uri.run {
                 // Try query parameters for all URLs
 
-                listOf("destination", "q", "query", "ll", "viewpoint", "center")
-                    .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key]) }
-                    ?.toLatLonPoint()
-                    ?.also { points.add(it) }
-
-                listOf("destination", "q", "query")
-                    .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]) }
-                    ?.groupOrNull()
-                    ?.also { defaultName = it }
-
                 Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
+
+                listOf("origin", "destination", "q", "query", "ll", "viewpoint", "center").forEach { key ->
+                    (LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint()
+                        ?: Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { NaivePoint(name = it) })
+                        ?.let {
+                            points.add(it)
+                            if (key != "origin") {
+                                if (!it.hasCoordinates()) {
+                                    // Go to HTML parsing if needed
+                                    htmlUriString = uri.toString()
+                                }
+                                return@run
+                            }
+                        }
+                }
 
                 // Parse path parts
 
@@ -65,55 +69,59 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
                 val firstPart = parts.firstOrNull()
                 if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
                     // Iterate path parts in reverse order
-                    var centerCoords: Pair<Double, Double>? = null
                     val pointPattern = Regex("""$LAT,$LON.*""")
-                    parts.dropWhile { it in partsThatSupportUriParsing }.forEachReversed { part ->
+                    parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
                         if (part.startsWith("data=")) {
                             // Data
                             // /data=...!3d44.4490541!4d26.0888398...
-                            Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()?.also { points.add(it) }
+                            Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()?.also {
+                                // Overwrite coordinates of previously found points with /data= but copy last point name
+                                points.lastOrNull().let { lastPoint ->
+                                    points.clear()
+                                    points.add(it.copy(name = lastPoint?.name))
+                                }
+                            } ?:
                             // /data=...!1d13.4236883!2d52.4858222...!1d13.4255518!2d52.4881038...
-                            points.addAll((Regex("""!1d$LON!2d$LAT""").findAll(part)).mapNotNull { it.toLonLatPoint() })
-                        } else if (part.startsWith('@') && centerCoords == null) {
+                            Regex("""!1d$LON!2d$LAT""").findAll(part).mapNotNull { it.toLonLatPoint() }
+                                .toList().takeIf { it.isNotEmpty() }?.let {
+                                    if (it.size == points.size) {
+                                        // Overwrite coordinates of previously found points with /data= but keep names
+                                        points.forEachIndexed { i, point ->
+                                            points[i] = point.copy(lat = it[i].lat, lon = it[i].lon)
+                                        }
+                                    } else {
+                                        // Overwrite coordinates of previously found points with /data= including names
+                                        points.clear()
+                                        points.addAll(it)
+                                    }
+                                }
+                        } else if (part.startsWith('@')) {
                             // Center
                             // /@52.5067296,13.2599309,6z
-                            Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint()?.let { point ->
-                                if (point.lat != null && point.lon != null) {
-                                    centerCoords = point.lat to point.lon
+                            Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint()?.also { point ->
+                                val lastPoint = points.lastOrNull()
+                                if (lastPoint == null) {
+                                    // Use center coordinates if we haven't already found a point
+                                    points.add(point)
+                                } else if (lastPoint.lat == null && lastPoint.lon == null) {
+                                    // Use center coordinates with the name of the last found point
+                                    points[points.size - 1] = point.copy(name = lastPoint.name)
+                                } else {
+                                    // Don't use center coordinates if we've already found a point with coordinate
                                 }
                                 defaultZ = point.z
                             }
-                        } else {
+                        } else if (part.isNotEmpty()) {
                             // Coordinates
                             // /52.492611,13.431726
-                            part
-                                .takeIf { points.isEmpty() } // Only if a point hasn't already been found, e.g. in /data
-                                ?.let { pointPattern.matchEntire(it) }
-                                ?.toLatLonPoint()
-                                ?.also { points.add(it) }
+                            pointPattern.matchEntire(part)?.toLatLonPoint()?.also { points.add(it) }
                             // Name
                             // /Central+Park
-                                ?: part
-                                    .takeIf { defaultName == null } // Use the last name-like path part
-                                    ?.let { Q_PATH_PATTERN.matchEntire(part) }
-                                    ?.groupOrNull()
-                                    ?.also { defaultName = it }
-                        }
-                        // Once we have a point, name, and z, we can stop iterating path parts
-                        if (points.isNotEmpty() && defaultName != null && defaultZ != null) {
-                            return@forEachReversed
+                                ?: points.add(NaivePoint(name = part))
                         }
                     }
-                    if (points.isEmpty()) {
-                        if (centerCoords != null) {
-                            // Use the center point only if we haven't found another point
-                            points.add(NaivePoint(centerCoords.first, centerCoords.second))
-                        } else if (firstPart in partsThatSupportHtmlParsing) {
-                            // Go to HTML parsing if needed
-                            htmlUriString = uri.toString()
-                        }
-                    }
-                } else if (firstPart in partsThatSupportHtmlParsing) {
+                }
+                if (points.lastOrNull()?.hasCoordinates() != true && firstPart in partsThatSupportHtmlParsing) {
                     // Go to HTML parsing if needed
                     htmlUriString = uri.toString()
                 }
@@ -158,9 +166,9 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
                 }
                 if (defaultPoint == null && !genericMetaTagFound) {
                     // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
-                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE contains coordinates of the
-                    // IP address that the HTTP request came from, instead of correct coordinates. So let's ignore the
-                    // coordinates.
+                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
+                    // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
+                    // ignore these coordinates.
                     defaultPointAppInitStatePattern.find(line)?.toLonLatPoint()?.let {
                         log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
                         defaultPoint = it

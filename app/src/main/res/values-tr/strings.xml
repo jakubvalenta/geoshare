@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="conversion_succeeded_copy_content_description">Kopyala</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinatları kopyala</string>
     <string name="conversion_succeeded_copy_google_maps">Google Haritalar’ı Kopyala</string>
     <string name="conversion_succeeded_copy_link">%1$s bağlantısını kopyala</string>

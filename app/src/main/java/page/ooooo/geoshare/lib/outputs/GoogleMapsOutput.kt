@@ -283,7 +283,7 @@ object GoogleMapsOutput : Output {
             }
     }
 
-    override fun getChipActions() = listOf(CopyLinkChipAction)
+    override fun getLastPointChipActions() = listOf(CopyLinkChipAction)
 
     override fun getRandomAction() = CopyLinkAction()
 

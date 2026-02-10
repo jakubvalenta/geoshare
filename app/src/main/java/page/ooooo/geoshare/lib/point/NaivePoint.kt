@@ -9,6 +9,8 @@ data class NaivePoint(
     val z: Double? = null,
     val name: String? = null,
 ) {
+    fun hasCoordinates(): Boolean = lat != null && lon != null
+
     fun hasName(): Boolean = !name.isNullOrEmpty()
 
     fun hasZ(): Boolean = z != null

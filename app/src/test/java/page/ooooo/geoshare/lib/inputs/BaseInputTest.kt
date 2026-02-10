@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 
-abstract class BaseInputTest() {
+abstract class BaseInputTest {
     protected abstract val input: Input
 
     protected var log: ILog = FakeLog

@@ -71,7 +71,7 @@ interface UserPreference<T> {
     )
 }
 
-abstract class SingleKeyPreference<T>() : UserPreference<T> {
+abstract class SingleKeyPreference<T> : UserPreference<T> {
     abstract val key: Preferences.Key<String>
     abstract val default: T
 

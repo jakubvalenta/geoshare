@@ -174,17 +174,20 @@ abstract class BaseActivityBehaviorTest {
         }
         onElement {
             if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                val expectedName = expectedPoints.lastOrNull()?.name?.replace('+', ' ')
+                val expectedName = expectedPoints.lastOrNull()?.cleanName
                 if (!expectedName.isNullOrEmpty()) {
                     assertTrue(
-                        "Expected ${textAsString()} to contain '$expectedName'",
+                        """Expected "${textAsString()}" to contain "$expectedName"""",
                         textAsString()?.contains(expectedName) == true,
                     )
                 } else if (expectedPoints.size > 1) {
-                    assertEquals("point ${expectedPoints.size}", textAsString())
+                    assertTrue(
+                        """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
+                        textAsString() in setOf("Last point", "Dernier point"),
+                    )
                 } else {
                     assertTrue(
-                        "Expected ${textAsString()} to equal 'Coordinates' (or a translation)",
+                        @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
                         textAsString() in setOf(
                             "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
                         ),
@@ -200,6 +203,19 @@ abstract class BaseActivityBehaviorTest {
             onElement {
                 if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
                     assertEquals(expectedText, textAsString())
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+        if (expectedPoints.size > 1) {
+            onElement {
+                if (viewIdResourceName == "geoShareExpandablePaneHeadline") {
+                    assertTrue(
+                        """Expected "${textAsString()}" to contain "${expectedPoints.size}"""",
+                        textAsString()?.contains(expectedPoints.size.toString()) == true,
+                    )
                     true
                 } else {
                     false

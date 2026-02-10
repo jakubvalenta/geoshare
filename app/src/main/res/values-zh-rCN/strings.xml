@@ -18,7 +18,6 @@
     <string name="intro_nav_finish">开始</string>
     <string name="main_input_uri_label">在此处粘贴地图链接</string>
     <string name="main_input_uri_clear_content_description">清除</string>
-    <string name="conversion_succeeded_copy_content_description">复制</string>
     <string name="main_navigate_to_intro">发现更多应用功能</string>
     <string name="converter_google_maps_permission_title">连接到 Google？</string>
     <string name="conversion_permission_common_deny">取消</string>

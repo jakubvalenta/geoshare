@@ -22,7 +22,6 @@
     <string name="main_input_uri_label">Cole um link de mapa aqui</string>
     <string name="main_input_uri_clear_content_description">Limpar</string>
     <string name="main_input_uri_supporting_text">ex: https://maps.app.goo.gl/… ou maps.apple.com/…</string>
-    <string name="conversion_succeeded_copy_content_description">Copiar</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="main_navigate_to_intro">Conheça mais recursos do app</string>
     <string name="converter_google_maps_permission_title">Conectar ao Google?</string>

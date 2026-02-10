@@ -17,6 +17,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -30,7 +31,6 @@ fun ResultSuccessPoint(
     onSelect: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val name = allOutputs.getName(points, i)
 
     Box {
         FlowRow(
@@ -41,13 +41,12 @@ fun ResultSuccessPoint(
             verticalArrangement = Arrangement.spacedBy(1.dp),
             itemVerticalAlignment = Alignment.CenterVertically,
         ) {
-            name?.let { text ->
-                Text(
-                    text,
-                    fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
+            Text(
+                points.getOrNull(i)?.cleanName
+                    ?: stringResource(R.string.conversion_succeeded_point_number, i + 1),
+                fontStyle = FontStyle.Italic,
+                style = MaterialTheme.typography.bodySmall,
+            )
             SelectionContainer {
                 allOutputs.getText(points, i)?.let { text ->
                     Text(text, style = MaterialTheme.typography.bodySmall)
@@ -57,7 +56,7 @@ fun ResultSuccessPoint(
         Box(Modifier.align(Alignment.TopEnd)) {
             IconButton(onSelect, Modifier.size(iconSize)) {
                 Icon(
-                    painterResource(R.drawable.more_horiz_24px),
+                    painterResource(R.drawable.content_copy_24px),
                     contentDescription = stringResource(R.string.nav_menu_content_description),
                 )
             }

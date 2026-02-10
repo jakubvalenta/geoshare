@@ -31,7 +31,6 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[Виберіть <i>%1$s</i>, і програма дозволить вам відкрити те саме місце в будь-якій встановленій картографічній програмі.]]></string>
     <string name="intro_open_by_default_headline">Налаштуйте Android для відкриття посилань Google Maps в альтернативних мапах (необов’язково)</string>
     <string name="main_input_uri_clear_content_description">Очистити</string>
-    <string name="conversion_succeeded_copy_content_description">Копіювати</string>
     <string name="conversion_permission_common_grant">Гаразд</string>
     <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат. %2$s потребує підключення до картографічного сервісу, щоб отримати їх.]]></string>
     <string name="intro_nav_next">Далі</string>

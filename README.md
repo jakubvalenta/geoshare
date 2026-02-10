@@ -112,7 +112,7 @@ Maps etc.)** and retrieve the coordinates from:
 - or the whole web page with running JavaScript.
 
 If you don’t allow connecting to the map service, then Geo Share creates a geo:
-link with a search term instead of coordinates or it stops, depending on the
+link with a search term instead of coordinates, or it stops, depending on the
 particular link.
 
 To permanently allow or deny connecting to the map service instead of always

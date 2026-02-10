@@ -391,13 +391,13 @@ private fun MainScreen(
                             )
                         }
                     }
-                    Spacer(
-                        Modifier
-                            .background(containerColor)
-                            .weight(1f)
-                            .fillMaxWidth()
-                    )
                 }
+                Spacer(
+                    Modifier
+                        .background(if (wide) containerColor else containerColor)
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
             }
             MainBottomBar(
                 currentState,
@@ -405,8 +405,8 @@ private fun MainScreen(
                 modifier = Modifier
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding),
-                containerColor = if (wide) Color.Transparent else containerColor,
-                contentColor = if (wide) LocalContentColor.current else contentColor,
+                containerColor = containerColor,
+                contentColor = contentColor,
             )
         },
         supportingPane = {
@@ -883,7 +883,10 @@ private fun SucceededPreview() {
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.example,
+                ),
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -922,7 +925,10 @@ private fun DarkSucceededPreview() {
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.example,
+                ),
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -961,7 +967,10 @@ private fun TabletSucceededPreview() {
         MainScreen(
             currentState = ActionFinished(
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                points = persistentListOf(Point.example),
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.example,
+                ),
                 action = NoopAutomation,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,

@@ -23,7 +23,6 @@
     <string name="about_title">Info su</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="faq_how_it_works_headline">Come funziona e considerazioni sulla privacy</string>
-    <string name="conversion_succeeded_copy_content_description">Copia</string>
     <string name="user_preferences_connection_title">Consenti la connessione a Google?</string>
     <string name="yes">Si</string>
     <string name="no">No</string>

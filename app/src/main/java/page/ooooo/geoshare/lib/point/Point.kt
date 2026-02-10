@@ -43,6 +43,8 @@ sealed interface Point {
         get() = lon?.toScale(7)?.toTrimmedString()
     val zStr: String?
         get() = z?.toScale(7)?.toTrimmedString()
+    val cleanName: String?
+        get() = name?.replace('+', ' ')
 
     fun hasCoordinates(): Boolean = lat != null && lon != null
 
@@ -84,9 +86,10 @@ data class GCJ02Point(
      * that Evil Transform's check is only rough and considers a part of Japan as China, thus using GCJ02 for this part
      * of Japan, which is incorrect; the whole Japan uses WGS84.
      *
-     * Also notice that our custom check whether a point is in China is imprecise too, because (1) we give it
-     * coordinates that we don't know whether they're WGS84 or GCJ02, and (2) we use a low resolution administrative
-     * boundary of China from Natural Earth, which might not exactly match the area where GCJ02 is used.
+     * Also notice that our custom check whether a point is in China is imprecise too, because:
+     * 1. We give it coordinates that we don't know whether they're WGS84 or GCJ02.
+     * 2. We use a low resolution administrative boundary of China from Natural Earth, which might not exactly match the
+     *    area where GCJ02 is used.
      *
      * @see isPointInChina
      */

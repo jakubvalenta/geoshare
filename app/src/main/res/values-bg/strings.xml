@@ -11,7 +11,6 @@
     <string name="intro_nav_finish">Да започваме</string>
     <string name="main_input_uri_label">Поставете връзка към картата тук</string>
     <string name="main_input_uri_clear_content_description">Изчисти</string>
-    <string name="conversion_succeeded_copy_content_description">Копиране</string>
     <string name="main_create_geo_uri">Показване на координати</string>
     <string name="converter_google_maps_permission_title">Свързване с Google?</string>
     <string name="conversion_permission_common_grant">Добре</string>
