@@ -7,6 +7,11 @@ import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.CurlUserAgent
+import io.ktor.client.request.get
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertEquals
@@ -22,6 +27,7 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.lib.point.Point
@@ -154,6 +160,19 @@ abstract class BaseActivityBehaviorTest {
         assumeTrue(
             "This test only works when $packageName is installed on the device",
             device.executeShellCommand("pm path $packageName").isNotEmpty(),
+        )
+    }
+
+    protected suspend fun assumeIpAddressCountry(countryCode: String) {
+        val client = HttpClient(CIO) {
+            CurlUserAgent()
+        }
+        val response = client.get("https://ipinfo.io")
+        val json: String = response.body()
+        val actualCountryCode = Regex(""""country":\s*"([^"]+)""").find(json)?.groupOrNull()
+        assumeTrue(
+            "This test only works when your IP address is in country with code $countryCode; your country code is $actualCountryCode",
+            actualCountryCode == countryCode,
         )
     }
 

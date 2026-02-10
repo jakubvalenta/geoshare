@@ -1,31 +1,40 @@
 package page.ooooo.geoshare.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.BD09MCPoint
 
 class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun test() = runTest {
+        assumeIpAddressCountry("CN")
+
         // Launch app and close intro
         launchApplication()
         closeIntro()
 
+        // Shared point
+        testUri(
+            BD09MCPoint(3619117.0, 13392211.0, 17.0),
+            "https://j.map.baidu.com/64/lqEk",
+        )
+
         // Shared place
         testUri(
-            BD09MCPoint(0.0, 0.0), // TODO
+            BD09MCPoint(3316047.58, 13502465.77, 19.0),
             "https://j.map.baidu.com/44/lth",
         )
 
         // Center
         testUri(
-            BD09MCPoint(3317203.0, 13520653.0, z = 13.0),
+            BD09MCPoint(3317203.0, 13520653.0, 13.0),
             "https://map.baidu.com/@13520653,3317203,13z",
         )
 
         // Place
         testUri(
-            BD09MCPoint(3315902.2199999997, 13502918.375, z = 16.0, name = "黄岩客运中心"),
+            BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心"),
             @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
         )
 
