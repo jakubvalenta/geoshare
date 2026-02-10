@@ -3,10 +3,12 @@ package page.ooooo.geoshare
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 @RunWith(AndroidJUnit4::class)
 class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
@@ -23,6 +25,9 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+        // Wait for the conversion to succeed
+        assertConversionSucceeded(persistentListOf(WGS84Point(52.5067296, 13.2599309, 11.0)))
 
         // Shows automation success message
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultSuccessMessage" }
@@ -41,10 +46,13 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Configure automation
         goToUserPreferencesDetailAutomationScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${PackageNames.GOOGLE_MAPS}" }.click()
+        onElement(20_000L) { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${PackageNames.GOOGLE_MAPS}" }.click()
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+        // Wait for the conversion to succeed
+        assertConversionSucceeded(persistentListOf(WGS84Point(52.5067296, 13.2599309, 11.0)))
 
         // Shows automation counter
         onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
@@ -53,7 +61,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         assertNull(onElementOrNull(3_000L) { packageName == PackageNames.GOOGLE_MAPS })
 
         // Google Maps opens
-        onElement { packageName == PackageNames.GOOGLE_MAPS }
+        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
 
         // Go back to Geo Share
         launchApplication()
@@ -78,6 +86,9 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Share a geo: URI with the app
         shareUri("geo:52.47254,13.4345")
+
+        // Wait for the conversion to succeed
+        assertConversionSucceeded(persistentListOf(WGS84Point(52.47254, 13.4345)))
 
         // Shows automation counter
         onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }

@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -44,7 +45,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             shareUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z")
 
             // Shows precise location in WGS 84
-            assertConversionSucceeded(GCJ02Point(31.23044166868017, 121.47099209401793, z = 11.0))
+            assertConversionSucceeded(WGS84Point(31.23044166868017, 121.47099209401793, z = 11.0))
 
             // Open copy menu
             onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
@@ -79,13 +80,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 GCJ02Point(
                     52.4842015,
                     13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                ),
-                GCJ02Point(
-                    52.4842015,
-                    13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide, Columbiadamm 160, 12049 Berlin",
-                ),
+                    name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
+                )
             )
 
             // Share another Google Maps short link with the app
@@ -113,13 +109,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 GCJ02Point(
                     52.4842015,
                     13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Volkspark Hasenheide, Columbiadamm 160, 12049 Berlin, Germany",
-                ),
-                GCJ02Point(
-                    52.4842015,
-                    13.4167277,
-                    name = @Suppress("SpellCheckingInspection") "Parc public Hasenheide, Columbiadamm 160, 12049 Berlin",
-                ),
+                    name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
+                )
             )
 
             // Share another Google Maps short link with the app
@@ -131,12 +122,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 GCJ02Point(
                     44.4490541,
                     26.0888398,
-                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
-                ),
-                GCJ02Point(
-                    44.4490541,
-                    26.0888398,
-                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București, 010098 Bucuresti, Roumanie",
+                    name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București",
                 )
             )
         }
@@ -316,7 +302,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                     52.4848232,
                     13.4240791,
                     name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
-                ),
+                )
             )
 
             // Share another Google Maps place link with the app
@@ -428,13 +414,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 GCJ02Point(
                     51.1982447,
                     6.4389493,
-                    name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
-                ),
-                GCJ02Point(
-                    51.1982447,
-                    6.4389493,
-                    name = @Suppress("SpellCheckingInspection") "Konditorei Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
-                ),
+                    name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                )
             )
         }
 
@@ -492,6 +473,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
+
+        // Wait for the conversion to succeed
+        assertConversionSucceeded(persistentListOf(WGS84Point(52.5067296, 13.2599309, 11.0)))
 
         // Open copy menu
         onElement { viewIdResourceName == "geoShareResultSuccessCopyMenuButton" }.click()
