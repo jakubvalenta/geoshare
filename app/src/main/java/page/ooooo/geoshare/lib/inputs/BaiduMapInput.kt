@@ -77,13 +77,17 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
 
     override fun shouldInterceptRequest(requestUrlString: String) =
         // Assets
-        requestUrlString.endsWith(".xxx") // TODO
+        requestUrlString.endsWith(".css")
+            || requestUrlString.endsWith(".ico")
+            || requestUrlString.endsWith(".png")
+            || requestUrlString.endsWith("/static/common/images/new/loading")
 
             // Map tiles
-            || requestUrlString.contains("/xxx/") // TODO
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
 
             // Tracking
-            || requestUrlString.contains("/xxx") // TODO
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_baidu_map_permission_title
