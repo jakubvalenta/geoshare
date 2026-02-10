@@ -11,7 +11,6 @@
     <string name="intro_nav_next">Weiter</string>
     <string name="main_input_uri_clear_content_description">Löschen</string>
     <string name="main_input_uri_supporting_text">z.B. https://maps.app.goo.gl/… oder maps.apple.com/…</string>
-    <string name="conversion_succeeded_copy_content_description">Kopieren</string>
     <string name="main_create_geo_uri">Koordinaten anzeigen</string>
     <string name="main_navigate_to_intro">Entdecke die Funktionen der App</string>
     <string name="converter_google_maps_permission_title">Mit Google Verbinden?</string>

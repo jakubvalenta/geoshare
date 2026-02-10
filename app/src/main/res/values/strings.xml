@@ -26,7 +26,6 @@
     <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
     <string name="billing_terms_of_service" translatable="false">Terms of service</string>
     <string name="billing_support_email" translatable="false">Support email</string>
-    <string name="conversion_succeeded_copy_content_description">Copy</string>
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_geo">Copy geo:</string>
     <string name="conversion_succeeded_copy_google_maps">Copy Google Maps</string>

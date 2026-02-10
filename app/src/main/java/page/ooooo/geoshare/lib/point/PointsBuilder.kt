@@ -6,7 +6,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
 
-class PointsBuilder() {
+class PointsBuilder {
     var points: MutableList<NaivePoint> = mutableListOf()
 
     /**
