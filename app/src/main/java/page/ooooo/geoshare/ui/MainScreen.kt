@@ -269,7 +269,7 @@ fun MainScreen(
         },
         onStart = { viewModel.start() },
         onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) },
-        onUrlChange = { pageUrlString -> viewModel.onUrlChange(pageUrlString) },
+        onUrlChange = { urlString -> viewModel.onUrlChange(urlString) },
         shouldInterceptRequest = { requestUrlString -> viewModel.shouldInterceptRequest(requestUrlString) },
     )
 }
