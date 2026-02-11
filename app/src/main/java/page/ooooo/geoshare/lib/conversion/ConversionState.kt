@@ -7,7 +7,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.timeout
 import page.ooooo.geoshare.R
@@ -411,6 +413,16 @@ data class RequestedParseWebPermission(
     }
 }
 
+/**
+ * When GrantedParseWebPermission is the current state, the UI should load [webUriString] in a WebView and call
+ * [onUrlChange] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling
+ * JavaScript `history.pushState()`.
+ *
+ * Transitioning this waits for [onUrlChange] to be called within [timeout]. If it doesn't happen, it returns a failure.
+ *
+ * To allow communication between [transition] and [onUrlChange], this state contains a mutable private state
+ * [currentUrlString]. This doesn't feel elegant and should be implemented differently, when we figure out how.
+ */
 data class GrantedParseWebPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
@@ -420,50 +432,51 @@ data class GrantedParseWebPermission(
     val webUriString: String,
     val timeout: Duration = 30.seconds,
 ) : ConversionState.HasLoadingIndicator {
-    override suspend fun transition(): State? =
-        if (
-            try {
-                // Fail the conversion unless the URL change callback is called within timeout
-                delay(timeout)
-                true
-            } catch (_: CancellationException) {
-                false
+    private val currentUrlString = MutableStateFlow<String?>(null)
+
+    @OptIn(FlowPreview::class)
+    override suspend fun transition(): State =
+        try {
+            val urlString = currentUrlString
+                .filterNotNull()
+                .timeout(timeout)
+                .first()
+            val matchingUriString = input.uriPattern.find(urlString)?.value
+            when (
+                val res = matchingUriString?.let { uriString ->
+                    input.parseUri(Uri.parse(uriString, stateContext.uriQuote))
+                }
+            ) {
+                is ParseUriResult.Succeeded -> {
+                    stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                    ConversionSucceeded(stateContext, inputUriString, res.points)
+                }
+
+                is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
+                    stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                    ConversionSucceeded(stateContext, inputUriString, res.points)
+                }
+
+                is ParseUriResult.SucceededAndSupportsWebParsing,
+                    -> {
+                    stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                    ConversionSucceeded(stateContext, inputUriString, res.points)
+                }
+
+                is ParseUriResult.Failed, null -> {
+                    stateContext.log.w(TAG, "Failed to parse web URL $webUriString")
+                    ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
+                }
             }
-        ) {
+        } catch (_: TimeoutCancellationException) {
             stateContext.log.e(TAG, "Parse web: Timed out")
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-        } else {
-            null
+        } catch (_: CancellationException) {
+            ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         }
 
-    suspend fun onUrlChange(urlString: String): State {
-        val matchingUriString = input.uriPattern.find(urlString)?.value
-        return when (
-            val res = matchingUriString?.let { uriString ->
-                input.parseUri(Uri.parse(uriString, stateContext.uriQuote))
-            }
-        ) {
-            is ParseUriResult.Succeeded -> {
-                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
-                ConversionSucceeded(stateContext, inputUriString, res.points)
-            }
-
-            is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
-                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
-                ConversionSucceeded(stateContext, inputUriString, res.points)
-            }
-
-            is ParseUriResult.SucceededAndSupportsWebParsing,
-                -> {
-                stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
-                ConversionSucceeded(stateContext, inputUriString, res.points)
-            }
-
-            is ParseUriResult.Failed, null -> {
-                stateContext.log.w(TAG, "Failed to parse web URL $webUriString")
-                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
-            }
-        }
+    fun onUrlChange(urlString: String) {
+        currentUrlString.value = urlString
     }
 
     override val loadingIndicator = LoadingIndicator.Large(

@@ -224,9 +224,7 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun onUrlChange(urlString: String) {
-        (stateContext.currentState as? GrantedParseWebPermission)?.let { currentState ->
-            transition { currentState.onUrlChange(urlString) }
-        }
+        (stateContext.currentState as? GrantedParseWebPermission)?.onUrlChange(urlString)
     }
 
     fun shouldInterceptRequest(requestUrlString: String): Boolean =
