@@ -18,7 +18,7 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
     private const val CENTER = """@$X,$Y,${Z}z.*"""
     private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
 
-    override val uriPattern = Regex("""(?:https?://)?map\.baidu\.com/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:j\.)?map\.baidu\.com/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.BAIDU_MAP,
         nameResId = R.string.converter_baidu_map_name,

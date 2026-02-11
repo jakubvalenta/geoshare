@@ -42,6 +42,17 @@ class BaiduMapInputTest : BaseInputTest() {
     }
 
     @Test
+    fun uriPattern_matchesShortLinkInText() {
+        assertEquals(
+            "https://j.map.baidu.com/64/lqEk",
+            getUri(
+                uriString = "这里是地图上的点：江苏省苏州市吴中区金庭镇移影桥\n" +
+                    "查看详情>>https://j.map.baidu.com/64/lqEk  #百度地图#"
+            ),
+        )
+    }
+
+    @Test
     fun parseUri_center() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0))),
