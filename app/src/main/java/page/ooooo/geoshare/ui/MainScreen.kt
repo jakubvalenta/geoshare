@@ -105,7 +105,7 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.Headline
-import page.ooooo.geoshare.ui.components.InvisibleWebView
+import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainFormLinks
 import page.ooooo.geoshare.ui.components.MainMenu
@@ -368,6 +368,8 @@ private fun MainScreen(
                     onSetErrorMessageResId = setErrorMessageResId,
                     onStart = onStart,
                     onUpdateInput = onUpdateInput,
+                    onUrlChange = onUrlChange,
+                    shouldInterceptRequest = shouldInterceptRequest,
                 )
                 if (!wide) {
                     Column(
@@ -443,14 +445,6 @@ private fun MainScreen(
             else -> contentColor
         },
     )
-
-    if (currentState is GrantedParseWebPermission) {
-        InvisibleWebView(
-            unsafeUrl = currentState.webUriString,
-            onUrlChange = onUrlChange,
-            shouldInterceptRequest = shouldInterceptRequest,
-        )
-    }
 
     selectedPointsAndIndex?.let { (points, i) ->
         ModalBottomSheet(
@@ -588,6 +582,8 @@ private fun MainMainPane(
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
+    onUrlChange: (urlString: String) -> Unit,
+    shouldInterceptRequest: (requestUrlString: String) -> Boolean,
 ) {
     when {
         loadingIndicator is LoadingIndicator.Large -> {
@@ -630,6 +626,14 @@ private fun MainMainPane(
                 onUpdateInput = onUpdateInput,
             )
         }
+    }
+
+    if (currentState is GrantedParseWebPermission) {
+        ConversionWebView(
+            unsafeUrl = currentState.webUriString,
+            onUrlChange = onUrlChange,
+            shouldInterceptRequest = shouldInterceptRequest,
+        )
     }
 }
 

@@ -9,13 +9,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,12 +22,12 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-private const val TAG = "InvisibleWebView"
+private const val TAG = "ConversionWebView"
 
 @OptIn(FlowPreview::class)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun InvisibleWebView(
+fun ConversionWebView(
     unsafeUrl: String,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
@@ -135,7 +132,6 @@ fun InvisibleWebView(
                 }
             }
         },
-        modifier = Modifier.offset((-3000).dp, (-3000).dp),
         update = { webView ->
             if (safeUrl != null) {
                 webView.loadUrl(safeUrl)
