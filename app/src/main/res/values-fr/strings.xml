@@ -193,7 +193,7 @@
     <string name="faq_how_text_2_item_http">soit les en-têtes HTTP,</string>
     <string name="faq_how_text_2_item_html">ou document HTML,</string>
     <string name="faq_how_text_2_item_web">ou la page web en direct, y compris JavaScript.</string>
-    <string name="faq_how_text_3">Si vous n’autorisez pas la connexion au service de carte, alors %1$s crée un lien geo: avec un terme de recherche au lieu de coordonnées ou il s’arrête, selon le lien particulier.</string>
+    <string name="faq_how_text_3">Si vous n’autorisez pas la connexion au service de carte, alors %1$s crée un lien geo: avec un terme de recherche au lieu de coordonnées, ou il s’arrête, selon le lien particulier.</string>
     <string name="faq_how_text_4">Pour autoriser ou refuser définitivement la connexion au service de carte au lieu de toujours demander (comportement par défaut), accédez aux %1$s de l’application.</string>
     <string name="faq_how_text_4_preferences_button">préférences</string>
     <string name="faq_privacy_headline">Considérations relatives à la confidentialité</string>
@@ -211,4 +211,6 @@
     <string name="converter_urbi_name">2GIS / Urbi</string>
     <string name="converter_waze_name">Waze</string>
     <string name="converter_yandex_maps_name">Yandex Maps</string>
+    <string name="conversion_succeeded_point_all">Tous les points (%1$d)</string>
+    <string name="conversion_succeeded_point_last">Dernier point</string>
 </resources>
