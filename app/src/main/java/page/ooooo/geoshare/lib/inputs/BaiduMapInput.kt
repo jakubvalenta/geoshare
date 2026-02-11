@@ -7,6 +7,7 @@ import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
+import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
@@ -30,6 +31,7 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
     override val shortUriPattern = Regex("""(?:https?://)?j\.map\.baidu\.com/\S+""")
     override val shortUriMethod = Input.ShortUriMethod.HEAD
 
+    @Suppress("SpellCheckingInspection")
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
@@ -72,24 +74,30 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
                             .map { NaivePoint(0.0, 0.0, name = it) }
                             .forEach { points.add(it) }
                     }
+
+                } else if (firstPart == "mobile") {
+                    // Mobile place detail
+                    // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=<LON>%2C<LAT>"
+                    Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()
+                        ?.also { points.add(it) }
                 }
             }
         }.asBD09MC()
     }
 
-    override fun shouldInterceptRequest(requestUrlString: String) =
-        // Assets
-        requestUrlString.endsWith(".css")
-            || requestUrlString.endsWith(".ico")
-            || requestUrlString.endsWith(".png")
-            || requestUrlString.endsWith("/static/common/images/new/loading")
-
-            // Map tiles
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
-
-            // Tracking
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
-            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
+    override fun shouldInterceptRequest(requestUrlString: String) = false
+//        // Assets
+//        requestUrlString.endsWith(".css")
+//            || requestUrlString.endsWith(".ico")
+//            || requestUrlString.endsWith(".png")
+//            || requestUrlString.endsWith("/static/common/images/new/loading")
+//
+//            // Map tiles
+//            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
+//
+//            // Tracking
+//            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
+//            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_baidu_map_permission_title
