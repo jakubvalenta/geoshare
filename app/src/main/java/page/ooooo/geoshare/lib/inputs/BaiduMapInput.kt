@@ -76,28 +76,33 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
                     }
 
                 } else if (firstPart == "mobile") {
-                    // Mobile place detail
+                    // Mobile place detail with coords
                     // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=<LON>%2C<LAT>"
                     Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()
                         ?.also { points.add(it) }
+                        ?: run {
+                            // Mobile place detail without coords
+                            // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1"
+                            webUriString = uri.toString()
+                        }
                 }
             }
         }.asBD09MC()
     }
 
-    override fun shouldInterceptRequest(requestUrlString: String) = false
-//        // Assets
-//        requestUrlString.endsWith(".css")
-//            || requestUrlString.endsWith(".ico")
-//            || requestUrlString.endsWith(".png")
-//            || requestUrlString.endsWith("/static/common/images/new/loading")
-//
-//            // Map tiles
-//            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
-//
-//            // Tracking
-//            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
-//            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
+    override fun shouldInterceptRequest(requestUrlString: String) =
+        // Assets
+        requestUrlString.endsWith(".css")
+            || requestUrlString.endsWith(".ico")
+            || requestUrlString.endsWith(".png")
+            || requestUrlString.endsWith("/static/common/images/new/loading")
+
+            // Map tiles
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
+
+            // Tracking
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
 
     @StringRes
     override val permissionTitleResId = R.string.converter_baidu_map_permission_title

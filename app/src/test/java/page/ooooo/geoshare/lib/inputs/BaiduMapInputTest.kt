@@ -103,7 +103,18 @@ class BaiduMapInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_mobilePlaceDetail() = runTest {
+    fun parseUri_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
+        assertEquals(
+            ParseUriResult.SucceededAndSupportsWebParsing(
+                persistentListOf(),
+                "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
+            ),
+            parseUri("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1")
+        )
+    }
+
+    @Test
+    fun parseUri_mobilePlaceDetailWithCoords_returnsSucceeded() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(
                 persistentListOf(BD09MCPoint(3619117.0, 13392211.0))
