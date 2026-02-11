@@ -413,6 +413,16 @@ data class RequestedParseWebPermission(
     }
 }
 
+/**
+ * When GrantedParseWebPermission is the current state, the UI should load [webUriString] in a WebView and call
+ * [onUrlChange] once the page loaded in the WebView changes its URL. A page usually changes its URL by calling
+ * JavaScript `history.pushState()`.
+ *
+ * Transitioning this waits for [onUrlChange] to be called within [timeout]. If it doesn't happen, it returns a failure.
+ *
+ * To allow communication between [transition] and [onUrlChange], this state contains a mutable private state
+ * [currentUrlString]. This doesn't feel elegant and should be implemented differently, when we figure out how.
+ */
 data class GrantedParseWebPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
@@ -429,7 +439,7 @@ data class GrantedParseWebPermission(
         try {
             val urlString = currentUrlString
                 .filterNotNull()
-                .timeout(timeout) // Fail the conversion unless the URL change callback is called within timeout
+                .timeout(timeout)
                 .first()
             val matchingUriString = input.uriPattern.find(urlString)?.value
             when (
