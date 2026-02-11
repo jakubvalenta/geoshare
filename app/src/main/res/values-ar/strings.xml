@@ -211,7 +211,7 @@
     <string name="faq_how_text_2_item_http">إما ترويسات HTTP،</string>
     <string name="faq_how_text_2_item_html">أو مستند HTML،</string>
     <string name="faq_how_text_2_item_web">أو صفحة الويب المباشرة بما في ذلك جافا سكريبت.</string>
-    <string name="faq_how_text_3">إذا لم تسمح بالاتصال بخدمة الخرائط، فسيقوم %1$s بإنشاء رابط geo: باستخدام مصطلح بحث بدلاً من الإحداثيات أو سيتوقف عن العمل، وذلك حسب الرابط المعني.</string>
+    <string name="faq_how_text_3">إذا لم تسمح بالاتصال بخدمة الخرائط، فسيقوم %1$s بإنشاء رابط geo: باستخدام مصطلح بحث بدلاً من الإحداثيات، أو سيتوقف عن العمل، وذلك حسب الرابط المعني.</string>
     <string name="faq_how_text_4">للسماح بالاتصال بخدمة الخرائط أو رفضه بشكل دائم بدلاً من السؤال في كل مرة (الخيار الافتراضي)، انتقل إلى %1$s الخاص بالتطبيق.</string>
     <string name="faq_how_text_4_preferences_button">التفضيلات</string>
     <string name="faq_privacy_headline">اعتبارات الخصوصية</string>
@@ -229,4 +229,6 @@
     <string name="converter_urbi_name">2GIS / Urbi</string>
     <string name="converter_waze_name">Waze</string>
     <string name="converter_yandex_maps_name">خرائط Yandex</string>
+    <string name="conversion_succeeded_point_all">كل النقط (%1$d)</string>
+    <string name="conversion_succeeded_point_last">آخر نقطة</string>
 </resources>
