@@ -28,6 +28,8 @@ open class NetworkTools(
     private val log: ILog = DefaultLog,
 ) {
     companion object {
+        const val DESKTOP_USER_AGENT =
+            @Suppress("SpellCheckingInspection") "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
         const val MAX_RETRIES = 9
         const val EXPONENTIAL_DELAY_BASE = 2.0
         const val EXPONENTIAL_DELAY_BASE_DELAY = 1_000L
@@ -142,9 +144,7 @@ open class NetworkTools(
             // case of Google Maps or maps link in case of Google Search.
             install(UserAgent) {
                 // Use custom user agent, because BrowserUserAgent() shows unsupported browser error in Apple Maps.
-                @Suppress("SpellCheckingInspection")
-                agent =
-                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+                agent = DESKTOP_USER_AGENT
             }
         }.use { client ->
             try {

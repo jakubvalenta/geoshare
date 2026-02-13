@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.findAll
@@ -93,13 +94,14 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
 
     override fun extendWebSettings(settings: WebSettings) {
         settings.domStorageEnabled = true
+        settings.userAgentString = NetworkTools.DESKTOP_USER_AGENT
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =
         // Assets
         requestUrlString.endsWith(".css")
             || requestUrlString.endsWith(".ico")
-            || requestUrlString.endsWith(".png")
+            || (requestUrlString.endsWith(".png") && !requestUrlString.contains("/image/api/"))
             || requestUrlString.endsWith("/static/common/images/new/loading")
 
             // Map tiles
