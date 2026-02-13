@@ -198,4 +198,5 @@
     <string name="network_exception_socket_timeout">tempo limite do soquete esgotado</string>
     <string name="network_exception_unknown">erro desconhecido</string>
     <string name="network_exception_unresolved_address">endereço não traduzido</string>
+    <string name="conversion_succeeded_point_all">Todos os pontos (%1$d)</string>
 </resources>
