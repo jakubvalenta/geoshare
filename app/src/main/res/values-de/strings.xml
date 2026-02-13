@@ -13,8 +13,8 @@
     <string name="main_input_uri_supporting_text">z.B. https://maps.app.goo.gl/… oder maps.apple.com/…</string>
     <string name="main_create_geo_uri">Koordinaten anzeigen</string>
     <string name="main_navigate_to_intro">Entdecke die Funktionen der App</string>
-    <string name="converter_google_maps_permission_title">Mit Google Verbinden?</string>
-    <string name="converter_apple_maps_permission_title">Mit Apple Verbinden?</string>
+    <string name="converter_google_maps_permission_title">Mit Google verbinden?</string>
+    <string name="converter_apple_maps_permission_title">Mit Apple verbinden?</string>
     <string name="conversion_permission_common_deny">Abbrechen</string>
     <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> enthält keine Koordinaten. %2$s muss sich mit dem Kartendienst verbinden, um sie zu erhalten.]]></string>
     <string name="intro_how_to_share_headline">Wie öffnet man Karten Orte in einer anderen App</string>
@@ -64,7 +64,7 @@
         <item quantity="other">%1$d unterstützte Links</item>
     </plurals>
     <string name="intro_open_by_default_app_screenshot_add">Hinzufügen</string>
-    <string name="converter_yandex_maps_permission_title">Mit Yandex Verbinden?</string>
+    <string name="converter_yandex_maps_permission_title">Mit Yandex verbinden?</string>
     <string name="converter_yandex_maps_loading_indicator_title">Verbindung mit Yandex…</string>
     <string name="inputs_title">Unterstützte Kartendienste</string>
     <string name="inputs_detail_text">Du kannst die folgenden Kartenlinks mit %1$s teilen oder in die App einfügen.</string>
@@ -94,11 +94,11 @@
     <string name="conversion_succeeded_share">Teilen</string>
     <string name="conversion_succeeded_point_number">Punkt %1$d</string>
     <string name="conversion_succeeded_save_gpx">GPX speichern</string>
-    <string name="converter_waze_permission_title">Mit Waze Verbinden?</string>
+    <string name="converter_waze_permission_title">Mit Waze verbinden?</string>
     <string name="converter_waze_loading_indicator_title">Verbindung mit Waze…</string>
-    <string name="converter_mapy_com_permission_title">Mit Mapy.com Verbinden?</string>
+    <string name="converter_mapy_com_permission_title">Mit Mapy.com verbinden?</string>
     <string name="converter_mapy_com_loading_indicator_title">Verbindung mit Mapy.com…</string>
-    <string name="converter_open_street_map_permission_title">Mit OpenStreetMap Verbinden?</string>
+    <string name="converter_open_street_map_permission_title">Mit OpenStreetMap verbinden?</string>
     <string name="converter_open_street_map_loading_indicator_title">Verbindung mit OpenStreetMap…</string>
     <string name="inputs_all">Alle Kartendienste</string>
     <string name="inputs_recent">Kürzlich hinzugefügt</string>
@@ -114,7 +114,7 @@
     <string name="conversion_succeeded_save_gpx_failed">Fehler beim Speichern der GPX-Datei</string>
     <string name="main_random">Zufälliger Link</string>
     <string name="converter_amap_loading_indicator_title">Verbindung mit Amap…</string>
-    <string name="converter_amap_permission_title">Mit Amap Verbinden?</string>
+    <string name="converter_amap_permission_title">Mit Amap verbinden?</string>
     <string name="conversion_automation_copy_link_succeeded">Link wurde automatisch kopiert</string>
     <string name="conversion_automation_copy_succeeded">Koordinaten wurden automatisch kopiert</string>
     <string name="conversion_automation_open_app_failed">Fehler beim automatischen Öffnen von %1$s</string>
@@ -140,7 +140,7 @@
     <string name="user_preferences_automation_title">Automatisierung</string>
     <string name="conversion_succeeded_copy_link_street_view">Link zum %1$s Street View kopieren</string>
     <string name="conversion_succeeded_open_app_street_view">Street View in %1$s anzeigen</string>
-    <string name="converter_urbi_permission_title">Mit 2GIS / Urbi Verbinden?</string>
+    <string name="converter_urbi_permission_title">Mit 2GIS / Urbi verbinden?</string>
     <string name="converter_urbi_loading_indicator_title">Verbindung mit 2GIS / Urbi…</string>
     <string name="not_available">Nicht verfügbar</string>
     <string name="conversion_succeeded_location_failed">Standort konnte nicht ermittelt werden</string>
@@ -169,4 +169,42 @@
         <item quantity="one">%1$d Sekunde</item>
         <item quantity="other">%1$d Sekunden</item>
     </plurals>
+    <string name="conversion_succeeded_point_all">Alle Punkte (%1$d)</string>
+    <string name="conversion_succeeded_point_last">Letzter Punkt</string>
+    <string name="donation_button">Spenden auf Ko-fi</string>
+    <string name="donation_description">Spart dir diese App Zeit?</string>
+    <string name="converter_amap_name">Amap (AutoNavi)</string>
+    <string name="converter_apple_maps_name">Apple Maps</string>
+    <string name="converter_baidu_map_name">Baidu Map</string>
+    <string name="converter_baidu_map_permission_title">Mit Baidu Map verbinden?</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_google_maps_name">Google Maps</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_waze_name">Waze</string>
+    <string name="converter_yandex_maps_name">Yandex Maps</string>
+    <string name="faq_how_headline">Funktionsweise</string>
+    <string name="faq_privacy_headline">Hinweise zum Datenschutz</string>
+    <string name="conversion_succeeded_description_q_only">Der Original-Link enthält keine Koordinaten, sondern nur einen Ortsnamen. Wenn du diesen Ort in einer anderen App öffnest, wird möglicherweise ein anderer Ort als im Original-Link angezeigt.</string>
+    <string name="faq_how_text_1">%1$s wandelt Kartenlinks in geo:-Links um, die von anderen Karten-Apps geöffnet werden können. Um einen geo:-Link zu erstellen, sind geografische Koordinaten erforderlich. %1$s extrahiert sie aus der Karten-URL.</string>
+    <string name="faq_how_text_2">Allerdings enthalten nicht alle Karten-URLs Koordinaten. In solchen Fällen, wird %1$s dich um Erlaubnis bitten, sich mit dem Kartendienst (Google Maps, Apple Maps usw.) zu verbinden und die Koordinaten holen:</string>
+    <string name="faq_how_text_2_item_http">entweder aus den HTTP-Headern,</string>
+    <string name="faq_how_text_2_item_html">oder aus dem HTML-Dokument,</string>
+    <string name="faq_how_text_2_item_web">oder aus die Live-Webseite einschließlich JavaScript.</string>
+    <string name="faq_how_text_3">Wenn du die Verbindung zum Kartendienst nicht zulässt, erstellt %1$s einen geo:-Link mit einem Ortssuchbegriff anstelle von Koordinaten oder stoppt, je nach dem konkreten Link.</string>
+    <string name="faq_how_text_4">Um die Verbindung mit Kartendienst zu erlauben oder zu verweigern, anstatt immer zu fragen (Standardeinstellung), gehe zu den %1$s der App.</string>
+    <string name="faq_how_text_4_preferences_button">Einstellungen</string>
+    <string name="faq_privacy_text">Wenn möglich, konvertiert %1$s Kartenlinks offline. Wenn der Kartenlink eine Online-Konvertierung erfordert, fragt die App dich, bevor sie sich mit dem Kartendienst (Google Maps, Apple Maps usw.) verbindet. Wenn du die Verbindung zulässt, erhält der Kartendienst den Kartenlink, kann deine IP-Adresse lesen und in einigen Fällen lädt %1$s die Live-Webseite des Kartendienstes und führt dessen JavaScript aus. Dies geschieht in einer eingeschränkten Umgebung, die Tracking-Skripte blockiert und keine Cookies speichert.</string>
+    <string name="network_exception_connect_timeout">Zeitüberschreitung bei der Verbindung</string>
+    <string name="network_exception_eof">Verbindung geschlossen</string>
+    <string name="network_exception_request_timeout">Zeitüberschreitung bei der Anfrage</string>
+    <string name="network_exception_response_error">Antwortfehler</string>
+    <string name="network_exception_server_response_error">Antwort-Serverfehler</string>
+    <string name="network_exception_socket_timeout">Socket-Zeitüberschreitung</string>
+    <string name="network_exception_unknown">unbekannter Fehler</string>
+    <string name="network_exception_unresolved_address">ungelöste Adresse</string>
 </resources>

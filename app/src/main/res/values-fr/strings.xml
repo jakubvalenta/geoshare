@@ -199,7 +199,7 @@
     <string name="faq_privacy_headline">Considérations relatives à la confidentialité</string>
     <string name="faq_privacy_text">Lorsque cela est possible, %1$s convertit les liens cartographiques hors ligne. Si le lien nécessite une conversion en ligne, l’application vous demandera l’autorisation avant de se connecter au service cartographique (Google Maps, Apple Maps, etc.). Si vous autorisez la connexion, le service cartographique recevra le lien, pourra lire votre adresse IP et, dans certains cas, %1$s chargera la page web du service cartographique et exécutera son code JavaScript. Cette opération se déroule dans un environnement restreint, qui bloque les scripts de suivi et ne stocke pas de cookies.</string>
     <string name="converter_amap_name">Amap (AutoNavi)</string>
-    <string name="converter_apple_maps_name">Apple Maps</string>
+    <string name="converter_apple_maps_name">Apple Plans</string>
     <string name="converter_baidu_map_name">Baidu Map</string>
     <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
     <string name="converter_google_maps_name">Google Maps</string>
