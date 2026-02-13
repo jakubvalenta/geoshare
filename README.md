@@ -28,6 +28,7 @@ map app.
 - Apple Maps
 - 2GIS
 - Amap (AutoNavi)
+- Baidu Map (beta)
 - CoMaps
 - HERE WeGo
 - Magic Earth
