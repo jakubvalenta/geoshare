@@ -71,4 +71,8 @@
     <string name="conversion_succeeded_location_failed">Nie udało się znaleźć lokalizacji</string>
     <string name="conversion_succeeded_description_q_only">Oryginalny link nie zawiera współrzędnych, a jedynie nazwę miejsca. Po otwarciu tej lokalizacji w innej aplikacji może ona znaleźć inne miejsce niż oryginalny link.</string>
     <string name="conversion_succeeded_copy_link_street_view">Skopiuj link do widoku ulicy w %1$s</string>
+    <string name="not_available">Niedostępne</string>
+    <string name="conversion_succeeded_copy_coordinates">Skopiuj współrzędne</string>
+    <string name="conversion_succeeded_copy_google_maps">Skopiuj Google Maps</string>
+    <string name="conversion_succeeded_copy_link">Zmienna zawiera imie aplikacji map takie jak \"Maps\" lub \"OsmAnd\"</string>
 </resources>
