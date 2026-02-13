@@ -444,6 +444,7 @@ private fun MainScreen(
             currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> contentColor
         },
+        shouldAutoFocusCurrentDestination = false,
     )
 
     selectedPointsAndIndex?.let { (points, i) ->
