@@ -77,15 +77,18 @@ fun ResultSuccessCoordinates(
                 SelectionContainer {
                     Text(
                         text,
-                        Modifier.testTag("geoShareResultSuccessLastPointCoordinates"),
+                        Modifier
+                            .weight(1f)
+                            .testTag("geoShareResultSuccessLastPointCoordinates"),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             } ?: Text(
                 stringResource(R.string.conversion_succeeded_description_q_only),
                 Modifier
-                    .testTag("geoShareResultSuccessLastPointDescription")
-                    .fillMaxWidth(),
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .testTag("geoShareResultSuccessLastPointDescription"),
                 fontStyle = FontStyle.Italic,
                 style = MaterialTheme.typography.bodySmall.copy(
                     lineBreak = LineBreak.Paragraph,
