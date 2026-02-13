@@ -3,8 +3,10 @@ package page.ooooo.geoshare.ui.components
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.ViewGroup
+import android.webkit.ConsoleMessage
 import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,6 +58,7 @@ fun ConversionWebView(
     LaunchedEffect(currentUrlStringFlow) {
         currentUrlStringFlow
             .filterNotNull()
+            .onEach { Log.d(TAG, "URL is $it") }
             .distinctUntilChanged()
             .debounce(urlChangeDebounceTimeout)
             .collect { urlString ->
@@ -78,12 +82,19 @@ fun ConversionWebView(
                 settings.javaScriptEnabled = true
                 extendWebSettings(settings)
 
+                setWebChromeClient(object : WebChromeClient() {
+                    override fun onConsoleMessage(cm: ConsoleMessage): Boolean =
+                        // Return true for messages that should be excluded from logcat
+                        (cm.messageLevel() != ConsoleMessage.MessageLevel.ERROR &&
+                            cm.messageLevel() != ConsoleMessage.MessageLevel.WARNING) ||
+                            cm.message().startsWith("Mixed Content")
+                })
+
                 addJavascriptInterface(
                     object {
                         @Suppress("unused")
                         @JavascriptInterface
                         fun onUrlChange(urlString: String) {
-                            Log.d(TAG, "URL changed to $urlString")
                             currentUrlStringFlow.value = urlString
                         }
                     },
@@ -96,6 +107,7 @@ fun ConversionWebView(
 
                         view?.evaluateJavascript(
                             """window.setInterval(function () {
+                                console.warn("HHH " + window.location.href);
                                 Android.onUrlChange(window.location.href);
                             }, ${urlChangeCheckInterval.inWholeMilliseconds});""".trimIndent(),
                             null,
@@ -108,7 +120,7 @@ fun ConversionWebView(
                     ): WebResourceResponse? {
                         request?.url?.toString()?.let { requestUrlString ->
                             if (shouldInterceptRequest(requestUrlString)) {
-                                Log.d(TAG, "Cancelled request to $requestUrlString")
+                                Log.d(TAG, "Blocked request to $requestUrlString")
                                 return WebResourceResponse("text/plain", "utf-8", null)
                             }
                             Log.d(TAG, "Allowed request to $requestUrlString")
