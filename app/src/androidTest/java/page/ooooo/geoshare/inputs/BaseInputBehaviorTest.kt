@@ -64,17 +64,10 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         // Go to main form
         goToMainForm()
 
-        // Set main input
+        // Set and submit main input
         val mainInput = onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
         mainInput.setText(unsafeText)
-        if (mainInput.isFocused) {
-            // If the field is focused, the submit button can be covered by IME, so submit by pressing Enter
-            pressEnter()
-        } else {
-            // If the field is not focused (for some reason), then pressing Enter doesn't submit, so submit by
-            // clicking the submit button instead
-            onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
-        }
+        onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
 
         // Confirm permission dialog
         confirmDialogIfItIsVisible()
