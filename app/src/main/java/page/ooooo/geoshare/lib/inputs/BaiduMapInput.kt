@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.webkit.WebSettings
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
@@ -88,6 +89,10 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
                 }
             }
         }.asBD09MC()
+    }
+
+    override fun extendWebSettings(settings: WebSettings) {
+        settings.domStorageEnabled = true
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

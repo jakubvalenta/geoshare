@@ -7,6 +7,7 @@ import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
@@ -29,8 +30,10 @@ private const val TAG = "ConversionWebView"
 @Composable
 fun ConversionWebView(
     unsafeUrl: String,
+    extendWebSettings: (settings: WebSettings) -> Unit,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
+    urlChangeCheckInterval: Duration = 1.seconds,
     urlChangeDebounceTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
@@ -73,6 +76,7 @@ fun ConversionWebView(
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
                 settings.javaScriptEnabled = true
+                extendWebSettings(settings)
 
                 addJavascriptInterface(
                     object {
@@ -91,27 +95,9 @@ fun ConversionWebView(
                         super.onPageFinished(view, url)
 
                         view?.evaluateJavascript(
-                            @Suppress("SpellCheckingInspection")
-                            """
-                                (function () {
-                                    const origPushState = history.pushState;
-                                    const origReplaceState = history.replaceState;
-
-                                    history.pushState = function() {
-                                        origPushState.apply(this, arguments);
-                                        Android.onUrlChange(window.location.href);
-                                    };
-
-                                    history.replaceState = function() {
-                                        origReplaceState.apply(this, arguments);
-                                        Android.onUrlChange(window.location.href);
-                                    };
-
-                                    window.addEventListener('popstate', function() {
-                                        Android.onUrlChange(window.location.href);
-                                    });
-                                })();
-                            """.trimIndent(),
+                            """window.setInterval(function () {
+                                Android.onUrlChange(window.location.href);
+                            }, ${urlChangeCheckInterval.inWholeMilliseconds});""".trimIndent(),
                             null,
                         )
                     }

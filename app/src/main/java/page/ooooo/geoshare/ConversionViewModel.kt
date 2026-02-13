@@ -41,7 +41,6 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.GrantedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
@@ -222,16 +221,6 @@ class ConversionViewModel @Inject constructor(
             transition { currentState.deny(doNotAsk) }
         }
     }
-
-    fun onUrlChange(urlString: String) {
-        (stateContext.currentState as? GrantedParseWebPermission)?.onUrlChange(urlString)
-    }
-
-    fun shouldInterceptRequest(requestUrlString: String): Boolean =
-        (stateContext.currentState as? GrantedParseWebPermission)?.input?.shouldInterceptRequest(requestUrlString)
-        // Return true by default, so that when conversion state changes but a WebView is still in composition, all
-        // request inside this WebView are cancelled
-            ?: true
 
     fun showLocationRationale(action: LocationAction, i: Int?) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
