@@ -4,10 +4,11 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.BD09MCPoint
+import kotlin.time.Duration.Companion.minutes
 
 class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() = runTest {
+    fun test() = runTest(timeout = 2.minutes) {
         assumeDomainResolvable("map.baidu.com")
 
         // Launch app and close intro
