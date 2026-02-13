@@ -7,13 +7,10 @@ import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.CurlUserAgent
-import io.ktor.client.request.get
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -27,10 +24,11 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.lib.point.Point
+import java.net.InetAddress
+import java.net.UnknownHostException
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
@@ -163,16 +161,17 @@ abstract class BaseActivityBehaviorTest {
         )
     }
 
-    protected suspend fun assumeIpAddressCountry(countryCode: String) {
-        val client = HttpClient(CIO) {
-            CurlUserAgent()
-        }
-        val response = client.get("https://ipinfo.io")
-        val json: String = response.body()
-        val actualCountryCode = Regex(""""country":\s*"([^"]+)""").find(json)?.groupOrNull()
+    protected suspend fun assumeDomainResolvable(domain: String) {
         assumeTrue(
-            "This test only works when your IP address is in country with code $countryCode; your country code is $actualCountryCode",
-            actualCountryCode == countryCode,
+            "This test only works when DNS resolves the domain $domain",
+            withContext(Dispatchers.IO) {
+                try {
+                    InetAddress.getByName(domain)
+                    true
+                } catch (_: UnknownHostException) {
+                    false
+                }
+            },
         )
     }
 

@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.point.BD09MCPoint
 class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
     fun test() = runTest {
-        assumeIpAddressCountry("CN")
+        assumeDomainResolvable("map.baidu.com")
 
         // Launch app and close intro
         launchApplication()
