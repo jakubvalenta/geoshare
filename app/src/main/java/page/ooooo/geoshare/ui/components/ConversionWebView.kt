@@ -107,7 +107,6 @@ fun ConversionWebView(
 
                         view?.evaluateJavascript(
                             """window.setInterval(function () {
-                                console.warn("HHH " + window.location.href);
                                 Android.onUrlChange(window.location.href);
                             }, ${urlChangeCheckInterval.inWholeMilliseconds});""".trimIndent(),
                             null,
