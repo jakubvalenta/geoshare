@@ -35,24 +35,17 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         confirmDialogIfItIsVisible()
     }
 
-    protected fun testUri(expectedPoints: ImmutableList<Point>, unsafeUriString: String) = uiAutomator {
-        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        assertConversionSucceeded(expectedPoints)
-    }
-
-    protected fun testUri(expectedPoint: Point, unsafeUriString: String) = uiAutomator {
-        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        assertConversionSucceeded(expectedPoint)
-    }
-
     protected fun testUri(
-        expectedPoint: Point,
-        @Suppress("SameParameterValue") unsafeUriString: String,
-        fallbackPoint: Point,
+        expectedPoints: ImmutableList<Point>,
+        unsafeUriString: String,
+        timeoutMs: Long = NETWORK_TIMEOUT,
     ) = uiAutomator {
         goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        assertConversionSucceeded(expectedPoint, fallbackPoint)
+        assertConversionSucceeded(expectedPoints, timeoutMs)
     }
+
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
+        testUri(persistentListOf(expectedPoint), unsafeUriString, timeoutMs)
 
     protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when

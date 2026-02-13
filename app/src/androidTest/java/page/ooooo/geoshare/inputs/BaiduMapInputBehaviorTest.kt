@@ -18,12 +18,14 @@ class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
         testUri(
             BD09MCPoint(3619117.0, 13392211.0, 17.0),
             "https://j.map.baidu.com/64/lqEk",
+            timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
         // Shared place
         testUri(
             BD09MCPoint(3316047.58, 13502465.77, 19.0),
             "https://j.map.baidu.com/44/lth",
+            timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
         // Center

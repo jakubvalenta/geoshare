@@ -182,87 +182,69 @@ abstract class BaseActivityBehaviorTest {
      * because we often cannot use an exact match, because Google Maps returns different place name depending on the
      * phone's language and location.
      */
-    protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>) = uiAutomator {
-        onElement(NETWORK_TIMEOUT) {
-            when (viewIdResourceName) {
-                "geoShareResultSuccessLastPointName" -> true
-                "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
-                else -> false
-            }
-        }
-        onElement {
-            if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                val expectedName = expectedPoints.lastOrNull()?.cleanName
-                if (!expectedName.isNullOrEmpty()) {
-                    assertTrue(
-                        """Expected "${textAsString()}" to contain "$expectedName"""",
-                        textAsString()?.contains(expectedName) == true,
-                    )
-                } else if (expectedPoints.size > 1) {
-                    assertTrue(
-                        """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
-                        textAsString() in setOf("Last point", "Dernier point"),
-                    )
-                } else {
-                    assertTrue(
-                        @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
-                        textAsString() in setOf(
-                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
-                        ),
-                    )
+    protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>, timeoutMs: Long = NETWORK_TIMEOUT) =
+        uiAutomator {
+            onElement(timeoutMs) {
+                when (viewIdResourceName) {
+                    "geoShareResultSuccessLastPointName" -> true
+                    "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
+                    else -> false
                 }
-                true
-            } else {
-                false
             }
-        }
-        val expectedText = allOutputs.getText(expectedPoints, null)
-        if (expectedText != null) {
             onElement {
-                if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
-                    assertEquals(expectedText, textAsString())
+                if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
+                    val expectedName = expectedPoints.lastOrNull()?.cleanName
+                    if (!expectedName.isNullOrEmpty()) {
+                        assertTrue(
+                            """Expected "${textAsString()}" to contain "$expectedName"""",
+                            textAsString()?.contains(expectedName) == true,
+                        )
+                    } else if (expectedPoints.size > 1) {
+                        assertTrue(
+                            """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
+                            textAsString() in setOf("Last point", "Dernier point"),
+                        )
+                    } else {
+                        assertTrue(
+                            @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
+                            textAsString() in setOf(
+                                "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
+                            ),
+                        )
+                    }
                     true
                 } else {
                     false
                 }
             }
-        }
-        if (expectedPoints.size > 1) {
-            onElement {
-                if (viewIdResourceName == "geoShareExpandablePaneHeadline") {
-                    assertTrue(
-                        """Expected "${textAsString()}" to contain "${expectedPoints.size}"""",
-                        textAsString()?.contains(expectedPoints.size.toString()) == true,
-                    )
-                    true
-                } else {
-                    false
+            val expectedText = allOutputs.getText(expectedPoints, null)
+            if (expectedText != null) {
+                onElement {
+                    if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
+                        assertEquals(expectedText, textAsString())
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+            if (expectedPoints.size > 1) {
+                onElement {
+                    if (viewIdResourceName == "geoShareExpandablePaneHeadline") {
+                        assertTrue(
+                            """Expected "${textAsString()}" to contain "${expectedPoints.size}"""",
+                            textAsString()?.contains(expectedPoints.size.toString()) == true,
+                        )
+                        true
+                    } else {
+                        false
+                    }
                 }
             }
         }
-    }
 
-    protected fun assertConversionSucceeded(
-        expectedPoints: ImmutableList<Point>,
-        fallbackPoints: ImmutableList<Point>,
-    ) =
-        try {
-            assertConversionSucceeded(expectedPoints)
-        } catch (e: Throwable) {
-            when (e) {
-                is ElementNotFoundException,
-                is AssertionError,
-                    -> assertConversionSucceeded(fallbackPoints)
-
-                else -> throw e
-            }
-        }
-
-    protected fun assertConversionSucceeded(expectedPoint: Point) =
-        assertConversionSucceeded(persistentListOf(expectedPoint))
-
-    protected fun assertConversionSucceeded(expectedPoint: Point, fallbackPoint: Point) =
-        assertConversionSucceeded(persistentListOf(expectedPoint), persistentListOf(fallbackPoint))
+    protected fun assertConversionSucceeded(expectedPoint: Point, timeoutMs: Long = NETWORK_TIMEOUT) =
+        assertConversionSucceeded(persistentListOf(expectedPoint), timeoutMs)
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps
