@@ -231,4 +231,5 @@
     <string name="converter_yandex_maps_name">خرائط Yandex</string>
     <string name="conversion_succeeded_point_all">كل النقط (%1$d)</string>
     <string name="conversion_succeeded_point_last">آخر نقطة</string>
+    <string name="converter_baidu_map_loading_indicator_title">يتصل ب Baidu Map…</string>
 </resources>
