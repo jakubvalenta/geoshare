@@ -213,4 +213,5 @@
     <string name="converter_yandex_maps_name">Yandex Maps</string>
     <string name="conversion_succeeded_point_all">Tous les points (%1$d)</string>
     <string name="conversion_succeeded_point_last">Dernier point</string>
+    <string name="converter_baidu_map_loading_indicator_title">Connexion à Baidu Map…</string>
 </resources>
