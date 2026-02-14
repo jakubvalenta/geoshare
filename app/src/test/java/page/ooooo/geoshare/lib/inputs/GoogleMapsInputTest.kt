@@ -693,7 +693,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsNull() = runTest {
+    fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsRequiresWebParsing() = runTest {
         assertEquals(
             ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml(
@@ -788,7 +788,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_failure() = runTest {
+    fun parseHtml_htmlDoesNotMatch_returnsRequiresWebParsing() = runTest {
         assertEquals(
             ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml("spam", "https://www.google.com/maps/place/Berlin,+Germany/")
@@ -796,7 +796,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsNull() = runTest {
+    fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsRequiresWebParsing() = runTest {
         assertEquals(
             ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml("<html></html>", "https://www.google.com/maps/place/Berlin,+Germany/"),
@@ -804,7 +804,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsIt() = runTest {
+    fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsRequiresRedirect() = runTest {
         assertEquals(
             ParseHtmlResult.RequiresRedirect(
                 @Suppress("SpellCheckingInspection") "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
@@ -824,7 +824,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsAbsoluteUrl_returnsIt() = runTest {
+    fun parseHtml_googleSearchHtmlContainsAbsoluteUrl_returnsRequiresRedirect() = runTest {
         assertEquals(
             ParseHtmlResult.RequiresRedirect("https://www.example.com/foo"),
             parseHtml("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
@@ -832,7 +832,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseHtml_googleSearchHtmlContainsInvalidUrl_returnsIt() = runTest {
+    fun parseHtml_googleSearchHtmlContainsInvalidUrl_returnsRequiresRedirect() = runTest {
         assertEquals(
             ParseHtmlResult.RequiresRedirect("spam"),
             parseHtml("""<html><a href="" data-url="spam"></a></html>"""),

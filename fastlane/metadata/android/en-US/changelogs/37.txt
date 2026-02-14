@@ -1,1 +1,2 @@
+- Added Baidu Map short link support.
 - Fixed cancellation of Google Maps web parsing.

@@ -114,6 +114,7 @@
     <string name="converter_apple_maps_permission_title">Connect to Apple?</string>
     <string name="converter_baidu_map_name">Baidu Map</string>
     <string name="converter_baidu_map_permission_title">Connect to Baidu Map?</string>
+    <string name="converter_baidu_map_loading_indicator_title">Connecting to Baidu Map…</string>
     <string name="converter_coordinates_name">coordinates</string>
     <string name="example">e.g. %1$s</string>
     <string name="converter_debug_name" translatable="false">Debug Input</string>

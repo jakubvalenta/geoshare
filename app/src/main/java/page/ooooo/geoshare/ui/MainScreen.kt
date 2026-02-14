@@ -269,8 +269,6 @@ fun MainScreen(
         },
         onStart = { viewModel.start() },
         onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) },
-        onUrlChange = { urlString -> viewModel.onUrlChange(urlString) },
-        shouldInterceptRequest = { requestUrlString -> viewModel.shouldInterceptRequest(requestUrlString) },
     )
 }
 
@@ -298,8 +296,6 @@ private fun MainScreen(
     onRun: (action: Action, i: Int?) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
-    onUrlChange: (urlString: String) -> Unit,
-    shouldInterceptRequest: (requestUrlString: String) -> Boolean,
 ) {
     val appName = stringResource(R.string.app_name)
     val containerColor = MaterialTheme.colorScheme.surface
@@ -368,8 +364,6 @@ private fun MainScreen(
                     onSetErrorMessageResId = setErrorMessageResId,
                     onStart = onStart,
                     onUpdateInput = onUpdateInput,
-                    onUrlChange = onUrlChange,
-                    shouldInterceptRequest = shouldInterceptRequest,
                 )
                 if (!wide) {
                     Column(
@@ -583,8 +577,6 @@ private fun MainMainPane(
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
-    onUrlChange: (urlString: String) -> Unit,
-    shouldInterceptRequest: (requestUrlString: String) -> Boolean,
 ) {
     when {
         loadingIndicator is LoadingIndicator.Large -> {
@@ -632,8 +624,9 @@ private fun MainMainPane(
     if (currentState is GrantedParseWebPermission) {
         ConversionWebView(
             unsafeUrl = currentState.webUriString,
-            onUrlChange = onUrlChange,
-            shouldInterceptRequest = shouldInterceptRequest,
+            onUrlChange = { currentState.onUrlChange(it) },
+            extendWebSettings = { currentState.input.extendWebSettings(it) },
+            shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
         )
     }
 }
@@ -811,8 +804,6 @@ private fun DefaultPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -843,8 +834,6 @@ private fun DarkPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -875,8 +864,6 @@ private fun TabletPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -917,8 +904,6 @@ private fun SucceededPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -959,8 +944,6 @@ private fun DarkSucceededPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1001,8 +984,6 @@ private fun TabletSucceededPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1046,8 +1027,6 @@ private fun AutomationPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1091,8 +1070,6 @@ private fun DarkAutomationPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1136,8 +1113,6 @@ private fun TabletAutomationPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1181,8 +1156,6 @@ private fun WebViewPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1226,8 +1199,6 @@ private fun DarkWebViewPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1271,8 +1242,6 @@ private fun TabletWebViewPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1309,8 +1278,6 @@ private fun ErrorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1347,8 +1314,6 @@ private fun DarkErrorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1385,8 +1350,6 @@ private fun TabletErrorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1437,8 +1400,6 @@ private fun LoadingIndicatorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1489,8 +1450,6 @@ private fun DarkLoadingIndicatorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }
@@ -1541,8 +1500,6 @@ private fun TabletLoadingIndicatorPreview() {
             onRun = { _, _ -> },
             onStart = {},
             onUpdateInput = {},
-            onUrlChange = {},
-            shouldInterceptRequest = { false },
         )
     }
 }

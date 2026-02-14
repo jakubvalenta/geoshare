@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.webkit.WebSettings
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.DefaultLog
@@ -39,6 +40,7 @@ interface Input {
         val permissionTitleResId: Int
         val loadingIndicatorTitleResId: Int
 
+        fun extendWebSettings(settings: WebSettings) {}
         fun shouldInterceptRequest(requestUrlString: String): Boolean = false
     }
 }

@@ -35,24 +35,17 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         confirmDialogIfItIsVisible()
     }
 
-    protected fun testUri(expectedPoints: ImmutableList<Point>, unsafeUriString: String) = uiAutomator {
-        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        assertConversionSucceeded(expectedPoints)
-    }
-
-    protected fun testUri(expectedPoint: Point, unsafeUriString: String) = uiAutomator {
-        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        assertConversionSucceeded(expectedPoint)
-    }
-
     protected fun testUri(
-        expectedPoint: Point,
-        @Suppress("SameParameterValue") unsafeUriString: String,
-        fallbackPoint: Point,
+        expectedPoints: ImmutableList<Point>,
+        unsafeUriString: String,
+        timeoutMs: Long = NETWORK_TIMEOUT,
     ) = uiAutomator {
         goToMainFormShareUriAndConfirmDialog(unsafeUriString)
-        assertConversionSucceeded(expectedPoint, fallbackPoint)
+        assertConversionSucceeded(expectedPoints, timeoutMs)
     }
+
+    protected fun testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
+        testUri(persistentListOf(expectedPoint), unsafeUriString, timeoutMs)
 
     protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
@@ -64,10 +57,18 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         // Go to main form
         goToMainForm()
 
-        // Set and submit main input
+        // Set main input
         val mainInput = onElement { viewIdResourceName == "geoShareMainInputUriStringTextField" }
         mainInput.setText(unsafeText)
-        onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
+
+        // Submit main form
+        if (mainInput.isFocused) {
+            // If the field is focused, the submit button can be covered by IME, so submit by pressing Enter
+            pressEnter()
+        } else {
+            // If the field is not focused, then pressing Enter doesn't submit, so submit by clicking the submit button
+            onElement { viewIdResourceName == "geoShareMainSubmitButton" }.click()
+        }
 
         // Confirm permission dialog
         confirmDialogIfItIsVisible()

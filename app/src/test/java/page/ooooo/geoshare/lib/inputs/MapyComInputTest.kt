@@ -41,7 +41,7 @@ class MapyComInputTest : BaseInputTest() {
     }
 
     @Test
-    fun uriPattern_matchersCoordinatesInText() {
+    fun uriPattern_matchesCoordinatesInText() {
         assertEquals(
             "41.9966006N, 6.1223825W",
             @Suppress("SpellCheckingInspection") getUri(uriString = "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha"),

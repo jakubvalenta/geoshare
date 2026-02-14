@@ -1,37 +1,54 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.webkit.WebSettings
+import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
+import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object BaiduMapInput : Input {
+object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
     private const val X = """(\d+(?:\.\d+)?)"""
     private const val Y = """(\d+(?:\.\d+)?)"""
     private const val CENTER = """@$X,$Y,${Z}z.*"""
     private const val WAYPOINT = """1\$\$\$\$$X,$Y\$\$([^$]+)"""
 
-    override val uriPattern = Regex("""(?:https?://)?map\.baidu\.com/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:j\.)?map\.baidu\.com/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.BAIDU_MAP,
         nameResId = R.string.converter_baidu_map_name,
         items = listOf(
+            InputDocumentationItem.Url(35, "https://j.map.baidu.com"),
             InputDocumentationItem.Url(33, "https://map.baidu.com"),
         ),
     )
+    override val shortUriPattern = Regex("""(?:https?://)?j\.map\.baidu\.com/\S+""")
+    override val shortUriMethod = Input.ShortUriMethod.HEAD
 
+    @Suppress("SpellCheckingInspection")
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
                 val parts = uri.pathParts.drop(1)
                 val firstPart = parts.firstOrNull() ?: return@run
-                if (firstPart.startsWith('@')) {
+
+                if (firstPart == "") {
+                    if (!queryParams["poiShareId"].isNullOrEmpty() || !queryParams["poiShareUid"].isNullOrEmpty()) {
+                        // Shared point or shared place
+                        // https://map.baidu.com/?poiShareId=<ID>
+                        // https://map.baidu.com/?shareurl=1&poiShareUid=<UID>
+                        webUriString = uri.toString()
+                    }
+
+                } else if (firstPart.startsWith('@')) {
                     // Center
                     // https://map.baidu.com/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>
                     Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.also { points.add(it) }
@@ -59,8 +76,44 @@ object BaiduMapInput : Input {
                             .map { NaivePoint(0.0, 0.0, name = it) }
                             .forEach { points.add(it) }
                     }
+
+                } else if (firstPart == "mobile") {
+                    // Mobile place detail with coords
+                    // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=<LON>%2C<LAT>"
+                    Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()
+                        ?.also { points.add(it) }
+                        ?: run {
+                            // Mobile place detail without coords
+                            // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1"
+                            webUriString = uri.toString()
+                        }
                 }
             }
         }.asBD09MC()
     }
+
+    override fun extendWebSettings(settings: WebSettings) {
+        settings.domStorageEnabled = true
+        settings.userAgentString = NetworkTools.DESKTOP_USER_AGENT
+    }
+
+    override fun shouldInterceptRequest(requestUrlString: String) =
+        // Assets
+        requestUrlString.endsWith(".css")
+            || requestUrlString.endsWith(".ico")
+            || (requestUrlString.endsWith(".png") && !requestUrlString.contains("/image/api/"))
+            || requestUrlString.endsWith("/static/common/images/new/loading")
+
+            // Map tiles
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
+
+            // Tracking
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "/alog.min.js")
+            || requestUrlString.contains(@Suppress("SpellCheckingInspection") "map.baidu.com/newmap_test/static/common/images/transparent.gif")
+
+    @StringRes
+    override val permissionTitleResId = R.string.converter_baidu_map_permission_title
+
+    @StringRes
+    override val loadingIndicatorTitleResId = R.string.converter_baidu_map_loading_indicator_title
 }

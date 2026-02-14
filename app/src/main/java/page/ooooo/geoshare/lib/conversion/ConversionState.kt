@@ -430,7 +430,7 @@ data class GrantedParseWebPermission(
     val uri: Uri,
     val pointsFromUri: ImmutableList<Point>,
     val webUriString: String,
-    val timeout: Duration = 30.seconds,
+    val timeout: Duration = 60.seconds,
 ) : ConversionState.HasLoadingIndicator {
     private val currentUrlString = MutableStateFlow<String?>(null)
 

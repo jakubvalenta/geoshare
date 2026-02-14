@@ -1,25 +1,43 @@
 package page.ooooo.geoshare.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.BD09MCPoint
+import kotlin.time.Duration.Companion.minutes
 
 class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun test() = runTest(timeout = 2.minutes) {
+        assumeDomainResolvable("map.baidu.com")
+
         // Launch app and close intro
         launchApplication()
         closeIntro()
 
+        // Shared point
+        testUri(
+            BD09MCPoint(3619467.0, 13392279.0, 17.0, name = "地图上的点"),
+            "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392279,3619467,17z...
+            timeoutMs = NETWORK_TIMEOUT * 2,
+        )
+
+        // Shared place
+        testUri(
+            BD09MCPoint(3316047.58, 13502465.77, 19.0, name = "黄岩客运中心"),
+            "https://j.map.baidu.com/44/lth", // Resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58...
+            timeoutMs = NETWORK_TIMEOUT * 2,
+        )
+
         // Center
         testUri(
-            BD09MCPoint(3317203.0, 13520653.0, z = 13.0),
+            BD09MCPoint(3317203.0, 13520653.0, 13.0),
             "https://map.baidu.com/@13520653,3317203,13z",
         )
 
         // Place
         testUri(
-            BD09MCPoint(3315902.2199999997, 13502918.375, z = 16.0, name = "黄岩客运中心"),
+            BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心"),
             @Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl",
         )
 
