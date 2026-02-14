@@ -11,7 +11,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.GoogleMapsAppType
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.AppIcon
@@ -275,27 +276,29 @@ object GoogleMapsOutput : Output {
         ShareStreetViewAction,
     )
 
-    override fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = buildList {
-        apps.filter { it.packageName in PackageNames.GOOGLE_MAPS_LIKE && it.packageName != PackageNames.GMAPS_WV }
-            .forEach { app ->
+    override fun getAppActions(apps: List<App>): List<Pair<String, Action>> = buildList {
+        apps.forEach { app ->
+            (app.type as? GoogleMapsAppType)?.let {
                 add(app.packageName to ShareNavigateToWithAppAction(app.packageName))
                 add(app.packageName to ShareStreetViewWithAppAction(app.packageName))
             }
+        }
     }
 
     override fun getLastPointChipActions() = listOf(CopyLinkChipAction)
 
     override fun getRandomAction() = CopyLinkAction()
 
-    override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
+    override fun getAutomations(apps: List<App>): List<Automation> = buildList {
         add(CopyLinkAutomation)
         add(CopyNavigateToAutomation)
         add(CopyStreetViewAutomation)
-        apps.filter { it.packageName in PackageNames.GOOGLE_MAPS_LIKE && it.packageName != PackageNames.GMAPS_WV }
-            .forEach { app ->
+        apps.forEach { app ->
+            (app.type as? GoogleMapsAppType)?.let {
                 add(ShareNavigateToWithAppAutomation(app.packageName))
                 add(ShareStreetViewWithAppAutomation(app.packageName))
             }
+        }
     }
 
     override fun findAutomation(type: Automation.Type, packageName: String?): Automation? = when (type) {

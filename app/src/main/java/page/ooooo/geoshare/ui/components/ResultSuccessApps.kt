@@ -25,14 +25,19 @@ import androidx.window.core.layout.WindowSizeClass
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.AndroidTools.AppType
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.DefaultGeoUriAppType
+import page.ooooo.geoshare.lib.android.GMapsWVAppType
+import page.ooooo.geoshare.lib.android.GoogleMapsAppType
+import page.ooooo.geoshare.lib.android.MagicEarthAppType
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.outputs.*
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 private sealed interface GridItem {
-    data class App(val appDetails: AndroidTools.AppDetails, val actions: List<Action>) : GridItem
+    data class App(val appDetails: AppDetails, val actions: List<Action>) : GridItem
     class ShareButton : GridItem
     class Empty : GridItem
 }
@@ -44,10 +49,10 @@ private val dropdownButtonOffset = 20.dp
 @Composable
 fun ResultSuccessApps(
     onRun: (action: Action, i: Int?) -> Unit,
-    onQueryAppDetails: (packageManager: PackageManager, packageName: String) -> AndroidTools.AppDetails? = { packageManager, packageName ->
+    onQueryAppDetails: (packageManager: PackageManager, packageName: String) -> AppDetails? = { packageManager, packageName ->
         AndroidTools.queryAppDetails(packageManager, packageName)
     },
-    onQueryApps: (packageManager: PackageManager) -> List<AndroidTools.App> = { packageManager ->
+    onQueryApps: (packageManager: PackageManager) -> List<App> = { packageManager ->
         AndroidTools.queryApps(packageManager)
     },
 ) {
@@ -60,7 +65,7 @@ fun ResultSuccessApps(
         4
     }
     val apps = onQueryApps(context.packageManager)
-    val actionsByAppDetails: Map<AndroidTools.AppDetails, List<Action>> = allOutputs.getAppActions(apps)
+    val actionsByAppDetails: Map<AppDetails, List<Action>> = allOutputs.getAppActions(apps)
         .groupOrNull()
         .mapNotNull { (packageName, actions) ->
             onQueryAppDetails(context.packageManager, packageName)?.let { app -> app to actions }
@@ -103,7 +108,7 @@ fun ResultSuccessApps(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun RowScope.ResultSuccessApp(
-    appDetails: AndroidTools.AppDetails,
+    appDetails: AppDetails,
     actions: List<Action>,
     onRun: (action: Action, i: Int?) -> Unit,
 ) {
@@ -206,7 +211,7 @@ private fun DefaultPreview() {
                 ResultSuccessApps(
                     onRun = { _, _ -> },
                     onQueryAppDetails = { _, packageName ->
-                        AndroidTools.AppDetails(
+                        AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -215,15 +220,15 @@ private fun DefaultPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            "com.google.android.apps.maps",
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.generalmagic.magicearth",
-                            "com.here.appDetails.maps",
-                            "cz.seznam.mapy",
-                            "net.osmand.plus",
-                            "us.spotco.maps",
-                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
+                            App("app.comaps.fdroid", DefaultGeoUriAppType),
+                            App("app.organicmaps", DefaultGeoUriAppType),
+                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
+                            App("cz.seznam.mapy", DefaultGeoUriAppType),
+                            App("net.osmand.plus", DefaultGeoUriAppType),
+                            App("com.generalmagic.magicearth", MagicEarthAppType),
+                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
+                        )
                     },
                 )
             }
@@ -242,7 +247,7 @@ private fun DarkPreview() {
                 ResultSuccessApps(
                     onRun = { _, _ -> },
                     onQueryAppDetails = { _, packageName ->
-                        AndroidTools.AppDetails(
+                        AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -251,15 +256,15 @@ private fun DarkPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            "com.google.android.apps.maps",
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.generalmagic.magicearth",
-                            "com.here.appDetails.maps",
-                            "cz.seznam.mapy",
-                            "net.osmand.plus",
-                            "us.spotco.maps",
-                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
+                            App("app.comaps.fdroid", DefaultGeoUriAppType),
+                            App("app.organicmaps", DefaultGeoUriAppType),
+                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
+                            App("cz.seznam.mapy", DefaultGeoUriAppType),
+                            App("net.osmand.plus", DefaultGeoUriAppType),
+                            App("com.generalmagic.magicearth", MagicEarthAppType),
+                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
+                        )
                     },
                 )
             }
@@ -278,7 +283,7 @@ private fun OneAppPreview() {
                 ResultSuccessApps(
                     onRun = { _, _ -> },
                     onQueryAppDetails = { _, packageName ->
-                        AndroidTools.AppDetails(
+                        AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -287,15 +292,15 @@ private fun OneAppPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            "com.google.android.apps.maps",
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.generalmagic.magicearth",
-                            "com.here.appDetails.maps",
-                            "cz.seznam.mapy",
-                            "net.osmand.plus",
-                            "us.spotco.maps",
-                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
+                            App("app.comaps.fdroid", DefaultGeoUriAppType),
+                            App("app.organicmaps", DefaultGeoUriAppType),
+                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
+                            App("cz.seznam.mapy", DefaultGeoUriAppType),
+                            App("net.osmand.plus", DefaultGeoUriAppType),
+                            App("com.generalmagic.magicearth", MagicEarthAppType),
+                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
+                        )
                     },
                 )
             }
@@ -314,7 +319,7 @@ private fun DarkOneAppPreview() {
                 ResultSuccessApps(
                     onRun = { _, _ -> },
                     onQueryAppDetails = { _, packageName ->
-                        AndroidTools.AppDetails(
+                        AppDetails(
                             packageName,
                             "$packageName label",
                             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
@@ -323,15 +328,15 @@ private fun DarkOneAppPreview() {
                     onQueryApps = {
                         @Suppress("SpellCheckingInspection")
                         listOf(
-                            "com.google.android.apps.maps",
-                            "app.comaps.fdroid",
-                            "app.organicmaps",
-                            "com.generalmagic.magicearth",
-                            "com.here.appDetails.maps",
-                            "cz.seznam.mapy",
-                            "net.osmand.plus",
-                            "us.spotco.maps",
-                        ).map { AndroidTools.App(it, AppType.GEO_URI) }
+                            App("app.comaps.fdroid", DefaultGeoUriAppType),
+                            App("app.organicmaps", DefaultGeoUriAppType),
+                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
+                            App("cz.seznam.mapy", DefaultGeoUriAppType),
+                            App("net.osmand.plus", DefaultGeoUriAppType),
+                            App("com.generalmagic.magicearth", MagicEarthAppType),
+                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
+                        )
                     },
                 )
             }

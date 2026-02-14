@@ -2,7 +2,6 @@ package page.ooooo.geoshare
 
 import android.os.Build
 import android.view.accessibility.AccessibilityNodeInfo
-import androidx.test.uiautomator.ElementNotFoundException
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
@@ -23,7 +22,8 @@ import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DEL
 import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
 import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.GoogleMapsAppType
+import page.ooooo.geoshare.lib.android.GpxRouteAppType
 import page.ooooo.geoshare.lib.outputs.allOutputs
 import page.ooooo.geoshare.lib.outputs.getText
 import page.ooooo.geoshare.lib.point.Point
@@ -63,10 +63,10 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun launchApplication() = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi.
-        device.executeShellCommand("monkey -p ${PackageNames.GEO_SHARE_DEBUG} 1")
+        device.executeShellCommand("monkey -p ${BuildConfig.APPLICATION_ID} 1")
 
         // Wait for the app to appear
-        waitForAppToBeVisible(PackageNames.GEO_SHARE_DEBUG)
+        waitForAppToBeVisible(BuildConfig.APPLICATION_ID)
     }
 
     protected fun closeApplication() = uiAutomator {
@@ -161,7 +161,7 @@ abstract class BaseActivityBehaviorTest {
         )
     }
 
-    protected suspend fun assumeDomainResolvable(domain: String) {
+    protected suspend fun assumeDomainResolvable(@Suppress("SameParameterValue") domain: String) {
         assumeTrue(
             "This test only works when DNS resolves the domain $domain",
             withContext(Dispatchers.IO) {
@@ -248,17 +248,17 @@ abstract class BaseActivityBehaviorTest {
 
     protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for Google Maps
-        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
+        onElement(20_000L) { packageName == GoogleMapsAppType.PACKAGE_NAME }
 
         // If there is a Google Maps sign in screen, skip it
         onElementOrNull(3_000L) {
-            packageName == PackageNames.GOOGLE_MAPS && @Suppress("SpellCheckingInspection") when (textAsString()) {
+            packageName == GoogleMapsAppType.PACKAGE_NAME && @Suppress("SpellCheckingInspection") when (textAsString()) {
                 "Make it your map", "Profitez d'une carte personnalisée" -> true
                 else -> false
             }
         }?.also {
             onElement {
-                packageName == PackageNames.GOOGLE_MAPS && when (textAsString()?.lowercase()) {
+                packageName == GoogleMapsAppType.PACKAGE_NAME && when (textAsString()?.lowercase()) {
                     "skip", "ignorer" -> true
                     else -> false
                 }
@@ -266,12 +266,12 @@ abstract class BaseActivityBehaviorTest {
         }
 
         // Verify Google Maps content
-        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+        onElement(20_000L) { packageName == GoogleMapsAppType.PACKAGE_NAME && this.block() }
     }
 
     protected fun waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
         // Wait for TomTom
-        onElement(30_000L) { packageName == PackageNames.TOMTOM }
+        onElement(30_000L) { packageName == GpxRouteAppType.TOMTOM_PACKAGE_NAME }
 
         // If there is location permission, grant it
         grantLocationPermissionIfNecessary()
@@ -285,13 +285,13 @@ abstract class BaseActivityBehaviorTest {
         }?.click()
 
         // Verify TomTom content
-        onElement { packageName == PackageNames.TOMTOM && this.block() }
+        onElement { packageName == GpxRouteAppType.TOMTOM_PACKAGE_NAME && this.block() }
     }
 
     protected fun shareUri(unsafeUriString: String) = uiAutomator {
         // Use shell command instead of startActivity() to support Xiaomi
         device.executeShellCommand(
-            @Suppress("SpellCheckingInspection") "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${PackageNames.GEO_SHARE_DEBUG}/page.ooooo.geoshare.ConversionActivity ${PackageNames.GEO_SHARE_DEBUG}"
+            @Suppress("SpellCheckingInspection") "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.ConversionActivity ${BuildConfig.APPLICATION_ID}"
         )
     }
 

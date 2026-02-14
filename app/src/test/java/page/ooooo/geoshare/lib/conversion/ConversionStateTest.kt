@@ -36,7 +36,7 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.GoogleMapsAppType
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingProduct
@@ -2605,7 +2605,7 @@ class ConversionStateTest {
     fun conversionSucceeded_userPreferenceAutomationIsOpenApp_returnsActionWaiting() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val delay = 2.seconds
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(
@@ -2851,7 +2851,7 @@ class ConversionStateTest {
     fun actionRan_automationIsOpenAppAndSuccessIsTrue_returnsActionSucceeded() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionRan(inputUriString, points, action, true)
         assertEquals(
             ActionSucceeded(inputUriString, points, action),
@@ -2863,7 +2863,7 @@ class ConversionStateTest {
     fun actionRan_automationIsOpenAppAndSuccessIsFalse_returnsActionFailed() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionRan(inputUriString, points, action, false)
         assertEquals(
             ActionFailed(inputUriString, points, action),
@@ -2923,7 +2923,7 @@ class ConversionStateTest {
     fun actionSucceeded_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionSucceeded(inputUriString, points, action)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -2938,7 +2938,7 @@ class ConversionStateTest {
     fun actionSucceeded_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionSucceeded(inputUriString, points, action)
         var res: State? = null
         val job = launch {
@@ -2961,7 +2961,7 @@ class ConversionStateTest {
     fun actionFailed_executionIsNotCancelled_waitsAndReturnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionFailed(inputUriString, points, action)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -2976,7 +2976,7 @@ class ConversionStateTest {
     fun actionFailed_executionIsCancelled_returnsActionFinished() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionFailed(inputUriString, points, action)
         var res: State? = null
         val job = launch {
@@ -2999,7 +2999,7 @@ class ConversionStateTest {
     fun actionFinished_returnsNull() = runTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
-        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS)
+        val action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType)
         val state = ActionFinished(inputUriString, points, action)
         assertNull(state.transition())
     }

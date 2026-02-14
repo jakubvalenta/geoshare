@@ -16,18 +16,20 @@ import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.DefaultGeoUriAppType
+import page.ooooo.geoshare.lib.android.GeoUriAppType
+import page.ooooo.geoshare.lib.android.geoUriAppTypes
+import page.ooooo.geoshare.lib.android.getByPackageName
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.AppIcon
 
 object GeoUriOutput : Output {
-    private val NAME_DISABLED_PACKAGE_NAME_PATTERN = Regex("""de\.schildbach\.oeffi""")
-    private val ZOOM_DISABLED_PACKAGE_NAME_PATTERN = Regex("""com\.garmin\..+""")
 
     open class CopyGeoUriAction : CopyAction() {
         override fun getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote): String =
-            formatUriString(points, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
+            formatUriString(points, i, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -41,7 +43,7 @@ object GeoUriOutput : Output {
 
     open class ShareGeoUriAction : OpenChooserAction() {
         override fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
-            formatUriString(points, i, nameDisabled = false, zoomDisabled = false, uriQuote = uriQuote)
+            formatUriString(points, i, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -53,16 +55,11 @@ object GeoUriOutput : Output {
         }
     }
 
-    open class ShareGeoUriWithAppAction(override val packageName: String) : OpenAppAction(packageName) {
+    open class ShareGeoUriWithAppAction(override val packageName: String, open val appType: GeoUriAppType) :
+        OpenAppAction(packageName) {
+
         override fun getUriString(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote) =
-            formatUriString(
-                points,
-                i,
-                nameDisabled = NAME_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
-                zoomDisabled = ZOOM_DISABLED_PACKAGE_NAME_PATTERN.matches(packageName),
-                useGCJ02 = packageName in PackageNames.GCJ02,
-                uriQuote = uriQuote,
-            )
+            formatUriString(points, i, appType, uriQuote = uriQuote)
 
         @Composable
         override fun Label() {
@@ -106,8 +103,8 @@ object GeoUriOutput : Output {
             pluralStringResource(R.plurals.conversion_automation_share_waiting, counterSec, counterSec)
     }
 
-    data class ShareGeoUriWithAppAutomation(override val packageName: String) :
-        ShareGeoUriWithAppAction(packageName),
+    data class ShareGeoUriWithAppAutomation(override val packageName: String, override val appType: GeoUriAppType) :
+        ShareGeoUriWithAppAction(packageName, appType),
         Action.HasSuccessMessage,
         Action.HasErrorMessage,
         BasicAutomation,
@@ -162,9 +159,12 @@ object GeoUriOutput : Output {
         ShareGeoUriAction(),
     )
 
-    override fun getAppActions(apps: List<AndroidTools.App>) =
-        apps.filter { it.type == AndroidTools.AppType.GEO_URI }
-            .map { it.packageName to ShareGeoUriWithAppAction(it.packageName) }
+    override fun getAppActions(apps: List<App>) =
+        apps.mapNotNull { app ->
+            (app.type as? GeoUriAppType)?.let { appType ->
+                app.packageName to ShareGeoUriWithAppAction(app.packageName, appType)
+            }
+        }
 
     override fun getLastPointChipActions() = listOf(CopyGeoUriAction())
 
@@ -172,66 +172,75 @@ object GeoUriOutput : Output {
 
     override fun getRandomAction() = CopyGeoUriAction()
 
-    override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
+    override fun getAutomations(apps: List<App>): List<Automation> = buildList {
         add(CopyGeoUriAutomation)
         add(ShareGeoUriAutomation)
-        apps.filter { it.type == AndroidTools.AppType.GEO_URI }
-            .forEach { add(ShareGeoUriWithAppAutomation(it.packageName)) }
+        apps.forEach { app ->
+            (app.type as? GeoUriAppType)?.let { appType ->
+                add(ShareGeoUriWithAppAutomation(app.packageName, appType))
+            }
+        }
     }
 
     override fun findAutomation(type: Automation.Type, packageName: String?): Automation? = when (type) {
-        Automation.Type.COPY_GEO_URI -> CopyGeoUriAutomation
-        Automation.Type.SHARE -> ShareGeoUriAutomation
-        Automation.Type.OPEN_APP if packageName != null -> ShareGeoUriWithAppAutomation(packageName)
+        Automation.Type.COPY_GEO_URI ->
+            CopyGeoUriAutomation
+
+        Automation.Type.SHARE ->
+            ShareGeoUriAutomation
+
+        Automation.Type.OPEN_APP if packageName != null ->
+            ShareGeoUriWithAppAutomation(packageName, geoUriAppTypes.getByPackageName(packageName))
+
         else -> null
     }
 
     fun formatUriString(
         points: ImmutableList<Point>,
         i: Int?,
-        nameDisabled: Boolean,
-        zoomDisabled: Boolean,
-        useGCJ02: Boolean = false,
+        appType: GeoUriAppType = DefaultGeoUriAppType,
         uriQuote: UriQuote = DefaultUriQuote(),
-    ) = points.getOrNull(i)?.run {
-        if (useGCJ02) {
-            toGCJ02()
-        } else {
-            toWGS84()
-        }
-    }?.run {
-        // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
-        buildString {
-            append("geo:")
-            append(
-                Uri.formatPath(
-                    latStr?.let { latStr ->
-                        lonStr?.let { lonStr ->
-                            "$latStr,$lonStr"
-                        }
-                    } ?: "0,0",
-                    uriQuote = uriQuote,
-                )
-            )
-            buildMap {
-                // It's important that the z parameter comes before q, because some map apps require the name (which is
-                // part of the q parameter) to be at the very end of the URI.
-                zStr?.takeUnless { zoomDisabled }?.let { zStr ->
-                    set("z", zStr)
-                }
-                latStr?.let { latStr ->
-                    lonStr?.let { lonStr ->
-                        name?.takeUnless { nameDisabled }?.let { name ->
-                            set("q", "$latStr,$lonStr(${name})")
-                        } ?: set("q", "$latStr,$lonStr")
-                    }
-                } ?: name?.let { name ->
-                    set("q", name)
-                }
+    ) =
+        points.getOrNull(i)?.run {
+            when (appType.srs) {
+                GeoUriAppType.Srs.GCJ02 -> toGCJ02()
+                GeoUriAppType.Srs.WGS84 -> toWGS84()
             }
-                .takeIf { it.isNotEmpty() }
-                ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
-                ?.let { append("?$it") }
-        }
-    } ?: "geo:0,0"
+        }?.run {
+            // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
+            buildString {
+                append("geo:")
+                append(
+                    Uri.formatPath(
+                        latStr?.let { latStr ->
+                            lonStr?.let { lonStr ->
+                                "$latStr,$lonStr"
+                            }
+                        } ?: "0,0",
+                        uriQuote = uriQuote,
+                    )
+                )
+                buildMap {
+                    // It's important that the z parameter comes before q, because some map apps require the name (which is
+                    // part of the q parameter) to be at the very end of the URI.
+                    zStr
+                        ?.takeIf { appType.params.zoomSupported && (appType.params.zoomAndQSupported || name == null) }
+                        ?.let { zStr ->
+                            set("z", zStr)
+                        }
+                    latStr?.takeIf { appType.params.pinSupported }?.let { latStr ->
+                        lonStr?.let { lonStr ->
+                            name?.takeIf { appType.params.nameSupported }?.let { name ->
+                                set("q", "$latStr,$lonStr(${name})")
+                            } ?: set("q", "$latStr,$lonStr")
+                        }
+                    } ?: name?.let { name ->
+                        set("q", name)
+                    }
+                }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
+                    ?.let { append("?$it") }
+            }
+        } ?: "geo:0,0"
 }

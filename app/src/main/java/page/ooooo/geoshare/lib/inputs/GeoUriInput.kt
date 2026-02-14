@@ -26,12 +26,7 @@ object GeoUriInput : Input {
             InputDocumentationItem.Text(3) {
                 stringResource(
                     R.string.example,
-                    GeoUriOutput.formatUriString(
-                        persistentListOf(Point.example),
-                        null,
-                        nameDisabled = false,
-                        zoomDisabled = false,
-                    ),
+                    GeoUriOutput.formatUriString(persistentListOf(Point.example), null),
                 )
             },
         ),

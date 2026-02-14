@@ -44,7 +44,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 private fun PaneScaffoldDirective.copy(
     maxHorizontalPartitions: Int = this.maxHorizontalPartitions,
     horizontalPartitionSpacerSize: Dp = this.horizontalPartitionSpacerSize,
-    maxVerticalPartitions: Int = this.maxVerticalPartitions,
+    @Suppress("SameParameterValue") maxVerticalPartitions: Int = this.maxVerticalPartitions,
     verticalPartitionSpacerSize: Dp = this.verticalPartitionSpacerSize,
     defaultPanePreferredWidth: Dp = this.defaultPanePreferredWidth,
     excludedBounds: List<Rect> = this.excludedBounds,
