@@ -6,19 +6,5 @@
         </item>
     </style>
 
-    <!--
-    This theme is a combination of android:Theme.Material.Light.NoActionBar and
-    android:Theme.Translucent.NoTitleBar, because for some reason
-    android:Theme.Translucent.NoTitleBar shows status and navigation bars with
-    black background.
-    -->
-    <style name="TranslucentTheme" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowAnimationStyle">@null</item>
-    </style>
-
-    <style name="MainTheme" parent="BaseMainTheme"/>
+    <style name="MainTheme" parent="BaseMainTheme" />
 </resources>

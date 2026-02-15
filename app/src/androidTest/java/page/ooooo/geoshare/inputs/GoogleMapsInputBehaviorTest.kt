@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
@@ -9,29 +10,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
-        // Launch app and close intro
-        launchApplication()
-        closeIntro()
-
-        // Search
-        testUri(
-            WGS84Point(name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden"),
-            "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
-        )
-
-        // Short URI in Japan
-        testUri(
-            WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
-            "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
-        )
-
-        // Short URI in China
-        testUri(
-            GCJ02Point(39.920439, 116.331538),
-            "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
-        )
-
+    fun googleMaps() {
         // Coordinates in data
         testUri(
             WGS84Point(52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
@@ -42,29 +21,6 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         testUri(
             WGS84Point(40.785091, -73.968285, z = 15.0, name = "Central Park"),
             "https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2",
-        )
-
-        // Coordinates and query (business)
-        testUri(
-            WGS84Point(
-                50.4484901,
-                8.0469828,
-                name = @Suppress("SpellCheckingInspection") "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar"
-            ),
-            @Suppress("SpellCheckingInspection")
-            "https://www.google.com/maps/place/%C3%84nderungsschneiderei+Hadamar,+Schulstra%C3%9Fe+3,+65589+Hadamar/@50.4484901,8.0469828,3a,54.9y,5.97h,62.4t/data=!3m5!1e1!3m3!1szFIo-lmR3NWYzi_eWhPHFQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DzFIo-lmR3NWYzi_eWhPHFQ%26w%3D900%26h%3D600%26ll%3D0.0,0.0%26yaw%3D5.0%26pitch%3D28.0%26cb_client%3Dgmm.iv.android!4m2!3m1!1s0x47bc3266a8f3bb4b:0x96d1177f5ecfc466?utm_source=mstt_0&g_ep=CAESBzI1LjM3LjAYACCBgQEqogEsOTQyNjc3MjcsOTQyNzU0MDcsOTQyODQ0NzgsOTQyMjMyOTksOTQyMTY0MTMsOTQyODA1NzYsOTQyMTI0OTYsOTQyMDczOTQsOTQyMDc1MDYsOTQyMDg1MDYsOTQyMTc1MjMsOTQyMTg2NTMsOTQyMjk4MzksOTQyNzUxNjgsOTQyNjI3MzMsNDcwODQzOTMsOTQyMTMyMDAsOTQyNTgzMjVCAkRF&skid=368dc137-203a-4698-9ed3-b974e7bee770&g_st=aw",
-        )
-
-        // Place
-        testUri(
-            WGS84Point(52.5200066, 13.404954, name = "Berlin"),
-            "https://www.google.com/maps/place/Berlin,+Germany/",
-        )
-
-        // Map view
-        testUri(
-            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
-            "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
 
         // Directions
@@ -91,17 +47,67 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
+    fun googleMapsHtml() = runBlocking {
+        assumeDomainResolvable("maps.google.com")
+
+        // Launch app and close intro
+        launchApplication()
+        closeIntro()
+        setUserPreferenceConnectionPermissionToAlways()
+
+        // Search
+        testUri(
+            WGS84Point(
+                51.0657922,
+                13.7555827,
+                name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
+            ),
+            "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
+        )
+
+        // Short URI in Japan
+        testUri(
+            WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
+            "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
+        )
+
+        // Short URI in China
+        testUri(
+            GCJ02Point(39.920439, 116.331538),
+            "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
+        )
+
+        // Coordinates and query (business)
+        testUri(
+            WGS84Point(
+                50.4484901,
+                8.0469828,
+                name = @Suppress("SpellCheckingInspection") "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar"
+            ),
+            @Suppress("SpellCheckingInspection")
+            "https://www.google.com/maps/place/%C3%84nderungsschneiderei+Hadamar,+Schulstra%C3%9Fe+3,+65589+Hadamar/@50.4484901,8.0469828,3a,54.9y,5.97h,62.4t/data=!3m5!1e1!3m3!1szFIo-lmR3NWYzi_eWhPHFQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DzFIo-lmR3NWYzi_eWhPHFQ%26w%3D900%26h%3D600%26ll%3D0.0,0.0%26yaw%3D5.0%26pitch%3D28.0%26cb_client%3Dgmm.iv.android!4m2!3m1!1s0x47bc3266a8f3bb4b:0x96d1177f5ecfc466?utm_source=mstt_0&g_ep=CAESBzI1LjM3LjAYACCBgQEqogEsOTQyNjc3MjcsOTQyNzU0MDcsOTQyODQ0NzgsOTQyMjMyOTksOTQyMTY0MTMsOTQyODA1NzYsOTQyMTI0OTYsOTQyMDczOTQsOTQyMDc1MDYsOTQyMDg1MDYsOTQyMTc1MjMsOTQyMTg2NTMsOTQyMjk4MzksOTQyNzUxNjgsOTQyNjI3MzMsNDcwODQzOTMsOTQyMTMyMDAsOTQyNTgzMjVCAkRF&skid=368dc137-203a-4698-9ed3-b974e7bee770&g_st=aw",
+        )
+
+        // Place
+        testUri(
+            WGS84Point(52.5200066, 13.404954, name = "Berlin"),
+            "https://www.google.com/maps/place/Berlin,+Germany/",
+        )
+
+        // Map view
+        testUri(
+            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
+            "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
+        )
+    }
+
+    @Test
     @NotEmulator
-    fun testSearch() {
+    fun googleSearch() {
         assumeTrue(
             "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
             false,
         )
-
-        // Launch app and set connection permission to Always
-        launchApplication()
-        closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
 
         // Google Search
         testUri(
@@ -111,13 +117,8 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun testPlaceList() {
+    fun googleMapsPlaceList() {
         assumeTrue("This test currently fails, because Google changed their HTML", false)
-
-        // Launch app and set connection permission to Always
-        launchApplication()
-        closeIntro()
-        setUserPreferenceConnectionPermissionToAlways()
 
         // Place list
         testUri(

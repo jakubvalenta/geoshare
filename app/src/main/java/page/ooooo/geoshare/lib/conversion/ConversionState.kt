@@ -1,9 +1,11 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
-import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -12,50 +14,66 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.timeout
+import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.inputs.HtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
+import page.ooooo.geoshare.lib.inputs.ShortUriInput
+import page.ooooo.geoshare.lib.inputs.WebInput
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.BasicAction
-import page.ooooo.geoshare.lib.outputs.BasicAutomation
+import page.ooooo.geoshare.lib.outputs.FileAction
 import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.outputs.LocationAutomation
-import page.ooooo.geoshare.lib.outputs.NoopAutomation
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.point.Point
 import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-private const val TAG = "ConversionState"
-
 interface ConversionState : State {
     override suspend fun transition(): State? = null
 
-    interface HasPermission : ConversionState, State.PermissionState
-
-    interface HasLoadingIndicator : ConversionState {
-        val loadingIndicator: LoadingIndicator
+    interface HasError {
+        val errorMessageResId: Int
+        val inputUriString: String
     }
 
-    interface HasResult : ConversionState {
+    interface HasSmallLoadingIndicator {
+        fun getSmallLoadingIndicator(resources: Resources): LoadingIndicator.Small
+    }
+
+    interface HasLargeLoadingIndicator {
+        fun getLargeLoadingIndicator(resources: Resources): LoadingIndicator.Large
+    }
+
+    interface HasPermission {
+        val permissionTitleResId: Int
+
+        suspend fun grant(doNotAsk: Boolean): State
+        suspend fun deny(doNotAsk: Boolean): State
+    }
+
+    interface HasResult {
         val inputUriString: String
         val points: ImmutableList<Point>
     }
 
-    interface HasError : ConversionState {
-        val errorMessageResId: Int
-        val inputUriString: String
+    companion object {
+        const val TAG = "ConversionState"
     }
 }
 
@@ -70,7 +88,8 @@ data class ReceivedUriString(
             return ConversionFailed(R.string.conversion_failed_missing_url, "")
         }
         for (input in stateContext.inputs) {
-            input.uriPattern.find(inputUriString)?.value?.let { uriString ->
+            val uriString = input.uriPattern.find(inputUriString)?.value
+            if (uriString != null) {
                 val uri = Uri.parse(uriString, stateContext.uriQuote)
                 return ReceivedUri(stateContext, inputUriString, input, uri, null)
             }
@@ -87,9 +106,10 @@ data class ReceivedUri(
     val permission: Permission?,
 ) : ConversionState {
     override suspend fun transition(): State {
-        if (input is Input.HasShortUri) {
-            input.shortUriPattern.find(uri.toString())?.value?.let { uriString ->
-                val uri = Uri.parse(uriString, stateContext.uriQuote)
+        if (input is ShortUriInput) {
+            val shortUriString = input.shortUriPattern.find(uri.toString())?.value
+            if (shortUriString != null) {
+                val uri = Uri.parse(shortUriString, stateContext.uriQuote)
                 return when (permission ?: stateContext.userPreferencesRepository.getValue(
                     ConnectionPermissionPreference
                 )) {
@@ -114,9 +134,9 @@ data class ReceivedUri(
 data class RequestedUnshortenPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val input: Input.HasShortUri,
+    val input: ShortUriInput,
     val uri: Uri,
-) : ConversionState.HasPermission {
+) : ConversionState, ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
 
     override suspend fun grant(doNotAsk: Boolean): State {
@@ -137,10 +157,10 @@ data class RequestedUnshortenPermission(
 data class GrantedUnshortenPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val input: Input.HasShortUri,
+    val input: ShortUriInput,
     val uri: Uri,
     val retry: NetworkTools.Retry? = null,
-) : ConversionState.HasLoadingIndicator {
+) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     override suspend fun transition(): State {
         val url = uri.toUrl()
         if (url == null) {
@@ -149,8 +169,8 @@ data class GrantedUnshortenPermission(
         }
         return try {
             val locationHeader = when (input.shortUriMethod) {
-                Input.ShortUriMethod.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
-                Input.ShortUriMethod.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
+                ShortUriInput.Method.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
+                ShortUriInput.Method.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
             }
             if (locationHeader != null) {
                 val unshortenedUri = Uri.parse(locationHeader, stateContext.uriQuote).toAbsoluteUri(uri)
@@ -179,17 +199,15 @@ data class GrantedUnshortenPermission(
         }
     }
 
-    override val loadingIndicator = LoadingIndicator.Large(
-        titleResId = input.loadingIndicatorTitleResId,
-        description = {
-            retry?.let { retry ->
-                stringResource(
-                    R.string.conversion_loading_indicator_description,
-                    retry.count + 1,
-                    NetworkTools.MAX_RETRIES + 1,
-                    stringResource(retry.tr.messageResId),
-                )
-            }
+    override fun getLargeLoadingIndicator(resources: Resources) = LoadingIndicator.Large(
+        title = resources.getString(input.loadingIndicatorTitleResId),
+        description = retry?.let { retry ->
+            resources.getString(
+                R.string.conversion_loading_indicator_description,
+                retry.count + 1,
+                NetworkTools.MAX_RETRIES + 1,
+                resources.getString(retry.tr.messageResId),
+            )
         },
     )
 }
@@ -209,16 +227,17 @@ data class UnshortenedUrl(
     val input: Input,
     val uri: Uri,
     val permission: Permission?,
+    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState {
     override suspend fun transition(): State =
-        when (val res = input.parseUri(uri)) {
+        when (val res = withContext(dispatcher) { input.parseUri(uri) }) {
             is ParseUriResult.Succeeded -> {
                 stateContext.log.i(null, "URI Pattern: Converted $uri to ${res.points}")
                 ConversionSucceeded(stateContext, inputUriString, res.points)
             }
 
             is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
-                if (input is Input.HasHtml) {
+                if (input is HtmlInput) {
                     when (permission
                         ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseHtmlPermission(
@@ -238,7 +257,7 @@ data class UnshortenedUrl(
             }
 
             is ParseUriResult.SucceededAndSupportsWebParsing -> {
-                if (input is Input.HasWeb) {
+                if (input is WebInput) {
                     when (permission
                         ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseWebPermission(
@@ -267,11 +286,11 @@ data class UnshortenedUrl(
 data class RequestedParseHtmlPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val input: Input.HasHtml,
+    val input: HtmlInput,
     val uri: Uri,
     val pointsFromUri: ImmutableList<Point>,
     val htmlUriString: String,
-) : ConversionState.HasPermission {
+) : ConversionState, ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
 
     override suspend fun grant(doNotAsk: Boolean): State {
@@ -292,12 +311,13 @@ data class RequestedParseHtmlPermission(
 data class GrantedParseHtmlPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val input: Input.HasHtml,
+    val input: HtmlInput,
     val uri: Uri,
     val pointsFromUri: ImmutableList<Point>,
     val htmlUriString: String,
     val retry: NetworkTools.Retry? = null,
-) : ConversionState.HasLoadingIndicator {
+    val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     override suspend fun transition(): State {
         val htmlUrl = Uri.parse(htmlUriString, stateContext.uriQuote).toUrl()
         if (htmlUrl == null) {
@@ -306,7 +326,7 @@ data class GrantedParseHtmlPermission(
         }
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
-            val res = stateContext.networkTools.getSource(htmlUrl, retry) { channel ->
+            val res = stateContext.networkTools.getSource(htmlUrl, retry, dispatcher = Dispatchers.Default) { channel ->
                 input.parseHtml(htmlUrl.toString(), channel, pointsFromUri, stateContext.log)
             }
             when (res) {
@@ -324,7 +344,7 @@ data class GrantedParseHtmlPermission(
                 }
 
                 is ParseHtmlResult.RequiresWebParsing -> {
-                    if (input is Input.HasWeb) {
+                    if (input is WebInput) {
                         stateContext.log.i(null, "HTML Pattern: URI $htmlUrl requires web parsing")
                         GrantedParseWebPermission(
                             stateContext, inputUriString, input, uri, pointsFromUri, res.webUriString
@@ -361,17 +381,15 @@ data class GrantedParseHtmlPermission(
         }
     }
 
-    override val loadingIndicator = LoadingIndicator.Large(
-        titleResId = input.loadingIndicatorTitleResId,
-        description = {
-            retry?.let { retry ->
-                stringResource(
-                    R.string.conversion_loading_indicator_description,
-                    retry.count + 1,
-                    NetworkTools.MAX_RETRIES + 1,
-                    stringResource(retry.tr.messageResId),
-                )
-            }
+    override fun getLargeLoadingIndicator(resources: Resources) = LoadingIndicator.Large(
+        title = resources.getString(input.loadingIndicatorTitleResId),
+        description = retry?.let { retry ->
+            resources.getString(
+                R.string.conversion_loading_indicator_description,
+                retry.count + 1,
+                NetworkTools.MAX_RETRIES + 1,
+                resources.getString(retry.tr.messageResId),
+            )
         },
     )
 }
@@ -391,11 +409,11 @@ data class DeniedParseHtmlPermission(
 data class RequestedParseWebPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val input: Input.HasWeb,
+    val input: WebInput,
     val uri: Uri,
     val pointsFromUri: ImmutableList<Point>,
     val webUriString: String,
-) : ConversionState.HasPermission {
+) : ConversionState, ConversionState.HasPermission {
     override val permissionTitleResId: Int = input.permissionTitleResId
 
     override suspend fun grant(doNotAsk: Boolean): State {
@@ -426,12 +444,12 @@ data class RequestedParseWebPermission(
 data class GrantedParseWebPermission(
     val stateContext: ConversionStateContext,
     val inputUriString: String,
-    val input: Input.HasWeb,
+    val input: WebInput,
     val uri: Uri,
     val pointsFromUri: ImmutableList<Point>,
     val webUriString: String,
     val timeout: Duration = 60.seconds,
-) : ConversionState.HasLoadingIndicator {
+) : ConversionState, ConversionState.HasLargeLoadingIndicator {
     private val currentUrlString = MutableStateFlow<String?>(null)
 
     @OptIn(FlowPreview::class)
@@ -448,28 +466,28 @@ data class GrantedParseWebPermission(
                 }
             ) {
                 is ParseUriResult.Succeeded -> {
-                    stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to ${res.points}")
                     ConversionSucceeded(stateContext, inputUriString, res.points)
                 }
 
                 is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
-                    stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to ${res.points}")
                     ConversionSucceeded(stateContext, inputUriString, res.points)
                 }
 
                 is ParseUriResult.SucceededAndSupportsWebParsing,
                     -> {
-                    stateContext.log.i(TAG, "Parsed web URL $matchingUriString to ${res.points}")
+                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to ${res.points}")
                     ConversionSucceeded(stateContext, inputUriString, res.points)
                 }
 
                 is ParseUriResult.Failed, null -> {
-                    stateContext.log.w(TAG, "Failed to parse web URL $webUriString")
+                    stateContext.log.w(ConversionState.TAG, "Failed to parse web URL $webUriString")
                     ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
                 }
             }
         } catch (_: TimeoutCancellationException) {
-            stateContext.log.e(TAG, "Parse web: Timed out")
+            stateContext.log.e(ConversionState.TAG, "Parse web: Timed out")
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
         } catch (_: CancellationException) {
             ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
@@ -479,9 +497,8 @@ data class GrantedParseWebPermission(
         currentUrlString.value = urlString
     }
 
-    override val loadingIndicator = LoadingIndicator.Large(
-        titleResId = input.loadingIndicatorTitleResId,
-        description = { null },
+    override fun getLargeLoadingIndicator(resources: Resources) = LoadingIndicator.Large(
+        title = resources.getString(input.loadingIndicatorTitleResId),
     )
 }
 
@@ -490,9 +507,10 @@ data class ConversionSucceeded(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
     val billingStatusTimeout: Duration = 3.seconds,
-) : ConversionState.HasResult {
+) : ConversionState, ConversionState.HasResult {
     @OptIn(FlowPreview::class)
     override suspend fun transition(): State? {
+        val lastPoint = points.lastOrNull() ?: return null
         val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null
@@ -536,11 +554,16 @@ data class ConversionSucceeded(
         }
 
         if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
-            if (automation is Automation.HasDelay) {
-                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
-                return ActionWaiting(stateContext, inputUriString, points, null, automation, delay)
+            val output = automation.toOutput { stateContext.linkRepository.getByUUID(it) } ?: return null
+            val action = when (output) {
+                is PointOutput -> output.toAction(lastPoint)
+                is PointsOutput -> output.toAction(points)
             }
-            return ActionReady(inputUriString, points, null, automation)
+            if (output is Output.HasAutomationDelay) {
+                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
+                return ActionWaiting(stateContext, inputUriString, points, action, isAutomation = true, delay = delay)
+            }
+            return ActionReady(inputUriString, points, action, isAutomation = true)
         }
         return null
     }
@@ -549,169 +572,189 @@ data class ConversionSucceeded(
 data class ConversionFailed(
     @param:StringRes override val errorMessageResId: Int,
     override val inputUriString: String,
-) : ConversionState.HasError
+) : ConversionState, ConversionState.HasError
 
 data class ActionWaiting(
     val stateContext: ConversionStateContext,
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: Action,
+    val action: Action<*>,
+    @Suppress("SameParameterValue") val isAutomation: Boolean,
     val delay: Duration,
-) : ConversionState.HasResult {
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = try {
         if (delay.isPositive()) {
             delay(delay)
         }
-        ActionReady(inputUriString, points, i, action)
+        ActionReady(inputUriString, points, action, isAutomation)
     } catch (_: CancellationException) {
-        ActionFinished(inputUriString, points, action)
+        ActionFinished(inputUriString, points, action, isAutomation)
     }
 }
 
 data class ActionReady(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: Action,
-) : ConversionState.HasResult {
+    val action: Action<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = when (action) {
-        is BasicAutomation -> BasicActionReady(inputUriString, points, i, action)
-        is BasicAction -> BasicActionReady(inputUriString, points, i, action)
-        is LocationAutomation -> LocationRationaleRequested(inputUriString, points, i, action)
-        is LocationAction -> LocationRationaleRequested(inputUriString, points, i, action)
+        is BasicAction -> BasicActionReady(inputUriString, points, action, isAutomation)
+        is FileAction -> FileUriRequested(inputUriString, points, action, isAutomation)
+        is LocationAction -> LocationRationaleRequested(inputUriString, points, action, isAutomation)
     }
 }
 
 data class BasicActionReady(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: BasicAction,
-) : ConversionState.HasResult
+    val action: BasicAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
+
+data class FileActionReady(
+    override val inputUriString: String,
+    override val points: ImmutableList<Point>,
+    val action: FileAction<*>,
+    val isAutomation: Boolean,
+    val uri: android.net.Uri,
+) : ConversionState, ConversionState.HasResult
 
 data class LocationActionReady(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: LocationAction,
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
     val location: Point,
-) : ConversionState.HasResult
+) : ConversionState, ConversionState.HasResult
 
 data class ActionRan(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val action: Action,
+    val action: Action<*>,
+    val isAutomation: Boolean,
     val success: Boolean?,
-) : ConversionState.HasResult {
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = when (success) {
-        true -> ActionSucceeded(inputUriString, points, action)
-        false -> ActionFailed(inputUriString, points, action)
-        else -> ActionFinished(inputUriString, points, action)
+        true -> ActionSucceeded(inputUriString, points, action, isAutomation)
+        false -> ActionFailed(inputUriString, points, action, isAutomation)
+        else -> ActionFinished(inputUriString, points, action, isAutomation)
     }
 }
 
 data class ActionSucceeded(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val action: Action,
-) : ConversionState.HasResult {
+    val action: Action<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, points, action)
+        return ActionFinished(inputUriString, points, action, isAutomation)
     }
 }
 
 data class ActionFailed(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val action: Action,
-) : ConversionState.HasResult {
+    val action: Action<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, points, action)
+        return ActionFinished(inputUriString, points, action, isAutomation)
     }
 }
 
 data class ActionFinished(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val action: Action,
-) : ConversionState.HasResult
+    val action: Action<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
+
+data class FileUriRequested(
+    override val inputUriString: String,
+    override val points: ImmutableList<Point>,
+    val action: FileAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
 
 data class LocationRationaleRequested(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: LocationAction,
-) : ConversionState.HasResult
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
 
 data class LocationRationaleShown(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: LocationAction,
-) : ConversionState.HasPermission, ConversionState.HasResult {
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasPermission, ConversionState.HasResult {
     @StringRes
     override val permissionTitleResId = R.string.conversion_succeeded_location_rationale_dialog_title
 
     override suspend fun grant(doNotAsk: Boolean): State =
-        LocationRationaleConfirmed(inputUriString, points, i, action)
+        LocationRationaleConfirmed(inputUriString, points, action, isAutomation)
 
-    override suspend fun deny(doNotAsk: Boolean): State = ActionFinished(inputUriString, points, action)
+    override suspend fun deny(doNotAsk: Boolean): State =
+        ActionFinished(inputUriString, points, action, isAutomation)
 }
 
 data class LocationRationaleConfirmed(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: LocationAction,
-) : ConversionState.HasResult
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult
 
 data class LocationPermissionReceived(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: LocationAction,
-) : ConversionState.HasResult, ConversionState.HasLoadingIndicator {
-    override val loadingIndicator = LoadingIndicator.Small(
-        messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasSmallLoadingIndicator, ConversionState.HasResult {
+    override fun getSmallLoadingIndicator(resources: Resources) = LoadingIndicator.Small(
+        resources.getString(R.string.conversion_succeeded_location_loading_indicator_title)
     )
 }
 
 data class LocationReceived(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val i: Int?,
-    val action: LocationAction,
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
     val location: Point?,
-) : ConversionState.HasResult {
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State = if (location == null) {
-        LocationFindingFailed(inputUriString, points, action)
+        LocationFindingFailed(inputUriString, points, action, isAutomation)
     } else {
-        LocationActionReady(inputUriString, points, i, action, location)
+        LocationActionReady(inputUriString, points, action, isAutomation = isAutomation, location = location)
     }
 }
 
 data class LocationFindingFailed(
     override val inputUriString: String,
     override val points: ImmutableList<Point>,
-    val action: LocationAction,
-) : ConversionState.HasResult {
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
+) : ConversionState, ConversionState.HasResult {
     override suspend fun transition(): State {
         try {
             delay(3.seconds)
         } catch (_: CancellationException) {
             // Do nothing
         }
-        return ActionFinished(inputUriString, points, action)
+        return ActionFinished(inputUriString, points, action, isAutomation)
     }
 }

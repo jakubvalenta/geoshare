@@ -31,7 +31,6 @@
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
     <string name="conversion_error_report">Докладване на проблем</string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.]]></string>
-    <string name="faq_item_collapse">Свиване на раздела</string>
     <string name="user_preferences_connection_title">Да се разреши ли свързване с картографска услуга (Google, Apple и др.)?</string>
     <string name="yes">Да</string>
     <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>
@@ -50,7 +49,6 @@
     <string name="conversion_failed_connection_permission_denied">Тази връзка не се поддържа без свързване с картографската услуга</string>
     <string name="conversion_failed_parse_url_error">Неуспешно обработване на връзка към карта</string>
     <string name="conversion_failed_parse_html_error">Неуспешно извличане на уеб страница от услугата за карти</string>
-    <string name="faq_item_expand">Разширяване на раздела</string>
     <string name="user_preferences_title">Предпочитания</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="user_preferences_connection_description">За да поддържа кратки връзки към карти и да получава координати от уеб страницата на картографската услуга, когато връзката не ги съдържа, %1$s може да се свърже с картографската услуга. Можете да намерите повече информация на екрана с ЧЗВ.</string>
@@ -90,7 +88,6 @@
     <string name="converter_geo_name">geo: URI</string>
     <string name="converter_waze_permission_title">Свързване с Waze?</string>
     <string name="converter_waze_loading_indicator_title">Свързване с Waze…</string>
-    <string name="conversion_succeeded_copy_google_maps">Копиране на Google Карти</string>
     <string name="conversion_succeeded_save_gpx">Запазване на GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s резултат %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
@@ -129,16 +126,12 @@
     <string name="conversion_succeeded_copy_link">Копиране на връзка %1$s</string>
     <string name="user_preferences_automation_description">Изберете действие, което да се извърши автоматично, когато връзка към карта се преобразува в координати.</string>
     <string name="user_preferences_automation_nothing">Нищо</string>
-    <string name="conversion_succeeded_open_app">Отваряне %1$s</string>
     <string name="user_preferences_automation_title">Автоматизация</string>
     <string name="main_random">Случайна връзка</string>
-    <string name="conversion_succeeded_copy_link_display">Копиране на връзката за показване на картата в %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Копиране на връзката за навигиране в %1$s</string>
     <string name="conversion_succeeded_open_app_display">Показване на картата в %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навигиране в %1$s</string>
     <string name="converter_amap_loading_indicator_title">Свързване с Amap…</string>
     <string name="converter_amap_permission_title">Свързване с Amap?</string>
-    <string name="conversion_succeeded_copy_link_street_view">Копиране на връзка към уличен изглед в %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Показване на уличен изглед в %1$s</string>
     <string name="converter_urbi_permission_title">Свързване с 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Свързване с 2GIS / Urbi…</string>

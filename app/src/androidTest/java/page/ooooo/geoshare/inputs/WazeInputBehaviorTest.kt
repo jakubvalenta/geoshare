@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.inputs
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class WazeInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun waze() {
         // Launch app and close intro
         launchApplication()
         closeIntro()
@@ -20,12 +21,6 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
         testUri(
             WGS84Point(name = "66 Acacia Avenue"),
             "https://waze.com/ul?q=66%20Acacia%20Avenue",
-        )
-
-        // Place id
-        testUri(
-            WGS84Point(52.000425474, 4.372739102),
-            "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
         )
 
         // Map view
@@ -45,6 +40,17 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
             WGS84Point(45.829189, 1.259372, z = 16.0),
             @Suppress("SpellCheckingInspection")
             "Use Waze to drive to 5 - 22 Boulevard Gambetta: https://waze.com/ul/hu00uswvn3",
+        )
+    }
+
+    @Test
+    fun wazeHtml() = runBlocking {
+        assumeDomainResolvable("waze.com")
+
+        // Place id
+        testUri(
+            WGS84Point(52.000425474, 4.372739102),
+            "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
         )
     }
 }

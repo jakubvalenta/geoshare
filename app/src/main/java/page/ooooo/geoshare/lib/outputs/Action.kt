@@ -1,63 +1,111 @@
 package page.ooooo.geoshare.lib.outputs
 
-import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
-import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.Clipboard
-import kotlinx.collections.immutable.ImmutableList
+import android.net.Uri
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.lib.point.WGS84Point
 
-sealed interface Action {
-    @Composable
-    fun Label()
+/**
+ * Action is an [output] with the [value] that's needed to execute it.
+ */
+sealed interface Action<T> {
+    val value: T
+    val output: Output
 
-    fun getIcon(): (@Composable () -> Unit)? = null
+    fun getDescription(value: T, uriQuote: UriQuote = DefaultUriQuote): String?
+}
 
-    fun isEnabled(points: ImmutableList<Point>, i: Int?): Boolean = true
+sealed interface BasicAction<T> : Action<T> {
+    suspend fun execute(actionContext: ActionContext): Boolean
 
-    interface HasPackageName {
-        val packageName: String
+    data class WithPoint(
+        override val value: Point,
+        override val output: PointOutput.WithoutLocation,
+    ) : BasicAction<Point> {
+        override suspend fun execute(actionContext: ActionContext) =
+            output.execute(value, actionContext)
+
+        override fun getDescription(value: Point, uriQuote: UriQuote) =
+            output.getDescription(value)
     }
 
-    interface HasSuccessMessage {
-        @Composable
-        fun successText(): String
-    }
+    data class WithPoints(
+        override val value: Points,
+        override val output: PointsOutput.WithoutLocation,
+    ) : BasicAction<Points> {
+        override suspend fun execute(actionContext: ActionContext) =
+            output.execute(value, actionContext)
 
-    interface HasErrorMessage {
-        @Composable
-        fun errorText(): String
+        override fun getDescription(value: Points, uriQuote: UriQuote) =
+            output.getDescription(value)
     }
 }
 
-interface BasicAction : Action {
-    suspend fun runAction(
-        points: ImmutableList<Point>,
-        i: Int?,
-        context: Context,
-        clipboard: Clipboard,
-        resources: Resources,
-        saveGpxLauncher: ActivityResultLauncher<Intent>,
-        uriQuote: UriQuote = DefaultUriQuote(),
-    ): Boolean
+sealed interface LocationAction<T> : Action<T> {
+    suspend fun execute(location: Point, actionContext: ActionContext): Boolean
+
+    data class WithPoint(
+        override val value: Point,
+        override val output: PointOutput.WithLocation,
+    ) : LocationAction<Point> {
+        override suspend fun execute(location: Point, actionContext: ActionContext) =
+            output.execute(location, value, actionContext)
+
+        override fun getDescription(value: Point, uriQuote: UriQuote) =
+            output.getDescription(value)
+    }
+
+    data class WithPoints(
+        override val value: Points,
+        override val output: PointsOutput.WithLocation,
+    ) : LocationAction<Points> {
+        override suspend fun execute(location: Point, actionContext: ActionContext) =
+            output.execute(location, value, actionContext)
+
+        override fun getDescription(value: Points, uriQuote: UriQuote) =
+            output.getDescription(value)
+    }
 }
 
-interface LocationAction : Action {
-    suspend fun runAction(
-        points: ImmutableList<Point>,
-        i: Int?,
-        location: Point,
-        context: Context,
-        clipboard: Clipboard,
-        resources: Resources,
-        saveGpxLauncher: ActivityResultLauncher<Intent>,
-        uriQuote: UriQuote = DefaultUriQuote(),
-    ): Boolean
+sealed interface FileAction<T> : Action<T> {
+    fun getFilename(resources: Resources): String
 
-    @Composable
-    fun permissionText(): String
+    val mimeType: String
+
+    suspend fun execute(uri: Uri, actionContext: ActionContext): Boolean
+
+    data class WithPoint(
+        override val value: Point,
+        override val output: PointOutput.WithFile,
+    ) : FileAction<Point> {
+        override fun getFilename(resources: Resources) = output.getFilename(resources)
+
+        override val mimeType = output.mimeType
+
+        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
+            output.execute(uri, value, actionContext)
+
+        override fun getDescription(value: Point, uriQuote: UriQuote) =
+            output.getDescription(value)
+    }
+
+    data class WithPoints(
+        override val value: Points,
+        override val output: PointsOutput.WithFile,
+    ) : FileAction<Points> {
+        override fun getFilename(resources: Resources) = output.getFilename(resources)
+
+        override val mimeType = output.mimeType
+
+        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
+            output.execute(uri, value, actionContext)
+
+        override fun getDescription(value: Points, uriQuote: UriQuote) =
+            output.getDescription(value)
+    }
 }
+
+val NoopAction = BasicAction.WithPoint(WGS84Point(), NoopOutput)

@@ -1,14 +1,13 @@
 package page.ooooo.geoshare.inputs
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.GCJ02Point
 
 class AmapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
-        // Launch app and close intro
-        launchApplication()
-        closeIntro()
+    fun amapHtml() = runBlocking {
+        assumeDomainResolvable(@Suppress("SpellCheckingInspection") "surl.amap.com")
 
         // Short URI
         testUri(

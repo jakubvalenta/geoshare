@@ -22,7 +22,7 @@ import page.ooooo.geoshare.lib.point.buildPoints
 /**
  * See https://developers.google.com/waze/deeplinks/
  */
-object WazeInput : Input.HasHtml {
+object WazeInput : HtmlInput, Input.HasRandomUri {
     @Suppress("SpellCheckingInspection")
     private const val HASH = """[0-9bcdefghjkmnpqrstuvwxyz]+"""
 
@@ -121,4 +121,7 @@ object WazeInput : Input.HasHtml {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_waze_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://waze.com/ul?ll={lat}%2C{lon}&z={z}")
 }

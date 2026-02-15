@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class OsmAndInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun osmAnd() {
         // Coordinates
         testUri(
             WGS84Point(52.51628, 13.37771, z = 15.0),

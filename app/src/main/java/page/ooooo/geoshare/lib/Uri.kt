@@ -15,10 +15,10 @@ data class Uri(
     val pathParts: ImmutableList<String> = persistentListOf(),
     val queryParams: ImmutableMap<String, String> = persistentMapOf(),
     val fragment: String = "",
-    val uriQuote: UriQuote = DefaultUriQuote(),
+    val uriQuote: UriQuote = DefaultUriQuote,
 ) {
     companion object {
-        fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote()): Uri {
+        fun parse(uriString: String, uriQuote: UriQuote = DefaultUriQuote): Uri {
             val schemeSepIndex = uriString.indexOf(':').takeIf { it > -1 }
             val hostSepIndex =
                 schemeSepIndex?.takeIf { uriString.length > it + 2 && uriString[it + 1] == '/' && uriString[it + 2] == '/' }
@@ -127,7 +127,7 @@ data class Uri(
         path: String,
         queryParams: ImmutableMap<String, String> = persistentMapOf(),
         fragment: String = "",
-        uriQuote: UriQuote = DefaultUriQuote(),
+        uriQuote: UriQuote = DefaultUriQuote,
     ) : this(
         scheme = scheme,
         host = host,

@@ -16,8 +16,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.outputs.allOutputs
-import page.ooooo.geoshare.lib.outputs.genRandomUriString
+import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.allInputs
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -52,12 +53,16 @@ fun MainFormLinks(
             Text(stringResource(R.string.main_navigate_to_intro))
         }
         TextButton({
-            allOutputs.genRandomUriString(
-                resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
-            )?.let { uriString ->
-                onUpdateInput(uriString)
-                onSetErrorMessageResId(null)
-            }
+            val randomPoint = Point.genRandomPoint(
+                name = resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
+            )
+            allInputs
+                .shuffled()
+                .firstNotNullOfOrNull { (it as? Input.HasRandomUri)?.genRandomUri(randomPoint) }
+                ?.let { newInputUriString ->
+                    onUpdateInput(newInputUriString)
+                    onSetErrorMessageResId(null)
+                }
         }) {
             Icon(
                 painterResource(R.drawable.ifl_24px),

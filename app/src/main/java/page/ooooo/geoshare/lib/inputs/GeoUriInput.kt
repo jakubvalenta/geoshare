@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
-import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -9,12 +8,12 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
-import page.ooooo.geoshare.lib.outputs.GeoUriOutput
+import page.ooooo.geoshare.lib.formats.GeoUriFormat
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object GeoUriInput : Input {
+object GeoUriInput : Input, Input.HasRandomUri {
     private const val NAME_REGEX = """\((.+)\)"""
 
     override val uriPattern =
@@ -24,10 +23,7 @@ object GeoUriInput : Input {
         nameResId = R.string.converter_geo_name,
         items = listOf(
             InputDocumentationItem.Text(3) {
-                stringResource(
-                    R.string.example,
-                    GeoUriOutput.formatUriString(persistentListOf(Point.example), null),
-                )
+                stringResource(R.string.example, GeoUriFormat.formatGeoUriString(Point.example))
             },
         ),
     )
@@ -50,4 +46,7 @@ object GeoUriInput : Input {
             }
         }.asWGS84()
     }
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
 }

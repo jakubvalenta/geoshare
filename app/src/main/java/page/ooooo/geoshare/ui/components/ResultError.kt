@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,7 +11,13 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,11 +60,9 @@ fun ResultError(
             .fillMaxWidth(),
     ) {
         if (!retryLoadingIndicatorVisible) {
-            Column(
-                Modifier.padding(horizontal = spacing.windowPadding),
-                verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
-            ) {
-                SelectionContainer {
+            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
+                Headline(stringResource(R.string.conversion_error_title))
+                SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
                     Text(
                         stringResource(errorMessageResId),
                         Modifier.testTag("geoShareConversionErrorMessage"),
@@ -67,7 +70,7 @@ fun ResultError(
                     )
                 }
                 if (inputUriString.isNotEmpty()) {
-                    SelectionContainer {
+                    SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
                         if (inputUriString.startsWith("https://")) {
                             Text(
                                 inputUriString,
@@ -85,33 +88,39 @@ fun ResultError(
                     }
                 }
             }
-            ResultChips {
-                ResultChip(
-                    { Text(stringResource(R.string.conversion_error_retry)) },
-                    icon = {
-                        Icon(Icons.Default.Refresh, null)
-                    },
-                    onClick = {
-                        coroutineScope.launch {
-                            setRetryLoadingIndicatorVisible(true)
-                            delay(1000)
-                            setRetryLoadingIndicatorVisible(false)
-                            onRetry()
-                        }
-                    },
-                )
-                ResultChip(
-                    { Text(stringResource(R.string.conversion_error_report)) },
-                ) {
-                    uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+            ScrollableChips {
+                item {
+                    StyledChip(
+                        stringResource(R.string.conversion_error_retry),
+                        icon = {
+                            Icon(Icons.Default.Refresh, null)
+                        },
+                        onClick = {
+                            coroutineScope.launch {
+                                setRetryLoadingIndicatorVisible(true)
+                                delay(1000)
+                                setRetryLoadingIndicatorVisible(false)
+                                onRetry()
+                            }
+                        },
+                    )
                 }
-                ResultChip(
-                    { Text(stringResource(R.string.inputs_title)) },
-                    icon = {
-                        Icon(Icons.Outlined.Info, null)
-                    },
-                ) {
-                    onNavigateToInputsScreen()
+                item {
+                    StyledChip(
+                        stringResource(R.string.conversion_error_report),
+                    ) {
+                        uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+                    }
+                }
+                item {
+                    StyledChip(
+                        stringResource(R.string.inputs_title),
+                        icon = {
+                            Icon(Icons.Outlined.Info, null)
+                        },
+                    ) {
+                        onNavigateToInputsScreen()
+                    }
                 }
             }
         } else {

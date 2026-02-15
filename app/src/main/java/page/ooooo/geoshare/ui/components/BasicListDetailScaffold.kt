@@ -15,9 +15,13 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
-import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.PaneScaffoldDirective
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldState
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldPredictiveBackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -29,8 +33,39 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun <T> BasicListDetailScaffold(
+fun <T> NavigableBasicListDetailScaffold(
     navigator: ThreePaneScaffoldNavigator<T>,
+    listPane: @Composable ColumnScope.(wide: Boolean, containerColor: Color) -> Unit,
+    detailPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    listContainerColor: Color = Color.Transparent,
+    listContentColor: Color = contentColor,
+    defaultBackBehavior: BackNavigationBehavior =
+        BackNavigationBehavior.PopUntilScaffoldValueChange,
+) {
+    ThreePaneScaffoldPredictiveBackHandler(
+        navigator = navigator,
+        backBehavior = defaultBackBehavior,
+    )
+
+    BasicListDetailScaffold(
+        directive = navigator.scaffoldDirective,
+        scaffoldState = navigator.scaffoldState,
+        listPane = listPane,
+        detailPane = detailPane,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        listContainerColor = listContainerColor,
+        listContentColor = listContentColor,
+    )
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+fun BasicListDetailScaffold(
+    directive: PaneScaffoldDirective,
+    scaffoldState: ThreePaneScaffoldState,
     listPane: @Composable ColumnScope.(wide: Boolean, containerColor: Color) -> Unit,
     detailPane: @Composable ColumnScope.(wide: Boolean) -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.surface,
@@ -40,14 +75,15 @@ fun <T> BasicListDetailScaffold(
 ) {
     val layoutDirection = LocalLayoutDirection.current
 
-    val wide = remember(navigator.scaffoldState) {
-        navigator.scaffoldState.targetState.primary == PaneAdaptedValue.Expanded &&
-        navigator.scaffoldState.targetState.secondary == PaneAdaptedValue.Expanded
+    val wide = remember(scaffoldState) {
+        scaffoldState.targetState.primary == PaneAdaptedValue.Expanded &&
+            scaffoldState.targetState.secondary == PaneAdaptedValue.Expanded
     }
     val insetPadding = WindowInsets.safeDrawing.asPaddingValues()
 
-    NavigableListDetailPaneScaffold(
-        navigator = navigator,
+    ListDetailPaneScaffold(
+        directive = directive,
+        scaffoldState = scaffoldState,
         listPane = {
             AnimatedPane {
                 val containerPadding = if (wide) {

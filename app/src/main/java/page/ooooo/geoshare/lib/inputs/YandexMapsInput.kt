@@ -14,7 +14,7 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
+object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
@@ -45,7 +45,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
     )
     override val shortUriPattern =
         Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
-    override val shortUriMethod = Input.ShortUriMethod.HEAD
+    override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
@@ -58,6 +58,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
                 Z_PATTERN.matchEntire(queryParams["whatshere[zoom]"])?.doubleGroupOrNull()?.also { defaultZ = it }
                     ?: Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
 
+                // Organization links seem to return 404 now. We still keep the code in case they start working again.
                 if (points.isEmpty() && Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
                     htmlUriString = uri.toString()
                 }
@@ -90,4 +91,7 @@ object YandexMapsInput : Input.HasShortUri, Input.HasHtml {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_yandex_maps_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")
 }

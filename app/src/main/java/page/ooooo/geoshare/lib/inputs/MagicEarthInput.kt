@@ -6,13 +6,14 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/
  */
-object MagicEarthInput : Input {
+object MagicEarthInput : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:(?:https?://)?magicearth.com|magicearth:/)/\?\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAGIC_EARTH,
@@ -42,4 +43,7 @@ object MagicEarthInput : Input {
             }
         }.asWGS84()
     }
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://magicearth.com/?show_on_map&lat={lat}&lon={lon}&name={name}&z={z}")
 }

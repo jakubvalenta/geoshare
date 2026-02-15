@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class UriQuoteTest {
-    val uriQuote = FakeUriQuote()
+    private val uriQuote = FakeUriQuote
 
     @Test
     fun encode_encodesSpace() {

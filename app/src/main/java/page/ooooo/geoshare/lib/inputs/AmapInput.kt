@@ -5,10 +5,11 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object AmapInput : Input.HasShortUri {
+object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.AMAP,
@@ -20,7 +21,7 @@ object AmapInput : Input.HasShortUri {
     )
 
     override val shortUriPattern = Regex("""(?:https?://)?surl\.amap\.com/\S+""")
-    override val shortUriMethod = Input.ShortUriMethod.HEAD
+    override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
@@ -36,4 +37,7 @@ object AmapInput : Input.HasShortUri {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_amap_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://wb.amap.com/?q={lat}%2C{lon}")
 }

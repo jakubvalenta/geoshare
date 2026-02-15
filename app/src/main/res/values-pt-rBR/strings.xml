@@ -34,8 +34,6 @@
     <string name="permission_do_not_ask">Não me pergunte novamente</string>
     <string name="faq_title">Perguntas frequentes</string>
     <string name="faq_how_it_works_headline">Como funciona e considerações de privacidade</string>
-    <string name="faq_item_collapse">Retrair seção</string>
-    <string name="faq_item_expand">Expandir seção</string>
     <string name="user_preferences_title">Preferências</string>
     <string name="user_preferences_connection_title">Permitir conectar ao mapa (Google, Apple, etc.)?</string>
     <string name="user_preferences_connection_description">Para suportar links curtos, e obter coordenadas da página web do mapa quando o link não tem elas, o %1$s pode conectar ao serviço de mapas. Você pode encontrar mais informações na tela de perguntas frequentes.</string>
@@ -91,7 +89,6 @@
     <string name="converter_geo_name">URIs geo:</string>
     <string name="converter_waze_permission_title">Conectar ao Wave?</string>
     <string name="converter_waze_loading_indicator_title">Conectando ao Waze…</string>
-    <string name="conversion_succeeded_copy_google_maps">Copiar Google Maps</string>
     <string name="conversion_succeeded_save_gpx">Salvar GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Resultado do %1$s %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">%1$dº ponto</string>
@@ -132,17 +129,13 @@
     <string name="conversion_succeeded_copy_link">Copiar link do %1$s</string>
     <string name="user_preferences_automation_description">Escolha uma ação para fazer automaticamente quando um link de mapa é convertido para coordenadas.</string>
     <string name="user_preferences_automation_nothing">Nenhuma</string>
-    <string name="conversion_succeeded_open_app">Abrir %1$s</string>
     <string name="user_preferences_automation_title">Automação</string>
     <string name="main_input_uri_paste_content_description">Colar</string>
     <string name="main_random">Link aleatório</string>
-    <string name="conversion_succeeded_copy_link_display">Copiar link para mostrar mapa no %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Copiar link para navegar em %1$s</string>
     <string name="conversion_succeeded_open_app_display">Mostrar mapa em %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navegar em %1$s</string>
     <string name="converter_amap_loading_indicator_title">Conectando-se ao Amap…</string>
     <string name="converter_amap_permission_title">Conectar ao Amap?</string>
-    <string name="conversion_succeeded_copy_link_street_view">Copiar link para a visão da rua no %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Mostrar visão da rua no %1$s</string>
     <string name="converter_urbi_permission_title">Conectar ao 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Conectando-se 2GIS / Urbi…</string>

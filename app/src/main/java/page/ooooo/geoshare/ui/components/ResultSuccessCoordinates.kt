@@ -29,34 +29,40 @@ import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.allOutputs
-import page.ooooo.geoshare.lib.outputs.getAllPointsChipActions
-import page.ooooo.geoshare.lib.outputs.getLastPointChipActions
-import page.ooooo.geoshare.lib.outputs.getText
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
+import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.lib.point.WGS84Point
-import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSuccessCoordinates(
-    points: ImmutableList<Point>,
+    points: Points,
+    appDetails: AppDetails,
+    outputsForPointChips: List<PointOutput>,
+    outputsForPointsChips: List<PointsOutput>,
     initialExpanded: Boolean = false,
-    onRun: (action: Action, i: Int?) -> Unit,
-    onSelect: (points: ImmutableList<Point>, i: Int?) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
+    onSelect: (index: Int?) -> Unit,
 ) {
+    val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
     var expanded by remember { mutableStateOf(initialExpanded) }
 
     Column {
         Headline(
-            points.getOrNull(null)?.cleanName
+            lastPoint.cleanName
                 ?: if (points.size > 1) {
                     stringResource(R.string.conversion_succeeded_point_last)
                 } else {
@@ -64,39 +70,42 @@ fun ResultSuccessCoordinates(
                 },
             Modifier
                 .testTag("geoShareResultSuccessLastPointName")
+                .padding(horizontal = spacing.windowPadding)
                 .padding(top = 4.dp), // Align with the "Open with..." headline on wide screen
         )
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(start = spacing.windowPadding, end = spacing.windowPadding - 14.dp),
+                .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            allOutputs.getText(points, null)?.let { text ->
+            if (lastPoint.hasCoordinates()) {
                 SelectionContainer {
                     Text(
-                        text,
+                        CoordsFormat.formatDegMinSecCoords(lastPoint),
                         Modifier
                             .weight(1f)
                             .testTag("geoShareResultSuccessLastPointCoordinates"),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-            } ?: Text(
-                stringResource(R.string.conversion_succeeded_description_q_only),
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .testTag("geoShareResultSuccessLastPointDescription"),
-                fontStyle = FontStyle.Italic,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    lineBreak = LineBreak.Paragraph,
-                    hyphens = Hyphens.Auto,
-                ),
-            )
+            } else {
+                Text(
+                    stringResource(R.string.conversion_succeeded_description_q_only),
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .testTag("geoShareResultSuccessLastPointDescription"),
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        lineBreak = LineBreak.Paragraph,
+                        hyphens = Hyphens.Auto,
+                    ),
+                )
+            }
             IconButton(
-                { onSelect(points, null) },
+                { onSelect(points.size - 1) },
                 Modifier.testTag("geoShareResultSuccessLastPointMenu")
             ) {
                 Icon(
@@ -105,21 +114,23 @@ fun ResultSuccessCoordinates(
                 )
             }
         }
-        ResultChips {
-            allOutputs.getLastPointChipActions()
-                .filter { it.isEnabled(points, null) }
-                .forEach { action ->
-                    ResultChip({ action.Label() }, icon = action.getIcon()) { onRun(action, null) }
-                }
-            if (points.size <= 1) {
-                allOutputs.getAllPointsChipActions()
-                    .filter { it.isEnabled(points, null) }
-                    .forEach { action ->
-                        ResultChip({ action.Label() }, icon = action.getIcon()) { onRun(action, null) }
+        if (outputsForPointChips.isNotEmpty()) {
+            ScrollableChips {
+                outputsForPointChips.forEach { output ->
+                    item {
+                        StyledChip(
+                            label = output.label(appDetails),
+                            icon = output.getIcon(appDetails)?.let {
+                                { IconFromDescriptor(it, contentDescription = null) }
+                            },
+                        ) {
+                            onExecute(output.toAction(lastPoint))
+                        }
                     }
+                }
             }
         }
-        points.takeIf { it.size > 1 }?.let { points ->
+        points.takeIf { points.size > 1 }?.let { points ->
             Surface(
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.onSurface,
@@ -130,12 +141,17 @@ fun ResultSuccessCoordinates(
                 ) {
                     ExpandablePane(
                         expanded = expanded,
-                        headline = stringResource(R.string.conversion_succeeded_point_all, points.size),
+                        title = {
+                            Text(
+                                stringResource(R.string.conversion_succeeded_point_all, points.size),
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("geoShareResultSuccessAllPointsHeadline"),
+                            )
+                        },
                         onSetExpanded = { expanded = it },
-                        modifier = Modifier.padding(
-                            start = spacing.windowPadding,
-                            end = spacing.windowPadding - 8.dp, // Align with last point menu
-                        ),
+                        modifier = Modifier.padding(horizontal = spacing.windowPadding),
                     ) {
                         Column(
                             Modifier.padding(
@@ -144,25 +160,31 @@ fun ResultSuccessCoordinates(
                             ),
                             verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
                         ) {
-                            points.indices.forEach { i ->
+                            points.forEachIndexed { index, point ->
                                 ResultSuccessPoint(
-                                    points = points,
-                                    i = i,
-                                    onSelect = { onSelect(points, i) },
+                                    point = point,
+                                    index = index,
+                                    onSelect = { onSelect(index) },
                                 )
                             }
                         }
                     }
-                    allOutputs.getAllPointsChipActions()
-                        .filter { it.isEnabled(points, null) }
-                        .takeIf { it.isNotEmpty() }
-                        ?.let { actions ->
-                            ResultChips {
-                                actions.forEach { action ->
-                                    ResultChip({ action.Label() }, icon = action.getIcon()) { onRun(action, null) }
+                    if (outputsForPointsChips.isNotEmpty()) {
+                        ScrollableChips {
+                            outputsForPointsChips.forEach { output ->
+                                item {
+                                    StyledChip(
+                                        label = output.label(appDetails),
+                                        icon = output.getIcon(appDetails)?.let {
+                                            { IconFromDescriptor(it, contentDescription = null) }
+                                        },
+                                    ) {
+                                        onExecute(output.toAction(points))
+                                    }
                                 }
                             }
                         }
+                    }
                 }
             }
         }
@@ -181,8 +203,11 @@ private fun DefaultPreview() {
         ) {
             ResultSuccessCoordinates(
                 points = persistentListOf(Point.example),
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -198,8 +223,11 @@ private fun DarkPreview() {
         ) {
             ResultSuccessCoordinates(
                 points = persistentListOf(Point.example),
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -215,8 +243,11 @@ private fun DescriptionPreview() {
         ) {
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -232,8 +263,11 @@ private fun DarkDescriptionPreview() {
         ) {
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -252,8 +286,11 @@ private fun LabelPreview() {
                     Point.example,
                     WGS84Point(50.123456, 11.123456, name = "My point"),
                 ),
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -272,8 +309,11 @@ private fun DarkLabelPreview() {
                     Point.example,
                     WGS84Point(50.123456, 11.123456, name = "My point"),
                 ),
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -297,9 +337,12 @@ private fun PointsPreview() {
                     Point.genRandomPoint(),
                     Point.genRandomPoint(),
                 ),
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -323,9 +366,12 @@ private fun DarkPointsPreview() {
                     Point.genRandomPoint(),
                     Point.genRandomPoint(),
                 ),
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -345,9 +391,12 @@ private fun PointsWithNamePreview() {
                     Point.genRandomPoint(),
                     Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                onExecute = {},
+                onSelect = {},
             )
         }
     }
@@ -367,9 +416,12 @@ private fun DarkPointsWithNamePreview() {
                     Point.genRandomPoint(),
                     Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
+                appDetails = emptyMap(),
+                outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+                outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
-                onRun = { _, _ -> },
-                onSelect = { _, _ -> },
+                onExecute = {},
+                onSelect = {},
             )
         }
     }

@@ -8,12 +8,13 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object HereWeGoInput : Input {
+object HereWeGoInput : Input, Input.HasRandomUri {
     private const val SIMPLIFIED_BASE64 = """[A-Za-z0-9+/]+=*"""
 
     override val uriPattern = Regex("""(?:https?://)?(?:share|wego)\.here\.com/\S+""")
@@ -65,4 +66,7 @@ object HereWeGoInput : Input {
             }
         }.asWGS84()
     }
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://wego.here.com/?map={lat}%2C{lon},{z}")
 }

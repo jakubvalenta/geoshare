@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.asBD09MC
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
+object BaiduMapInput : ShortUriInput, WebInput {
     private const val X = """(\d+(?:\.\d+)?)"""
     private const val Y = """(\d+(?:\.\d+)?)"""
     private const val CENTER = """@$X,$Y,${Z}z.*"""
@@ -31,7 +31,7 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
         ),
     )
     override val shortUriPattern = Regex("""(?:https?://)?j\.map\.baidu\.com/\S+""")
-    override val shortUriMethod = Input.ShortUriMethod.HEAD
+    override val shortUriMethod = ShortUriInput.Method.HEAD
 
     @Suppress("SpellCheckingInspection")
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
@@ -55,7 +55,7 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
 
                 } else if (firstPart == "poi") {
                     // Place
-                    // https://map.baidu.com/poi/<NAME>/@<X>,<Y>,<Z>
+                    // https://map.baidu.com/poi/{name}/@{x},{y},{z}
                     Regex(CENTER).matchEntire(parts.getOrNull(2))
                         ?.toLonLatZPoint()
                         ?.also { points.add(it.copy(name = parts.getOrNull(1))) }
@@ -79,7 +79,7 @@ object BaiduMapInput : Input.HasShortUri, Input.HasWeb {
 
                 } else if (firstPart == "mobile") {
                     // Mobile place detail with coords
-                    // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=<LON>%2C<LAT>"
+                    // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo={lon}%2C{lat}"
                     Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()
                         ?.also { points.add(it) }
                         ?: run {

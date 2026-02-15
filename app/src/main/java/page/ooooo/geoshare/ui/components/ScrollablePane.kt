@@ -1,27 +1,31 @@
 package page.ooooo.geoshare.ui.components
 
-import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -37,14 +41,17 @@ private fun createLinearFunc(x1: Float, y1: Float, x2: Float, y2: Float): (x: In
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScrollablePane(
-    @StringRes titleResId: Int,
+    title: @Composable () -> Unit,
     onBack: (() -> Unit)?,
-    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
+    navigationImageVector: ImageVector = Icons.AutoMirrored.Default.ArrowBack,
+    content: LazyListScope.() -> Unit,
 ) {
     val density = LocalDensity.current
     val spacing = LocalSpacing.current
 
-    val scrollState = rememberScrollState()
+    val lazyListState = rememberLazyListState()
     val headlineHeightPx = with(density) { MaterialTheme.typography.headlineMedium.fontSize.toPx() }
     val headlinePaddingTopPx = with(density) { spacing.largeAdaptive.toPx() }
     val headlinePaddingBottomPx = with(density) { spacing.mediumAdaptive.toPx() }
@@ -58,21 +65,28 @@ fun ScrollablePane(
     )
     val headlineAlpha by remember {
         derivedStateOf {
-            calcHeadlineAlpha(scrollState.value).coerceIn(0f, 1f)
+            if (lazyListState.firstVisibleItemIndex == 0) {
+                calcHeadlineAlpha(lazyListState.firstVisibleItemScrollOffset).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
         }
     }
     val titleAlpha by remember {
         derivedStateOf {
-            calcTitleAlpha(scrollState.value).coerceIn(0f, 1f)
+            if (lazyListState.firstVisibleItemIndex == 0) {
+                calcTitleAlpha(lazyListState.firstVisibleItemScrollOffset).coerceIn(0f, 1f)
+            } else {
+                1f
+            }
         }
     }
 
     TopAppBar(
         title = {
-            Text(
-                stringResource(titleResId),
-                Modifier.graphicsLayer { alpha = titleAlpha },
-            )
+            Box(Modifier.graphicsLayer { alpha = titleAlpha }) {
+                title()
+            }
         },
         navigationIcon = {
             if (onBack != null) {
@@ -84,23 +98,27 @@ fun ScrollablePane(
                     ),
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        imageVector = navigationImageVector,
                         contentDescription = stringResource(R.string.nav_back_content_description)
                     )
                 }
             }
         },
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
     )
-    Column(
-        Modifier
-            .fillMaxHeight()
-            .verticalScroll(scrollState),
-    ) {
-        Headline(
-            stringResource(titleResId),
-            Modifier.graphicsLayer { alpha = headlineAlpha },
-        )
-        content()
+    LazyColumn(modifier.fillMaxHeight(), lazyListState) {
+        item {
+            Box(
+                Modifier
+                    .graphicsLayer { alpha = headlineAlpha }
+                    .padding(top = spacing.headlineTopAdaptive, bottom = spacing.mediumAdaptive),
+            ) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.headlineMedium) {
+                    title()
+                }
+            }
+        }
+        this.content()
     }
 }

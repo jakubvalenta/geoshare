@@ -43,7 +43,6 @@
     <string name="user_preferences_connection_title">允許連接到地圖服務嗎（ Google, Apple 等）？</string>
     <string name="user_preferences_connection_description">為了支援縮短的地圖連結，並在連結本身未包含座標時，從地圖服務的網頁中取得座標,，%1$s 可以連接到地圖服務。您可查看應用程式內的常見問題（FAQ）頁面了解更詳細的資訊。</string>
     <string name="conversion_succeeded_copy_geo">複製geo:</string>
-    <string name="conversion_succeeded_copy_google_maps">複製Google地圖</string>
     <string name="intro_title">簡介</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">放置圖釘</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[選擇 <i>%1$s</i> 之後，應用程式將會讓您在其他安裝的地圖應用程式中打開相同的地點。]]></string>
@@ -86,8 +85,6 @@
     <string name="intro_settings_activity_not_found">無法開啟設定</string>
     <string name="main_input_uri_label">在此貼上地圖連結</string>
     <string name="about_text"><![CDATA[<p>%1$s是免費且開源的應用程式分佈在 <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> 或其後版本授權條款發行。</p><br><p>您可以在 <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>找到代碼，你也可以在 <a href="https://github.com/jakubvalenta/geoshare/issues">回報錯誤</a>.</p><br><p>歡迎您給我們反饋。 您可以透過<a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="faq_item_collapse">收起部分</string>
-    <string name="faq_item_expand">展開部分</string>
     <string name="user_preferences_title">偏好設定</string>
     <string name="yes">總是</string>
     <string name="user_preferences_connection_option_ask">在連接前詢問</string>
@@ -125,7 +122,6 @@
     <string name="conversion_succeeded_copy_link">複製%1$s連結</string>
     <string name="user_preferences_automation_description">選擇在地圖連結轉換為座標時要自動執行的動作。</string>
     <string name="user_preferences_automation_nothing">什麼也沒有</string>
-    <string name="conversion_succeeded_open_app">開啟%1$s</string>
     <string name="user_preferences_automation_title">自動地</string>
     <string name="not_available">無法使用</string>
 </resources>

@@ -57,7 +57,8 @@ navigation, you can easily switch from Google Maps to your favorite
   clipboard in various formats, for example as a geo: link.
 - Shows all points of a **place list** link.
 - Allows performing an action **automatically** when a map link is processed.
-- Allows **launching navigation** in TomTom, Google Maps, Magic Earth...
+- Allows **launching navigation** in all apps that support it, including TomTom.
+- Allows opening a location in **web maps**, pre-installed ones or your own.
 - Allows saving a location as a **GPX file**.
 - Retries on **patchy internet connection**.
 - Allows **pasting map links** directly into the app, instead of sharing them

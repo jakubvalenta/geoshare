@@ -39,8 +39,6 @@
     <string name="permission_do_not_ask">Не запитувати знову</string>
     <string name="conversion_failed_connection_permission_denied">Це посилання не підтримується без підключення до картографічного сервісу</string>
     <string name="intro_how_to_share_google_maps_caption">Поділіться місцезнаходженням зі своєї картографічної програми або веббраузера.</string>
-    <string name="faq_item_collapse">Згорнути розділ</string>
-    <string name="faq_item_expand">Розгорнути розділ</string>
     <string name="user_preferences_title">Параметри</string>
     <string name="user_preferences_connection_title">Дозволити підключення до картографічного сервісу (Google, Apple тощо)?</string>
     <string name="user_preferences_connection_description">Для підтримки коротких посилань на карти та отримання координат з веб-сторінки картографічного сервісу, якщо посилання їх не містить, %1$s може підключитися до картографічного сервісу. Більш детальну інформацію можна знайти на екрані FAQ.</string>
@@ -92,7 +90,6 @@
     <string name="converter_geo_name">geo: URIs</string>
     <string name="converter_waze_permission_title">Підключитися до Waze?</string>
     <string name="converter_waze_loading_indicator_title">Підключення до Waze…</string>
-    <string name="conversion_succeeded_copy_google_maps">Копіювати Карти Google</string>
     <string name="conversion_succeeded_save_gpx">Зберегти GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Результат %1$s %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
@@ -137,16 +134,12 @@
     <string name="conversion_succeeded_copy_link">Копіювати посилання %1$s</string>
     <string name="user_preferences_automation_description">Виберіть дію, яка має виконуватися автоматично під час перетворення посилання на карту на координати.</string>
     <string name="user_preferences_automation_nothing">Нічого</string>
-    <string name="conversion_succeeded_open_app">Відкрити %1$s</string>
     <string name="user_preferences_automation_title">Автоматизація</string>
     <string name="main_random">Випадкове посилання</string>
-    <string name="conversion_succeeded_copy_link_display">Скопіювати посилання, щоб показати карту в %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Скопіюйте посилання для навігації в %1$s</string>
     <string name="conversion_succeeded_open_app_display">Показати карту в %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навігація в %1$s</string>
     <string name="converter_amap_loading_indicator_title">Підключення до Amap…</string>
     <string name="converter_amap_permission_title">Підключитися до Amap?</string>
-    <string name="conversion_succeeded_copy_link_street_view">Копіювати посилання на перегляд вулиць у %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Показати вигляд вулиці в %1$s</string>
     <string name="converter_urbi_permission_title">Підключитися до 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Підключення до 2GIS / Urbi…</string>

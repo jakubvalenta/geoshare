@@ -71,8 +71,6 @@
     <string name="converter_coordinates_name">Koordinaten</string>
     <string name="example">z.B. %1$s</string>
     <string name="converter_geo_name">geo: URIs</string>
-    <string name="faq_item_collapse">Abschnitt zuklappen</string>
-    <string name="faq_item_expand">Abschnitt ausklappen</string>
     <string name="user_preferences_title">Einstellungen</string>
     <string name="yes">Ja</string>
     <string name="user_preferences_connection_option_ask">Vor dem Verbinden fragen</string>
@@ -89,7 +87,6 @@
     <string name="conversion_failed_unsupported_service">Nicht unterstützter Kartendienst</string>
     <string name="user_preferences_connection_title">Verbindung zu Kartendienst (Google, Apple usw.) zulassen?</string>
     <string name="user_preferences_connection_description">Um kurze Kartenlinks zu unterstützen und Koordinaten von der Webseite des Kartendienstes zu bekommen, wenn der Link sie nicht enthält, kann %1$s sich mit dem Kartendienst verbinden. Mehr Infos findest du auf dem FAQ-Bildschirm.</string>
-    <string name="conversion_succeeded_copy_google_maps">Google Maps kopieren</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s Ergebnis %2$s.gpx</string>
     <string name="conversion_succeeded_share">Teilen</string>
     <string name="conversion_succeeded_point_number">Punkt %1$d</string>
@@ -106,9 +103,6 @@
     <string name="main_input_uri_paste_content_description">Einfügen</string>
     <string name="conversion_succeeded_copy_coordinates">Koordinaten kopieren</string>
     <string name="conversion_succeeded_copy_link">Link zu %1$s kopieren</string>
-    <string name="conversion_succeeded_copy_link_display">Link zum Anzeigen der Karte in %1$s kopieren</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Link zum Navigieren in %1$s kopieren</string>
-    <string name="conversion_succeeded_open_app">%1$s öffnen</string>
     <string name="conversion_succeeded_open_app_display">Karte in %1$s anzeigen</string>
     <string name="conversion_succeeded_open_app_navigate_to">In %1$s navigieren</string>
     <string name="conversion_succeeded_save_gpx_failed">Fehler beim Speichern der GPX-Datei</string>
@@ -138,7 +132,6 @@
     <string name="user_preferences_automation_description">Wähle eine Aktion aus, die automatisch ausgeführt werden soll, wenn ein Kartenlink in Koordinaten umgewandelt wird.</string>
     <string name="user_preferences_automation_nothing">Nichts</string>
     <string name="user_preferences_automation_title">Automatisierung</string>
-    <string name="conversion_succeeded_copy_link_street_view">Link zum %1$s Street View kopieren</string>
     <string name="conversion_succeeded_open_app_street_view">Street View in %1$s anzeigen</string>
     <string name="converter_urbi_permission_title">Mit 2GIS / Urbi verbinden?</string>
     <string name="converter_urbi_loading_indicator_title">Verbindung mit 2GIS / Urbi…</string>

@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class MapsMeInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun mapsMe() {
         // Launch app and close intro
         launchApplication()
         closeIntro()

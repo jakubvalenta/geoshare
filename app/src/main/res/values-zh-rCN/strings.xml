@@ -27,8 +27,6 @@
     <string name="permission_do_not_ask">不要再询问我</string>
     <string name="faq_title">常见问题</string>
     <string name="faq_how_it_works_headline">工作原理和隐私考虑</string>
-    <string name="faq_item_collapse">折叠部分</string>
-    <string name="faq_item_expand">展开部分</string>
     <string name="user_preferences_title">偏好设置</string>
     <string name="user_preferences_connection_title">是否允许连接到地图服务（Google、Apple 等）？</string>
     <string name="user_preferences_connection_description">为了支持短地图链接，并在链接不包含坐标时从地图服务的网页获取坐标，%1$s 可以连接到地图服务。您可以在常见问题屏幕上找到更多信息。</string>
@@ -87,7 +85,6 @@
     <string name="converter_coordinates_name">坐标</string>
     <string name="example">例如：%1$s</string>
     <string name="converter_geo_name">geo: URI</string>
-    <string name="conversion_succeeded_copy_google_maps">复制 Google 地图</string>
     <string name="conversion_succeeded_save_gpx">保存 GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s 结果 %2$s.gpx</string>
     <string name="conversion_succeeded_share">分享</string>
@@ -125,16 +122,12 @@
     <string name="conversion_succeeded_copy_link">复制 %1$s 链接</string>
     <string name="user_preferences_automation_description">选择当地图链接转换为坐标时要自动执行的操作。</string>
     <string name="user_preferences_automation_nothing">无</string>
-    <string name="conversion_succeeded_open_app">打开 %1$s</string>
     <string name="user_preferences_automation_title">自动化</string>
     <string name="main_random">随机链接</string>
-    <string name="conversion_succeeded_copy_link_display">复制链接以在 %1$s 中显示地图</string>
-    <string name="conversion_succeeded_copy_link_drive_to">复制链接以在 %1$s 中导航</string>
     <string name="conversion_succeeded_open_app_display">在 %1$s 中显示地图</string>
     <string name="conversion_succeeded_open_app_navigate_to">在 %1$s 中导航</string>
     <string name="converter_amap_loading_indicator_title">正在连接到高德地图…</string>
     <string name="converter_amap_permission_title">连接到高德地图？</string>
-    <string name="conversion_succeeded_copy_link_street_view">复制 %1$s 的街景链接</string>
     <string name="conversion_succeeded_open_app_street_view">在 %1$s 显示街景</string>
     <string name="converter_urbi_permission_title">连接到 2GIS / Urbi？</string>
     <string name="converter_urbi_loading_indicator_title">正在连接到 2GIS / Urbi…</string>

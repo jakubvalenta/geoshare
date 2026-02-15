@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="conversion_succeeded_copy_coordinates">Koordinatları kopyala</string>
-    <string name="conversion_succeeded_copy_google_maps">Google Haritalar’ı Kopyala</string>
     <string name="conversion_succeeded_copy_link">%1$s bağlantısını kopyala</string>
-    <string name="conversion_succeeded_copy_link_display">Haritayı %1$s’de göstermek için bağlantıyı kopyala</string>
-    <string name="conversion_succeeded_copy_link_drive_to">%1$s’de gezinmek için bağlantıyı kopyalayın</string>
-    <string name="conversion_succeeded_copy_link_street_view">%1$s’deki sokak görünümüne bağlantıyı kopyala</string>
-    <string name="conversion_succeeded_open_app">%1$s’yi Aç</string>
     <string name="conversion_succeeded_open_app_display">Haritayı %1$s’de göster</string>
     <string name="conversion_succeeded_share">Paylaş</string>
     <string name="conversion_succeeded_skip">Orijinal bağlantıyı kopyala</string>
@@ -93,8 +88,6 @@
     <string name="permission_do_not_ask">Bana bir daha sorma</string>
     <string name="faq_title">SSS</string>
     <string name="faq_how_it_works_headline">Nasıl çalışır ve gizlilik hususları</string>
-    <string name="faq_item_collapse">Bölümü daralt</string>
-    <string name="faq_item_expand">Bölümü genişlet</string>
     <string name="user_preferences_title">Tercihler</string>
     <string name="user_preferences_automation_description">Bir harita bağlantısı koordinatlara dönüştürüldüğünde otomatik olarak gerçekleştirilecek eylemi seçin.</string>
     <string name="user_preferences_automation_nothing">Hiçbiri</string>

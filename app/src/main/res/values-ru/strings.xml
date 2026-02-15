@@ -47,8 +47,6 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Больше не спрашивать меня</string>
     <string name="faq_title">ЧаВо</string>
-    <string name="faq_item_collapse">Свернуть раздел</string>
-    <string name="faq_item_expand">Развернуть раздел</string>
     <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису (Google, Apple и т.д.)?</string>
     <string name="user_preferences_title">Настройки</string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
@@ -83,7 +81,6 @@
     <string name="conversion_succeeded_skip">Копировать изначальную ссылку</string>
     <string name="conversion_succeeded_title">Координаты</string>
     <string name="conversion_error_title">Ошибка</string>
-    <string name="conversion_succeeded_copy_google_maps">Копировать ссылку на Карты Google</string>
     <string name="conversion_succeeded_save_gpx">Сохранить как GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s результат %2$s.gpx</string>
     <string name="conversion_succeeded_share">Поделиться</string>
@@ -105,13 +102,9 @@
     <string name="not_available">Недоступно</string>
     <string name="conversion_succeeded_copy_coordinates">Копировать координаты</string>
     <string name="conversion_succeeded_copy_link">Копировать ссылку %1$s</string>
-    <string name="conversion_succeeded_copy_link_display">Копировать ссылку на отображение карты в %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Копировать ссылку на навигацию в %1$s</string>
-    <string name="conversion_succeeded_copy_link_street_view">Копировать ссылку на обзор улицы в %1$s</string>
     <string name="conversion_succeeded_location_failed">Не удалось найти местоположение</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Поиск вашего местоположения…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">Разрешить доступ к местоположению?</string>
-    <string name="conversion_succeeded_open_app">Открыть %1$s</string>
     <string name="conversion_succeeded_open_app_display">Показать карту в %1$s</string>
     <string name="conversion_succeeded_open_app_failed">Не удалось открыть %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навигация в %1$s</string>

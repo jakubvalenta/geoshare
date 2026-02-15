@@ -64,6 +64,12 @@ open class NetworkTools(
         }
     }
 
+    /**
+     * Make a GET request to [url] and call [block] with the resulting [ByteReadChannel].
+     *
+     * The network request as well as the [block] are executed on [dispatcher]. When the [block] finishes, the channel
+     * is closed.
+     */
     @Throws(NetworkException::class)
     open suspend fun <T> getSource(
         url: URL,

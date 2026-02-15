@@ -1,7 +1,7 @@
 - Add copy to clipboard feature.
 - Add support for 'maps.google.com?q=(place)' URLs.
 - Add support for 'maps.google.com/placelists/list' URLs.
-- Fix crash when converting URL due to cancelled coroutine job.
+- Fix crash when converting URL due to canceled coroutine job.
 - Fix some URLs by following redirects when getting HTML document.
 - Add support for Android 7.1.
 - Add an FAQ screen.

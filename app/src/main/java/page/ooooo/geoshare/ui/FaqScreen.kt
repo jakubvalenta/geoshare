@@ -187,18 +187,25 @@ fun FaqItem(
     itemId: FaqItemId,
     expandedItemId: FaqItemId?,
     onSetExpandedItemId: (FaqItemId?) -> Unit,
-    headline: String,
+    title: String,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     ExpandablePane(
         expanded = expandedItemId == itemId,
-        headline = headline,
-        onSetExpanded = { onSetExpandedItemId(itemId) },
+        onSetExpanded = { onSetExpandedItemId(if (expandedItemId != itemId) itemId else null) },
+        title = {
+            Text(
+                title,
+                Modifier.weight(1f),
+                style = MaterialTheme.typography.headlineSmall,
+            )
+        },
+        modifier = Modifier.padding(top = spacing.tinyAdaptive),
     ) {
         Column(
-            Modifier.padding(end = endOffset),
+            Modifier.padding(top = spacing.smallAdaptive, end = endOffset),
             verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
         ) {
             content()

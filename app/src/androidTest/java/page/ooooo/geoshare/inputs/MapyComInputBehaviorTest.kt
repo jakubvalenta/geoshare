@@ -1,15 +1,12 @@
 package page.ooooo.geoshare.inputs
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class MapyComInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
-        // Launch app and close intro
-        launchApplication()
-        closeIntro()
-
+    fun mapyCom() {
         // Coordinates
         testUri(
             WGS84Point(50.0525078, 14.0184810, z = 9.0),
@@ -25,6 +22,11 @@ class MapyComInputBehaviorTest : BaseInputBehaviorTest() {
             WGS84Point(50.0992553, 14.4336590, z = 19.0),
             "https://mapy.com/en/zakladni?source=firm&id=13362491&x=14.4336590&y=50.0992553&z=19",
         )
+    }
+
+    @Test
+    fun mapyComHtml() = runBlocking {
+        assumeDomainResolvable("mapy.com")
 
         // Short URI
         testUri(
@@ -34,13 +36,6 @@ class MapyComInputBehaviorTest : BaseInputBehaviorTest() {
         testUri(
             WGS84Point(50.0858554, 14.4624724, z = 17.0),
             "https://mapy.cz/s/jetucaputu",
-        )
-
-        // Text
-        testTextUri(
-            WGS84Point(41.9966006, -6.1223825),
-            @Suppress("SpellCheckingInspection")
-            "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha",
         )
     }
 }

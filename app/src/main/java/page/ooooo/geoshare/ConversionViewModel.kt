@@ -1,39 +1,31 @@
 package page.ooooo.geoshare
 
-import android.app.Activity
-import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
-import androidx.datastore.preferences.core.MutablePreferences
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import page.ooooo.geoshare.data.AppsRepository
+import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
-import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
-import page.ooooo.geoshare.data.local.preferences.UserPreference
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.billing.Billing
-import page.ooooo.geoshare.lib.billing.BillingProduct
-import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.billing.FeatureStatus
-import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionRan
 import page.ooooo.geoshare.lib.conversion.ActionReady
@@ -41,8 +33,9 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.FileActionReady
+import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationActionReady
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
 import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
@@ -52,17 +45,25 @@ import page.ooooo.geoshare.lib.conversion.ReceivedUriString
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.inputs.allInputs
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.Automation
 import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.getOutputsForApps
+import page.ooooo.geoshare.lib.outputs.getOutputsForLinks
+import page.ooooo.geoshare.lib.outputs.getOutputsForPoint
+import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
+import page.ooooo.geoshare.lib.outputs.getOutputsForPoints
+import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
+import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.toWGS84
-import page.ooooo.geoshare.lib.point.writeGpxPoints
-import page.ooooo.geoshare.ui.SavableDelegate
 import javax.inject.Inject
-import kotlin.time.Duration
 
+@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
+    appsRepository: AppsRepository,
+    private val linkRepository: LinkRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val billing: Billing,
     savedStateHandle: SavedStateHandle,
@@ -70,17 +71,19 @@ class ConversionViewModel @Inject constructor(
 
     val stateContext = ConversionStateContext(
         inputs = allInputs,
+        linkRepository = linkRepository,
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
     ) { newState ->
+        Log.d(TAG, "Current state is ${newState::class.simpleName}")
         _currentState.value = newState
         when (newState) {
-            is ConversionState.HasLoadingIndicator -> {
+            is ConversionState.HasLargeLoadingIndicator -> {
                 loadingIndicatorJob?.cancel()
                 loadingIndicatorJob = viewModelScope.launch {
                     // Show loading indicator only if the state lasts longer than 200ms.
                     delay(200L)
-                    _loadingIndicator.value = newState.loadingIndicator
+                    _largeLoadingIndicatorVisible.value = true
                 }
             }
 
@@ -89,7 +92,7 @@ class ConversionViewModel @Inject constructor(
                 loadingIndicatorJob = viewModelScope.launch {
                     // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
                     delay(200L)
-                    _loadingIndicator.value = null
+                    _largeLoadingIndicatorVisible.value = false
                 }
             }
         }
@@ -98,93 +101,71 @@ class ConversionViewModel @Inject constructor(
     private val _currentState = MutableStateFlow<State>(Initial())
     val currentState: StateFlow<State> = _currentState
 
-    var inputUriString by SavableDelegate(savedStateHandle, "inputUriString", "")
+    var inputUriString by savedStateHandle.saveable("inputUriString") { mutableStateOf("") }
 
-    private val _loadingIndicator = MutableStateFlow<LoadingIndicator?>(null)
-    val loadingIndicator: StateFlow<LoadingIndicator?> = _loadingIndicator
+    private val _largeLoadingIndicatorVisible = MutableStateFlow(false)
+    val largeLoadingIndicatorVisible: StateFlow<Boolean> = _largeLoadingIndicatorVisible
 
     private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
 
-    val automationFeatureStatus: StateFlow<FeatureStatus> = billing.status.map {
-        when (it) {
-            is BillingStatus.Loading -> FeatureStatus.LOADING
-            is BillingStatus.Purchased if billing.features.contains(AutomationFeature) -> FeatureStatus.AVAILABLE
-            else -> FeatureStatus.NOT_AVAILABLE
-        }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        FeatureStatus.LOADING,
-    )
-    val billingAppNameResId: Int = billing.appNameResId
-    val billingMessage: StateFlow<Message?> = billing.message
-    val billingFeatures: ImmutableList<Feature> = billing.features
-    val billingOffers: StateFlow<List<Offer>> = billing.status
-        .filter { it !is BillingStatus.Loading }
-        .distinctUntilChanged()
-        .map {
-            billing.queryOffers()
-        }
+    val appDetails = appsRepository.appDetails
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            emptyList(),
+            emptyMap(),
         )
-    val billingRefundableDuration: Duration = billing.refundableDuration
-    val billingStatus: StateFlow<BillingStatus> = billing.status
+    val outputsForPoint: StateFlow<List<PointOutput>> =
+        linkRepository.all.map { getOutputsForPoint(it) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
+            )
+    val outputsForPoints: StateFlow<List<PointsOutput>> =
+        flow { emit(getOutputsForPoints()) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
+            )
+    val outputsForPointChips: StateFlow<List<PointOutput>> =
+        linkRepository.all.map { getOutputsForPointChips(it) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
+            )
+    val outputsForPointsChips: StateFlow<List<PointsOutput>> =
+        flow { emit(getOutputsForPointsChips()) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
+            )
+    val outputsForApps: StateFlow<Map<String, List<Output>>> =
+        appsRepository.apps.map { apps -> getOutputsForApps(apps) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyMap(),
+            )
+    val outputsForLinks: StateFlow<Map<String?, List<Output>>> =
+        linkRepository.all.map { links -> getOutputsForLinks(links) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyMap(),
+            )
+    val outputsForSharing: StateFlow<List<Output>> =
+        flow { emit(getOutputsForSharing()) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
+            )
 
-    val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            UserPreferencesValues(),
-        )
-
-    val automation: StateFlow<Automation> = userPreferencesRepository.values
-        .map { it.automation }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            AutomationPreference.default,
-        )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val changelogShown: StateFlow<Boolean> = userPreferencesRepository.values
-        .map { it.changelogShownForVersionCode }
-        .distinctUntilChanged()
-        .mapLatest { changelogShownForVersionCodeValue ->
-            if (changelogShownForVersionCodeValue != null) {
-                stateContext.inputs.all { input ->
-                    input.documentation.items.all { inputDocumentationItem ->
-                        inputDocumentationItem.addedInVersionCode <= changelogShownForVersionCodeValue
-                    }
-                }
-            } else {
-                true
-            }
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            true,
-        )
-
-    val changelogShownForVersionCode: StateFlow<Int?> = userPreferencesRepository.values
-        .map { it.changelogShownForVersionCode }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            ChangelogShownForVersionCodePreference.default,
-        )
-
-    val introShown: StateFlow<Boolean> = userPreferencesRepository.values
-        .map { it.introShownForVersionCode != IntroShowForVersionCodePreference.default }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            true,
-        )
+    // Methods
 
     fun start() {
         stateContext.currentState = ReceivedUriString(stateContext, inputUriString)
@@ -200,8 +181,8 @@ class ConversionViewModel @Inject constructor(
                 }
                 stateContext.transition()
             } catch (tr: Exception) {
-                stateContext.log.e(null, "Exception while transitioning state", tr)
-                stateContext.log.e(null, tr.stackTraceToString())
+                stateContext.log.e(TAG, "Exception while transitioning state", tr)
+                stateContext.log.e(TAG, tr.stackTraceToString())
                 stateContext.currentState = ConversionFailed(
                     R.string.conversion_failed_parse_url_error,
                     inputUriString,
@@ -222,94 +203,8 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun showLocationRationale(action: LocationAction, i: Int?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                LocationRationaleShown(currentState.inputUriString, currentState.points, i, action)
-            }
-        }
-    }
-
-    fun skipLocationRationale(action: LocationAction, i: Int?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                LocationPermissionReceived(currentState.inputUriString, currentState.points, i, action)
-            }
-        }
-    }
-
-    fun receiveLocationPermission() {
-        (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
-            transition {
-                LocationPermissionReceived(
-                    currentState.inputUriString, currentState.points, currentState.i, currentState.action
-                )
-            }
-        }
-    }
-
-    fun receiveLocation(action: LocationAction, i: Int?, location: Point?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                LocationReceived(currentState.inputUriString, currentState.points, i, action, location)
-            }
-        }
-    }
-
-    fun cancelLocationFinding() {
-        (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
-            transition {
-                ActionFinished(currentState.inputUriString, currentState.points, currentState.action)
-            }
-        }
-    }
-
-    fun runAction(action: Action, i: Int?) {
-        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
-            transition {
-                ActionReady(currentState.inputUriString, currentState.points, i, action)
-            }
-        }
-    }
-
-    fun finishBasicAction(success: Boolean?) {
-        (stateContext.currentState as? BasicActionReady)?.let { currentState ->
-            transition {
-                ActionRan(currentState.inputUriString, currentState.points, currentState.action, success)
-            }
-        }
-    }
-
-    fun finishLocationAction(success: Boolean?) {
-        (stateContext.currentState as? LocationActionReady)?.let { currentState ->
-            transition {
-                ActionRan(currentState.inputUriString, currentState.points, currentState.action, success)
-            }
-        }
-    }
-
-    fun writeGpx(writer: Appendable) {
-        (stateContext.currentState as? ConversionState.HasResult)?.points?.toWGS84()?.writeGpxPoints(writer)
-    }
-
-    fun launchBillingFlow(activity: Activity, offerToken: String) {
-        viewModelScope.launch {
-            billing.launchBillingFlow(activity, offerToken)
-        }
-    }
-
-    fun manageBillingProduct(product: BillingProduct) {
-        billing.manageProduct(product)
-    }
-
     fun cancel() {
         transitionJob?.cancel()
-    }
-
-    fun updateInput(value: String) {
-        withMutableSnapshot {
-            inputUriString = value
-        }
     }
 
     fun reset() {
@@ -318,42 +213,140 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun setChangelogShown() {
-        val newestInputAddedInVersionCode = allInputs.maxOfOrNull { input ->
-            input.documentation.items.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE
-        } ?: BuildConfig.VERSION_CODE
-        setUserPreferenceValue(ChangelogShownForVersionCodePreference, newestInputAddedInVersionCode)
-    }
+    // Any action
 
-    fun setIntroShown() {
-        setUserPreferenceValue(IntroShowForVersionCodePreference, BuildConfig.VERSION_CODE)
-    }
-
-    fun <T> setUserPreferenceValue(userPreference: UserPreference<T>, value: T) {
-        viewModelScope.launch {
-            userPreferencesRepository.setValue(userPreference, value)
+    fun startAction(action: Action<*>) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            transition {
+                ActionReady(currentState.inputUriString, currentState.points, action, isAutomation = false)
+            }
         }
     }
 
-    fun editUserPreferences(transform: (preferences: MutablePreferences) -> Unit) {
-        viewModelScope.launch {
-            userPreferencesRepository.edit(transform)
+    fun finishBasicAction(success: Boolean?) {
+        (stateContext.currentState as? BasicActionReady)?.let { currentState ->
+            transition {
+                ActionRan(
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation,
+                    success,
+                )
+            }
         }
     }
 
-    fun onResume(activity: Activity) {
-        billing.startConnection()
-        viewModelScope.launch {
-            billing.showInAppMessages(activity)
+    // File action
+
+    fun receiveFileUri(uri: Uri) {
+        (stateContext.currentState as? FileUriRequested)?.let { currentState ->
+            transition {
+                FileActionReady(
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation,
+                    uri,
+                )
+            }
         }
     }
 
-    fun onPause() {
-        billing.endConnection()
+    fun cancelFileUriRequest() {
+        (stateContext.currentState as? FileUriRequested)?.let { currentState ->
+            transition {
+                ActionFinished(
+                    currentState.inputUriString, currentState.points, currentState.action, currentState.isAutomation
+                )
+            }
+        }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        billing.endConnection()
+    fun finishFileAction(success: Boolean?) {
+        (stateContext.currentState as? FileActionReady)?.let { currentState ->
+            transition {
+                ActionRan(
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation,
+                    success,
+                )
+            }
+        }
+    }
+
+    // Location action
+
+    fun showLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            transition {
+                LocationRationaleShown(currentState.inputUriString, currentState.points, action, isAutomation)
+            }
+        }
+    }
+
+    fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            transition {
+                LocationPermissionReceived(currentState.inputUriString, currentState.points, action, isAutomation)
+            }
+        }
+    }
+
+    fun receiveLocationPermission() {
+        (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
+            transition {
+                LocationPermissionReceived(
+                    currentState.inputUriString, currentState.points, currentState.action, currentState.isAutomation
+                )
+            }
+        }
+    }
+
+    fun receiveLocation(action: LocationAction<*>, isAutomation: Boolean, location: Point?) {
+        (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
+            transition {
+                LocationReceived(
+                    currentState.inputUriString, currentState.points, action, isAutomation, location
+                )
+            }
+        }
+    }
+
+    fun cancelLocationFinding() {
+        (stateContext.currentState as? LocationPermissionReceived)?.let { currentState ->
+            transition {
+                ActionFinished(
+                    currentState.inputUriString, currentState.points, currentState.action, currentState.isAutomation
+                )
+            }
+        }
+    }
+
+    fun finishLocationAction(success: Boolean?) {
+        (stateContext.currentState as? LocationActionReady)?.let { currentState ->
+            transition {
+                ActionRan(
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation,
+                    success,
+                )
+            }
+        }
+    }
+
+    // Lifecycle
+
+    fun onCreateOrNewIntent(intent: Intent) {
+        inputUriString = AndroidTools.getIntentUriString(intent) ?: ""
+        start()
+    }
+
+    companion object {
+        const val TAG = "ConversionViewModel"
     }
 }

@@ -6,10 +6,11 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.point.NaivePoint
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object MapyComInput : Input.HasShortUri {
+object MapyComInput : ShortUriInput, Input.HasRandomUri {
     private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
 
     override val uriPattern =
@@ -25,7 +26,7 @@ object MapyComInput : Input.HasShortUri {
         ),
     )
     override val shortUriPattern = Regex("""(?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+""")
-    override val shortUriMethod = Input.ShortUriMethod.GET
+    override val shortUriMethod = ShortUriInput.Method.GET
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
@@ -46,7 +47,7 @@ object MapyComInput : Input.HasShortUri {
                 }
 
                 // Query params
-                // https://mapy.com/...?x=<LON>&y=<LAT>&z=<Z>
+                // https://mapy.com/...?x={lon}&y={lat}&z={z}
                 LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
                     LON_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
                         Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull().let { z ->
@@ -63,4 +64,7 @@ object MapyComInput : Input.HasShortUri {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_mapy_com_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
 }

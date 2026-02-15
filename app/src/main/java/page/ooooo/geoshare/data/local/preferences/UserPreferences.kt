@@ -1,297 +1,73 @@
 package page.ooooo.geoshare.data.local.preferences
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.billing.FeatureStatus
-import page.ooooo.geoshare.lib.outputs.Automation
-import page.ooooo.geoshare.lib.outputs.NoopAutomation
-import page.ooooo.geoshare.lib.outputs.allOutputs
-import page.ooooo.geoshare.lib.outputs.findAutomation
-import page.ooooo.geoshare.lib.outputs.getAutomations
-import page.ooooo.geoshare.ui.components.ParagraphHtml
-import page.ooooo.geoshare.ui.components.RadioButtonGroup
-import page.ooooo.geoshare.ui.components.RadioButtonOption
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.ILog
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.DataTypes
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 interface UserPreference<T> {
-    val loading: T
-
     fun getValue(values: UserPreferencesValues): T
-    fun getValue(preferences: Preferences): T
-    fun setValue(preferences: MutablePreferences, value: T)
-
-    @Composable
-    fun title(): String
-
-    @Composable
-    fun Description(enabled: Boolean = true) {
-    }
-
-    @Composable
-    fun suffix(): String? = null
-
-    @Composable
-    fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus)
-
-    @Composable
-    fun Component(
-        values: UserPreferencesValues,
-        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
-        enabled: Boolean = true,
-        featureStatus: FeatureStatus,
-    )
+    fun getValue(preferences: Preferences, log: ILog = DefaultLog): T
+    fun setValue(preferences: MutablePreferences, value: T, log: ILog = DefaultLog)
 }
 
-abstract class SingleKeyPreference<T> : UserPreference<T> {
-    abstract val key: Preferences.Key<String>
-    abstract val default: T
+interface TextUserPreference<T> : UserPreference<T> {
+    val key: Preferences.Key<String>
+    val default: T
 
-    open val modifier: Modifier = Modifier
+    fun serialize(value: T): String
 
-    protected abstract fun serialize(value: T): String
+    fun deserialize(value: String?): T
 
-    protected abstract fun deserialize(value: String?): T
+    fun isValid(value: String?): Boolean = true
 
-    override fun getValue(preferences: Preferences): T = deserialize(preferences[key])
+    override fun getValue(preferences: Preferences, log: ILog): T = deserialize(preferences[key])
 
-    override fun setValue(preferences: MutablePreferences, value: T) = preferences.set(key, serialize(value))
-
-    @Composable
-    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
-        val value = getValue(values)
-        Text(serialize(value ?: default))
-    }
-
-    @Composable
-    override fun Component(
-        values: UserPreferencesValues,
-        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
-        enabled: Boolean,
-        featureStatus: FeatureStatus,
-    ) {
-        val value = getValue(values)
-        val spacing = LocalSpacing.current
-        val (inputValue, setInputValue) = remember { mutableStateOf(serialize(value)) }
-        val error = getError(inputValue)
-
-        OutlinedTextField(
-            value = inputValue,
-            onValueChange = {
-                setInputValue(it)
-                onValueChange { preferences -> setValue(preferences, deserialize(it)) }
-            },
-            modifier = modifier.padding(top = spacing.tinyAdaptive),
-            enabled = enabled,
-            suffix = suffix()?.let { text ->
-                {
-                    Text(
-                        text,
-                        color = if (error == null) {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        },
-                    )
-                }
-            },
-            trailingIcon = {
-                IconButton({
-                    setInputValue(serialize(default))
-                    onValueChange { preferences -> setValue(preferences, default) }
-                }) {
-                    Icon(
-                        Icons.Default.Refresh,
-                        stringResource(R.string.reset),
-                    )
-                }
-            },
-            supportingText = error?.let { error ->
-                {
-                    Text(error)
-                }
-            },
-            isError = error != null,
-            singleLine = true,
-        )
-    }
-
-    @Composable
-    open fun getError(value: String?): String? = null
+    override fun setValue(preferences: MutablePreferences, value: T, log: ILog) = preferences.set(key, serialize(value))
 }
 
-abstract class NullableIntPreference : SingleKeyPreference<Int?>() {
-    override val loading = null
-
+interface NullableIntPreference : TextUserPreference<Int?> {
     override fun serialize(value: Int?) = value.toString()
 
     override fun deserialize(value: String?) = value?.toIntOrNull() ?: default
 }
 
-abstract class DurationPreference : SingleKeyPreference<Duration>() {
-    open val minValue = Int.MIN_VALUE
-    open val maxValue = Int.MAX_VALUE
+interface DurationPreference : TextUserPreference<Duration> {
+    val minSec: Int
+    val maxSec: Int
 
     override fun serialize(value: Duration) = value.toInt(DurationUnit.SECONDS).toString()
 
-    override fun deserialize(value: String?) =
-        value?.toIntOrNull()?.coerceIn(minValue, maxValue)?.seconds ?: default
+    override fun deserialize(value: String?) = value?.toIntOrNull()?.coerceIn(minSec, maxSec)?.seconds ?: default
 
-    @Composable
-    override fun suffix() = stringResource(R.string.seconds_unit)
-
-    @Composable
-    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
-        if (values.automation is Automation.HasDelay) {
-            val seconds = getValue(values).toInt(DurationUnit.SECONDS)
-            Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
-        }
-    }
-
-    @Composable
-    override fun getError(value: String?) = if (value?.toIntOrNull()?.let { it in minValue..maxValue } == true) {
-        null
-    } else {
-        stringResource(R.string.user_preferences_number_error_range, minValue, maxValue)
-    }
+    override fun isValid(value: String?) = value?.toIntOrNull()?.let { it in minSec..maxSec } == true
 }
 
-data class PreferenceOption<T>(
-    val value: T,
-    val modifier: Modifier = Modifier,
-    val icon: (@Composable () -> Unit)? = null,
-    val label: @Composable () -> Unit,
-)
-
-abstract class OptionsPreference<T> : UserPreference<T> {
-    abstract val default: T
-
-    @Composable
-    abstract fun options(): List<PreferenceOption<T>>
-
-    @Composable
-    override fun ValueLabel(values: UserPreferencesValues, featureStatus: FeatureStatus) {
-        val value = getValue(values)
-        val option = if (featureStatus == FeatureStatus.NOT_AVAILABLE) {
-            options().find { it.value == default }
-        } else {
-            options().find { it.value == value }
-                ?: options().find { it.value == default }
-        }
-        if (option != null) {
-            if (option.icon != null) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                        option.icon()
-                    }
-                    option.label()
-                }
-            } else {
-                option.label()
-            }
-        } else {
-            Text(value.toString())
-        }
-    }
-
-    @Composable
-    override fun Component(
-        values: UserPreferencesValues,
-        onValueChange: (transform: (MutablePreferences) -> Unit) -> Unit,
-        enabled: Boolean,
-        featureStatus: FeatureStatus,
-    ) {
-        val value = if (featureStatus == FeatureStatus.AVAILABLE) {
-            getValue(values)
-        } else {
-            default
-        }
-        val spacing = LocalSpacing.current
-        RadioButtonGroup(
-            selectedValue = value,
-            onSelect = {
-                onValueChange { preferences ->
-                    setValue(preferences, it)
-                }
-            },
-            modifier = Modifier.padding(top = spacing.tinyAdaptive),
-            enabled = enabled,
-        ) {
-            options().map { option ->
-                RadioButtonOption(option.value, option.modifier) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        if (option.icon != null) {
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                                option.icon()
-                            }
-                        }
-                        option.label()
-                    }
-                }
-            }
-        }
-    }
+interface OptionsPreference<T> : UserPreference<T> {
+    val default: T
 }
 
-object ConnectionPermissionPreference : OptionsPreference<Permission>() {
+object ConnectionPermissionPreference : OptionsPreference<Permission> {
     override val default = Permission.ASK
-    override val loading = default
+    val loading = default
 
     private val key = stringPreferencesKey("connect_to_google_permission")
 
-    @Composable
-    override fun options() = listOf(
-        PreferenceOption(
-            Permission.ALWAYS,
-            Modifier.testTag("geoShareUserPreferenceConnectionPermissionAlways"),
-        ) {
-            Text(stringResource(R.string.yes))
-        },
-        PreferenceOption(Permission.ASK) {
-            Text(stringResource(R.string.user_preferences_connection_option_ask))
-        },
-        PreferenceOption(Permission.NEVER) {
-            Text(stringResource(R.string.no))
-        },
-    )
-
     override fun getValue(values: UserPreferencesValues) = values.connectionPermission
 
-    override fun getValue(preferences: Preferences) = preferences[key]?.let {
+    override fun getValue(preferences: Preferences, log: ILog) = preferences[key]?.let {
         try {
             Permission.valueOf(it)
         } catch (_: IllegalArgumentException) {
@@ -299,158 +75,196 @@ object ConnectionPermissionPreference : OptionsPreference<Permission>() {
         }
     } ?: default
 
-    override fun setValue(preferences: MutablePreferences, value: Permission) {
+    override fun setValue(preferences: MutablePreferences, value: Permission, log: ILog) {
         preferences[key] = value.name
     }
 
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_connection_title)
-
-    @Composable
-    override fun Description(enabled: Boolean) {
-        ParagraphHtml(
-            stringResource(R.string.user_preferences_connection_description, stringResource(R.string.app_name)),
-            if (enabled) Modifier else Modifier.alpha(0.7f),
-        )
-    }
+    fun getOptionGroups(): List<List<Permission>> = listOf(
+        listOf(
+            Permission.ALWAYS,
+            Permission.ASK,
+            Permission.NEVER,
+        ),
+    )
 }
 
-object AutomationPreference : OptionsPreference<Automation>() {
+object AutomationPreference : OptionsPreference<Automation> {
+    private const val TAG = "Automation"
+
     override val default = NoopAutomation
-    override val loading = default
+    val loading = default
 
-    private val typeKey = stringPreferencesKey("automation")
-    private val packageNameKey = stringPreferencesKey("automation_package_name")
+    private val key = stringPreferencesKey("automation")
 
-    @Composable
-    override fun options(): List<PreferenceOption<Automation>> {
-        val context = LocalContext.current
-        val apps = AndroidTools.queryApps(context.packageManager)
-        return buildList {
-            add(NoopAutomation)
-            addAll(allOutputs.getAutomations(apps))
-        }.sortedBy { automation ->
-            when (automation.type) {
-                Automation.Type.NOOP -> 0
-                Automation.Type.COPY_COORDS_DEC -> 1
-                Automation.Type.COPY_COORDS_NSWE_DEC -> 2
-                Automation.Type.COPY_GEO_URI -> 3
-                Automation.Type.OPEN_APP -> 4
-                Automation.Type.OPEN_APP_GOOGLE_MAPS_NAVIGATE_TO -> 5
-                Automation.Type.OPEN_APP_GOOGLE_MAPS_STREET_VIEW -> 6
-                Automation.Type.OPEN_APP_MAGIC_EARTH_NAVIGATE_TO -> 7
-                Automation.Type.OPEN_APP_GPX_ROUTE -> 8
-                Automation.Type.COPY_APPLE_MAPS_URI -> 9
-                Automation.Type.COPY_APPLE_MAPS_NAVIGATE_TO_URI -> 10
-                Automation.Type.COPY_GOOGLE_MAPS_URI -> 11
-                Automation.Type.COPY_GOOGLE_MAPS_NAVIGATE_TO_URI -> 12
-                Automation.Type.COPY_GOOGLE_MAPS_STREET_VIEW_URI -> 13
-                Automation.Type.COPY_MAGIC_EARTH_URI -> 14
-                Automation.Type.COPY_MAGIC_EARTH_NAVIGATE_TO_URI -> 15
-                Automation.Type.SAVE_GPX -> 16
-                Automation.Type.SHARE -> 17
-                Automation.Type.SHARE_GPX_ROUTE -> 18
-            }
-        }.map { automation ->
-            PreferenceOption(
-                value = automation,
-                modifier = automation.testTag?.let { Modifier.testTag(it) } ?: Modifier,
-                icon = automation.getIcon(),
-            ) {
-                automation.Label()
-            }
-        }
+    /**
+     * Instance of [Json] for serialization.
+     *
+     * It's configured in such a way that it allows deserializing an old string after new properties have been added to
+     * a class. So that we can update the [Automation] classes and users don't lose their preferences.
+     */
+    private val json = Json {
+        encodeDefaults = false
+        ignoreUnknownKeys = true
     }
 
     override fun getValue(values: UserPreferencesValues) = values.automation
 
-    override fun getValue(preferences: Preferences): Automation =
-        preferences[typeKey]?.let {
-            try {
-                Automation.Type.valueOf(it)
-            } catch (_: IllegalArgumentException) {
-                null
-            }
-        }?.let { type ->
-            preferences[packageNameKey]?.ifEmpty { null }.let { packageName ->
-                allOutputs.findAutomation(type, packageName)
-            }
-        } ?: default
+    override fun getValue(preferences: Preferences, log: ILog) =
+        getValueOrNull(preferences, log)
+            ?: @Suppress("DEPRECATION") getOldValueOrNull(preferences, log)
+            // Silently ignore serialization errors, because they should never happen, because we test all automations
+            // in unit tests.
+            ?: default
 
-    override fun setValue(preferences: MutablePreferences, value: Automation) {
-        preferences[typeKey] = value.type.name
-        preferences[packageNameKey] = value.packageName
+    /**
+     * Get [Automation] from [preferences] by deserializing a JSON stored in a single string key.
+     */
+    private fun getValueOrNull(preferences: Preferences, log: ILog): Automation? {
+        val serializedString = preferences[key] ?: return NoopAutomation
+        return try {
+            json.decodeFromString<Automation>(serializedString)
+        } catch (tr: IllegalArgumentException) {
+            log.e(TAG, "Deserialization error", tr)
+            null
+        }
     }
 
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_automation_title)
-
-    @Composable
-    override fun Description(enabled: Boolean) {
-        ParagraphHtml(
-            stringResource(R.string.user_preferences_automation_description),
-            if (enabled) Modifier else Modifier.alpha(0.7f),
+    /**
+     * Get [Automation] from [preferences] by reading automation type and package name from two different string keys.
+     *
+     * This is an old way of storing automation in preferences, which we keep for backward compatibility. So that users
+     * of old app versions don't lose their automation preference after upgrading the app.
+     */
+    @Deprecated("Replaced with getValueOrNull")
+    private fun getOldValueOrNull(preferences: Preferences, log: ILog): Automation? {
+        val type = preferences[key] ?: return NoopAutomation
+        val oldPackageNameKey = stringPreferencesKey("automation_package_name")
+        val packageName = preferences[oldPackageNameKey]
+        val serializedString = json.encodeToString(
+            @Suppress("DEPRECATION")
+            OldData(type = type, packageName = packageName)
         )
+        return try {
+            json.decodeFromString<Automation>(serializedString)
+        } catch (tr: IllegalArgumentException) {
+            log.e(TAG, "Deserialization error", tr)
+            null
+        }
     }
+
+    @Deprecated("Replaced with getValueOrNull")
+    @Serializable
+    private data class OldData(val type: String?, val packageName: String?)
+
+    override fun setValue(preferences: MutablePreferences, value: Automation, log: ILog) {
+        val serializedString = try {
+            json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because they should never happen, because we test all automations
+            // in unit tests.
+            log.e(TAG, "Serialization error", tr)
+            return
+        }
+        preferences[key] = serializedString
+    }
+
+    fun getOptionGroups(apps: DataTypes, appDetails: AppDetails, links: List<Link>): List<List<Automation>> = listOf(
+        listOf(
+            NoopAutomation,
+        ),
+        listOf(
+            CopyCoordsDecAutomation,
+            CopyCoordsDegMinSecAutomation,
+            CopyGeoUriAutomation,
+            ShareDisplayUriAutomation,
+            ShareNavigationGoogleUriAutomation,
+            ShareStreetViewGoogleUriAutomation,
+            SavePointGpxAutomation,
+        ),
+        listOf(
+            ShareRouteGpxAutomation,
+            SharePointsGpxAutomation,
+            SaveRouteGpxAutomation,
+            SavePointsGpxAutomation,
+        ),
+        apps
+            .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
+            .flatMap { (packageName, dataTypes) ->
+                buildList {
+                    if (DataType.GEO_URI in dataTypes) {
+                        add(OpenDisplayGeoUriAutomation(packageName))
+                    }
+                    if (DataType.MAGIC_EARTH_URI in dataTypes) {
+                        add(OpenDisplayMagicEarthUriAutomation(packageName))
+                        add(OpenNavigationMagicEarthUriAutomation(packageName))
+                    }
+                    if (DataType.GOOGLE_NAVIGATION_URI in dataTypes) {
+                        add(OpenNavigationGoogleUriAutomation(packageName))
+                    }
+                    if (DataType.GOOGLE_STREET_VIEW_URI in dataTypes) {
+                        add(OpenStreetViewGoogleUriAutomation(packageName))
+                    }
+                    if (DataType.GPX_DATA in dataTypes) {
+                        add(OpenRouteGpxAutomation(packageName))
+                        add(OpenPointsGpxAutomation(packageName))
+                    }
+                    if (DataType.GPX_ONE_POINT_DATA in dataTypes) {
+                        add(OpenRouteOnePointGpxAutomation(packageName))
+                    }
+                }
+            },
+        links
+            .groupBy { it.groupOrName }
+            .toSortedMap()
+            .flatMap { (_, links) ->
+                listOf(
+                    *links.map { ShareLinkUriAutomation(it.uuid) }.toTypedArray(),
+                    *links.map { CopyLinkUriAutomation(it.uuid) }.toTypedArray(),
+                )
+            },
+    )
 }
 
-object AutomationDelayPreference : DurationPreference() {
-    override val key = stringPreferencesKey("automation_delay")
+object AutomationDelayPreference : DurationPreference {
     override val default = 5.seconds
-    override val loading = default
-    override val modifier = Modifier
-    override val minValue = 0
-    override val maxValue = 60
+    val loading = default
+
+    override val key = stringPreferencesKey("automation_delay")
+    override val minSec = 0
+    override val maxSec = 60
 
     override fun getValue(values: UserPreferencesValues) = values.automationDelay
-
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_automation_delay_sec_title)
-
-    @Composable
-    override fun Description(enabled: Boolean) {
-        ParagraphHtml(
-            stringResource(R.string.user_preferences_automation_delay_sec_description),
-            if (enabled) Modifier else Modifier.alpha(0.7f),
-        )
-    }
 }
 
-object BillingCachedProductIdPreference : SingleKeyPreference<String?>() {
-    override val key = stringPreferencesKey("billing_product_id")
+object BillingCachedProductIdPreference : TextUserPreference<String?> {
     override val default = ""
-    override val loading = ""
+    val loading = default
+
+    override val key = stringPreferencesKey("billing_product_id")
 
     override fun serialize(value: String?) = value.orEmpty()
 
     override fun deserialize(value: String?) = value?.ifEmpty { null }
 
     override fun getValue(values: UserPreferencesValues) = values.billingCachedProductId
-
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_billing_cached_product_id)
 }
 
-object IntroShowForVersionCodePreference : NullableIntPreference() {
-    override val key = stringPreferencesKey("intro_shown_for_version_code")
+object IntroShowForVersionCodePreference : NullableIntPreference {
+    val loading = null
+
     override val default = 0
-    override val modifier = Modifier
+    override val key = stringPreferencesKey("intro_shown_for_version_code")
 
     override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCode
-
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_last_run_version_code_title)
 }
 
-object ChangelogShownForVersionCodePreference : NullableIntPreference() {
+object ChangelogShownForVersionCodePreference : NullableIntPreference {
+    val loading = null
+
     override val key = stringPreferencesKey("changelog_shown_for_version_code")
     override val default = BuildConfig.VERSION_CODE
-    override val modifier = Modifier.testTag("geoShareUserPreferenceChangelogShownForVersionCode")
 
     override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCode
-
-    @Composable
-    override fun title() = stringResource(R.string.user_preferences_changelog_shown_for_version_code_title)
 }
 
 data class UserPreferencesValues(

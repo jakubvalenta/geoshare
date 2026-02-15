@@ -5,6 +5,8 @@ import com.github._46319943.bd09convertor.BD09Convertor
 import com.github.wandergis.coordtransform.CoordTransform
 import com.lbt05.evil_transform.GCJPointer
 import com.lbt05.evil_transform.WGSPointer
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.extensions.toTrimmedString
 import page.ooooo.geoshare.lib.geo.isPointInChina
@@ -24,7 +26,7 @@ sealed interface Point {
             maxLat: Double = 80.0,
             minLon: Double = -180.0,
             maxLon: Double = 180.0,
-            z: Double? = null,
+            z: Double = 16.0,
             name: String? = null,
         ): Point {
             val lat = Random.nextDouble(minLat, maxLat).toScale(6)
@@ -53,6 +55,35 @@ sealed interface Point {
     fun toWGS84(): WGS84Point
 
     fun toGCJ02(): GCJ02Point
+
+    fun formatUriString(
+        coordsUriTemplate: String,
+        nameUriTemplate: String = "",
+        srs: Srs = Srs.WGS84,
+        defaultZ: Double = 16.0,
+        uriQuote: UriQuote = DefaultUriQuote,
+    ): String? =
+        when (srs) {
+            Srs.WGS84 -> toWGS84()
+            Srs.GCJ02 -> toGCJ02()
+        }
+            .run {
+                latStr?.let { latStr ->
+                    lonStr?.let { lonStr ->
+                        val zOrDefaultStr = (z ?: defaultZ).toScale(7).toTrimmedString()
+                        coordsUriTemplate
+                            .replace("{lat}", uriQuote.encode(latStr))
+                            .replace("{lon}", uriQuote.encode(lonStr))
+                            .replace("{z}", uriQuote.encode(zOrDefaultStr))
+                            .replace("{name}", uriQuote.encode(cleanName.orEmpty()))
+                            .takeIf { it.isNotEmpty() }
+                    }
+                } ?: cleanName?.let { cleanName ->
+                    nameUriTemplate
+                        .replace("{q}", uriQuote.encode(cleanName))
+                        .takeIf { it.isNotEmpty() }
+                }
+            }
 }
 
 @Immutable

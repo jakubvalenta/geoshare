@@ -18,7 +18,7 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asGCJ02
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
+object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
 
     override val uriPattern =
@@ -37,7 +37,7 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
         ),
     )
     override val shortUriPattern = Regex("""(?:https?://)?$SHORT_URL""")
-    override val shortUriMethod = Input.ShortUriMethod.HEAD
+    override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
@@ -221,4 +221,13 @@ object GoogleMapsInput : Input.HasShortUri, Input.HasHtml, Input.HasWeb {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_google_maps_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString(
+            listOf(
+                "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
+                "https://www.google.com/maps/dir/?api=1&destination={lat}%2C{lon}",
+                "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat}%2C{lon}",
+            ).random()
+        )
 }

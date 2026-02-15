@@ -6,10 +6,11 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object OsmAndInput : Input {
+object OsmAndInput : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OSM_AND,
@@ -22,12 +23,15 @@ object OsmAndInput : Input {
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         points = buildPoints {
             uri.run {
-                LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()
-                        ?.also { points.add(it) }
+                listOf("pin", "finish", "start").firstNotNullOfOrNull { key ->
+                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint()?.also { points.add(it) }
+                } ?: Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also { points.add(it) }
 
                 Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()?.also { defaultZ = it }
             }
         }.asWGS84()
     }
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://osmand.net/map?pin={lat}%2C{lon}")
 }

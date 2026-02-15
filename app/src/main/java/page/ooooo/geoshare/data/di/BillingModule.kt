@@ -16,7 +16,6 @@ object BillingModule {
 
     @Provides
     @Singleton
-    fun provideBilling(@ApplicationContext context: Context): Billing {
-        return BillingImpl(context)
-    }
+    fun provideBilling(@ApplicationContext context: Context): Billing =
+        BillingImpl(context)
 }

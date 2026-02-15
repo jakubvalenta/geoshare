@@ -8,7 +8,7 @@ import page.ooooo.geoshare.lib.Uri
  * Debug input is useful for WebView testing, because it has web parsing enabled but doesn't make a request to
  * a commercial website.
  */
-object DebugInput : Input.HasWeb {
+object DebugInput : WebInput {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?example\.com(?:/\S+|$)""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.DEBUG,
