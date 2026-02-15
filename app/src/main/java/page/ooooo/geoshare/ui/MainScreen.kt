@@ -72,7 +72,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.GoogleMapsAppType
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -1001,7 +1001,7 @@ private fun AutomationPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
                 i = null,
-                action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
+                action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
                 delay = 3.seconds,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -1044,7 +1044,7 @@ private fun DarkAutomationPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
                 i = null,
-                action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
+                action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
                 delay = 3.seconds,
             ),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
@@ -1087,7 +1087,7 @@ private fun TabletAutomationPreview() {
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
                 i = null,
-                action = GeoUriOutput.ShareGeoUriWithAppAutomation(PackageNames.GOOGLE_MAPS),
+                action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
                 delay = 3.seconds,
             ),
             billingAppNameResId = R.string.app_name,

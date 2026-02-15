@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.extensions.toDegMinSec
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.point.Point
@@ -104,7 +104,7 @@ object CoordinatesOutput : Output {
 
     override fun getRandomAction() = listOf(CopyDecCoordsAction(), CopyDegMinSecCoordsAction()).randomOrNull()
 
-    override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = listOf(
+    override fun getAutomations(apps: List<App>): List<Automation> = listOf(
         CopyDecCoordsAutomation,
         CopyDegMinSecCoordsAutomation,
     )

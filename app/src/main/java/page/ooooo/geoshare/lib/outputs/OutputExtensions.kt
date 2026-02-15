@@ -4,13 +4,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.point.Point
 
 fun List<Output>.getText(points: ImmutableList<Point>, i: Int?, uriQuote: UriQuote = DefaultUriQuote()) =
     this.firstNotNullOfOrNull { it.getText(points, i, uriQuote) }
 
-fun List<Output>.getAppActions(apps: List<AndroidTools.App>) =
+fun List<Output>.getAppActions(apps: List<App>) =
     this.flatMap { it.getAppActions(apps) }
 
 fun List<Output>.getAllPointsChipActions() =
@@ -28,7 +28,7 @@ fun List<Output>.getPointActions() =
 fun List<Output>.getChooserAction() =
     this.firstNotNullOfOrNull { it.getChooserAction() }
 
-fun List<Output>.getAutomations(apps: List<AndroidTools.App>) =
+fun List<Output>.getAutomations(apps: List<App>) =
     this.flatMap { it.getAutomations(apps) }
 
 fun List<Output>.findAutomation(type: Automation.Type, packageName: String?) =

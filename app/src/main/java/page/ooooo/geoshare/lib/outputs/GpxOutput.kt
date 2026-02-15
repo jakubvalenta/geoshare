@@ -19,6 +19,8 @@ import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.GpxRouteAppType
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.lib.point.toWGS84
@@ -248,17 +250,23 @@ object GpxOutput : Output {
         SaveGpxPointsAction(),
     )
 
-    override fun getAppActions(apps: List<AndroidTools.App>) =
-        apps.filter { it.type == AndroidTools.AppType.GPX }
-            .map { it.packageName to ShareGpxRouteWithAppAction(it.packageName) }
+    override fun getAppActions(apps: List<App>) =
+        apps.mapNotNull { app ->
+            (app.type as? GpxRouteAppType)?.let {
+                app.packageName to ShareGpxRouteWithAppAction(app.packageName)
+            }
+        }
 
     override fun getAllPointsChipActions() = listOf(SaveGpxPointsAction())
 
-    override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
+    override fun getAutomations(apps: List<App>): List<Automation> = buildList {
         add(ShareGpxRouteAutomation)
         add(SaveGpxPointsAutomation)
-        apps.filter { it.type == AndroidTools.AppType.GPX }
-            .forEach { add(ShareGpxRouteWithAppAutomation(it.packageName)) }
+        apps.forEach { app ->
+            (app.type as? GpxRouteAppType)?.let {
+                add(ShareGpxRouteWithAppAutomation(app.packageName))
+            }
+        }
     }
 
     override fun findAutomation(type: Automation.Type, packageName: String?): Automation? = when (type) {

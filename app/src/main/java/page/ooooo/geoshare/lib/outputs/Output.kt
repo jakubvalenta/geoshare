@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.outputs
 
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.point.Point
 
 interface Output {
@@ -12,7 +12,7 @@ interface Output {
 
     fun getPointActions(): List<Action> = emptyList()
 
-    fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = emptyList()
+    fun getAppActions(apps: List<App>): List<Pair<String, Action>> = emptyList()
 
     fun getAllPointsChipActions(): List<Action> = emptyList()
 
@@ -22,7 +22,7 @@ interface Output {
 
     fun getRandomAction(): CopyAction? = null
 
-    fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = emptyList()
+    fun getAutomations(apps: List<App>): List<Automation> = emptyList()
 
     fun findAutomation(type: Automation.Type, packageName: String?): Automation? = null
 }

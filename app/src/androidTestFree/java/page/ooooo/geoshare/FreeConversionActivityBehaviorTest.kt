@@ -7,7 +7,8 @@ import kotlinx.collections.immutable.persistentListOf
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.lib.android.GoogleMapsAppType
+import page.ooooo.geoshare.lib.android.GpxRouteAppType
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 @RunWith(AndroidJUnit4::class)
@@ -38,7 +39,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun automationOpensApp() = uiAutomator {
-        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
+        assumeAppInstalled(GoogleMapsAppType.PACKAGE_NAME)
 
         // Launch application and close intro
         launchApplication()
@@ -46,7 +47,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
         // Configure automation
         goToUserPreferencesDetailAutomationScreen()
-        onElement(20_000L) { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${PackageNames.GOOGLE_MAPS}" }.click()
+        onElement(20_000L) { viewIdResourceName == "geoShareUserPreferenceAutomationOpenApp_${GoogleMapsAppType.PACKAGE_NAME}" }.click()
 
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
@@ -58,10 +59,10 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         onElement { viewIdResourceName == "geoShareResultSuccessAutomationCounter" }
 
         // Google Maps doesn't open while the counter is running
-        assertNull(onElementOrNull(3_000L) { packageName == PackageNames.GOOGLE_MAPS })
+        assertNull(onElementOrNull(3_000L) { packageName == GoogleMapsAppType.PACKAGE_NAME })
 
         // Google Maps opens
-        onElement(20_000L) { packageName == PackageNames.GOOGLE_MAPS }
+        onElement(20_000L) { packageName == GoogleMapsAppType.PACKAGE_NAME }
 
         // Go back to Geo Share
         launchApplication()
@@ -72,7 +73,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
     @Test
     fun automationOpensTomTom() = uiAutomator {
-        assumeAppInstalled(PackageNames.TOMTOM)
+        assumeAppInstalled(GpxRouteAppType.TOMTOM_PACKAGE_NAME)
 
         // Launch application and close intro
         launchApplication()

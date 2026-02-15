@@ -13,6 +13,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.lib.android.MagicEarthAppType
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.AppIcon
@@ -196,20 +198,24 @@ object MagicEarthOutput : Output {
         ShareNavigateToUriAction,
     )
 
-    override fun getAppActions(apps: List<AndroidTools.App>): List<Pair<String, Action>> = buildList {
-        apps.filter { it.type == AndroidTools.AppType.MAGIC_EARTH }.forEach { app ->
-            add(app.packageName to ShareDisplayUriWithAppAction(app.packageName))
-            add(app.packageName to ShareNavigateToUriWithAppAction(app.packageName))
+    override fun getAppActions(apps: List<App>): List<Pair<String, Action>> = buildList {
+        apps.forEach { app ->
+            (app.type as? MagicEarthAppType)?.let {
+                add(app.packageName to ShareDisplayUriWithAppAction(app.packageName))
+                add(app.packageName to ShareNavigateToUriWithAppAction(app.packageName))
+            }
         }
     }
 
     override fun getRandomAction() = CopyDisplayUriAction()
 
-    override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = buildList {
+    override fun getAutomations(apps: List<App>): List<Automation> = buildList {
         add(CopyDisplayUriAutomation)
         add(CopyNavigateToUriAutomation)
-        apps.filter { it.type == AndroidTools.AppType.MAGIC_EARTH }.forEach { app ->
-            add(ShareNavigateToUriWithAppAutomation(app.packageName))
+        apps.forEach { app ->
+            (app.type as? MagicEarthAppType)?.let {
+                add(ShareNavigateToUriWithAppAutomation(app.packageName))
+            }
         }
     }
 

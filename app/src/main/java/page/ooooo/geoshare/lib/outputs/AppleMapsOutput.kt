@@ -8,7 +8,7 @@ import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.lib.android.App
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.getOrNull
 import page.ooooo.geoshare.ui.components.TextIcon
@@ -82,7 +82,7 @@ object AppleMapsOutput : Output {
 
     override fun getRandomAction() = listOf(CopyDisplayLinkAction(), CopyNavigateToLinkAction()).randomOrNull()
 
-    override fun getAutomations(apps: List<AndroidTools.App>): List<Automation> = listOf(
+    override fun getAutomations(apps: List<App>): List<Automation> = listOf(
         CopyDisplayLinkAutomation,
         CopyNavigateToLinkAutomation,
     )

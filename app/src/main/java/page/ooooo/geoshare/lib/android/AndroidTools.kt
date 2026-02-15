@@ -7,7 +7,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -50,12 +49,6 @@ import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
 object AndroidTools {
-
-    enum class AppType { GEO_URI, GPX, MAGIC_EARTH }
-
-    data class App(val packageName: String, val type: AppType)
-
-    data class AppDetails(val packageName: String, val label: String, val icon: Drawable)
 
     fun getIntentUriString(intent: Intent): String? =
         when (val intentAction = intent.action) {
@@ -136,7 +129,7 @@ object AndroidTools {
         )) {
             if (packageName !in seenPackageNames) {
                 seenPackageNames.add(packageName)
-                add(App(packageName, AppType.MAGIC_EARTH))
+                add(App(packageName, MagicEarthAppType))
             }
         }
         for (packageName in queryPackageNames(
@@ -145,7 +138,7 @@ object AndroidTools {
         )) {
             if (packageName !in seenPackageNames) {
                 seenPackageNames.add(packageName)
-                add(App(packageName, AppType.GEO_URI))
+                add(App(packageName, geoUriAppTypes.getByPackageName(packageName)))
             }
         }
         for (packageName in queryPackageNames(
@@ -156,7 +149,7 @@ object AndroidTools {
         )) {
             if (packageName !in seenPackageNames) {
                 seenPackageNames.add(packageName)
-                add(App(packageName, AppType.GPX))
+                add(App(packageName, GpxRouteAppType))
             }
         }
     }
@@ -177,9 +170,9 @@ object AndroidTools {
             putExtra(
                 Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(
                     @Suppress("SpellCheckingInspection")
-                    (ComponentName(PackageNames.GEO_SHARE, "page.ooooo.geoshare.ConversionActivity")),
+                    (ComponentName(BuildConfig.APPLICATION_ID, "page.ooooo.geoshare.ConversionActivity")),
                     @Suppress("SpellCheckingInspection")
-                    (ComponentName(PackageNames.GEO_SHARE_DEBUG, "page.ooooo.geoshare.ConversionActivity")),
+                    (ComponentName(BuildConfig.APPLICATION_ID + ".debug", "page.ooooo.geoshare.ConversionActivity")),
                 )
             )
         }
