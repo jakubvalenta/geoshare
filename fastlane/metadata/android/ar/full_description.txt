@@ -6,7 +6,7 @@
 - خرائط أبل (Apple Maps)
 - 2GIS
 - أماب (Amap - AutoNavi)
-- خرائط Baidu (تجريبي، لا روابط قصيرة)
+- خرائط Baidu (تجريبي)
 - كو مابس (CoMaps)
 - هير ويغو (HERE WeGo)
 - ماجيك إيرث (Magic Earth)
