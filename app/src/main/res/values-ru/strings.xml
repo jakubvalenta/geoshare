@@ -219,4 +219,5 @@
     <string name="network_exception_server_response_error">ошибка в ответе сервера</string>
     <string name="network_exception_unresolved_address">не получен адрес</string>
     <string name="network_exception_socket_timeout">время ожидания сокета</string>
+    <string name="converter_baidu_map_loading_indicator_title">Подключение к Baidu Map…</string>
 </resources>

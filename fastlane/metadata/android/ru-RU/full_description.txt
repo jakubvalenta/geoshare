@@ -6,7 +6,7 @@
 - Карты Apple
 - 2ГИС
 - Amap (AutoNavi)
-- Baidu Map (beta, без коротких ссылок)
+- Baidu Map (beta)
 - CoMaps
 - HERE WeGo
 - Magic Earth
