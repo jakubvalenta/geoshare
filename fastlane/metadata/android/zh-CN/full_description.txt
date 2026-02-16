@@ -6,18 +6,18 @@
 - Apple 地图
 - 2GIS
 - 高德地图
-- 百度地图（测试，不支持短链接）
+- 百度地图（测试）
 - CoMaps
 - HERE WeGo
 - Magic Earth
 - Maps.me
 - Mapy.com
 - OpenStreetMap
-- Organic 地图
+- Organic Maps
 - OsmAnd
 - Urbi
 - Waze
-- Yandex 地图
+- Yandex Maps
 - 坐标
 
 <b>示例用例</b>
