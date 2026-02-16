@@ -187,9 +187,25 @@
     <string name="faq_how_text_2_item_http">или HTTP заглавия,</string>
     <string name="faq_how_text_2_item_html">или HTML документ,</string>
     <string name="faq_how_text_2_item_web">или на живо уеб страница, включваща JavaScript.</string>
-    <string name="faq_how_text_3">Ако не позволиш свързване към картата, тогава %1$s създава geo: връзка с търсене вместо координати или спира, в зависимост от конкретния връзка.</string>
+    <string name="faq_how_text_3">Ако не разрешите свързване с картографската услуга, %1$s създава geo: връзка с термин за търсене вместо координати или спира, в зависимост от конкретната връзка.</string>
     <string name="faq_how_text_4">За да разрешите или откажете постоянно свързване с картографската услуга, вместо винаги да питате (по подразбиране), отидете в %1$s на приложението.</string>
     <string name="faq_how_text_4_preferences_button">предпочитания</string>
     <string name="faq_privacy_headline">Съображения за поверителност</string>
     <string name="faq_privacy_text">Когато е възможно, %1$s конвертира връзките към картата офлайн. Ако връзката към картата изисква онлайн конвертиране, приложението ще ви попита преди да се свърже с картографската услуга (Google Maps, Apple Maps и др.). Ако разрешите връзката, картографската услуга ще получи връзката към картата, ще може да прочете вашия IP адрес и в някои случаи %1$s ще зареди уеб страницата на картографската услуга и ще изпълни нейния JavaScript. Това се случва в ограничена среда, която блокира скриптовете за проследяване и не съхранява „бисквитки“.</string>
+    <string name="conversion_succeeded_point_all">Всички точки (%1$d)</string>
+    <string name="conversion_succeeded_point_last">Последна точка</string>
+    <string name="converter_amap_name">Amap (AutoNavi)</string>
+    <string name="converter_apple_maps_name">Apple Maps</string>
+    <string name="converter_baidu_map_name">Baidu Map</string>
+    <string name="converter_baidu_map_loading_indicator_title">Свързване с Baidu Map…</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_google_maps_name">Google Карти</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_waze_name">Waze</string>
+    <string name="converter_yandex_maps_name">Yandex Maps</string>
 </resources>
