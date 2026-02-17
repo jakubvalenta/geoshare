@@ -199,4 +199,19 @@
     <string name="network_exception_unknown">erro desconhecido</string>
     <string name="network_exception_unresolved_address">endereço não traduzido</string>
     <string name="conversion_succeeded_point_all">Todos os pontos (%1$d)</string>
+    <string name="conversion_succeeded_point_last">Último ponto</string>
+    <string name="converter_amap_name">Amap (AutoNavi)</string>
+    <string name="converter_apple_maps_name">Mapas da Apple</string>
+    <string name="converter_baidu_map_name">Baidu Map</string>
+    <string name="converter_baidu_map_loading_indicator_title">Conectando ao Baidu Map…</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_google_maps_name">Google Maps</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_waze_name">Waze</string>
+    <string name="converter_yandex_maps_name">Yandex Maps</string>
 </resources>
