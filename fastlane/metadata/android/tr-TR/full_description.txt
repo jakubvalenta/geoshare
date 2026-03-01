@@ -6,7 +6,7 @@ Geo Share ile bir harita bağlantısı paylaşın ve uygulama bunu yüklü başk
 - Apple Haritalar
 - 2GIS
 - Amap (AutoNavi)
-- Baidu Harita (beta, kısa bağlantılar yok)
+- Baidu Harita (beta)
 - CoMaps
 - HERE WeGo
 - Magic Earth
