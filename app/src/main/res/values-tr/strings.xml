@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="conversion_succeeded_copy_coordinates">Koordinatları kopyala</string>
     <string name="conversion_succeeded_copy_google_maps">Google Haritalar’ı Kopyala</string>
     <string name="conversion_succeeded_copy_link">%1$s bağlantısını kopyala</string>
@@ -118,4 +118,76 @@
     <string name="inputs_all">Tüm harita servisleri</string>
     <string name="inputs_recent">Son zamanlarda eklenenler</string>
     <string name="inputs_default_handler">Varsayılan olarak %1$s’de açılır</string>
+    <string name="not_available">Mevcut değil</string>
+    <string name="conversion_succeeded_copy_geo">Geo\'yu kopyala:</string>
+    <string name="conversion_succeeded_description_q_only">Orijinal bağlantı koordinat içermiyor, yalnızca yer adı içeriyor. Bu konumu başka bir uygulamada açtığınızda, orijinal bağlantıdakinden farklı bir yer bulabilir.</string>
+    <string name="conversion_succeeded_location_failed">Konum bulunamadı</string>
+    <string name="conversion_succeeded_location_loading_indicator_title">Konumunuz bulunuyor…</string>
+    <string name="conversion_succeeded_location_rationale_dialog_title">Konum erişimine izin verilsin mi?</string>
+    <string name="conversion_succeeded_open_app_failed">%1$s açılamadı</string>
+    <string name="conversion_succeeded_open_app_navigate_to">%1$s\'de gezinin</string>
+    <string name="conversion_succeeded_open_app_street_view">Street view\'i %1$s\'de göster</string>
+    <string name="conversion_succeeded_point_all">Tüm noktalar (%1$d)</string>
+    <string name="conversion_succeeded_point_last">Son nokta</string>
+    <string name="conversion_succeeded_save_gpx">GPX\'i kaydet</string>
+    <string name="conversion_succeeded_save_gpx_failed">GPX kaydedilemedi</string>
+    <string name="conversion_succeeded_save_gpx_filename">%1$s sonuç %2$s.gpx</string>
+    <string name="donation_button">Ko-fi üzerinden bağış yapın</string>
+    <string name="donation_description">Bu uygulama size zaman kazandırıyor mu?</string>
+    <string name="intro_how_to_share_google_maps_screenshot_title">Şununla paylaş</string>
+    <string name="intro_how_to_share_google_maps_screenshot_place"></string>
+    <string name="conversion_succeeded_apps_headline">Şununla aç…</string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Sonra Ayarlar'a gidin &#8594; Uygulamalar &#8594; %1$s &#8594; <i>Varsayılan olarak aç</i>, bağlantıların uygulamada açılmasını etkinleştirin ve <i>Bağlantılar ekle</i>'ye tıklayın]]></string>
+    <string name="output_gpx_location_permission">%1$s mevcut konumunuzdan başlayan bir rota oluşturacaktır.</string>
+    <string name="output_gpx_route_share">GPX rotasını paylaş</string>
+    <string name="output_gpx_route_share_failed">GPX rotası paylaşımı başarısız oldu</string>
+    <string name="output_gpx_route_share_automation_succeeded">GPX rotası otomatik olarak paylaşıldı</string>
+    <plurals name="output_gpx_route_share_automation_waiting">
+        <item quantity="one">GPX rotasını otomatik olarak %1$ds\'de paylaşılıyor</item>
+        <item quantity="other">GPX rotasını otomatik olarak %1$ds\'de paylaşılıyor</item>
+    </plurals>
+    <string name="converter_amap_name">Amap (AutoNavi)</string>
+    <string name="converter_apple_maps_name">Apple Haritalar</string>
+    <string name="converter_baidu_map_name">Baidu Harita</string>
+    <string name="converter_baidu_map_permission_title">Baidu Haritası\'na bağlanılsın mı?</string>
+    <string name="converter_baidu_map_loading_indicator_title">Baidu Haritasına bağlanılıyor…</string>
+    <string name="converter_ge0_name">Maps.me, Organic Maps, CoMaps</string>
+    <string name="converter_geo_name">geo: URI</string>
+    <string name="converter_google_maps_name">Google Haritalar</string>
+    <string name="converter_here_wego_name">HERE WeGo</string>
+    <string name="converter_magic_earth_name">Magic Earth</string>
+    <string name="converter_mapy_com_name">Mapy.com</string>
+    <string name="converter_open_street_map_name">OpenStreetMap</string>
+    <string name="converter_osm_and_name">OsmAnd</string>
+    <string name="converter_urbi_name">2GIS / Urbi</string>
+    <string name="converter_waze_name">Waze</string>
+    <string name="converter_yandex_maps_name">Yandex Haritalar</string>
+    <string name="conversion_automation_save_gpx_succeeded">GPX otomatik olarak kaydedildi</string>
+    <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">%3$s nedeniyle %2$d\'den %1$d\'si başarısız oldu</string>
+    <string name="faq_how_headline">Nasıl çalışır</string>
+    <string name="faq_how_text_2_item_http">ya HTTP başlıkları,</string>
+    <string name="faq_how_text_2_item_html">ya HTML belgesi,</string>
+    <string name="faq_how_text_2_item_web">ya da JavaScript içeren canlı web sayfası.</string>
+    <string name="faq_how_text_4_preferences_button">tercihler</string>
+    <string name="faq_location_permission_headline">Konum izni</string>
+    <string name="faq_privacy_headline">Gizlilik hususları</string>
+    <string name="user_preferences_automation_delay_sec_title">Otomasyon gecikmesi</string>
+    <string name="user_preferences_automation_delay_sec_description">Uygulamanın otomatik bir işlem başlatmadan önce (örneğin, harita uygulamasını otomatik olarak açmadan önce) ne kadar süre bekleyeceğini ayarlayın.</string>
+    <string name="user_preferences_number_error_range" tools:ignore="PluralsCandidate">Değer %1$d ile %2$d arasında olmalıdır</string>
+    <string name="conversion_failed_unshorten_error">Kısa bağlantı çözümlenemedi</string>
+    <string name="inputs_link">Bağlantı</string>
+    <string name="network_exception_connect_timeout">bağlantı zaman aşımı</string>
+    <string name="network_exception_eof">bağlantı kapatılması</string>
+    <string name="network_exception_request_timeout">istek zaman aşımı</string>
+    <string name="network_exception_response_error">yanıt hatası</string>
+    <string name="network_exception_server_response_error">sunucu yanıtı hatası</string>
+    <string name="network_exception_socket_timeout">soket zaman aşımı</string>
+    <string name="network_exception_unknown">bilinmeyen hata</string>
+    <string name="network_exception_unresolved_address">çözümlenmemiş adres</string>
+    <string name="reset">sıfırlama</string>
+    <string name="seconds_unit">saniye</string>
+    <plurals name="seconds">
+        <item quantity="one">%1$d saniye</item>
+        <item quantity="other">%1$d saniye</item>
+    </plurals>
 </resources>
