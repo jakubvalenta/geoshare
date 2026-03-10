@@ -7,7 +7,6 @@
     <string name="main_input_uri_supporting_text">наприклад, https://maps.app.goo.gl/… або maps.apple.com/…</string>
     <string name="conversion_error_report">Повідомити про проблему</string>
     <string name="conversion_permission_common_deny">Скасувати</string>
-    <string name="conversion_succeeded_copy_geo">Копіювати гео:</string>
     <string name="nav_menu_content_description">Меню</string>
     <string name="intro_title">Вступ</string>
     <string name="intro_how_to_share_headline">Як показати розташування на мапі в іншому картографічному застосунку</string>

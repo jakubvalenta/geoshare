@@ -111,7 +111,6 @@
     <string name="inputs_recent">Son zamanlarda eklenenler</string>
     <string name="inputs_default_handler">Varsayılan olarak %1$s’de açılır</string>
     <string name="not_available">Mevcut değil</string>
-    <string name="conversion_succeeded_copy_geo">Geo’yu kopyala:</string>
     <string name="conversion_succeeded_description_q_only">Orijinal bağlantı koordinat içermiyor, yalnızca yer adı içeriyor. Bu konumu başka bir uygulamada açtığınızda, orijinal bağlantıdakinden farklı bir yer bulabilir.</string>
     <string name="conversion_succeeded_location_failed">Konum bulunamadı</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Konumunuz bulunuyor…</string>
