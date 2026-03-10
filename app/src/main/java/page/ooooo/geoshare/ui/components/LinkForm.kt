@@ -25,7 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -378,7 +378,8 @@ fun LinkForm(
                     ) { value ->
                         Surface(
                             Modifier.fillMaxWidth(),
-                            tonalElevation = MenuDefaults.TonalElevation,
+                            shape = ShapeDefaults.Large,
+                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
                         ) {
                             DropdownMenuItem(
                                 text = { Text(shareOutput.label(appDetails)) },
