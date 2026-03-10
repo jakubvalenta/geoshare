@@ -87,7 +87,6 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Bana bir daha sorma</string>
     <string name="faq_title">SSS</string>
-    <string name="faq_how_it_works_headline">Nasıl çalışır ve gizlilik hususları</string>
     <string name="user_preferences_title">Tercihler</string>
     <string name="user_preferences_automation_description">Bir harita bağlantısı koordinatlara dönüştürüldüğünde otomatik olarak gerçekleştirilecek eylemi seçin.</string>
     <string name="user_preferences_automation_nothing">Hiçbiri</string>
