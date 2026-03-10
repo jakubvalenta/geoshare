@@ -34,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -47,9 +46,9 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun AboutScreen(
     onBack: () -> Unit = {},
-    viewModel: ConversionViewModel,
+    billingViewModel: BillingViewModel,
 ) {
-    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
+    val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val donation = remember(billingStatus) {
         (billingStatus as? BillingStatus.Purchased)?.product?.type == BillingProduct.Type.DONATION
     }

@@ -5,12 +5,31 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -22,11 +41,15 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.IntroViewModel
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.GoogleMapsAppType
-import page.ooooo.geoshare.ui.components.*
+import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.ui.components.ParagraphHtml
+import page.ooooo.geoshare.ui.components.ScreenshotMapAppOpen
+import page.ooooo.geoshare.ui.components.ScreenshotOpen
+import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
+import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefaultMapApp
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -34,7 +57,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun IntroScreen(
     onBack: () -> Unit,
-    viewModel: ConversionViewModel,
+    viewModel: IntroViewModel,
 ) {
     val context = LocalContext.current
     val settingsLauncher = rememberLauncherForActivityResult(
@@ -45,7 +68,7 @@ fun IntroScreen(
 
     IntroScreen(
         onBack = {
-            viewModel.setIntroShown()
+            viewModel.setShown()
             onBack()
         },
         onShowOpenByDefaultSettings = {
@@ -139,7 +162,7 @@ private fun IntroScreen(
                             ScreenshotOpenByDefaultMapApp()
                             Button(
                                 {
-                                    onShowOpenByDefaultSettingsForPackage(GoogleMapsAppType.PACKAGE_NAME)
+                                    onShowOpenByDefaultSettingsForPackage(GOOGLE_MAPS_PACKAGE_NAME)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,

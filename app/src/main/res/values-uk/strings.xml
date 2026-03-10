@@ -7,7 +7,6 @@
     <string name="main_input_uri_supporting_text">наприклад, https://maps.app.goo.gl/… або maps.apple.com/…</string>
     <string name="conversion_error_report">Повідомити про проблему</string>
     <string name="conversion_permission_common_deny">Скасувати</string>
-    <string name="faq_how_it_works_headline">Як це працює та міркування щодо приватності</string>
     <string name="conversion_succeeded_copy_geo">Копіювати гео:</string>
     <string name="nav_menu_content_description">Меню</string>
     <string name="intro_title">Вступ</string>
@@ -39,8 +38,6 @@
     <string name="permission_do_not_ask">Не запитувати знову</string>
     <string name="conversion_failed_connection_permission_denied">Це посилання не підтримується без підключення до картографічного сервісу</string>
     <string name="intro_how_to_share_google_maps_caption">Поділіться місцезнаходженням зі своєї картографічної програми або веббраузера.</string>
-    <string name="faq_item_collapse">Згорнути розділ</string>
-    <string name="faq_item_expand">Розгорнути розділ</string>
     <string name="user_preferences_title">Параметри</string>
     <string name="user_preferences_connection_title">Дозволити підключення до картографічного сервісу (Google, Apple тощо)?</string>
     <string name="user_preferences_connection_description">Для підтримки коротких посилань на карти та отримання координат з веб-сторінки картографічного сервісу, якщо посилання їх не містить, %1$s може підключитися до картографічного сервісу. Більш детальну інформацію можна знайти на екрані FAQ.</string>
@@ -53,7 +50,6 @@
     <string name="conversion_succeeded_apps_not_found">Жодного картографічного застосунку не встановлено</string>
     <string name="copying_finished">Скопійовано в буфер обміну</string>
     <string name="conversion_failed_parse_html_error">Не вдалося завантажити вебсторінку з картографічного сервісу</string>
-    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s перетворює посилання на карти на посилання geo:, які можна відкрити в інших картографічних програмах. Для створення посилання geo: потрібні географічні координати. %1$s витягує їх з URL-адреси мапи.</p><br><p>Однак не всі URL-адреси мап містять координати. У таких випадках %1$s <b>запитає у вас дозвіл на під’єднання до картографічного сервісу (Google Maps, Apple Maps тощо)</b> та отримає координати з HTTP-заголовків або HTML-документа посилання.</p><br><p>Точніше, існує три сценарії, як %1$s перетворює URL-адресу карти на географічну: URI:</p><br><p><b>1.</b></p><br><p>Якщо URL-адреса мап вже містить географічні координати (наприклад, <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), то вона аналізується, і запит до серверів картографічного сервісу не надсилається.</p><br><p><b>2.</b></p><br><p>Якщо URL-адреса мапи не містить географічних координат (наприклад <tt>https://www.google.com/maps/place/Central+Park/</tt>), тоді %1$s запитує вас, чи може він під’єднатися до картографічного сервісу.</p><br><p>Якщо ви дозволите з’єднання до картографічного сервісу, тоді %1$s надсилає <b>HTTP GET-запит</b> до Google Maps (або Apple Maps тощо) та аналізує координати з HTML-відповіді. Ви можете уявити це як <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Якщо ви не дозволяєте під’єднання до картографічного сервісу, %1$s створює посилання geo: з пошуковим терміном місця (наприклад, <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Якщо URL-адреса мапи є коротким посиланням (наприклад, <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), %1$s запитує вас, чи може він під’єднатися до картографічного сервісу.</p><br><p>Якщо ви дозволяєте під’єднання до картографічного сервісу, %1$s надсилає <b>HTTP HEAD-запит</b> до короткого посилання та зчитує повне посилання із заголовків відповіді. Ви можете уявити це як <tt>curl --head https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. Потім %1$s продовжує зі сценарієм 1 або 2, залежно від того, чи повне посилання містить координати чи ні. У випадку сценарію 2 буде встановлено ще одне з’єднання з картографічним сервісом, але цього разу без запиту.</p><br><p>Якщо ви не дозволите під’єднання до картографічного сервісу, то %1$s скасовує створення посилання geo:.</p><br><br><p>Щоб назавжди дозволити або заборонити під’єднання до картографічного сервісу замість постійного запиту (типово), перейдіть до налаштувань програми.</p>]]></string>
     <string name="conversion_failed_parse_html_connection_error">Помилка з’єднання під час завантаження вебсторінки з картографічного сервісу</string>
     <string name="conversion_failed_unshorten_connection_error">Помилка під’єднання під час вирішення короткого посилання</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">У браузері</string>
@@ -92,7 +88,6 @@
     <string name="converter_geo_name">geo: URIs</string>
     <string name="converter_waze_permission_title">Підключитися до Waze?</string>
     <string name="converter_waze_loading_indicator_title">Підключення до Waze…</string>
-    <string name="conversion_succeeded_copy_google_maps">Копіювати Карти Google</string>
     <string name="conversion_succeeded_save_gpx">Зберегти GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Результат %1$s %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
@@ -137,16 +132,12 @@
     <string name="conversion_succeeded_copy_link">Копіювати посилання %1$s</string>
     <string name="user_preferences_automation_description">Виберіть дію, яка має виконуватися автоматично під час перетворення посилання на карту на координати.</string>
     <string name="user_preferences_automation_nothing">Нічого</string>
-    <string name="conversion_succeeded_open_app">Відкрити %1$s</string>
     <string name="user_preferences_automation_title">Автоматизація</string>
     <string name="main_random">Випадкове посилання</string>
-    <string name="conversion_succeeded_copy_link_display">Скопіювати посилання, щоб показати карту в %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Скопіюйте посилання для навігації в %1$s</string>
     <string name="conversion_succeeded_open_app_display">Показати карту в %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навігація в %1$s</string>
     <string name="converter_amap_loading_indicator_title">Підключення до Amap…</string>
     <string name="converter_amap_permission_title">Підключитися до Amap?</string>
-    <string name="conversion_succeeded_copy_link_street_view">Копіювати посилання на перегляд вулиць у %1$s</string>
     <string name="conversion_succeeded_open_app_street_view">Показати вигляд вулиці в %1$s</string>
     <string name="converter_urbi_permission_title">Підключитися до 2GIS / Urbi?</string>
     <string name="converter_urbi_loading_indicator_title">Підключення до 2GIS / Urbi…</string>

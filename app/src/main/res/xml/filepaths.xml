@@ -1,5 +1,8 @@
 <paths>
     <files-path
+        path="points/"
+        name="points" />
+    <files-path
         path="routes/"
-        name="routes"/>
+        name="routes" />
 </paths>

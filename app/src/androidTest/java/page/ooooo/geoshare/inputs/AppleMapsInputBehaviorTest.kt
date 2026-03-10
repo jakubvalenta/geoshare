@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.inputs
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun appleMaps() {
         // Launch app and close intro
         launchApplication()
         closeIntro()
@@ -29,6 +30,28 @@ class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             "https://maps.apple.com/?q=Central+Park&sll=50.894967,4.341626&z=10&t=s",
         )
 
+        // Map view
+        testUri(
+            WGS84Point(52.49115540927951, 13.42595574770533),
+            "https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533",
+        )
+
+        // Text
+        testTextUri(
+            WGS84Point(52.49115540927951, 13.42595574770533),
+            "https://maps.apple.com/?ll=52.49115540927951,13.42595574770533",
+        )
+    }
+
+    @Test
+    fun appleMapsHtml() = runTest {
+        assumeDomainResolvable("maps.apple.com")
+
+        // Launch app and close intro
+        launchApplication()
+        closeIntro()
+        setUserPreferenceConnectionPermissionToAlways()
+
         // Place id
         testUri(
             WGS84Point(52.4735927, 13.4050798),
@@ -39,22 +62,10 @@ class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618",
         )
 
-        // Map view
-        testUri(
-            WGS84Point(52.49115540927951, 13.42595574770533),
-            "https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533",
-        )
-
         // Short URI
         testUri(
             WGS84Point(52.4737758, 13.4373898),
             "https://maps.apple/p/7E-Brjrk_THN14",
-        )
-
-        // Text
-        testTextUri(
-            WGS84Point(52.49115540927951, 13.42595574770533),
-            "https://maps.apple.com/?ll=52.49115540927951,13.42595574770533",
         )
     }
 }

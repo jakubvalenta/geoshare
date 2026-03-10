@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GeoUriInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun geoUri() {
         // Launch app and close intro
         launchApplication()
         closeIntro()

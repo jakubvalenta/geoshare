@@ -4,6 +4,7 @@
       <w>amap</w>
       <w>coord</w>
       <w>coords</w>
+      <w>fastlane</w>
       <w>magicearth</w>
       <w>mapy</w>
       <w>osmand</w>
@@ -12,6 +13,7 @@
       <w>snackbar</w>
       <w>streetview</w>
       <w>threema</w>
+      <w>urbi</w>
       <w>weblate</w>
       <w>wego</w>
     </words>

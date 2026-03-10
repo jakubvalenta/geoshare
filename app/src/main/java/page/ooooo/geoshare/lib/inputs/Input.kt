@@ -9,38 +9,41 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.point.Point
 
 interface Input {
-
-    enum class ShortUriMethod { GET, HEAD }
-
     val uriPattern: Regex
     val documentation: InputDocumentation
 
     suspend fun parseUri(uri: Uri): ParseUriResult
 
-    interface HasShortUri : Input {
-        val shortUriPattern: Regex
-        val shortUriMethod: ShortUriMethod
-        val permissionTitleResId: Int
-        val loadingIndicatorTitleResId: Int
+    interface HasRandomUri {
+        fun genRandomUri(point: Point): String?
     }
+}
 
-    interface HasHtml : Input {
-        val permissionTitleResId: Int
-        val loadingIndicatorTitleResId: Int
+interface ShortUriInput : Input {
+    enum class Method { GET, HEAD }
 
-        suspend fun parseHtml(
-            htmlUrlString: String,
-            channel: ByteReadChannel,
-            pointsFromUri: ImmutableList<Point>,
-            log: ILog = DefaultLog,
-        ): ParseHtmlResult
-    }
+    val shortUriPattern: Regex
+    val shortUriMethod: Method
+    val permissionTitleResId: Int
+    val loadingIndicatorTitleResId: Int
+}
 
-    interface HasWeb : Input {
-        val permissionTitleResId: Int
-        val loadingIndicatorTitleResId: Int
+interface HtmlInput : Input {
+    val permissionTitleResId: Int
+    val loadingIndicatorTitleResId: Int
 
-        fun extendWebSettings(settings: WebSettings) {}
-        fun shouldInterceptRequest(requestUrlString: String): Boolean = false
-    }
+    suspend fun parseHtml(
+        htmlUrlString: String,
+        channel: ByteReadChannel,
+        pointsFromUri: ImmutableList<Point>,
+        log: ILog = DefaultLog,
+    ): ParseHtmlResult
+}
+
+interface WebInput : Input {
+    val permissionTitleResId: Int
+    val loadingIndicatorTitleResId: Int
+
+    fun extendWebSettings(settings: WebSettings) {}
+    fun shouldInterceptRequest(requestUrlString: String): Boolean = false
 }

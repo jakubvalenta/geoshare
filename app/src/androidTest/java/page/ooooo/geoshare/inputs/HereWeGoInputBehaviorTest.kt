@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class HereWeGoInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun hereWeGo() {
         // Coordinates
         testUri(
             WGS84Point(50.21972, -0.68453, z = 6.93),

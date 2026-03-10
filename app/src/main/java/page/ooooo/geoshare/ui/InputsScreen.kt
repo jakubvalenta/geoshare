@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,28 +31,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.inputs.InputDocumentation
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 import page.ooooo.geoshare.lib.inputs.InputDocumentationItem
 import page.ooooo.geoshare.lib.inputs.allInputs
-import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
-import page.ooooo.geoshare.ui.components.LabelLarge
+import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScrollablePane
+import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -65,13 +59,15 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun InputsScreen(
     initialDocumentationId: InputDocumentationId?,
     onBack: () -> Unit = {},
-    viewModel: ConversionViewModel,
+    viewModel: InputsViewModel = hiltViewModel(),
 ) {
-    val changelogShownForVersionCode by viewModel.changelogShownForVersionCode.collectAsStateWithLifecycle()
+    val allDocumentations by viewModel.allDocumentations.collectAsStateWithLifecycle()
+    val recentDocumentations by viewModel.recentDocumentations.collectAsStateWithLifecycle()
 
     InputsScreen(
-        changelogShownForVersionCode = changelogShownForVersionCode,
         initialDocumentationId = initialDocumentationId,
+        allDocumentations = allDocumentations,
+        recentDocumentations = recentDocumentations,
         onBack = {
             viewModel.setChangelogShown()
             onBack()
@@ -82,8 +78,9 @@ fun InputsScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun InputsScreen(
-    changelogShownForVersionCode: Int?,
     initialDocumentationId: InputDocumentationId?,
+    allDocumentations: List<InputDocumentation>,
+    recentDocumentations: List<InputDocumentation>,
     onBack: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -96,25 +93,21 @@ private fun InputsScreen(
             },
         ),
     )
-    val documentations = remember {
-        allInputs.map { input -> input.documentation }
-    }
-    val currentDocumentation = remember(navigator.currentDestination, documentations) {
-        navigator.currentDestination?.contentKey?.let { id -> documentations.find { it.id == id } }
+    val currentDocumentation = remember(navigator.currentDestination, allDocumentations) {
+        navigator.currentDestination?.contentKey?.let { id -> allDocumentations.find { it.id == id } }
     }
 
     BackHandler {
         onBack()
     }
 
-    BasicListDetailScaffold(
+    NavigableBasicListDetailScaffold(
         navigator = navigator,
-        listPane = { wide, containerColor ->
+        listPane = { wide, _ ->
             InputsListPane(
-                currentDocumentation = currentDocumentation,
-                documentations = documentations,
-                changelogShownForVersionCode = changelogShownForVersionCode,
-                containerColor = containerColor,
+                currentDocumentationId = navigator.currentDestination?.contentKey,
+                allDocumentations = allDocumentations,
+                recentDocumentations = recentDocumentations,
                 wide = wide,
                 onBack = {
                     coroutineScope.launch {
@@ -155,10 +148,9 @@ private fun InputsScreen(
 
 @Composable
 private fun InputsListPane(
-    currentDocumentation: InputDocumentation?,
-    documentations: List<InputDocumentation>,
-    changelogShownForVersionCode: Int?,
-    containerColor: Color,
+    currentDocumentationId: InputDocumentationId?,
+    allDocumentations: List<InputDocumentation>,
+    recentDocumentations: List<InputDocumentation>,
     wide: Boolean,
     onBack: () -> Unit,
     onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
@@ -167,92 +159,62 @@ private fun InputsListPane(
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
 
-    val recentDocumentations = remember(changelogShownForVersionCode, documentations) {
-        changelogShownForVersionCode?.let { changelogShownForVersionCode ->
-            documentations.filter { documentation ->
-                documentation.items.any { it.addedInVersionCode > changelogShownForVersionCode }
-            }.takeIf { it.isNotEmpty() }
-        }
-    }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         // Do nothing
     }
 
     ScrollablePane(
-        titleResId = R.string.inputs_title,
+        title = {
+            Text(stringResource(R.string.inputs_title))
+        },
         onBack = onBack,
+        modifier = Modifier.padding(horizontal = spacing.windowPadding),
     ) {
         if (!wide) {
-            Column(Modifier.padding(horizontal = spacing.windowPadding)) {
-                ParagraphText(
-                    stringResource(R.string.inputs_list_text, appName),
-                    Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
-                )
-                InputsSettingsButton {
-                    AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+            item {
+                Column {
+                    ParagraphText(
+                        stringResource(R.string.inputs_list_text, appName),
+                        Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                    )
+                    InputsSettingsButton {
+                        AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
+                    }
                 }
             }
         }
-        if (recentDocumentations != null) {
-            LabelLarge(
-                stringResource(R.string.inputs_recent),
-                color = MaterialTheme.colorScheme.error,
-            )
-            InputsListDocumentations(
-                currentDocumentation = currentDocumentation,
-                documentations = recentDocumentations,
-                containerColor = containerColor,
-                onNavigateToDocumentation = onNavigateToDocumentation,
-                testTagPrefix = "geoShareInputsDocumentationRecent_",
-            )
-            LabelLarge(stringResource(R.string.inputs_all))
+        if (recentDocumentations.isNotEmpty()) {
+            item {
+                SegmentedListLabel(stringResource(R.string.inputs_recent), MaterialTheme.colorScheme.error)
+            }
+            item {
+                SegmentedList(
+                    values = recentDocumentations,
+                    itemHeadline = { stringResource(it.nameResId) },
+                    itemIsSelected = { it.id == currentDocumentationId },
+                    itemOnClick = { onNavigateToDocumentation(it.id) },
+                    itemTestTag = { "geoShareInputsDocumentationRecent_${it.id}" },
+                    sort = true,
+                )
+            }
+            item {
+                SegmentedListLabel(stringResource(R.string.inputs_all))
+            }
         } else {
-            Spacer(Modifier.height(spacing.mediumAdaptive))
-        }
-        InputsListDocumentations(
-            currentDocumentation = currentDocumentation,
-            documentations = documentations,
-            containerColor = containerColor,
-            onNavigateToDocumentation = onNavigateToDocumentation,
-            testTagPrefix = "geoShareInputsDocumentationAll_",
-        )
-    }
-}
-
-@Composable
-private fun InputsListDocumentations(
-    currentDocumentation: InputDocumentation?,
-    documentations: List<InputDocumentation>,
-    containerColor: Color,
-    onNavigateToDocumentation: (id: InputDocumentationId) -> Unit,
-    testTagPrefix: String,
-) {
-    val spacing = LocalSpacing.current
-
-    ElevatedCard(Modifier.padding(horizontal = spacing.windowPadding)) {
-        documentations
-            .map { documentation -> Pair(documentation, stringResource(documentation.nameResId)) }
-            .sortedBy { (_, name) -> name }
-            .forEachIndexed { i, (documentation, name) ->
-                ListItem(
-                    headlineContent = {
-                        Text(name, style = MaterialTheme.typography.bodyLarge)
-                    },
-                    modifier = Modifier
-                        .clickable(onClick = { onNavigateToDocumentation(documentation.id) }, role = Role.Button)
-                        .testTag("${testTagPrefix}${documentation.id}"),
-                    colors = ListItemDefaults.colors(
-                        containerColor = if (currentDocumentation == documentation) {
-                            MaterialTheme.colorScheme.surfaceContainerHighest
-                        } else {
-                            MaterialTheme.colorScheme.surfaceContainerHigh
-                        },
-                    ),
-                )
-                if (i != documentations.size - 1) {
-                    HorizontalDivider(color = containerColor)
-                }
+            item {
+                Spacer(Modifier.height(spacing.mediumAdaptive))
             }
+        }
+        item {
+            SegmentedList(
+                values = allDocumentations,
+                itemHeadline = { stringResource(it.nameResId) },
+                itemIsSelected = { it.id == currentDocumentationId },
+                itemOnClick = { onNavigateToDocumentation(it.id) },
+                itemTestTag = { "geoShareInputsDocumentationAll_${it.id}" },
+                sort = true,
+            )
+        }
     }
 }
 
@@ -285,6 +247,7 @@ private fun InputsDetailPane(
     val context = LocalContext.current
     val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
+    val maxWidth = 600.dp
 
     var documentationInputDetailsList by remember(currentDocumentation) {
         mutableStateOf(getDocumentationInputDetails(currentDocumentation, context.packageManager))
@@ -294,21 +257,26 @@ private fun InputsDetailPane(
     }
 
     ScrollablePane(
-        titleResId = currentDocumentation.nameResId,
+        title = {
+            Text(stringResource(currentDocumentation.nameResId))
+        },
         onBack = onBack.takeUnless { wide },
+        modifier = Modifier.padding(horizontal = spacing.windowPadding),
     ) {
-        Column(
-            Modifier
-                .widthIn(max = 600.dp)
-                .padding(horizontal = spacing.windowPadding),
-        ) {
+        item {
             ParagraphText(
                 stringResource(R.string.inputs_detail_text, appName),
-                Modifier.padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
+                Modifier
+                    .widthIn(maxWidth)
+                    .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
             )
+        }
+        item {
             InputsSettingsButton {
                 AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
             }
+        }
+        item {
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -326,8 +294,12 @@ private fun InputsDetailPane(
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
+        }
+        item {
             HorizontalDivider()
-            documentationInputDetailsList.forEach { documentationInputDetails ->
+        }
+        documentationInputDetailsList.forEach { documentationInputDetails ->
+            item {
                 Row(
                     Modifier.padding(vertical = spacing.smallAdaptive),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -376,7 +348,10 @@ private fun DefaultPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = null,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -392,7 +367,10 @@ private fun DarkPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = null,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -408,7 +386,61 @@ private fun TabletPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = null,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
+                    onBack = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NoRecentPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsScreen(
+                    initialDocumentationId = null,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = emptyList(),
+                    onBack = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkNoRecentPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsScreen(
+                    initialDocumentationId = null,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = emptyList(),
+                    onBack = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletNoRecentPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                InputsScreen(
+                    initialDocumentationId = null,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = emptyList(),
                     onBack = {},
                 )
             }
@@ -424,7 +456,10 @@ private fun OpenStreetMapPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -440,7 +475,10 @@ private fun DarkOpenStreetMapPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -456,7 +494,10 @@ private fun TabletOpenStreetMapPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.OPEN_STREET_MAP,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -472,7 +513,10 @@ private fun GeoUriPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -488,7 +532,10 @@ private fun DarkGeoUriPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }
@@ -504,7 +551,10 @@ private fun TabletGeoUriPreview() {
             Column {
                 InputsScreen(
                     initialDocumentationId = InputDocumentationId.GEO_URI,
-                    changelogShownForVersionCode = 25,
+                    allDocumentations = allInputs.map { it.documentation },
+                    recentDocumentations = allInputs.map { it.documentation }.filter { documentation ->
+                        documentation.items.any { it.addedInVersionCode > 25 }
+                    },
                     onBack = {},
                 )
             }

@@ -17,7 +17,7 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object OpenStreetMapInput : Input.HasHtml {
+object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
     private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
     private const val HASH = """[A-Za-z0-9_~]+-+"""
 
@@ -80,4 +80,7 @@ object OpenStreetMapInput : Input.HasHtml {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_open_street_map_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
 }

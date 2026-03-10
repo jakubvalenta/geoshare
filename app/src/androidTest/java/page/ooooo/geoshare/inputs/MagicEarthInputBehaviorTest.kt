@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class MagicEarthInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun magicEarth() {
         // Coordinates
         testUri(
             WGS84Point(48.85649, 2.35216),

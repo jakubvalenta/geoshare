@@ -7,7 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class UriTest {
-    private val uriQuote = FakeUriQuote()
+    private val uriQuote = FakeUriQuote
 
     @Test
     fun parse_empty() {

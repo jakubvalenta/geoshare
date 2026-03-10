@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.CancellationSignal
 import android.os.Looper
@@ -35,10 +36,8 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.WGS84Point
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.FileNotFoundException
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -50,12 +49,14 @@ import kotlin.time.Duration.Companion.seconds
 
 object AndroidTools {
 
+    const val TAG = "AndroidTools"
+
     fun getIntentUriString(intent: Intent): String? =
         when (val intentAction = intent.action) {
             Intent.ACTION_VIEW -> {
                 val intentData: String? = intent.data?.toString()
                 if (intentData == null) {
-                    Log.w(null, "Missing intent data")
+                    Log.w(TAG, "Missing intent data")
                     null
                 } else {
                     intentData
@@ -65,7 +66,7 @@ object AndroidTools {
             Intent.ACTION_SEND -> {
                 val intentText = intent.getStringExtra("android.intent.extra.TEXT")
                 if (intentText == null) {
-                    Log.w(null, "Missing intent extra text")
+                    Log.w(TAG, "Missing intent extra text")
                     null
                 } else {
                     intentText
@@ -73,86 +74,106 @@ object AndroidTools {
             }
 
             else -> {
-                Log.w(null, "Unsupported intent action $intentAction")
+                Log.w(TAG, "Unsupported intent action $intentAction")
                 null
             }
         }
 
-    private fun queryAppDetailsWithoutCache(packageManager: PackageManager, packageName: String): AppDetails? {
+    private fun queryAppDetails(packageManager: PackageManager, packageName: String): AppDetail? {
         val applicationInfo = try {
             packageManager.getApplicationInfo(packageName, 0)
         } catch (e: Exception) {
-            Log.e(null, "Error when querying an app", e)
+            Log.e(TAG, "Error when querying an app", e)
             return null
         }
         return try {
-            AppDetails(
-                applicationInfo.packageName,
+            AppDetail(
                 applicationInfo.loadLabel(packageManager).toString(),
                 applicationInfo.loadIcon(packageManager),
             )
         } catch (e: Exception) {
-            Log.e(null, "Error when loading info about an app", e)
+            Log.e(TAG, "Error when loading info about an app", e)
             null
         }
     }
 
-    private val appDetailsCache: HashMap<String, AppDetails> = hashMapOf()
-
-    fun queryAppDetails(packageManager: PackageManager, packageName: String): AppDetails? =
-        appDetailsCache[packageName] ?: queryAppDetailsWithoutCache(packageManager, packageName)
-            ?.also { appDetailsCache[packageName] = it }
+    /**
+     * Query [packageManager] for labels and icons of passed [apps].
+     *
+     * It is executed on a non-main thread, because it takes about 50ms and maybe that's too much.
+     */
+    suspend fun queryAppDetails(
+        packageManager: PackageManager,
+        apps: DataTypes,
+    ): AppDetails = withContext(Dispatchers.Default) {
+        apps.mapValues { (packageName) -> queryAppDetails(packageManager, packageName) }
+    }
 
     private fun queryPackageNames(packageManager: PackageManager, intent: Intent): List<String> {
         val resolveInfos = try {
             packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
         } catch (e: Exception) {
-            Log.e(null, "Error when querying installed apps", e)
+            Log.e(TAG, "Error when querying installed apps", e)
             return emptyList()
         }
         return resolveInfos.mapNotNull { resolveInfo ->
             val packageName = try {
                 resolveInfo.activityInfo.packageName
             } catch (e: Exception) {
-                Log.e(null, "Error when loading info about an installed app", e)
+                Log.e(TAG, "Error when loading info about an installed app", e)
                 null
             }
             packageName?.takeUnless { it == BuildConfig.APPLICATION_ID }
         }
     }
 
-    fun queryApps(packageManager: PackageManager): List<App> = buildList {
-        val seenPackageNames = mutableSetOf<String>()
-        for (packageName in queryPackageNames(
-            packageManager,
-            Intent(Intent.ACTION_VIEW, "magicearth:".toUri()),
-        )) {
-            if (packageName !in seenPackageNames) {
-                seenPackageNames.add(packageName)
-                add(App(packageName, MagicEarthAppType))
+    fun queryApps(packageManager: PackageManager): DataTypes =
+        buildMap<String, MutableSet<DataType>> {
+            for (packageName in queryPackageNames(
+                packageManager,
+                Intent(Intent.ACTION_VIEW, "geo:".toUri()),
+            )) {
+                getOrPut(packageName) { mutableSetOf() }.add(DataType.GEO_URI)
+            }
+            for (packageName in queryPackageNames(
+                packageManager,
+                Intent(Intent.ACTION_VIEW, "google.navigation:".toUri()),
+            )) {
+                getOrPut(packageName) { mutableSetOf() }.add(DataType.GOOGLE_NAVIGATION_URI)
+            }
+            for (packageName in queryPackageNames(
+                packageManager,
+                Intent(Intent.ACTION_VIEW, "google.streetview:".toUri()),
+            )) {
+                getOrPut(packageName) { mutableSetOf() }.add(DataType.GOOGLE_STREET_VIEW_URI)
+            }
+            for (packageName in queryPackageNames(
+                packageManager,
+                Intent(Intent.ACTION_VIEW, "magicearth:".toUri()),
+            )) {
+                getOrPut(packageName) { mutableSetOf() }.apply {
+                    add(DataType.MAGIC_EARTH_URI)
+                    // Remove support for geo: and google.navigation: URIs from the Magic Earth app, because it doesn't
+                    // support these URIs well
+                    remove(DataType.GEO_URI)
+                    remove(DataType.GOOGLE_NAVIGATION_URI)
+                }
+            }
+            for (packageName in queryPackageNames(
+                packageManager,
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType("content:".toUri(), "application/gpx+xml")
+                },
+            )) {
+                getOrPut(packageName) { mutableSetOf() }.add(
+                    if (packageName.startsWith(TOMTOM_PACKAGE_NAME_PREFIX)) {
+                        DataType.GPX_ONE_POINT_DATA
+                    } else {
+                        DataType.GPX_DATA
+                    }
+                )
             }
         }
-        for (packageName in queryPackageNames(
-            packageManager,
-            Intent(Intent.ACTION_VIEW, "geo:".toUri()),
-        )) {
-            if (packageName !in seenPackageNames) {
-                seenPackageNames.add(packageName)
-                add(App(packageName, geoUriAppTypes.getByPackageName(packageName)))
-            }
-        }
-        for (packageName in queryPackageNames(
-            packageManager,
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType("content:".toUri(), "application/gpx+xml")
-            },
-        )) {
-            if (packageName !in seenPackageNames) {
-                seenPackageNames.add(packageName)
-                add(App(packageName, GpxRouteAppType))
-            }
-        }
-    }
 
     private fun startActivity(context: Context, intent: Intent): Boolean =
         try {
@@ -189,7 +210,7 @@ object AndroidTools {
         val uri = try {
             FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.FileProvider", file)
         } catch (e: IllegalArgumentException) {
-            Log.e(null, "Error when getting URI for file", e)
+            Log.e(TAG, "Error when getting URI for file", e)
             return false
         }
         return startActivity(
@@ -214,7 +235,7 @@ object AndroidTools {
         val uri = try {
             FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.FileProvider", file)
         } catch (e: IllegalArgumentException) {
-            Log.e(null, "Error when getting URI for file", e)
+            Log.e(TAG, "Error when getting URI for file", e)
             return false
         }
         return startActivity(
@@ -227,6 +248,9 @@ object AndroidTools {
             ),
         )
     }
+
+    fun openWebUri(context: Context, uriString: String): Boolean =
+        startActivity(context, Intent(Intent.ACTION_VIEW, uriString.toUri()))
 
     fun hasLocationPermission(context: Context): Boolean =
         context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -283,7 +307,7 @@ object AndroidTools {
                         Looper.getMainLooper(),
                     )
                 } catch (e: Exception) {
-                    Log.e(null, "Error when getting location", e)
+                    Log.e(TAG, "Error when getting location", e)
                     cont.resumeWithException(e)
                 }
             }
@@ -313,7 +337,7 @@ object AndroidTools {
                 }
             }
         } catch (e: SecurityException) {
-            Log.e(null, "Security error when getting location", e)
+            Log.e(TAG, "Security error when getting location", e)
             null
         }
     }
@@ -325,13 +349,13 @@ object AndroidTools {
                 PackageManager.MATCH_DEFAULT_ONLY,
             )
         } catch (e: Exception) {
-            Log.e(null, "Error when querying which app is the default handler for a URI", e)
+            Log.e(TAG, "Error when querying which app is the default handler for a URI", e)
             return false
         }
         val packageName = try {
             resolveInfo?.activityInfo?.packageName
         } catch (e: Exception) {
-            Log.e(null, "Error when loading info about an app that is the default handler for URI", e)
+            Log.e(TAG, "Error when loading info about an app that is the default handler for URI", e)
             null
         }
         return packageName == BuildConfig.APPLICATION_ID
@@ -372,20 +396,22 @@ object AndroidTools {
     suspend fun pasteFromClipboard(clipboard: Clipboard): String =
         clipboard.getClipEntry()?.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: ""
 
-    /**
-     * See [GitHub Gist](https://gist.github.com/starry-shivam/901267c26eb030eb3faf1ccd4d2bdd32)
-     */
-    fun isMiuiDevice(): Boolean =
-        setOf("xiaomi", "redmi", "poco").contains(Build.BRAND.lowercase()) &&
-            (!getRuntimeProperty("ro.miui.ui.version.name").isNullOrBlank() ||
-                !getRuntimeProperty("ro.mi.os.version.name").isNullOrBlank())
-
-    private fun getRuntimeProperty(property: String): String? = try {
-        @Suppress("SpellCheckingInspection")
-        Runtime.getRuntime().exec("getprop $property").inputStream.use { input ->
-            BufferedReader(InputStreamReader(input), 1024).readLine()
+    fun openFileUri(context: Context, uri: Uri, block: Appendable.() -> Unit): Boolean {
+        val outputStream = try {
+            context.contentResolver.openOutputStream(uri)
+        } catch (_: FileNotFoundException) {
+            Log.e(TAG, "Output stream URI $uri could not be opened")
+            return false
         }
-    } catch (_: IOException) {
-        null
+        if (outputStream == null) {
+            Log.e(TAG, "Output stream URI $uri recently crashed")
+            return false
+        }
+        outputStream.use { outputStream ->
+            outputStream.writer().use { writer ->
+                writer.block()
+            }
+        }
+        return true
     }
 }

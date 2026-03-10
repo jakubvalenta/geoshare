@@ -2,6 +2,8 @@ package page.ooooo.geoshare.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -59,8 +61,8 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -68,11 +70,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.GoogleMapsAppType
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -83,6 +90,8 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.FileActionReady
+import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.GrantedParseWebPermission
 import page.ooooo.geoshare.lib.conversion.GrantedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.Initial
@@ -99,13 +108,24 @@ import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.GeoUriOutput
-import page.ooooo.geoshare.lib.outputs.NoopAutomation
+import page.ooooo.geoshare.lib.outputs.ActionContext
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.NoopAction
+import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.getOutputsForApps
+import page.ooooo.geoshare.lib.outputs.getOutputsForLinks
+import page.ooooo.geoshare.lib.outputs.getOutputsForPointChips
+import page.ooooo.geoshare.lib.outputs.getOutputsForPointsChips
+import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.WGS84Point
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
-import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.ConversionWebView
+import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainFormLinks
 import page.ooooo.geoshare.ui.components.MainMenu
@@ -114,7 +134,7 @@ import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSuccessApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
-import page.ooooo.geoshare.ui.components.ResultSuccessSheetContent
+import page.ooooo.geoshare.ui.components.ResultSuccessSheet
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
@@ -126,72 +146,94 @@ fun MainScreen(
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
+    onNavigateToLinksScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    viewModel: ConversionViewModel,
+    onNavigateToUserPreferencesScreen: () -> Unit,
+    billingViewModel: BillingViewModel,
+    conversionViewModel: ConversionViewModel,
+    inputsViewModel: InputsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val currentState by viewModel.currentState.collectAsStateWithLifecycle()
+    val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
 
-    val automationFeatureStatus by viewModel.automationFeatureStatus.collectAsStateWithLifecycle()
-    val billingAppNameResId = viewModel.billingAppNameResId
-    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
-    val changelogShown by viewModel.changelogShown.collectAsStateWithLifecycle()
-    val loadingIndicator by viewModel.loadingIndicator.collectAsStateWithLifecycle()
+    val appDetails by conversionViewModel.appDetails.collectAsStateWithLifecycle()
+    val automationFeatureStatus by billingViewModel.automationFeatureStatus.collectAsStateWithLifecycle()
+    val billingAppNameResId = billingViewModel.billingAppNameResId
+    val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
+    val changelogShown by inputsViewModel.changelogShown.collectAsStateWithLifecycle()
+    val largeLoadingIndicatorVisible by conversionViewModel.largeLoadingIndicatorVisible.collectAsStateWithLifecycle()
+    val outputsForApps by conversionViewModel.outputsForApps.collectAsStateWithLifecycle()
+    val outputsForLinks by conversionViewModel.outputsForLinks.collectAsStateWithLifecycle()
+    val outputsForPoint by conversionViewModel.outputsForPoint.collectAsStateWithLifecycle()
+    val outputsForPointChips by conversionViewModel.outputsForPointChips.collectAsStateWithLifecycle()
+    val outputsForPoints by conversionViewModel.outputsForPoints.collectAsStateWithLifecycle()
+    val outputsForPointsChips by conversionViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
+    val outputsForSharing by conversionViewModel.outputsForSharing.collectAsStateWithLifecycle()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            viewModel.receiveLocationPermission()
+            conversionViewModel.receiveLocationPermission()
         }
-    val saveGpxLauncher =
+    val saveFileLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    outputStream.writer().use { writer ->
-                        viewModel.writeGpx(writer)
-                    }
-                }
-            }
+                conversionViewModel.receiveFileUri(uri)
+            } ?: conversionViewModel.cancelFileUriRequest()
         }
 
     LaunchedEffect(currentState) {
         currentState.let { currentState ->
             when (currentState) {
+                // Basic action
+
                 is BasicActionReady -> {
-                    val success = currentState.action.runAction(
-                        points = currentState.points,
-                        i = currentState.i,
+                    val actionContext = ActionContext(
                         context = context,
                         clipboard = clipboard,
                         resources = resources,
-                        saveGpxLauncher = saveGpxLauncher,
                     )
-                    viewModel.finishBasicAction(success)
+                    val success = currentState.action.execute(actionContext)
+                    conversionViewModel.finishBasicAction(success)
                 }
 
-                is LocationActionReady -> {
-                    val success = currentState.action.runAction(
-                        points = currentState.points,
-                        i = currentState.i,
-                        location = currentState.location,
+                // File action
+
+                is FileUriRequested -> {
+                    try {
+                        saveFileLauncher.launch(
+                            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = currentState.action.mimeType
+                                putExtra(Intent.EXTRA_TITLE, currentState.action.getFilename(resources))
+                            },
+                        )
+                    } catch (_: ActivityNotFoundException) {
+                        conversionViewModel.cancelFileUriRequest()
+                    }
+                }
+
+                is FileActionReady -> {
+                    val actionContext = ActionContext(
                         context = context,
                         clipboard = clipboard,
                         resources = resources,
-                        saveGpxLauncher = saveGpxLauncher,
                     )
-                    viewModel.finishLocationAction(success)
+                    val success = currentState.action.execute(currentState.uri, actionContext)
+                    conversionViewModel.finishFileAction(success)
                 }
+
+                // Location action
 
                 is LocationRationaleRequested -> {
                     if (AndroidTools.hasLocationPermission(context)) {
-                        viewModel.skipLocationRationale(currentState.action, currentState.i)
+                        conversionViewModel.skipLocationRationale(currentState.action, currentState.isAutomation)
                     } else {
-                        viewModel.showLocationRationale(currentState.action, currentState.i)
+                        conversionViewModel.showLocationRationale(currentState.action, currentState.isAutomation)
                     }
                 }
 
@@ -207,11 +249,21 @@ fun MainScreen(
                         val location = try {
                             AndroidTools.getLocation(context)
                         } catch (_: CancellationException) {
-                            viewModel.cancelLocationFinding()
+                            conversionViewModel.cancelLocationFinding()
                             return@launch
                         }
-                        viewModel.receiveLocation(currentState.action, currentState.i, location)
+                        conversionViewModel.receiveLocation(currentState.action, currentState.isAutomation, location)
                     }
+                }
+
+                is LocationActionReady -> {
+                    val actionContext = ActionContext(
+                        context = context,
+                        clipboard = clipboard,
+                        resources = resources,
+                    )
+                    val success = currentState.action.execute(currentState.location, actionContext)
+                    conversionViewModel.finishLocationAction(success)
                 }
             }
         }
@@ -219,81 +271,101 @@ fun MainScreen(
 
     MainScreen(
         currentState = currentState,
+        appDetails = appDetails,
         automationFeatureStatus = automationFeatureStatus,
         billingAppNameResId = billingAppNameResId,
         billingStatus = billingStatus,
         changelogShown = changelogShown,
-        inputUriString = viewModel.inputUriString,
-        loadingIndicator = loadingIndicator,
+        inputUriString = conversionViewModel.inputUriString,
+        largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+        outputsForApps = outputsForApps,
+        outputsForLinks = outputsForLinks,
+        outputsForPoint = outputsForPoint,
+        outputsForPointChips = outputsForPointChips,
+        outputsForPoints = outputsForPoints,
+        outputsForPointsChips = outputsForPointsChips,
+        outputsForSharing = outputsForSharing,
         onCancel = {
             locationJob?.cancel()
-            viewModel.cancel()
+            conversionViewModel.cancel()
         },
-        onDeny = { doNotAsk -> viewModel.deny(doNotAsk) },
-        onGrant = { doNotAsk -> viewModel.grant(doNotAsk) },
+        onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
+        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onNavigateToAboutScreen = {
-            viewModel.cancel()
+            conversionViewModel.cancel()
             onNavigateToAboutScreen()
         },
         onNavigateToBillingScreen = {
-            viewModel.cancel()
+            conversionViewModel.cancel()
             onNavigateToBillingScreen()
         },
         onNavigateToFaqScreen = {
-            viewModel.cancel()
+            conversionViewModel.cancel()
             onNavigateToFaqScreen()
         },
         onNavigateToInputsScreen = {
-            viewModel.cancel()
+            conversionViewModel.cancel()
             onNavigateToInputsScreen()
         },
         onNavigateToIntroScreen = {
-            viewModel.cancel()
+            conversionViewModel.cancel()
             onNavigateToIntroScreen()
         },
-        onNavigateToUserPreferencesScreen = {
-            viewModel.cancel()
-            onNavigateToUserPreferencesScreen()
+        onNavigateToLinksScreen = {
+            conversionViewModel.cancel()
+            onNavigateToLinksScreen()
         },
         onNavigateToUserPreferencesAutomationScreen = {
-            viewModel.cancel()
+            conversionViewModel.cancel()
             onNavigateToUserPreferencesAutomationScreen()
         },
+        onNavigateToUserPreferencesScreen = {
+            conversionViewModel.cancel()
+            onNavigateToUserPreferencesScreen()
+        },
         onReset = {
-            viewModel.cancel()
-            viewModel.reset()
+            conversionViewModel.cancel()
+            conversionViewModel.reset()
         },
-        onRun = { action, i ->
-            viewModel.cancel()
-            viewModel.runAction(action, i)
+        onExecute = { action ->
+            conversionViewModel.cancel()
+            conversionViewModel.startAction(action)
         },
-        onStart = { viewModel.start() },
-        onUpdateInput = { newInputUriString -> viewModel.updateInput(newInputUriString) },
-    )
+        onStart = { conversionViewModel.start() },
+    ) { conversionViewModel.inputUriString = it }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(
     currentState: State,
+    appDetails: AppDetails,
     automationFeatureStatus: FeatureStatus,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     changelogShown: Boolean,
     inputUriString: String,
-    loadingIndicator: LoadingIndicator?,
+    largeLoadingIndicatorVisible: Boolean,
+    outputsForApps: Map<String, List<Output>>,
+    outputsForLinks: Map<String?, List<Output>>,
+    outputsForPoint: List<PointOutput>,
+    outputsForPointChips: List<PointOutput>,
+    outputsForPoints: List<PointsOutput>,
+    outputsForPointsChips: List<PointsOutput>,
+    outputsForSharing: List<Output>,
     onCancel: () -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
+    onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
-    onNavigateToBillingScreen: () -> Unit,
-    onNavigateToUserPreferencesScreen: () -> Unit,
+    onNavigateToLinksScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
+    onNavigateToUserPreferencesScreen: () -> Unit,
     onReset: () -> Unit,
-    onRun: (action: Action, i: Int?) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
@@ -304,9 +376,7 @@ private fun MainScreen(
     val spacing = LocalSpacing.current
 
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
-    val (selectedPointsAndIndex, setSelectedPointsAndIndex) = retain {
-        mutableStateOf<Pair<ImmutableList<Point>, Int?>?>(null)
-    }
+    val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
     BackHandler(currentState !is Initial) {
@@ -345,21 +415,25 @@ private fun MainScreen(
             Column(
                 Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .testTag("geoShareMainPane"),
             ) {
                 MainMainPane(
                     currentState = currentState,
+                    appDetails = appDetails,
+                    outputsForPointChips = outputsForPointChips,
+                    outputsForPointsChips = outputsForPointsChips,
                     billingAppNameResId = billingAppNameResId,
                     billingStatus = billingStatus,
                     errorMessageResId = errorMessageResId,
                     inputUriString = inputUriString,
-                    loadingIndicator = loadingIndicator,
+                    largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
                     onCancel = onCancel,
                     onNavigateToInputsScreen = onNavigateToInputsScreen,
-                    onRun = onRun,
-                    onSelect = { points, i ->
+                    onExecute = onExecute,
+                    onSelect = { index ->
                         onCancel()
-                        setSelectedPointsAndIndex(points to i)
+                        setSelectedPointIndex(index)
                     },
                     onSetErrorMessageResId = setErrorMessageResId,
                     onStart = onStart,
@@ -374,14 +448,19 @@ private fun MainScreen(
                     ) {
                         CompositionLocalProvider(LocalContentColor provides contentColor) {
                             MainSupportingPane(
+                                appDetails = appDetails,
                                 automationFeatureStatus = automationFeatureStatus,
                                 currentState = currentState,
-                                loadingIndicator = loadingIndicator,
+                                largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+                                outputsForApps = outputsForApps,
+                                outputsForLinks = outputsForLinks,
+                                outputsForSharing = outputsForSharing,
                                 onCancel = onCancel,
                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                                 onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                onNavigateToLinksScreen = onNavigateToLinksScreen,
                                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                onRun = onRun,
+                                onExecute = onExecute,
                                 onSetErrorMessageResId = setErrorMessageResId,
                                 onUpdateInput = onUpdateInput,
                             )
@@ -397,7 +476,7 @@ private fun MainScreen(
             }
             MainBottomBar(
                 currentState,
-                loadingIndicator,
+                largeLoadingIndicatorVisible,
                 modifier = Modifier
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding),
@@ -413,64 +492,69 @@ private fun MainScreen(
                     .verticalScroll(rememberScrollState()),
             ) {
                 MainSupportingPane(
+                    appDetails = appDetails,
                     automationFeatureStatus = automationFeatureStatus,
                     currentState = currentState,
-                    loadingIndicator = loadingIndicator,
+                    largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+                    outputsForApps = outputsForApps,
+                    outputsForLinks = outputsForLinks,
+                    outputsForSharing = outputsForSharing,
                     onCancel = onCancel,
                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                     onNavigateToIntroScreen = onNavigateToIntroScreen,
+                    onNavigateToLinksScreen = onNavigateToLinksScreen,
                     onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                    onRun = onRun,
+                    onExecute = onExecute,
                     onSetErrorMessageResId = setErrorMessageResId,
                     onUpdateInput = onUpdateInput,
                 )
             }
         },
-        mainContainerColor = when {
-            loadingIndicator is LoadingIndicator.Large -> MaterialTheme.colorScheme.surfaceContainer
-            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+        mainContainerColor = when (currentState) {
+            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> MaterialTheme.colorScheme.surfaceContainer
+            is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+            is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
             else -> containerColor
         },
-        mainContentColor = when {
-            loadingIndicator is LoadingIndicator.Large -> contentColor
-            currentState is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-            currentState is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+        mainContentColor = when (currentState) {
+            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> contentColor
+            is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+            is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> contentColor
         },
         shouldAutoFocusCurrentDestination = false,
     )
 
-    selectedPointsAndIndex?.let { (points, i) ->
+    if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
         ModalBottomSheet(
-            onDismissRequest = { setSelectedPointsAndIndex(null) },
+            onDismissRequest = { setSelectedPointIndex(null) },
             modifier = Modifier
-                .semantics { testTagsAsResourceId = true }
-                .testTag("geoShareConversionSheet")
                 // Set and consume insets to prevent unclickable items when the sheet is expanded (probably a bug in
                 // Compose Material 3)
                 .windowInsetsPadding(WindowInsets.safeDrawing),
             sheetState = sheetState,
         ) {
-            ResultSuccessSheetContent(
-                points = points,
-                i = i,
+            ResultSuccessSheet(
+                points = currentState.points,
+                selectedPointIndex = selectedPointIndex,
+                appDetails = appDetails,
+                outputsForPoint = outputsForPoint,
+                outputsForPoints = outputsForPoints,
+                onExecute = onExecute,
                 onHide = {
                     coroutineScope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
-                            setSelectedPointsAndIndex(null)
+                            setSelectedPointIndex(null)
                         }
                     }
                 },
-                onRun = onRun,
             )
         }
     }
 
-    when {
-        loadingIndicator is LoadingIndicator.Large -> {}
-
-        currentState is RequestedUnshortenPermission -> {
+    when (currentState) {
+        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {}
+        is RequestedUnshortenPermission -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -494,7 +578,7 @@ private fun MainScreen(
             }
         }
 
-        currentState is RequestedParseHtmlPermission -> {
+        is RequestedParseHtmlPermission -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -518,7 +602,7 @@ private fun MainScreen(
             }
         }
 
-        currentState is RequestedParseWebPermission -> {
+        is RequestedParseWebPermission -> {
             PermissionDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -542,7 +626,7 @@ private fun MainScreen(
             }
         }
 
-        currentState is LocationRationaleShown -> {
+        is LocationRationaleShown -> {
             ConfirmationDialog(
                 title = stringResource(currentState.permissionTitleResId),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -553,10 +637,15 @@ private fun MainScreen(
                     .semantics { testTagsAsResourceId = true }
                     .testTag("geoShareLocationRationaleDialog"),
             ) {
-                Text(
-                    AnnotatedString.fromHtml(currentState.action.permissionText()),
-                    style = TextStyle(lineBreak = LineBreak.Paragraph),
-                )
+                when (currentState.action) {
+                    is LocationAction.WithPoint -> currentState.action.output.permissionText()
+                    is LocationAction.WithPoints -> currentState.action.output.permissionText()
+                }.let { text ->
+                    Text(
+                        AnnotatedString.fromHtml(text),
+                        style = TextStyle(lineBreak = LineBreak.Paragraph),
+                    )
+                }
             }
         }
     }
@@ -565,30 +654,31 @@ private fun MainScreen(
 @Composable
 private fun MainMainPane(
     currentState: State,
+    appDetails: AppDetails,
+    outputsForPointChips: List<PointOutput>,
+    outputsForPointsChips: List<PointsOutput>,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     errorMessageResId: Int?,
     inputUriString: String,
-    loadingIndicator: LoadingIndicator?,
+    largeLoadingIndicatorVisible: Boolean,
     onCancel: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onRun: (action: Action, i: Int?) -> Unit,
-    onSelect: (points: ImmutableList<Point>, i: Int?) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
+    onSelect: (index: Int?) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onStart: () -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
-    when {
-        loadingIndicator is LoadingIndicator.Large -> {
-            Headline(stringResource(loadingIndicator.titleResId))
+    when (currentState) {
+        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {
             MainLoadingIndicator(
-                loadingIndicator,
+                loadingIndicator = currentState.getLargeLoadingIndicator(LocalResources.current),
                 onCancel = onCancel,
             )
         }
 
-        currentState is ConversionState.HasError -> {
-            Headline(stringResource(R.string.conversion_error_title))
+        is ConversionState.HasError -> {
             ResultError(
                 currentState.errorMessageResId,
                 currentState.inputUriString,
@@ -600,15 +690,18 @@ private fun MainMainPane(
             )
         }
 
-        currentState is ConversionState.HasResult -> {
+        is ConversionState.HasResult -> {
             ResultSuccessCoordinates(
                 points = currentState.points,
-                onRun = onRun,
+                appDetails = appDetails,
+                outputsForPointChips = outputsForPointChips,
+                outputsForPointsChips = outputsForPointsChips,
+                onExecute = onExecute,
                 onSelect = onSelect,
             )
         }
 
-        currentState is Initial -> {
+        is Initial -> {
             MainForm(
                 inputUriString = inputUriString,
                 billingAppNameResId = billingAppNameResId,
@@ -633,34 +726,44 @@ private fun MainMainPane(
 
 @Composable
 private fun MainSupportingPane(
+    appDetails: AppDetails,
     automationFeatureStatus: FeatureStatus,
     currentState: State,
-    loadingIndicator: LoadingIndicator?,
+    largeLoadingIndicatorVisible: Boolean,
+    outputsForApps: Map<String, List<Output>>,
+    outputsForLinks: Map<String?, List<Output>>,
+    outputsForSharing: List<Output>,
     onCancel: () -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToIntroScreen: () -> Unit,
+    onNavigateToLinksScreen: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
-    onRun: (action: Action, i: Int?) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
 ) {
-    when {
-        loadingIndicator is LoadingIndicator.Large -> {}
-
-        currentState is ConversionState.HasResult -> {
+    when (currentState) {
+        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {}
+        is ConversionState.HasResult -> {
             ResultSuccessMessage(
                 currentState = currentState,
+                appDetails = appDetails,
                 automationFeatureStatus = automationFeatureStatus,
-                loadingIndicator = loadingIndicator,
                 onCancel = onCancel,
                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
             )
             ResultSuccessApps(
-                onRun = onRun,
+                appDetails = appDetails,
+                outputsForApps = outputsForApps,
+                outputsForLinks = outputsForLinks,
+                outputsForSharing = outputsForSharing,
+                points = currentState.points,
+                onExecute = onExecute,
+                onNavigateToLinksScreen = onNavigateToLinksScreen,
             )
         }
 
-        currentState is Initial -> {
+        is Initial -> {
             MainFormLinks(
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
@@ -682,13 +785,14 @@ private fun MainLoadingIndicator(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(top = spacing.smallAdaptive)
             .padding(horizontal = spacing.windowPadding),
     ) {
+        Headline(loadingIndicator.title)
         LoadingIndicator(
             Modifier
                 .size(96.dp)
-                .align(Alignment.CenterHorizontally),
+                .align(Alignment.CenterHorizontally)
+                .padding(top = spacing.smallAdaptive),
             color = MaterialTheme.colorScheme.tertiary,
         )
         Button(
@@ -703,9 +807,9 @@ private fun MainLoadingIndicator(
         ) {
             Text(stringResource(R.string.conversion_loading_indicator_cancel))
         }
-        loadingIndicator.description()?.let { text ->
+        loadingIndicator.description?.let { description ->
             Text(
-                text,
+                description,
                 Modifier.padding(bottom = spacing.mediumAdaptive),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
@@ -717,22 +821,21 @@ private fun MainLoadingIndicator(
 @Composable
 private fun MainBottomBar(
     currentState: State,
-    loadingIndicator: LoadingIndicator?,
+    largeLoadingIndicatorVisible: Boolean,
     containerColor: Color,
     contentColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    when {
-        loadingIndicator is LoadingIndicator.Large -> {}
-
-        currentState is ConversionState.HasError -> MainSkipButton(
+    when (currentState) {
+        is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {}
+        is ConversionState.HasError -> MainSkipButton(
             currentState.inputUriString,
             containerColor,
             contentColor,
             modifier,
         )
 
-        currentState is ConversionState.HasResult -> MainSkipButton(
+        is ConversionState.HasResult -> MainSkipButton(
             currentState.inputUriString,
             containerColor,
             contentColor,
@@ -784,27 +887,35 @@ private fun DefaultPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -814,27 +925,35 @@ private fun DarkPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -844,27 +963,35 @@ private fun TabletPreview() {
     AppTheme {
         MainScreen(
             currentState = Initial(),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -879,8 +1006,10 @@ private fun SucceededPreview() {
                     Point.genRandomPoint(),
                     Point.example,
                 ),
-                action = NoopAutomation,
+                action = NoopAction,
+                isAutomation = false,
             ),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -889,22 +1018,33 @@ private fun SucceededPreview() {
             ),
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -919,8 +1059,10 @@ private fun DarkSucceededPreview() {
                     Point.genRandomPoint(),
                     Point.example,
                 ),
-                action = NoopAutomation,
+                action = NoopAction,
+                isAutomation = false,
             ),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -929,22 +1071,33 @@ private fun DarkSucceededPreview() {
             ),
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -959,8 +1112,10 @@ private fun TabletSucceededPreview() {
                     Point.genRandomPoint(),
                     Point.example,
                 ),
-                action = NoopAutomation,
+                action = NoopAction,
+                isAutomation = false,
             ),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -969,22 +1124,86 @@ private fun TabletSucceededPreview() {
             ),
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkTabletSucceededPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = ActionFinished(
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.example,
+                ),
+                action = NoopAction,
+                isAutomation = false,
+            ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                refundable = true,
+            ),
+            changelogShown = true,
+            inputUriString = "",
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
+            onCancel = {},
+            onDeny = {},
+            onGrant = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onExecute = {},
+            onStart = {},
+        ) {}
     }
 }
 
@@ -995,15 +1214,17 @@ private fun AutomationPreview() {
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                i = null,
-                action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point()),
+                isAutomation = true,
                 delay = 3.seconds,
             ),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -1012,22 +1233,33 @@ private fun AutomationPreview() {
             ),
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1038,15 +1270,17 @@ private fun DarkAutomationPreview() {
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                i = null,
-                action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point()),
+                isAutomation = true,
                 delay = 3.seconds,
             ),
+            appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
@@ -1055,22 +1289,33 @@ private fun DarkAutomationPreview() {
             ),
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1081,39 +1326,52 @@ private fun TabletAutomationPreview() {
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                 points = persistentListOf(Point.example),
-                i = null,
-                action = GeoUriOutput.ShareGeoUriWithAppAutomation(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
+                action = OpenDisplayGeoUriOutput(GOOGLE_MAPS_PACKAGE_NAME).toAction(WGS84Point()),
+                isAutomation = true,
                 delay = 3.seconds,
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                )
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1124,6 +1382,7 @@ private fun WebViewPreview() {
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1133,30 +1392,38 @@ private fun WebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1167,6 +1434,7 @@ private fun DarkWebViewPreview() {
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1176,30 +1444,38 @@ private fun DarkWebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1210,6 +1486,7 @@ private fun TabletWebViewPreview() {
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1219,30 +1496,38 @@ private fun TabletWebViewPreview() {
                 pointsFromUri = persistentListOf(),
                 webUriString = "https://www.example.com/",
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1255,30 +1540,38 @@ private fun ErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1291,30 +1584,38 @@ private fun DarkErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1327,30 +1628,38 @@ private fun TabletErrorPreview() {
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = null,
+            largeLoadingIndicatorVisible = false,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1361,8 +1670,7 @@ private fun LoadingIndicatorPreview() {
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
-                    listOf(),
-                    NetworkTools(),
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1374,33 +1682,38 @@ private fun LoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = LoadingIndicator.Large(
-                titleResId = R.string.converter_google_maps_loading_indicator_title,
-                description = { null },
-            ),
+            largeLoadingIndicatorVisible = true,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1411,8 +1724,7 @@ private fun DarkLoadingIndicatorPreview() {
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
-                    listOf(),
-                    NetworkTools(),
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1424,33 +1736,38 @@ private fun DarkLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = LoadingIndicator.Large(
-                titleResId = R.string.converter_google_maps_loading_indicator_title,
-                description = { null },
-            ),
+            largeLoadingIndicatorVisible = true,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }
 
@@ -1461,8 +1778,7 @@ private fun TabletLoadingIndicatorPreview() {
         MainScreen(
             currentState = GrantedUnshortenPermission(
                 ConversionStateContext(
-                    listOf(),
-                    NetworkTools(),
+                    linkRepository = FakeLinkRepository(),
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1474,32 +1790,37 @@ private fun TabletLoadingIndicatorPreview() {
                     NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 refundable = true,
             ),
-            automationFeatureStatus = FeatureStatus.AVAILABLE,
             changelogShown = true,
             inputUriString = "",
-            loadingIndicator = LoadingIndicator.Large(
-                titleResId = R.string.converter_google_maps_loading_indicator_title,
-                description = { null },
-            ),
+            largeLoadingIndicatorVisible = true,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
             onCancel = {},
             onDeny = {},
             onGrant = {},
             onNavigateToAboutScreen = {},
-            onNavigateToFaqScreen = {},
-            onNavigateToIntroScreen = {},
-            onNavigateToInputsScreen = {},
             onNavigateToBillingScreen = {},
-            onNavigateToUserPreferencesScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
             onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
             onReset = {},
-            onRun = { _, _ -> },
+            onExecute = {},
             onStart = {},
-            onUpdateInput = {},
-        )
+        ) {}
     }
 }

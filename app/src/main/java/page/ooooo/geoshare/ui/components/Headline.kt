@@ -8,6 +8,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -18,12 +20,9 @@ fun Headline(text: String, modifier: Modifier = Modifier) {
     Text(
         text,
         modifier
+            .semantics { heading() }
             .fillMaxWidth()
-            .padding(horizontal = spacing.windowPadding)
-            .padding(
-                top = spacing.headlineTopAdaptive,
-                bottom = spacing.mediumAdaptive
-            ),
+            .padding(top = spacing.headlineTopAdaptive, bottom = spacing.mediumAdaptive),
         style = MaterialTheme.typography.headlineMedium,
     )
 }

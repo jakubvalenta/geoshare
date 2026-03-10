@@ -10,13 +10,13 @@ interface UriQuote {
     fun decode(s: String): String
 }
 
-class DefaultUriQuote : UriQuote {
+object DefaultUriQuote : UriQuote {
     override fun encode(s: String): String = Uri.encode(s)
     override fun encode(s: String, allow: String): String = Uri.encode(s, allow)
     override fun decode(s: String): String = Uri.decode(s)
 }
 
-class FakeUriQuote : UriQuote {
+object FakeUriQuote : UriQuote {
     override fun encode(s: String): String = URLEncoder.encode(s, "utf-8").replace("+", "%20")
 
     override fun encode(s: String, allow: String): String = allow.fold(URLEncoder.encode(s, "utf-8")) { res, char ->

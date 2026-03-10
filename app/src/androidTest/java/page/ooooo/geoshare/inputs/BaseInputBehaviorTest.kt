@@ -4,20 +4,17 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BaseActivityBehaviorTest
+import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.point.Point
 
 abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
 
     protected fun setUserPreferenceConnectionPermissionToAlways() = uiAutomator {
         goToUserPreferencesDetailConnectionPermissionScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermissionAlways" }.click()
-
-        // Go back to main screen
-        pressBack()
-        pressBack()
+        onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_${Permission.ALWAYS}" }.click()
     }
 
-    protected fun confirmDialogIfItIsVisible() = uiAutomator {
+    protected fun confirmDialogIfVisible() = uiAutomator {
         onElementOrNull(3000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
     }
 
@@ -26,13 +23,13 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    private fun goToMainFormShareUriAndConfirmDialog(unsafeUriString: String) = uiAutomator {
+    private fun goToMainFormAndShareUriAndConfirmDialog(unsafeUriString: String) = uiAutomator {
         // Go to main form
         goToMainForm()
 
         // Share URI and confirm permission dialog
         shareUri(unsafeUriString)
-        confirmDialogIfItIsVisible()
+        confirmDialogIfVisible()
     }
 
     protected fun testUri(
@@ -40,7 +37,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         unsafeUriString: String,
         timeoutMs: Long = NETWORK_TIMEOUT,
     ) = uiAutomator {
-        goToMainFormShareUriAndConfirmDialog(unsafeUriString)
+        goToMainFormAndShareUriAndConfirmDialog(unsafeUriString)
         assertConversionSucceeded(expectedPoints, timeoutMs)
     }
 
@@ -51,7 +48,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the texts, so we put the text in the main screen of the app instead.
         // device.executeShellCommand(
-        //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n ${PackageNames.GEO_SHARE_DEBUG}/page.ooooo.geoshare.ConversionActivity ${PackageNames.GEO_SHARE_DEBUG}"
+        //     "am start -a android.intent.action.SEND -t text/plain -e android.intent.extra.TEXT $unsafeText -n ${BuildConfig.APPLICATION_ID}.debug/${BuildConfig.APPLICATION_ID}.ConversionActivity ${BuildConfig.APPLICATION_ID}.debug"
         // )
 
         // Go to main form
@@ -71,7 +68,7 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         }
 
         // Confirm permission dialog
-        confirmDialogIfItIsVisible()
+        confirmDialogIfVisible()
 
         // Shows points
         assertConversionSucceeded(expectedPoints)

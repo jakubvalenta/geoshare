@@ -5,7 +5,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 
 class CoordinatesInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
+    fun coordinates() {
         // Launch app and close intro
         launchApplication()
         closeIntro()

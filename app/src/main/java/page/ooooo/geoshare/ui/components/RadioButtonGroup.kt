@@ -19,55 +19,57 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-data class RadioButtonOption<T>(
-    val value: T,
-    val modifier: Modifier = Modifier,
-    val label: @Composable () -> Unit,
-)
-
 @Composable
 fun <T> RadioButtonGroup(
     selectedValue: T,
     onSelect: (value: T) -> Unit,
+    values: List<T>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    options: @Composable () -> List<RadioButtonOption<T>>,
+    getTestTag: ((value: T) -> String)? = null,
+    option: @Composable (value: T) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
         // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
         Column(modifier.selectableGroup()) {
-            options().forEach { option ->
+            values.forEach { value ->
                 Row(
-                    option.modifier
+                    Modifier
                         .fillMaxWidth()
                         .padding(vertical = spacing.tinyAdaptive)
                         .selectable(
-                            selected = (option.value == selectedValue),
+                            selected = value == selectedValue,
                             enabled = enabled,
                             role = Role.RadioButton,
-                            onClick = { onSelect(option.value) },
-                        ),
+                            onClick = { onSelect(value) },
+                        )
+                        .run {
+                            getTestTag?.invoke(value)?.let {
+                                testTag(it)
+                            } ?: this
+                        },
                     horizontalArrangement = Arrangement.spacedBy(spacing.small),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = (option.value == selectedValue),
+                        selected = value == selectedValue,
                         // Null recommended for accessibility with screen readers
                         onClick = null,
                         enabled = enabled,
                     )
                     if (enabled) {
-                        option.label()
+                        option(value)
                     } else {
                         Box(Modifier.alpha(0.7f)) {
-                            option.label()
+                            option(value)
                         }
                     }
                 }
@@ -86,15 +88,12 @@ private fun DefaultPreview() {
             RadioButtonGroup(
                 selectedValue = 2,
                 onSelect = {},
-            ) {
-                listOf(
-                    RadioButtonOption(value = 1) {
-                        Text("Foo bar")
-                    },
-                    RadioButtonOption(value = 2) {
-                        Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
-                    },
-                )
+                values = listOf(1, 2),
+            ) { value ->
+                when (value) {
+                    1 -> Text("Foo bar")
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                }
             }
         }
     }
@@ -108,15 +107,12 @@ private fun DarkPreview() {
             RadioButtonGroup(
                 selectedValue = 2,
                 onSelect = {},
-            ) {
-                listOf(
-                    RadioButtonOption(value = 1) {
-                        Text("Foo bar")
-                    },
-                    RadioButtonOption(value = 2) {
-                        Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
-                    },
-                )
+                values = listOf(1, 2),
+            ) { value ->
+                when (value) {
+                    1 -> Text("Foo bar")
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                }
             }
         }
     }
@@ -130,16 +126,13 @@ private fun DisabledPreview() {
             RadioButtonGroup(
                 selectedValue = 2,
                 onSelect = {},
+                values = listOf(1, 2),
                 enabled = false,
-            ) {
-                listOf(
-                    RadioButtonOption(value = 1) {
-                        Text("Foo bar")
-                    },
-                    RadioButtonOption(value = 2) {
-                        Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
-                    },
-                )
+            ) { value ->
+                when (value) {
+                    1 -> Text("Foo bar")
+                    2 -> Text("Kotlin is a modern but already mature programming language designed to make developers happier.")
+                }
             }
         }
     }

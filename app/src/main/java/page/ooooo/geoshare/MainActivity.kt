@@ -6,31 +6,31 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import page.ooooo.geoshare.ui.BillingViewModel
 import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: ConversionViewModel by viewModels()
-
+    private val billingViewModel: BillingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                MainNavigation(viewModel, introEnabled = true)
+                MainNavigation(billingViewModel)
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.onResume(this)
+        billingViewModel.onResume(this)
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.onPause()
+        billingViewModel.onPause()
     }
 }

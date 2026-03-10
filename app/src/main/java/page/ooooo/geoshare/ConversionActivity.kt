@@ -8,40 +8,46 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import page.ooooo.geoshare.lib.android.AndroidTools
+import page.ooooo.geoshare.ui.BillingViewModel
 import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class ConversionActivity : ComponentActivity() {
-    private val viewModel: ConversionViewModel by viewModels()
+    private val billingViewModel: BillingViewModel by viewModels()
+    private val conversionViewModel: ConversionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.updateInput(AndroidTools.getIntentUriString(intent) ?: "")
-        viewModel.start()
+
+        Log.i(TAG, "Create: ${intent.data}")
+        conversionViewModel.onCreateOrNewIntent(intent)
+
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                MainNavigation(viewModel, introEnabled = false)
+                MainNavigation(billingViewModel, conversionViewModel, introEnabled = false)
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.onResume(this)
+        billingViewModel.onResume(this)
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.onPause()
+        billingViewModel.onPause()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Log.i("ConversionActivity", "New intent: ${intent.data}")
-        viewModel.updateInput(AndroidTools.getIntentUriString(intent) ?: "")
-        viewModel.start()
+        Log.i(TAG, "New intent: ${intent.data}")
+        conversionViewModel.onCreateOrNewIntent(intent)
+    }
+
+    companion object {
+        const val TAG = "ConversionActivity"
     }
 }

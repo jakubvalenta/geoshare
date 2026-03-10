@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -81,6 +82,10 @@ android {
         buildConfig = true
         compose = true
     }
+    room {
+        // Enable room auto-migrations.
+        schemaDirectory("$projectDir/schemas")
+    }
     lint {
         disable += "MissingTranslation" // Translation is crowdsourced, so this isn't viable
     }
@@ -107,12 +112,16 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.testing)
     implementation(libs.hilt.android)
     implementation(libs.jts.core)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.mock)
+    ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -1,201 +1,178 @@
 package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.runtime.*
-import androidx.compose.runtime.retain.retain
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.AndroidTools
-import page.ooooo.geoshare.lib.android.App
+import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.DefaultGeoUriAppType
-import page.ooooo.geoshare.lib.android.GMapsWVAppType
-import page.ooooo.geoshare.lib.android.GoogleMapsAppType
-import page.ooooo.geoshare.lib.android.MagicEarthAppType
-import page.ooooo.geoshare.lib.extensions.groupOrNull
-import page.ooooo.geoshare.lib.outputs.*
+import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.outputs.getOutputsForApps
+import page.ooooo.geoshare.lib.outputs.getOutputsForLinks
+import page.ooooo.geoshare.lib.outputs.getOutputsForSharing
+import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-private sealed interface GridItem {
-    data class App(val appDetails: AppDetails, val actions: List<Action>) : GridItem
-    class ShareButton : GridItem
-    class Empty : GridItem
-}
-
-private val iconSize = 46.dp
-private val dropdownButtonSize = 30.dp
-private val dropdownButtonOffset = 20.dp
-
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultSuccessApps(
-    onRun: (action: Action, i: Int?) -> Unit,
-    onQueryAppDetails: (packageManager: PackageManager, packageName: String) -> AppDetails? = { packageManager, packageName ->
-        AndroidTools.queryAppDetails(packageManager, packageName)
-    },
-    onQueryApps: (packageManager: PackageManager) -> List<App> = { packageManager ->
-        AndroidTools.queryApps(packageManager)
-    },
+    appDetails: AppDetails,
+    outputsForApps: Map<String, List<Output>>,
+    outputsForLinks: Map<String?, List<Output>>,
+    outputsForSharing: List<Output>,
+    points: Points,
+    iconSize: Dp = 46.dp,
+    onExecute: (Action<*>) -> Unit,
+    onNavigateToLinksScreen: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val lastPoint = points.lastOrNull() ?: return
+    val onClick = { output: Output ->
+        onExecute(
+            when (output) {
+                is PointOutput -> output.toAction(lastPoint)
+                is PointsOutput -> output.toAction(points)
+            }
+        )
+    }
     val spacing = LocalSpacing.current
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val columnCount = if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
-        5
-    } else {
-        4
-    }
-    val apps = onQueryApps(context.packageManager)
-    val actionsByAppDetails: Map<AppDetails, List<Action>> = allOutputs.getAppActions(apps)
-        .groupOrNull()
-        .mapNotNull { (packageName, actions) ->
-            onQueryAppDetails(context.packageManager, packageName)?.let { app -> app to actions }
-        }
-        .sortedBy { (appDetails) -> appDetails.label }
-        .toMap()
-    val grid = buildList {
-        actionsByAppDetails.forEach { (appDetails, actions) -> add(GridItem.App(appDetails, actions)) }
-        add(GridItem.ShareButton())
-        repeat(columnCount - (actionsByAppDetails.size + 1) % columnCount) { add(GridItem.Empty()) }
-    }
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = spacing.windowPadding)
-            .padding(top = spacing.largeAdaptive),
-        verticalArrangement = Arrangement.spacedBy(spacing.largeAdaptive),
-    ) {
-        grid.chunked(columnCount).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
-                row.forEach { gridItem ->
-                    when (gridItem) {
-                        is GridItem.App -> gridItem.let { (app, actions) ->
-                            ResultSuccessApp(app, actions, onRun)
-                        }
-
-                        is GridItem.ShareButton -> ResultSuccessAppShare {
-                            allOutputs.getChooserAction()?.let { action -> onRun(action, null) }
-                        }
-
-                        is GridItem.Empty -> ResultSuccessAppEmpty()
+    Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
+        // Apps
+        outputsForApps
+            .map { (packageName, outputs) -> appDetails[packageName]?.label to outputs }
+            .sortedWith(compareBy(nullsLast()) { (label) -> label })
+            .forEach { (label, outputs) ->
+                item {
+                    AppIcon(Modifier.weight(1f), label, appDetails, outputs, onClick) {
+                        outputs.firstOrNull()?.getIcon(appDetails)
+                            ?.let { IconFromDescriptor(it, contentDescription = null, size = iconSize) }
+                            ?: Box(
+                                Modifier
+                                    .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
+                                    .requiredSize(iconSize)
+                            )
                     }
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun RowScope.ResultSuccessApp(
-    appDetails: AppDetails,
-    actions: List<Action>,
-    onRun: (action: Action, i: Int?) -> Unit,
-) {
-    val spacing = LocalSpacing.current
-    var menuExpanded by retain { mutableStateOf(false) }
-
-    Column(
-        Modifier
-            .combinedClickable(onLongClick = {
-                menuExpanded = true
-            }) {
-                actions.firstOrNull()?.let { action -> onRun(action, null) }
-            }
-            .weight(1f)
-            .testTag("geoShareResultCardApp_${appDetails.packageName}"),
-        verticalArrangement = Arrangement.spacedBy(spacing.tinyAdaptive)) {
-        Box(
-            Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(iconSize),
-        ) {
-            Image(
-                rememberDrawablePainter(appDetails.icon),
-                appDetails.label,
-            )
-            actions.takeIf { it.size > 1 }?.let { actions ->
-                Box(
-                    Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(dropdownButtonOffset, -dropdownButtonOffset),
+        // Share item
+        item {
+            AppIcon(Modifier.weight(1f), null, appDetails, outputsForSharing, onClick) {
+                Surface(
+                    Modifier.requiredSize(iconSize),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = CircleShape,
                 ) {
-                    FilledIconButton(
-                        { menuExpanded = true },
-                        Modifier.size(dropdownButtonSize),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.more_horiz_24px),
-                            contentDescription = stringResource(R.string.nav_menu_content_description),
-                        )
-                    }
-                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        actions.forEach { action ->
-                            DropdownMenuItem(
-                                text = { action.Label() },
-                                onClick = {
-                                    menuExpanded = false
-                                    onRun(action, null)
-                                },
+                    outputsForSharing.firstOrNull()?.let { firstOutput ->
+                        firstOutput.getIcon(appDetails)?.let { icon ->
+                            IconFromDescriptor(
+                                icon,
+                                contentDescription = firstOutput.label(appDetails),
+                                size = 24.dp
                             )
                         }
                     }
                 }
             }
         }
-        Text(
-            appDetails.label,
-            Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
-}
 
-@Composable
-fun RowScope.ResultSuccessAppShare(onClick: () -> Unit) {
-    Column(Modifier.weight(1f)) {
-        FilledIconButton(
-            onClick,
+    if (outputsForLinks.isNotEmpty()) {
+        Row(
             Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(iconSize),
+                .fillMaxWidth()
+                .padding(
+                    start = spacing.windowPadding,
+                    top = spacing.tinyAdaptive,
+                    end = spacing.windowPadding - 8.dp, // Align with last point menu
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                Icons.Default.Share,
-                stringResource(R.string.conversion_succeeded_share),
+            Text(
+                stringResource(R.string.links_title),
+                Modifier.semantics { heading() },
+                style = MaterialTheme.typography.bodyLarge,
             )
+            IconButton(
+                { onNavigateToLinksScreen() },
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.conversion_succeeded_apps_links_configure),
+                    Modifier.requiredSize(24.dp),
+                )
+            }
+        }
+        Grid(
+            Modifier
+                .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.smallAdaptive)
+        ) {
+            // Links
+            outputsForLinks
+                .forEach { (group, outputs) ->
+                    item {
+                        AppIcon(Modifier.weight(1f), group, appDetails, outputs, onClick) {
+                            outputs.firstOrNull()?.getIcon(appDetails)?.let {
+                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                                    IconFromDescriptor(
+                                        it,
+                                        contentDescription = null,
+                                        size = iconSize,
+                                        inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
         }
     }
-}
-
-@Composable
-fun RowScope.ResultSuccessAppEmpty() {
-    Box(Modifier.weight(1f))
 }
 
 // Previews
@@ -209,28 +186,62 @@ private fun DefaultPreview() {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    onRun = { _, _ -> },
-                    onQueryAppDetails = { _, packageName ->
-                        AppDetails(
-                            packageName,
-                            "$packageName label",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        HERE_WEGO_PACKAGE_NAME to AppDetail(
+                            "HERE WeGo",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        MAPY_COM_PACKAGE_NAME to AppDetail(
+                            "Mapy.com",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        MAGIC_EARTH_PACKAGE_NAME to AppDetail(
+                            "Magic Earth",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        GOOGLE_MAPS_PACKAGE_NAME to AppDetail(
+                            "Google Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        GMAPS_WV_PACKAGE_NAME to AppDetail(
+                            "GMaps WV",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        TOMTOM_PACKAGE_NAME to AppDetail(
+                            "TomTom",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    outputsForApps = getOutputsForApps(
+                        mapOf(
+                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                            GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                            MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                            TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                         )
-                    },
-                    onQueryApps = {
-                        @Suppress("SpellCheckingInspection")
-                        listOf(
-                            App("app.comaps.fdroid", DefaultGeoUriAppType),
-                            App("app.organicmaps", DefaultGeoUriAppType),
-                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
-                            App("cz.seznam.mapy", DefaultGeoUriAppType),
-                            App("net.osmand.plus", DefaultGeoUriAppType),
-                            App("com.generalmagic.magicearth", MagicEarthAppType),
-                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
-                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
-                        )
-                    },
-                )
+                    ),
+                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = getOutputsForSharing(),
+                    points = persistentListOf(Point.example),
+                    onExecute = {},
+                ) {}
             }
         }
     }
@@ -245,28 +256,62 @@ private fun DarkPreview() {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    onRun = { _, _ -> },
-                    onQueryAppDetails = { _, packageName ->
-                        AppDetails(
-                            packageName,
-                            "$packageName label",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        HERE_WEGO_PACKAGE_NAME to AppDetail(
+                            "HERE WeGo",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        MAPY_COM_PACKAGE_NAME to AppDetail(
+                            "Mapy.com",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        MAGIC_EARTH_PACKAGE_NAME to AppDetail(
+                            "Magic Earth",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        GOOGLE_MAPS_PACKAGE_NAME to AppDetail(
+                            "Google Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        GMAPS_WV_PACKAGE_NAME to AppDetail(
+                            "GMaps WV",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        TOMTOM_PACKAGE_NAME to AppDetail(
+                            "TomTom",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    outputsForApps = getOutputsForApps(
+                        mapOf(
+                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                            GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                            MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                            TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                         )
-                    },
-                    onQueryApps = {
-                        @Suppress("SpellCheckingInspection")
-                        listOf(
-                            App("app.comaps.fdroid", DefaultGeoUriAppType),
-                            App("app.organicmaps", DefaultGeoUriAppType),
-                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
-                            App("cz.seznam.mapy", DefaultGeoUriAppType),
-                            App("net.osmand.plus", DefaultGeoUriAppType),
-                            App("com.generalmagic.magicearth", MagicEarthAppType),
-                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
-                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
-                        )
-                    },
-                )
+                    ),
+                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = getOutputsForSharing(),
+                    points = persistentListOf(Point.example),
+                    onExecute = {},
+                ) {}
             }
         }
     }
@@ -274,35 +319,24 @@ private fun DarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun OneAppPreview() {
+private fun LoadingPreview() {
     AppTheme {
         Surface {
             Column {
-                val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    onRun = { _, _ -> },
-                    onQueryAppDetails = { _, packageName ->
-                        AppDetails(
-                            packageName,
-                            "$packageName label",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    appDetails = emptyMap(),
+                    outputsForApps = getOutputsForApps(
+                        mapOf(
+                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         )
-                    },
-                    onQueryApps = {
-                        @Suppress("SpellCheckingInspection")
-                        listOf(
-                            App("app.comaps.fdroid", DefaultGeoUriAppType),
-                            App("app.organicmaps", DefaultGeoUriAppType),
-                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
-                            App("cz.seznam.mapy", DefaultGeoUriAppType),
-                            App("net.osmand.plus", DefaultGeoUriAppType),
-                            App("com.generalmagic.magicearth", MagicEarthAppType),
-                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
-                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
-                        )
-                    },
-                )
+                    ),
+                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = getOutputsForSharing(),
+                    points = persistentListOf(Point.example),
+                    onExecute = {},
+                ) {}
             }
         }
     }
@@ -310,35 +344,24 @@ private fun OneAppPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkOneAppPreview() {
+private fun DarkLoadingPreview() {
     AppTheme {
         Surface {
             Column {
-                val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessApps(
-                    onRun = { _, _ -> },
-                    onQueryAppDetails = { _, packageName ->
-                        AppDetails(
-                            packageName,
-                            "$packageName label",
-                            icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
+                    appDetails = emptyMap(),
+                    outputsForApps = getOutputsForApps(
+                        mapOf(
+                            COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                            ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                         )
-                    },
-                    onQueryApps = {
-                        @Suppress("SpellCheckingInspection")
-                        listOf(
-                            App("app.comaps.fdroid", DefaultGeoUriAppType),
-                            App("app.organicmaps", DefaultGeoUriAppType),
-                            App("com.here.appDetails.maps", DefaultGeoUriAppType),
-                            App("cz.seznam.mapy", DefaultGeoUriAppType),
-                            App("net.osmand.plus", DefaultGeoUriAppType),
-                            App("com.generalmagic.magicearth", MagicEarthAppType),
-                            App(GoogleMapsAppType.PACKAGE_NAME, GoogleMapsAppType),
-                            App(GMapsWVAppType.PACKAGE_NAME, GMapsWVAppType),
-                        )
-                    },
-                )
+                    ),
+                    outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+                    outputsForSharing = getOutputsForSharing(),
+                    points = persistentListOf(Point.example),
+                    onExecute = {},
+                ) {}
             }
         }
     }
@@ -346,13 +369,18 @@ private fun DarkOneAppPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun NoAppsPreview() {
+private fun EmptyPreview() {
     AppTheme {
         Surface {
             Column {
                 ResultSuccessApps(
-                    onRun = { _, _ -> },
-                )
+                    appDetails = emptyMap(),
+                    outputsForApps = emptyMap(),
+                    outputsForLinks = emptyMap(),
+                    outputsForSharing = getOutputsForSharing(),
+                    points = persistentListOf(Point.example),
+                    onExecute = {},
+                ) {}
             }
         }
     }
@@ -360,13 +388,18 @@ private fun NoAppsPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkNoAppsPreview() {
+private fun DarkEmptyPreview() {
     AppTheme {
         Surface {
             Column {
                 ResultSuccessApps(
-                    onRun = { _, _ -> },
-                )
+                    appDetails = emptyMap(),
+                    outputsForApps = getOutputsForApps(emptyMap()),
+                    outputsForLinks = emptyMap(),
+                    outputsForSharing = getOutputsForSharing(),
+                    points = persistentListOf(Point.example),
+                    onExecute = {},
+                ) {}
             }
         }
     }

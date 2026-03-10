@@ -61,7 +61,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.billing.AutomationFeature
@@ -71,7 +70,7 @@ import page.ooooo.geoshare.lib.billing.FakeOneTimeOffer
 import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
-import page.ooooo.geoshare.ui.components.AppHeadline
+import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.TextList
@@ -86,15 +85,15 @@ import kotlin.time.DurationUnit
 @Composable
 fun BillingScreen(
     onBack: () -> Unit = {},
-    viewModel: ConversionViewModel,
+    billingViewModel: BillingViewModel,
 ) {
     val context = LocalContext.current
-    val billingAppNameResId = viewModel.billingAppNameResId
-    val billingFeatures = viewModel.billingFeatures
-    val billingMessage by viewModel.billingMessage.collectAsStateWithLifecycle()
-    val billingOffers by viewModel.billingOffers.collectAsStateWithLifecycle()
-    val billingRefundableDuration = viewModel.billingRefundableDuration
-    val billingStatus by viewModel.billingStatus.collectAsStateWithLifecycle()
+    val billingAppNameResId = billingViewModel.billingAppNameResId
+    val billingFeatures = billingViewModel.billingFeatures
+    val billingMessage by billingViewModel.billingMessage.collectAsStateWithLifecycle()
+    val billingOffers by billingViewModel.billingOffers.collectAsStateWithLifecycle()
+    val billingRefundableDuration = billingViewModel.billingRefundableDuration
+    val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
 
     BillingScreen(
         billingAppNameResId = billingAppNameResId,
@@ -105,10 +104,10 @@ fun BillingScreen(
         billingStatus = billingStatus,
         onBack = onBack,
         onLaunchBillingFlow = { offerToken ->
-            viewModel.launchBillingFlow(context as Activity, offerToken)
+            billingViewModel.launchBillingFlow(context as Activity, offerToken)
         },
         onManageBillingProduct = { product ->
-            viewModel.manageBillingProduct(product)
+            billingViewModel.manageBillingProduct(product)
         },
     )
 }
@@ -267,7 +266,7 @@ private fun BillingMainPane(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )
-            AppHeadline(billingAppNameResId, Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false)
+            MainHeadline(billingAppNameResId, Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false)
             CompositionLocalProvider(
                 LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
                     lineBreak = LineBreak.Paragraph,

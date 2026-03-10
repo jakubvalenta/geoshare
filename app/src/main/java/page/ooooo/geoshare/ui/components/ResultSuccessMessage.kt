@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,8 +49,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.android.GoogleMapsAppType
+import page.ooooo.geoshare.lib.android.AppDetail
+import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.conversion.ActionFailed
@@ -57,31 +63,32 @@ import page.ooooo.geoshare.lib.conversion.ActionSucceeded
 import page.ooooo.geoshare.lib.conversion.ActionWaiting
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.LoadingIndicator
 import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
 import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.Automation
-import page.ooooo.geoshare.lib.outputs.GeoUriOutput
-import page.ooooo.geoshare.lib.outputs.GpxOutput
+import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
+import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-private fun isMessageShown(state: ConversionState.HasResult?, loadingIndicator: LoadingIndicator?): Boolean =
-    state is ActionWaiting && state.action is Automation.HasDelay ||
-        state is ActionSucceeded && state.action is Action.HasSuccessMessage ||
-        state is ActionFailed && state.action is Action.HasErrorMessage ||
+private fun isMessageShown(state: ConversionState.HasResult?): Boolean =
+    state is ActionWaiting && state.action.output is Output.HasAutomationDelay ||
+        state is ActionSucceeded && !state.isAutomation && state.action.output is Output.HasSuccessText ||
+        state is ActionFailed && !state.isAutomation && state.action.output is Output.HasErrorText ||
+        state is ActionSucceeded && state.isAutomation && state.action.output is Output.HasAutomationSuccessText ||
+        state is ActionFailed && state.isAutomation && state.action.output is Output.HasAutomationErrorText ||
         state is LocationFindingFailed ||
-        loadingIndicator is LoadingIndicator.Small
+        state is ConversionState.HasSmallLoadingIndicator
 
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
+    appDetails: AppDetails,
     automationFeatureStatus: FeatureStatus,
-    loadingIndicator: LoadingIndicator?,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
@@ -90,7 +97,7 @@ fun ResultSuccessMessage(
     var counterSec by remember { mutableIntStateOf(0) }
     var targetState by remember {
         mutableStateOf(
-            if (animationsEnabled && isMessageShown(currentState, loadingIndicator)) {
+            if (animationsEnabled && isMessageShown(currentState)) {
                 // To make the message appear with an animation, first start with null state and only later change it to
                 // the current state (using LaunchedEffect).
                 null
@@ -114,8 +121,8 @@ fun ResultSuccessMessage(
             if (!animationsEnabled) {
                 EnterTransition.None togetherWith ExitTransition.None
             } else {
-                val initialStateMessageShown = isMessageShown(this.initialState, loadingIndicator)
-                val targetStateMessageShown = isMessageShown(this.targetState, loadingIndicator)
+                val initialStateMessageShown = isMessageShown(this.initialState)
+                val targetStateMessageShown = isMessageShown(this.targetState)
                 if (!initialStateMessageShown && !targetStateMessageShown) {
                     // Message stays hidden
                     EnterTransition.None togetherWith ExitTransition.None
@@ -129,10 +136,10 @@ fun ResultSuccessMessage(
             }
         }
     ) { targetState ->
-        when {
-            targetState is ActionWaiting && targetState.action is Automation.HasDelay ->
-                ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareResultSuccessAutomationCounter")) {
+        when (targetState) {
+            is ActionWaiting if targetState.action.output is Output.HasAutomationDelay ->
+                (targetState.action.output as? Output.HasAutomationDelay)?.let { output ->
+                    ResultMessageRow {
                         LaunchedEffect(targetState.action) {
                             counterSec = targetState.delay.toInt(DurationUnit.SECONDS)
                             while (counterSec > 0) {
@@ -140,96 +147,128 @@ fun ResultSuccessMessage(
                                 counterSec--
                             }
                         }
-                        targetState.action.waitingText(counterSec)
-                    }
-                    FilledIconButton(
-                        onCancel,
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = MaterialTheme.colorScheme.onTertiary,
-                        ),
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            stringResource(R.string.conversion_loading_indicator_cancel),
+                        ResultMessageText(
+                            output.automationWaitingText(counterSec, appDetails),
+                            Modifier.testTag("geoShareResultSuccessAutomationCounter"),
                         )
-                    }
-                }
-
-            targetState is ActionSucceeded && targetState.action is Action.HasSuccessMessage ->
-                ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareResultSuccessMessage")) {
-                        targetState.action.successText()
-                    }
-                }
-
-            targetState is ActionFailed && targetState.action is Action.HasErrorMessage ->
-                ResultMessageRow {
-                    ResultMessageText(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ) {
-                        targetState.action
-                        targetState.action.errorText()
-                    }
-                }
-
-            targetState is LocationFindingFailed ->
-                ResultMessageRow {
-                    ResultMessageText(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ) {
-                        stringResource(R.string.conversion_succeeded_location_failed)
-                    }
-                }
-
-            loadingIndicator is LoadingIndicator.Small ->
-                ResultMessageRow {
-                    ResultMessageText(Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage")) {
-                        stringResource(loadingIndicator.messageResId)
-                    }
-                    FilledIconButton(
-                        onCancel,
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            contentColor = MaterialTheme.colorScheme.onTertiary,
-                        ),
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            stringResource(R.string.conversion_loading_indicator_cancel),
-                        )
-                    }
-                }
-
-            else ->
-                ResultMessageRow {
-                    Text(
-                        stringResource(R.string.conversion_succeeded_apps_headline),
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
-                    FeatureBadged(
-                        enabled = automationFeatureStatus == FeatureStatus.NOT_AVAILABLE,
-                        badge = { modifier ->
-                            FeatureBadgeSmall(
-                                onNavigateToUserPreferencesAutomationScreen,
-                                modifier.testTag("geoShareResultAutomationBadge")
-                            )
-                        },
-                    ) { modifier ->
-                        Button(
-                            onNavigateToUserPreferencesAutomationScreen,
-                            modifier.testTag("geoShareResultAutomationButton"),
-                            colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
+                        FilledIconButton(
+                            onCancel,
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                contentColor = MaterialTheme.colorScheme.onTertiary,
                             ),
                         ) {
-                            Text(stringResource(R.string.user_preferences_automation_title))
+                            Icon(
+                                Icons.Default.Close,
+                                stringResource(R.string.conversion_loading_indicator_cancel),
+                            )
                         }
                     }
                 }
+
+            is ActionSucceeded if !targetState.isAutomation && targetState.action.output is Output.HasSuccessText ->
+                (targetState.action.output as? Output.HasSuccessText)?.let { output ->
+                    ResultMessageRow {
+                        ResultMessageText(
+                            output.successText(appDetails),
+                            Modifier.testTag("geoShareResultSuccessMessage"),
+                        )
+                    }
+                }
+
+            is ActionFailed if !targetState.isAutomation && targetState.action.output is Output.HasErrorText ->
+                (targetState.action.output as? Output.HasErrorText)?.let { output ->
+                    ResultMessageRow {
+                        ResultMessageText(
+                            output.errorText(appDetails),
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                    }
+                }
+
+            is ActionSucceeded if targetState.isAutomation && targetState.action.output is Output.HasAutomationSuccessText ->
+                (targetState.action.output as? Output.HasAutomationSuccessText)?.let { output ->
+                    ResultMessageRow {
+                        ResultMessageText(
+                            output.automationSuccessText(appDetails),
+                            Modifier.testTag("geoShareResultSuccessMessage"),
+                        )
+                    }
+                }
+
+            is ActionFailed if targetState.isAutomation && targetState.action.output is Output.HasAutomationErrorText ->
+                (targetState.action.output as? Output.HasAutomationErrorText)?.let { output ->
+                    ResultMessageRow {
+                        ResultMessageText(
+                            output.automationErrorText(appDetails),
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                    }
+                }
+
+            is LocationFindingFailed -> ResultMessageRow {
+                ResultMessageText(
+                    stringResource(R.string.conversion_succeeded_location_failed),
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+
+            is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
+                ResultMessageText(
+                    targetState.getSmallLoadingIndicator(LocalResources.current).message,
+                    Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage"),
+                )
+                FilledIconButton(
+                    onCancel,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary,
+                    ),
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        stringResource(R.string.conversion_loading_indicator_cancel),
+                    )
+                }
+            }
+
+            else -> DefaultResultMessageRow(automationFeatureStatus, onNavigateToUserPreferencesAutomationScreen)
+        }
+    }
+}
+
+@Composable
+private fun DefaultResultMessageRow(
+    automationFeatureStatus: FeatureStatus,
+    onNavigateToUserPreferencesAutomationScreen: () -> Unit,
+) {
+    ResultMessageRow {
+        Text(
+            stringResource(R.string.conversion_succeeded_apps_headline),
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        FeatureBadged(
+            enabled = automationFeatureStatus == FeatureStatus.NOT_AVAILABLE,
+            badge = { modifier ->
+                FeatureBadgeSmall(
+                    onNavigateToUserPreferencesAutomationScreen,
+                    modifier.testTag("geoShareResultAutomationBadge")
+                )
+            },
+        ) { modifier ->
+            Button(
+                onNavigateToUserPreferencesAutomationScreen,
+                modifier.testTag("geoShareResultAutomationButton"),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            ) {
+                Text(stringResource(R.string.user_preferences_automation_title))
+            }
         }
     }
 }
@@ -246,10 +285,10 @@ private fun ResultMessageRow(content: @Composable RowScope.() -> Unit) {
 
 @Composable
 private fun RowScope.ResultMessageText(
+    text: String,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
-    text: @Composable () -> String,
 ) {
     val spacing = LocalSpacing.current
     Row(
@@ -261,7 +300,7 @@ private fun RowScope.ResultMessageText(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text(),
+            text,
             color = contentColor,
             style = MaterialTheme.typography.labelLarge,
             maxLines = 1,
@@ -277,17 +316,22 @@ private fun RowScope.ResultMessageText(
 private fun ActionFinishedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -301,17 +345,22 @@ private fun ActionFinishedPreview() {
 private fun DarkActionFinishedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFinished(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -326,17 +375,22 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(Point.example),
-                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                            GoogleMapsAppType.PACKAGE_NAME,
-                            GoogleMapsAppType
+                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                        isAutomation = true,
+                    ),
+                    appDetails = mapOf(
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
-                    loadingIndicator = null,
                     animationsEnabled = false,
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -353,17 +407,22 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
     AppTheme {
         Surface {
             Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
                 ResultSuccessMessage(
                     currentState = ActionFinished(
                         inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                         points = persistentListOf(Point.example),
-                        action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                            GoogleMapsAppType.PACKAGE_NAME,
-                            GoogleMapsAppType
+                        action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                        isAutomation = true,
+                    ),
+                    appDetails = mapOf(
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
                     automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
-                    loadingIndicator = null,
                     animationsEnabled = false,
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -379,24 +438,28 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
 private fun ActionWaitingPreview() {
     AppTheme {
         Surface {
-            val userPreferencesRepository = FakeUserPreferencesRepository()
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
-                        userPreferencesRepository = userPreferencesRepository,
+                        linkRepository = FakeLinkRepository(),
+                        userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    i = null,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
-                    ),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
                     delay = 3.seconds,
                 ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -410,24 +473,28 @@ private fun ActionWaitingPreview() {
 private fun DarkActionWaitingPreview() {
     AppTheme {
         Surface {
-            val userPreferencesRepository = FakeUserPreferencesRepository()
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
-                        userPreferencesRepository = userPreferencesRepository,
+                        linkRepository = FakeLinkRepository(),
+                        userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    i = null,
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
-                    ),
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
                     delay = 3.seconds,
                 ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -441,17 +508,22 @@ private fun DarkActionWaitingPreview() {
 private fun LocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    i = null,
-                    action = GpxOutput.ShareGpxRouteWithAppAction(GoogleMapsAppType.PACKAGE_NAME),
+                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = LoadingIndicator.Small(
-                    messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
-                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -465,17 +537,22 @@ private fun LocationPermissionReceivedPreview() {
 private fun DarkLocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    i = null,
-                    action = GpxOutput.ShareGpxRouteWithAppAction(GoogleMapsAppType.PACKAGE_NAME),
+                    action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = LoadingIndicator.Small(
-                    messageResId = R.string.conversion_succeeded_location_loading_indicator_title,
-                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -489,17 +566,22 @@ private fun DarkLocationPermissionReceivedPreview() {
 private fun SucceededPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -513,17 +595,80 @@ private fun SucceededPreview() {
 private fun DarSucceededPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionSucceeded(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
+                animationsEnabled = false,
+                onCancel = {},
+                onNavigateToUserPreferencesAutomationScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SucceededNoMessagePreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
+            ResultSuccessMessage(
+                currentState = ActionSucceeded(
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    points = persistentListOf(Point.example),
+                    action = SharePointsGpxOutput.toAction(persistentListOf(Point.example)),
+                    isAutomation = false,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
+                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                animationsEnabled = false,
+                onCancel = {},
+                onNavigateToUserPreferencesAutomationScreen = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkSucceededNoMessagePreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
+            ResultSuccessMessage(
+                currentState = ActionSucceeded(
+                    inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                    points = persistentListOf(Point.example),
+                    action = SharePointsGpxOutput.toAction(persistentListOf(Point.example)),
+                    isAutomation = false,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
+                    ),
+                ),
+                automationFeatureStatus = FeatureStatus.AVAILABLE,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -537,17 +682,22 @@ private fun DarSucceededPreview() {
 private fun FailedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -561,17 +711,22 @@ private fun FailedPreview() {
 private fun DarkFailedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
+            @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionFailed(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
-                    action = GeoUriOutput.ShareGeoUriWithAppAutomation(
-                        GoogleMapsAppType.PACKAGE_NAME,
-                        GoogleMapsAppType
+                    action = OpenDisplayGeoUriOutput(OSMAND_PLUS_PACKAGE_NAME).toAction(Point.example),
+                    isAutomation = true,
+                ),
+                appDetails = mapOf(
+                    OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                        "OsmAnd",
+                        context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
                 automationFeatureStatus = FeatureStatus.AVAILABLE,
-                loadingIndicator = null,
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},

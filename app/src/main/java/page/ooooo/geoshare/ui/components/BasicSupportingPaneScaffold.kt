@@ -136,6 +136,7 @@ fun BasicSupportingPaneScaffold(
                             navigationIconContentColor = mainContentColor,
                             actionIconContentColor = mainContentColor,
                         ),
+                        contentPadding = TopAppBarDefaults.ContentPadding
                     )
                     CompositionLocalProvider(LocalContentColor provides mainContentColor) {
                         mainPane(innerPadding, wide)
@@ -144,7 +145,7 @@ fun BasicSupportingPaneScaffold(
             }
         },
         supportingPane = {
-            AnimatedPane(Modifier.preferredWidth(400.dp)) {
+            AnimatedPane(Modifier.preferredWidth(450.dp)) {
                 val containerPadding = if (wide) {
                     PaddingValues(
                         top = insetPadding.calculateTopPadding(),

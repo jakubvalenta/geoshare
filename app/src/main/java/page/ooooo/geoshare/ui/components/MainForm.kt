@@ -54,7 +54,7 @@ fun MainForm(
         R.string.app_name
     }
 
-    AppHeadline(
+    MainHeadline(
         appNameResId,
         Modifier
             .padding(

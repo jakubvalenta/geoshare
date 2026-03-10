@@ -16,7 +16,7 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object AppleMapsInput : Input.HasHtml {
+object AppleMapsInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?maps\.apple(\.com)?[/?#]\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.APPLE_MAPS,
@@ -92,4 +92,12 @@ object AppleMapsInput : Input.HasHtml {
 
     @StringRes
     override val loadingIndicatorTitleResId = R.string.converter_apple_maps_loading_indicator_title
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString(
+            listOf(
+                "https://maps.apple.com/?ll={lat}%2C{lon}&z={z}&q={name}",
+                "https://maps.apple.com/?daddr={lat}%2C{lon}",
+            ).random()
+        )
 }

@@ -1,15 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
-import androidx.annotation.StringRes
-import androidx.compose.runtime.Composable
-
 sealed interface LoadingIndicator {
-    data class Small(
-        @param:StringRes val messageResId: Int,
-    ) : LoadingIndicator
-
-    data class Large(
-        @param:StringRes val titleResId: Int,
-        val description: @Composable () -> String?,
-    ) : LoadingIndicator
+    data class Small(val message: String) : LoadingIndicator
+    data class Large(val title: String, val description: String? = null) : LoadingIndicator
 }

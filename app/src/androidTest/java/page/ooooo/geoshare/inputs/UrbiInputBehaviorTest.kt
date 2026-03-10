@@ -1,20 +1,22 @@
 package page.ooooo.geoshare.inputs
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class UrbiInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
-        // Launch app and close intro
-        launchApplication()
-        closeIntro()
-
+    fun urbi() {
         // Point with marker
         testUri(
             WGS84Point(25.25915, 55.225263, z = 12.77),
             "https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452?m=55.225263%2C25.25915%2F12.77"
         )
+    }
+
+    @Test
+    fun urbiHtml() = runBlocking {
+        assumeDomainResolvable("go.2gis.com")
 
         // Short URI
         testUri(

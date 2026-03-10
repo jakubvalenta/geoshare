@@ -5,13 +5,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
-import page.ooooo.geoshare.lib.outputs.CoordinatesOutput
+import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asWGS84
 import page.ooooo.geoshare.lib.point.buildPoints
 
-object CoordinatesInput : Input {
+object CoordinatesInput : Input, Input.HasRandomUri {
     @Suppress("SpellCheckingInspection")
     private const val CHARS = """[\p{Zs},°'′"″NSWE]"""
     private const val SPACE = """\p{Zs}*"""
@@ -30,7 +30,7 @@ object CoordinatesInput : Input {
         nameResId = R.string.converter_coordinates_name,
         items = listOf(
             InputDocumentationItem.Text(20) {
-                stringResource(R.string.example, CoordinatesOutput.formatDegMinSecString(Point.example) ?: "0 E, 0 N")
+                stringResource(R.string.example, CoordsFormat.formatDegMinSecCoords(Point.example))
             },
         ),
     )
@@ -125,4 +125,7 @@ object CoordinatesInput : Input {
         val dec = (sig * (deg + min + sec))
         return dec.toScale(6)
     }
+
+    override fun genRandomUri(point: Point) =
+        point.formatUriString("N {lat}, E {lon}")
 }

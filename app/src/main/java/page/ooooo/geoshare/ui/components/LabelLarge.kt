@@ -1,24 +1,23 @@
 package page.ooooo.geoshare.ui.components
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import page.ooooo.geoshare.ui.theme.LocalSpacing
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 
 @Composable
-fun LabelLarge(text: String, color: Color = MaterialTheme.colorScheme.primary) {
-    val spacing = LocalSpacing.current
+fun LabelLarge(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = LocalContentColor.current,
+) {
     Text(
         text,
-        Modifier.padding(
-            start = spacing.windowPadding,
-            top = spacing.largeAdaptive,
-            end = spacing.windowPadding,
-            bottom = spacing.smallAdaptive,
-        ),
+        modifier.semantics { heading() },
         color = color,
         style = MaterialTheme.typography.labelLarge,
     )

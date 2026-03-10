@@ -47,15 +47,12 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Больше не спрашивать меня</string>
     <string name="faq_title">ЧаВо</string>
-    <string name="faq_item_collapse">Свернуть раздел</string>
-    <string name="faq_item_expand">Развернуть раздел</string>
     <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису (Google, Apple и т.д.)?</string>
     <string name="user_preferences_title">Настройки</string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
     <string name="conversion_failed_unshorten_connection_error">Ошибка подключения при открытии короткой ссылки</string>
     <string name="copying_finished">Скопировано в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>
-    <string name="faq_how_it_works_headline">Как это работает и вопросы конфиденциальности</string>
     <string name="conversion_failed_parse_url_error">Не удалось обработать ссылку на карту</string>
     <string name="intro_how_to_share_google_maps_content_description">Снимок экрана Google Карт с диалогом «Поделится ссылкой»</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
@@ -74,7 +71,6 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[Выберете <i>%1$s</i> и приложение позволит вам открыть то же место в любом установленном приложении для работы с картами.]]></string>
     <string name="conversion_failed_unshorten_error">Не удалось открыть короткую ссылку</string>
     <string name="about_text"><![CDATA[<p>%1$s — это бесплатное приложение с открытым исходным кодом, распространяемое по лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или более поздней версии.</p><br><p>Вы можете найти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, где вы также можете <a href="https://github.com/jakubvalenta/geoshare/issues">сообщать о проблемах</a>.</p><br><p>Мы будем рады вашим отзывам. Вы можете связаться со мной по адресу <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="faq_how_it_works_text" tools:ignore="TypographyDashes"><![CDATA[<p>%1$s преобразует ссылки на карты в geo-ссылки, которые могут быть открыты другими картографическими приложениями. Для создания geo-ссылки необходимы географические координаты. %1$s извлекает их из URL-адреса карты.</p><br><p>Однако не все URL карты содержат координаты. В таких случаях %1$s <b>запросит у вас разрешение на подключение к картографическому сервису (Google Карты, Карты Apple и т.д.)</b> и извлечёт координаты либо из HTTP-заголовков, либо из HTML-документа ссылки.</p><br><p>Более точно: существует три сценария того, как %1$s преобразует URL карты в geo: URI:</p><br><p><b> 1.</b></p><br><p>Если URL карты уже содержит географические координаты (например, <tt>https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398</tt>), то он будет разобран, и запрос к серверам картографического сервиса не будет сделан.</p><br><p><b>2.</b></p><br><p>Если URL карты не содержит географических координат (например, <tt>https://www.google.com/maps/place/Central+Park/</tt>), то %1$s спрашивает вас, можно ли подключиться к картографическому сервису.</p><br><p>Если вы разрешаете подключение к картографическому сервису, то %1$s делает <b>запрос HTTP GET</b> к Google Картам (или Картам Apple и т.д.) и разбирает координаты из HTML ответа. Вы можете представить это как <tt>curl https://www.google.com/maps/place/Central+Park/ | grep -E \'/@[0-9.,-]+\'</tt>.</p><br><p>Если вы не разрешаете подключение к картографическому сервису, то %1$s создает geo-ссылку с поисковым запросом места (например, <tt>geo:0,0?q=Central%%20Park</tt>).</p><br><p><b>3.</b></p><br><p>Если URL карты — это короткая ссылка (например, <tt>https://maps.app.goo.gl/TmbeHMiLEfTBws9EA</tt>), то %1$s спрашивает вас, можно ли подключиться к картографическому сервису.</p><br><p>Если вы разрешаете подключение, то %1$s делает <b>запрос HTTP HEAD</b> к короткой ссылке и считывает полную ссылку из заголовков ответа. Вы можете представить это как <tt>curl --head https://maps.app.goo.gl/TmbeHMiLEfTBws9EA | grep location:</tt>. Затем %1$s продолжает работу по сценарию 1 или 2 в зависимости от того, содержит ли полная ссылка координаты или нет. В случае сценария 2 будет выполнено ещё одно подключение к картографическому сервису, но на этот раз без запроса.</p><br><p>Если вы не разрешаете подключение к картографическому сервису, то %1$s отменяет создание geo-ссылки.</p><br><br><p>Чтобы постоянно разрешать или запрещать подключение к картографическому сервису вместо того, чтобы всегда спрашивать (по умолчанию), перейдите в параметры приложения.</p>]]></string>
     <string name="user_preferences_connection_description">Чтобы поддерживать короткие ссылки на карты и получать координаты с веб-страницы картографического сервиса, когда ссылка их не содержит, %1$s может подключаться к картографическому сервису. Более подробную информацию вы можете найти в разделе ЧаВо.</string>
     <string name="converter_google_maps_loading_indicator_title">Подключение к Google…</string>
     <string name="converter_apple_maps_loading_indicator_title">Подключение к Apple…</string>
@@ -83,7 +79,6 @@
     <string name="conversion_succeeded_skip">Копировать изначальную ссылку</string>
     <string name="conversion_succeeded_title">Координаты</string>
     <string name="conversion_error_title">Ошибка</string>
-    <string name="conversion_succeeded_copy_google_maps">Копировать ссылку на Карты Google</string>
     <string name="conversion_succeeded_save_gpx">Сохранить как GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s результат %2$s.gpx</string>
     <string name="conversion_succeeded_share">Поделиться</string>
@@ -105,13 +100,9 @@
     <string name="not_available">Недоступно</string>
     <string name="conversion_succeeded_copy_coordinates">Копировать координаты</string>
     <string name="conversion_succeeded_copy_link">Копировать ссылку %1$s</string>
-    <string name="conversion_succeeded_copy_link_display">Копировать ссылку на отображение карты в %1$s</string>
-    <string name="conversion_succeeded_copy_link_drive_to">Копировать ссылку на навигацию в %1$s</string>
-    <string name="conversion_succeeded_copy_link_street_view">Копировать ссылку на обзор улицы в %1$s</string>
     <string name="conversion_succeeded_location_failed">Не удалось найти местоположение</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Поиск вашего местоположения…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">Разрешить доступ к местоположению?</string>
-    <string name="conversion_succeeded_open_app">Открыть %1$s</string>
     <string name="conversion_succeeded_open_app_display">Показать карту в %1$s</string>
     <string name="conversion_succeeded_open_app_failed">Не удалось открыть %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Навигация в %1$s</string>

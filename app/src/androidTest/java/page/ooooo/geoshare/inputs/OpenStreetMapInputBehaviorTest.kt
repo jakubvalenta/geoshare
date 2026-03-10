@@ -1,16 +1,13 @@
 package page.ooooo.geoshare.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
 class OpenStreetMapInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
-    fun test() {
-        // Launch app and close intro
-        launchApplication()
-        closeIntro()
-
+    fun openStreetMap() {
         // Coordinates
         testUri(
             WGS84Point(51.49, -0.13, z = 16.0),
@@ -22,6 +19,22 @@ class OpenStreetMapInputBehaviorTest : BaseInputBehaviorTest() {
             WGS84Point(51.0528, 13.7364),
             "https://www.openstreetmap.org/directions?to=51.0528,13.7364",
         )
+
+        // Short URI
+        testUri(
+            WGS84Point(-16.23152732849121, -49.08348083496094, z = 11.0),
+            "https://osm.org/go/NuJWxJh-",
+        )
+    }
+
+    @Test
+    fun openStreetMapHtml() = runBlocking {
+        assumeDomainResolvable("www.openstreetmap.org")
+
+        // Launch app and close intro
+        launchApplication()
+        closeIntro()
+        setUserPreferenceConnectionPermissionToAlways()
 
         // Node
         testUri(
@@ -85,12 +98,6 @@ class OpenStreetMapInputBehaviorTest : BaseInputBehaviorTest() {
                 WGS84Point(45.4772950, 9.2296354),
             ),
             "https://www.openstreetmap.org/way/596674456",
-        )
-
-        // Short URI
-        testUri(
-            WGS84Point(-16.23152732849121, -49.08348083496094, z = 11.0),
-            "https://osm.org/go/NuJWxJh-",
         )
     }
 }

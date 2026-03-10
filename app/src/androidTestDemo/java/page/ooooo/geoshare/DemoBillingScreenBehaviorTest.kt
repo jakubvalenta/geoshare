@@ -3,9 +3,12 @@ package page.ooooo.geoshare
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
@@ -26,7 +29,7 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
 
         // Go to main screen
         pressBack()
-        waitForStableInActiveWindow()
+        quickWaitForStableInActiveWindow()
         pressBack()
 
         // Go to billing screen using billing icon
@@ -48,7 +51,7 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
 
         // Go to main screen
         pressBack()
-        waitForStableInActiveWindow()
+        quickWaitForStableInActiveWindow()
         pressBack()
 
         // Shows Geo Share Pro headline
@@ -118,7 +121,8 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
         pressBack()
 
         // Configure automation
-        onElement { viewIdResourceName == "geoShareUserPreferenceAutomationCopyCoordsDec" }.click()
+        val automation = CopyCoordsDecAutomation
+        onElement { viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}" }.click()
 
         // Go to the result screen
         pressBack()
@@ -142,6 +146,6 @@ class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
 
     private fun goToUserPreferencesDetailAutomationScreen() = uiAutomator {
         goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_AUTOMATION" }.click()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.AUTOMATION}" }.click()
     }
 }

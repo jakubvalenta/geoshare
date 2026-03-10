@@ -4,6 +4,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.ConversionViewModel
+import page.ooooo.geoshare.data.IntroViewModel
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 
 @Serializable
@@ -26,6 +28,9 @@ data class InputsRoute(val id: InputDocumentationId? = null)
 object IntroRoute
 
 @Serializable
+object LinksRoute
+
+@Serializable
 object MainRoute
 
 @Serializable
@@ -36,9 +41,14 @@ data class UserPreferencesRoute(val id: UserPreferencesGroupId? = null)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
+fun MainNavigation(
+    billingViewModel: BillingViewModel,
+    conversionViewModel: ConversionViewModel = hiltViewModel(),
+    introEnabled: Boolean = true,
+    introViewModel: IntroViewModel = hiltViewModel(),
+) {
     val navController = rememberNavController()
-    val introShown by viewModel.introShown.collectAsStateWithLifecycle()
+    val introShown by introViewModel.shown.collectAsStateWithLifecycle()
 
     LaunchedEffect(introEnabled, introShown) {
         if (introEnabled && !introShown) {
@@ -52,7 +62,7 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
         composable<AboutRoute> {
             AboutScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                viewModel = viewModel,
+                billingViewModel = billingViewModel,
             )
         }
         composable<FaqRoute> {
@@ -66,21 +76,23 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
         composable<IntroRoute> {
             IntroScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                viewModel = viewModel,
+                viewModel = introViewModel,
             )
         }
         composable<MainRoute> {
             MainScreen(
                 onNavigateToAboutScreen = { navController.navigate(AboutRoute) },
-                onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
-                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
-                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
-                onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
+                onNavigateToFaqScreen = { navController.navigate(FaqRoute) },
+                onNavigateToInputsScreen = { navController.navigate(InputsRoute()) },
+                onNavigateToIntroScreen = { navController.navigate(IntroRoute) },
+                onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
                 onNavigateToUserPreferencesAutomationScreen = {
                     navController.navigate(UserPreferencesRoute(UserPreferencesGroupId.AUTOMATION))
                 },
-                viewModel = viewModel,
+                onNavigateToUserPreferencesScreen = { navController.navigate(UserPreferencesRoute()) },
+                billingViewModel = billingViewModel,
+                conversionViewModel = conversionViewModel,
             )
         }
         composable<InputsRoute> { backStackEntry ->
@@ -88,13 +100,17 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
             InputsScreen(
                 initialDocumentationId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                viewModel = viewModel,
+            )
+        }
+        composable<LinksRoute> { backStackEntry ->
+            LinksScreen(
+                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
         composable<BillingRoute> {
             BillingScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
-                viewModel = viewModel,
+                billingViewModel = billingViewModel,
             )
         }
         composable<UserPreferencesRoute> { backStackEntry ->
@@ -103,7 +119,8 @@ fun MainNavigation(viewModel: ConversionViewModel, introEnabled: Boolean) {
                 initialGroupId = route.id,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
-                viewModel = viewModel,
+                onNavigateToLinksScreen = { navController.navigate(LinksRoute) },
+                billingViewModel = billingViewModel,
             )
         }
     }
