@@ -49,7 +49,7 @@ fun ResultSuccessSheet(
         item {
             ResultSuccessSheetItemGroup(
                 title = if (points.size > 1) {
-                    stringResource(R.string.conversion_succeeded_point_number, selectedPointIndex)
+                    stringResource(R.string.conversion_succeeded_point_number, selectedPointIndex + 1)
                 } else {
                     null
                 },
