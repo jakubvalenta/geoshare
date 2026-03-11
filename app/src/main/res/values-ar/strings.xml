@@ -8,7 +8,6 @@
     <string name="permission_do_not_ask">لا تسألني مرة أخرى</string>
     <string name="copying_finished">نُسخ إلى الحافظة</string>
     <string name="conversion_failed_connection_permission_denied">هذا الرابط غير مدعوم بدون الاتصال بخدمة الخرائط</string>
-    <string name="conversion_succeeded_copy_geo">انسخ geo:</string>
     <string name="nav_menu_content_description">القائمة</string>
     <string name="nav_back_content_description">العودة إلى الشاشة الرئيسية</string>
     <string name="intro_how_to_share_headline">كيفية إظهار موقع خريطة في تطبيق خرائط آخر</string>

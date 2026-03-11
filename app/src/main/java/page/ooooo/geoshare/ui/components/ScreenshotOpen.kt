@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.formats.CoordsFormat
+import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
 
@@ -52,7 +53,7 @@ fun ScreenshotOpen() {
             y = 220,
         ) {
             ScreenshotText(
-                stringResource(R.string.conversion_succeeded_copy_geo),
+                CopyGeoUriOutput.label(emptyMap()),
                 scale,
                 Modifier
                     .border(

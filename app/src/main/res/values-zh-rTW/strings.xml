@@ -41,7 +41,6 @@
     <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> 不含有坐標. %2$s 需要連接至地圖服務來取得。]]></string>
     <string name="user_preferences_connection_title">允許連接到地圖服務嗎（ Google, Apple 等）？</string>
     <string name="user_preferences_connection_description">為了支援縮短的地圖連結，並在連結本身未包含座標時，從地圖服務的網頁中取得座標,，%1$s 可以連接到地圖服務。您可查看應用程式內的常見問題（FAQ）頁面了解更詳細的資訊。</string>
-    <string name="conversion_succeeded_copy_geo">複製geo:</string>
     <string name="intro_title">簡介</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">放置圖釘</string>
     <string name="intro_how_to_share_app_caption"><![CDATA[選擇 <i>%1$s</i> 之後，應用程式將會讓您在其他安裝的地圖應用程式中打開相同的地點。]]></string>

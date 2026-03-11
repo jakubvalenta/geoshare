@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="conversion_succeeded_copy_geo">Kopírovat geo:</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="intro_title">Intro</string>
     <string name="intro_how_to_share_headline">Jak otevřít mapovou polohu v jiné mapové aplikaci</string>

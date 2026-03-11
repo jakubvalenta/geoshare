@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="conversion_succeeded_copy_geo">Copier geo:</string>
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Retour à l’écran principal</string>
     <string name="intro_title">Intro</string>
