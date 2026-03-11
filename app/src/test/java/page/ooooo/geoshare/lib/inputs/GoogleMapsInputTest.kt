@@ -166,6 +166,16 @@ class GoogleMapsInputTest : BaseInputTest() {
             ParseUriResult.Succeeded(
                 persistentListOf(GCJ02Point(40.785091, -73.968285, z = 15.0, name = "Central Park"))
             ),
+            parseUri("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!8m2"),
+        )
+    }
+
+    @Test
+    fun parseUri_placeAndDataS2() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                persistentListOf(GCJ02Point(40.78251718512075, -73.96551778676746, z = 15.0, name = "Central Park"))
+            ),
             parseUri("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
         )
     }
@@ -252,7 +262,23 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             @Suppress("SpellCheckingInspection") ParseUriResult.SucceededAndSupportsHtmlParsing(
                 persistentListOf(GCJ02Point(name = "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten")),
-                "https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b%3A0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1"
+                "https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!17m2!4m1!1e3!18m1!1e1"
+            ),
+            parseUri("https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!17m2!4m1!1e3!18m1!1e1"),
+        )
+    }
+
+    @Test
+    fun parseUri_placeOnlyS2() = runTest {
+        assertEquals(
+            @Suppress("SpellCheckingInspection") ParseUriResult.Succeeded(
+                persistentListOf(
+                    GCJ02Point(
+                        37.7869659989264,
+                        -122.39956000140454,
+                        name = "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten"
+                    )
+                ),
             ),
             parseUri("https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b:0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1"),
         )
@@ -263,7 +289,17 @@ class GoogleMapsInputTest : BaseInputTest() {
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(
                 persistentListOf(),
-                "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda"
+                "https://www.google.com/maps/place//data=!4m2!3m1"
+            ),
+            parseUri("https://www.google.com/maps/place//data=!4m2!3m1"),
+        )
+    }
+
+    @Test
+    fun parseUri_placeWithoutNameS2() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                persistentListOf(GCJ02Point(27.765195833623086, -15.601850943673506)),
             ),
             parseUri("https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda"),
         )
@@ -499,6 +535,25 @@ class GoogleMapsInputTest : BaseInputTest() {
                     GCJ02Point(52.4858222, 13.4236883, name = "Hermannstraße 1, 12049 Berlin, Germany"),
                     GCJ02Point(52.4881038, 13.4255518, name = "Weserstr. 1, 12047 Berlin, Germany"),
                     GCJ02Point(52.4807739, 13.4300356, name = "Reuterstraße 1, Berlin-Neukölln, Germany", z = 16.0),
+                )
+            ),
+            @Suppress("SpellCheckingInspection") parseUri("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!2m2!1d13.4236883!2d52.4858222!1m5!1m1!2m2!1d13.4255518!2d52.4881038!1m5!1m1!2m2!1d13.4300356!2d52.4807739!3e2"),
+        )
+    }
+
+    @Test
+    fun parseUri_directionsFromToViaWithCoordinatesInDataS2() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                @Suppress("SpellCheckingInspection") persistentListOf(
+                    GCJ02Point(52.485822218541934, 13.423688319399824, name = "Hermannstraße 1, 12049 Berlin, Germany"),
+                    GCJ02Point(52.48810376596012, 13.425551838089799, name = "Weserstr. 1, 12047 Berlin, Germany"),
+                    GCJ02Point(
+                        52.48077002937864,
+                        13.430029990871251,
+                        name = "Reuterstraße 1, Berlin-Neukölln, Germany",
+                        z = 16.0
+                    ),
                 )
             ),
             @Suppress("SpellCheckingInspection") parseUri("https://www.google.com/maps/dir/Hermannstra%C3%9Fe+1,+12049+Berlin,+Germany/Weserstr.+1,+12047+Berlin,+Germany/Reuterstra%C3%9Fe+1,+Berlin-Neuk%C3%B6lln,+Germany/@52.4844406,13.4217121,16z/data=!3m1!4b1!4m20!4m19!1m5!1m1!1s0x47a84fb831937021:0x28d6914e5ca0f9f5!2m2!1d13.4236883!2d52.4858222!1m5!1m1!1s0x47a84fb7098f1d89:0x74c8a84ad2981e9f!2m2!1d13.4255518!2d52.4881038!1m5!1m1!1s0x47a84fbb7c0791d7:0xf6e39aaedab8b2d9!2m2!1d13.4300356!2d52.4807739!3e2"),

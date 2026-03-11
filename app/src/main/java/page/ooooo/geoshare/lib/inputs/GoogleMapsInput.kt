@@ -71,7 +71,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
                 val firstPart = parts.firstOrNull()
                 if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
-                    // Iterate path parts in reverse order
+                    // Iterate path parts
                     val pointPattern = Regex("""$LAT,$LON.*""")
                     parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
                         if (part.startsWith("data=")) {
