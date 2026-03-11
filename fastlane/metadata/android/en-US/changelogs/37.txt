@@ -2,5 +2,6 @@
 - Added the option to open a location in web maps.
 - Added Baidu Map short link support.
 - Added Turkish translation.
+- Improved Google Maps coordinate extraction by using S2 geometry.
 - Improved compatibility of resulting geo: URIs.
 - Fixed cancellation of Google Maps web parsing.
