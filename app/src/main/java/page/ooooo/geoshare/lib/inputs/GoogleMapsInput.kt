@@ -10,9 +10,11 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
+import page.ooooo.geoshare.lib.extensions.prefixedHexToLongOrNull
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.geo.decodeS2CellId
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.lib.point.asGCJ02
@@ -20,6 +22,7 @@ import page.ooooo.geoshare.lib.point.buildPoints
 
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
+    private const val HEX = """(0x[A-Fa-f0-9]+)"""
 
     override val uriPattern =
         Regex("""(?:https?://)?(?:(?:www|maps)\.)?(?:google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
@@ -74,16 +77,23 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                         if (part.startsWith("data=")) {
                             // Data
                             // /data=...!3d44.4490541!4d26.0888398...
-                            Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()?.also {
-                                // Overwrite coordinates of previously found points with /data= but copy last point name
-                                points.lastOrNull().let { lastPoint ->
-                                    points.clear()
-                                    points.add(it.copy(name = lastPoint?.name))
+                            (Regex("""!3d$LAT!4d$LON""").find(part)
+                                ?.toLatLonPoint()
+                                ?.let { listOf(it) } ?:
+                            // /data=...!1s0x47a84fb831937021:0x28d6914e5ca0f9f5...
+                            Regex("""!1s$HEX:""").findAll(part)
+                                .mapNotNull {
+                                    it.groupOrNull(1)?.prefixedHexToLongOrNull()
+                                        ?.let { id -> decodeS2CellId(id) }
                                 }
-                            } ?:
+                                .toList()
+                                .takeIf { it.isNotEmpty() } ?:
                             // /data=...!1d13.4236883!2d52.4858222...!1d13.4255518!2d52.4881038...
-                            Regex("""!1d$LON!2d$LAT""").findAll(part).mapNotNull { it.toLonLatPoint() }
-                                .toList().takeIf { it.isNotEmpty() }?.let {
+                            Regex("""!1d$LON!2d$LAT""").findAll(part)
+                                .mapNotNull { it.toLonLatPoint() }
+                                .toList()
+                                .takeIf { it.isNotEmpty() }
+                                )?.let {
                                     if (it.size == points.size) {
                                         // Overwrite coordinates of previously found points with /data= but keep names
                                         points.forEachIndexed { i, point ->
