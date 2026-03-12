@@ -1,9 +1,8 @@
 package page.ooooo.geoshare.lib.extensions
 
+import page.ooooo.geoshare.lib.point.NaivePoint
 import kotlin.text.MatchResult
 import kotlin.text.Regex
-
-import page.ooooo.geoshare.lib.point.NaivePoint
 
 fun Regex.find(input: CharSequence?): MatchResult? = input?.let { this.find(it) }
 
