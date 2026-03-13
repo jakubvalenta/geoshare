@@ -19,7 +19,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates in data in China
         testUri(
-            WGS84Point(39.916947439886265, 116.39073095659673),
+            WGS84Point(39.916947439886265, 116.39073095659673, name = "Forbidden City"),
             @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a",
         )
 
@@ -66,6 +66,12 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Center
         testUri(
+            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
+            "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
+        )
+
+        // API
+        testUri(
             WGS84Point(52.5067296, 13.2599309),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
@@ -83,8 +89,8 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
         // Search
         testUri(
             WGS84Point(
-                51.0657922,
-                13.7555827,
+                51.065792219045214,
+                13.755582675572933,
                 name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
             ),
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
@@ -104,15 +110,10 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Place
         testUri(
-            WGS84Point(52.5200066, 13.404954, name = "Berlin"),
+            WGS84Point(52.50670098526605, 13.424606480239948, name = "Berlin"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
         )
 
-        // Map view
-        testUri(
-            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
-            "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
-        )
     }
 
     @Test
