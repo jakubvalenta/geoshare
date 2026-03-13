@@ -41,21 +41,21 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             // Short link
             // https://osm.org/go/{hash}
             Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
-                ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }?.also {
+                ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }?.let {
                     points = persistentListOf(it.asWGS84())
                     return@run
                 }
 
             // Coordinates
             // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
-            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also {
+            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
                 points = persistentListOf(it.asWGS84())
                 return@run
             }
 
             // Directions
             // https://www.openstreetmap.org/directions?to={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.also {
+            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.let {
                 points = persistentListOf(it.asWGS84())
                 return@run
             }

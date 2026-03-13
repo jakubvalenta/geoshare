@@ -50,14 +50,14 @@ object BaiduMapInput : ShortUriInput, WebInput {
             } else if (firstPart.startsWith('@')) {
                 // Center
                 // https://map.baidu.com/@{center_x},{center_y},{center_z}
-                Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.also {
+                Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.let {
                     points = persistentListOf(it.asBD09MC())
                 }
 
             } else if (firstPart == "poi") {
                 // Place
                 // https://map.baidu.com/poi/{name}/@{x},{y},{z}
-                Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint()?.also {
+                Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint()?.let {
                     points = persistentListOf(it.asBD09MC().copy(name = parts.getOrNull(1)))
                 }
 

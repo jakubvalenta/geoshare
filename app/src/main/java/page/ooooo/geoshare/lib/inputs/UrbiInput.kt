@@ -54,7 +54,7 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
-            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.also {
+            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.let {
                 points = persistentListOf(it.asWGS84())
                 return@run
             }
@@ -63,7 +63,7 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
             // Point
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
-            Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.also {
+            Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(z = z))
                 return@run
             }
@@ -71,7 +71,7 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
             // API
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
             // TODO Extract name
-            LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.also {
+            LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(z = z))
                 return@run
             }
@@ -89,9 +89,9 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toZLonLatPoint()?.also {
+            pattern.find(line)?.toZLonLatPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(name = name))
-                break
+                return@buildParseHtmlResult
             }
         }
     }

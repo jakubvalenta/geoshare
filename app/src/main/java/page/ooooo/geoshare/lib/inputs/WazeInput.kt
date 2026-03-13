@@ -41,15 +41,15 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
         uri.run {
-            (
-                Regex("""/ul/h($HASH)""").matchEntire(path)
-                    ?: Regex("($HASH)").matchEntire(queryParams["h"])
-                )
-                ?.groupOrNull()
+            // Short link
+            // https://waze.com/ul/h{hash}
+            (Regex("""/ul/h($HASH)""").matchEntire(path)
+            // https://www.waze.com/live-map?h={hash}
+                ?: Regex("($HASH)").matchEntire(queryParams["h"])
+                )?.groupOrNull()
                 ?.let { hash -> decodeWazeGeoHash(hash) }
-                ?.let { it.copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6)) }
-                ?.also {
-                    points = persistentListOf(it.asWGS84())
+                ?.let {
+                    points = persistentListOf(it.asWGS84().copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6)))
                     return@run
                 }
 
@@ -57,16 +57,24 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
 
             val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
 
+            // Coordinates
+            // https://waze.com/ul?ll={lat},{lon}
             (Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
                 ?: LAT_LON_PATTERN.matchEntire(queryParams[@Suppress("SpellCheckingInspection") "latlng"])
-                )?.toLatLonPoint()?.also {
+                )?.toLatLonPoint()?.let {
                     points = persistentListOf(it.asWGS84().copy(z = z, name = name))
                     return@run
                 }
 
-            points = persistentListOf(WGS84Point(z = z, name = name))
+            // Search
+            // https://waze.com/ul?q={name}
+            if (name != null) {
+                points = persistentListOf(WGS84Point(z = z, name = name))
+            }
 
+            // Place
+            // https://ul.waze.com/ul?venue_id={id}
             queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
                 // To skip some redirects when downloading HTML, replace this URL:
                 // https://ul.waze.com/ul?venue_id=2884104.28644432.6709020
@@ -110,13 +118,11 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
         val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toLatLonPoint()?.also {
+            pattern.find(line)?.toLatLonPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(name = name))
                 return@buildParseHtmlResult
             }
         }
-
-        points = persistentListOf()
     }
 
     @StringRes

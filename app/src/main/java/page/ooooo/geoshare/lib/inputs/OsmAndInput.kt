@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -20,23 +21,30 @@ object OsmAndInput : Input, Input.HasRandomUri {
     )
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        // TODO Extract both start and finish
         uri.run {
             val z = Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()
 
-            // Pin
-            // https://osmand.net/map?pin={lat},{lon}
             // Directions
             // https://osmand.net/map?start={lat},{lon}&finish={lat},{lon}
-            listOf("pin", "finish", "start")
-                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.also {
-                    points = persistentListOf(it.asWGS84().copy(z = z))
-                    return@run
+            LAT_LON_PATTERN.matchEntire(queryParams["finish"])?.toLatLonPoint().let { finish ->
+                LAT_LON_PATTERN.matchEntire(queryParams["start"])?.toLatLonPoint().let { start ->
+                    if (finish != null || start != null) {
+                        points = listOfNotNull(start, finish).map { it.asWGS84().copy(z = z) }.toImmutableList()
+                        return@run
+                    }
                 }
+            }
+
+            // Pin
+            // https://osmand.net/map?pin={lat},{lon}
+            LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(z = z))
+                return@run
+            }
 
             // View
             // https://osmand.net/map#{z}/{lat}/{lon}
-            Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also {
+            Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(z = z))
                 return@run
             }

@@ -37,7 +37,9 @@ object MagicEarthInput : Input, Input.HasRandomUri {
                 }
             }
 
-            points = persistentListOf(WGS84Point(z = z, name = name))
+            if (name != null) {
+                points = persistentListOf(WGS84Point(z = z, name = name))
+            }
         }
     }
 

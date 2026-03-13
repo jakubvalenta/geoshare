@@ -30,22 +30,36 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
         uri.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
+            // Search or place with name
+            // https://maps.apple.com/?q={name}
+            // https://maps.apple.com/place?place-id={id}...&q={name}
             val name = listOf("name", "address", @Suppress("SpellCheckingInspection") "daddr", "q")
                 .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
 
+            // Coordinates
+            // https://maps.apple.com/?ll={lat},{lon}
             // Notice that we consider the search center 'sll' to be a normal point
             listOf("ll", @Suppress("SpellCheckingInspection") "daddr", "coordinate", "q", "sll", "center")
-                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.also {
+                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.let {
                     points = persistentListOf(it.asWGS84().copy(z = z, name = name))
                     return@run
                 }
 
-            points = persistentListOf(WGS84Point(z = z, name = name))
+            // Short link
+            // https://maps.apple/p/{hash}
             if (host == "maps.apple" && path.startsWith("/p/") ||
+                // Place
+                // https://maps.apple.com/place?auid={id}...
                 !queryParams[@Suppress("SpellCheckingInspection") "auid"].isNullOrEmpty() ||
+                // Place
+                // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
                 htmlUriString = uri.toString()
+            }
+
+            if (name != null) {
+                points = persistentListOf(WGS84Point(z = z, name = name))
             }
         }
     }

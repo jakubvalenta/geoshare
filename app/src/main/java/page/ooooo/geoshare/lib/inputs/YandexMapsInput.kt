@@ -12,7 +12,6 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.WGS84Point
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
@@ -52,14 +51,17 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
             val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
 
+            // Coordinates
+            // https://yandex.com/maps?ll={lon},{lat}
+            // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
             listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
-                .firstNotNullOfOrNull { key -> LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint() }?.also {
+                .firstNotNullOfOrNull { key -> LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint() }?.let {
                     points = persistentListOf(it.asWGS84().copy(z = z))
                     return@buildParseUriResult
                 }
 
-            // Organization links seem to return 404 now. We still keep the code in case they start working again.
-            points = persistentListOf(WGS84Point(z = z))
+            // Organization -- these links seem to return 404 now; we still keep the code in case they start working again
+            // https://yandex.com/maps/org/94933420809?spam
             if (Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
                 htmlUriString = uri.toString()
             }
@@ -77,13 +79,11 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
         val pattern = Regex("""ll=$LON%2C$LAT""")
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toLonLatPoint()?.also {
+            pattern.find(line)?.toLonLatPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(name = name))
                 return@buildParseHtmlResult
             }
         }
-
-        points = persistentListOf()
     }
 
     @StringRes

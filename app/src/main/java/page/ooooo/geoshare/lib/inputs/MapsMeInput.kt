@@ -33,12 +33,14 @@ object MapsMeInput : Input {
                 ?.let { Regex(HASH).matchEntire(it)?.value }
                 ?.let { hash -> decodeGe0Hash(hash) }
                 ?.let { it.copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7)) }
-                ?.also {
+                ?.let {
                     points = persistentListOf(it.asWGS84().copy(name = name))
                     return@run
                 }
 
-            points = persistentListOf(WGS84Point(name = name))
+            if (name != null) {
+                points = persistentListOf(WGS84Point(name = name))
+            }
         }
     }
 }

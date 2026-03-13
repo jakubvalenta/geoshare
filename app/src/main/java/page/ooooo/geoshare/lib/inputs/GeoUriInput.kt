@@ -32,22 +32,34 @@ object GeoUriInput : Input, Input.HasRandomUri {
         uri.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
+            // Name in separate param
+            // ?q={lat},{lon}&({name})
             val name = queryParams
                 .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
                 .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
+            // Query
+            // ?q={name}
                 ?: Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
 
-            Regex("""$LAT,$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])?.toLatLonNamePoint()?.also {
+            // Pin without name
+            // ?q={lat},{lon}
+            // Pin with name
+            // ?q={lat},{lon}({name})
+            Regex("""$LAT,$LON(?:$NAME_REGEX)?""").matchEntire(queryParams["q"])?.toLatLonNamePoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(z = z, name = it.name ?: name))
                 return@run
             }
 
-            LAT_LON_PATTERN.matchEntire(path)?.toLatLonPoint()?.also {
+            // Coordinates
+            // geo:{lat},{lon}
+            LAT_LON_PATTERN.matchEntire(path)?.toLatLonPoint()?.let {
                 points = persistentListOf(it.asWGS84().copy(z = z, name = name))
                 return@run
             }
 
-            points = persistentListOf(WGS84Point(z = z, name = name))
+            if (name != null) {
+                points = persistentListOf(WGS84Point(z = z, name = name))
+            }
         }
     }
 
