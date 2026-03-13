@@ -114,6 +114,7 @@ class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Grant location permission
+            waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
             grantLocationPermission()
 
             mockLocation {

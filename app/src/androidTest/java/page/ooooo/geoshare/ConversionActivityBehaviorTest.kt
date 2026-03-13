@@ -516,7 +516,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Grant location permission
-            quickWaitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
+            waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
             grantLocationPermission()
 
             mockLocation {
