@@ -96,30 +96,6 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 val pointPattern = Regex("""$LAT,$LON.*""")
                 parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
                     if (part.startsWith("data=")) {
-                        // Data S2 (WGS 84)
-                        // /data=...!1s0x{id}:0x...
-                        Regex("""!1s$HEX:""").findAll(part)
-                            .mapNotNull { it.groupOrNull(1)?.prefixedHexToLongOrNull() }
-                            .map { id -> decodeS2CellId(id) }
-                            .toList()
-                            .takeIf { it.isNotEmpty() }
-                            ?.let { naivePoints ->
-                                // Overwrite previously found points, but keep their names
-                                if (mutablePoints.size == naivePoints.size) {
-                                    mutablePoints.forEachIndexed { i, point ->
-                                        mutablePoints[i] = naivePoints[i].asWGS84().copy(
-                                            z = point.z,
-                                            name = point.name,
-                                        )
-                                    }
-                                } else {
-                                    // Overwrite previously found points
-                                    mutablePoints.clear()
-                                    mutablePoints.addAll(naivePoints.map { it.asWGS84().copy(z = z) })
-                                }
-                                return@forEach
-                            }
-
                         // Data one point (GCJ-02)
                         // /data=...!3d{lat}!4d{lon}...
                         Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()
@@ -153,6 +129,30 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                                     // Overwrite previously found points
                                     mutablePoints.clear()
                                     mutablePoints.addAll(naivePoints.map { it.asGCJ02().copy(z = z) })
+                                }
+                                return@forEach
+                            }
+
+                        // Data S2 (WGS 84)
+                        // /data=...!1s0x{id}:0x...
+                        Regex("""!1s$HEX:""").findAll(part)
+                            .mapNotNull { it.groupOrNull(1)?.prefixedHexToLongOrNull() }
+                            .map { id -> decodeS2CellId(id) }
+                            .toList()
+                            .takeIf { it.isNotEmpty() }
+                            ?.let { naivePoints ->
+                                // Overwrite previously found points, but keep their names
+                                if (mutablePoints.size == naivePoints.size) {
+                                    mutablePoints.forEachIndexed { i, point ->
+                                        mutablePoints[i] = naivePoints[i].asWGS84().copy(
+                                            z = point.z,
+                                            name = point.name,
+                                        )
+                                    }
+                                } else {
+                                    // Overwrite previously found points
+                                    mutablePoints.clear()
+                                    mutablePoints.addAll(naivePoints.map { it.asWGS84().copy(z = z) })
                                 }
                                 return@forEach
                             }

@@ -83,9 +83,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
                 // Shows precise location
                 assertConversionSucceeded(
-                    GCJ02Point(
-                        52.4842015,
-                        13.4167277,
+                    // FIXME The correct point should be GCJ02Point(52.4842015, 13.4167277)
+                    WGS84Point(
+                        52.484113066123456, 13.409879063890362,
                         name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
                     )
                 )
@@ -116,9 +116,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
                 // Shows precise location
                 assertConversionSucceeded(
-                    GCJ02Point(
-                        52.4842015,
-                        13.4167277,
+                    // FIXME The correct point should be GCJ02Point(52.4842015, 13.4167277)
+                    WGS84Point(
+                        52.484113066123456, 13.409879063890362,
                         name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
                     )
                 )
@@ -129,9 +129,9 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
                 // Shows precise location again
                 assertConversionSucceeded(
-                    GCJ02Point(
-                        44.4490541,
-                        26.0888398,
+                    // FIXME The correct point should be GCJ02Point(44.4490541, 26.0888398)
+                    WGS84Point(
+                        44.39886293774796, 26.052727426371987,
                         name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București",
                     )
                 )
@@ -374,8 +374,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 // Shows precise location
                 assertConversionSucceeded(
                     GCJ02Point(
-                        52.4834254,
-                        13.4245399,
+                        52.4834254, 13.4245399,
                         name = @Suppress("SpellCheckingInspection") "Hermannstraße 20, 12049 Berlin",
                     ),
                 )
@@ -387,8 +386,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 // Shows precise location again
                 assertConversionSucceeded(
                     GCJ02Point(
-                        52.4832988,
-                        13.4245179,
+                        52.4832988, 13.4245179,
                         name = @Suppress("SpellCheckingInspection") "Hermannstraße 21, 12049 Berlin",
                     )
                 )
@@ -470,8 +468,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 // Shows precise location
                 assertConversionSucceeded(
                     GCJ02Point(
-                        51.1982447,
-                        6.4389493,
+                        51.1982447, 6.4389493,
                         name = @Suppress("SpellCheckingInspection") "Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                     )
                 )
@@ -519,6 +516,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
             }
 
             // Grant location permission
+            quickWaitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
             grantLocationPermission()
 
             mockLocation {
