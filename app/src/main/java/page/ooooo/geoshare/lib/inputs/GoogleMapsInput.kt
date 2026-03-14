@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
-import page.ooooo.geoshare.lib.extensions.prefixedHexToLongOrNull
+import page.ooooo.geoshare.lib.extensions.prefixedHexToULongOrNull
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -136,7 +136,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                         // Data S2 (WGS 84)
                         // /data=...!1s0x{id}:0x...
                         Regex("""!1s$HEX:""").findAll(part)
-                            .mapNotNull { it.groupOrNull(1)?.prefixedHexToLongOrNull() }
+                            .mapNotNull { it.groupOrNull(1)?.prefixedHexToULongOrNull() }
                             .map { id -> decodeS2CellId(id) }
                             .toList()
                             .takeIf { it.isNotEmpty() }

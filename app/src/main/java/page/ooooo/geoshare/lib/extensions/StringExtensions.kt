@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.lib.extensions
 
-fun String.prefixedHexToLongOrNull(): Long? =
+fun String.prefixedHexToULongOrNull(): ULong? =
     try {
-        this.hexToLong(HexFormat { number.prefix = "0x" })
+        this.hexToULong(HexFormat { number.prefix = "0x" })
     } catch (_: IllegalArgumentException) {
         null
     }
