@@ -6,11 +6,11 @@
     <string name="intro_how_to_share_headline">如何在其他地图应用中显示地图位置</string>
     <string name="intro_how_to_share_google_maps_caption">从地图应用或您的网络浏览器分享位置。</string>
     <string name="intro_how_to_share_google_maps_content_description">Google 地图分享屏幕的屏幕截图</string>
-    <string name="intro_how_to_share_app_caption"><![CDATA[选择<i>%1$s</i>，该应用将允许您在任何已安装的地图应用中打开相同的位置。]]></string>
+    <string name="intro_how_to_share_app_caption"><![CDATA[选择 <i>%1$s</i>，该应用将允许您在任何已安装的地图应用中打开同一位置。]]></string>
     <string name="intro_how_to_share_app_content_description">%1$s 分享屏幕的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_content_description">Google 地图默认打开设置的屏幕截图</string>
     <string name="intro_open_by_default_google_maps_button">打开 Google 地图设置</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[然后转到设置 &#8594; 应用 &#8594; %1$s &#8594; <i>默认打开</i>，开启在此应用中打开的链接，然后点击<i>添加链接</i>。]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[然后转到设置 &#8594; 应用 &#8594; %1$s &#8594; <i>默认打开</i>，开启在此应用中打开链接，然后点击<i>添加链接</i>。]]></string>
     <string name="intro_open_by_default_app_button">打开 %1$s 设置</string>
     <string name="intro_nav_close">关闭</string>
     <string name="intro_nav_next">下一页</string>
@@ -40,10 +40,10 @@
     <string name="conversion_failed_parse_html_error">无法从地图服务获取网页</string>
     <string name="intro_open_by_default_headline">配置 Android 以在替代地图中打开 Google 地图的链接（可选）</string>
     <string name="intro_open_by_default_app_content_description">%1$s 默认打开设置的屏幕截图</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，转到设置 &#8594; 应用 &#8594; 地图 &#8594; <i>默认打开</i>，并关闭此应用中链接的打开。]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，转到设置 &#8594; 应用 &#8594; 地图 &#8594; <i>默认打开</i>，并关闭在此应用中打开链接。]]></string>
     <string name="main_input_uri_supporting_text">例如：https://maps.app.goo.gl/… 或 maps.apple.com/…</string>
     <string name="intro_settings_activity_not_found">无法打开设置</string>
-    <string name="intro_open_by_default_app_note"><![CDATA[至少选择 <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。如果某些链接显示为灰色，则其他谷歌应用设置为默认会打开它们。您可以找到这些应用并关闭它们的链接打开，就像我们为 Google 地图所做的那样。]]></string>
+    <string name="intro_open_by_default_app_note"><![CDATA[至少选择 <tt>maps.google.com</tt> 和 <tt>maps.app.goo.gl</tt>。如果部分链接显示为灰色，则其他 Google 应用已设置为默认打开它们。您可以找到这些应用并关闭在应用中打开链接，就像我们为 Google 地图所做的那样。]]></string>
     <string name="main_create_geo_uri">显示坐标</string>
     <string name="conversion_error_report">报告问题</string>
     <string name="conversion_permission_common_grant">确定</string>
