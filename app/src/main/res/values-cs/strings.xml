@@ -132,7 +132,7 @@
     <string name="user_preferences_automation_nothing">Nic</string>
     <string name="main_input_uri_paste_content_description">Vložit</string>
     <string name="main_random">Náhodný odkaz</string>
-    <string name="conversion_succeeded_open_app_display">Zobrazit mapu v %1$s</string>
+    <string name="conversion_succeeded_open_app_display">Zobrazit mapu v %1$s</string>
     <string name="conversion_succeeded_open_app_navigate_to">Navigovat v %1$s</string>
     <string name="converter_amap_loading_indicator_title">Spojování s Amap…</string>
     <string name="converter_amap_permission_title">Spojit se s Amap?</string>
@@ -148,10 +148,10 @@
     <string name="output_gpx_route_share_failed">Nepodařilo se sdílet trasu GPX</string>
     <string name="output_gpx_route_share_automation_succeeded">Trasa GPX byla automaticky nasdílena</string>
     <plurals name="output_gpx_route_share_automation_waiting">
-        <item quantity="one">Trasa GPX bude automaticky nasdílena za %1$d s</item>
-        <item quantity="few">Trasa GPX bude automaticky nasdílena za %1$d s</item>
-        <item quantity="many">Trasa GPX bude automaticky nasdílena za %1$d s</item>
-        <item quantity="other">Trasa GPX bude automaticky nasdílena za %1$d s</item>
+        <item quantity="one">Trasa GPX bude automaticky nasdílena za %1$d s</item>
+        <item quantity="few">Trasa GPX bude automaticky nasdílena za %1$d s</item>
+        <item quantity="many">Trasa GPX bude automaticky nasdílena za %1$d s</item>
+        <item quantity="other">Trasa GPX bude automaticky nasdílena za %1$d s</item>
     </plurals>
     <string name="faq_location_permission_headline">Oprávnění pro přístup k poloze</string>
     <string name="faq_location_permission_text">%1$s požádá o přístupu k poloze při spuštění navigace TomTom a při sdílení trasy GPX, protože v těchto případech aplikace potřebuje vytvořit trasu GPX, která začíná v místě, kde se právě nacházíte. Informace o poloze se hned po vytvoření trasy smaže.</string>
