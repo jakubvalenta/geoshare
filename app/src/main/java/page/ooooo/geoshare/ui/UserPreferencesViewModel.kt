@@ -39,7 +39,7 @@ class UserPreferencesViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val userPreferencesValues: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
+    val values: StateFlow<UserPreferencesValues> = userPreferencesRepository.values
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

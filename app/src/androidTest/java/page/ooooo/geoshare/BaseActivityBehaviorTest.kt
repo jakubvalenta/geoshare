@@ -15,10 +15,10 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
 import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
@@ -205,14 +205,24 @@ abstract class BaseActivityBehaviorTest {
                     false
                 }
             }
-            val expectedCoords = expectedPoints
+            val expectedCoordinatesOptions = expectedPoints
                 .lastOrNull()
                 ?.takeIf { it.hasCoordinates() }
-                ?.let { CoordsFormat.formatDegMinSecCoords(it) }
-            if (expectedCoords != null) {
+                ?.let { point ->
+                    CoordinateFormat.entries.map { coordinateFormat ->
+                        when (coordinateFormat) {
+                            CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
+                            CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
+                        }
+                    }
+                }
+            if (expectedCoordinatesOptions != null) {
                 onElement {
                     if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
-                        assertEquals(expectedCoords, textAsString())
+                        assertTrue(
+                            """Expected "${textAsString()} to equal one of ${expectedCoordinatesOptions.joinToString()}""",
+                            textAsString() in expectedCoordinatesOptions,
+                        )
                         true
                     } else {
                         false

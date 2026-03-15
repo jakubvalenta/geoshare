@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import page.ooooo.geoshare.data.DefaultUserPreferencesRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.UserPreference
@@ -51,5 +52,6 @@ val defaultFakeUserPreferences = UserPreferencesValues(
     billingCachedProductId = "",
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
+    coordinateFormat = CoordinateFormat.DEC,
     introShownForVersionCode = 0,
 )

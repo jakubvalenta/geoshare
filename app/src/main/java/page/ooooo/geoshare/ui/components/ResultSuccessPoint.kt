@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -35,6 +36,7 @@ private val iconSize = 16.dp
 fun ResultSuccessPoint(
     point: Point,
     index: Int,
+    coordinateFormat: CoordinateFormat,
     onSelect: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -55,7 +57,10 @@ fun ResultSuccessPoint(
             )
             SelectionContainer {
                 Text(
-                    CoordsFormat.formatDegMinSecCoords(point),
+                    when (coordinateFormat) {
+                        CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
+                        CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
+                    },
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -79,6 +84,7 @@ private fun DefaultPreview() {
             ResultSuccessPoint(
                 point = Point.example,
                 index = 2,
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 onSelect = {},
             )
         }
@@ -93,6 +99,7 @@ private fun DarkPreview() {
             ResultSuccessPoint(
                 point = Point.example,
                 index = 2,
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 onSelect = {},
             )
         }
@@ -108,6 +115,7 @@ private fun LongNamePreview() {
             ResultSuccessPoint(
                 point = Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 index = 2,
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 onSelect = {},
             )
         }
@@ -123,6 +131,7 @@ private fun DarkLongNamePreview() {
             ResultSuccessPoint(
                 point = Point.genRandomPoint(name = "Reuterstraße 1, Berlin-Neukölln, Germany"),
                 index = 2,
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 onSelect = {},
             )
         }

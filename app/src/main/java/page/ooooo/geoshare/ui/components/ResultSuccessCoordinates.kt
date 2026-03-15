@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.outputs.Action
@@ -50,6 +51,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun ResultSuccessCoordinates(
     points: Points,
     appDetails: AppDetails,
+    coordinateFormat: CoordinateFormat,
     outputsForPointChips: List<PointOutput>,
     outputsForPointsChips: List<PointsOutput>,
     initialExpanded: Boolean = false,
@@ -83,7 +85,10 @@ fun ResultSuccessCoordinates(
             if (lastPoint.hasCoordinates()) {
                 SelectionContainer {
                     Text(
-                        CoordsFormat.formatDegMinSecCoords(lastPoint),
+                        when (coordinateFormat) {
+                            CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(lastPoint)
+                            CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(lastPoint)
+                        },
                         Modifier
                             .weight(1f)
                             .testTag("geoShareResultSuccessLastPointCoordinates"),
@@ -164,6 +169,7 @@ fun ResultSuccessCoordinates(
                                 ResultSuccessPoint(
                                     point = point,
                                     index = index,
+                                    coordinateFormat = coordinateFormat,
                                     onSelect = { onSelect(index) },
                                 )
                             }
@@ -204,6 +210,7 @@ private fun DefaultPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(Point.example),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 onExecute = {},
@@ -224,6 +231,7 @@ private fun DarkPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(Point.example),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 onExecute = {},
@@ -244,6 +252,7 @@ private fun DescriptionPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 onExecute = {},
@@ -264,6 +273,7 @@ private fun DarkDescriptionPreview() {
             ResultSuccessCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0)),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 onExecute = {},
@@ -287,6 +297,7 @@ private fun LabelPreview() {
                     WGS84Point(50.123456, 11.123456, name = "My point"),
                 ),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 onExecute = {},
@@ -310,6 +321,7 @@ private fun DarkLabelPreview() {
                     WGS84Point(50.123456, 11.123456, name = "My point"),
                 ),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 onExecute = {},
@@ -338,6 +350,7 @@ private fun PointsPreview() {
                     Point.genRandomPoint(),
                 ),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -367,6 +380,7 @@ private fun DarkPointsPreview() {
                     Point.genRandomPoint(),
                 ),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -392,6 +406,7 @@ private fun PointsWithNamePreview() {
                     Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,
@@ -417,6 +432,7 @@ private fun DarkPointsWithNamePreview() {
                     Point.genRandomPoint(name = "Berlin, Germany", z = 13.0),
                 ),
                 appDetails = emptyMap(),
+                coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
                 outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
                 outputsForPointsChips = getOutputsForPointsChips(),
                 initialExpanded = true,

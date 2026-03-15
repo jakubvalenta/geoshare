@@ -62,6 +62,8 @@ import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -74,7 +76,9 @@ import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.FeatureBadgeLarge
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
@@ -93,6 +97,7 @@ enum class UserPreferencesGroupId {
     AUTOMATION,
     AUTOMATION_DELAY,
     CONNECTION_PERMISSION,
+    COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
     LINKS,
 }
@@ -120,7 +125,7 @@ fun UserPreferencesScreen(
     val automationFeatureStatus by billingViewModel.automationFeatureStatus.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val links by viewModel.links.collectAsStateWithLifecycle()
-    val userPreferencesValues by viewModel.userPreferencesValues.collectAsStateWithLifecycle()
+    val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferencesScreen(
         initialGroupId = initialGroupId,
@@ -306,6 +311,18 @@ private fun UserPreferencesListPane(
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION_DELAY) },
                     )
                 )
+                add(
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.COORDINATE_FORMAT,
+                        headline = { stringResource(R.string.user_preferences_coordinate_format_title) },
+                        supportingContent = {
+                            CoordinateFormatPreferenceValue(
+                                value = CoordinateFormatPreference.getValue(values),
+                            )
+                        },
+                        onClick = { onNavigateToGroup(UserPreferencesGroupId.COORDINATE_FORMAT) },
+                    )
+                )
                 if (BuildConfig.DEBUG) {
                     add(
                         UserPreferencesGroup(
@@ -339,6 +356,18 @@ private fun ConnectionPermissionPreferenceValue(value: Permission) {
                 Permission.ALWAYS -> R.string.yes
                 Permission.ASK -> R.string.user_preferences_connection_option_ask
                 Permission.NEVER -> R.string.no
+            }
+        )
+    )
+}
+
+@Composable
+private fun CoordinateFormatPreferenceValue(value: CoordinateFormat) {
+    Text(
+        stringResource(
+            when (value) {
+                CoordinateFormat.DEC -> R.string.user_preferences_coordinate_format_option_dec
+                CoordinateFormat.DEG_MIN_SEC -> R.string.user_preferences_coordinate_format_option_deg_min_sec
             }
         )
     )
@@ -428,6 +457,42 @@ private fun UserPreferencesDetailPane(
                     },
                 ) { option ->
                     ConnectionPermissionPreferenceValue(option)
+                }
+            }
+
+        UserPreferencesGroupId.COORDINATE_FORMAT ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_coordinate_format_title,
+                description = {
+                    stringResource(R.string.user_preferences_coordinate_format_description)
+                },
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) {
+                userPreferencesOptionsControl(
+                    userPreference = CoordinateFormatPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    optionGroups = CoordinateFormatPreference.getOptionGroups(),
+                    getItemTestTag = { option ->
+                        // TODO Add instrumented test
+                        "geoShareUserPreferenceCoordinateFormat_${option}"
+                    },
+                ) { option ->
+                    Column {
+                        CoordinateFormatPreferenceValue(option)
+                        Text(
+                            Point.example.let { examplePoint ->
+                                when (option) {
+                                    CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(examplePoint)
+                                    CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(examplePoint)
+                                }
+                            },
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
 
@@ -839,6 +904,78 @@ private fun TabletConnectionPermissionPreview() {
             Column {
                 UserPreferencesScreen(
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
+                    apps = emptyMap(),
+                    appDetails = emptyMap(),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CoordinateFormatPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
+                    apps = emptyMap(),
+                    appDetails = emptyMap(),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkCoordinateFormatPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
+                    apps = emptyMap(),
+                    appDetails = emptyMap(),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = defaultFakeUserPreferences,
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletCoordinateFormatPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
                     automationFeatureStatus = FeatureStatus.LOADING,
