@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -46,7 +47,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
         Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
                 .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
@@ -63,7 +64,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
             // Organization -- these links seem to return 404 now; we still keep the code in case they start working again
             // https://yandex.com/maps/org/94933420809?spam
             if (Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
-                htmlUriString = uri.toString()
+                htmlUriString = toString()
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formats.CoordsFormat
@@ -34,7 +35,7 @@ object CoordinatesInput : Input, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             // Decimal
             // e.g. `N 41.40338, E 2.17403`

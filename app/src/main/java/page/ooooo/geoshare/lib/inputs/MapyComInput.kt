@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.point.Point
@@ -27,7 +28,7 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
     override val shortUriPattern = Regex("""(?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+""")
     override val shortUriMethod = ShortUriInput.Method.GET
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             // Coordinates -- use this part of the text, because it's more precise than the URL
             // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`

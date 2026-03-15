@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -34,7 +35,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
     @Suppress("SpellCheckingInspection")
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             val parts = uri.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
@@ -44,7 +45,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
                     // Shared point or shared place
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
-                    webUriString = uri.toString()
+                    webUriString = toString()
                 }
 
             } else if (firstPart.startsWith('@')) {
@@ -87,7 +88,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
                     ?: run {
                         // Mobile place detail without coords
                         // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1"
-                        webUriString = uri.toString()
+                        webUriString = toString()
                     }
             }
         }

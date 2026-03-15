@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.Point
@@ -22,7 +23,7 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val shortUriPattern = Regex("""(?:https?://)?surl\.amap\.com/\S+""")
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         // TODO Extract name
         uri.run {
             // Query param p

@@ -9,6 +9,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -39,7 +40,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             // Short link
             // https://waze.com/ul/h{hash}
@@ -102,7 +103,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
                     uriQuote = uri.uriQuote,
                 ).toString()
             } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
-                htmlUriString = uri.toString()
+                htmlUriString = toString()
             }
         }
     }

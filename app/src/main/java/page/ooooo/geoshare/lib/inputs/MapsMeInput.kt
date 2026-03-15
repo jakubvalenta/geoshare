@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
@@ -22,7 +23,7 @@ object MapsMeInput : Input {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
                 ?.let { Q_PATH_PATTERN.matchEntire(it) }

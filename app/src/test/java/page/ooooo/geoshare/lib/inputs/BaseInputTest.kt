@@ -23,7 +23,7 @@ abstract class BaseInputTest {
 
     fun isShortUri(uriString: String): Boolean = getShortUri(uriString) != null
 
-    suspend fun parseUri(uriString: String) = input.parseUri(Uri.parse(uriString, uriQuote))
+    suspend fun parseUri(uriString: String) = input.parseUri(Uri.parse(uriString, uriQuote), uriQuote)
 
     suspend fun parseHtml(html: String, htmlUrlString: String = "https://example.com/") =
         (input as HtmlInput).parseHtml(
