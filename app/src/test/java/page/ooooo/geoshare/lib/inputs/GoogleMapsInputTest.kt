@@ -530,6 +530,43 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
+    fun parseUri_directionsWithSeveralWaypoints() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                persistentListOf(
+                    GCJ02Point(
+                        55.626402299999995, 37.1331874,
+                        name = "Ликино",
+                    ),
+                    GCJ02Point(
+                        55.637071, 37.206128,
+                        name = "Лесной Городок",
+                    ),
+                    GCJ02Point(
+                        55.6826036, 37.3149893,
+                        name = "Ба́ковка",
+                    ),
+                    GCJ02Point(
+                        55.7073371, 37.3859881,
+                        name = "АШАН",
+                    ),
+                    GCJ02Point(
+                        55.658595899999995, 37.4428281,
+                        name = "Востряковское кладбище",
+                    ),
+                    GCJ02Point(
+                        55.6116874, 37.686148599999996,
+                        name = "Музей-заповедник Царицыно",
+                    ),
+                )
+            ),
+            parseUri(
+                "https://www.google.com/maps/dir/%D0%9B%D0%B8%D0%BA%D0%B8%D0%BD%D0%BE/%D0%9B%D0%B5%D1%81%D0%BD%D0%BE%D0%B9+%D0%93%D0%BE%D1%80%D0%BE%D0%B4%D0%BE%D0%BA/%D0%91%D0%B0%CC%81%D0%BA%D0%BE%D0%B2%D0%BA%D0%B0/%D0%90%D0%A8%D0%90%D0%9D/%D0%92%D0%BE%D1%81%D1%82%D1%80%D1%8F%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%BE%D0%B5+%D0%BA%D0%BB%D0%B0%D0%B4%D0%B1%D0%B8%D1%89%D0%B5/%D0%9C%D1%83%D0%B7%D0%B5%D0%B9-%D0%B7%D0%B0%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%BD%D0%B8%D0%BA+%D0%A6%D0%B0%D1%80%D0%B8%D1%86%D1%8B%D0%BD%D0%BE/data=!4m38!4m37!1m5!1m4!1s0x46b55767341de071:0xe1281fa8dd2b9f9c!8m2!3d55.626402299999995!4d37.1331874!1m5!1m4!1s0x46b550cf63985f73:0x6b36a6abc6d503bc!8m2!3d55.637071!4d37.206128!1m5!1m4!1s0x46b551d28d217481:0x798f7f7ed913cf5!8m2!3d55.6826036!4d37.3149893!1m5!1m4!1s0x46b55031416094cd:0xe26749066071b637!8m2!3d55.7073371!4d37.3859881!1m5!1m4!1s0x46b54d91de6fa877:0x96e21b5b19e3920a!8m2!3d55.658595899999995!4d37.4428281!1m5!1m4!1s0x414ab3cc65ff1f95:0x6261499f9a7afd91!8m2!3d55.6116874!4d37.686148599999996!3e0"
+            ),
+        )
+    }
+
+    @Test
     fun parseUri_directionsEmpty() = runTest {
         assertEquals(
             ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://www.google.com/maps/dir/"),

@@ -99,27 +99,19 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 val pointPattern = Regex("""$LAT,$LON.*""")
                 parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
                     if (part.startsWith("data=")) {
-                        // Data one point
-                        // /data=...!3d{lat}!4d{lon}...
-                        Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()
-                            ?.let { naivePoint ->
-                                // Overwrite previously found points, but copy last point name
-                                mutablePoints.lastOrNull().let { lastPoint ->
-                                    mutablePoints.clear()
-                                    mutablePoints.add(
-                                        naivePoint.asGCJ02().copy(z = lastPoint?.z, name = lastPoint?.name)
-                                    )
-                                }
-                                return@forEach
-                            }
-
-                        // Data several points
-                        // /data=...!1d{lon}!2d{lat)...!1d{lon}!2d{lat}...
-                        Regex("""!1d$LON!2d$LAT""").findAll(part)
-                            .mapNotNull { it.toLonLatPoint() }
+                        // Data lat-lon points
+                        // /data=...!3d{lat}!4d{lon}...!3d{lat}!4d{lon}...
+                        (Regex("""!3d$LAT!4d$LON""").findAll(part)
+                            .mapNotNull { it.toLatLonPoint() }
                             .toList()
                             .takeIf { it.isNotEmpty() }
-                            ?.let { naivePoints ->
+                        // Data lon-lat points
+                        // /data=...!1d{lon}!2d{lat)...!1d{lon}!2d{lat}...
+                            ?: Regex("""!1d$LON!2d$LAT""").findAll(part)
+                                .mapNotNull { it.toLonLatPoint() }
+                                .toList()
+                                .takeIf { it.isNotEmpty() }
+                            )?.let { naivePoints ->
                                 // Overwrite previously found points, but keep their names
                                 if (mutablePoints.size == naivePoints.size) {
                                     mutablePoints.forEachIndexed { i, point ->
