@@ -32,9 +32,10 @@ object MapsMeInput : Input {
             (if (scheme == "ge0") host else pathParts.getOrNull(1))
                 ?.let { Regex(HASH).matchEntire(it)?.value }
                 ?.let { hash -> decodeGe0Hash(hash) }
-                ?.let { it.copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7)) }
                 ?.let {
-                    points = persistentListOf(it.asWGS84().copy(name = name))
+                    points = persistentListOf(
+                        it.asWGS84().copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7), name = name)
+                    )
                     return@run
                 }
 

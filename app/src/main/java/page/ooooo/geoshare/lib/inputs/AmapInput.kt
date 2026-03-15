@@ -27,14 +27,14 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
         uri.run {
             // Query param p
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
-            Regex("""\w+,$LAT,$LON.+""").matchEntire(queryParams["p"])?.toLatLonPoint()?.also {
+            Regex("""\w+,$LAT,$LON.+""").matchEntire(queryParams["p"])?.toLatLonPoint()?.let {
                 points = persistentListOf(it.asGCJ02())
                 return@run
             }
 
             // Query param q
             // https://wb.amap.com/?q=<lat>,<lon>,<name>
-            Regex("""$LAT,$LON.+""").matchEntire(queryParams["q"])?.toLatLonPoint()?.also {
+            Regex("""$LAT,$LON.+""").matchEntire(queryParams["q"])?.toLatLonPoint()?.let {
                 points = persistentListOf(it.asGCJ02())
                 return@run
             }

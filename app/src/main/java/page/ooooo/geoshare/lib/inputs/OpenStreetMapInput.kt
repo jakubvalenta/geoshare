@@ -41,7 +41,8 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
             // Short link
             // https://osm.org/go/{hash}
             Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
-                ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }?.let {
+                ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                ?.let {
                     points = persistentListOf(it.asWGS84())
                     return@run
                 }
@@ -81,21 +82,18 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
     ) = buildParseHtmlResult {
+        val name = pointsFromUri.lastOrNull()?.name
         val mutablePoints = mutableListOf<WGS84Point>()
 
         val pattern = Regex(""""lat":$LAT,"lon":$LON""")
         while (true) {
             val line = channel.readLine() ?: break
-            mutablePoints.addAll(
-                pattern.findAll(line).mapNotNull {
-                    it.toLatLonPoint()?.let { (lat, lon, z) -> WGS84Point(lat, lon, z) }
-                }
-            )
+            mutablePoints.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint()?.asWGS84() })
         }
 
-        pointsFromUri.lastOrNull()?.name?.let { defaultName ->
+        if (name != null) {
             mutablePoints.removeLastOrNull()?.let { lastPoint ->
-                mutablePoints.add(lastPoint.copy(name = defaultName))
+                mutablePoints.add(lastPoint.copy(name = name))
             }
         }
 

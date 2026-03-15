@@ -49,7 +49,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
             } else if (firstPart.startsWith('@')) {
                 // Center
-                // https://map.baidu.com/@{center_x},{center_y},{center_z}
+                // https://map.baidu.com/@{centerX},{centerY},{centerZ}
                 Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.let {
                     points = persistentListOf(it.asBD09MC())
                 }
@@ -63,7 +63,7 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
             } else if (firstPart == "dir") {
                 // Directions with query params
-                // https://map.baidu.com/dir/...?sn={start_point}&en={waypoint_point}$$1$$%20to:{dest_point}
+                // https://map.baidu.com/dir/...?sn={startPoint}&en={waypointPoint}$$1$$%20to:{destPoint}
                 val pattern = Regex(WAYPOINT)
                 points = listOfNotNull(
                     pattern.find(queryParams["sn"])?.toLonLatNamePoint()?.asBD09MC(),
@@ -71,11 +71,11 @@ object BaiduMapInput : ShortUriInput, WebInput {
                         .toList().toTypedArray(),
                 ).takeIf { it.isNotEmpty() }?.toImmutableList() ?:
                     // Directions with waypoint names only (ignore center)
-                    // https://map.baidu.com/dir/{start_name}/{waypoint_name}/{dest_name}/@{center_x},{center_y},{center_z}z
+                    // https://map.baidu.com/dir/{startName}/{waypointName}/{destName}/@{centerX},{centerY},{centerZ}z
                     parts
                         .drop(1)
                         .filterNot { it.startsWith('@') }
-                        .map { BD09MCPoint(0.0, 0.0, name = it) }
+                        .map { BD09MCPoint(name = it) }
                         .toImmutableList()
 
             } else if (firstPart == "mobile") {

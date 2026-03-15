@@ -89,8 +89,6 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
                 return@buildParseHtmlResult
             }
         }
-
-        points = persistentListOf()
     }
 
     @StringRes
