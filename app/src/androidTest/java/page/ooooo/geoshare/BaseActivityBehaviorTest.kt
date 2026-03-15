@@ -314,9 +314,23 @@ abstract class BaseActivityBehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.CONNECTION_PERMISSION}" }.click()
     }
 
+    protected fun goToUserPreferencesDetailCoordinateFormatScreen() = uiAutomator {
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.COORDINATE_FORMAT}" }.click()
+    }
+
     protected fun goToUserPreferencesDetailDeveloperScreen() = uiAutomator {
         goToUserPreferencesScreen()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" }.click()
+    }
+
+    protected fun goToMainScreenFromUserPreferencesDetail() = uiAutomator {
+        onElement { viewIdResourceName == "geoShareBack" }.click()
+        if (onElementOrNull(1_000L) { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" } != null) {
+            // On a non-tablet screen, we need to tap the back button one more time to get from the user preferences
+            // list screen to the main screen
+            onElement { viewIdResourceName == "geoShareBack" }.click()
+        }
     }
 
     protected fun chooseFile() = uiAutomator {

@@ -477,7 +477,6 @@ private fun UserPreferencesDetailPane(
                     onValueChange = onValueChange,
                     optionGroups = CoordinateFormatPreference.getOptionGroups(),
                     getItemTestTag = { option ->
-                        // TODO Add instrumented test
                         "geoShareUserPreferenceCoordinateFormat_${option}"
                     },
                 ) { option ->
