@@ -96,12 +96,6 @@ android {
 }
 
 dependencies {
-    constraints {
-        implementation("com.google.guava:guava:33.2.1-jre") {
-            because("s2-geometry pulls version 25 by default, which causes duplicate class ListenableFuture")
-        }
-    }
-
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -127,7 +121,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.mock)
-    implementation(libs.s2.geometry)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
