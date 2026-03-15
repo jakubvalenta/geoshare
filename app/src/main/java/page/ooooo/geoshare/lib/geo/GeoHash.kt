@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.lib.geo
 
 import page.ooooo.geoshare.lib.extensions.toScale
+import page.ooooo.geoshare.lib.point.NaivePoint
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -18,7 +19,7 @@ private fun decodeGeoHash(
     roundingMode: GeoHashRoundingMode = GeoHashRoundingMode.LEFT,
     yCellCountAdjustment: (yBitCount: Int) -> Double = { 0.0 },
     zoomAdjustmentConst: Int = -8,
-): Triple<Double, Double, Double> {
+): NaivePoint {
 
     // Collect odd bits of the hash into x and even bits into y (or the other way around, if isLonOddBits is false).
     // E.g. base32 hash "ezs" (0b01101_11111_11000) will have x=124 (0b01111100) and y=94 (0b1011110)
@@ -71,7 +72,7 @@ private fun decodeGeoHash(
     // base64 hashes, so we need to multiply it to make it work for base32 hashes too
     z += zoomAdjustmentConst * (digitBitCount.toDouble() / 6.0)
 
-    return Triple(lat, lon, max(z, 0.0).toScale(0))
+    return NaivePoint(lat, lon, max(z, 0.0).toScale(0))
 }
 
 @Suppress("SpellCheckingInspection")
@@ -81,11 +82,11 @@ private val OPEN_STREET_MAP_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
 /**
  * See https://wiki.openstreetmap.org/wiki/Shortlink#How_the_encoding_works
  */
-fun decodeOpenStreetMapQuadTileHash(hash: String) = decodeGeoHash(
-    hash = hash,
-    charMap = OPEN_STREET_MAP_HASH_CHAR_MAP,
-    digitBitCount = 6,
-).let { (lat, lon, z) ->
+fun decodeOpenStreetMapQuadTileHash(hash: String): NaivePoint {
+    val naivePoint = decodeGeoHash(hash = hash, charMap = OPEN_STREET_MAP_HASH_CHAR_MAP, digitBitCount = 6)
+    if (naivePoint.z == null) {
+        return naivePoint
+    }
     // Add relative zoom, which works like this:
     // - If the hash doesn't end with "-", add 0.
     // - If the hash ends with "-", add -2.
@@ -95,7 +96,7 @@ fun decodeOpenStreetMapQuadTileHash(hash: String) = decodeGeoHash(
     // - etc.
     val relativeZoom = hash.takeLastWhile { it == '-' }.length.takeIf { it > 0 }
         ?.let { zoomCharCount -> (zoomCharCount + 2).mod(3) - 2 } ?: 0
-    Triple(lat, lon, max(z + relativeZoom, 0.0))
+    return naivePoint.copy(z = max(naivePoint.z + relativeZoom, 0.0))
 }
 
 @Suppress("SpellCheckingInspection")
@@ -105,22 +106,23 @@ private val ORGANIC_MAPS_HASH_CHAR_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
 /**
  * See https://github.com/mapsme/ge0_url_decoder/blob/c609a6503fa91d424d5169c74158424e9eaf6f06/mwm_api.php#L7-L51
  */
-fun decodeGe0Hash(hash: String) = decodeGeoHash(
-    hash = try {
-        hash.substring(1)
-    } catch (_: IndexOutOfBoundsException) {
-        ""
-    },
-    charMap = ORGANIC_MAPS_HASH_CHAR_MAP,
-    digitBitCount = 6,
-    bitOrder = GeoHashBitOrder.LAT_LON,
-    roundingMode = GeoHashRoundingMode.MIDDLE,
-    yCellCountAdjustment = { yBitCount -> -(2.0.pow(yBitCount - 30)) },
-).let { (lat, lon, z) ->
+fun decodeGe0Hash(hash: String): NaivePoint {
+    val naivePoint = decodeGeoHash(
+        hash = try {
+            hash.substring(1)
+        } catch (_: IndexOutOfBoundsException) {
+            ""
+        },
+        charMap = ORGANIC_MAPS_HASH_CHAR_MAP,
+        digitBitCount = 6,
+        bitOrder = GeoHashBitOrder.LAT_LON,
+        roundingMode = GeoHashRoundingMode.MIDDLE,
+        yCellCountAdjustment = { yBitCount -> -(2.0.pow(yBitCount - 30)) },
+    )
     val zFromHash = hash.getOrNull(0)
         ?.let { ORGANIC_MAPS_HASH_CHAR_MAP[it] }
         ?.let { (it / 4.0 + 4).toScale(0) }
-    Triple(lat, lon, zFromHash ?: z)
+    return naivePoint.copy(z = zFromHash ?: naivePoint.z)
 }
 
 @Suppress("SpellCheckingInspection")

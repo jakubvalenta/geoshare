@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
@@ -13,8 +14,6 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.extensions.toZLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
 
 object UrbiInput : HtmlInput, Input.HasRandomUri {
     override val uriPattern =
@@ -50,16 +49,33 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
     )
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        htmlUriString = uri.toString()
-        points = buildPoints {
-            uri.run {
-                Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.also { points.add(it) }
-                    ?: Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.also { points.add(it) }
-                    ?: LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.also { points.add(it) }
+        uri.run {
+            htmlUriString = uri.toString()
 
-                Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
+            // Marker
+            // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
+            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.let {
+                points = persistentListOf(it.asWGS84())
+                return@run
             }
-        }.asWGS84()
+
+            val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
+
+            // Point
+            // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
+            Regex(""".*/$LON,$LAT/?$""").matchEntire(path)?.toLonLatPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(z = z))
+                return@run
+            }
+
+            // API
+            // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
+            // TODO Extract name
+            LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(z = z))
+                return@run
+            }
+        }
     }
 
     override suspend fun parseHtml(
@@ -68,18 +84,16 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
     ) = buildParseHtmlResult {
-        points = buildPoints {
-            defaultName = pointsFromUri.lastOrNull()?.name
+        val name = pointsFromUri.lastOrNull()?.name
 
-            val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
-            while (true) {
-                val line = channel.readLine() ?: break
-                pattern.find(line)?.toZLonLatPoint()?.also {
-                    points.add(it)
-                    break
-                }
+        val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
+        while (true) {
+            val line = channel.readLine() ?: break
+            pattern.find(line)?.toZLonLatPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(name = name))
+                return@buildParseHtmlResult
             }
-        }.asWGS84()
+        }
     }
 
     @StringRes

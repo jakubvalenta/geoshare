@@ -37,7 +37,7 @@ sealed interface ParseUriResult {
 sealed interface ParseHtmlResult {
 
     class Builder {
-        lateinit var points: ImmutableList<Point>
+        var points: ImmutableList<Point> = persistentListOf()
         var redirectUriString: String? = null
         var webUriString: String? = null
 

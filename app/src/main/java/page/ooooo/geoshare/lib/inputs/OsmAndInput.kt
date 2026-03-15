@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -7,8 +9,6 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
 
 object OsmAndInput : Input, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/\S+""")
@@ -21,15 +21,34 @@ object OsmAndInput : Input, Input.HasRandomUri {
     )
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                listOf("pin", "finish", "start").firstNotNullOfOrNull { key ->
-                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint()?.also { points.add(it) }
-                } ?: Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also { points.add(it) }
+        uri.run {
+            val z = Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()
 
-                Regex("""$Z/.*""").matchEntire(fragment)?.doubleGroupOrNull()?.also { defaultZ = it }
+            // Directions
+            // https://osmand.net/map?start={lat},{lon}&finish={lat},{lon}
+            LAT_LON_PATTERN.matchEntire(queryParams["finish"])?.toLatLonPoint().let { finish ->
+                LAT_LON_PATTERN.matchEntire(queryParams["start"])?.toLatLonPoint().let { start ->
+                    if (finish != null || start != null) {
+                        points = listOfNotNull(start, finish).map { it.asWGS84().copy(z = z) }.toImmutableList()
+                        return@run
+                    }
+                }
             }
-        }.asWGS84()
+
+            // Pin
+            // https://osmand.net/map?pin={lat},{lon}
+            LAT_LON_PATTERN.matchEntire(queryParams["pin"])?.toLatLonPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(z = z))
+                return@run
+            }
+
+            // View
+            // https://osmand.net/map#{z}/{lat}/{lon}
+            Regex("""$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(z = z))
+                return@run
+            }
+        }
     }
 
     override fun genRandomUri(point: Point) =

@@ -127,7 +127,7 @@ class BaiduMapInputTest : BaseInputTest() {
     fun parseUri_directionsOnePointNoParams() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(
-                persistentListOf(BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号")),
+                persistentListOf(BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号")),
             ),
             parseUri(
                 "https://map.baidu.com/dir/%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%B9%BF%E5%B7%9E%E5%B8%82%E8%B6%8A%E7%A7%80%E5%8C%BA%E5%A4%A7%E5%A1%98%E8%A1%97%E9%81%93%E4%B8%AD%E5%B1%B1%E4%B8%89%E8%B7%AF%E4%B8%9C%E6%98%8C%E5%A4%A7%E8%A1%972%E5%8F%B7/@12614173.165,2630534.5250000004,16z"
@@ -155,8 +155,8 @@ class BaiduMapInputTest : BaseInputTest() {
         assertEquals(
             ParseUriResult.Succeeded(
                 persistentListOf(
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区白云街道烟雨路"),
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
+                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路"),
+                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
                 ),
             ),
             parseUri(
@@ -190,9 +190,9 @@ class BaiduMapInputTest : BaseInputTest() {
         assertEquals(
             ParseUriResult.Succeeded(
                 persistentListOf(
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区白云街道烟雨路"),
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区梅花村街道泰兴直街35号"),
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
+                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路"),
+                    BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号"),
+                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
                 )
             ),
             parseUri(
@@ -231,10 +231,10 @@ class BaiduMapInputTest : BaseInputTest() {
         assertEquals(
             ParseUriResult.Succeeded(
                 persistentListOf(
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区白云街道烟雨路"),
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区梅花村街道泰兴直街35号"),
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区黄花岗街道永福路36号DE座"),
-                    BD09MCPoint(0.0, 0.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
+                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路"),
+                    BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号"),
+                    BD09MCPoint(name = "广东省广州市越秀区黄花岗街道永福路36号DE座"),
+                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
                 )
             ),
             parseUri(

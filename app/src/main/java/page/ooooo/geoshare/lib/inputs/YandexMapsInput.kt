@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
@@ -11,8 +12,6 @@ import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
@@ -48,22 +47,25 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                @Suppress("SpellCheckingInspection")
-                LON_LAT_PATTERN.matchEntire(queryParams["whatshere[point]"])?.toLonLatPoint()?.also { points.add(it) }
-                    ?: LON_LAT_PATTERN.matchEntire(queryParams["ll"])?.toLonLatPoint()?.also { points.add(it) }
+        uri.run {
+            val z = listOf(@Suppress("SpellCheckingInspection") "whatshere[zoom]", "z")
+                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
 
-                @Suppress("SpellCheckingInspection")
-                Z_PATTERN.matchEntire(queryParams["whatshere[zoom]"])?.doubleGroupOrNull()?.also { defaultZ = it }
-                    ?: Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()?.also { defaultZ = it }
-
-                // Organization links seem to return 404 now. We still keep the code in case they start working again.
-                if (points.isEmpty() && Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
-                    htmlUriString = uri.toString()
+            // Coordinates
+            // https://yandex.com/maps?ll={lon},{lat}
+            // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
+            listOf(@Suppress("SpellCheckingInspection") "whatshere[point]", "ll")
+                .firstNotNullOfOrNull { key -> LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint() }?.let {
+                    points = persistentListOf(it.asWGS84().copy(z = z))
+                    return@buildParseUriResult
                 }
+
+            // Organization -- these links seem to return 404 now; we still keep the code in case they start working again
+            // https://yandex.com/maps/org/94933420809?spam
+            if (Regex("""/maps/org/\d+(?:[/?#].*|$)""").matches(path)) {
+                htmlUriString = uri.toString()
             }
-        }.asWGS84()
+        }
     }
 
     override suspend fun parseHtml(
@@ -72,18 +74,16 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
     ) = buildParseHtmlResult {
-        points = buildPoints {
-            defaultName = pointsFromUri.lastOrNull()?.name
+        val name = pointsFromUri.lastOrNull()?.name
 
-            val pattern = Regex("""ll=$LON%2C$LAT""")
-            while (true) {
-                val line = channel.readLine() ?: break
-                pattern.find(line)?.toLonLatPoint()?.also {
-                    points.add(it)
-                    break
-                }
+        val pattern = Regex("""ll=$LON%2C$LAT""")
+        while (true) {
+            val line = channel.readLine() ?: break
+            pattern.find(line)?.toLonLatPoint()?.let {
+                points = persistentListOf(it.asWGS84().copy(name = name))
+                return@buildParseHtmlResult
             }
-        }.asWGS84()
+        }
     }
 
     @StringRes

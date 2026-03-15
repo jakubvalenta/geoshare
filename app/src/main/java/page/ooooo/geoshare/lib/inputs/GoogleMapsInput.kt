@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
@@ -13,10 +15,9 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asGCJ02
-import page.ooooo.geoshare.lib.point.buildPoints
 
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
@@ -40,94 +41,134 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                // Try query parameters for all URLs
+        uri.run {
+            val mutablePoints = mutableListOf<Point>()
 
-                Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()?.also { defaultZ = it }
+            val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
 
-                listOf("origin", "destination", "q", "query", "ll", "viewpoint", "center").forEach { key ->
-                    (LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint()
-                        ?: Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { NaivePoint(name = it) })
-                        ?.let {
-                            points.add(it)
-                            if (key != "origin") {
-                                if (!it.hasCoordinates()) {
-                                    // Go to HTML parsing if needed
-                                    htmlUriString = uri.toString()
-                                }
-                                return@run
-                            }
-                        }
+            // API directions
+            // https://www.google.com/maps/dir/?origin={lat},{lon}&destination={lat},{lon}
+            // https://www.google.com/maps/dir/?origin={name}&destination={name}
+            listOf("origin", "destination")
+                .mapNotNull { key ->
+                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint()
+                        ?: Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { NaivePoint(name = it) }
                 }
-
-                // Parse path parts
-
-                val partsThatSupportUriParsing = setOf("dir", "place", "search")
-                val partsThatSupportHtmlParsing = setOf(null, "", "@", "d", "dir", "place", "placelists")
-                val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
-                val firstPart = parts.firstOrNull()
-                if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
-                    // Iterate path parts in reverse order
-                    val pointPattern = Regex("""$LAT,$LON.*""")
-                    parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
-                        if (part.startsWith("data=")) {
-                            // Data
-                            // /data=...!3d44.4490541!4d26.0888398...
-                            Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()?.also {
-                                // Overwrite coordinates of previously found points with /data= but copy last point name
-                                points.lastOrNull().let { lastPoint ->
-                                    points.clear()
-                                    points.add(it.copy(name = lastPoint?.name))
-                                }
-                            } ?:
-                            // /data=...!1d13.4236883!2d52.4858222...!1d13.4255518!2d52.4881038...
-                            Regex("""!1d$LON!2d$LAT""").findAll(part).mapNotNull { it.toLonLatPoint() }
-                                .toList().takeIf { it.isNotEmpty() }?.let {
-                                    if (it.size == points.size) {
-                                        // Overwrite coordinates of previously found points with /data= but keep names
-                                        points.forEachIndexed { i, point ->
-                                            points[i] = point.copy(lat = it[i].lat, lon = it[i].lon)
-                                        }
-                                    } else {
-                                        // Overwrite coordinates of previously found points with /data= including names
-                                        points.clear()
-                                        points.addAll(it)
-                                    }
-                                }
-                        } else if (part.startsWith('@')) {
-                            // Center
-                            // /@52.5067296,13.2599309,6z
-                            Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint()?.also { point ->
-                                val lastPoint = points.lastOrNull()
-                                if (lastPoint == null) {
-                                    // Use center coordinates if we haven't already found a point
-                                    points.add(point)
-                                } else if (lastPoint.lat == null && lastPoint.lon == null) {
-                                    // Use center coordinates with the name of the last found point
-                                    points[points.size - 1] = point.copy(name = lastPoint.name)
-                                } else {
-                                    // Don't use center coordinates if we've already found a point with coordinate
-                                }
-                                defaultZ = point.z
-                            }
-                        } else if (part.isNotEmpty()) {
-                            // Coordinates
-                            // /52.492611,13.431726
-                            pointPattern.matchEntire(part)?.toLatLonPoint()?.also { points.add(it) }
-                            // Name
-                            // /Central+Park
-                                ?: points.add(NaivePoint(name = part))
-                        }
+                .takeIf { it.isNotEmpty() }
+                ?.let { naivePoints ->
+                    points = naivePoints.map { it.asGCJ02().copy(z = z) }.toImmutableList()
+                    if (points.any { !it.hasCoordinates() }) {
+                        // Go to HTML parsing if needed
+                        htmlUriString = uri.toString()
                     }
+                    return@run
                 }
-                if (points.lastOrNull()?.hasCoordinates() != true && firstPart in partsThatSupportHtmlParsing) {
+
+            // API coordinates
+            // https://maps.google.com/?ll={lat},{lon}
+            // https://maps.google.com/?q={lat},{lon}
+            listOf("q", "query", "ll", "viewpoint", "center")
+                .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.let {
+                    points = persistentListOf(it.asGCJ02().copy(z = z))
+                    return@run
+                }
+
+            // API search
+            // https://maps.google.com/?q={name}
+            listOf("q", "query", "ll", "viewpoint", "center").forEach { key ->
+                Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
+                    points = persistentListOf(GCJ02Point(z = z, name = name))
                     // Go to HTML parsing if needed
                     htmlUriString = uri.toString()
+                    return@run
                 }
             }
-        }.asGCJ02()
+
+            val partsThatSupportUriParsing = setOf("dir", "place", "search")
+            val partsThatSupportHtmlParsing = setOf(null, "", "@", "d", "dir", "place", "placelists")
+            val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
+            val firstPart = parts.firstOrNull()
+            if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
+                // Iterate path parts
+                val pointPattern = Regex("""$LAT,$LON.*""")
+                parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
+                    if (part.startsWith("data=")) {
+                        // Data one point
+                        // /data=...!3d{lat}!4d{lon}...
+                        Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()
+                            ?.let { naivePoint ->
+                                // Overwrite previously found points, but copy last point name
+                                mutablePoints.lastOrNull().let { lastPoint ->
+                                    mutablePoints.clear()
+                                    mutablePoints.add(
+                                        naivePoint.asGCJ02().copy(z = lastPoint?.z, name = lastPoint?.name)
+                                    )
+                                }
+                                return@forEach
+                            }
+
+                        // Data several points
+                        // /data=...!1d{lon}!2d{lat)...!1d{lon}!2d{lat}...
+                        Regex("""!1d$LON!2d$LAT""").findAll(part)
+                            .mapNotNull { it.toLonLatPoint() }
+                            .toList()
+                            .takeIf { it.isNotEmpty() }
+                            ?.let { naivePoints ->
+                                // Overwrite previously found points, but keep their names
+                                if (mutablePoints.size == naivePoints.size) {
+                                    mutablePoints.forEachIndexed { i, point ->
+                                        mutablePoints[i] = naivePoints[i].asGCJ02().copy(
+                                            z = point.z,
+                                            name = point.name,
+                                        )
+                                    }
+                                } else {
+                                    // Overwrite previously found points
+                                    mutablePoints.clear()
+                                    mutablePoints.addAll(naivePoints.map { it.asGCJ02().copy(z = z) })
+                                }
+                                return@forEach
+                            }
+
+                    } else if (part.startsWith('@')) {
+                        // Center
+                        // /@{lat},{lon},{z}z
+                        Regex("""@$LAT,$LON(?:,${Z}z)?.*""").matchEntire(part)?.toLatLonZPoint()?.let { naivePoint ->
+                            val lastPoint = mutablePoints.lastOrNull()
+                            if (lastPoint == null) {
+                                // If we haven't already found a point, add center as a new point
+                                mutablePoints.add(naivePoint.asGCJ02().let { it.copy(z = it.z ?: z) })
+                            } else if (lastPoint.lat == null && lastPoint.lon == null) {
+                                // If we've already found a point, but it has no coordinates, update it with center
+                                mutablePoints[mutablePoints.size - 1] =
+                                    naivePoint.asGCJ02().let { it.copy(z = it.z ?: lastPoint.z, name = lastPoint.name) }
+                            } else {
+                                // If we've already found a pont, and it has coordinates, update it with zoom only
+                                mutablePoints[mutablePoints.size - 1] = lastPoint.toGCJ02().copy(z = naivePoint.z)
+                            }
+                        }
+                    } else if (part.isNotEmpty()) {
+                        // Coordinates
+                        // /{lat},{lon}
+                        pointPattern.matchEntire(part)?.toLatLonPoint()?.let {
+                            mutablePoints.add(it.asGCJ02().copy(z = z))
+                        }
+                        // Name
+                        // /{name}
+                            ?: mutablePoints.add(GCJ02Point(z = z, name = part))
+                    }
+                }
+            }
+
+            if (mutablePoints.lastOrNull()?.hasCoordinates() != true && firstPart in partsThatSupportHtmlParsing) {
+                // Go to HTML parsing if needed
+                htmlUriString = uri.toString()
+            }
+
+            points = mutablePoints.toImmutableList()
+        }
     }
+
 
     override suspend fun parseHtml(
         htmlUrlString: String,
@@ -135,61 +176,65 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
     ) = buildParseHtmlResult {
-        points = buildPoints {
-            defaultName = pointsFromUri.lastOrNull()?.name
+        val name = pointsFromUri.lastOrNull()?.name
+        val mutablePoints = mutableListOf<GCJ02Point>()
+        var defaultPoint: GCJ02Point? = null
 
-            var defaultPoint: NaivePoint? = null
-            var genericMetaTagFound = false
-            val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
-            val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
-            val defaultPointAppInitStatePattern =
-                Regex("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
-            val genericMetaTagPattern = Regex(
-                @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
-            )
-            val uriPattern = Regex("""data-url="([^"]+)"""")
+        var genericMetaTagFound = false
+        val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
+        val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
+        val defaultPointAppInitStatePattern =
+            Regex("""APP_INITIALIZATION_STATE=\[\[\[[\d.-]+,$LON,$LAT""")
+        val genericMetaTagPattern = Regex(
+            @Suppress("SpellCheckingInspection") """<meta content="Google Maps" itemprop="name""""
+        )
+        val uriPattern = Regex("""data-url="([^"]+)"""")
 
-            while (true) {
-                val line = channel.readLine() ?: break
-                if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
-                    log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
-                    genericMetaTagFound = true
-                }
-                if (points.addAll((pointPattern.findAll(line).mapNotNull { it.toLatLonPoint() }))) {
-                    log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
-                }
-                if (defaultPoint == null) {
-                    defaultPointLinkPattern.find(line)?.toLatLonPoint()?.let {
-                        log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
-                        defaultPoint = it
-                    }
-                }
-                if (defaultPoint == null && !genericMetaTagFound) {
-                    // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
-                    // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
-                    // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
-                    // ignore these coordinates.
-                    defaultPointAppInitStatePattern.find(line)?.toLonLatPoint()?.let {
-                        log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
-                        defaultPoint = it
-                    }
-                }
-                if (redirectUriString == null) {
-                    uriPattern.find(line)?.groupOrNull()?.let {
-                        log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
-                        redirectUriString = it
-                    }
+        while (true) {
+            val line = channel.readLine() ?: break
+            if (!genericMetaTagFound && genericMetaTagPattern.find(line) != null) {
+                log.d("GoogleMapsInput", "HTML Pattern: Generic meta tag matched line $line")
+                genericMetaTagFound = true
+            }
+            if (
+                mutablePoints.addAll(
+                    pointPattern.findAll(line).mapNotNull { it.toLatLonPoint()?.asGCJ02()?.copy(name = name) }
+                )
+            ) {
+                log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")
+            }
+            if (defaultPoint == null) {
+                defaultPointLinkPattern.find(line)?.toLatLonPoint()?.let {
+                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 1 matched line $line")
+                    defaultPoint = it.asGCJ02().copy(name = name)
                 }
             }
-
-            if (points.isEmpty()) {
-                if (defaultPoint != null) {
-                    points.add(defaultPoint)
-                } else {
-                    webUriString = htmlUrlString
+            if (defaultPoint == null && !genericMetaTagFound) {
+                // When the HTML contains a generic "Google Maps" META tag instead of a specific one like
+                // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
+                // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
+                // ignore these coordinates.
+                defaultPointAppInitStatePattern.find(line)?.toLonLatPoint()?.let {
+                    log.d("GoogleMapsInput", "HTML Pattern: Default point pattern 2 matched line $line")
+                    defaultPoint = it.asGCJ02().copy(name = name)
                 }
             }
-        }.asGCJ02()
+            if (redirectUriString == null) {
+                uriPattern.find(line)?.groupOrNull()?.let {
+                    log.d("GoogleMapsInput", "HTML Pattern: URI pattern matched line $line")
+                    redirectUriString = it
+                }
+            }
+        }
+
+        if (mutablePoints.isNotEmpty()) {
+            points = mutablePoints.toImmutableList()
+        } else if (defaultPoint != null) {
+            points = persistentListOf(defaultPoint)
+        } else {
+            // Go to web parsing
+            webUriString = htmlUrlString
+        }
     }
 
     override fun shouldInterceptRequest(requestUrlString: String) =

@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
@@ -12,10 +14,8 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
-import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
     private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
@@ -37,25 +37,43 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
     )
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                Regex("""/go/($HASH)""").matchEntire(path)
-                    ?.groupOrNull()
-                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                    ?.let { (lat, lon, z) -> NaivePoint(lat, lon, z) }
-                    ?.also { points.add(it) }
-                    ?: Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.also { points.add(it) }
-                    ?: LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: Regex(ELEMENT_PATH).matchEntire(path)?.let { m ->
-                        m.groupOrNull(1)?.let { type ->
-                            m.groupOrNull(2)?.let { id ->
-                                htmlUriString =
-                                    "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
-                            }
-                        }
-                    }
+        uri.run {
+            // Short link
+            // https://osm.org/go/{hash}
+            Regex("""/go/($HASH)""").matchEntire(path)?.groupOrNull()
+                ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                ?.let {
+                    points = persistentListOf(it.asWGS84())
+                    return@run
+                }
+
+            // Coordinates
+            // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
+            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint()?.let {
+                points = persistentListOf(it.asWGS84())
+                return@run
             }
-        }.asWGS84()
+
+            // Directions
+            // https://www.openstreetmap.org/directions?to={lat},{lon}
+            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint()?.let {
+                points = persistentListOf(it.asWGS84())
+                return@run
+            }
+
+            // Element
+            // https://www.openstreetmap.org/node/{id}
+            // https://www.openstreetmap.org/relation/{id}
+            // https://www.openstreetmap.org/way/{id}
+            Regex(ELEMENT_PATH).matchEntire(path)?.let { m ->
+                m.groupOrNull(1)?.let { type ->
+                    m.groupOrNull(2)?.let { id ->
+                        htmlUriString =
+                            "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun parseHtml(
@@ -64,15 +82,22 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
         pointsFromUri: ImmutableList<Point>,
         log: ILog,
     ) = buildParseHtmlResult {
-        points = buildPoints {
-            defaultName = pointsFromUri.lastOrNull()?.name
+        val name = pointsFromUri.lastOrNull()?.name
+        val mutablePoints = mutableListOf<WGS84Point>()
 
-            val pattern = Regex(""""lat":$LAT,"lon":$LON""")
-            while (true) {
-                val line = channel.readLine() ?: break
-                points.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint() })
+        val pattern = Regex(""""lat":$LAT,"lon":$LON""")
+        while (true) {
+            val line = channel.readLine() ?: break
+            mutablePoints.addAll(pattern.findAll(line).mapNotNull { it.toLatLonPoint()?.asWGS84() })
+        }
+
+        if (name != null) {
+            mutablePoints.removeLastOrNull()?.let { lastPoint ->
+                mutablePoints.add(lastPoint.copy(name = name))
             }
-        }.asWGS84()
+        }
+
+        points = mutablePoints.toImmutableList()
     }
 
     @StringRes

@@ -1,13 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asGCJ02
-import page.ooooo.geoshare.lib.point.buildPoints
 
 object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/\S+""")
@@ -24,12 +23,22 @@ object AmapInput : ShortUriInput, Input.HasRandomUri {
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                Regex("""\w+,$LAT,$LON.+""").matchEntire(queryParams["p"])?.toLatLonPoint()?.also { points.add(it) }
-                    ?: Regex("""$LAT,$LON.+""").matchEntire(queryParams["q"])?.toLatLonPoint()?.also { points.add(it) }
+        // TODO Extract name
+        uri.run {
+            // Query param p
+            // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
+            Regex("""\w+,$LAT,$LON.+""").matchEntire(queryParams["p"])?.toLatLonPoint()?.let {
+                points = persistentListOf(it.asGCJ02())
+                return@run
             }
-        }.asGCJ02()
+
+            // Query param q
+            // https://wb.amap.com/?q=<lat>,<lon>,<name>
+            Regex("""$LAT,$LON.+""").matchEntire(queryParams["q"])?.toLatLonPoint()?.let {
+                points = persistentListOf(it.asGCJ02())
+                return@run
+            }
+        }
     }
 
     @StringRes

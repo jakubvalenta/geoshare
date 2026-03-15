@@ -6,33 +6,53 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
     fun googleMaps() {
         // Coordinates in data
         testUri(
-            WGS84Point(52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
+            GCJ02Point(52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
             "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=!4m6!3m5!1s0x47045b49399cf863:0xf61cbcaacd7d3070!7e2!8m2!3d52.4083009!4d16.929066199999998"
+        )
+
+        // Coordinates in data in China
+        testUri(
+            GCJ02Point(39.9168038, 116.3971621, name = "Forbidden City"),
+            @Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a",
         )
 
         // Coordinates and query (address)
         testUri(
-            WGS84Point(40.785091, -73.968285, z = 15.0, name = "Central Park"),
-            "https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2",
+            GCJ02Point(40.785091, -73.968285, z = 15.0, name = "Central Park"),
+            "https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z",
+        )
+
+        // Coordinates and query (business)
+        testUri(
+            GCJ02Point(
+                50.4484901, 8.0469828,
+                name = @Suppress("SpellCheckingInspection") "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar",
+            ),
+            @Suppress("SpellCheckingInspection")
+            "https://www.google.com/maps/place/%C3%84nderungsschneiderei+Hadamar,+Schulstra%C3%9Fe+3,+65589+Hadamar/@50.4484901,8.0469828,3a,54.9y,5.97h,62.4t/data=!3m5!1e1!3m3!1szFIo-lmR3NWYzi_eWhPHFQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DzFIo-lmR3NWYzi_eWhPHFQ%26w%3D900%26h%3D600%26ll%3D0.0,0.0%26yaw%3D5.0%26pitch%3D28.0%26cb_client%3Dgmm.iv.android!4m2!3m1!1s0x47bc3266a8f3bb4b:0x96d1177f5ecfc466?utm_source=mstt_0&skid=368dc137-203a-4698-9ed3-b974e7bee770&g_st=aw",
         )
 
         // Directions
         testUri(
             persistentListOf(
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Hermannstraß 1, 12049 Berlin, Germany"),
-                WGS84Point(name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany"),
-                WGS84Point(
-                    52.4807739,
-                    13.4300356,
+                GCJ02Point(
+                    52.4858222, 13.4236883,
+                    name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany",
+                ),
+                GCJ02Point(
+                    52.4881038, 13.4255518,
+                    name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany",
+                ),
+                GCJ02Point(
+                    52.4807739, 13.4300356,
+                    name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany",
                     z = 16.0,
-                    name = @Suppress("SpellCheckingInspection") "Reuterstraße 1, Berlin-Neukölln, Germany"
                 ),
             ),
             @Suppress("SpellCheckingInspection")
@@ -41,7 +61,13 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Center
         testUri(
-            WGS84Point(52.5067296, 13.2599309),
+            GCJ02Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
+            "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
+        )
+
+        // API
+        testUri(
+            GCJ02Point(52.5067296, 13.2599309),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
     }
@@ -57,9 +83,8 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Search
         testUri(
-            WGS84Point(
-                51.0657922,
-                13.7555827,
+            GCJ02Point(
+                51.0657922, 13.7555827,
                 name = @Suppress("SpellCheckingInspection") "Louisenstraße 60, 01099 Dresden",
             ),
             "https://www.google.com/maps/search/?api=1&query=Louisenstra%C3%9Fe%2060,%2001099%20Dresden",
@@ -67,7 +92,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Short URI in Japan
         testUri(
-            WGS84Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
+            GCJ02Point(34.5945482, 133.7583428, z = 17.0, name = "Steak no Don"),
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
@@ -77,27 +102,10 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
         )
 
-        // Coordinates and query (business)
-        testUri(
-            WGS84Point(
-                50.4484901,
-                8.0469828,
-                name = @Suppress("SpellCheckingInspection") "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar"
-            ),
-            @Suppress("SpellCheckingInspection")
-            "https://www.google.com/maps/place/%C3%84nderungsschneiderei+Hadamar,+Schulstra%C3%9Fe+3,+65589+Hadamar/@50.4484901,8.0469828,3a,54.9y,5.97h,62.4t/data=!3m5!1e1!3m3!1szFIo-lmR3NWYzi_eWhPHFQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DzFIo-lmR3NWYzi_eWhPHFQ%26w%3D900%26h%3D600%26ll%3D0.0,0.0%26yaw%3D5.0%26pitch%3D28.0%26cb_client%3Dgmm.iv.android!4m2!3m1!1s0x47bc3266a8f3bb4b:0x96d1177f5ecfc466?utm_source=mstt_0&g_ep=CAESBzI1LjM3LjAYACCBgQEqogEsOTQyNjc3MjcsOTQyNzU0MDcsOTQyODQ0NzgsOTQyMjMyOTksOTQyMTY0MTMsOTQyODA1NzYsOTQyMTI0OTYsOTQyMDczOTQsOTQyMDc1MDYsOTQyMDg1MDYsOTQyMTc1MjMsOTQyMTg2NTMsOTQyMjk4MzksOTQyNzUxNjgsOTQyNjI3MzMsNDcwODQzOTMsOTQyMTMyMDAsOTQyNTgzMjVCAkRF&skid=368dc137-203a-4698-9ed3-b974e7bee770&g_st=aw",
-        )
-
         // Place
         testUri(
-            WGS84Point(52.5200066, 13.404954, name = "Berlin"),
+            GCJ02Point(52.5200066, 13.404954, name = "Berlin"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
-        )
-
-        // Map view
-        testUri(
-            WGS84Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"),
-            "https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
     }
 
@@ -111,7 +119,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Google Search
         testUri(
-            WGS84Point(27.765028, -15.600889),
+            GCJ02Point(27.765028, -15.600889),
             "https://g.co/kgs/91UYXud",
         )
     }

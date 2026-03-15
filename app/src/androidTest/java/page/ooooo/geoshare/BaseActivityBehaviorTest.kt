@@ -247,7 +247,7 @@ abstract class BaseActivityBehaviorTest {
                 "Make it your map", "Profitez d'une carte personnalisée" -> true
                 else -> false
             }
-        }?.also {
+        }?.let {
             onElement {
                 packageName == GOOGLE_MAPS_PACKAGE_NAME && when (textAsString()?.lowercase()) {
                     "skip", "ignorer" -> true

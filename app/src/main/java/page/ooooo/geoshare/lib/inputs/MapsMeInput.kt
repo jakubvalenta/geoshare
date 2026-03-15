@@ -1,13 +1,12 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 object MapsMeInput : Input {
     private const val HASH = """[A-Za-z0-9\-_]{2,}"""
@@ -24,21 +23,25 @@ object MapsMeInput : Input {
     )
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                (if (scheme == "ge0") host else pathParts.getOrNull(1))
-                    ?.let { Regex(HASH).matchEntire(it) }
-                    ?.value
-                    ?.let { hash -> decodeGe0Hash(hash) }
-                    ?.let { (lat, lon, z) -> NaivePoint(lat.toScale(7), lon.toScale(7), z) }
-                    ?.also { points.add(it) }
+        uri.run {
+            val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
+                ?.let { Q_PATH_PATTERN.matchEntire(it) }
+                ?.groupOrNull()
+                ?.replace('_', ' ')
 
-                (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
-                    ?.let { Q_PATH_PATTERN.matchEntire(it) }
-                    ?.groupOrNull()
-                    ?.replace('_', ' ')
-                    ?.also { defaultName = it }
+            (if (scheme == "ge0") host else pathParts.getOrNull(1))
+                ?.let { Regex(HASH).matchEntire(it)?.value }
+                ?.let { hash -> decodeGe0Hash(hash) }
+                ?.let {
+                    points = persistentListOf(
+                        it.asWGS84().copy(lat = it.lat?.toScale(7), lon = it.lon?.toScale(7), name = name)
+                    )
+                    return@run
+                }
+
+            if (name != null) {
+                points = persistentListOf(WGS84Point(name = name))
             }
-        }.asWGS84()
+        }
     }
 }

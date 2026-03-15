@@ -1,14 +1,13 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.annotation.StringRes
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
-import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 object MapyComInput : ShortUriInput, Input.HasRandomUri {
     private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
@@ -29,34 +28,33 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
     override val shortUriMethod = ShortUriInput.Method.GET
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                // Coordinates -- use this part of the text, because it's more precise than the URL
-                // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`
-                Regex(COORDS).matchEntire(path)?.let { m ->
-                    m.groupValues[0].let { entireMatch ->
-                        m.doubleGroupOrNull(1)?.let { lat ->
-                            m.doubleGroupOrNull(2)?.let { lon ->
-                                val latSig = if (entireMatch.contains('S')) -1 else 1
-                                val lonSig = if (entireMatch.contains('W')) -1 else 1
-                                points.add(NaivePoint(latSig * lat, lonSig * lon))
-                                return@run
-                            }
-                        }
-                    }
-                }
-
-                // Query params
-                // https://mapy.com/...?x={lon}&y={lat}&z={z}
-                LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
-                    LON_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
-                        Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull().let { z ->
-                            points.add(NaivePoint(lat, lon, z))
+        uri.run {
+            // Coordinates -- use this part of the text, because it's more precise than the URL
+            // e.g. `Vega de Tera 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha`
+            Regex(COORDS).matchEntire(path)?.let { m ->
+                m.groupValues[0].let { entireMatch ->
+                    m.doubleGroupOrNull(1)?.let { lat ->
+                        m.doubleGroupOrNull(2)?.let { lon ->
+                            val latSig = if (entireMatch.contains('S')) -1 else 1
+                            val lonSig = if (entireMatch.contains('W')) -1 else 1
+                            points = persistentListOf(WGS84Point(latSig * lat, lonSig * lon))
+                            return@run
                         }
                     }
                 }
             }
-        }.asWGS84()
+
+            // Query params
+            // https://mapy.com/...?x={lon}&y={lat}&z={z}
+            LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
+                    Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull().let { z ->
+                        points = persistentListOf(WGS84Point(lat, lon, z))
+                        return@run
+                    }
+                }
+            }
+        }
     }
 
     @StringRes

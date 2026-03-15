@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -7,10 +8,8 @@ import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
-import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.WGS84Point
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -31,40 +30,40 @@ object HereWeGoInput : Input, Input.HasRandomUri {
 
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                val parts = uri.pathParts.drop(1)
-                val firstPart = parts.firstOrNull() ?: return@run
-                if (firstPart == "") {
-                    Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint()?.also { points.add(it) }
-                } else {
-                    val secondPart = parts.getOrNull(1)
-                    if (secondPart != null) {
-                        if (firstPart == "l") {
-                            LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint()?.also { points.add(it) }
-                        } else if (firstPart == "p") {
-                            Regex("""[a-z]-($SIMPLIFIED_BASE64)""").matchEntire(secondPart)
-                                ?.groupOrNull()
-                                ?.let { encoded -> Base64.decode(encoded).decodeToString() }
-                                ?.let { decoded ->
-                                    Regex("""(?:lat=|"latitude":)$LAT""").find(decoded)
-                                        ?.doubleGroupOrNull()
-                                        ?.let { lat ->
-                                            Regex("""(?:lon=|"longitude":)$LON""").find(decoded)
-                                                ?.doubleGroupOrNull()
-                                                ?.let { lon ->
-                                                    NaivePoint(lat, lon)
-                                                }
-                                        }
-                                }
-                                ?.also { points.add(it) }
+        uri.run {
+            val parts = uri.pathParts.drop(1)
+            val firstPart = parts.firstOrNull() ?: return@run
+            if (firstPart == "") {
+                Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint()?.let {
+                    points = persistentListOf(it.asWGS84())
+                }
+            } else {
+                val secondPart = parts.getOrNull(1)
+                if (secondPart != null) {
+                    val z = Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()
+                    if (firstPart == "l") {
+                        LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint()?.let {
+                            points = persistentListOf(it.asWGS84().copy(z = z))
                         }
+                    } else if (firstPart == "p") {
+                        Regex("""[a-z]-($SIMPLIFIED_BASE64)""").matchEntire(secondPart)
+                            ?.groupOrNull()
+                            ?.let { encoded -> Base64.decode(encoded).decodeToString() }
+                            ?.let { decoded ->
+                                Regex("""(?:lat=|"latitude":)$LAT""").find(decoded)
+                                    ?.doubleGroupOrNull()
+                                    ?.let { lat ->
+                                        Regex("""(?:lon=|"longitude":)$LON""").find(decoded)
+                                            ?.doubleGroupOrNull()
+                                            ?.let { lon ->
+                                                points = persistentListOf(WGS84Point(lat, lon, z))
+                                            }
+                                    }
+                            }
                     }
                 }
-
-                Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()?.also { defaultZ = it }
             }
-        }.asWGS84()
+        }
     }
 
     override fun genRandomUri(point: Point) =

@@ -39,22 +39,26 @@ class OsmAndInputTest : BaseInputTest() {
     }
 
     @Test
-    fun parseUri_finish() = runTest {
+    fun parseUri_directions() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.5, 13.5), WGS84Point(52.51628, 13.37771))),
+            parseUri("https://osmand.net/map?start=52.5,13.5&finish=52.51628,13.37771"),
+        )
+        assertEquals(
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.5, 13.5))),
+            parseUri("https://osmand.net/map?start=52.5,13.5"),
+        )
         assertEquals(
             ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.51628, 13.37771))),
-            parseUri("https://osmand.net/map?start=52.5,13.5&finish=52.51628,13.37771"),
+            parseUri("https://osmand.net/map?finish=52.51628,13.37771"),
         )
     }
 
     @Test
-    fun parseUri_pinTakesPrecedenceOverFinishAndStart() = runTest {
+    fun parseUri_directionsTakesPrecedenceOverPin() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.51628, 13.37771))),
-            parseUri("https://osmand.net/map?pin=52.51628,13.37771&start=52.5,13.5"),
-        )
-        assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.51628, 13.37771))),
-            parseUri("https://osmand.net/map?pin=52.51628,13.37771&start=52.5,13.5&finish=52.4,13.4"),
+            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.5, 13.5), WGS84Point(52.51628, 13.37771))),
+            parseUri("https://osmand.net/map?pin=52.51628,13.37771&start=52.5,13.5&finish=52.51628,13.37771"),
         )
     }
 

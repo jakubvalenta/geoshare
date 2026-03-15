@@ -1,15 +1,14 @@
 package page.ooooo.geoshare.lib.inputs
 
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.formats.CoordsFormat
-import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.lib.point.asWGS84
-import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.WGS84Point
 
 object CoordinatesInput : Input, Input.HasRandomUri {
     @Suppress("SpellCheckingInspection")
@@ -36,79 +35,77 @@ object CoordinatesInput : Input, Input.HasRandomUri {
     )
 
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                // Decimal
-                // e.g. `N 41.40338, E 2.17403`
-                Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""").matchEntire(path)?.let { m ->
-                    points.add(
-                        NaivePoint(
-                            degToDec(
-                                m.value.contains('S'),
-                                m.groupOrNull(1),
-                                m.groupOrNull(2),
-                            ),
-                            degToDec(
-                                m.value.contains('W'),
-                                m.groupOrNull(3),
-                                m.groupOrNull(4),
-                            ),
-                        )
+        uri.run {
+            // Decimal
+            // e.g. `N 41.40338, E 2.17403`
+            Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LON_SIG$LON_DEG$CHARS*""").matchEntire(path)?.let { m ->
+                points = persistentListOf(
+                    WGS84Point(
+                        degToDec(
+                            m.value.contains('S'),
+                            m.groupOrNull(1),
+                            m.groupOrNull(2),
+                        ),
+                        degToDec(
+                            m.value.contains('W'),
+                            m.groupOrNull(3),
+                            m.groupOrNull(4),
+                        ),
                     )
-                    return@run
-                }
-
-                // Degrees minutes seconds
-                // e.g. `41°24'12.2"N 2°10'26.5"E`
-                Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""").matchEntire(
-                    path
-                )?.let { m ->
-                    points.add(
-                        NaivePoint(
-                            degToDec(
-                                m.value.contains('S'),
-                                m.groupOrNull(1),
-                                m.groupOrNull(2),
-                                m.groupOrNull(3),
-                                m.groupOrNull(4),
-                            ),
-                            degToDec(
-                                m.value.contains('W'),
-                                m.groupOrNull(5),
-                                m.groupOrNull(6),
-                                m.groupOrNull(7),
-                                m.groupOrNull(8),
-                            ),
-                        )
-                    )
-                    return@run
-                }
-
-                // Degrees minutes
-                // e.g. `41 24.2028, 2 10.4418`
-                Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""").matchEntire(
-                    path
-                )?.let { m ->
-                    points.add(
-                        NaivePoint(
-                            degToDec(
-                                m.value.contains('S'),
-                                m.groupOrNull(1),
-                                m.groupOrNull(2),
-                                m.groupOrNull(3),
-                            ),
-                            degToDec(
-                                m.value.contains('W'),
-                                m.groupOrNull(4),
-                                m.groupOrNull(5),
-                                m.groupOrNull(6),
-                            ),
-                        )
-                    )
-                    return@run
-                }
+                )
+                return@run
             }
-        }.asWGS84()
+
+            // Degrees minutes seconds
+            // e.g. `41°24'12.2"N 2°10'26.5"E`
+            Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LAT_SEC$CHARS+$SPACE$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS+$LON_SEC$CHARS*""").matchEntire(
+                path
+            )?.let { m ->
+                points = persistentListOf(
+                    WGS84Point(
+                        degToDec(
+                            m.value.contains('S'),
+                            m.groupOrNull(1),
+                            m.groupOrNull(2),
+                            m.groupOrNull(3),
+                            m.groupOrNull(4),
+                        ),
+                        degToDec(
+                            m.value.contains('W'),
+                            m.groupOrNull(5),
+                            m.groupOrNull(6),
+                            m.groupOrNull(7),
+                            m.groupOrNull(8),
+                        ),
+                    )
+                )
+                return@run
+            }
+
+            // Degrees minutes
+            // e.g. `41 24.2028, 2 10.4418`
+            Regex("""$CHARS*$LAT_SIG$LAT_DEG$CHARS+$LAT_MIN$CHARS+$LON_SIG$LON_DEG$CHARS+$LON_MIN$CHARS*""").matchEntire(
+                path
+            )?.let { m ->
+                points = persistentListOf(
+                    WGS84Point(
+                        degToDec(
+                            m.value.contains('S'),
+                            m.groupOrNull(1),
+                            m.groupOrNull(2),
+                            m.groupOrNull(3),
+                        ),
+                        degToDec(
+                            m.value.contains('W'),
+                            m.groupOrNull(4),
+                            m.groupOrNull(5),
+                            m.groupOrNull(6),
+                        ),
+                    )
+                )
+                return@run
+            }
+        }
     }
 
     private fun degToDec(

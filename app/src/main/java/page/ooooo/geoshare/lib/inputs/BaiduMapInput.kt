@@ -2,6 +2,8 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.webkit.WebSettings
 import androidx.annotation.StringRes
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
@@ -11,9 +13,7 @@ import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatNamePoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
-import page.ooooo.geoshare.lib.point.NaivePoint
-import page.ooooo.geoshare.lib.point.asBD09MC
-import page.ooooo.geoshare.lib.point.buildPoints
+import page.ooooo.geoshare.lib.point.BD09MCPoint
 
 object BaiduMapInput : ShortUriInput, WebInput {
     private const val X = """(\d+(?:\.\d+)?)"""
@@ -35,61 +35,62 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
     @Suppress("SpellCheckingInspection")
     override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        points = buildPoints {
-            uri.run {
-                val parts = uri.pathParts.drop(1)
-                val firstPart = parts.firstOrNull() ?: return@run
+        uri.run {
+            val parts = uri.pathParts.drop(1)
+            val firstPart = parts.firstOrNull() ?: return@run
 
-                if (firstPart == "") {
-                    if (!queryParams["poiShareId"].isNullOrEmpty() || !queryParams["poiShareUid"].isNullOrEmpty()) {
-                        // Shared point or shared place
-                        // https://map.baidu.com/?poiShareId=<ID>
-                        // https://map.baidu.com/?shareurl=1&poiShareUid=<UID>
+            if (firstPart == "") {
+                if (!queryParams["poiShareId"].isNullOrEmpty() || !queryParams["poiShareUid"].isNullOrEmpty()) {
+                    // Shared point or shared place
+                    // https://map.baidu.com/?poiShareId={id}
+                    // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
+                    webUriString = uri.toString()
+                }
+
+            } else if (firstPart.startsWith('@')) {
+                // Center
+                // https://map.baidu.com/@{centerX},{centerY},{centerZ}
+                Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.let {
+                    points = persistentListOf(it.asBD09MC())
+                }
+
+            } else if (firstPart == "poi") {
+                // Place
+                // https://map.baidu.com/poi/{name}/@{x},{y},{z}
+                Regex(CENTER).matchEntire(parts.getOrNull(2))?.toLonLatZPoint()?.let {
+                    points = persistentListOf(it.asBD09MC().copy(name = parts.getOrNull(1)))
+                }
+
+            } else if (firstPart == "dir") {
+                // Directions with query params
+                // https://map.baidu.com/dir/...?sn={startPoint}&en={waypointPoint}$$1$$%20to:{destPoint}
+                val pattern = Regex(WAYPOINT)
+                points = listOfNotNull(
+                    pattern.find(queryParams["sn"])?.toLonLatNamePoint()?.asBD09MC(),
+                    *pattern.findAll(queryParams["en"]).mapNotNull { it.toLonLatNamePoint()?.asBD09MC() }
+                        .toList().toTypedArray(),
+                ).takeIf { it.isNotEmpty() }?.toImmutableList() ?:
+                    // Directions with waypoint names only (ignore center)
+                    // https://map.baidu.com/dir/{startName}/{waypointName}/{destName}/@{centerX},{centerY},{centerZ}z
+                    parts
+                        .drop(1)
+                        .filterNot { it.startsWith('@') }
+                        .map { BD09MCPoint(name = it) }
+                        .toImmutableList()
+
+            } else if (firstPart == "mobile") {
+                // Mobile place detail with coords
+                // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo={lon}%2c{lat}"
+                Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()?.also {
+                    points = persistentListOf(it.asBD09MC())
+                }
+                    ?: run {
+                        // Mobile place detail without coords
+                        // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid={uid}/act=read_share&vt=map&da_from=weixin&openna=1"
                         webUriString = uri.toString()
                     }
-
-                } else if (firstPart.startsWith('@')) {
-                    // Center
-                    // https://map.baidu.com/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>
-                    Regex(CENTER).matchEntire(firstPart)?.toLonLatZPoint()?.also { points.add(it) }
-
-                } else if (firstPart == "poi") {
-                    // Place
-                    // https://map.baidu.com/poi/{name}/@{x},{y},{z}
-                    Regex(CENTER).matchEntire(parts.getOrNull(2))
-                        ?.toLonLatZPoint()
-                        ?.also { points.add(it.copy(name = parts.getOrNull(1))) }
-
-                } else if (firstPart == "dir") {
-                    // Directions
-                    // https://map.baidu.com/dir/...?sn=<START_POINT>&en=<WAYPOINT_POINT>$$1$$%20to:<DEST_POINT>
-                    val pattern = Regex(WAYPOINT)
-                    pattern.find(queryParams["sn"])?.toLonLatNamePoint()?.also { points.add(it) }
-                    points.addAll((pattern.findAll(queryParams["en"])).mapNotNull { it.toLonLatNamePoint() })
-
-                    // Directions without params
-                    // https://map.baidu.com/dir/<START_NAME>/<WAYPOINT_NAME>/<DEST_NAME>/@<CENTER_X>,<CENTER_Y>,<CENTER_Z>z
-                    if (points.isEmpty()) {
-                        parts
-                            .drop(1)
-                            .filterNot { it.startsWith('@') }
-                            .map { NaivePoint(0.0, 0.0, name = it) }
-                            .forEach { points.add(it) }
-                    }
-
-                } else if (firstPart == "mobile") {
-                    // Mobile place detail with coords
-                    // https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo={lon}%2C{lat}"
-                    Regex("""sharegeo=$X,$Y""").find(parts.lastOrNull())?.toLonLatPoint()
-                        ?.also { points.add(it) }
-                        ?: run {
-                            // Mobile place detail without coords
-                            // "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=<UID>/act=read_share&vt=map&da_from=weixin&openna=1"
-                            webUriString = uri.toString()
-                        }
-                }
             }
-        }.asBD09MC()
+        }
     }
 
     override fun extendWebSettings(settings: WebSettings) {
