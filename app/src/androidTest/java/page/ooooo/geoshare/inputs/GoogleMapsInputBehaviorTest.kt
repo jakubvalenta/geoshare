@@ -96,7 +96,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
             "https://maps.app.goo.gl/mBtbC6qXLK2baGTV9",
         )
 
-        // Short URI in China (GCJ-02)
+        // Short URI in China
         testUri(
             GCJ02Point(39.920439, 116.331538),
             "https://maps.app.goo.gl/FP3EV7tTUKYbmcVp7",
