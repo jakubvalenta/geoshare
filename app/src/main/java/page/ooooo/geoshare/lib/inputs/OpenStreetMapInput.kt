@@ -9,6 +9,7 @@ import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -36,7 +37,7 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             // Short link
             // https://osm.org/go/{hash}

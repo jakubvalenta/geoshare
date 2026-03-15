@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -48,9 +49,9 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
-            htmlUriString = uri.toString()
+            htmlUriString = toString()
 
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}

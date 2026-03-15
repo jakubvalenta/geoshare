@@ -9,6 +9,7 @@ import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -40,8 +41,13 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
     override val shortUriPattern = Regex("""(?:https?://)?$SHORT_URL""")
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        uri.run {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult = buildParseUriResult {
+        // Google Maps Go
+        // https://maps.app.goo.gl/?link={url}
+        val cleanUri = uri.queryParams["link"]?.takeIf { it.isNotEmpty() }?.let { Uri.parse(it, uriQuote) }
+            ?: uri
+
+        cleanUri.run {
             val mutablePoints = mutableListOf<Point>()
 
             val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
@@ -59,7 +65,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                     points = naivePoints.map { it.asGCJ02().copy(z = z) }.toImmutableList()
                     if (points.any { !it.hasCoordinates() }) {
                         // Go to HTML parsing if needed
-                        htmlUriString = uri.toString()
+                        htmlUriString = toString()
                     }
                     return@run
                 }
@@ -79,14 +85,14 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     points = persistentListOf(GCJ02Point(z = z, name = name))
                     // Go to HTML parsing if needed
-                    htmlUriString = uri.toString()
+                    htmlUriString = toString()
                     return@run
                 }
             }
 
             val partsThatSupportUriParsing = setOf("dir", "place", "search")
             val partsThatSupportHtmlParsing = setOf(null, "", "@", "d", "dir", "place", "placelists")
-            val parts = uri.pathParts.drop(1).dropWhile { it == "maps" }
+            val parts = pathParts.drop(1).dropWhile { it.isEmpty() || it == "maps" }
             val firstPart = parts.firstOrNull()
             if (firstPart in partsThatSupportUriParsing || firstPart?.startsWith('@') == true) {
                 // Iterate path parts
@@ -162,7 +168,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
 
             if (mutablePoints.lastOrNull()?.hasCoordinates() != true && firstPart in partsThatSupportHtmlParsing) {
                 // Go to HTML parsing if needed
-                htmlUriString = uri.toString()
+                htmlUriString = toString()
             }
 
             points = mutablePoints.toImmutableList()

@@ -1,6 +1,7 @@
 - Added the option to launch navigation and open GPX in all apps that support it.
 - Added the option to open a location in web maps.
 - Added Baidu Map short link support.
+- Added Google Maps GO support.
 - Added Turkish translation.
 - Changed default coordinate format and added it to preferences.
 - Improved compatibility of resulting geo: URIs.

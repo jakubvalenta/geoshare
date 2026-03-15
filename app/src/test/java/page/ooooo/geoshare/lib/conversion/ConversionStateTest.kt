@@ -266,7 +266,7 @@ class ConversionStateTest {
             override val documentation =
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-            override suspend fun parseUri(uri: Uri) = ParseUriResult.Succeeded(persistentListOf())
+            override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = ParseUriResult.Succeeded(persistentListOf())
         }
         val stateContext = mockStateContext(inputs = listOf(mockInput))
         val state = ReceivedUri(stateContext, inputUriString, mockInput, uri, Permission.NEVER)
@@ -748,7 +748,7 @@ class ConversionStateTest {
             override val shortUriMethod = ShortUriInput.Method.GET
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
-            override suspend fun parseUri(uri: Uri) = ParseUriResult.Succeeded(persistentListOf())
+            override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = ParseUriResult.Succeeded(persistentListOf())
         }
         val stateContext = mockStateContext(
             inputs = listOf(mockInput),
@@ -838,7 +838,7 @@ class ConversionStateTest {
         val uri = Uri.parse(inputUriString, uriQuote)
         val points = persistentListOf(WGS84Point(1.0, 2.0))
         val mockGoogleMapsInput: GoogleMapsInput = mock {
-            on { parseUri(any()) } doReturn ParseUriResult.Succeeded(points)
+            on { parseUri(any(), any()) } doReturn ParseUriResult.Succeeded(points)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(ConnectionPermissionPreference) } doThrow NotImplementedError()
@@ -859,7 +859,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
         val mockGoogleMapsInput: GoogleMapsInput = mock {
-            on { parseUri(any()) } doReturn ParseUriResult.Failed()
+            on { parseUri(any(), any()) } doReturn ParseUriResult.Failed()
         }
         val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
         val state = UnshortenedUrl(
@@ -883,7 +883,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockInput))
@@ -904,7 +904,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(
+                    points,
+                    htmlUriString
+                )
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -931,7 +934,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(
+                    points,
+                    htmlUriString
+                )
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -958,7 +964,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(
+                    points,
+                    htmlUriString
+                )
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -978,7 +987,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(
+                    points,
+                    htmlUriString
+                )
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.ALWAYS
@@ -1009,7 +1021,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(
+                    points,
+                    htmlUriString
+                )
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.ASK
@@ -1040,7 +1055,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(points, htmlUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsHtmlParsing(
+                    points,
+                    htmlUriString
+                )
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.NEVER
@@ -1068,7 +1086,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
             }
             val stateContext = mockStateContext(inputs = listOf(mockInput))
@@ -1089,7 +1107,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val webUriString = "$inputUriString/web"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(
+                    points,
+                    webUriString
+                )
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -1116,7 +1137,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val webUriString = "$inputUriString/web"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(
+                    points,
+                    webUriString
+                )
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -1143,7 +1167,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val webUriString = "$inputUriString/web"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(
+                    points,
+                    webUriString
+                )
             }
             val stateContext = mockStateContext(inputs = listOf(mockGoogleMapsInput))
             val state = UnshortenedUrl(
@@ -1163,7 +1190,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val webUriString = "$inputUriString/web"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(
+                    points,
+                    webUriString
+                )
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.ALWAYS
@@ -1194,7 +1224,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val webUriString = "$inputUriString/web"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(
+                    points,
+                    webUriString
+                )
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.ASK
@@ -1225,7 +1258,10 @@ class ConversionStateTest {
             val points = persistentListOf(WGS84Point(name = "bar"))
             val webUriString = "$inputUriString/web"
             val mockGoogleMapsInput: GoogleMapsInput = mock {
-                on { parseUri(any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(points, webUriString)
+                on { parseUri(any(), any()) } doReturn ParseUriResult.SucceededAndSupportsWebParsing(
+                    points,
+                    webUriString
+                )
             }
             val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
                 on { getValue(ConnectionPermissionPreference) } doReturn Permission.NEVER
@@ -1402,7 +1438,7 @@ class ConversionStateTest {
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
-            override suspend fun parseUri(uri: Uri): ParseUriResult {
+            override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                 throw NotImplementedError()
             }
 
@@ -1659,7 +1695,7 @@ class ConversionStateTest {
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
-            override suspend fun parseUri(uri: Uri): ParseUriResult {
+            override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                 throw NotImplementedError()
             }
 
@@ -1708,7 +1744,7 @@ class ConversionStateTest {
                 InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
             override val permissionTitleResId = -1
             override val loadingIndicatorTitleResId = -1
-            override suspend fun parseUri(uri: Uri): ParseUriResult {
+            override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                 throw NotImplementedError()
             }
 
@@ -1758,7 +1794,7 @@ class ConversionStateTest {
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
-                override suspend fun parseUri(uri: Uri): ParseUriResult {
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                     throw NotImplementedError()
                 }
 
@@ -1815,7 +1851,7 @@ class ConversionStateTest {
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
-                override suspend fun parseUri(uri: Uri): ParseUriResult {
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                     throw NotImplementedError()
                 }
 
@@ -1865,7 +1901,7 @@ class ConversionStateTest {
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
-                override suspend fun parseUri(uri: Uri): ParseUriResult {
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                     throw NotImplementedError()
                 }
 
@@ -1910,7 +1946,7 @@ class ConversionStateTest {
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
                 override val permissionTitleResId = -1
                 override val loadingIndicatorTitleResId = -1
-                override suspend fun parseUri(uri: Uri): ParseUriResult {
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
                     throw NotImplementedError()
                 }
 
@@ -2260,7 +2296,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     if (uri.toString() == urlString) {
                         ParseUriResult.Succeeded(resPoints)
                     } else {
@@ -2300,7 +2336,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     if (uri.toString() == urlString) {
                         ParseUriResult.SucceededAndSupportsHtmlParsing(resPoints, "$inputUriString/html")
                     } else {
@@ -2340,7 +2376,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     if (uri.toString() == urlString) {
                         ParseUriResult.SucceededAndSupportsWebParsing(resPoints, "$inputUriString/web")
                     } else {
@@ -2379,7 +2415,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     if (uri.toString() == urlString) {
                         ParseUriResult.Failed()
                     } else {
@@ -2419,7 +2455,7 @@ class ConversionStateTest {
                 override val documentation =
                     InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
 
-                override suspend fun parseUri(uri: Uri) =
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     if (uri.toString() == urlString) {
                         ParseUriResult.Succeeded(resPoints)
                     } else {

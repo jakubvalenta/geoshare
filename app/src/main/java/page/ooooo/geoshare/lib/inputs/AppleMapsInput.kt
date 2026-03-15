@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -26,7 +27,7 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
         ),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
 
@@ -55,7 +56,7 @@ object AppleMapsInput : HtmlInput, Input.HasRandomUri {
                 // https://maps.apple.com/place?place-id={id}...
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
-                htmlUriString = uri.toString()
+                htmlUriString = toString()
             }
 
             if (name != null) {

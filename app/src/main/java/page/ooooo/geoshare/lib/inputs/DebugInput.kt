@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import androidx.annotation.StringRes
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 
 /**
  * Debug input is useful for WebView testing, because it has web parsing enabled but doesn't make a request to
@@ -16,8 +17,10 @@ object DebugInput : WebInput {
         items = emptyList(),
     )
 
-    override suspend fun parseUri(uri: Uri) = buildParseUriResult {
-        webUriString = uri.toString()
+    override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
+        uri.run {
+            webUriString = toString()
+        }
     }
 
     @StringRes

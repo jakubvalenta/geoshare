@@ -230,7 +230,7 @@ data class UnshortenedUrl(
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState {
     override suspend fun transition(): State =
-        when (val res = withContext(dispatcher) { input.parseUri(uri) }) {
+        when (val res = withContext(dispatcher) { input.parseUri(uri, stateContext.uriQuote) }) {
             is ParseUriResult.Succeeded -> {
                 stateContext.log.i(null, "URI Pattern: Converted $uri to ${res.points}")
                 ConversionSucceeded(stateContext, inputUriString, res.points)
@@ -462,7 +462,7 @@ data class GrantedParseWebPermission(
             val matchingUriString = input.uriPattern.find(urlString)?.value
             when (
                 val res = matchingUriString?.let { uriString ->
-                    input.parseUri(Uri.parse(uriString, stateContext.uriQuote))
+                    input.parseUri(Uri.parse(uriString, stateContext.uriQuote), stateContext.uriQuote)
                 }
             ) {
                 is ParseUriResult.Succeeded -> {

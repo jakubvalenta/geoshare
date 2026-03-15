@@ -4,15 +4,17 @@ import android.webkit.WebSettings
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.collections.immutable.ImmutableList
 import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.point.Point
 
 interface Input {
     val uriPattern: Regex
     val documentation: InputDocumentation
 
-    suspend fun parseUri(uri: Uri): ParseUriResult
+    suspend fun parseUri(uri: Uri, uriQuote: UriQuote = DefaultUriQuote): ParseUriResult
 
     interface HasRandomUri {
         fun genRandomUri(point: Point): String?
