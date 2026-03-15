@@ -6,7 +6,6 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.lib.point.GCJ02Point
-import page.ooooo.geoshare.lib.point.WGS84Point
 
 class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     @Test
@@ -31,8 +30,8 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Coordinates and query (business)
         testUri(
-            WGS84Point(
-                50.448539371305024, 8.047084600532981,
+            GCJ02Point(
+                50.4484901, 8.0469828,
                 name = @Suppress("SpellCheckingInspection") "Änderungsschneiderei Hadamar, Schulstraße 3, 65589 Hadamar",
             ),
             @Suppress("SpellCheckingInspection")
@@ -120,7 +119,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Google Search
         testUri(
-            WGS84Point(27.765028, -15.600889),
+            GCJ02Point(27.765028, -15.600889),
             "https://g.co/kgs/91UYXud",
         )
     }

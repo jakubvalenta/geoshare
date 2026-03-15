@@ -12,18 +12,15 @@ import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
-import page.ooooo.geoshare.lib.extensions.prefixedHexToULongOrNull
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
-import page.ooooo.geoshare.lib.geo.decodeS2CellId
 import page.ooooo.geoshare.lib.point.GCJ02Point
 import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
-    private const val HEX = """(0x[A-Fa-f0-9]+)"""
 
     override val uriPattern =
         Regex("""(?:https?://)?(?:(?:www|maps)\.)?(?:google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
@@ -96,7 +93,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                 val pointPattern = Regex("""$LAT,$LON.*""")
                 parts.dropWhile { it in partsThatSupportUriParsing }.forEach { part ->
                     if (part.startsWith("data=")) {
-                        // Data one point (GCJ-02)
+                        // Data one point
                         // /data=...!3d{lat}!4d{lon}...
                         Regex("""!3d$LAT!4d$LON""").find(part)?.toLatLonPoint()
                             ?.let { naivePoint ->
@@ -110,7 +107,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                                 return@forEach
                             }
 
-                        // Data several points (GCJ-02)
+                        // Data several points
                         // /data=...!1d{lon}!2d{lat)...!1d{lon}!2d{lat}...
                         Regex("""!1d$LON!2d$LAT""").findAll(part)
                             .mapNotNull { it.toLonLatPoint() }
@@ -133,29 +130,6 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
                                 return@forEach
                             }
 
-                        // Data S2 (WGS 84)
-                        // /data=...!1s0x{id}:0x...
-                        Regex("""!1s$HEX:""").findAll(part)
-                            .mapNotNull { it.groupOrNull(1)?.prefixedHexToULongOrNull() }
-                            .map { id -> decodeS2CellId(id) }
-                            .toList()
-                            .takeIf { it.isNotEmpty() }
-                            ?.let { naivePoints ->
-                                // Overwrite previously found points, but keep their names
-                                if (mutablePoints.size == naivePoints.size) {
-                                    mutablePoints.forEachIndexed { i, point ->
-                                        mutablePoints[i] = naivePoints[i].asWGS84().copy(
-                                            z = point.z,
-                                            name = point.name,
-                                        )
-                                    }
-                                } else {
-                                    // Overwrite previously found points
-                                    mutablePoints.clear()
-                                    mutablePoints.addAll(naivePoints.map { it.asWGS84().copy(z = z) })
-                                }
-                                return@forEach
-                            }
                     } else if (part.startsWith('@')) {
                         // Center
                         // /@{lat},{lon},{z}z

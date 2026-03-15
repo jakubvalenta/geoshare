@@ -1,12 +1,5 @@
 package page.ooooo.geoshare.lib.extensions
 
-fun String.prefixedHexToULongOrNull(): ULong? =
-    try {
-        this.hexToULong(HexFormat { number.prefix = "0x" })
-    } catch (_: IllegalArgumentException) {
-        null
-    }
-
 fun String.truncateMiddle(maxLength: Int = 60, ellipsis: String = "\u2026"): String =
     if (this.length > maxLength) {
         val partLength: Int = maxLength / 2

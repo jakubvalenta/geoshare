@@ -83,9 +83,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
                 // Shows precise location
                 assertConversionSucceeded(
-                    // FIXME The correct point should be GCJ02Point(52.4842015, 13.4167277)
-                    WGS84Point(
-                        52.484113066123456, 13.409879063890362,
+                    GCJ02Point(
+                        52.4842015, 13.4167277,
                         name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
                     )
                 )
@@ -116,9 +115,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
                 // Shows precise location
                 assertConversionSucceeded(
-                    // FIXME The correct point should be GCJ02Point(52.4842015, 13.4167277)
-                    WGS84Point(
-                        52.484113066123456, 13.409879063890362,
+                    GCJ02Point(
+                        52.4842015, 13.4167277,
                         name = @Suppress("SpellCheckingInspection") "Columbiadamm 160, 12049 Berlin",
                     )
                 )
@@ -129,9 +127,8 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
 
                 // Shows precise location again
                 assertConversionSucceeded(
-                    // FIXME The correct point should be GCJ02Point(44.4490541, 26.0888398)
-                    WGS84Point(
-                        44.39886293774796, 26.052727426371987,
+                    GCJ02Point(
+                        44.4490541, 26.0888398,
                         name = @Suppress("SpellCheckingInspection") "RAI - Romantic & Intimate, Calea Victoriei 202 București",
                     )
                 )
@@ -341,8 +338,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 // Shows precise location
                 assertConversionSucceeded(
                     GCJ02Point(
-                        52.4848232,
-                        13.4240791,
+                        52.4848232, 13.4240791,
                         name = @Suppress("SpellCheckingInspection") "Hermannstraße 10, 12049 Berlin",
                     )
                 )
