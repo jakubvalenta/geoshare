@@ -555,7 +555,7 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
                 .scrollToElement(Direction.DOWN) {
                     viewIdResourceName == "geoShareResultSuccessSheetItemHeadline" &&
                         textAsString() in
-                        setOf("Save GPX route", @Suppress("SpellCheckingInspection") "Enregistrer GPX")
+                        setOf("Save GPX route", @Suppress("SpellCheckingInspection") "Enregistrer l’itinéraire GPX")
                 }
                 .click()
         }
@@ -564,6 +564,11 @@ class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
         chooseFile()
 
         // Shows success message
-        onElement { textAsString() == "Saved GPX file" }
+        onElement {
+            textAsString() in setOf(
+                "Saved GPX file",
+                @Suppress("SpellCheckingInspection") "Fichier GPX enregistré",
+            )
+        }
     }
 }
