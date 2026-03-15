@@ -21,10 +21,8 @@ import page.ooooo.geoshare.lib.point.NaivePoint
 import page.ooooo.geoshare.lib.point.Point
 
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
-    private const val SHORT_URL = """(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+"""
-
     override val uriPattern =
-        Regex("""(?:https?://)?(?:(?:www|maps)\.)?(?:google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+|$SHORT_URL)""")
+        Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]\S+""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,
@@ -38,7 +36,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
             InputDocumentationItem.Url(10, "https://g.co/kgs"),
         ),
     )
-    override val shortUriPattern = Regex("""(?:https?://)?$SHORT_URL""")
+    override val shortUriPattern = Regex("""(?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+""")
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult = buildParseUriResult {
