@@ -40,7 +40,7 @@ fun ScreenshotOpen() {
             y = 100,
         ) {
             ScreenshotText(
-                CoordsFormat.formatDegMinSecCoords(Point.example),
+                CoordsFormat.formatDecCoords(Point.example),
                 scale,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,

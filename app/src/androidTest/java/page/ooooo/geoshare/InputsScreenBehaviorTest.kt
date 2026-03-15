@@ -6,7 +6,6 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
-import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class InputsScreenBehaviorTest : BaseActivityBehaviorTest() {
@@ -67,14 +66,7 @@ class InputsScreenBehaviorTest : BaseActivityBehaviorTest() {
         goToUserPreferencesDetailDeveloperScreen()
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }
             .setText("19")
-
-        // Go to main screen
-        onElement { viewIdResourceName == "geoShareBack" }.click()
-        if (onElementOrNull(1_000L) { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" } != null) {
-            // On a non-tablet screen, we need to tap the back button one more time to get from the user preferences
-            // list screen to the main screen
-            onElement { viewIdResourceName == "geoShareBack" }.click()
-        }
+        goToMainScreenFromUserPreferencesDetail()
 
         // Shows main menu badge
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }

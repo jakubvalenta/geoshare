@@ -73,6 +73,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
@@ -152,6 +153,7 @@ fun MainScreen(
     billingViewModel: BillingViewModel,
     conversionViewModel: ConversionViewModel,
     inputsViewModel: InputsViewModel = hiltViewModel(),
+    userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
@@ -173,6 +175,7 @@ fun MainScreen(
     val outputsForPoints by conversionViewModel.outputsForPoints.collectAsStateWithLifecycle()
     val outputsForPointsChips by conversionViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
     val outputsForSharing by conversionViewModel.outputsForSharing.collectAsStateWithLifecycle()
+    val userPreferencesValues by userPreferencesViewModel.values.collectAsStateWithLifecycle()
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
@@ -276,6 +279,7 @@ fun MainScreen(
         billingAppNameResId = billingAppNameResId,
         billingStatus = billingStatus,
         changelogShown = changelogShown,
+        coordinateFormat = userPreferencesValues.coordinateFormat,
         inputUriString = conversionViewModel.inputUriString,
         largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
         outputsForApps = outputsForApps,
@@ -344,6 +348,7 @@ private fun MainScreen(
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
     changelogShown: Boolean,
+    coordinateFormat: CoordinateFormat,
     inputUriString: String,
     largeLoadingIndicatorVisible: Boolean,
     outputsForApps: Map<String, List<Output>>,
@@ -425,6 +430,7 @@ private fun MainScreen(
                     outputsForPointsChips = outputsForPointsChips,
                     billingAppNameResId = billingAppNameResId,
                     billingStatus = billingStatus,
+                    coordinateFormat = coordinateFormat,
                     errorMessageResId = errorMessageResId,
                     inputUriString = inputUriString,
                     largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
@@ -659,6 +665,7 @@ private fun MainMainPane(
     outputsForPointsChips: List<PointsOutput>,
     billingAppNameResId: Int,
     billingStatus: BillingStatus,
+    coordinateFormat: CoordinateFormat,
     errorMessageResId: Int?,
     inputUriString: String,
     largeLoadingIndicatorVisible: Boolean,
@@ -694,6 +701,7 @@ private fun MainMainPane(
             ResultSuccessCoordinates(
                 points = currentState.points,
                 appDetails = appDetails,
+                coordinateFormat = coordinateFormat,
                 outputsForPointChips = outputsForPointChips,
                 outputsForPointsChips = outputsForPointsChips,
                 onExecute = onExecute,
@@ -892,6 +900,7 @@ private fun DefaultPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -930,6 +939,7 @@ private fun DarkPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -968,6 +978,7 @@ private fun TabletPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.NotPurchased(),
             changelogShown = false,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1017,6 +1028,7 @@ private fun SucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1070,6 +1082,7 @@ private fun DarkSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1123,6 +1136,7 @@ private fun TabletSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1176,6 +1190,7 @@ private fun DarkTabletSucceededPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1232,6 +1247,7 @@ private fun AutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1288,6 +1304,7 @@ private fun DarkAutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1344,6 +1361,7 @@ private fun TabletAutomationPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = getOutputsForApps(
@@ -1400,6 +1418,7 @@ private fun WebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1452,6 +1471,7 @@ private fun DarkWebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1504,6 +1524,7 @@ private fun TabletWebViewPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1548,6 +1569,7 @@ private fun ErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1592,6 +1614,7 @@ private fun DarkErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1636,6 +1659,7 @@ private fun TabletErrorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
             outputsForApps = emptyMap(),
@@ -1690,6 +1714,7 @@ private fun LoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             outputsForApps = emptyMap(),
@@ -1744,6 +1769,7 @@ private fun DarkLoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             outputsForApps = emptyMap(),
@@ -1798,6 +1824,7 @@ private fun TabletLoadingIndicatorPreview() {
                 refundable = true,
             ),
             changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
             outputsForApps = emptyMap(),

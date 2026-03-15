@@ -160,7 +160,7 @@ class LinksScreenBehaviorTest : BaseActivityBehaviorTest() {
         }
 
         // Go back to list
-        device.pressBack()
+        pressBack()
 
         // Toggle link
         onElement { viewIdResourceName == "geoShareLinksListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()
@@ -179,7 +179,7 @@ class LinksScreenBehaviorTest : BaseActivityBehaviorTest() {
         }
 
         // Go back to list
-        device.pressBack()
+        pressBack()
 
         // Toggle link
         onElement { viewIdResourceName == "geoShareLinksListItemToggle_b109970a-aef8-4482-9879-52e128fd0e07" }.click()

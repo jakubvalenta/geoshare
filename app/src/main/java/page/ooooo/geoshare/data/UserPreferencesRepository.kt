@@ -40,6 +40,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
                 billingCachedProductId = BillingCachedProductIdPreference.getValue(it),
                 changelogShownForVersionCode = ChangelogShownForVersionCodePreference.getValue(it),
                 connectionPermission = ConnectionPermissionPreference.getValue(it),
+                coordinateFormat = CoordinateFormatPreference.getValue(it),
                 introShownForVersionCode = IntroShowForVersionCodePreference.getValue(it),
             )
         }

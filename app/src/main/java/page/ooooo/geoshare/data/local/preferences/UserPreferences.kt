@@ -88,6 +88,34 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
     )
 }
 
+object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
+    override val default = CoordinateFormat.DEC
+    val loading = default
+
+    private val key = stringPreferencesKey("coordinate_format")
+
+    override fun getValue(values: UserPreferencesValues) = values.coordinateFormat
+
+    override fun getValue(preferences: Preferences, log: ILog) = preferences[key]?.let {
+        try {
+            CoordinateFormat.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: CoordinateFormat, log: ILog) {
+        preferences[key] = value.name
+    }
+
+    fun getOptionGroups(): List<List<CoordinateFormat>> = listOf(
+        listOf(
+            CoordinateFormat.DEC,
+            CoordinateFormat.DEG_MIN_SEC,
+        ),
+    )
+}
+
 object AutomationPreference : OptionsPreference<Automation> {
     private const val TAG = "Automation"
 
@@ -273,5 +301,6 @@ data class UserPreferencesValues(
     val billingCachedProductId: String? = BillingCachedProductIdPreference.loading,
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
+    val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )
