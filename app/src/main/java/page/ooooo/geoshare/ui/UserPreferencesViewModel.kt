@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.AppsRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import javax.inject.Inject
 
@@ -50,6 +51,14 @@ class UserPreferencesViewModel @Inject constructor(
     fun editUserPreferences(transform: (preferences: MutablePreferences) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             userPreferencesRepository.edit(transform)
+        }
+    }
+
+    fun hideApp(packageName: String) {
+        editUserPreferences { preferences ->
+            val value = HiddenAppsPreference.getValue(preferences)
+            val newValue = (value ?: emptySet()) + packageName
+            HiddenAppsPreference.setValue(preferences, newValue)
         }
     }
 }

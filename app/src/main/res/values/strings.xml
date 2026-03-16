@@ -294,4 +294,5 @@
     </plurals>
     <string name="user_preferences_visible_apps_description">Choose which of your installed map apps should be displayed after converting a map link to coordinates.</string>
     <string name="user_preferences_visible_apps_title">Visible apps</string>
+    <string name="conversion_succeeded_hide_app">Hide</string>
 </resources>

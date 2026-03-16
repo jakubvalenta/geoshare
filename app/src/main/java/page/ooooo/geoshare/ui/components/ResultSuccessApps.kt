@@ -68,6 +68,7 @@ fun ResultSuccessApps(
     points: Points,
     iconSize: Dp = 46.dp,
     onExecute: (Action<*>) -> Unit,
+    onHideApp: (packageName: String) -> Unit,
     onNavigateToLinksScreen: () -> Unit,
 ) {
     val lastPoint = points.lastOrNull() ?: return
@@ -84,11 +85,18 @@ fun ResultSuccessApps(
     Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
         // Apps
         outputsForApps
-            .map { (packageName, outputs) -> appDetails[packageName]?.label to outputs }
-            .sortedWith(compareBy(nullsLast()) { (label) -> label })
-            .forEach { (label, outputs) ->
+            .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
+            .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
+            .forEach { (packageName, label, outputs) ->
                 item {
-                    AppIcon(Modifier.weight(1f), label, appDetails, outputs, onClick) {
+                    AppIcon(
+                        modifier = Modifier.weight(1f),
+                        label = label,
+                        appDetails = appDetails,
+                        outputs = outputs,
+                        onClick = onClick,
+                        onHide = { onHideApp(packageName) },
+                    ) {
                         outputs.firstOrNull()?.getIcon(appDetails)
                             ?.let { IconFromDescriptor(it, contentDescription = null, size = iconSize) }
                             ?: Box(
@@ -242,6 +250,7 @@ private fun DefaultPreview() {
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -313,6 +322,7 @@ private fun DarkPreview() {
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -339,6 +349,7 @@ private fun LoadingPreview() {
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -365,6 +376,7 @@ private fun DarkLoadingPreview() {
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -384,6 +396,7 @@ private fun EmptyPreview() {
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -403,6 +416,7 @@ private fun DarkEmptyPreview() {
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }

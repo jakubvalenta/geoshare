@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -59,6 +61,7 @@ fun AppIcon(
     appDetails: AppDetails = emptyMap(),
     outputs: List<Output> = emptyList(),
     onClick: (Output) -> Unit = {},
+    onHide: (() -> Unit)? = null,
     enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
@@ -101,22 +104,20 @@ fun AppIcon(
                 )
             }
         }
-        if (outputs.size > 1) {
-            FilledIconButton(
-                { setExpanded(true) },
-                Modifier.size(30.dp),
-                shape = MaterialShapes.ClamShell.toShape(),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-            ) {
-                Icon(
-                    painterResource(R.drawable.more_horiz_24px),
-                    contentDescription = stringResource(R.string.nav_menu_content_description),
-                    Modifier.size(20.dp),
-                )
-            }
+        FilledIconButton(
+            { setExpanded(true) },
+            Modifier.size(30.dp),
+            shape = MaterialShapes.ClamShell.toShape(),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        ) {
+            Icon(
+                painterResource(R.drawable.more_horiz_24px),
+                contentDescription = stringResource(R.string.nav_menu_content_description),
+                Modifier.size(20.dp),
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -138,6 +139,18 @@ fun AppIcon(
                         ?.also { prevIconDescriptor = it }
                         ?.let { { IconFromDescriptor(it, contentDescription = null) } }
                         ?: { Spacer(Modifier.size(24.dp)) },
+                )
+            }
+            if (onHide != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.conversion_succeeded_hide_app)) },
+                    onClick = {
+                        setExpanded(false)
+                        onHide()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.Close, null)
+                    }
                 )
             }
         }
