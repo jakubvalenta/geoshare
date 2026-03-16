@@ -31,8 +31,8 @@ fun getOutputsForPoints(): List<PointsOutput> =
         SavePointsGpxOutput,
     )
 
-fun getOutputsForApps(apps: DataTypes): Map<String, List<Output>> =
-    apps.mapValues { (packageName, dataTypes) ->
+fun getOutputsForApps(apps: DataTypes, hiddenApps: Set<String> = emptySet()): Map<String, List<Output>> =
+    apps.filterKeys { it !in hiddenApps }.mapValues { (packageName, dataTypes) ->
         buildList {
             if (DataType.GEO_URI in dataTypes) {
                 add(OpenDisplayGeoUriOutput(packageName))

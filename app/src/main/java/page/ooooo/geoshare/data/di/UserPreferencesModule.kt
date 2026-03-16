@@ -53,6 +53,6 @@ val defaultFakeUserPreferences = UserPreferencesValues(
     changelogShownForVersionCode = 22,
     connectionPermission = Permission.ALWAYS,
     coordinateFormat = CoordinateFormat.DEC,
-    hiddenPackageNames = emptySet(),
+    hiddenApps = emptySet(),
     introShownForVersionCode = 0,
 )

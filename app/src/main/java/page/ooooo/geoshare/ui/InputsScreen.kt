@@ -267,7 +267,7 @@ private fun InputsDetailPane(
             ParagraphText(
                 stringResource(R.string.inputs_detail_text, appName),
                 Modifier
-                    .widthIn(maxWidth)
+                    .widthIn(max = maxWidth)
                     .padding(top = spacing.tinyAdaptive, bottom = spacing.mediumAdaptive),
             )
         }

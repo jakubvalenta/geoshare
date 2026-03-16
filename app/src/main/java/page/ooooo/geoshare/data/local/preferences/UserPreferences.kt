@@ -284,7 +284,7 @@ object HiddenAppsPreference : UserPreference<Set<String>?> {
     private val key = stringPreferencesKey("hidden_apps")
     private const val DELIMITER = ","
 
-    override fun getValue(values: UserPreferencesValues) = values.hiddenPackageNames
+    override fun getValue(values: UserPreferencesValues) = values.hiddenApps
 
     override fun getValue(preferences: Preferences, log: ILog) =
         preferences[key]?.split(DELIMITER)?.map { it.trim() }?.toSet() ?: default
@@ -322,6 +322,6 @@ data class UserPreferencesValues(
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
-    val hiddenPackageNames: Set<String>? = HiddenAppsPreference.loading,
+    val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

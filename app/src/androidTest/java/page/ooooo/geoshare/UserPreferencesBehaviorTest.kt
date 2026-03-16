@@ -53,4 +53,6 @@ class UserPreferencesBehaviorTest : BehaviorTest {
             }
         }
     }
+
+    // TODO Test hidden apps
 }
