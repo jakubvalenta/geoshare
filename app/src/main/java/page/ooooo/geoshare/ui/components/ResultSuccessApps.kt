@@ -67,6 +67,7 @@ fun ResultSuccessApps(
     outputsForSharing: List<Output>,
     points: Points,
     iconSize: Dp = 46.dp,
+    onDisableLinkGroup: (group: String?) -> Unit,
     onExecute: (Action<*>) -> Unit,
     onHideApp: (packageName: String) -> Unit,
     onNavigateToLinksScreen: () -> Unit,
@@ -165,7 +166,14 @@ fun ResultSuccessApps(
             outputsForLinks
                 .forEach { (group, outputs) ->
                     item {
-                        AppIcon(Modifier.weight(1f), group, appDetails, outputs, onClick) {
+                        AppIcon(
+                            modifier = Modifier.weight(1f),
+                            label = group,
+                            appDetails = appDetails,
+                            outputs = outputs,
+                            onClick = onClick,
+                            onHide = { onDisableLinkGroup(group) },
+                        ) {
                             outputs.firstOrNull()?.getIcon(appDetails)?.let {
                                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                                     IconFromDescriptor(
@@ -249,6 +257,7 @@ private fun DefaultPreview() {
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
                 ) {}
@@ -321,6 +330,7 @@ private fun DarkPreview() {
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
                 ) {}
@@ -348,6 +358,7 @@ private fun LoadingPreview() {
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
                 ) {}
@@ -375,6 +386,7 @@ private fun DarkLoadingPreview() {
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
                 ) {}
@@ -395,6 +407,7 @@ private fun EmptyPreview() {
                     outputsForLinks = emptyMap(),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
                 ) {}
@@ -415,6 +428,7 @@ private fun DarkEmptyPreview() {
                     outputsForLinks = emptyMap(),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
                     onHideApp = {},
                 ) {}

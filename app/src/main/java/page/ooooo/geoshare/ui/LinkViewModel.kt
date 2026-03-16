@@ -180,6 +180,12 @@ class LinkViewModel @Inject constructor(
         }
     }
 
+    fun disableGroup(group: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            TODO()
+        }
+    }
+
     fun restoreInitialData(resources: Resources) {
         viewModelScope.launch(Dispatchers.IO) {
             linkRepository.restoreInitialData()
