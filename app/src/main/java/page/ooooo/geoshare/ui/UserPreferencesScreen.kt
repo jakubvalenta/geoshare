@@ -3,12 +3,14 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.annotation.Keep
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -20,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -45,9 +48,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
@@ -64,6 +69,7 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -100,6 +106,7 @@ enum class UserPreferencesGroupId {
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
     LINKS,
+    HIDDEN_APPS,
 }
 
 private data class UserPreferencesGroup(
@@ -323,6 +330,19 @@ private fun UserPreferencesListPane(
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.COORDINATE_FORMAT) },
                     )
                 )
+                add(
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.HIDDEN_APPS,
+                        headline = { stringResource(R.string.user_preferences_hidden_apps_title) },
+                        supportingContent = {
+                            HiddenAppsPreferenceValue(
+                                value = HiddenAppsPreference.getValue(values),
+                                appDetails = appDetails,
+                            )
+                        },
+                        onClick = { onNavigateToGroup(UserPreferencesGroupId.HIDDEN_APPS) },
+                    )
+                )
                 if (BuildConfig.DEBUG) {
                     add(
                         UserPreferencesGroup(
@@ -416,6 +436,15 @@ private fun AutomationPreferenceValue(
 private fun AutomationDelayPreferenceValue(value: Duration) {
     val seconds = value.toInt(DurationUnit.SECONDS)
     Text(pluralStringResource(R.plurals.seconds, seconds, seconds))
+}
+
+@Composable
+private fun HiddenAppsPreferenceValue(value: Set<String>?, appDetails: AppDetails) {
+    Text(
+        (appDetails.keys - value).takeIf { it.isNotEmpty() }?.size?.let { visibleCount ->
+            pluralStringResource(R.plurals.user_preferences_hidden_apps_count, visibleCount, appDetails.size)
+        } ?: stringResource(R.string.user_preferences_hidden_apps_all)
+    )
 }
 
 @Composable
@@ -605,6 +634,49 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
+        UserPreferencesGroupId.HIDDEN_APPS ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_hidden_apps_title,
+                description = {
+                    stringResource(R.string.user_preferences_hidden_apps_description)
+                },
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) {
+                val value = HiddenAppsPreference.getValue(values) ?: emptySet()
+                val options = HiddenAppsPreference.getOptions(apps) // TODO Sort
+                userPreferencesSwitchesControl(
+                    value = options - value,
+                    onCheckedChange = { option, checked ->
+                        onValueChange { preferences ->
+                            HiddenAppsPreference.setValue(
+                                preferences,
+                                if (checked) value + option else value - option,
+                            )
+                        }
+                    },
+                    options = HiddenAppsPreference.getOptions(apps),
+                    getSwitchTestTag = { option ->
+                        "geoShareUserPreferenceHiddenAppToggle_${option}"
+                    },
+                    leadingContent = { option ->
+                        appDetails[option]?.icon?.let { drawable ->
+                            {
+                                Image(
+                                    rememberDrawablePainter(drawable),
+                                    null,
+                                    Modifier.widthIn(24.dp),
+                                )
+                            }
+                        }
+                    },
+                ) { option ->
+                    appDetails[option]?.label ?: option
+                }
+            }
+
         UserPreferencesGroupId.LINKS -> {}
     }
 }
@@ -708,6 +780,37 @@ fun <T> LazyListScope.userPreferencesOptionsControl(
                 )
             }
         }
+    }
+}
+
+fun <T> LazyListScope.userPreferencesSwitchesControl(
+    value: Set<T>,
+    onCheckedChange: (option: T, checked: Boolean) -> Unit,
+    options: Set<T>,
+    getSwitchTestTag: ((option: T) -> String)? = null,
+    leadingContent: ((option: T) -> (@Composable () -> Unit)?)? = null,
+    headline: @Composable (option: T) -> String,
+) {
+    item {
+        SegmentedList(
+            values = options.toList(),
+            itemHeadline = headline,
+            itemLeadingContent = leadingContent,
+            itemTrailingContent = { option ->
+                {
+                    Switch(
+                        checked = option in value,
+                        onCheckedChange = { onCheckedChange(option, it) },
+                        modifier = Modifier.run {
+                            getSwitchTestTag?.invoke(option)?.let {
+                                testTag(it)
+                            } ?: this
+                        },
+                    )
+                }
+            },
+            sort = true,
+        )
     }
 }
 

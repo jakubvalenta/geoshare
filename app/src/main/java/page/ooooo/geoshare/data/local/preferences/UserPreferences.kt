@@ -277,11 +277,11 @@ object BillingCachedProductIdPreference : TextUserPreference<String?> {
     override fun getValue(values: UserPreferencesValues) = values.billingCachedProductId
 }
 
-object HiddenPackageNamesPreference : UserPreference<Set<String>?> {
+object HiddenAppsPreference : UserPreference<Set<String>?> {
     val default: Set<String> = emptySet()
     val loading: Set<String>? = null
 
-    private val key = stringPreferencesKey("hidden_package_names")
+    private val key = stringPreferencesKey("hidden_apps")
     private const val DELIMITER = ","
 
     override fun getValue(values: UserPreferencesValues) = values.hiddenPackageNames
@@ -292,6 +292,9 @@ object HiddenPackageNamesPreference : UserPreference<Set<String>?> {
     override fun setValue(preferences: MutablePreferences, value: Set<String>?, log: ILog) {
         preferences[key] = value?.joinToString(DELIMITER) { it.trim().replace(DELIMITER, "") } ?: ""
     }
+
+    fun getOptions(apps: DataTypes): Set<String> =
+        apps.keys
 }
 
 object IntroShowForVersionCodePreference : NullableIntPreference {
@@ -319,6 +322,6 @@ data class UserPreferencesValues(
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
-    val hiddenPackageNames: Set<String>? = HiddenPackageNamesPreference.loading,
+    val hiddenPackageNames: Set<String>? = HiddenAppsPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

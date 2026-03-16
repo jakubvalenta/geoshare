@@ -285,4 +285,11 @@
     <string name="srs_gcj02" translatable="false">GCJ-02</string>
     <string name="srs_wgs84" translatable="false">WGS 84</string>
     <string name="text_list_bullet" translatable="false">•</string>
+    <string name="user_preferences_hidden_apps_all">All apps</string>
+    <plurals name="user_preferences_hidden_apps_count">
+        <item quantity="one">%1$d app out of %1$d</item>
+        <item quantity="other">%1$d apps out of %1$d</item>
+    </plurals>
+    <string name="user_preferences_hidden_apps_description">Choose which of your installed apps will be displayed after processing a map link.</string>
+    <string name="user_preferences_hidden_apps_title">Visible apps</string>
 </resources>
