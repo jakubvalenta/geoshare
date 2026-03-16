@@ -1034,7 +1034,8 @@ private fun SucceededPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
@@ -1088,7 +1089,8 @@ private fun DarkSucceededPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
@@ -1142,7 +1144,8 @@ private fun TabletSucceededPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
@@ -1196,7 +1199,8 @@ private fun DarkTabletSucceededPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
@@ -1253,7 +1257,8 @@ private fun AutomationPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
@@ -1310,7 +1315,8 @@ private fun DarkAutomationPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),
@@ -1367,7 +1373,8 @@ private fun TabletAutomationPreview() {
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                )
+                ),
+                emptySet(),
             ),
             outputsForLinks = getOutputsForLinks(defaultFakeLinks),
             outputsForPoint = emptyList(),

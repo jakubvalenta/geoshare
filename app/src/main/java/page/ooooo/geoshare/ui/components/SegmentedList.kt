@@ -28,7 +28,7 @@ fun <T> SegmentedList(
     modifier: Modifier = Modifier,
     itemHeadline: @Composable (value: T) -> String,
     itemIsSelected: (value: T) -> Boolean = { false },
-    itemOnClick: (value: T) -> Unit = {},
+    itemOnClick: (value: T) -> Unit,
     itemEnabled: ((value: T) -> Boolean)? = null,
     itemLeadingContent: ((value: T) -> (@Composable () -> Unit)?)? = null,
     itemSupportingContent: ((value: T) -> (@Composable () -> Unit)?)? = null,

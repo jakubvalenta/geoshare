@@ -109,7 +109,58 @@ class UserPreferencesTest {
                         TEST_PACKAGE_NAME to AppDetail("ZZZ sort last", mock()),
                         TOMTOM_PACKAGE_NAME to AppDetail("TomTom", mock()),
                     ),
+                    hiddenApps = emptySet(),
                     links = defaultFakeLinks,
+                )
+                .map { group ->
+                    group.map { automation ->
+                        automation.toOutput { defaultFakeLinks.findByUUID(it) }
+                    }
+                },
+        )
+    }
+
+    @Test
+    fun getOptionGroups_doesNotReturnAutomationsForHiddenApps() = runTest {
+        assertEquals(
+            listOf(
+                listOf(
+                    NoopOutput,
+                ),
+                listOf(
+                    CopyCoordsDecOutput,
+                    CopyCoordsDegMinSecOutput,
+                    CopyGeoUriOutput,
+                    ShareDisplayGeoUriOutput,
+                    ShareNavigationGoogleUriOutput,
+                    ShareStreetViewGoogleUriOutput,
+                    SavePointGpxOutput,
+                ),
+                listOf(
+                    ShareRouteGpxOutput,
+                    SharePointsGpxOutput,
+                    SaveRouteGpxOutput,
+                    SavePointsGpxOutput,
+                ),
+                listOf(
+                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME),
+                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME),
+                ),
+            ),
+            AutomationPreference
+                .getOptionGroups(
+                    apps = mapOf(
+                        MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                        TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                        TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                    ),
+                    appDetails = mapOf(
+                        MAGIC_EARTH_PACKAGE_NAME to AppDetail("Magic Earth", mock()),
+                        TEST_PACKAGE_NAME to AppDetail("ZZZ sort last", mock()),
+                        TOMTOM_PACKAGE_NAME to AppDetail("TomTom", mock()),
+                    ),
+                    hiddenApps = setOf(MAGIC_EARTH_PACKAGE_NAME),
+                    links = emptyList(),
                 )
                 .map { group ->
                     group.map { automation ->
@@ -146,6 +197,7 @@ class UserPreferencesTest {
                 TEST_PACKAGE_NAME to AppDetail("ZZZ sort last", mock()),
                 TOMTOM_PACKAGE_NAME to AppDetail("TomTom", mock()),
             ),
+            hiddenApps = emptySet(),
             links = defaultFakeLinks,
         ).flatten().forEach { expectedAutomation ->
             val preferences = mutablePreferencesOf()

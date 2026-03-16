@@ -80,7 +80,7 @@ class AllOutputsTest {
                 "$TEST_PACKAGE_NAME.empty" to emptyList(),
             ),
             getOutputsForApps(
-                apps = mapOf(
+                mapOf(
                     TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
                     GOOGLE_MAPS_PACKAGE_NAME to setOf(
                         DataType.GEO_URI,
@@ -91,6 +91,33 @@ class AllOutputsTest {
                     MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
                     TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                     "$TEST_PACKAGE_NAME.empty" to emptySet(),
+                ),
+                emptySet(),
+            ),
+        )
+    }
+
+    @Test
+    fun getOutputsForApps_doesNotReturnOutputsForHiddenApps() {
+        assertEquals(
+            mapOf(
+                TEST_PACKAGE_NAME to listOf(
+                    OpenDisplayGeoUriOutput(TEST_PACKAGE_NAME)
+                ),
+                TOMTOM_PACKAGE_NAME to listOf(
+                    OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME),
+                ),
+            ),
+            getOutputsForApps(
+                mapOf(
+                    TEST_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                ),
+                setOf(
+                    GOOGLE_MAPS_PACKAGE_NAME,
+                    MAGIC_EARTH_PACKAGE_NAME,
                 ),
             ),
         )

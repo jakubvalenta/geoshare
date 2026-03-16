@@ -235,7 +235,8 @@ private fun DefaultPreview() {
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
                             TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
@@ -305,7 +306,8 @@ private fun DarkPreview() {
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
                             TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
@@ -330,7 +332,8 @@ private fun LoadingPreview() {
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
@@ -355,7 +358,8 @@ private fun DarkLoadingPreview() {
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
@@ -394,7 +398,7 @@ private fun DarkEmptyPreview() {
             Column {
                 ResultSuccessApps(
                     appDetails = emptyMap(),
-                    outputsForApps = getOutputsForApps(emptyMap()),
+                    outputsForApps = getOutputsForApps(emptyMap(), emptySet()),
                     outputsForLinks = emptyMap(),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),

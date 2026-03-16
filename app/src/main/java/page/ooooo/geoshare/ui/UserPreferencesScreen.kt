@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -74,7 +75,8 @@ import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePrefere
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.TextUserPreference
+import page.ooooo.geoshare.data.local.preferences.SetPreference
+import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -95,6 +97,7 @@ import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
@@ -108,7 +111,7 @@ enum class UserPreferencesGroupId {
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
     LINKS,
-    HIDDEN_APPS,
+    VISIBLE_APPS,
 }
 
 private data class UserPreferencesGroup(
@@ -267,8 +270,11 @@ private fun UserPreferencesListPane(
         modifier = Modifier.padding(horizontal = spacing.windowPadding),
     ) {
         item {
-            val values = buildList {
-                add(
+            SegmentedListLabel(stringResource(R.string.user_preferences_section_inputs))
+        }
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.CONNECTION_PERMISSION,
                         headline = { stringResource(R.string.user_preferences_connection_title) },
@@ -278,16 +284,17 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.CONNECTION_PERMISSION) },
-                    )
-                )
-                add(
-                    UserPreferencesGroup(
-                        id = UserPreferencesGroupId.LINKS,
-                        headline = { stringResource(R.string.links_title) },
-                        onClick = { onNavigateToLinksScreen() },
-                    )
-                )
-                add(
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        item {
+            SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
+        }
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.AUTOMATION,
                         headline = { stringResource(R.string.user_preferences_automation_title) },
@@ -307,9 +314,7 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION) },
-                    )
-                )
-                add(
+                    ),
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.AUTOMATION_DELAY,
                         headline = { stringResource(R.string.user_preferences_automation_delay_sec_title) },
@@ -320,9 +325,51 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION_DELAY) },
-                    )
-                )
-                add(
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        item {
+            SegmentedListLabel(stringResource(R.string.user_preferences_section_outputs))
+        }
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.VISIBLE_APPS,
+                        headline = { stringResource(R.string.user_preferences_visible_apps_title) },
+                        enabled = HiddenAppsPreference.getValue(values) != HiddenAppsPreference.loading,
+                        supportingContent = HiddenAppsPreference.getValue(values)?.let { value ->
+                            @Composable {
+                                val options = HiddenAppsPreference.getOptions(apps)
+                                Text(
+                                    (options - value).size.takeIf { it > 0 && it != options.size }
+                                        ?.let { visibleCount ->
+                                            pluralStringResource(
+                                                R.plurals.user_preferences_visible_apps_count,
+                                                visibleCount,
+                                                visibleCount,
+                                                options.size,
+                                            )
+                                        } ?: stringResource(R.string.user_preferences_visible_apps_all)
+                                )
+                            }
+                        },
+                        onClick = { onNavigateToGroup(UserPreferencesGroupId.VISIBLE_APPS) },
+                    ),
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.LINKS,
+                        headline = { stringResource(R.string.links_title) },
+                        supportingContent = {
+                            Text(
+                                links.filter { it.enabled }.map { it.groupOrName }.toSortedSet().joinToString(),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = { onNavigateToLinksScreen() },
+                    ),
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.COORDINATE_FORMAT,
                         headline = { stringResource(R.string.user_preferences_coordinate_format_title) },
@@ -332,55 +379,48 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.COORDINATE_FORMAT) },
-                    )
-                )
-                add(
-                    UserPreferencesGroup(
-                        id = UserPreferencesGroupId.HIDDEN_APPS,
-                        headline = { stringResource(R.string.user_preferences_hidden_apps_title) },
-                        enabled = HiddenAppsPreference.getValue(values) != null,
-                        supportingContent = HiddenAppsPreference.getValue(values)?.let { value ->
-                            @Composable {
-                                val options = HiddenAppsPreference.getOptions(apps)
-                                Text(
-                                    (options - value).size.takeIf { it > 0 && it != options.size }
-                                        ?.let { visibleCount ->
-                                            pluralStringResource(
-                                                R.plurals.user_preferences_hidden_apps_count,
-                                                visibleCount,
-                                                visibleCount,
-                                                options.size,
-                                            )
-                                        } ?: stringResource(R.string.user_preferences_hidden_apps_all)
-                                )
-                            }
-                        },
-                        onClick = { onNavigateToGroup(UserPreferencesGroupId.HIDDEN_APPS) },
-                    )
-                )
-                if (BuildConfig.DEBUG) {
-                    add(
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        if (BuildConfig.DEBUG) {
+            item {
+                SegmentedListLabel(stringResource(R.string.user_preferences_developer_title))
+            }
+            item {
+                UserPreferencesListSection(
+                    groups = listOf(
                         UserPreferencesGroup(
                             id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                             headline = { stringResource(R.string.user_preferences_developer_title) },
                             onClick = { onNavigateToGroup(UserPreferencesGroupId.DEVELOPER_OPTIONS) },
-                        )
-                    )
-                }
+                        ),
+                    ),
+                    currentGroupId = currentGroupId,
+                )
             }
-            SegmentedList(
-                values = values,
-                modifier = Modifier.padding(top = spacing.mediumAdaptive),
-                itemHeadline = { it.headline() },
-                itemIsSelected = { it.id == currentGroupId },
-                itemOnClick = { it.onClick() },
-                itemEnabled = { it.enabled },
-                itemTrailingContent = { it.trailingContent },
-                itemSupportingContent = { it.supportingContent },
-                itemTestTag = { "geoShareUserPreferencesGroup_${it.id}" },
-            )
         }
     }
+}
+
+@Composable
+private fun UserPreferencesListSection(
+    groups: List<UserPreferencesGroup>,
+    currentGroupId: UserPreferencesGroupId?,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedList(
+        values = groups,
+        modifier = modifier,
+        itemHeadline = { it.headline() },
+        itemIsSelected = { it.id == currentGroupId },
+        itemOnClick = { it.onClick() },
+        itemEnabled = { it.enabled },
+        itemTrailingContent = { it.trailingContent },
+        itemSupportingContent = { it.supportingContent },
+        itemTestTag = { "geoShareUserPreferencesGroup_${it.id}" },
+    )
 }
 
 @Composable
@@ -546,7 +586,12 @@ private fun UserPreferencesDetailPane(
             ) { maxWidth ->
                 userPreferencesOptionsControl(
                     userPreference = AutomationPreference,
-                    optionGroups = AutomationPreference.getOptionGroups(apps, appDetails, links),
+                    optionGroups = AutomationPreference.getOptionGroups(
+                        apps,
+                        appDetails,
+                        values.hiddenApps,
+                        links,
+                    ),
                     values = values,
                     enabled = automationFeatureStatus == FeatureStatus.AVAILABLE,
                     modifier = Modifier.widthIn(max = maxWidth),
@@ -654,36 +699,26 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
-        UserPreferencesGroupId.HIDDEN_APPS ->
+        UserPreferencesGroupId.VISIBLE_APPS ->
             UserPreferencesControls(
-                titleResId = R.string.user_preferences_hidden_apps_title,
+                titleResId = R.string.user_preferences_visible_apps_title,
                 description = {
-                    stringResource(R.string.user_preferences_hidden_apps_description)
+                    stringResource(R.string.user_preferences_visible_apps_description)
                 },
                 billingAppNameResId = billingAppNameResId,
                 wide = wide,
                 onBack = onBack,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             ) { maxWidth ->
-                val value = HiddenAppsPreference.getValue(values)
-                val options = HiddenAppsPreference.getOptions(apps) // TODO Sort
                 userPreferencesSwitchesControl(
-                    value = options - (value ?: emptySet()),
-                    onCheckedChange = { option, checked ->
-                        onValueChange { preferences ->
-                            HiddenAppsPreference.setValue(
-                                preferences,
-                                (value ?: emptySet()).let { value ->
-                                    if (checked) value + option else value - option
-                                },
-                            )
-                        }
-                    },
+                    userPreference = HiddenAppsPreference,
+                    values = values,
+                    onValueChange = onValueChange,
                     options = HiddenAppsPreference.getOptions(apps),
                     modifier = Modifier.widthIn(max = maxWidth),
-                    enabled = value != null,
+                    inverted = true,
                     getSwitchTestTag = { option ->
-                        "geoShareUserPreferenceHiddenAppToggle_${option}"
+                        "geoShareUserPreferenceVisibleAppToggle_${option}"
                     },
                     leadingContent = { option ->
                         appDetails[option]?.icon?.let { drawable ->
@@ -810,28 +845,51 @@ fun <T> LazyListScope.userPreferencesOptionsControl(
     }
 }
 
-fun <T> LazyListScope.userPreferencesSwitchesControl(
-    value: Set<T>,
-    onCheckedChange: (option: T, checked: Boolean) -> Unit,
-    options: Set<T>,
+fun LazyListScope.userPreferencesSwitchesControl(
+    userPreference: SetPreference,
+    values: UserPreferencesValues,
+    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
+    options: Set<String>,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    getSwitchTestTag: ((option: T) -> String)? = null,
-    leadingContent: ((option: T) -> (@Composable () -> Unit)?)? = null,
-    headline: @Composable (option: T) -> String,
+    inverted: Boolean = false,
+    getSwitchTestTag: ((option: String) -> String)? = null,
+    leadingContent: ((option: String) -> (@Composable () -> Unit)?)? = null,
+    headline: @Composable (option: String) -> String,
 ) {
+    val value = userPreference.getValue(values)
+    val enabled = value != null
+
+    fun isChecked(option: String): Boolean =
+        value?.contains(option) == true xor inverted
+
+    fun setValue(option: String, checked: Boolean) {
+        val newValue = (value ?: emptySet()).let { value ->
+            if (checked xor inverted) {
+                value + option
+            } else {
+                value - option
+            }
+        }
+        onValueChange { preferences ->
+            userPreference.setValue(preferences, newValue)
+        }
+    }
+
     item {
         SegmentedList(
             values = options.toList(),
             modifier = modifier,
             itemHeadline = headline,
+            itemOnClick = { option -> setValue(option, !isChecked(option)) },
             itemEnabled = { enabled },
             itemLeadingContent = leadingContent,
             itemTrailingContent = { option ->
                 {
                     Switch(
-                        checked = option in value,
-                        onCheckedChange = { onCheckedChange(option, it) },
+                        checked = isChecked(option),
+                        onCheckedChange = {
+                            setValue(option, it)
+                        },
                         modifier = Modifier.run {
                             getSwitchTestTag?.invoke(option)?.let {
                                 testTag(it)
@@ -847,7 +905,7 @@ fun <T> LazyListScope.userPreferencesSwitchesControl(
 }
 
 fun <T> LazyListScope.userPreferencesTextControl(
-    userPreference: TextUserPreference<T>,
+    userPreference: TextPreference<T>,
     values: UserPreferencesValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
     modifier: Modifier = Modifier,
@@ -1416,14 +1474,14 @@ private fun TableAutomationDelayPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun HiddenAppsPreview() {
+private fun VisibleAppsPreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    initialGroupId = UserPreferencesGroupId.VISIBLE_APPS,
                     apps = mapOf(
                         COMAPS_FDROID_PACKAGE_NAME to emptySet(),
                         ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
@@ -1461,14 +1519,14 @@ private fun HiddenAppsPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkHiddenAppsPreview() {
+private fun DarkVisibleAppsPreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    initialGroupId = UserPreferencesGroupId.VISIBLE_APPS,
                     apps = mapOf(
                         COMAPS_FDROID_PACKAGE_NAME to emptySet(),
                         ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
@@ -1506,14 +1564,14 @@ private fun DarkHiddenAppsPreview() {
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
-private fun TabletHiddenAppsPreview() {
+private fun TabletVisibleAppsPreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    initialGroupId = UserPreferencesGroupId.VISIBLE_APPS,
                     apps = mapOf(
                         COMAPS_FDROID_PACKAGE_NAME to emptySet(),
                         ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
@@ -1551,14 +1609,14 @@ private fun TabletHiddenAppsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun HiddenAppsLoadingPreview() {
+private fun VisibleAppsLoadingPreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    initialGroupId = UserPreferencesGroupId.VISIBLE_APPS,
                     apps = mapOf(
                         COMAPS_FDROID_PACKAGE_NAME to emptySet(),
                         ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
@@ -1594,14 +1652,14 @@ private fun HiddenAppsLoadingPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkHiddenAppsLoadingPreview() {
+private fun DarkVisibleAppsLoadingPreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    initialGroupId = UserPreferencesGroupId.VISIBLE_APPS,
                     apps = mapOf(
                         COMAPS_FDROID_PACKAGE_NAME to emptySet(),
                         ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
@@ -1637,14 +1695,14 @@ private fun DarkHiddenAppsLoadingPreview() {
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
-private fun TabletHiddenAppsLoadingPreview() {
+private fun TabletVisibleAppsLoadingPreview() {
     AppTheme {
         Surface {
             Column {
                 val context = LocalContext.current
                 @SuppressLint("LocalContextGetResourceValueCall")
                 UserPreferencesScreen(
-                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    initialGroupId = UserPreferencesGroupId.VISIBLE_APPS,
                     apps = mapOf(
                         COMAPS_FDROID_PACKAGE_NAME to emptySet(),
                         ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
