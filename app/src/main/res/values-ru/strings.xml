@@ -249,4 +249,8 @@
     <string name="links_restore_initial_data_title">Сбросить настройки web-карт?</string>
     <string name="links_title">Web-карты</string>
     <string name="links_update">Изменить web-карту</string>
+    <string name="user_preferences_coordinate_format_description">Выберите формат, в котором будут отображаться все географические координаты в приложении.</string>
+    <string name="user_preferences_coordinate_format_option_dec">Десятичные градусы</string>
+    <string name="user_preferences_coordinate_format_option_deg_min_sec">Градусы, минуты, секунды</string>
+    <string name="user_preferences_coordinate_format_title">Формат координат</string>
 </resources>
