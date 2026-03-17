@@ -243,7 +243,7 @@
     <string name="links_restore_initial_data_title">Réinitialiser les cartes Web aux paramètres d’usine par défaut ?</string>
     <string name="links_title">Cartes Web</string>
     <string name="links_update">Modifier la carte Web</string>
-    <string name="user_preferences_coordinate_format_description">Choisissez le format dans lequel toutes les coordonnées géographiques s\'affichent dans l\'application.</string>
+    <string name="user_preferences_coordinate_format_description">Choisissez le format dans lequel toutes les coordonnées géographiques s’affichent dans l’application.</string>
     <string name="user_preferences_coordinate_format_option_dec">Degrés décimaux</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Degrés, minutes, secondes</string>
     <string name="user_preferences_coordinate_format_title">Format de coordonnées</string>
