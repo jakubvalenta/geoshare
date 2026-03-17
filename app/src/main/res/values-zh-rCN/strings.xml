@@ -231,4 +231,8 @@
     <string name="links_title">网络地图</string>
     <string name="links_update">编辑网络地图</string>
     <string name="links_restore_initial_data_text">您的所有网络地图都将被删除并替换为预装地图。</string>
+    <string name="user_preferences_coordinate_format_description">选择应用中所有地理坐标的显示格式。</string>
+    <string name="user_preferences_coordinate_format_option_dec">十进制度数</string>
+    <string name="user_preferences_coordinate_format_option_deg_min_sec">度分秒</string>
+    <string name="user_preferences_coordinate_format_title">坐标格式</string>
 </resources>
