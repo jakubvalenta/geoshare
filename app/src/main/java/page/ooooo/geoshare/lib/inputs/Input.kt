@@ -38,6 +38,7 @@ interface HtmlInput : Input {
         htmlUrlString: String,
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
+        uriQuote: UriQuote = DefaultUriQuote,
         log: ILog = DefaultLog,
     ): ParseHtmlResult
 }

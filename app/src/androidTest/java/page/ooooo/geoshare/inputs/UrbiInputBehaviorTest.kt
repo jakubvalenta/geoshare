@@ -20,7 +20,11 @@ class UrbiInputBehaviorTest : BaseInputBehaviorTest() {
 
         // Short URI
         testUri(
-            WGS84Point(41.285765, 69.234083, z = 17.0),
+            WGS84Point(
+                41.285765, 69.234083,
+                z = 17.0,
+                name = "Music Store, магазин музыкальных инструментов",
+            ),
             "https://go.2gis.com/WSTdK",
         )
     }

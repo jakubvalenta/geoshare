@@ -112,6 +112,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
         htmlUrlString: String,
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
+        uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
         val name = pointsFromUri.lastOrNull()?.name

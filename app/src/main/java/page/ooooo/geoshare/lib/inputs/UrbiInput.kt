@@ -9,11 +9,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.decodeBasicHtmlEntities
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
-import page.ooooo.geoshare.lib.extensions.toZLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 
 object UrbiInput : HtmlInput, Input.HasRandomUri {
@@ -71,9 +72,13 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
             // API
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
-            // TODO Extract name
             LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z))
+                points = persistentListOf(
+                    it.asWGS84().copy(
+                        z = z,
+                        name = Q_PARAM_PATTERN.matchEntire(queryParams["title"])?.groupOrNull(),
+                    )
+                )
                 return@run
             }
         }
@@ -83,16 +88,34 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
         htmlUrlString: String,
         channel: ByteReadChannel,
         pointsFromUri: ImmutableList<Point>,
+        uriQuote: UriQuote,
         log: ILog,
     ) = buildParseHtmlResult {
-        val name = pointsFromUri.lastOrNull()?.name
+        // Notice that unlike in other Inputs, we don't copy any point names from pointsFromUri here
 
-        val pattern = Regex("""zoom=$Z&amp;center=$LON%2C$LAT""")
+        val pattern = Regex("""property="twitter:image" content="([^"]+)""")
         while (true) {
             val line = channel.readLine() ?: break
-            pattern.find(line)?.toZLonLatPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(name = name))
-                return@buildParseHtmlResult
+            pattern.find(line)?.groupOrNull()?.let { attr ->
+                val uri = Uri.parse(attr.decodeBasicHtmlEntities(), uriQuote)
+                when (val res = parseUri(uri)) {
+                    is ParseUriResult.Failed -> {}
+
+                    is ParseUriResult.Succeeded -> {
+                        points = res.points
+                        return@buildParseHtmlResult
+                    }
+
+                    is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
+                        points = res.points
+                        return@buildParseHtmlResult
+                    }
+
+                    is ParseUriResult.SucceededAndSupportsWebParsing -> {
+                        points = res.points
+                        return@buildParseHtmlResult
+                    }
+                }
             }
         }
     }

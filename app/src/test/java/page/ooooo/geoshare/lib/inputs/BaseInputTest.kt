@@ -34,6 +34,7 @@ abstract class BaseInputTest {
             htmlUrlString = htmlUrlString,
             channel = html.byteInputStream().toByteReadChannel(),
             pointsFromUri = persistentListOf(),
+            uriQuote = uriQuote,
             log = log,
         )
 }
