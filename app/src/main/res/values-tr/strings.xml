@@ -186,4 +186,5 @@
     </plurals>
     <string name="conversion_failed_parse_html_error">Harita servisinden web sayfası alınamadı</string>
     <string name="inputs_settings">Android ayarlarına giderek bağlantıların her zaman %1$s’de açılmasını seçebilirsiniz</string>
+    <string name="user_preferences_coordinate_format_title">Koordinat formatı</string>
 </resources>
