@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.lib.inputs
 
+import androidx.annotation.Keep
 import androidx.compose.runtime.Composable
 
+@Keep
 enum class InputDocumentationId {
     AMAP,
     APPLE_MAPS,

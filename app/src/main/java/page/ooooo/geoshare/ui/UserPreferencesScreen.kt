@@ -2,6 +2,7 @@ package page.ooooo.geoshare.ui
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.annotation.Keep
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -103,6 +104,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+@Keep
 enum class UserPreferencesGroupId {
     AUTOMATION,
     AUTOMATION_DELAY,
@@ -838,7 +840,7 @@ private fun LazyListScope.userPreferencesSwitchesControl(
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
     options: Set<String>,
     modifier: Modifier = Modifier,
-    inverted: Boolean = false,
+    @Suppress("SameParameterValue") inverted: Boolean = false,
     getSwitchTestTag: ((option: String) -> String)? = null,
     leadingContent: ((option: String) -> (@Composable () -> Unit)?)? = null,
     headline: @Composable (option: String) -> String,
