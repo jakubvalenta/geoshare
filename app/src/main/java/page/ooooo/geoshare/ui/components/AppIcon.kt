@@ -50,6 +50,7 @@ import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.OpenPointOutput
+import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
@@ -87,6 +88,7 @@ fun AppIcon(
             .run {
                 outputs.firstOrNull()?.let { firstOutput ->
                     ((firstOutput as? OpenPointOutput)?.packageName
+                        ?: (firstOutput as? OpenRouteOnePointGpxOutput)?.packageName
                         ?: (firstOutput as? ShareLinkUriOutput)?.link?.uuid)?.let { id ->
                         testTag("geoShareApp_$id")
                     }
