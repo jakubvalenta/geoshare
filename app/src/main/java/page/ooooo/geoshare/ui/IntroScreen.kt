@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -26,10 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.retain.retain
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -40,6 +41,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.IntroViewModel
@@ -56,7 +59,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun IntroScreen(
-    onBack: () -> Unit,
+    onClose: () -> Unit,
     viewModel: IntroViewModel,
 ) {
     val context = LocalContext.current
@@ -67,9 +70,9 @@ fun IntroScreen(
     }
 
     IntroScreen(
-        onBack = {
+        onClose = {
             viewModel.setShown()
-            onBack()
+            onClose()
         },
         onShowOpenByDefaultSettings = {
             AndroidTools.showOpenByDefaultSettings(context, settingsLauncher)
@@ -84,30 +87,30 @@ fun IntroScreen(
 @Composable
 private fun IntroScreen(
     initialPage: Int = 0,
-    onBack: () -> Unit,
+    onClose: () -> Unit,
     onShowOpenByDefaultSettings: () -> Unit,
     onShowOpenByDefaultSettingsForPackage: (packageName: String) -> Unit,
 ) {
-    val spacing = LocalSpacing.current
     val appName = stringResource(R.string.app_name)
+    val coroutineScope = rememberCoroutineScope()
+    val spacing = LocalSpacing.current
+
     val pageCount = 2
-    var page by retain { mutableIntStateOf(initialPage) }
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { pageCount })
     val animatedProgress by animateFloatAsState(
-        targetValue = (page + 1f) / pageCount,
+        targetValue = (pagerState.currentPage + 1f) / pageCount,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "progressAnimation",
     )
-    val coroutineScope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
+    val maxWidth = 600.dp
 
     BackHandler {
-        if (page != 0) {
+        if (pagerState.canScrollBackward) {
             coroutineScope.launch {
-                scrollState.scrollTo(0)
-                page--
+                pagerState.scrollToPage(pagerState.currentPage)
             }
         } else {
-            onBack()
+            onClose()
         }
     }
 
@@ -119,26 +122,24 @@ private fun IntroScreen(
         Column(
             Modifier
                 .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .padding(horizontal = spacing.windowPadding)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .consumeWindowInsets(innerPadding),
         ) {
             LinearProgressIndicator(
                 { animatedProgress },
-                Modifier.padding(vertical = spacing.tinyAdaptive),
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = spacing.tinyAdaptive),
                 trackColor = MaterialTheme.colorScheme.surface,
             )
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-            ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+            ) { page ->
                 when (page) {
                     0 -> IntroPage(
                         stringResource(R.string.intro_how_to_share_headline),
                         page,
+                        maxWidth,
                     ) {
                         IntroFigure(
                             stringResource(R.string.intro_how_to_share_google_maps_caption),
@@ -155,6 +156,7 @@ private fun IntroScreen(
                     1 -> IntroPage(
                         stringResource(R.string.intro_open_by_default_headline),
                         page,
+                        maxWidth,
                     ) {
                         IntroFigure(
                             stringResource(R.string.intro_open_by_default_google_maps_caption),
@@ -195,42 +197,43 @@ private fun IntroScreen(
                     }
                 }
             }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = spacing.tinyAdaptive),
-            ) {
-                if (page != pageCount - 1) {
-                    TextButton(
-                        { onBack() },
-                        Modifier.testTag("geoShareIntroScreenCloseButton"),
-                    ) {
-                        Text(stringResource(R.string.intro_nav_close))
-                    }
-                }
-                Spacer(Modifier.weight(1f))
-                Button(
-                    {
-                        if (page != pageCount - 1) {
-                            coroutineScope.launch {
-                                scrollState.scrollTo(0)
-                                page++
-                            }
-                        } else {
-                            onBack()
-                        }
-                    },
-                    Modifier.testTag("geoShareIntroScreenNextButton"),
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    Modifier
+                        .widthIn(max = maxWidth)
+                        .padding(horizontal = spacing.windowPadding, vertical = spacing.tinyAdaptive),
                 ) {
-                    Text(
-                        stringResource(
-                            if (page != pageCount - 1) {
-                                R.string.intro_nav_next
+                    if (pagerState.canScrollForward) {
+                        TextButton(
+                            { onClose() },
+                            Modifier.testTag("geoShareIntroScreenCloseButton"),
+                        ) {
+                            Text(stringResource(R.string.intro_nav_close))
+                        }
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Button(
+                        {
+                            if (pagerState.canScrollForward) {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                }
                             } else {
-                                R.string.intro_nav_finish
+                                onClose()
                             }
+                        },
+                        Modifier.testTag("geoShareIntroScreenNextButton"),
+                    ) {
+                        Text(
+                            stringResource(
+                                if (pagerState.canScrollForward) {
+                                    R.string.intro_nav_next
+                                } else {
+                                    R.string.intro_nav_finish
+                                }
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -241,22 +244,29 @@ private fun IntroScreen(
 private fun IntroPage(
     headline: String,
     page: Int,
+    maxWidth: Dp,
     content: @Composable () -> Unit = {},
 ) {
     val spacing = LocalSpacing.current
-    Column(Modifier.fillMaxWidth()) {
-        Text(
-            headline,
-            Modifier
-                .testTag("geoShareIntroPage${page}HeadingText")
-                .padding(vertical = spacing.smallAdaptive),
-            style = MaterialTheme.typography.headlineSmall,
-        )
+
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Column(
-            Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive),
+            Modifier
+                .fillMaxHeight()
+                .widthIn(max = maxWidth)
+                .padding(horizontal = spacing.windowPadding)
+                .verticalScroll(rememberScrollState()),
         ) {
-            content()
+            Text(
+                headline,
+                Modifier
+                    .padding(vertical = spacing.smallAdaptive)
+                    .testTag("geoShareIntroPage${page}HeadingText"),
+                style = MaterialTheme.typography.headlineSmall,
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)) {
+                content()
+            }
         }
     }
 }
@@ -284,7 +294,7 @@ private fun IntroFigure(
 private fun PageOnePreview() {
     AppTheme {
         IntroScreen(
-            onBack = {},
+            onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -296,7 +306,19 @@ private fun PageOnePreview() {
 private fun DarkPageOnePreview() {
     AppTheme {
         IntroScreen(
-            onBack = {},
+            onClose = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPageOnePreview() {
+    AppTheme {
+        IntroScreen(
+            onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -309,7 +331,7 @@ private fun PageTwoPreview() {
     AppTheme {
         IntroScreen(
             initialPage = 1,
-            onBack = {},
+            onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -322,7 +344,7 @@ private fun DarkPageTwoPreview() {
     AppTheme {
         IntroScreen(
             initialPage = 1,
-            onBack = {},
+            onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )
@@ -331,10 +353,11 @@ private fun DarkPageTwoPreview() {
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
-private fun TabletPageOnePreview() {
+private fun TabletPageTwoPreview() {
     AppTheme {
         IntroScreen(
-            onBack = {},
+            initialPage = 1,
+            onClose = {},
             onShowOpenByDefaultSettings = {},
             onShowOpenByDefaultSettingsForPackage = {},
         )

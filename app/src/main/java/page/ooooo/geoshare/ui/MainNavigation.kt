@@ -75,7 +75,7 @@ fun MainNavigation(
         }
         composable<IntroRoute> {
             IntroScreen(
-                onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                onClose = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 viewModel = introViewModel,
             )
         }
