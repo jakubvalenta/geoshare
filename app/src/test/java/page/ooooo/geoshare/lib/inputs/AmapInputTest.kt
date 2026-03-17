@@ -55,9 +55,24 @@ class AmapInputTest : BaseInputTest() {
     fun parseUri_inChina() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(
-                persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624))
+                persistentListOf(
+                    GCJ02Point(
+                        31.222811749011463, 121.46840706467624,
+                        name = "上海市黄浦区巨鹿路15-17号",
+                    ),
+                )
             ),
             parseUri("https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624%2C%E4%B8%8A%E6%B5%B7%E5%B8%82%E9%BB%84%E6%B5%A6%E5%8C%BA%E5%B7%A8%E9%B9%BF%E8%B7%AF15-17%E5%8F%B7&src=app_C3090"),
+        )
+    }
+
+    @Test
+    fun parseUri_inChinaWithoutName() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624))
+            ),
+            parseUri("https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624"),
         )
     }
 
@@ -65,9 +80,24 @@ class AmapInputTest : BaseInputTest() {
     fun parseUri_notInChina() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(
-                persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103))
+                persistentListOf(
+                    GCJ02Point(
+                        45.8289525077221, 1.266689300537103,
+                        name = @Suppress("SpellCheckingInspection") "利摩日主教座堂,42 Rue Prte Panet, 87000 Limoges, 法国",
+                    ),
+                )
             ),
             parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103%2C%E5%88%A9%E6%91%A9%E6%97%A5%E4%B8%BB%E6%95%99%E5%BA%A7%E5%A0%82%2C42+Rue+Prte+Panet%2C+87000+Limoges%2C+%E6%B3%95%E5%9B%BD&src=app_C3090"),
+        )
+    }
+
+    @Test
+    fun parseUri_notInChinaWithoutName() = runTest {
+        assertEquals(
+            ParseUriResult.Succeeded(
+                persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103))
+            ),
+            parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103"),
         )
     }
 
