@@ -261,4 +261,8 @@
     <string name="links_restore_initial_data_title">صفّر خرائط الويب إلى الإعدادات الافتراضية؟</string>
     <string name="links_title">خرائط الويب</string>
     <string name="links_update">عدِّل خريطة الويب</string>
+    <string name="user_preferences_coordinate_format_description">اختر التنسيق الذي تُعرض به جميع الإحداثيات الجغرافية في كافة أنحاء التطبيق.</string>
+    <string name="user_preferences_coordinate_format_option_dec">درجات عشرية</string>
+    <string name="user_preferences_coordinate_format_option_deg_min_sec">درجات، دقائق، ثوانٍ</string>
+    <string name="user_preferences_coordinate_format_title">تنسيق الإحداثيات</string>
 </resources>
