@@ -93,7 +93,7 @@ class UserPreferencesBehaviorTest : BehaviorTest {
 
         // Make the app visible in preferences
         goToUserPreferencesList()
-        goToUserPreferencesDetail(UserPreferencesGroupId.VISIBLE_APPS)
+        goToUserPreferencesDetail(UserPreferencesGroupId.HIDDEN_APPS)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareVisibleAppToggle_${OSMAND_PLUS_PACKAGE_NAME}" }
             .click()

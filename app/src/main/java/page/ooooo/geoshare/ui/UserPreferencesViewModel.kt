@@ -68,7 +68,7 @@ class UserPreferencesViewModel @Inject constructor(
                 (HiddenAppsPreference.getValue(preferences) ?: emptySet()) + packageName,
             )
         }
-        _message.value = Message(resources.getString(R.string.user_preferences_visible_apps_message_hidden))
+        _message.value = Message(resources.getString(R.string.user_preferences_apps_message_hidden))
     }
 
     fun dismissMessage() {
