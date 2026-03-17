@@ -7,3 +7,9 @@ fun String.truncateMiddle(maxLength: Int = 60, ellipsis: String = "\u2026"): Str
     } else {
         this
     }
+
+fun String.decodeBasicHtmlEntities(): String =
+    this.replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")

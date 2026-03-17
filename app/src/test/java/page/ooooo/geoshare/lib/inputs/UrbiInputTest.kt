@@ -149,7 +149,15 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseHtml() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(persistentListOf(WGS84Point(41.285765, 69.234083, z = 17.0))),
+            ParseHtmlResult.Succeeded(
+                persistentListOf(
+                    WGS84Point(
+                        41.285765, 69.234083,
+                        z = 17.0,
+                        name = "Music Store, магазин музыкальных инструментов",
+                    ),
+                )
+            ),
             parseHtml(
                 """<html>
 <head>

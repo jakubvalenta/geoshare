@@ -1446,6 +1446,7 @@ class ConversionStateTest {
                 htmlUrlString: String,
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
+                uriQuote: UriQuote,
                 log: ILog,
             ) = ParseHtmlResult.Failed()
         }
@@ -1703,6 +1704,7 @@ class ConversionStateTest {
                 htmlUrlString: String,
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
+                uriQuote: UriQuote,
                 log: ILog,
             ) = ParseHtmlResult.Succeeded(pointsFromHtml)
         }
@@ -1752,6 +1754,7 @@ class ConversionStateTest {
                 htmlUrlString: String,
                 channel: ByteReadChannel,
                 pointsFromUri: ImmutableList<Point>,
+                uriQuote: UriQuote,
                 log: ILog,
             ) = ParseHtmlResult.Succeeded(pointsFromHtml)
         }
@@ -1802,6 +1805,7 @@ class ConversionStateTest {
                     htmlUrlString: String,
                     channel: ByteReadChannel,
                     pointsFromUri: ImmutableList<Point>,
+                    uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult.RequiresRedirect(redirectUriString)
             }
@@ -1859,6 +1863,7 @@ class ConversionStateTest {
                     htmlUrlString: String,
                     channel: ByteReadChannel,
                     pointsFromUri: ImmutableList<Point>,
+                    uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult.RequiresRedirect(redirectUriString)
             }
@@ -1909,6 +1914,7 @@ class ConversionStateTest {
                     htmlUrlString: String,
                     channel: ByteReadChannel,
                     pointsFromUri: ImmutableList<Point>,
+                    uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult.RequiresWebParsing(webUriString)
             }
@@ -1954,6 +1960,7 @@ class ConversionStateTest {
                     htmlUrlString: String,
                     channel: ByteReadChannel,
                     pointsFromUri: ImmutableList<Point>,
+                    uriQuote: UriQuote,
                     log: ILog,
                 ) = ParseHtmlResult.RequiresWebParsing(webUriString)
             }

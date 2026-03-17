@@ -327,7 +327,13 @@ data class GrantedParseHtmlPermission(
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
             val res = stateContext.networkTools.getSource(htmlUrl, retry, dispatcher = Dispatchers.Default) { channel ->
-                input.parseHtml(htmlUrl.toString(), channel, pointsFromUri, stateContext.log)
+                input.parseHtml(
+                    htmlUrl.toString(),
+                    channel,
+                    pointsFromUri,
+                    uriQuote = stateContext.uriQuote,
+                    log = stateContext.log,
+                )
             }
             when (res) {
                 is ParseHtmlResult.Succeeded -> {
