@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.ILog
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
@@ -71,9 +72,13 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
             // API
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
-            // TODO Extract name
             LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint()?.let {
-                points = persistentListOf(it.asWGS84().copy(z = z))
+                points = persistentListOf(
+                    it.asWGS84().copy(
+                        z = z,
+                        name = Q_PARAM_PATTERN.matchEntire(queryParams["title"])?.groupOrNull(),
+                    )
+                )
                 return@run
             }
         }
