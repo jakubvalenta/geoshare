@@ -351,15 +351,14 @@ private fun UserPreferencesListPane(
                             @Composable {
                                 val options = HiddenAppsPreference.getOptions(apps)
                                 Text(
-                                    (options - value).size.takeIf { it > 0 && it != options.size }
-                                        ?.let { visibleCount ->
-                                            pluralStringResource(
-                                                R.plurals.user_preferences_apps_visible_count,
-                                                visibleCount,
-                                                visibleCount,
-                                                options.size,
-                                            )
-                                        } ?: stringResource(R.string.user_preferences_apps_visible_all)
+                                    (options - value).size.takeIf { it != options.size }?.let { visibleCount ->
+                                        pluralStringResource(
+                                            R.plurals.user_preferences_apps_visible_count,
+                                            visibleCount,
+                                            visibleCount,
+                                            options.size,
+                                        )
+                                    } ?: stringResource(R.string.user_preferences_apps_visible_all)
                                 )
                             }
                         },
@@ -1197,6 +1196,7 @@ private fun AutomationPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1232,6 +1232,7 @@ private fun DarkAutomationPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1267,6 +1268,7 @@ private fun TabletAutomationPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1302,6 +1304,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1337,6 +1340,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1372,6 +1376,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1398,6 +1403,7 @@ private fun AutomationDelayPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1424,6 +1430,7 @@ private fun DarkAutomationDelayPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1450,6 +1457,7 @@ private fun TableAutomationDelayPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1740,6 +1748,7 @@ private fun DeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1766,6 +1775,7 @@ private fun DarkDeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1792,6 +1802,7 @@ private fun TableDeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
