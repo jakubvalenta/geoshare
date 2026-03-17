@@ -29,6 +29,7 @@
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
     <string name="conversion_succeeded_description_q_only">The original link doesn’t contain coordinates, only a place name. When you open this location in another app, it might find a different place than the original link.</string>
+    <string name="conversion_succeeded_hide">Hide</string>
     <string name="conversion_succeeded_location_failed">Failed to find location</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Finding your location…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">Allow location access?</string>
@@ -260,6 +261,7 @@
     <string name="links_form_uri_template_name">URL template when only a search term is available</string>
     <string name="links_insert">Add web map</string>
     <string name="links_message_deleted">Web map deleted</string>
+    <string name="links_message_disabled_group">The web map has been hidden. You can show it again in preferences.</string>
     <string name="links_message_factory_reset">Web maps have been reset to factory defaults</string>
     <string name="links_message_inserted">Web map added</string>
     <string name="links_message_updated">Web map updated</string>
@@ -293,6 +295,6 @@
         <item quantity="other">%1$d apps out of %2$d</item>
     </plurals>
     <string name="user_preferences_visible_apps_description">Choose which of your installed map apps should be displayed after converting a map link to coordinates.</string>
+    <string name="user_preferences_visible_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
     <string name="user_preferences_visible_apps_title">Visible apps</string>
-    <string name="conversion_succeeded_hide_app">Hide</string>
 </resources>

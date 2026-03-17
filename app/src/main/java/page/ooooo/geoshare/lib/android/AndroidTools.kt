@@ -382,11 +382,7 @@ object AndroidTools {
             val intent = Intent(action, "package:$packageName".toUri())
             launcher.launch(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(
-                context,
-                R.string.intro_settings_activity_not_found,
-                Toast.LENGTH_LONG,
-            ).show()
+            Toast.makeText(context, R.string.intro_settings_activity_not_found, Toast.LENGTH_LONG).show()
         }
     }
 

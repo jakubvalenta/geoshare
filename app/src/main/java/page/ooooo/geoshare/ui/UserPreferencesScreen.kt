@@ -2,7 +2,6 @@ package page.ooooo.geoshare.ui
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.annotation.Keep
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -103,7 +102,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-@Keep
 enum class UserPreferencesGroupId {
     AUTOMATION,
     AUTOMATION_DELAY,
@@ -267,7 +265,9 @@ private fun UserPreferencesListPane(
             Text(stringResource(R.string.user_preferences_title))
         },
         onBack = onBack,
-        modifier = Modifier.padding(horizontal = spacing.windowPadding),
+        modifier = Modifier
+            .padding(horizontal = spacing.windowPadding)
+            .testTag("geoShareUserPreferencesListPane"),
     ) {
         item {
             SegmentedListLabel(stringResource(R.string.user_preferences_section_inputs))
@@ -508,70 +508,6 @@ private fun UserPreferencesDetailPane(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     when (currentGroupId) {
-        UserPreferencesGroupId.CONNECTION_PERMISSION ->
-            UserPreferencesControls(
-                titleResId = R.string.user_preferences_connection_title,
-                description = {
-                    stringResource(
-                        R.string.user_preferences_connection_description,
-                        stringResource(R.string.app_name),
-                    )
-                },
-                billingAppNameResId = billingAppNameResId,
-                wide = wide,
-                onBack = onBack,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-            ) { maxWidth ->
-                userPreferencesOptionsControl(
-                    userPreference = ConnectionPermissionPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                    optionGroups = ConnectionPermissionPreference.getOptionGroups(),
-                    modifier = Modifier.widthIn(max = maxWidth),
-                    getItemTestTag = { option ->
-                        "geoShareUserPreferenceConnectionPermission_${option}"
-                    },
-                ) { option ->
-                    ConnectionPermissionPreferenceValue(option)
-                }
-            }
-
-        UserPreferencesGroupId.COORDINATE_FORMAT ->
-            UserPreferencesControls(
-                titleResId = R.string.user_preferences_coordinate_format_title,
-                description = {
-                    stringResource(R.string.user_preferences_coordinate_format_description)
-                },
-                billingAppNameResId = billingAppNameResId,
-                wide = wide,
-                onBack = onBack,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-            ) { maxWidth ->
-                userPreferencesOptionsControl(
-                    userPreference = CoordinateFormatPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                    optionGroups = CoordinateFormatPreference.getOptionGroups(),
-                    modifier = Modifier.widthIn(max = maxWidth),
-                    getItemTestTag = { option ->
-                        "geoShareUserPreferenceCoordinateFormat_${option}"
-                    },
-                ) { option ->
-                    Column {
-                        CoordinateFormatPreferenceValue(option)
-                        Text(
-                            Point.example.let { examplePoint ->
-                                when (option) {
-                                    CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(examplePoint)
-                                    CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(examplePoint)
-                                }
-                            },
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-
         UserPreferencesGroupId.AUTOMATION ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_automation_title,
@@ -639,6 +575,70 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
+        UserPreferencesGroupId.CONNECTION_PERMISSION ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_connection_title,
+                description = {
+                    stringResource(
+                        R.string.user_preferences_connection_description,
+                        stringResource(R.string.app_name),
+                    )
+                },
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) { maxWidth ->
+                userPreferencesOptionsControl(
+                    userPreference = ConnectionPermissionPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    optionGroups = ConnectionPermissionPreference.getOptionGroups(),
+                    modifier = Modifier.widthIn(max = maxWidth),
+                    getItemTestTag = { option ->
+                        "geoShareUserPreferenceConnectionPermission_${option}"
+                    },
+                ) { option ->
+                    ConnectionPermissionPreferenceValue(option)
+                }
+            }
+
+        UserPreferencesGroupId.COORDINATE_FORMAT ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_coordinate_format_title,
+                description = {
+                    stringResource(R.string.user_preferences_coordinate_format_description)
+                },
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) { maxWidth ->
+                userPreferencesOptionsControl(
+                    userPreference = CoordinateFormatPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    optionGroups = CoordinateFormatPreference.getOptionGroups(),
+                    modifier = Modifier.widthIn(max = maxWidth),
+                    getItemTestTag = { option ->
+                        "geoShareUserPreferenceCoordinateFormat_${option}"
+                    },
+                ) { option ->
+                    Column {
+                        CoordinateFormatPreferenceValue(option)
+                        Text(
+                            Point.example.let { examplePoint ->
+                                when (option) {
+                                    CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(examplePoint)
+                                    CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(examplePoint)
+                                }
+                            },
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
         UserPreferencesGroupId.DEVELOPER_OPTIONS ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_developer_title,
@@ -699,6 +699,8 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
+        UserPreferencesGroupId.LINKS -> {}
+
         UserPreferencesGroupId.VISIBLE_APPS ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_visible_apps_title,
@@ -717,9 +719,7 @@ private fun UserPreferencesDetailPane(
                     options = HiddenAppsPreference.getOptions(apps),
                     modifier = Modifier.widthIn(max = maxWidth),
                     inverted = true,
-                    getSwitchTestTag = { option ->
-                        "geoShareUserPreferenceVisibleAppToggle_${option}"
-                    },
+                    getSwitchTestTag = { option -> "geoShareVisibleAppToggle_${option}" },
                     leadingContent = { option ->
                         appDetails[option]?.icon?.let { drawable ->
                             {
@@ -735,13 +735,11 @@ private fun UserPreferencesDetailPane(
                     appDetails[option]?.label ?: option
                 }
             }
-
-        UserPreferencesGroupId.LINKS -> {}
     }
 }
 
 @Composable
-fun UserPreferencesControls(
+private fun UserPreferencesControls(
     titleResId: Int,
     billingAppNameResId: Int,
     wide: Boolean,
@@ -797,7 +795,7 @@ fun UserPreferencesControls(
     }
 }
 
-fun <T> LazyListScope.userPreferencesOptionsControl(
+private fun <T> LazyListScope.userPreferencesOptionsControl(
     userPreference: OptionsPreference<T>,
     values: UserPreferencesValues,
     optionGroups: List<List<T>>,
@@ -845,7 +843,7 @@ fun <T> LazyListScope.userPreferencesOptionsControl(
     }
 }
 
-fun LazyListScope.userPreferencesSwitchesControl(
+private fun LazyListScope.userPreferencesSwitchesControl(
     userPreference: SetPreference,
     values: UserPreferencesValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
@@ -904,7 +902,7 @@ fun LazyListScope.userPreferencesSwitchesControl(
     }
 }
 
-fun <T> LazyListScope.userPreferencesTextControl(
+private fun <T> LazyListScope.userPreferencesTextControl(
     userPreference: TextPreference<T>,
     values: UserPreferencesValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,

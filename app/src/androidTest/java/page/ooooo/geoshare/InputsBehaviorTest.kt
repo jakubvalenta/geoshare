@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
+import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class InputsBehaviorTest : BehaviorTest {
@@ -51,7 +52,7 @@ class InputsBehaviorTest : BehaviorTest {
         Assert.assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainMenuBadge" })
 
         // Go to the inputs screen
-        goToInputsScreen()
+        goToInputsList()
 
         // Does not show recently added documentations
         Assert.assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.MAPY_COM}" })
@@ -64,7 +65,8 @@ class InputsBehaviorTest : BehaviorTest {
         pressBack()
 
         // Set user preference changelogShowForVersionCode to version 19
-        goToUserPreferencesDetailDeveloperScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.DEVELOPER_OPTIONS)
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }
             .setText("19")
         goToMainScreenFromUserPreferencesDetail()
@@ -73,7 +75,7 @@ class InputsBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareMainMenuBadge" }
 
         // Go to the inputs screen
-        goToInputsScreen()
+        goToInputsList()
 
         // Shows documentations added since version 19
         onElement { viewIdResourceName == "geoShareInputsDocumentationRecent_${InputDocumentationId.HERE_WEGO}" }

@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -32,6 +33,8 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -74,6 +77,7 @@ import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
+import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
@@ -130,6 +134,8 @@ import page.ooooo.geoshare.ui.components.Headline
 import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainFormLinks
 import page.ooooo.geoshare.ui.components.MainMenu
+import page.ooooo.geoshare.ui.components.MessageSnackbarHost
+import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSuccessApps
@@ -169,6 +175,7 @@ fun MainScreen(
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val changelogShown by inputsViewModel.changelogShown.collectAsStateWithLifecycle()
     val largeLoadingIndicatorVisible by conversionViewModel.largeLoadingIndicatorVisible.collectAsStateWithLifecycle()
+    val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
     val outputsForApps by conversionViewModel.outputsForApps.collectAsStateWithLifecycle()
     val outputsForLinks by conversionViewModel.outputsForLinks.collectAsStateWithLifecycle()
     val outputsForPoint by conversionViewModel.outputsForPoint.collectAsStateWithLifecycle()
@@ -176,7 +183,10 @@ fun MainScreen(
     val outputsForPoints by conversionViewModel.outputsForPoints.collectAsStateWithLifecycle()
     val outputsForPointsChips by conversionViewModel.outputsForPointsChips.collectAsStateWithLifecycle()
     val outputsForSharing by conversionViewModel.outputsForSharing.collectAsStateWithLifecycle()
+    val userPreferencesMessage by userPreferencesViewModel.message.collectAsStateWithLifecycle()
     val userPreferencesValues by userPreferencesViewModel.values.collectAsStateWithLifecycle()
+
+    // Action
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
@@ -283,6 +293,7 @@ fun MainScreen(
         coordinateFormat = userPreferencesValues.coordinateFormat,
         inputUriString = conversionViewModel.inputUriString,
         largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+        linkMessage = linkMessage,
         outputsForApps = outputsForApps,
         outputsForLinks = outputsForLinks,
         outputsForPoint = outputsForPoint,
@@ -290,14 +301,17 @@ fun MainScreen(
         outputsForPoints = outputsForPoints,
         outputsForPointsChips = outputsForPointsChips,
         outputsForSharing = outputsForSharing,
+        userPreferenceMessage = userPreferencesMessage,
         onCancel = {
             locationJob?.cancel()
             conversionViewModel.cancel()
         },
         onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
-        onDisableLinkGroup = { group -> linkViewModel.disableGroup(group) },
+        onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
+        onDismissLinkMessage = { linkViewModel.dismissMessage() },
+        onDismissUserPreferenceMessage = { userPreferencesViewModel.dismissMessage() },
         onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
-        onHideApp = { packageName -> userPreferencesViewModel.hideApp(packageName) },
+        onHideApp = { packageName -> userPreferencesViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
             conversionViewModel.cancel()
             onNavigateToAboutScreen()
@@ -342,6 +356,7 @@ fun MainScreen(
     ) { conversionViewModel.inputUriString = it }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(
@@ -354,6 +369,7 @@ private fun MainScreen(
     coordinateFormat: CoordinateFormat,
     inputUriString: String,
     largeLoadingIndicatorVisible: Boolean,
+    linkMessage: Message?,
     outputsForApps: Map<String, List<Output>>,
     outputsForLinks: Map<String?, List<Output>>,
     outputsForPoint: List<PointOutput>,
@@ -361,9 +377,12 @@ private fun MainScreen(
     outputsForPoints: List<PointsOutput>,
     outputsForPointsChips: List<PointsOutput>,
     outputsForSharing: List<Output>,
+    userPreferenceMessage: Message?,
     onCancel: () -> Unit,
     onDeny: (doNotAsk: Boolean) -> Unit,
     onDisableLinkGroup: (group: String?) -> Unit,
+    onDismissLinkMessage: () -> Unit,
+    onDismissUserPreferenceMessage: () -> Unit,
     onGrant: (doNotAsk: Boolean) -> Unit,
     onHideApp: (packageName: String) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
@@ -388,157 +407,181 @@ private fun MainScreen(
     val (errorMessageResId, setErrorMessageResId) = retain { mutableStateOf<Int?>(null) }
     val (selectedPointIndex, setSelectedPointIndex) = retain { mutableStateOf<Int?>(null) }
     val sheetState = rememberModalBottomSheetState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(currentState !is Initial) {
         onReset()
     }
 
-    BasicSupportingPaneScaffold(
-        navigationIcon = {
-            if (currentState !is Initial) {
-                IconButton(
-                    onReset,
-                    Modifier.testTag("geoShareMainBackButton"),
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Default.ArrowBack,
-                        stringResource(R.string.nav_back_content_description)
-                    )
-                }
-            }
+    // Message
+
+    LaunchedEffect(linkMessage) {
+        if (linkMessage != null) {
+            snackbarHostState.showSnackbar(MessageSnackbarVisuals(linkMessage))
+            onDismissLinkMessage()
+        }
+    }
+
+    LaunchedEffect(userPreferenceMessage) {
+        if (userPreferenceMessage != null) {
+            snackbarHostState.showSnackbar(MessageSnackbarVisuals(userPreferenceMessage))
+            onDismissUserPreferenceMessage()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            MessageSnackbarHost(snackbarHostState)
         },
-        actions = {
-            MainMenu(
-                currentState = currentState,
-                billingAppNameResId = billingAppNameResId,
-                billingStatus = billingStatus,
-                changelogShown = changelogShown,
-                onNavigateToAboutScreen = onNavigateToAboutScreen,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-                onNavigateToFaqScreen = onNavigateToFaqScreen,
-                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
-            )
-        },
-        mainPane = { innerPadding, wide ->
-            Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .testTag("geoShareMainPane"),
-            ) {
-                MainMainPane(
-                    currentState = currentState,
-                    appDetails = appDetails,
-                    outputsForPointChips = outputsForPointChips,
-                    outputsForPointsChips = outputsForPointsChips,
-                    billingAppNameResId = billingAppNameResId,
-                    billingStatus = billingStatus,
-                    coordinateFormat = coordinateFormat,
-                    errorMessageResId = errorMessageResId,
-                    inputUriString = inputUriString,
-                    largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
-                    onCancel = onCancel,
-                    onNavigateToInputsScreen = onNavigateToInputsScreen,
-                    onExecute = onExecute,
-                    onSelect = { index ->
-                        onCancel()
-                        setSelectedPointIndex(index)
-                    },
-                    onSetErrorMessageResId = setErrorMessageResId,
-                    onStart = onStart,
-                    onUpdateInput = onUpdateInput,
-                )
-                if (!wide) {
-                    Column(
-                        Modifier
-                            .background(containerColor)
-                            .fillMaxWidth()
-                            .padding(top = spacing.largeAdaptive)
+    ) {
+        BasicSupportingPaneScaffold(
+            navigationIcon = {
+                if (currentState !is Initial) {
+                    IconButton(
+                        onReset,
+                        Modifier.testTag("geoShareMainBackButton"),
                     ) {
-                        CompositionLocalProvider(LocalContentColor provides contentColor) {
-                            MainSupportingPane(
-                                appDetails = appDetails,
-                                automationFeatureStatus = automationFeatureStatus,
-                                currentState = currentState,
-                                largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
-                                outputsForApps = outputsForApps,
-                                outputsForLinks = outputsForLinks,
-                                outputsForSharing = outputsForSharing,
-                                onCancel = onCancel,
-                                onDisableLinkGroup = onDisableLinkGroup,
-                                onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onNavigateToIntroScreen = onNavigateToIntroScreen,
-                                onNavigateToLinksScreen = onNavigateToLinksScreen,
-                                onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                                onExecute = onExecute,
-                                onHideApp = onHideApp,
-                                onSetErrorMessageResId = setErrorMessageResId,
-                                onUpdateInput = onUpdateInput,
-                            )
-                        }
+                        Icon(
+                            Icons.AutoMirrored.Default.ArrowBack,
+                            stringResource(R.string.nav_back_content_description)
+                        )
                     }
                 }
-                Spacer(
-                    Modifier
-                        .background(if (wide) containerColor else containerColor)
-                        .weight(1f)
-                        .fillMaxWidth()
-                )
-            }
-            MainBottomBar(
-                currentState,
-                largeLoadingIndicatorVisible,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
-                containerColor = containerColor,
-                contentColor = contentColor,
-            )
-        },
-        supportingPane = {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .padding(top = spacing.headlineTopAdaptive)
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                MainSupportingPane(
-                    appDetails = appDetails,
-                    automationFeatureStatus = automationFeatureStatus,
+            },
+            actions = {
+                MainMenu(
                     currentState = currentState,
-                    largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
-                    outputsForApps = outputsForApps,
-                    outputsForLinks = outputsForLinks,
-                    outputsForSharing = outputsForSharing,
-                    onCancel = onCancel,
-                    onDisableLinkGroup = onDisableLinkGroup,
+                    billingAppNameResId = billingAppNameResId,
+                    billingStatus = billingStatus,
+                    changelogShown = changelogShown,
+                    onNavigateToAboutScreen = onNavigateToAboutScreen,
+                    onNavigateToBillingScreen = onNavigateToBillingScreen,
+                    onNavigateToFaqScreen = onNavigateToFaqScreen,
                     onNavigateToInputsScreen = onNavigateToInputsScreen,
                     onNavigateToIntroScreen = onNavigateToIntroScreen,
-                    onNavigateToLinksScreen = onNavigateToLinksScreen,
-                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
-                    onExecute = onExecute,
-                    onHideApp = onHideApp,
-                    onSetErrorMessageResId = setErrorMessageResId,
-                    onUpdateInput = onUpdateInput,
+                    onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                 )
-            }
-        },
-        mainContainerColor = when (currentState) {
-            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> MaterialTheme.colorScheme.surfaceContainer
-            is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
-            is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
-            else -> containerColor
-        },
-        mainContentColor = when (currentState) {
-            is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> contentColor
-            is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
-            is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
-            else -> contentColor
-        },
-        shouldAutoFocusCurrentDestination = false,
-    )
+            },
+            mainPane = { innerPadding, wide ->
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .testTag("geoShareMainPane"),
+                ) {
+                    MainMainPane(
+                        currentState = currentState,
+                        appDetails = appDetails,
+                        outputsForPointChips = outputsForPointChips,
+                        outputsForPointsChips = outputsForPointsChips,
+                        billingAppNameResId = billingAppNameResId,
+                        billingStatus = billingStatus,
+                        coordinateFormat = coordinateFormat,
+                        errorMessageResId = errorMessageResId,
+                        inputUriString = inputUriString,
+                        largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+                        onCancel = onCancel,
+                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                        onExecute = onExecute,
+                        onSelect = { index ->
+                            onCancel()
+                            setSelectedPointIndex(index)
+                        },
+                        onSetErrorMessageResId = setErrorMessageResId,
+                        onStart = onStart,
+                        onUpdateInput = onUpdateInput,
+                    )
+                    if (!wide) {
+                        Column(
+                            Modifier
+                                .background(containerColor)
+                                .fillMaxWidth()
+                                .padding(top = spacing.largeAdaptive)
+                        ) {
+                            CompositionLocalProvider(LocalContentColor provides contentColor) {
+                                MainSupportingPane(
+                                    appDetails = appDetails,
+                                    automationFeatureStatus = automationFeatureStatus,
+                                    currentState = currentState,
+                                    largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+                                    outputsForApps = outputsForApps,
+                                    outputsForLinks = outputsForLinks,
+                                    outputsForSharing = outputsForSharing,
+                                    onCancel = onCancel,
+                                    onDisableLinkGroup = onDisableLinkGroup,
+                                    onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                    onNavigateToIntroScreen = onNavigateToIntroScreen,
+                                    onNavigateToLinksScreen = onNavigateToLinksScreen,
+                                    onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                                    onExecute = onExecute,
+                                    onHideApp = onHideApp,
+                                    onSetErrorMessageResId = setErrorMessageResId,
+                                    onUpdateInput = onUpdateInput,
+                                )
+                            }
+                        }
+                    }
+                    Spacer(
+                        Modifier
+                            .background(if (wide) containerColor else containerColor)
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
+                MainBottomBar(
+                    currentState,
+                    largeLoadingIndicatorVisible,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .consumeWindowInsets(innerPadding),
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                )
+            },
+            supportingPane = {
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .padding(top = spacing.headlineTopAdaptive)
+                        .verticalScroll(rememberScrollState())
+                        .testTag("geoShareMainSupportingPane"),
+                ) {
+                    MainSupportingPane(
+                        appDetails = appDetails,
+                        automationFeatureStatus = automationFeatureStatus,
+                        currentState = currentState,
+                        largeLoadingIndicatorVisible = largeLoadingIndicatorVisible,
+                        outputsForApps = outputsForApps,
+                        outputsForLinks = outputsForLinks,
+                        outputsForSharing = outputsForSharing,
+                        onCancel = onCancel,
+                        onDisableLinkGroup = onDisableLinkGroup,
+                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                        onNavigateToIntroScreen = onNavigateToIntroScreen,
+                        onNavigateToLinksScreen = onNavigateToLinksScreen,
+                        onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
+                        onExecute = onExecute,
+                        onHideApp = onHideApp,
+                        onSetErrorMessageResId = setErrorMessageResId,
+                        onUpdateInput = onUpdateInput,
+                    )
+                }
+            },
+            mainContainerColor = when (currentState) {
+                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> MaterialTheme.colorScheme.surfaceContainer
+                is ConversionState.HasError -> MaterialTheme.colorScheme.errorContainer
+                is ConversionState.HasResult -> MaterialTheme.colorScheme.secondaryContainer
+                else -> containerColor
+            },
+            mainContentColor = when (currentState) {
+                is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> contentColor
+                is ConversionState.HasError -> MaterialTheme.colorScheme.onErrorContainer
+                is ConversionState.HasResult -> MaterialTheme.colorScheme.onSecondaryContainer
+                else -> contentColor
+            },
+            shouldAutoFocusCurrentDestination = false,
+        )
+    }
 
     if (currentState is ConversionState.HasResult && selectedPointIndex != null) {
         ModalBottomSheet(
@@ -916,6 +959,7 @@ private fun DefaultPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -923,8 +967,11 @@ private fun DefaultPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -957,6 +1004,7 @@ private fun DarkPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -964,8 +1012,11 @@ private fun DarkPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -998,6 +1049,7 @@ private fun TabletPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1005,8 +1057,11 @@ private fun TabletPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1050,6 +1105,7 @@ private fun SucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1062,8 +1118,11 @@ private fun SucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1107,6 +1166,7 @@ private fun DarkSucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1119,8 +1179,11 @@ private fun DarkSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1164,6 +1227,7 @@ private fun TabletSucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1176,8 +1240,11 @@ private fun TabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1221,6 +1288,7 @@ private fun DarkTabletSucceededPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1233,8 +1301,11 @@ private fun DarkTabletSucceededPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1281,6 +1352,7 @@ private fun AutomationPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1293,8 +1365,11 @@ private fun AutomationPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1341,6 +1416,7 @@ private fun DarkAutomationPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1353,8 +1429,11 @@ private fun DarkAutomationPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1401,6 +1480,7 @@ private fun TabletAutomationPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
                     OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
@@ -1413,8 +1493,11 @@ private fun TabletAutomationPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = getOutputsForPointsChips(),
             outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1461,6 +1544,7 @@ private fun WebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1468,8 +1552,11 @@ private fun WebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1516,6 +1603,7 @@ private fun DarkWebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1523,8 +1611,11 @@ private fun DarkWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1571,6 +1662,7 @@ private fun TabletWebViewPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1578,8 +1670,11 @@ private fun TabletWebViewPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1618,6 +1713,7 @@ private fun ErrorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1625,8 +1721,11 @@ private fun ErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1665,6 +1764,7 @@ private fun DarkErrorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1672,8 +1772,11 @@ private fun DarkErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1712,6 +1815,7 @@ private fun TabletErrorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = false,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1719,8 +1823,11 @@ private fun TabletErrorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1769,6 +1876,7 @@ private fun LoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1776,8 +1884,11 @@ private fun LoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1826,6 +1937,7 @@ private fun DarkLoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1833,8 +1945,11 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},
@@ -1883,6 +1998,7 @@ private fun TabletLoadingIndicatorPreview() {
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
             largeLoadingIndicatorVisible = true,
+            linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
             outputsForPoint = emptyList(),
@@ -1890,8 +2006,11 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForPoints = emptyList(),
             outputsForPointsChips = emptyList(),
             outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
             onCancel = {},
             onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
             onDeny = {},
             onGrant = {},
             onHideApp = {},

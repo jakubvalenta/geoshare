@@ -110,7 +110,13 @@ fun ResultSuccessApps(
             }
         // Share item
         item {
-            AppIcon(Modifier.weight(1f), null, appDetails, outputsForSharing, onClick) {
+            AppIcon(
+                modifier = Modifier.weight(1f),
+                label = null,
+                appDetails = appDetails,
+                outputs = outputsForSharing,
+                onClick = onClick,
+            ) {
                 Surface(
                     Modifier.requiredSize(iconSize),
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,

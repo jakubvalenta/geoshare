@@ -168,21 +168,22 @@ class LinkViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Enable [link] if [enabled] is true, or disable the [link] if [enabled] is false.
-     *
-     * Notice that unlike in [saveForm] or [delete], we don't set [message] here, because the user already gets feedback,
-     * since there is a switch in the UI that immediately gets toggled.
-     */
-    fun toggle(link: Link, enabled: Boolean) {
+    fun enable(uid: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            linkRepository.update(if (enabled) link.enable() else link.disable())
+            linkRepository.enable(uid)
         }
     }
 
-    fun disableGroup(group: String?) {
+    fun disable(uid: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            TODO()
+            linkRepository.disable(uid)
+        }
+    }
+
+    fun disableGroup(resources: Resources, group: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            linkRepository.disableGroup(group)
+            _message.value = Message(resources.getString(R.string.links_message_disabled_group))
         }
     }
 

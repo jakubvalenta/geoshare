@@ -22,7 +22,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
 
         // Go to automation preferences
-        goToUserPreferencesDetailAutomationScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Shows automation paywall
         onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
@@ -44,7 +45,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
 
         // Go to automation preferences
         pressBack()
-        goToUserPreferencesDetailAutomationScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Does not show automation paywall
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareFeatureBadgeLarge" })
@@ -73,7 +75,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
 
         // Go to automation preferences
-        goToUserPreferencesDetailAutomationScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
         // Shows automation paywall
         onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
@@ -142,10 +145,5 @@ class DemoBillingBehaviorTest : BehaviorTest {
 
     private fun goToBillingScreen() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
-    }
-
-    private fun goToUserPreferencesDetailAutomationScreen() = uiAutomator {
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.AUTOMATION}" }.click()
     }
 }

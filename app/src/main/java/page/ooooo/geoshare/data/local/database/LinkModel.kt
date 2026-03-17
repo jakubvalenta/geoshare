@@ -48,10 +48,6 @@ data class Link(
     val enabled: Boolean
         get() = appEnabled || sheetEnabled || chipEnabled
 
-    fun enable(): Link = copy(appEnabled = true)
-
-    fun disable(): Link = copy(appEnabled = false, chipEnabled = false, sheetEnabled = false)
-
     fun formatUriString(point: Point, uriQuote: UriQuote = DefaultUriQuote): String? =
         point.formatUriString(coordsUriTemplate, nameUriTemplate, srs, uriQuote = uriQuote)
 
@@ -88,4 +84,13 @@ interface LinkDao {
 
     @Delete
     suspend fun delete(link: Link)
+
+    @Query("UPDATE link SET appEnabled = 1 WHERE uid = :uid")
+    suspend fun enable(uid: Int)
+
+    @Query("UPDATE link SET appEnabled = 0, chipEnabled = 0, sheetEnabled = 0 WHERE uid = :uid")
+    suspend fun disable(uid: Int)
+
+    @Query("UPDATE link SET appEnabled = 0, chipEnabled = 0, sheetEnabled = 0 WHERE `group` = :group")
+    suspend fun disableGroup(group: String?)
 }

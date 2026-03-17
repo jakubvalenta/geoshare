@@ -35,7 +35,8 @@ class FreeConversionBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetailAutomationScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = CopyCoordsDecAutomation
         onElement { viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}" }.click()
 
@@ -58,7 +59,8 @@ class FreeConversionBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetailAutomationScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = OpenDisplayGeoUriAutomation(GOOGLE_MAPS_PACKAGE_NAME)
         val serializedString = Json.encodeToString<Automation>(automation)
         onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
@@ -95,7 +97,8 @@ class FreeConversionBehaviorTest : BehaviorTest {
             closeIntro()
 
             // Configure automation
-            goToUserPreferencesDetailAutomationScreen()
+            goToUserPreferencesList()
+            goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
             val automation = OpenRouteOnePointGpxAutomation(TOMTOM_PACKAGE_NAME)
             val serializedString = Json.encodeToString<Automation>(automation)
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
@@ -137,7 +140,8 @@ class FreeConversionBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Configure automation
-        goToUserPreferencesDetailAutomationScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
         val automation = SavePointsGpxAutomation
         onElement { viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}" }.click()
 
@@ -160,10 +164,5 @@ class FreeConversionBehaviorTest : BehaviorTest {
                 @Suppress("SpellCheckingInspection") "GPX enregistré automatiquement",
             )
         }
-    }
-
-    private fun goToUserPreferencesDetailAutomationScreen() = uiAutomator {
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.AUTOMATION}" }.click()
     }
 }

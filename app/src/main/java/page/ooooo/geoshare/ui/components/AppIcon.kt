@@ -19,6 +19,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
@@ -48,8 +49,10 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.OpenPointOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -80,6 +83,14 @@ fun AppIcon(
                 } else {
                     this
                 }
+            }
+            .run {
+                outputs.firstOrNull()?.let { firstOutput ->
+                    ((firstOutput as? OpenPointOutput)?.packageName
+                        ?: (firstOutput as? ShareLinkUriOutput)?.link?.uuid)?.let { id ->
+                        testTag("geoShareApp_$id")
+                    }
+                } ?: this
             },
         contentAlignment = Alignment.TopEnd,
     ) {
@@ -96,7 +107,7 @@ fun AppIcon(
                     label,
                     Modifier
                         .fillMaxWidth()
-                        .testTag("geoShareResultSuccessAppLabel"),
+                        .testTag("geoShareAppLabel"),
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
@@ -129,7 +140,12 @@ fun AppIcon(
             var prevIconDescriptor: IconDescriptor? = null
             outputs.forEach { output ->
                 DropdownMenuItem(
-                    text = { Text(output.label(appDetails), Modifier.testTag("geoShareAppContextMenuItem")) },
+                    text = {
+                        Text(
+                            output.label(appDetails),
+                            Modifier.testTag("geoShareAppOutput"),
+                        )
+                    },
                     onClick = {
                         setExpanded(false)
                         onClick(output)
@@ -142,8 +158,14 @@ fun AppIcon(
                 )
             }
             if (onHide != null) {
+                HorizontalDivider()
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.conversion_succeeded_hide_app)) },
+                    text = {
+                        Text(
+                            stringResource(R.string.conversion_succeeded_hide),
+                            Modifier.testTag("geoShareAppHide"),
+                        )
+                    },
                     onClick = {
                         setExpanded(false)
                         onHide()
