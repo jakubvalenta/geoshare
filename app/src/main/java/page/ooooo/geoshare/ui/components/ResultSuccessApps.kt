@@ -67,7 +67,9 @@ fun ResultSuccessApps(
     outputsForSharing: List<Output>,
     points: Points,
     iconSize: Dp = 46.dp,
+    onDisableLinkGroup: (group: String?) -> Unit,
     onExecute: (Action<*>) -> Unit,
+    onHideApp: (packageName: String) -> Unit,
     onNavigateToLinksScreen: () -> Unit,
 ) {
     val lastPoint = points.lastOrNull() ?: return
@@ -84,11 +86,18 @@ fun ResultSuccessApps(
     Grid(Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.smallAdaptive)) {
         // Apps
         outputsForApps
-            .map { (packageName, outputs) -> appDetails[packageName]?.label to outputs }
-            .sortedWith(compareBy(nullsLast()) { (label) -> label })
-            .forEach { (label, outputs) ->
+            .map { (packageName, outputs) -> Triple(packageName, appDetails[packageName]?.label, outputs) }
+            .sortedWith(compareBy(nullsLast()) { (_, label) -> label })
+            .forEach { (packageName, label, outputs) ->
                 item {
-                    AppIcon(Modifier.weight(1f), label, appDetails, outputs, onClick) {
+                    AppIcon(
+                        modifier = Modifier.weight(1f),
+                        label = label,
+                        appDetails = appDetails,
+                        outputs = outputs,
+                        onClick = onClick,
+                        onHide = { onHideApp(packageName) },
+                    ) {
                         outputs.firstOrNull()?.getIcon(appDetails)
                             ?.let { IconFromDescriptor(it, contentDescription = null, size = iconSize) }
                             ?: Box(
@@ -101,7 +110,13 @@ fun ResultSuccessApps(
             }
         // Share item
         item {
-            AppIcon(Modifier.weight(1f), null, appDetails, outputsForSharing, onClick) {
+            AppIcon(
+                modifier = Modifier.weight(1f),
+                label = null,
+                appDetails = appDetails,
+                outputs = outputsForSharing,
+                onClick = onClick,
+            ) {
                 Surface(
                     Modifier.requiredSize(iconSize),
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -157,7 +172,14 @@ fun ResultSuccessApps(
             outputsForLinks
                 .forEach { (group, outputs) ->
                     item {
-                        AppIcon(Modifier.weight(1f), group, appDetails, outputs, onClick) {
+                        AppIcon(
+                            modifier = Modifier.weight(1f),
+                            label = group,
+                            appDetails = appDetails,
+                            outputs = outputs,
+                            onClick = onClick,
+                            onHide = { onDisableLinkGroup(group) },
+                        ) {
                             outputs.firstOrNull()?.getIcon(appDetails)?.let {
                                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                                     IconFromDescriptor(
@@ -235,12 +257,15 @@ private fun DefaultPreview() {
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
                             TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -305,12 +330,15 @@ private fun DarkPreview() {
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
                             TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -330,12 +358,15 @@ private fun LoadingPreview() {
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -355,12 +386,15 @@ private fun DarkLoadingPreview() {
                         mapOf(
                             COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
                             ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
-                        )
+                        ),
+                        emptySet(),
                     ),
                     outputsForLinks = getOutputsForLinks(defaultFakeLinks),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -379,7 +413,9 @@ private fun EmptyPreview() {
                     outputsForLinks = emptyMap(),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }
@@ -394,11 +430,13 @@ private fun DarkEmptyPreview() {
             Column {
                 ResultSuccessApps(
                     appDetails = emptyMap(),
-                    outputsForApps = getOutputsForApps(emptyMap()),
+                    outputsForApps = getOutputsForApps(emptyMap(), emptySet()),
                     outputsForLinks = emptyMap(),
                     outputsForSharing = getOutputsForSharing(),
                     points = persistentListOf(Point.example),
+                    onDisableLinkGroup = {},
                     onExecute = {},
+                    onHideApp = {},
                 ) {}
             }
         }

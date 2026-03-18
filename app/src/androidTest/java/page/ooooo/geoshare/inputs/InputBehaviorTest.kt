@@ -1,51 +1,46 @@
 package page.ooooo.geoshare.inputs
 
 import androidx.test.uiautomator.UiAutomatorTestScope
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BehaviorTest
 import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.point.Point
+import page.ooooo.geoshare.lib.point.Points
+import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 interface InputBehaviorTest : BehaviorTest {
 
     fun UiAutomatorTestScope.setUserPreferenceConnectionPermissionToAlways() {
-        goToUserPreferencesDetailConnectionPermissionScreen()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.CONNECTION_PERMISSION)
         onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_${Permission.ALWAYS}" }.click()
     }
 
     fun UiAutomatorTestScope.confirmDialogIfVisible() {
-        onElementOrNull(3000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
+        onElementOrNull(3_000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
     }
 
-    fun UiAutomatorTestScope.goToMainForm() {
+    private fun UiAutomatorTestScope.goToMainForm() {
         // Make sure we leave the result screen, if we're there, so that we don't accidentally test the old result.
-        onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
+        onElementOrNull(1_000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    fun UiAutomatorTestScope.goToMainFormAndShareUriAndConfirmDialog(unsafeUriString: String) {
+    fun UiAutomatorTestScope.testUri(expectedPoints: Points, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) {
         // Go to main form
         goToMainForm()
 
         // Share URI and confirm permission dialog
         shareUri(unsafeUriString)
         confirmDialogIfVisible()
-    }
 
-    fun UiAutomatorTestScope.testUri(
-        expectedPoints: ImmutableList<Point>,
-        unsafeUriString: String,
-        timeoutMs: Long = NETWORK_TIMEOUT,
-    ) {
-        goToMainFormAndShareUriAndConfirmDialog(unsafeUriString)
         assertConversionSucceeded(expectedPoints, timeoutMs)
     }
 
     fun UiAutomatorTestScope.testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
         testUri(persistentListOf(expectedPoint), unsafeUriString, timeoutMs)
 
-    fun UiAutomatorTestScope.testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) {
+    fun UiAutomatorTestScope.testTextUri(expectedPoints: Points, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the texts, so we put the text in the main screen of the app instead.
         // device.executeShellCommand(

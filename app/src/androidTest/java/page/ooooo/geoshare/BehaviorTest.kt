@@ -100,13 +100,13 @@ interface BehaviorTest {
         activityManager.appTasks.forEach { it.finishAndRemoveTask() }
     }
 
-    fun closeIntro() = uiAutomator {
+    fun UiAutomatorTestScope.closeIntro() {
         quickWaitForStableInActiveWindow() // Wait for the intro to render, otherwise closing it can fail even with large timeout
         onElement { viewIdResourceName == "geoShareIntroScreenCloseButton" }.click()
     }
 
-    fun quickWaitForStableInActiveWindow() = uiAutomator {
-        waitForStableInActiveWindow(stableTimeoutMs = 1000L, stableIntervalMs = 100L, requireStableScreenshot = false)
+    fun UiAutomatorTestScope.quickWaitForStableInActiveWindow() {
+        waitForStableInActiveWindow(stableTimeoutMs = 1_000L, stableIntervalMs = 100L, requireStableScreenshot = false)
     }
 
     fun onDialog(
@@ -328,37 +328,42 @@ interface BehaviorTest {
         onElement(block = block).click()
     }
 
-    fun UiAutomatorTestScope.goToInputsScreen() {
+    fun UiAutomatorTestScope.goToInputsList() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuInputs" }
     }
 
-    fun UiAutomatorTestScope.goToUserPreferencesScreen() {
+    fun UiAutomatorTestScope.goToUserPreferencesList() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuUserPreferences" }
     }
 
-    fun UiAutomatorTestScope.goToUserPreferencesDetailConnectionPermissionScreen() {
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.CONNECTION_PERMISSION}" }.click()
-    }
-
-    fun UiAutomatorTestScope.goToUserPreferencesDetailCoordinateFormatScreen() {
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.COORDINATE_FORMAT}" }.click()
-    }
-
-    fun UiAutomatorTestScope.goToUserPreferencesDetailDeveloperScreen() {
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" }.click()
+    fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferencesGroupId) {
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }.click()
     }
 
     fun UiAutomatorTestScope.goToMainScreenFromUserPreferencesDetail() {
         onElement { viewIdResourceName == "geoShareBack" }.click()
-        if (onElementOrNull(1_000L) { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" } != null) {
+        if (
+            onElementOrNull(1_000L) {
+                viewIdResourceName == "geoShareLinksListPane" ||
+                    viewIdResourceName == "geoShareUserPreferencesListPane"
+            } != null
+        ) {
             // On a non-tablet screen, we need to tap the back button one more time to get from the user preferences
             // list screen to the main screen
             onElement { viewIdResourceName == "geoShareBack" }.click()
         }
     }
+
+    /**
+     * Return the main screen scrollable element that contains app icons. Works on phone as well as tablet.
+     */
+    fun UiAutomatorTestScope.onMainScrollablePane(): UiObject2 =
+        onElement {
+            // First try supporting pane, which is displayed only on wide screens
+            viewIdResourceName == "geoShareMainSupportingPane" ||
+                // Then try the main pane, which is displayed on all devices but doesn't contain apps on wide screens
+                viewIdResourceName == "geoShareMainPane"
+        }
 
     fun UiAutomatorTestScope.chooseFile() {
         if (onElementOrNull(3_000L) { textAsString() == "Recent" } != null) {

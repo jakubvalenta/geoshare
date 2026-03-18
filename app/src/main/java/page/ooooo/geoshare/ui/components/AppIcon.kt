@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
@@ -46,8 +49,11 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.OpenPointOutput
+import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -59,6 +65,7 @@ fun AppIcon(
     appDetails: AppDetails = emptyMap(),
     outputs: List<Output> = emptyList(),
     onClick: (Output) -> Unit = {},
+    onHide: (() -> Unit)? = null,
     enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
@@ -77,6 +84,15 @@ fun AppIcon(
                 } else {
                     this
                 }
+            }
+            .run {
+                outputs.firstOrNull()?.let { firstOutput ->
+                    ((firstOutput as? OpenPointOutput)?.packageName
+                        ?: (firstOutput as? OpenRouteOnePointGpxOutput)?.packageName
+                        ?: (firstOutput as? ShareLinkUriOutput)?.link?.uuid)?.let { id ->
+                        testTag("geoShareApp_$id")
+                    }
+                } ?: this
             },
         contentAlignment = Alignment.TopEnd,
     ) {
@@ -93,7 +109,7 @@ fun AppIcon(
                     label,
                     Modifier
                         .fillMaxWidth()
-                        .testTag("geoShareResultSuccessAppLabel"),
+                        .testTag("geoShareAppLabel"),
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
@@ -101,22 +117,20 @@ fun AppIcon(
                 )
             }
         }
-        if (outputs.size > 1) {
-            FilledIconButton(
-                { setExpanded(true) },
-                Modifier.size(30.dp),
-                shape = MaterialShapes.ClamShell.toShape(),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-            ) {
-                Icon(
-                    painterResource(R.drawable.more_horiz_24px),
-                    contentDescription = stringResource(R.string.nav_menu_content_description),
-                    Modifier.size(20.dp),
-                )
-            }
+        FilledIconButton(
+            { setExpanded(true) },
+            Modifier.size(30.dp),
+            shape = MaterialShapes.ClamShell.toShape(),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+        ) {
+            Icon(
+                painterResource(R.drawable.more_horiz_24px),
+                contentDescription = stringResource(R.string.nav_menu_content_description),
+                Modifier.size(20.dp),
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -128,7 +142,12 @@ fun AppIcon(
             var prevIconDescriptor: IconDescriptor? = null
             outputs.forEach { output ->
                 DropdownMenuItem(
-                    text = { Text(output.label(appDetails), Modifier.testTag("geoShareAppContextMenuItem")) },
+                    text = {
+                        Text(
+                            output.label(appDetails),
+                            Modifier.testTag("geoShareAppOutput"),
+                        )
+                    },
                     onClick = {
                         setExpanded(false)
                         onClick(output)
@@ -138,6 +157,24 @@ fun AppIcon(
                         ?.also { prevIconDescriptor = it }
                         ?.let { { IconFromDescriptor(it, contentDescription = null) } }
                         ?: { Spacer(Modifier.size(24.dp)) },
+                )
+            }
+            if (onHide != null) {
+                HorizontalDivider()
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            stringResource(R.string.conversion_succeeded_hide),
+                            Modifier.testTag("geoShareAppHide"),
+                        )
+                    },
+                    onClick = {
+                        setExpanded(false)
+                        onHide()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.Close, null)
+                    }
                 )
             }
         }

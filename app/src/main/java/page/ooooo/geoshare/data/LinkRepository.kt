@@ -26,6 +26,12 @@ interface LinkRepository {
 
     suspend fun delete(link: Link)
 
+    suspend fun enable(uid: Int)
+
+    suspend fun disable(uid: Int)
+
+    suspend fun disableGroup(group: String?)
+
     suspend fun restoreInitialData()
 }
 
@@ -53,7 +59,13 @@ class DefaultLinkRepository @Inject constructor(
 
     override suspend fun update(vararg links: Link) = linkDao.update(*links)
 
+    override suspend fun enable(uid: Int) = linkDao.enable(uid)
+
+    override suspend fun disable(uid: Int) = linkDao.disable(uid)
+
     override suspend fun delete(link: Link) = linkDao.delete(link)
+
+    override suspend fun disableGroup(group: String?) = linkDao.disableGroup(group)
 
     override suspend fun restoreInitialData() {
         appDatabase.openHelper.writableDatabase.let { db ->

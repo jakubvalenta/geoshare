@@ -23,7 +23,7 @@ interface UserPreference<T> {
     fun setValue(preferences: MutablePreferences, value: T, log: ILog = DefaultLog)
 }
 
-interface TextUserPreference<T> : UserPreference<T> {
+interface TextPreference<T> : UserPreference<T> {
     val key: Preferences.Key<String>
     val default: T
 
@@ -38,13 +38,13 @@ interface TextUserPreference<T> : UserPreference<T> {
     override fun setValue(preferences: MutablePreferences, value: T, log: ILog) = preferences.set(key, serialize(value))
 }
 
-interface NullableIntPreference : TextUserPreference<Int?> {
+interface NullableIntPreference : TextPreference<Int?> {
     override fun serialize(value: Int?) = value.toString()
 
     override fun deserialize(value: String?) = value?.toIntOrNull() ?: default
 }
 
-interface DurationPreference : TextUserPreference<Duration> {
+interface DurationPreference : TextPreference<Duration> {
     val minSec: Int
     val maxSec: Int
 
@@ -60,10 +60,9 @@ interface OptionsPreference<T> : UserPreference<T> {
 }
 
 object ConnectionPermissionPreference : OptionsPreference<Permission> {
+    private val key = stringPreferencesKey("connect_to_google_permission")
     override val default = Permission.ASK
     val loading = default
-
-    private val key = stringPreferencesKey("connect_to_google_permission")
 
     override fun getValue(values: UserPreferencesValues) = values.connectionPermission
 
@@ -89,10 +88,9 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
 }
 
 object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
+    private val key = stringPreferencesKey("coordinate_format")
     override val default = CoordinateFormat.DEC
     val loading = default
-
-    private val key = stringPreferencesKey("coordinate_format")
 
     override fun getValue(values: UserPreferencesValues) = values.coordinateFormat
 
@@ -117,12 +115,10 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
 }
 
 object AutomationPreference : OptionsPreference<Automation> {
-    private const val TAG = "Automation"
-
+    private val key = stringPreferencesKey("automation")
     override val default = NoopAutomation
     val loading = default
-
-    private val key = stringPreferencesKey("automation")
+    private const val TAG = "Automation"
 
     /**
      * Instance of [Json] for serialization.
@@ -196,7 +192,12 @@ object AutomationPreference : OptionsPreference<Automation> {
         preferences[key] = serializedString
     }
 
-    fun getOptionGroups(apps: DataTypes, appDetails: AppDetails, links: List<Link>): List<List<Automation>> = listOf(
+    fun getOptionGroups(
+        apps: DataTypes,
+        appDetails: AppDetails,
+        hiddenApps: Set<String>?,
+        links: List<Link>,
+    ): List<List<Automation>> = listOfNotNull(
         listOf(
             NoopAutomation,
         ),
@@ -216,6 +217,7 @@ object AutomationPreference : OptionsPreference<Automation> {
             SavePointsGpxAutomation,
         ),
         apps
+            .filterKeys { hiddenApps?.contains(it) != true }
             .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
             .flatMap { (packageName, dataTypes) ->
                 buildList {
@@ -240,7 +242,8 @@ object AutomationPreference : OptionsPreference<Automation> {
                         add(OpenRouteOnePointGpxAutomation(packageName))
                     }
                 }
-            },
+            }
+            .takeIf { it.isNotEmpty() },
         links
             .groupBy { it.groupOrName }
             .toSortedMap()
@@ -249,26 +252,26 @@ object AutomationPreference : OptionsPreference<Automation> {
                     *links.map { ShareLinkUriAutomation(it.uuid) }.toTypedArray(),
                     *links.map { CopyLinkUriAutomation(it.uuid) }.toTypedArray(),
                 )
-            },
+            }
+            .takeIf { it.isNotEmpty() },
     )
 }
 
 object AutomationDelayPreference : DurationPreference {
+    override val key = stringPreferencesKey("automation_delay")
     override val default = 5.seconds
     val loading = default
 
-    override val key = stringPreferencesKey("automation_delay")
     override val minSec = 0
     override val maxSec = 60
 
     override fun getValue(values: UserPreferencesValues) = values.automationDelay
 }
 
-object BillingCachedProductIdPreference : TextUserPreference<String?> {
+object BillingCachedProductIdPreference : TextPreference<String?> {
+    override val key = stringPreferencesKey("billing_product_id")
     override val default = ""
     val loading = default
-
-    override val key = stringPreferencesKey("billing_product_id")
 
     override fun serialize(value: String?) = value.orEmpty()
 
@@ -277,20 +280,61 @@ object BillingCachedProductIdPreference : TextUserPreference<String?> {
     override fun getValue(values: UserPreferencesValues) = values.billingCachedProductId
 }
 
-object IntroShowForVersionCodePreference : NullableIntPreference {
+/**
+ * A set of strings stored as a JSON array.
+ */
+interface SetPreference : UserPreference<Set<String>?> {
+    val key: Preferences.Key<String>
+    val default: Set<String>?
+
+    override fun getValue(preferences: Preferences, log: ILog): Set<String>? {
+        val serializedString = preferences[key] ?: return default
+        return try {
+            Json.decodeFromString<Set<String>?>(serializedString)
+        } catch (tr: IllegalArgumentException) {
+            log.e(TAG, "Deserialization error", tr)
+            null
+        }
+    }
+
+    override fun setValue(preferences: MutablePreferences, value: Set<String>?, log: ILog) {
+        val serializedString = try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because a set of strings should always serialize
+            log.e(TAG, "Serialization error", tr)
+            return
+        }
+        preferences[key] = serializedString
+    }
+
+    companion object {
+        private const val TAG = "SetPreference"
+    }
+}
+
+object HiddenAppsPreference : SetPreference {
+    override val key = stringPreferencesKey("hidden_apps")
+    override val default: Set<String> = emptySet()
     val loading = null
 
-    override val default = 0
+    override fun getValue(values: UserPreferencesValues) = values.hiddenApps
+
+    fun getOptions(apps: DataTypes): Set<String> = apps.keys
+}
+
+object IntroShowForVersionCodePreference : NullableIntPreference {
     override val key = stringPreferencesKey("intro_shown_for_version_code")
+    override val default = 0
+    val loading = null
 
     override fun getValue(values: UserPreferencesValues) = values.introShownForVersionCode
 }
 
 object ChangelogShownForVersionCodePreference : NullableIntPreference {
-    val loading = null
-
     override val key = stringPreferencesKey("changelog_shown_for_version_code")
     override val default = BuildConfig.VERSION_CODE
+    val loading = null
 
     override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCode
 }
@@ -302,5 +346,6 @@ data class UserPreferencesValues(
     val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
     val connectionPermission: Permission = ConnectionPermissionPreference.loading,
     val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
+    val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
     val introShownForVersionCode: Int? = IntroShowForVersionCodePreference.loading,
 )

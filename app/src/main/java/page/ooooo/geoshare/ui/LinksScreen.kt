@@ -81,7 +81,9 @@ fun LinksScreen(
         message = message,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
+        onDisable = { viewModel.disable(it) },
         onDismissMessage = { viewModel.dismissMessage() },
+        onEnable = { viewModel.enable(it) },
         onNavigateTo = {
             coroutineScope.launch {
                 viewModel.navigateTo(it)
@@ -89,7 +91,6 @@ fun LinksScreen(
         },
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
-        onToggle = { link, enabled -> viewModel.toggle(link, enabled) },
         appEnabled = viewModel.appEnabled,
         chipEnabled = viewModel.chipEnabled,
         coordsUriTemplate = viewModel.coordsUriTemplate,
@@ -129,7 +130,9 @@ private fun LinksScreen(
     type: LinkType,
     onBack: () -> Unit,
     onDelete: () -> Unit,
+    onDisable: (uid: Int) -> Unit,
     onDismissMessage: () -> Unit,
+    onEnable: (uid: Int) -> Unit,
     onSaveForm: () -> Unit,
     onNavigateTo: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
@@ -142,7 +145,6 @@ private fun LinksScreen(
     onSetSheetEnabled: (Boolean) -> Unit,
     onSetSrs: (Srs) -> Unit,
     onSetType: (LinkType) -> Unit,
-    onToggle: (link: Link, enabled: Boolean) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -200,9 +202,10 @@ private fun LinksScreen(
                     destination = destination,
                     links = links,
                     onBack = onBack,
+                    onDisable = onDisable,
+                    onEnable = onEnable,
                     onNavigateToContentKey = onNavigateTo,
                     onRestoreInitialLinks = onRestoreInitialData,
-                    onToggle = onToggle,
                 )
             },
             detailPane = { wide ->
@@ -246,9 +249,10 @@ private fun LinksListPane(
     destination: Int?,
     links: List<Link>,
     onBack: () -> Unit,
+    onDisable: (uid: Int) -> Unit,
+    onEnable: (uid: Int) -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
     onRestoreInitialLinks: () -> Unit,
-    onToggle: (link: Link, enabled: Boolean) -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val (restoreInitialLinksDialogOpen, setRestoreInitialLinksDialogOpen) = retain { mutableStateOf(false) }
@@ -301,7 +305,13 @@ private fun LinksListPane(
                             {
                                 Switch(
                                     checked = it.enabled,
-                                    onCheckedChange = { enabled -> onToggle(it, enabled) },
+                                    onCheckedChange = { enabled ->
+                                        if (enabled) {
+                                            onEnable(it.uid)
+                                        } else {
+                                            onDisable(it.uid)
+                                        }
+                                    },
                                     modifier = Modifier.testTag("geoShareLinksListItemToggle_${it.uuid}")
                                 )
                             }
@@ -466,7 +476,9 @@ private fun DefaultPreview() {
                     type = LinkType.DISPLAY,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -479,7 +491,6 @@ private fun DefaultPreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -507,7 +518,9 @@ private fun DarkPreview() {
                     type = LinkType.DISPLAY,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -520,7 +533,6 @@ private fun DarkPreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -548,7 +560,9 @@ private fun TabletPreview() {
                     type = LinkType.DISPLAY,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -561,7 +575,6 @@ private fun TabletPreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -589,7 +602,9 @@ private fun InsertPreview() {
                     type = LinkType.DISPLAY,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -602,7 +617,6 @@ private fun InsertPreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -630,7 +644,9 @@ private fun DarkInsertPreview() {
                     type = LinkType.DISPLAY,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -643,7 +659,6 @@ private fun DarkInsertPreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -672,7 +687,9 @@ private fun TabletInsertPreview() {
                     type = LinkType.DISPLAY,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -685,7 +702,6 @@ private fun TabletInsertPreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -715,7 +731,9 @@ private fun UpdatePreview() {
                     type = link.type,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -728,7 +746,6 @@ private fun UpdatePreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -758,7 +775,9 @@ private fun DarkUpdatePreview() {
                     type = link.type,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -771,7 +790,6 @@ private fun DarkUpdatePreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }
@@ -801,7 +819,9 @@ private fun TabletUpdatePreview() {
                     type = link.type,
                     onBack = {},
                     onDelete = {},
+                    onDisable = {},
                     onDismissMessage = {},
+                    onEnable = {},
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
@@ -814,7 +834,6 @@ private fun TabletUpdatePreview() {
                     onSetSheetEnabled = {},
                     onSetSrs = {},
                     onSetType = {},
-                    onToggle = { _, _ -> },
                 )
             }
         }

@@ -69,6 +69,36 @@ class FakeLinkRepository(
         _fakeLinks.value = _fakeLinks.value.filterNot { it.uid == link.uid }
     }
 
+    override suspend fun enable(uid: Int) {
+        _fakeLinks.value = _fakeLinks.value.map {
+            if (it.uid == uid) {
+                it.copy(appEnabled = true)
+            } else {
+                it
+            }
+        }
+    }
+
+    override suspend fun disable(uid: Int) {
+        _fakeLinks.value = _fakeLinks.value.map {
+            if (it.uid == uid) {
+                it.copy(appEnabled = false, chipEnabled = false, sheetEnabled = false)
+            } else {
+                it
+            }
+        }
+    }
+
+    override suspend fun disableGroup(group: String?) {
+        _fakeLinks.value = _fakeLinks.value.map {
+            if (it.group == group) {
+                it.copy(appEnabled = false, chipEnabled = false, sheetEnabled = false)
+            } else {
+                it
+            }
+        }
+    }
+
     override suspend fun restoreInitialData() {
         _fakeLinks.value = defaultFakeLinks
     }
