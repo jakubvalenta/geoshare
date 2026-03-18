@@ -21,7 +21,7 @@ class LinksBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link detail
-        goToUserPreferencesScreen()
+        goToUserPreferencesList()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Insert link
@@ -38,17 +38,17 @@ class LinksBehaviorTest : BehaviorTest {
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
         // Tap copy link in the context menu
-        onElement { viewIdResourceName == "geoShareMainPane" }
+        onMainScrollablePane()
             // Scroll by percents, because it's more reliable than scrolling to the app icon
             .scroll(Direction.DOWN, 2f)
-        onElement { viewIdResourceName == "geoShareResultSuccessAppLabel" && textAsString() == "My New Maps" }.longClick()
+        onElement { viewIdResourceName == "geoShareAppLabel" && textAsString() == "My New Maps" }.longClick()
         onElement {
-            viewIdResourceName == "geoShareAppContextMenuItem" &&
+            viewIdResourceName == "geoShareAppOutput" &&
                 textAsString() in setOf("Copy My New Maps link", "Copier le lien My New Maps")
         }.click()
 
         // Shows success message
-        onElement { viewIdResourceName == "geoShareMainPane" }
+        onMainScrollablePane()
             // Swipe instead of scrolling, because we need to check the message before it disappears
             .swipe(Direction.DOWN, 1f)
         onElement { viewIdResourceName == "geoShareResultSuccessMessage" }
@@ -61,7 +61,7 @@ class LinksBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to link list
-        goToUserPreferencesScreen()
+        goToUserPreferencesList()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Go to link detail
@@ -140,7 +140,7 @@ class LinksBehaviorTest : BehaviorTest {
         closeIntro()
 
         // Go to links list
-        goToUserPreferencesScreen()
+        goToUserPreferencesList()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
 
         // Go to link detail

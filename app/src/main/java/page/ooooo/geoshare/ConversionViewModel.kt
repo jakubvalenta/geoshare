@@ -17,6 +17,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -144,7 +146,14 @@ class ConversionViewModel @Inject constructor(
                 emptyList(),
             )
     val outputsForApps: StateFlow<Map<String, List<Output>>> =
-        appsRepository.apps.map { apps -> getOutputsForApps(apps) }
+        appsRepository.apps
+            .combine(
+                userPreferencesRepository.values
+                    .map { it.hiddenApps }
+                    .distinctUntilChanged()
+            ) { apps, hiddenApps ->
+                getOutputsForApps(apps, hiddenApps)
+            }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),

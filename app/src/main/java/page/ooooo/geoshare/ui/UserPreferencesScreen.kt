@@ -3,12 +3,14 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.annotation.Keep
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -20,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -42,12 +45,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
@@ -64,16 +70,20 @@ import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePr
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.local.preferences.IntroShowForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.OptionsPreference
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.TextUserPreference
+import page.ooooo.geoshare.data.local.preferences.SetPreference
+import page.ooooo.geoshare.data.local.preferences.TextPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
+import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.billing.FeatureStatus
 import page.ooooo.geoshare.lib.formats.CoordsFormat
@@ -82,11 +92,13 @@ import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.FeatureBadgeLarge
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
+import page.ooooo.geoshare.ui.components.LabelLarge
 import page.ooooo.geoshare.ui.components.NavigableBasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.RadioButtonGroup
 import page.ooooo.geoshare.ui.components.ScrollablePane
 import page.ooooo.geoshare.ui.components.SegmentedList
+import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration
@@ -99,6 +111,7 @@ enum class UserPreferencesGroupId {
     CONNECTION_PERMISSION,
     COORDINATE_FORMAT,
     DEVELOPER_OPTIONS,
+    HIDDEN_APPS,
     LINKS,
 }
 
@@ -178,6 +191,7 @@ private fun UserPreferencesScreen(
         listPane = { _, _ ->
             UserPreferencesListPane(
                 currentGroupId = currentGroupId,
+                apps = apps,
                 appDetails = appDetails,
                 automationFeatureStatus = automationFeatureStatus,
                 links = links,
@@ -233,6 +247,7 @@ private fun UserPreferencesScreen(
 private fun UserPreferencesListPane(
     currentGroupId: UserPreferencesGroupId?,
     values: UserPreferencesValues,
+    apps: DataTypes,
     appDetails: AppDetails,
     automationFeatureStatus: FeatureStatus,
     links: List<Link>,
@@ -253,11 +268,20 @@ private fun UserPreferencesListPane(
             Text(stringResource(R.string.user_preferences_title))
         },
         onBack = onBack,
-        modifier = Modifier.padding(horizontal = spacing.windowPadding),
+        modifier = Modifier
+            .padding(horizontal = spacing.windowPadding)
+            .testTag("geoShareUserPreferencesListPane"),
     ) {
         item {
-            val values = buildList {
-                add(
+            LabelLarge(
+                stringResource(R.string.user_preferences_section_input),
+                Modifier.padding(top = spacing.tiny, bottom = spacing.tiny),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.CONNECTION_PERMISSION,
                         headline = { stringResource(R.string.user_preferences_connection_title) },
@@ -267,16 +291,17 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.CONNECTION_PERMISSION) },
-                    )
-                )
-                add(
-                    UserPreferencesGroup(
-                        id = UserPreferencesGroupId.LINKS,
-                        headline = { stringResource(R.string.links_title) },
-                        onClick = { onNavigateToLinksScreen() },
-                    )
-                )
-                add(
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        item {
+            SegmentedListLabel(stringResource(R.string.user_preferences_automation_title))
+        }
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.AUTOMATION,
                         headline = { stringResource(R.string.user_preferences_automation_title) },
@@ -296,9 +321,7 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION) },
-                    )
-                )
-                add(
+                    ),
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.AUTOMATION_DELAY,
                         headline = { stringResource(R.string.user_preferences_automation_delay_sec_title) },
@@ -309,9 +332,50 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION_DELAY) },
-                    )
-                )
-                add(
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        item {
+            SegmentedListLabel(stringResource(R.string.user_preferences_section_output))
+        }
+        item {
+            UserPreferencesListSection(
+                groups = listOf(
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.HIDDEN_APPS,
+                        headline = { stringResource(R.string.user_preferences_apps_title) },
+                        enabled = HiddenAppsPreference.getValue(values) != HiddenAppsPreference.loading,
+                        supportingContent = HiddenAppsPreference.getValue(values)?.let { value ->
+                            @Composable {
+                                val options = HiddenAppsPreference.getOptions(apps)
+                                Text(
+                                    (options - value).size.takeIf { it != options.size }?.let { visibleCount ->
+                                        pluralStringResource(
+                                            R.plurals.user_preferences_apps_visible_count,
+                                            visibleCount,
+                                            visibleCount,
+                                            options.size,
+                                        )
+                                    } ?: stringResource(R.string.user_preferences_apps_visible_all)
+                                )
+                            }
+                        },
+                        onClick = { onNavigateToGroup(UserPreferencesGroupId.HIDDEN_APPS) },
+                    ),
+                    UserPreferencesGroup(
+                        id = UserPreferencesGroupId.LINKS,
+                        headline = { stringResource(R.string.links_title) },
+                        supportingContent = {
+                            Text(
+                                links.filter { it.enabled }.map { it.groupOrName }.toSortedSet().joinToString(),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = { onNavigateToLinksScreen() },
+                    ),
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.COORDINATE_FORMAT,
                         headline = { stringResource(R.string.user_preferences_coordinate_format_title) },
@@ -321,31 +385,48 @@ private fun UserPreferencesListPane(
                             )
                         },
                         onClick = { onNavigateToGroup(UserPreferencesGroupId.COORDINATE_FORMAT) },
-                    )
-                )
-                if (BuildConfig.DEBUG) {
-                    add(
+                    ),
+                ),
+                currentGroupId = currentGroupId,
+            )
+        }
+        if (BuildConfig.DEBUG) {
+            item {
+                SegmentedListLabel(stringResource(R.string.user_preferences_developer_title))
+            }
+            item {
+                UserPreferencesListSection(
+                    groups = listOf(
                         UserPreferencesGroup(
                             id = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                             headline = { stringResource(R.string.user_preferences_developer_title) },
                             onClick = { onNavigateToGroup(UserPreferencesGroupId.DEVELOPER_OPTIONS) },
-                        )
-                    )
-                }
+                        ),
+                    ),
+                    currentGroupId = currentGroupId,
+                )
             }
-            SegmentedList(
-                values = values,
-                modifier = Modifier.padding(top = spacing.mediumAdaptive),
-                itemHeadline = { it.headline() },
-                itemIsSelected = { it.id == currentGroupId },
-                itemOnClick = { it.onClick() },
-                itemEnabled = { it.enabled },
-                itemTrailingContent = { it.trailingContent },
-                itemSupportingContent = { it.supportingContent },
-                itemTestTag = { "geoShareUserPreferencesGroup_${it.id}" },
-            )
         }
     }
+}
+
+@Composable
+private fun UserPreferencesListSection(
+    groups: List<UserPreferencesGroup>,
+    currentGroupId: UserPreferencesGroupId?,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedList(
+        values = groups,
+        modifier = modifier,
+        itemHeadline = { it.headline() },
+        itemIsSelected = { it.id == currentGroupId },
+        itemOnClick = { it.onClick() },
+        itemEnabled = { it.enabled },
+        itemTrailingContent = { it.trailingContent },
+        itemSupportingContent = { it.supportingContent },
+        itemTestTag = { "geoShareUserPreferencesGroup_${it.id}" },
+    )
 }
 
 @Composable
@@ -433,6 +514,71 @@ private fun UserPreferencesDetailPane(
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     when (currentGroupId) {
+        UserPreferencesGroupId.AUTOMATION ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_automation_title,
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                description = {
+                    stringResource(R.string.user_preferences_automation_description)
+                },
+                featureStatus = automationFeatureStatus,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) {
+                userPreferencesOptionsControl(
+                    userPreference = AutomationPreference,
+                    optionGroups = AutomationPreference.getOptionGroups(
+                        apps,
+                        appDetails,
+                        values.hiddenApps,
+                        links,
+                    ),
+                    values = values,
+                    enabled = automationFeatureStatus == FeatureStatus.AVAILABLE,
+                    getItemTestTag = { option ->
+                        try {
+                            Json.encodeToString(option)
+                        } catch (_: IllegalArgumentException) {
+                            null
+                        }
+                            .let { serializedString -> "geoShareUserPreferenceAutomation_$serializedString" }
+                    },
+                    onValueChange = onValueChange,
+                ) { value ->
+                    AutomationPreferenceValue(value, appDetails, links)
+                }
+            }
+
+        UserPreferencesGroupId.AUTOMATION_DELAY ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_automation_delay_sec_title,
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                description = {
+                    stringResource(R.string.user_preferences_automation_delay_sec_description)
+                },
+                featureStatus = automationFeatureStatus,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) {
+                userPreferencesTextControl(
+                    userPreference = AutomationDelayPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    error = {
+                        stringResource(
+                            R.string.user_preferences_number_error_range,
+                            AutomationDelayPreference.minSec,
+                            AutomationDelayPreference.maxSec,
+                        )
+                    },
+                    suffix = {
+                        stringResource(R.string.seconds_unit)
+                    },
+                )
+            }
+
         UserPreferencesGroupId.CONNECTION_PERMISSION ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_connection_title,
@@ -495,66 +641,6 @@ private fun UserPreferencesDetailPane(
                 }
             }
 
-        UserPreferencesGroupId.AUTOMATION ->
-            UserPreferencesControls(
-                titleResId = R.string.user_preferences_automation_title,
-                billingAppNameResId = billingAppNameResId,
-                wide = wide,
-                description = {
-                    stringResource(R.string.user_preferences_automation_description)
-                },
-                featureStatus = automationFeatureStatus,
-                onBack = onBack,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-            ) {
-                userPreferencesOptionsControl(
-                    userPreference = AutomationPreference,
-                    optionGroups = AutomationPreference.getOptionGroups(apps, appDetails, links),
-                    values = values,
-                    enabled = automationFeatureStatus == FeatureStatus.AVAILABLE,
-                    getItemTestTag = { option ->
-                        try {
-                            Json.encodeToString(option)
-                        } catch (_: IllegalArgumentException) {
-                            null
-                        }
-                            .let { serializedString -> "geoShareUserPreferenceAutomation_$serializedString" }
-                    },
-                    onValueChange = onValueChange,
-                ) { value ->
-                    AutomationPreferenceValue(value, appDetails, links)
-                }
-            }
-
-        UserPreferencesGroupId.AUTOMATION_DELAY ->
-            UserPreferencesControls(
-                titleResId = R.string.user_preferences_automation_delay_sec_title,
-                billingAppNameResId = billingAppNameResId,
-                wide = wide,
-                description = {
-                    stringResource(R.string.user_preferences_automation_delay_sec_description)
-                },
-                featureStatus = automationFeatureStatus,
-                onBack = onBack,
-                onNavigateToBillingScreen = onNavigateToBillingScreen,
-            ) {
-                userPreferencesTextControl(
-                    userPreference = AutomationDelayPreference,
-                    values = values,
-                    onValueChange = onValueChange,
-                    error = {
-                        stringResource(
-                            R.string.user_preferences_number_error_range,
-                            AutomationDelayPreference.minSec,
-                            AutomationDelayPreference.maxSec,
-                        )
-                    },
-                    suffix = {
-                        stringResource(R.string.seconds_unit)
-                    },
-                )
-            }
-
         UserPreferencesGroupId.DEVELOPER_OPTIONS ->
             UserPreferencesControls(
                 titleResId = R.string.user_preferences_developer_title,
@@ -605,12 +691,46 @@ private fun UserPreferencesDetailPane(
                 )
             }
 
+        UserPreferencesGroupId.HIDDEN_APPS ->
+            UserPreferencesControls(
+                titleResId = R.string.user_preferences_apps_title,
+                description = {
+                    stringResource(R.string.user_preferences_apps_description)
+                },
+                billingAppNameResId = billingAppNameResId,
+                wide = wide,
+                onBack = onBack,
+                onNavigateToBillingScreen = onNavigateToBillingScreen,
+            ) {
+                userPreferencesSwitchesControl(
+                    userPreference = HiddenAppsPreference,
+                    values = values,
+                    onValueChange = onValueChange,
+                    options = HiddenAppsPreference.getOptions(apps),
+                    inverted = true,
+                    getSwitchTestTag = { option -> "geoShareVisibleAppToggle_${option}" },
+                    leadingContent = { option ->
+                        appDetails[option]?.icon?.let { drawable ->
+                            {
+                                Image(
+                                    rememberDrawablePainter(drawable),
+                                    null,
+                                    Modifier.widthIn(max = 24.dp),
+                                )
+                            }
+                        }
+                    },
+                ) { option ->
+                    appDetails[option]?.label ?: option
+                }
+            }
+
         UserPreferencesGroupId.LINKS -> {}
     }
 }
 
 @Composable
-fun UserPreferencesControls(
+private fun UserPreferencesControls(
     titleResId: Int,
     billingAppNameResId: Int,
     wide: Boolean,
@@ -621,14 +741,15 @@ fun UserPreferencesControls(
     content: LazyListScope.() -> Unit,
 ) {
     val spacing = LocalSpacing.current
+    val maxWidth = 500.dp
 
     Box {
-        Column {
+        Column(Modifier.widthIn(max = maxWidth)) {
             ScrollablePane(
                 title = {
                     Text(
                         stringResource(titleResId),
-                        Modifier.padding(bottom = spacing.tiny), // Align with the first item of the list pane
+                        Modifier.padding(bottom = spacing.tiny),
                     )
                 },
                 onBack = onBack.takeUnless { wide },
@@ -664,10 +785,11 @@ fun UserPreferencesControls(
     }
 }
 
-fun <T> LazyListScope.userPreferencesOptionsControl(
+private fun <T> LazyListScope.userPreferencesOptionsControl(
     userPreference: OptionsPreference<T>,
     values: UserPreferencesValues,
     optionGroups: List<List<T>>,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     getItemTestTag: ((option: T) -> String)? = null,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
@@ -689,7 +811,7 @@ fun <T> LazyListScope.userPreferencesOptionsControl(
                 },
                 values = values,
                 enabled = enabled,
-                modifier = Modifier.run {
+                modifier = modifier.run {
                     if (i == 0) {
                         padding(top = LocalSpacing.current.tinyAdaptive)
                     } else {
@@ -703,7 +825,7 @@ fun <T> LazyListScope.userPreferencesOptionsControl(
         if (i < optionGroups.size - 1) {
             item {
                 HorizontalDivider(
-                    Modifier.padding(vertical = LocalSpacing.current.tinyAdaptive),
+                    modifier.padding(vertical = LocalSpacing.current.tinyAdaptive),
                     thickness = Dp.Hairline,
                 )
             }
@@ -711,8 +833,67 @@ fun <T> LazyListScope.userPreferencesOptionsControl(
     }
 }
 
-fun <T> LazyListScope.userPreferencesTextControl(
-    userPreference: TextUserPreference<T>,
+private fun LazyListScope.userPreferencesSwitchesControl(
+    userPreference: SetPreference,
+    values: UserPreferencesValues,
+    onValueChange: ((MutablePreferences) -> Unit) -> Unit,
+    options: Set<String>,
+    modifier: Modifier = Modifier,
+    @Suppress("SameParameterValue") inverted: Boolean = false,
+    getSwitchTestTag: ((option: String) -> String)? = null,
+    leadingContent: ((option: String) -> (@Composable () -> Unit)?)? = null,
+    headline: @Composable (option: String) -> String,
+) {
+    val value = userPreference.getValue(values)
+    val enabled = value != null
+
+    fun isChecked(option: String): Boolean =
+        value?.contains(option) == true xor inverted
+
+    fun setValue(option: String, checked: Boolean) {
+        val newValue = (value ?: emptySet()).let { value ->
+            if (checked xor inverted) {
+                value + option
+            } else {
+                value - option
+            }
+        }
+        onValueChange { preferences ->
+            userPreference.setValue(preferences, newValue)
+        }
+    }
+
+    item {
+        SegmentedList(
+            values = options.toList(),
+            modifier = modifier,
+            itemHeadline = headline,
+            itemOnClick = { option -> setValue(option, !isChecked(option)) },
+            itemEnabled = { enabled },
+            itemLeadingContent = leadingContent,
+            itemTrailingContent = { option ->
+                {
+                    Switch(
+                        checked = isChecked(option),
+                        onCheckedChange = {
+                            setValue(option, it)
+                        },
+                        modifier = Modifier.run {
+                            getSwitchTestTag?.invoke(option)?.let {
+                                testTag(it)
+                            } ?: this
+                        },
+                        enabled = enabled,
+                    )
+                }
+            },
+            sort = true,
+        )
+    }
+}
+
+private fun <T> LazyListScope.userPreferencesTextControl(
+    userPreference: TextPreference<T>,
     values: UserPreferencesValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
     modifier: Modifier = Modifier,
@@ -1015,6 +1196,7 @@ private fun AutomationPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1050,6 +1232,7 @@ private fun DarkAutomationPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1085,6 +1268,7 @@ private fun TabletAutomationPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1120,6 +1304,7 @@ private fun AutomationFeatureNotAvailablePreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1155,6 +1340,7 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1190,6 +1376,7 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1216,6 +1403,7 @@ private fun AutomationDelayPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1242,6 +1430,7 @@ private fun DarkAutomationDelayPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1268,7 +1457,272 @@ private fun TableAutomationDelayPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HiddenAppsPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apps = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
+                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
+                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                    ),
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = UserPreferencesValues(
+                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                    ),
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkHiddenAppsPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apps = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
+                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
+                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                    ),
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = UserPreferencesValues(
+                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                    ),
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletHiddenAppsPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apps = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
+                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
+                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                    ),
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = UserPreferencesValues(
+                        hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
+                    ),
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HiddenAppsLoadingPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apps = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
+                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
+                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                    ),
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = UserPreferencesValues(),
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkHiddenAppsLoadingPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apps = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
+                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
+                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                    ),
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = UserPreferencesValues(),
+                    onBack = {},
+                    onNavigateToBillingScreen = {},
+                    onNavigateToLinksScreen = {},
+                    onValueChange = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletHiddenAppsLoadingPreview() {
+    AppTheme {
+        Surface {
+            Column {
+                val context = LocalContext.current
+                @SuppressLint("LocalContextGetResourceValueCall")
+                UserPreferencesScreen(
+                    initialGroupId = UserPreferencesGroupId.HIDDEN_APPS,
+                    apps = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to emptySet(),
+                        ORGANIC_MAPS_PACKAGE_NAME to emptySet(),
+                        OSMAND_PLUS_PACKAGE_NAME to emptySet(),
+                    ),
+                    appDetails = mapOf(
+                        COMAPS_FDROID_PACKAGE_NAME to AppDetail(
+                            "CoMaps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        ORGANIC_MAPS_PACKAGE_NAME to AppDetail(
+                            "Organic Maps",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                        OSMAND_PLUS_PACKAGE_NAME to AppDetail(
+                            "OsmAnd",
+                            context.getDrawable(R.mipmap.ic_launcher_round)!!
+                        ),
+                    ),
+                    automationFeatureStatus = FeatureStatus.LOADING,
+                    billingAppNameResId = R.string.app_name_pro,
+                    links = defaultFakeLinks,
+                    userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
                     onNavigateToBillingScreen = {},
                     onNavigateToLinksScreen = {},
@@ -1294,6 +1748,7 @@ private fun DeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1320,6 +1775,7 @@ private fun DarkDeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -1346,6 +1802,7 @@ private fun TableDeveloperOptionsPreview() {
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
+                        hiddenApps = emptySet(),
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},

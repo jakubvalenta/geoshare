@@ -33,10 +33,7 @@ class ConversionBehaviorTest : BehaviorTest {
         assertConversionSucceeded(GCJ02Point(52.5067296, 13.2599309, z = 11.0))
 
         // Tap the Google Maps icon
-        onElement {
-            viewIdResourceName == "geoShareResultSuccessAppLabel" &&
-                textAsString() in setOf("Maps", "Google Maps")
-        }.click()
+        onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
@@ -57,10 +54,7 @@ class ConversionBehaviorTest : BehaviorTest {
                 assertConversionSucceeded(expectedPoint)
 
                 // Tap the Google Maps icon
-                onElement {
-                    viewIdResourceName == "geoShareResultSuccessAppLabel" &&
-                        textAsString() in setOf("Maps", "Google Maps")
-                }.click()
+                onElement { viewIdResourceName == "geoShareApp_${GOOGLE_MAPS_PACKAGE_NAME}" }.click()
 
                 // Google Maps shows precise location
                 waitAndAssertGoogleMapsContainsElement { textAsString() == "Ming&Qing Dynasties Furniture Hall" }
@@ -482,10 +476,10 @@ class ConversionBehaviorTest : BehaviorTest {
             shareUri("geo:52.47254,13.4345")
 
             // Tap the TomTom icon
-            onElement { viewIdResourceName == "geoShareMainPane" }
+            onMainScrollablePane()
                 // Scroll by percents, because it's more reliable than scrolling to the app icon
                 .scroll(Direction.DOWN, 2f)
-            onElement { viewIdResourceName == "geoShareResultSuccessAppLabel" && textAsString() == "TomTom" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
 
             // Dismiss the location rationale dialog
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
@@ -493,7 +487,7 @@ class ConversionBehaviorTest : BehaviorTest {
             }
 
             // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareResultSuccessAppLabel" && textAsString() == "TomTom" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
 
             // Confirm location rationale
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {
@@ -504,7 +498,7 @@ class ConversionBehaviorTest : BehaviorTest {
             denyLocationPermission()
 
             // Tap the TomTom icon again
-            onElement { viewIdResourceName == "geoShareResultSuccessAppLabel" && textAsString() == "TomTom" }.click()
+            onElement { viewIdResourceName == "geoShareApp_${TOMTOM_PACKAGE_NAME}" }.click()
 
             // Confirm location rationale
             onDialog("geoShareLocationRationaleDialog", timeoutMs = 20_000L) {

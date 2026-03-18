@@ -30,6 +30,7 @@ fun <T> SegmentedList(
     itemIsSelected: (value: T) -> Boolean = { false },
     itemOnClick: (value: T) -> Unit,
     itemEnabled: ((value: T) -> Boolean)? = null,
+    itemLeadingContent: ((value: T) -> (@Composable () -> Unit)?)? = null,
     itemSupportingContent: ((value: T) -> (@Composable () -> Unit)?)? = null,
     itemTrailingContent: ((value: T) -> (@Composable () -> Unit)?)? = null,
     itemTestTag: ((value: T) -> String)? = null,
@@ -64,6 +65,7 @@ fun <T> SegmentedList(
                         } ?: this
                     },
                     enabled = itemEnabled?.invoke(value) ?: true,
+                    leadingContent = itemLeadingContent?.invoke(value),
                     trailingContent = itemTrailingContent?.invoke(value),
                     supportingContent = itemSupportingContent?.invoke(value)?.let { supportingContent ->
                         {
@@ -85,7 +87,7 @@ fun SegmentedListLabel(text: String, color: Color = MaterialTheme.colorScheme.pr
     val spacing = LocalSpacing.current
     LabelLarge(
         text,
-        Modifier.padding(top = spacing.largeAdaptive, bottom = spacing.smallAdaptive),
+        Modifier.padding(top = spacing.medium, bottom = spacing.tiny),
         color = color,
     )
 }

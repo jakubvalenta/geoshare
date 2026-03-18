@@ -29,6 +29,7 @@
     <string name="conversion_succeeded_copy_coordinates">Copy coordinates</string>
     <string name="conversion_succeeded_copy_link">Copy %1$s link</string>
     <string name="conversion_succeeded_description_q_only">The original link doesn’t contain coordinates, only a place name. When you open this location in another app, it might find a different place than the original link.</string>
+    <string name="conversion_succeeded_hide">Hide</string>
     <string name="conversion_succeeded_location_failed">Failed to find location</string>
     <string name="conversion_succeeded_location_loading_indicator_title">Finding your location…</string>
     <string name="conversion_succeeded_location_rationale_dialog_title">Allow location access?</string>
@@ -209,11 +210,11 @@
     <string name="user_preferences_automation_delay_sec_title">Automation delay</string>
     <string name="user_preferences_automation_delay_sec_description">Set how long the app waits before launching an automated action (e.g. before automatically opening a map app).</string>
     <string name="user_preferences_billing_cached_product_id" translatable="false">Cached product id</string>
-    <string name="user_preferences_connection_description">To support short map links, and to get coordinates from the web page of the map service when the link doesn’t contain them, %1$s can connect to the map service. You can find more information on the FAQ screen.</string>
+    <string name="user_preferences_connection_description">To support short links and links that don’t contain geographic coordinates in the URL, %1$s can connect to the map service (Google Maps, Apple Maps, etc.).</string>
     <string name="yes">Yes</string>
     <string name="user_preferences_connection_option_ask">Ask before connecting</string>
     <string name="no">No</string>
-    <string name="user_preferences_connection_title">Allow connecting to map service (Google, Apple etc.)?</string>
+    <string name="user_preferences_connection_title">Allow connecting to map service?</string>
     <string name="user_preferences_coordinate_format_description">Choose the format in which all geographic coordinates are displayed throughout the app.</string>
     <string name="user_preferences_coordinate_format_option_dec">Decimal degrees</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Degrees, minutes, seconds</string>
@@ -244,7 +245,7 @@
     <string name="links_delete">Delete</string>
     <string name="links_delete_text">The web map “%1$s” will be permanently deleted.</string>
     <string name="links_delete_title">Delete web map?</string>
-    <string name="links_description">Web maps allow opening coordinates in the browser. Enable the pre-installed ones or add your own.</string>
+    <string name="links_description">Web maps allow opening coordinates in the browser. Turn on the pre-installed ones or add your own.</string>
     <string name="links_form_advanced">Advanced</string>
     <string name="links_form_enabled_option_app">Show in the list of apps</string>
     <string name="links_form_enabled_option_chip">Show in the coordinates box</string>
@@ -260,6 +261,7 @@
     <string name="links_form_uri_template_name">URL template when only a search term is available</string>
     <string name="links_insert">Add web map</string>
     <string name="links_message_deleted">Web map deleted</string>
+    <string name="links_message_disabled_group">The web map has been hidden. You can show it again in preferences.</string>
     <string name="links_message_factory_reset">Web maps have been reset to factory defaults</string>
     <string name="links_message_inserted">Web map added</string>
     <string name="links_message_updated">Web map updated</string>
@@ -285,4 +287,14 @@
     <string name="srs_gcj02" translatable="false">GCJ-02</string>
     <string name="srs_wgs84" translatable="false">WGS 84</string>
     <string name="text_list_bullet" translatable="false">•</string>
+    <string name="user_preferences_apps_visible_all">All apps are visible</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="one">%1$d app out of %2$d is visible</item>
+        <item quantity="other">%1$d apps out of %2$d are visible</item>
+    </plurals>
+    <string name="user_preferences_apps_description">Choose which of your installed apps should be displayed after converting a map link to coordinates.</string>
+    <string name="user_preferences_apps_message_hidden">The app has been hidden. You can show it again in preferences.</string>
+    <string name="user_preferences_apps_title">Apps</string>
+    <string name="user_preferences_section_input">Input</string>
+    <string name="user_preferences_section_output">Output</string>
 </resources>
