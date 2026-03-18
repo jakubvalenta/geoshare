@@ -11,7 +11,7 @@ import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.point.GCJ02Point
 
 @RunWith(AndroidJUnit4::class)
-class UserPreferencesBehaviorTest : BaseActivityBehaviorTest() {
+class UserPreferencesBehaviorTest : BehaviorTest {
 
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {

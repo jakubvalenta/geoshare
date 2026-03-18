@@ -6,7 +6,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class IntroScreenBehaviorTest : BaseActivityBehaviorTest() {
+class IntroBehaviorTest : BehaviorTest {
 
     @Test
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {

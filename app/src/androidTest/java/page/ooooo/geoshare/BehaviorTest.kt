@@ -1,8 +1,14 @@
 package page.ooooo.geoshare
 
 import android.app.ActivityManager
+import android.content.Context
+import android.location.Location
+import android.location.LocationManager
+import android.location.provider.ProviderProperties
+import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.textAsString
@@ -14,7 +20,9 @@ import io.ktor.http.isSuccess
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -51,7 +59,21 @@ class DialogScope(val dialog: UiObject2) {
     }
 }
 
-abstract class BaseActivityBehaviorTest {
+class MockLocationScope(val locationManager: LocationManager, val mockProviderName: String) {
+    fun setLocation(lat: Double, lon: Double) {
+        val location = Location(mockProviderName).apply {
+            latitude = lat
+            longitude = lon
+            altitude = 0.0
+            accuracy = 1.0f
+            time = System.currentTimeMillis()
+            elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
+        }
+        locationManager.setTestProviderLocation(mockProviderName, location)
+    }
+}
+
+interface BehaviorTest {
 
     companion object {
         const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
@@ -66,7 +88,7 @@ abstract class BaseActivityBehaviorTest {
         pressHome()
     }
 
-    protected fun launchApplication() = uiAutomator {
+    fun UiAutomatorTestScope.launchApplication() {
         // Use shell command instead of startActivity() to support Xiaomi.
         device.executeShellCommand("monkey -p ${BuildConfig.APPLICATION_ID} 1")
 
@@ -74,22 +96,46 @@ abstract class BaseActivityBehaviorTest {
         waitForAppToBeVisible(BuildConfig.APPLICATION_ID)
     }
 
-    protected fun closeApplication() {
+    fun closeApplication() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val activityManager = context.getSystemService(ActivityManager::class.java)
         activityManager.appTasks.forEach { it.finishAndRemoveTask() }
     }
 
-    protected fun closeIntro() = uiAutomator {
+    // FIXME
+    suspend fun UiAutomatorTestScope.killApplication(timeoutMs: Long = 3_000L, pollIntervalMs: Long = 100L) {
+        pressHome()
+        delay(500L) // Wait for the app to go to background, otherwise it doesn't get killed
+        device.executeShellCommand("am kill ${BuildConfig.APPLICATION_ID}")
+
+        // Poll until the process is gone
+        withTimeout(timeoutMs) {
+            while (
+                device.executeShellCommand(
+                    @Suppress("SpellCheckingInspection") "pidof ${BuildConfig.APPLICATION_ID}"
+                ).isNotBlank()
+            ) {
+                delay(pollIntervalMs)
+            }
+        }
+    }
+
+    fun UiAutomatorTestScope.bringApplicationToFront() {
+        device.executeShellCommand(
+            @Suppress("SpellCheckingInspection") "am start -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.MainActivity ${BuildConfig.APPLICATION_ID}"
+        )
+    }
+
+    fun closeIntro() = uiAutomator {
         quickWaitForStableInActiveWindow() // Wait for the intro to render, otherwise closing it can fail even with large timeout
         onElement { viewIdResourceName == "geoShareIntroScreenCloseButton" }.click()
     }
 
-    protected fun quickWaitForStableInActiveWindow() = uiAutomator {
+    fun quickWaitForStableInActiveWindow() = uiAutomator {
         waitForStableInActiveWindow(stableTimeoutMs = 1000L, stableIntervalMs = 100L, requireStableScreenshot = false)
     }
 
-    protected fun onDialog(
+    fun onDialog(
         resourceName: String,
         timeoutMs: Long = 20_000L,
         block: DialogScope.() -> Unit,
@@ -104,15 +150,15 @@ abstract class BaseActivityBehaviorTest {
             else -> false
         }
 
-    protected fun grantLocationPermission() = uiAutomator {
+    fun UiAutomatorTestScope.grantLocationPermission() {
         onElement { isLocationGrantButton(this) }.click()
     }
 
-    protected fun grantLocationPermissionIfNecessary() = uiAutomator {
+    fun UiAutomatorTestScope.grantLocationPermissionIfNecessary() {
         onElementOrNull(3_000L) { isLocationGrantButton(this) }?.click()
     }
 
-    protected fun denyLocationPermission() = uiAutomator {
+    fun UiAutomatorTestScope.denyLocationPermission() {
         onElement {
             @Suppress("SpellCheckingInspection") when (textAsString()?.lowercase()) {
                 "don't allow", "don’t allow", "ne pas autoriser" -> true
@@ -121,31 +167,33 @@ abstract class BaseActivityBehaviorTest {
         }.click()
     }
 
-    protected fun assumeAppInstalled(packageName: String) = uiAutomator {
+    fun UiAutomatorTestScope.assumeAppInstalled(packageName: String) {
         assumeTrue(
             "This test only works when $packageName is installed on the device",
             device.executeShellCommand("pm path $packageName").isNotEmpty(),
         )
     }
 
-    protected suspend fun assumeDomainResolvable(
+    suspend fun assumeDomainResolvable(
         @Suppress("SameParameterValue") domain: String,
         timeoutMs: Long = 1_000L,
     ) {
-        // Use futures, because InetAddress.getByName() is not cancellable using simple Kotlin withTimeout()
+        // Use futures, because InetAddress.getByName() is not cancellable using Kotlin's withTimeout()
         val executor = Executors.newSingleThreadExecutor()
-        val future = executor.submit<InetAddress> {
-            InetAddress.getByName(domain)
+        val future = executor.submit<Boolean> {
+            try {
+                InetAddress.getByName(domain)
+                true
+            } catch (_: UnknownHostException) {
+                false
+            }
         }
         val success = try {
             withContext(Dispatchers.IO) {
                 future.get(timeoutMs, TimeUnit.MILLISECONDS)
             }
-            true
         } catch (_: TimeoutException) {
             future.cancel(true)
-            false
-        } catch (_: UnknownHostException) {
             false
         } finally {
             executor.shutdownNow()
@@ -153,7 +201,7 @@ abstract class BaseActivityBehaviorTest {
         assumeTrue("This test only works when DNS resolves the domain $domain", success)
     }
 
-    protected suspend fun assumeHttpHeadIsSuccess(@Suppress("SameParameterValue") url: String) {
+    suspend fun assumeHttpHeadIsSuccess(@Suppress("SameParameterValue") url: String) {
         val status = withContext(Dispatchers.IO) {
             HttpClient(CIO).head(url).status
         }
@@ -170,84 +218,89 @@ abstract class BaseActivityBehaviorTest {
      * because we often cannot use an exact match, because Google Maps returns different place name depending on the
      * phone's language and location.
      */
-    protected fun assertConversionSucceeded(expectedPoints: ImmutableList<Point>, timeoutMs: Long = NETWORK_TIMEOUT) =
-        uiAutomator {
-            onElement(timeoutMs) {
-                when (viewIdResourceName) {
-                    "geoShareResultSuccessLastPointName" -> true
-                    "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
-                    else -> false
+    fun UiAutomatorTestScope.assertConversionSucceeded(
+        expectedPoints: ImmutableList<Point>,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) {
+        onElement(timeoutMs) {
+            when (viewIdResourceName) {
+                "geoShareResultSuccessLastPointName" -> true
+                "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed")
+                else -> false
+            }
+        }
+        val expectedName = expectedPoints.lastOrNull()?.cleanName
+        onElement {
+            if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
+                if (!expectedName.isNullOrEmpty()) {
+                    assertTrue(
+                        """Expected "${textAsString()}" to contain "$expectedName"""",
+                        textAsString()?.contains(expectedName) == true,
+                    )
+                } else if (expectedPoints.size > 1) {
+                    assertTrue(
+                        """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
+                        textAsString() in setOf("Last point", "Dernier point"),
+                    )
+                } else {
+                    assertTrue(
+                        @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
+                        textAsString() in setOf(
+                            "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
+                        ),
+                    )
+                }
+                true
+            } else {
+                false
+            }
+        }
+        val expectedCoordinatesOptions = expectedPoints
+            .lastOrNull()
+            ?.takeIf { it.hasCoordinates() }
+            ?.let { point ->
+                CoordinateFormat.entries.map { coordinateFormat ->
+                    when (coordinateFormat) {
+                        CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
+                        CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
+                    }
                 }
             }
-            val expectedName = expectedPoints.lastOrNull()?.cleanName
+        if (expectedCoordinatesOptions != null) {
             onElement {
-                if (viewIdResourceName == "geoShareResultSuccessLastPointName") {
-                    if (!expectedName.isNullOrEmpty()) {
-                        assertTrue(
-                            """Expected "${textAsString()}" to contain "$expectedName"""",
-                            textAsString()?.contains(expectedName) == true,
-                        )
-                    } else if (expectedPoints.size > 1) {
-                        assertTrue(
-                            """Expected "${textAsString()}" to equal "Last point" or "Dernier point""""",
-                            textAsString() in setOf("Last point", "Dernier point"),
-                        )
-                    } else {
-                        assertTrue(
-                            @Suppress("SpellCheckingInspection") """Expected "${textAsString()}" to equal "Coordinates" or "Coordonnées""""",
-                            textAsString() in setOf(
-                                "Coordinates", @Suppress("SpellCheckingInspection") "Coordonnées"
-                            ),
-                        )
-                    }
+                if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
+                    assertTrue(
+                        """Expected "${textAsString()} to equal one of ${expectedCoordinatesOptions.joinToString()}""",
+                        textAsString() in expectedCoordinatesOptions,
+                    )
                     true
                 } else {
                     false
                 }
             }
-            val expectedCoordinatesOptions = expectedPoints
-                .lastOrNull()
-                ?.takeIf { it.hasCoordinates() }
-                ?.let { point ->
-                    CoordinateFormat.entries.map { coordinateFormat ->
-                        when (coordinateFormat) {
-                            CoordinateFormat.DEC -> CoordsFormat.formatDecCoords(point)
-                            CoordinateFormat.DEG_MIN_SEC -> CoordsFormat.formatDegMinSecCoords(point)
-                        }
-                    }
-                }
-            if (expectedCoordinatesOptions != null) {
-                onElement {
-                    if (viewIdResourceName == "geoShareResultSuccessLastPointCoordinates") {
-                        assertTrue(
-                            """Expected "${textAsString()} to equal one of ${expectedCoordinatesOptions.joinToString()}""",
-                            textAsString() in expectedCoordinatesOptions,
-                        )
-                        true
-                    } else {
-                        false
-                    }
-                }
-            }
-            if (expectedPoints.size > 1) {
-                onElement {
-                    if (viewIdResourceName == "geoShareResultSuccessAllPointsHeadline") {
-                        assertTrue(
-                            """Expected "${textAsString()}" to contain "${expectedPoints.size}"""",
-                            textAsString()?.contains(expectedPoints.size.toString()) == true,
-                        )
-                        true
-                    } else {
-                        false
-                    }
+        }
+        if (expectedPoints.size > 1) {
+            onElement {
+                if (viewIdResourceName == "geoShareResultSuccessAllPointsHeadline") {
+                    assertTrue(
+                        """Expected "${textAsString()}" to contain "${expectedPoints.size}"""",
+                        textAsString()?.contains(expectedPoints.size.toString()) == true,
+                    )
+                    true
+                } else {
+                    false
                 }
             }
         }
+    }
 
-    protected fun assertConversionSucceeded(expectedPoint: Point, timeoutMs: Long = NETWORK_TIMEOUT) =
+    fun UiAutomatorTestScope.assertConversionSucceeded(
+        expectedPoint: Point,
+        timeoutMs: Long = NETWORK_TIMEOUT,
+    ) =
         assertConversionSucceeded(persistentListOf(expectedPoint), timeoutMs)
 
-    protected fun waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
+    fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for Google Maps
         onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME }
 
@@ -270,7 +323,7 @@ abstract class BaseActivityBehaviorTest {
         onElement(20_000L) { packageName == GOOGLE_MAPS_PACKAGE_NAME && this.block() }
     }
 
-    protected fun waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
+    fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
         // Wait for TomTom
         onElement(30_000L) { packageName == TOMTOM_PACKAGE_NAME }
 
@@ -289,42 +342,42 @@ abstract class BaseActivityBehaviorTest {
         onElement { packageName == TOMTOM_PACKAGE_NAME && this.block() }
     }
 
-    protected fun shareUri(unsafeUriString: String) = uiAutomator {
+    fun UiAutomatorTestScope.shareUri(unsafeUriString: String) {
         // Use shell command instead of startActivity() to support Xiaomi
         device.executeShellCommand(
             @Suppress("SpellCheckingInspection") "am start -a android.intent.action.VIEW -d $unsafeUriString -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.ConversionActivity ${BuildConfig.APPLICATION_ID}"
         )
     }
 
-    protected fun goToMenuItem(block: AccessibilityNodeInfo.() -> Boolean) = uiAutomator {
+    fun UiAutomatorTestScope.goToMenuItem(block: AccessibilityNodeInfo.() -> Boolean) {
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement(block = block).click()
     }
 
-    protected fun goToInputsScreen() {
+    fun UiAutomatorTestScope.goToInputsScreen() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuInputs" }
     }
 
-    protected fun goToUserPreferencesScreen() {
+    fun UiAutomatorTestScope.goToUserPreferencesScreen() {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuUserPreferences" }
     }
 
-    protected fun goToUserPreferencesDetailConnectionPermissionScreen() = uiAutomator {
+    fun UiAutomatorTestScope.goToUserPreferencesDetailConnectionPermissionScreen() {
         goToUserPreferencesScreen()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.CONNECTION_PERMISSION}" }.click()
     }
 
-    protected fun goToUserPreferencesDetailCoordinateFormatScreen() = uiAutomator {
+    fun UiAutomatorTestScope.goToUserPreferencesDetailCoordinateFormatScreen() {
         goToUserPreferencesScreen()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.COORDINATE_FORMAT}" }.click()
     }
 
-    protected fun goToUserPreferencesDetailDeveloperScreen() = uiAutomator {
+    fun UiAutomatorTestScope.goToUserPreferencesDetailDeveloperScreen() {
         goToUserPreferencesScreen()
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" }.click()
     }
 
-    protected fun goToMainScreenFromUserPreferencesDetail() = uiAutomator {
+    fun UiAutomatorTestScope.goToMainScreenFromUserPreferencesDetail() {
         onElement { viewIdResourceName == "geoShareBack" }.click()
         if (onElementOrNull(1_000L) { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.DEVELOPER_OPTIONS}" } != null) {
             // On a non-tablet screen, we need to tap the back button one more time to get from the user preferences
@@ -333,7 +386,7 @@ abstract class BaseActivityBehaviorTest {
         }
     }
 
-    protected fun chooseFile() = uiAutomator {
+    fun UiAutomatorTestScope.chooseFile() {
         if (onElementOrNull(3_000L) { textAsString() == "Recent" } != null) {
             // If we happen to be in the Recent directory, go to Downloads, because it's not possible to save to Recent
             device.click(50, 100) // Tap the hamburger menu
@@ -346,5 +399,30 @@ abstract class BaseActivityBehaviorTest {
             }
         }
         onElement { textAsString() in setOf("SAVE", @Suppress("SpellCheckingInspection") "ENREGISTRER") }.click()
+    }
+
+    fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
+        device.executeShellCommand(
+            @Suppress("SpellCheckingInspection")
+            "appops set ${BuildConfig.APPLICATION_ID} android:mock_location allow"
+        )
+
+        val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+        val locationManager: LocationManager = context.getSystemService(LocationManager::class.java)
+        val mockProviderName = LocationManager.GPS_PROVIDER
+
+        locationManager.addTestProvider(
+            mockProviderName,
+            false, false, false, false, false, false, false,
+            ProviderProperties.POWER_USAGE_LOW,
+            ProviderProperties.ACCURACY_FINE,
+        )
+        locationManager.setTestProviderEnabled(mockProviderName, true)
+
+        try {
+            MockLocationScope(locationManager, mockProviderName).block()
+        } finally {
+            locationManager.removeTestProvider(mockProviderName)
+        }
     }
 }

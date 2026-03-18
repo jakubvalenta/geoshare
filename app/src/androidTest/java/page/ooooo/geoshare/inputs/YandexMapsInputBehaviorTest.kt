@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class YandexMapsInputBehaviorTest : BaseInputBehaviorTest() {
+class YandexMapsInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun yandexMaps() {
+    fun yandexMaps() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(-37.81384550094835, 144.96315783657042, z = 17.852003),
@@ -21,8 +22,10 @@ class YandexMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun yandexMapsHtml() = runBlocking {
-        assumeDomainResolvable("yandex.com")
+    fun yandexMapsHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("yandex.com")
+        }
 
         // Short URI
         testUri(

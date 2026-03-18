@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class WazeInputBehaviorTest : BaseInputBehaviorTest() {
+class WazeInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun waze() {
+    fun waze() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         closeIntro()
@@ -44,8 +45,10 @@ class WazeInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun wazeHtml() = runBlocking {
-        assumeDomainResolvable("waze.com")
+    fun wazeHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("waze.com")
+        }
 
         // Place id
         testUri(

@@ -5,13 +5,16 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
-class LinksScreenBehaviorTest : BaseActivityBehaviorTest() {
+class LinksBehaviorTest : BehaviorTest {
 
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
@@ -195,6 +198,43 @@ class LinksScreenBehaviorTest : BaseActivityBehaviorTest() {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormAppEnabled_checked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSheetEnabled_unchecked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormChipEnabled_unchecked" }
+        }
+    }
+
+    @Test
+    fun whenAppIsKilledAndBroughtToFront_restoresFormValues() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Go to link list
+        goToUserPreferencesScreen()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
+
+        // Go to link detail
+        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+
+        // Change name
+        onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }.apply {
+            setText(
+                "$text edited"
+            )
+        }
+
+        // Kill and bring to front
+        runBlocking {
+            killApplication()
+        }
+        bringApplicationToFront()
+
+        // Shows filled name
+        onElement {
+            if (viewIdResourceName == "geoShareLinkFormName") {
+                assertEquals("Apple Maps navigation edited", textAsString())
+                true
+            } else {
+                false
+            }
         }
     }
 }

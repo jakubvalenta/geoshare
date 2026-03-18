@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
@@ -7,9 +8,9 @@ import org.junit.Test
 import page.ooooo.geoshare.NotEmulator
 import page.ooooo.geoshare.lib.point.GCJ02Point
 
-class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
+class GoogleMapsInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun googleMaps() {
+    fun googleMaps() = uiAutomator {
         // Coordinates in data
         testUri(
             GCJ02Point(52.4083009, 16.929066199999998, name = "Poznań Old Town, 61-001 Poznań, Poland"),
@@ -73,8 +74,10 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun googleMapsHtml() = runBlocking {
-        assumeDomainResolvable("maps.google.com")
+    fun googleMapsHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("maps.google.com")
+        }
 
         // Launch app and close intro
         launchApplication()
@@ -111,7 +114,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
 
     @Test
     @NotEmulator
-    fun googleSearch() {
+    fun googleSearch() = uiAutomator {
         assumeTrue(
             "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
             false,
@@ -125,7 +128,7 @@ class GoogleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun googleMapsPlaceList() {
+    fun googleMapsPlaceList() = uiAutomator {
         assumeTrue("This test currently fails, because Google changed their HTML", false)
 
         // Place list

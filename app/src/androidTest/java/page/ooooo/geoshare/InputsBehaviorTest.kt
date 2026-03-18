@@ -5,10 +5,11 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.lib.inputs.InputDocumentationId
 
 @RunWith(AndroidJUnit4::class)
-class InputsScreenBehaviorTest : BaseActivityBehaviorTest() {
+class InputsBehaviorTest : BehaviorTest {
 
     @Test
     fun whenAppIsOpenTwice_isVisibleOnlyFirstTime() = uiAutomator {

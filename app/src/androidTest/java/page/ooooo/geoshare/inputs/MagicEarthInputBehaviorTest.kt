@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class MagicEarthInputBehaviorTest : BaseInputBehaviorTest() {
+class MagicEarthInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun magicEarth() {
+    fun magicEarth() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(48.85649, 2.35216),
