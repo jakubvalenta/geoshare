@@ -6,7 +6,7 @@ Sdílejte odkaz na mapy s Geo Share a tato aplikace jej otevře v jiné mapové 
 - Apple Mapy
 - 2GIS
 - Amap (AutoNavi)
-- Baidu Map (beta, bez krátkých odkazů)
+- Baidu Map (beta)
 - CoMaps
 - HERE WeGo
 - Magic Earth
@@ -31,7 +31,8 @@ Když rádi hledáte místa v Google Mapách, ale pro navigování preferujete j
 - Zobrazuje <b>zeměpisné souřadnice</b> odkazu na mapy a umožňuje je kopírovat do schránky v různých formátech, například jako geo: odkaz.
 - Zobrazuje všechny body <b>seznamu míst</b>.
 - Umožňuje <b>automaticky</b> provést zvolenou akci po zpracování odkazu.
-- Umožňuje <b>spustit navigaci</b> v aplikacích TomTom, Waze, Magic Earth...
+- Umožňuje <b>spustit navigaci</b> ve všech aplikacích, které to podporují, včetně TomTom.
+- Umožňuje otevřít místo ve <b>webových mapách</b>, předinstalovaných nebo vašich vlastních.
 - Umožňuje uložit místo jako <b>soubor GPX</b>.
 - Opakovaně zkouší spojení při <b>pomalém internetu</b>.
 - Umožňuje <b>vložit odkaz na mapy</b> přímo do aplikace, místo jeho sdílení s aplikací.
