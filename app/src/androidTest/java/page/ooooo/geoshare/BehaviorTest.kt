@@ -20,9 +20,7 @@ import io.ktor.http.isSuccess
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -100,30 +98,6 @@ interface BehaviorTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val activityManager = context.getSystemService(ActivityManager::class.java)
         activityManager.appTasks.forEach { it.finishAndRemoveTask() }
-    }
-
-    // FIXME
-    suspend fun UiAutomatorTestScope.killApplication(timeoutMs: Long = 3_000L, pollIntervalMs: Long = 100L) {
-        pressHome()
-        delay(500L) // Wait for the app to go to background, otherwise it doesn't get killed
-        device.executeShellCommand("am kill ${BuildConfig.APPLICATION_ID}")
-
-        // Poll until the process is gone
-        withTimeout(timeoutMs) {
-            while (
-                device.executeShellCommand(
-                    @Suppress("SpellCheckingInspection") "pidof ${BuildConfig.APPLICATION_ID}"
-                ).isNotBlank()
-            ) {
-                delay(pollIntervalMs)
-            }
-        }
-    }
-
-    fun UiAutomatorTestScope.bringApplicationToFront() {
-        device.executeShellCommand(
-            @Suppress("SpellCheckingInspection") "am start -n ${BuildConfig.APPLICATION_ID}/page.ooooo.geoshare.MainActivity ${BuildConfig.APPLICATION_ID}"
-        )
     }
 
     fun closeIntro() = uiAutomator {

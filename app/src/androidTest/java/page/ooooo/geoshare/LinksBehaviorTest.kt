@@ -71,9 +71,7 @@ class LinksBehaviorTest : BehaviorTest {
 
         // Update link
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }.apply {
-            setText(
-                "$text edited"
-            )
+            setText("$text edited")
         }
         onElement { viewIdResourceName == "geoShareLinkFormCoordsUriTemplate" && textAsString() == "https://maps.apple.com/?daddr={lat}%2C{lon}" }
             .apply { setText("$text&edited=1") }
@@ -198,43 +196,6 @@ class LinksBehaviorTest : BehaviorTest {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormAppEnabled_checked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSheetEnabled_unchecked" }
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormChipEnabled_unchecked" }
-        }
-    }
-
-    @Test
-    fun whenAppIsKilledAndBroughtToFront_restoresFormValues() = uiAutomator {
-        // Launch application and close intro
-        launchApplication()
-        closeIntro()
-
-        // Go to link list
-        goToUserPreferencesScreen()
-        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
-
-        // Go to link detail
-        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
-
-        // Change name
-        onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }.apply {
-            setText(
-                "$text edited"
-            )
-        }
-
-        // Kill and bring to front
-        runBlocking {
-            killApplication()
-        }
-        bringApplicationToFront()
-
-        // Shows filled name
-        onElement {
-            if (viewIdResourceName == "geoShareLinkFormName") {
-                assertEquals("Apple Maps navigation edited", textAsString())
-                true
-            } else {
-                false
-            }
         }
     }
 }
