@@ -62,10 +62,3 @@ fun MatchResult.toLonLatNamePoint(): NaivePoint? =
             NaivePoint(lat, lon, name = this.groupOrNull(3))
         }
     }
-
-fun MatchResult.toZLonLatPoint(): NaivePoint? =
-    this.doubleGroupOrNull(2)?.let { lon ->
-        this.doubleGroupOrNull(3)?.let { lat ->
-            NaivePoint(lat, lon, z = this.doubleGroupOrNull(1))
-        }
-    }

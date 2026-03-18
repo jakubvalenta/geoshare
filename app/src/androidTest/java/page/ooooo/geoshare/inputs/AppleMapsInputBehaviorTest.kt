@@ -2,7 +2,6 @@ package page.ooooo.geoshare.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
