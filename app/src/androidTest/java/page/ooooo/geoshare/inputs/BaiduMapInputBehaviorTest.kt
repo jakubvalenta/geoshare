@@ -1,13 +1,15 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.lib.point.BD09MCPoint
 
-class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
+class BaiduMapInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun baiduMap() {
+    fun baiduMap() = uiAutomator {
         // Center
         testUri(
             BD09MCPoint(3317203.0, 13520653.0, 13.0),
@@ -33,9 +35,11 @@ class BaiduMapInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun baiduMapHtml() = runBlocking {
-        assumeDomainResolvable("map.baidu.com")
-        assumeHttpHeadIsSuccess("https://maponline1.bdimg.com/tile/?qt=vtile&x=13490&y=6210&z=14&styles=pl&udt=20230101&scaler=1&p=1")
+    fun baiduMapHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("map.baidu.com")
+            assumeHttpHeadIsSuccess("https://maponline1.bdimg.com/tile/?qt=vtile&x=13490&y=6210&z=14&styles=pl&udt=20230101&scaler=1&p=1")
+        }
 
         // Shared point
         testUri(

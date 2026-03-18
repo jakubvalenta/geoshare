@@ -1,13 +1,14 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class OpenStreetMapInputBehaviorTest : BaseInputBehaviorTest() {
+class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun openStreetMap() {
+    fun openStreetMap() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(51.49, -0.13, z = 16.0),
@@ -28,8 +29,10 @@ class OpenStreetMapInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun openStreetMapHtml() = runBlocking {
-        assumeDomainResolvable("www.openstreetmap.org")
+    fun openStreetMapHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("www.openstreetmap.org")
+        }
 
         // Launch app and close intro
         launchApplication()

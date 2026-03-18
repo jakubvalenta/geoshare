@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.inputs
 
-import kotlinx.coroutines.test.runTest
+import androidx.test.uiautomator.uiAutomator
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
+class AppleMapsInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun appleMaps() {
+    fun appleMaps() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         closeIntro()
@@ -44,8 +45,10 @@ class AppleMapsInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun appleMapsHtml() = runTest {
-        assumeDomainResolvable("maps.apple.com")
+    fun appleMapsHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("maps.apple.com")
+        }
 
         // Launch app and close intro
         launchApplication()

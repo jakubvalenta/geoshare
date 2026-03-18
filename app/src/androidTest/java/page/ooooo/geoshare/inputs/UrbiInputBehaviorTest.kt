@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class UrbiInputBehaviorTest : BaseInputBehaviorTest() {
+class UrbiInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun urbi() {
+    fun urbi() = uiAutomator {
         // Point with marker
         testUri(
             WGS84Point(25.25915, 55.225263, z = 12.77),
@@ -15,8 +16,10 @@ class UrbiInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun urbiHtml() = runBlocking {
-        assumeDomainResolvable("go.2gis.com")
+    fun urbiHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("go.2gis.com")
+        }
 
         // Short URI
         testUri(

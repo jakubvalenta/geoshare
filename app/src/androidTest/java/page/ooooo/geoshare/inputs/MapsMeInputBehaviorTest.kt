@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class MapsMeInputBehaviorTest : BaseInputBehaviorTest() {
+class MapsMeInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun mapsMe() {
+    fun mapsMe() = uiAutomator {
         // Launch app and close intro
         launchApplication()
         closeIntro()

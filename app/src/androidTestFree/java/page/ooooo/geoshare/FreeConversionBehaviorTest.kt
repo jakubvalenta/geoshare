@@ -26,7 +26,7 @@ import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
-class FreeConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
+class FreeConversionBehaviorTest : BehaviorTest {
 
     @Test
     fun automationCopiesCoordinates() = uiAutomator {

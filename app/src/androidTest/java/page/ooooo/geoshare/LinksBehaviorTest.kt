@@ -8,10 +8,11 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
-class LinksScreenBehaviorTest : BaseActivityBehaviorTest() {
+class LinksBehaviorTest : BehaviorTest {
 
     @Test
     fun whenLinkIsInserted_allowsCopyingIt() = uiAutomator {
@@ -68,9 +69,7 @@ class LinksScreenBehaviorTest : BaseActivityBehaviorTest() {
 
         // Update link
         onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }.apply {
-            setText(
-                "$text edited"
-            )
+            setText("$text edited")
         }
         onElement { viewIdResourceName == "geoShareLinkFormCoordsUriTemplate" && textAsString() == "https://maps.apple.com/?daddr={lat}%2C{lon}" }
             .apply { setText("$text&edited=1") }
