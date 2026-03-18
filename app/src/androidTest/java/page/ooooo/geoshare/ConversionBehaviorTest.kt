@@ -20,7 +20,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
-class ConversionActivityBehaviorTest : BaseActivityBehaviorTest() {
+class ConversionBehaviorTest : BehaviorTest {
 
     @Test
     fun whenFullUriIsShared_showsPointAndAllowsOpeningGoogleMaps() = uiAutomator {

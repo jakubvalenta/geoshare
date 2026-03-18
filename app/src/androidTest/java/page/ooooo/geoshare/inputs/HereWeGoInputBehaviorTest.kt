@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class HereWeGoInputBehaviorTest : BaseInputBehaviorTest() {
+class HereWeGoInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun hereWeGo() {
+    fun hereWeGo() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(50.21972, -0.68453, z = 6.93),

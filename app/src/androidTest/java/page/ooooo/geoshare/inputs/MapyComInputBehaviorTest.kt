@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.inputs
 
+import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
-class MapyComInputBehaviorTest : BaseInputBehaviorTest() {
+class MapyComInputBehaviorTest : InputBehaviorTest {
     @Test
-    fun mapyCom() {
+    fun mapyCom() = uiAutomator {
         // Coordinates
         testUri(
             WGS84Point(50.0525078, 14.0184810, z = 9.0),
@@ -25,8 +26,10 @@ class MapyComInputBehaviorTest : BaseInputBehaviorTest() {
     }
 
     @Test
-    fun mapyComHtml() = runBlocking {
-        assumeDomainResolvable("mapy.com")
+    fun mapyComHtml() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("mapy.com")
+        }
 
         // Short URI
         testUri(

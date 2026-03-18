@@ -1,29 +1,30 @@
 package page.ooooo.geoshare.inputs
 
-import androidx.test.uiautomator.uiAutomator
+import androidx.test.uiautomator.UiAutomatorTestScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.BaseActivityBehaviorTest
+import page.ooooo.geoshare.BehaviorTest
+import page.ooooo.geoshare.BehaviorTest.Companion.NETWORK_TIMEOUT
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.point.Point
 
-abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
+interface InputBehaviorTest : BehaviorTest {
 
-    protected fun setUserPreferenceConnectionPermissionToAlways() = uiAutomator {
+    fun UiAutomatorTestScope.setUserPreferenceConnectionPermissionToAlways() {
         goToUserPreferencesDetailConnectionPermissionScreen()
         onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_${Permission.ALWAYS}" }.click()
     }
 
-    protected fun confirmDialogIfVisible() = uiAutomator {
+    fun UiAutomatorTestScope.confirmDialogIfVisible() {
         onElementOrNull(3000L) { viewIdResourceName == "geoShareConfirmationDialogConfirmButton" }?.click()
     }
 
-    protected fun goToMainForm() = uiAutomator {
+    fun UiAutomatorTestScope.goToMainForm() {
         // Make sure we leave the result screen, if we're there, so that we don't accidentally test the old result.
         onElementOrNull(1000L) { viewIdResourceName == "geoShareMainBackButton" }?.click()
     }
 
-    private fun goToMainFormAndShareUriAndConfirmDialog(unsafeUriString: String) = uiAutomator {
+    fun UiAutomatorTestScope.goToMainFormAndShareUriAndConfirmDialog(unsafeUriString: String) {
         // Go to main form
         goToMainForm()
 
@@ -32,19 +33,19 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         confirmDialogIfVisible()
     }
 
-    protected fun testUri(
+    fun UiAutomatorTestScope.testUri(
         expectedPoints: ImmutableList<Point>,
         unsafeUriString: String,
         timeoutMs: Long = NETWORK_TIMEOUT,
-    ) = uiAutomator {
+    ) {
         goToMainFormAndShareUriAndConfirmDialog(unsafeUriString)
         assertConversionSucceeded(expectedPoints, timeoutMs)
     }
 
-    protected fun testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
+    fun UiAutomatorTestScope.testUri(expectedPoint: Point, unsafeUriString: String, timeoutMs: Long = NETWORK_TIMEOUT) =
         testUri(persistentListOf(expectedPoint), unsafeUriString, timeoutMs)
 
-    protected fun testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) = uiAutomator {
+    fun UiAutomatorTestScope.testTextUri(expectedPoints: ImmutableList<Point>, unsafeText: String) {
         // It would be preferable to test sharing of the text with the app, but this shell command doesn't work when
         // there are spaces in the texts, so we put the text in the main screen of the app instead.
         // device.executeShellCommand(
@@ -74,6 +75,6 @@ abstract class BaseInputBehaviorTest : BaseActivityBehaviorTest() {
         assertConversionSucceeded(expectedPoints)
     }
 
-    protected fun testTextUri(expectedPoint: Point, unsafeText: String) =
+    fun UiAutomatorTestScope.testTextUri(expectedPoint: Point, unsafeText: String) =
         testTextUri(persistentListOf(expectedPoint), unsafeText)
 }

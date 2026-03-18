@@ -11,7 +11,7 @@ import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
-class DemoBillingScreenBehaviorTest : BaseActivityBehaviorTest() {
+class DemoBillingBehaviorTest : BehaviorTest {
 
     private fun purchaseAndRefund(offerResourceName: String, manageButtonResourceName: String) = uiAutomator {
         // Launch application and close intro
