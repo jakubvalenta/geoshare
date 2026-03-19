@@ -91,23 +91,31 @@ private val darkScheme = darkColorScheme(
 
 @Immutable
 data class ScreenshotColors(
+    val surfaceColor: Color,
+    val surfaceContainerHighestColor: Color,
     val textColor: Color,
     val mutedTextColor: Color,
 )
 
 val LocalScreenshotColors = staticCompositionLocalOf {
     ScreenshotColors(
+        surfaceColor = Color.Unspecified,
+        surfaceContainerHighestColor = Color.Unspecified,
         textColor = Color.Unspecified,
         mutedTextColor = Color.Unspecified,
     )
 }
 
 private val lightScreenshotColors = ScreenshotColors(
+    surfaceColor = screenshotSurfaceLight,
+    surfaceContainerHighestColor = screenshotSurfaceContainerHighestLight,
     textColor = screenshotTextColorLight,
     mutedTextColor = screenshotMutedTextColorLight,
 )
 
 private val darkScreenshotColors = ScreenshotColors(
+    surfaceColor = screenshotSurfaceDark,
+    surfaceContainerHighestColor = screenshotSurfaceContainerHighestDark,
     textColor = screenshotTextColorDark,
     mutedTextColor = screenshotMutedTextColorDark,
 )

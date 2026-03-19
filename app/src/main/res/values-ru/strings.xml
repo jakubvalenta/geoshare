@@ -63,7 +63,7 @@
     <string name="conversion_failed_parse_html_error">Не удалось получить веб-страницу из картографического сервиса</string>
     <string name="conversion_failed_connection_permission_denied">Эта ссылка не поддерживается без подключения к картографическому сервису</string>
     <string name="main_input_uri_supporting_text">Например, https://maps.app.goo.gl/… или maps.apple.com/…</string>
-    <string name="intro_open_by_default_app_note"><![CDATA[Выберете хотя бы <tt>maps.google.com</tt> и <tt>maps.app.goo.gl</tt>. Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Карт.]]></string>
+    <string name="intro_open_by_default_app_note">Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Карт.</string>
     <string name="intro_open_by_default_app_content_description">Снимок экрана настроек %1$s «Открыть по умолчанию»</string>
     <string name="conversion_failed_missing_url">Отсутствует URL-адрес</string>
     <string name="conversion_permission_common_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить их.]]></string>
