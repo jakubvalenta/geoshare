@@ -74,8 +74,12 @@ val surfaceContainerDark = Color(0xFF19211F)
 val surfaceContainerHighDark = Color(0xFF232C29)
 val surfaceContainerHighestDark = Color(0xFF2E3734)
 
+val screenshotSurfaceLight = Color(0xFFEEEEEE)
+val screenshotSurfaceContainerHighestLight = Color(0xFFE8E8E8)
 val screenshotTextColorLight = Color(0XFF1B1B1B)
 val screenshotMutedTextColorLight = Color(0XFF474747)
 
+val screenshotSurfaceDark = Color(0XFF191919)
+val screenshotSurfaceContainerHighestDark = Color(0xFF1F1F1F)
 val screenshotTextColorDark = Color(0xFFE2E2E2)
 val screenshotMutedTextColorDark = Color(0xFFC6C6C6)
