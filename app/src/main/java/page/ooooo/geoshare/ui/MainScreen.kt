@@ -10,10 +10,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -50,8 +52,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -82,9 +86,16 @@ import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -142,8 +153,10 @@ import page.ooooo.geoshare.ui.components.ResultSuccessApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
+import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -493,10 +506,10 @@ private fun MainScreen(
                     )
                     if (!wide) {
                         Column(
+                            // This column must not have weight(1f), otherwise the last row of app icons gets shrinked
                             Modifier
-                                .background(containerColor)
                                 .fillMaxWidth()
-                                .padding(top = spacing.largeAdaptive)
+                                .background(containerColor)
                         ) {
                             CompositionLocalProvider(LocalContentColor provides contentColor) {
                                 MainSupportingPane(
@@ -517,16 +530,19 @@ private fun MainScreen(
                                     onHideApp = onHideApp,
                                     onSetErrorMessageResId = setErrorMessageResId,
                                     onUpdateInput = onUpdateInput,
+                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
                                 )
                             }
                         }
                     }
-                    Spacer(
+                    Column(
                         Modifier
-                            .background(if (wide) containerColor else containerColor)
                             .weight(1f)
                             .fillMaxWidth()
-                    )
+                            .background(containerColor)
+                    ) {
+                        MainBottomPane(currentState)
+                    }
                 }
                 MainBottomBar(
                     currentState,
@@ -542,7 +558,6 @@ private fun MainScreen(
                 Column(
                     Modifier
                         .weight(1f)
-                        .padding(top = spacing.headlineTopAdaptive)
                         .verticalScroll(rememberScrollState())
                         .testTag("geoShareMainSupportingPane"),
                 ) {
@@ -564,6 +579,7 @@ private fun MainScreen(
                         onHideApp = onHideApp,
                         onSetErrorMessageResId = setErrorMessageResId,
                         onUpdateInput = onUpdateInput,
+                        modifier = Modifier.padding(top = spacing.headlineTopAdaptive),
                     )
                 }
             },
@@ -773,14 +789,27 @@ private fun MainMainPane(
             )
         }
     }
+}
 
+@Composable
+private fun MainBottomPane(currentState: State) {
     if (currentState is GrantedParseWebPermission) {
-        ConversionWebView(
-            unsafeUrl = currentState.webUriString,
-            onUrlChange = { currentState.onUrlChange(it) },
-            extendWebSettings = { currentState.input.extendWebSettings(it) },
-            shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
-        )
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val wholeSquaresCount = floor(maxWidth.value / 30)
+            val squarePx = with(LocalDensity.current) { (maxWidth / wholeSquaresCount).toPx() }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer { alpha = 0.1f }
+                    .checkeredBackground(squarePx)
+            )
+            ConversionWebView(
+                unsafeUrl = currentState.webUriString,
+                onUrlChange = { currentState.onUrlChange(it) },
+                extendWebSettings = { currentState.input.extendWebSettings(it) },
+                shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
+            )
+        }
     }
 }
 
@@ -803,6 +832,7 @@ private fun MainSupportingPane(
     onHideApp: (packageName: String) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {}
@@ -810,6 +840,7 @@ private fun MainSupportingPane(
             ResultSuccessMessage(
                 currentState = currentState,
                 appDetails = appDetails,
+                modifier = modifier,
                 automationFeatureStatus = automationFeatureStatus,
                 onCancel = onCancel,
                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
@@ -829,6 +860,7 @@ private fun MainSupportingPane(
 
         is Initial -> {
             MainFormLinks(
+                modifier = modifier,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
                 onSetErrorMessageResId = onSetErrorMessageResId,
@@ -1108,7 +1140,15 @@ private fun SucceededPreview() {
             linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1169,7 +1209,84 @@ private fun DarkSucceededPreview() {
             linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                ),
+                emptySet(),
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onExecute = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallSucceededPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = ActionFinished(
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.example,
+                ),
+                action = NoopAction,
+                isAutomation = false,
+            ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                refundable = true,
+            ),
+            changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputUriString = "",
+            largeLoadingIndicatorVisible = false,
+            linkMessage = null,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1230,7 +1347,15 @@ private fun TabletSucceededPreview() {
             linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1543,7 +1668,7 @@ private fun WebViewPreview() {
             changelogShown = true,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicatorVisible = false,
+            largeLoadingIndicatorVisible = true,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1602,7 +1727,7 @@ private fun DarkWebViewPreview() {
             changelogShown = true,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicatorVisible = false,
+            largeLoadingIndicatorVisible = true,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1661,7 +1786,7 @@ private fun TabletWebViewPreview() {
             changelogShown = true,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicatorVisible = false,
+            largeLoadingIndicatorVisible = true,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),

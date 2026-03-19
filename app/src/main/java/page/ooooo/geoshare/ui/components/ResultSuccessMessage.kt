@@ -89,6 +89,7 @@ fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
     appDetails: AppDetails,
     automationFeatureStatus: FeatureStatus,
+    modifier: Modifier = Modifier,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
@@ -113,7 +114,7 @@ fun ResultSuccessMessage(
 
     AnimatedContent(
         targetState,
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = spacing.windowPadding)
             .fillMaxWidth()
             .height(40.dp),
