@@ -39,6 +39,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -53,6 +57,7 @@ import page.ooooo.geoshare.ui.components.ScreenshotMapAppOpen
 import page.ooooo.geoshare.ui.components.ScreenshotOpen
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefaultMapApp
+import page.ooooo.geoshare.ui.components.styledArgsString
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -189,10 +194,23 @@ private fun IntroScreen(
                             ) {
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
-                            ParagraphHtml(
-                                // TODO Update second page text
+                            Text(
+                                styledArgsString(
+                                    R.string.intro_open_by_default_app_note_1,
+                                    SpanStyle(fontWeight = FontWeight.Bold),
+                                    "maps.app.goog.gl", "maps.google.com", "www.google.com",
+                                ),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    lineBreak = LineBreak.Paragraph,
+                                    hyphens = Hyphens.Auto,
+                                ),
+                            )
+                            Text(
                                 stringResource(R.string.intro_open_by_default_app_note),
-                                Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    lineBreak = LineBreak.Paragraph,
+                                    hyphens = Hyphens.Auto,
+                                ),
                             )
                         }
                     }

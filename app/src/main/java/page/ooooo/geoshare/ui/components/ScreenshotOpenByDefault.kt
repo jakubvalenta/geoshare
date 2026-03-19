@@ -65,7 +65,7 @@ fun ScreenshotOpenByDefault() {
                         scaleX = scale
                         scaleY = scale
                     }
-                    .clip(MaterialTheme.shapes.large)
+                    .clip(MaterialTheme.shapes.extraLarge)
                     .background(ScreenshotTheme.colors.surfaceColor)
             ) {
                 Text(
