@@ -10,10 +10,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -50,8 +52,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -142,8 +146,10 @@ import page.ooooo.geoshare.ui.components.ResultSuccessApps
 import page.ooooo.geoshare.ui.components.ResultSuccessCoordinates
 import page.ooooo.geoshare.ui.components.ResultSuccessMessage
 import page.ooooo.geoshare.ui.components.ResultSuccessSheet
+import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -491,13 +497,13 @@ private fun MainScreen(
                         onStart = onStart,
                         onUpdateInput = onUpdateInput,
                     )
-                    if (!wide) {
-                        Column(
-                            Modifier
-                                .background(containerColor)
-                                .fillMaxWidth()
-                                .padding(top = spacing.largeAdaptive)
-                        ) {
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(containerColor)
+                    ) {
+                        if (!wide) {
                             CompositionLocalProvider(LocalContentColor provides contentColor) {
                                 MainSupportingPane(
                                     appDetails = appDetails,
@@ -517,16 +523,12 @@ private fun MainScreen(
                                     onHideApp = onHideApp,
                                     onSetErrorMessageResId = setErrorMessageResId,
                                     onUpdateInput = onUpdateInput,
+                                    modifier = Modifier.padding(top = spacing.largeAdaptive),
                                 )
                             }
                         }
+                        MainBottomPane(currentState)
                     }
-                    Spacer(
-                        Modifier
-                            .background(if (wide) containerColor else containerColor)
-                            .weight(1f)
-                            .fillMaxWidth()
-                    )
                 }
                 MainBottomBar(
                     currentState,
@@ -542,7 +544,6 @@ private fun MainScreen(
                 Column(
                     Modifier
                         .weight(1f)
-                        .padding(top = spacing.headlineTopAdaptive)
                         .verticalScroll(rememberScrollState())
                         .testTag("geoShareMainSupportingPane"),
                 ) {
@@ -564,6 +565,7 @@ private fun MainScreen(
                         onHideApp = onHideApp,
                         onSetErrorMessageResId = setErrorMessageResId,
                         onUpdateInput = onUpdateInput,
+                        modifier = Modifier.padding(top = spacing.headlineTopAdaptive),
                     )
                 }
             },
@@ -773,14 +775,27 @@ private fun MainMainPane(
             )
         }
     }
+}
 
+@Composable
+private fun MainBottomPane(currentState: State) {
     if (currentState is GrantedParseWebPermission) {
-        ConversionWebView(
-            unsafeUrl = currentState.webUriString,
-            onUrlChange = { currentState.onUrlChange(it) },
-            extendWebSettings = { currentState.input.extendWebSettings(it) },
-            shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
-        )
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val wholeSquaresCount = floor(maxWidth.value / 30)
+            val squarePx = with(LocalDensity.current) { (maxWidth / wholeSquaresCount).toPx() }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .graphicsLayer { alpha = 0.1f }
+                    .checkeredBackground(squarePx)
+            )
+            ConversionWebView(
+                unsafeUrl = currentState.webUriString,
+                onUrlChange = { currentState.onUrlChange(it) },
+                extendWebSettings = { currentState.input.extendWebSettings(it) },
+                shouldInterceptRequest = { currentState.input.shouldInterceptRequest(it) },
+            )
+        }
     }
 }
 
@@ -803,6 +818,7 @@ private fun MainSupportingPane(
     onHideApp: (packageName: String) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {}
@@ -810,6 +826,7 @@ private fun MainSupportingPane(
             ResultSuccessMessage(
                 currentState = currentState,
                 appDetails = appDetails,
+                modifier = modifier,
                 automationFeatureStatus = automationFeatureStatus,
                 onCancel = onCancel,
                 onNavigateToUserPreferencesAutomationScreen = onNavigateToUserPreferencesAutomationScreen,
@@ -829,6 +846,7 @@ private fun MainSupportingPane(
 
         is Initial -> {
             MainFormLinks(
+                modifier = modifier,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onNavigateToIntroScreen = onNavigateToIntroScreen,
                 onSetErrorMessageResId = onSetErrorMessageResId,
@@ -1543,7 +1561,7 @@ private fun WebViewPreview() {
             changelogShown = true,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicatorVisible = false,
+            largeLoadingIndicatorVisible = true,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1602,7 +1620,7 @@ private fun DarkWebViewPreview() {
             changelogShown = true,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicatorVisible = false,
+            largeLoadingIndicatorVisible = true,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
@@ -1661,7 +1679,7 @@ private fun TabletWebViewPreview() {
             changelogShown = true,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
-            largeLoadingIndicatorVisible = false,
+            largeLoadingIndicatorVisible = true,
             linkMessage = null,
             outputsForApps = emptyMap(),
             outputsForLinks = emptyMap(),
