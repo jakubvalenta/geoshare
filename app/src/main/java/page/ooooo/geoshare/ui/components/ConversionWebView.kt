@@ -12,10 +12,12 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,6 +67,14 @@ fun ConversionWebView(
                 Log.d(TAG, "URL hasn't changed in $urlChangeDebounceTimeout, calling callback")
                 onUrlChange(urlString)
             }
+    }
+
+
+    // Render a placeholder in Preview, because WebView is not supported there
+    val isPreview = LocalInspectionMode.current
+    if (isPreview) {
+        Text("WebView: $unsafeUrl")
+        return
     }
 
     AndroidView(

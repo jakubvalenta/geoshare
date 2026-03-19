@@ -28,12 +28,13 @@ fun MainFormLinks(
     onNavigateToIntroScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onUpdateInput: (newInputUriString: String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
     Column(
-        Modifier
+        modifier
             .padding(horizontal = spacing.windowPadding),
     ) {
         TextButton(onNavigateToInputsScreen) {
