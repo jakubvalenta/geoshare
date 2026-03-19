@@ -190,6 +190,7 @@ private fun IntroScreen(
                                 Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                             }
                             ParagraphHtml(
+                                // TODO Update second page text
                                 stringResource(R.string.intro_open_by_default_app_note),
                                 Modifier.fillMaxWidth(),
                             )
@@ -313,6 +314,18 @@ private fun DarkPageOnePreview() {
     }
 }
 
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPageOnePreview() {
+    AppTheme {
+        IntroScreen(
+            onClose = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
+    }
+}
+
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletPageOnePreview() {
@@ -341,6 +354,19 @@ private fun PageTwoPreview() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPageTwoPreview() {
+    AppTheme {
+        IntroScreen(
+            initialPage = 1,
+            onClose = {},
+            onShowOpenByDefaultSettings = {},
+            onShowOpenByDefaultSettingsForPackage = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallPageTwoPreview() {
     AppTheme {
         IntroScreen(
             initialPage = 1,
