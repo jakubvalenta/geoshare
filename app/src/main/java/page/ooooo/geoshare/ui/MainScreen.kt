@@ -86,9 +86,16 @@ import page.ooooo.geoshare.lib.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
+import page.ooooo.geoshare.lib.android.COMAPS_FDROID_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.DataType
+import page.ooooo.geoshare.lib.android.GMAPS_WV_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.HERE_WEGO_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.MAGIC_EARTH_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.MAPY_COM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
+import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.billing.BillingImpl
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -497,13 +504,13 @@ private fun MainScreen(
                         onStart = onStart,
                         onUpdateInput = onUpdateInput,
                     )
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .background(containerColor)
-                    ) {
-                        if (!wide) {
+                    if (!wide) {
+                        Column(
+                            // This column must not have weight(1f), otherwise the last row of app icons gets shrinked
+                            Modifier
+                                .fillMaxWidth()
+                                .background(containerColor)
+                        ) {
                             CompositionLocalProvider(LocalContentColor provides contentColor) {
                                 MainSupportingPane(
                                     appDetails = appDetails,
@@ -527,6 +534,13 @@ private fun MainScreen(
                                 )
                             }
                         }
+                    }
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(containerColor)
+                    ) {
                         MainBottomPane(currentState)
                     }
                 }
@@ -1126,7 +1140,15 @@ private fun SucceededPreview() {
             linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1187,7 +1209,84 @@ private fun DarkSucceededPreview() {
             linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
+                ),
+                emptySet(),
+            ),
+            outputsForLinks = getOutputsForLinks(defaultFakeLinks),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = getOutputsForPointChips(defaultFakeLinks),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = getOutputsForPointsChips(),
+            outputsForSharing = getOutputsForSharing(),
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onExecute = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true, device = Devices.NEXUS_5)
+@Composable
+private fun SmallSucceededPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = ActionFinished(
+                inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                points = persistentListOf(
+                    Point.genRandomPoint(),
+                    Point.example,
+                ),
+                action = NoopAction,
+                isAutomation = false,
+            ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                refundable = true,
+            ),
+            changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputUriString = "",
+            largeLoadingIndicatorVisible = false,
+            linkMessage = null,
+            outputsForApps = getOutputsForApps(
+                mapOf(
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
@@ -1248,7 +1347,15 @@ private fun TabletSucceededPreview() {
             linkMessage = null,
             outputsForApps = getOutputsForApps(
                 mapOf(
-                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    COMAPS_FDROID_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    GMAPS_WV_PACKAGE_NAME to setOf(DataType.GEO_URI),
+                    GOOGLE_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    HERE_WEGO_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    MAGIC_EARTH_PACKAGE_NAME to setOf(DataType.MAGIC_EARTH_URI),
+                    MAPY_COM_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    ORGANIC_MAPS_PACKAGE_NAME to setOf(DataType.GEO_URI, DataType.GOOGLE_NAVIGATION_URI),
+                    OSMAND_PLUS_PACKAGE_NAME to setOf(DataType.GPX_DATA),
+                    TOMTOM_PACKAGE_NAME to setOf(DataType.GPX_ONE_POINT_DATA),
                 ),
                 emptySet(),
             ),
