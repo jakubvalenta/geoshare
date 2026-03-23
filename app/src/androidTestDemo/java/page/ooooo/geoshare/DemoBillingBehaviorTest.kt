@@ -7,7 +7,9 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
-import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
+import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
@@ -143,7 +145,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultSuccessMessage" }
     }
 
-    private fun goToBillingScreen() {
+    private fun goToBillingScreen() = uiAutomator {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
     }
 }
