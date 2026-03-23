@@ -92,10 +92,13 @@ of links in this app, and tap _Add links_.
 ![Screenshot of Geo Share’s Open by default
 settings](./docs/open_by_default_geo_share.webp)
 
-Select at least `maps.google.com` and `maps.app.goo.gl`. If some links are
-grayed out, other Google apps are set to open them by default. You can find
-these apps and turn off the opening of links for them, like we did for Google
-Maps.
+Select **maps.app.goog.gl**, **maps.google.com**, and **www.google.com**. These
+are the common Google Maps links. You can choose other maps or the more rare
+links too, but it’s not essential.
+
+If some links are grayed out, other map apps are set to open them by default.
+You can find these apps and turn off the opening of links for them, like we did
+for Google Maps.
 
 ## How it works
 
