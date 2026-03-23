@@ -219,7 +219,7 @@ Create file `fastlane/Appfile` with the following content:
 
 ```ruby
 json_key_file("path/to/play-store-credentials.json")
-package_name("page.ooooo.geoshare")
+package_name("page.ooooo.geoshare.pro")
 ```
 
 ### Updating Google Play metadata
