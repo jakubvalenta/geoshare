@@ -46,8 +46,8 @@ class BillingImpl(
     private val context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     override val products: ImmutableList<BillingProduct> = persistentListOf(
-        BillingProduct("pro_one_time", BillingProduct.Type.ONE_TIME),
-        BillingProduct("pro_subscription", BillingProduct.Type.SUBSCRIPTION),
+        BillingProduct("pro_lifetime", BillingProduct.Type.ONE_TIME),
+        BillingProduct("pro_monthly", BillingProduct.Type.SUBSCRIPTION),
     ),
     private val productDetailsParamsBuilder: () -> ProductDetailsParamsBuilder = { DefaultProductDetailsParamsBuilder() },
     private val billingFlowParamsBuilder: () -> BillingFlowParamsBuilder = { DefaultBillingFlowParamsBuilder() },

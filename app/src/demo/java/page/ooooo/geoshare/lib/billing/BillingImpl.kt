@@ -21,14 +21,14 @@ class BillingImpl(private val context: Context) : Billing {
     override val appNameResId = R.string.app_name_pro
     override val features = persistentListOf(AutomationFeature)
     override val products = persistentListOf(
-        BillingProduct("demo_one_time", BillingProduct.Type.ONE_TIME),
-        BillingProduct("demo_subscription", BillingProduct.Type.SUBSCRIPTION),
+        BillingProduct("demo_lifetime", BillingProduct.Type.ONE_TIME),
+        BillingProduct("demo_monthly", BillingProduct.Type.SUBSCRIPTION),
     )
     override val refundableDuration = 48.hours
 
     private val offers = listOf(
-        Offer("offer_one_time", "$19", Offer.Period.ONE_TIME, "demo_one_time"),
-        Offer("offer_subscription", "$1.50", Offer.Period.MONTHLY, "demo_subscription"),
+        Offer("offer_one_time", "$19", Offer.Period.ONE_TIME, "demo_lifetime"),
+        Offer("offer_subscription", "$1.50", Offer.Period.MONTHLY, "demo_monthly"),
     )
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())

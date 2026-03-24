@@ -51,7 +51,7 @@ class BillingImplTest {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -71,8 +71,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -87,7 +87,7 @@ class BillingImplTest {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -107,8 +107,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -128,7 +128,7 @@ class BillingImplTest {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -148,8 +148,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -169,7 +169,7 @@ class BillingImplTest {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -189,15 +189,15 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_one_time" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = true
             ),
             billingImpl.status.value,
         )
@@ -211,7 +211,7 @@ class BillingImplTest {
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -231,15 +231,15 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_one_time" }, refundable = false
+                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = false
             ),
             billingImpl.status.value,
         )
@@ -273,8 +273,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -296,7 +296,7 @@ class BillingImplTest {
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
                         },
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_subscription")
+                            on { products } doReturn listOf("test_monthly")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -322,15 +322,15 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_subscription" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_monthly" }, refundable = true
             ),
             billingImpl.status.value,
         )
@@ -364,8 +364,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -377,7 +377,7 @@ class BillingImplTest {
     fun status_whenFirstPurchasesResponseContainsKnownProductAndSecondResponseContainsUnknownProduct_isPurchased() {
         val purchaseTimeValue = System.currentTimeMillis()
         val responseProductIds = listOf(
-            "test_one_time",
+            "test_lifetime",
             "spam",
         ).iterator()
         val billingClient = object : FakeBillingClient() {
@@ -405,15 +405,15 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_one_time" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = true
             ),
             billingImpl.status.value,
         )
@@ -439,8 +439,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -481,8 +481,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -497,17 +497,17 @@ class BillingImplTest {
         val responseProductDetailsLists = listOf(
             listOf(
                 mock<ProductDetails> {
-                    on { productId } doReturn "test_one_time"
+                    on { productId } doReturn "test_lifetime"
                     on { oneTimePurchaseOfferDetailsList } doReturn emptyList()
                 },
                 mock<ProductDetails> {
-                    on { productId } doReturn "test_subscription"
+                    on { productId } doReturn "test_monthly"
                     on { oneTimePurchaseOfferDetails } doReturn null
                 },
             ),
             listOf(
                 mock<ProductDetails> {
-                    on { productId } doReturn "test_subscription"
+                    on { productId } doReturn "test_monthly"
                     on { subscriptionOfferDetails } doReturn null
                 },
             ),
@@ -536,8 +536,8 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
             log = FakeLog,
         )
@@ -607,7 +607,7 @@ class BillingImplTest {
                         on { formattedPrice } doReturn "$1"
                     }.let { oneTimePurchaseOfferDetails ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { oneTimePurchaseOfferDetailsList } doReturn listOf(oneTimePurchaseOfferDetails)
                         }
                     },
@@ -616,7 +616,7 @@ class BillingImplTest {
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_subscription"
+                            on { productId } doReturn "test_monthly"
                             on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                         }
                     },
@@ -637,7 +637,7 @@ class BillingImplTest {
                         }
                     }.let { subscriptionOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_subscription"
+                            on { productId } doReturn "test_monthly"
                             on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
                         }
                     },
@@ -667,16 +667,16 @@ class BillingImplTest {
                 context,
                 billingClientBuilder,
                 products = persistentListOf(
-                    BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                    BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                 ),
                 log = FakeLog,
             )
             assertEquals(
                 listOf(
-                    Offer("offer_one_time_details_list", "$1", Offer.Period.ONE_TIME, "test_one_time"),
-                    Offer("offer_one_time_details", "$3.33", Offer.Period.ONE_TIME, "test_subscription"),
-                    Offer("offer_subscription_details", "$99.90", Offer.Period.MONTHLY, "test_subscription"),
+                    Offer("offer_one_time_details_list", "$1", Offer.Period.ONE_TIME, "test_lifetime"),
+                    Offer("offer_one_time_details", "$3.33", Offer.Period.ONE_TIME, "test_monthly"),
+                    Offer("offer_subscription_details", "$99.90", Offer.Period.MONTHLY, "test_monthly"),
                 ),
                 billingImpl.queryOffers(),
             )
@@ -703,7 +703,7 @@ class BillingImplTest {
                         }
                     }.let { subscriptionOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
                         }
                     },
@@ -722,7 +722,7 @@ class BillingImplTest {
                         }
                     }.let { subscriptionOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
                         }
                     },
@@ -741,7 +741,7 @@ class BillingImplTest {
                         }
                     }.let { subscriptionOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
                         }
                     },
@@ -771,14 +771,14 @@ class BillingImplTest {
                 context,
                 billingClientBuilder,
                 products = persistentListOf(
-                    BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
-                    BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                 ),
                 log = FakeLog,
             )
             assertEquals(
                 listOf(
-                    Offer("offer_monthly_infinite", "$3", Offer.Period.MONTHLY, "test_one_time"),
+                    Offer("offer_monthly_infinite", "$3", Offer.Period.MONTHLY, "test_lifetime"),
                 ),
                 billingImpl.queryOffers(),
             )
@@ -793,7 +793,7 @@ class BillingImplTest {
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
-                        on { productId } doReturn "test_one_time"
+                        on { productId } doReturn "test_lifetime"
                         on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                     }
                 },
@@ -812,7 +812,7 @@ class BillingImplTest {
                     BillingResult.newBuilder()
                         .setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -847,7 +847,7 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
             log = FakeLog,
         )
@@ -868,7 +868,7 @@ class BillingImplTest {
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
-                        on { productId } doReturn "test_one_time"
+                        on { productId } doReturn "test_lifetime"
                         on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                         on { zza() } doReturn "test_package_name"
                     }
@@ -888,7 +888,7 @@ class BillingImplTest {
                     BillingResult.newBuilder()
                         .setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -925,7 +925,7 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
             productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
             billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -948,7 +948,7 @@ class BillingImplTest {
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
-                        on { productId } doReturn "test_one_time"
+                        on { productId } doReturn "test_lifetime"
                         on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                     }
                 },
@@ -967,7 +967,7 @@ class BillingImplTest {
                     BillingResult.newBuilder()
                         .setResponseCode(BillingResponseCode.USER_CANCELED).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -1002,7 +1002,7 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
             productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
             billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -1025,7 +1025,7 @@ class BillingImplTest {
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
-                        on { productId } doReturn "test_one_time"
+                        on { productId } doReturn "test_lifetime"
                         on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                     }
                 },
@@ -1044,7 +1044,7 @@ class BillingImplTest {
                     BillingResult.newBuilder()
                         .setResponseCode(BillingResponseCode.ERROR).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf("test_one_time")
+                            on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
@@ -1079,7 +1079,7 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
             productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
             billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -1103,7 +1103,7 @@ class BillingImplTest {
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                         }
                     },
@@ -1123,35 +1123,35 @@ class BillingImplTest {
                     purchasesUpdatedListener?.onPurchasesUpdated(
                         BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_one_time")
+                                on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { purchaseToken } doReturn "test_purchase_token_purchased_1"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_one_time")
+                                on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PENDING
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { purchaseToken } doReturn "test_purchase_token_pending"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_one_time")
+                                on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.UNSPECIFIED_STATE
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { purchaseToken } doReturn "test_purchase_token_unspecified_state"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_one_time")
+                                on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { purchaseToken } doReturn "test_purchase_token_purchased_2"
                                 on { isAcknowledged } doReturn false
                             },
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_one_time")
+                                on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
                                 on { purchaseToken } doReturn "test_purchase_token_purchased_acknowledged"
@@ -1191,7 +1191,7 @@ class BillingImplTest {
                 context,
                 billingClientBuilder,
                 products = persistentListOf(
-                    BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -1219,7 +1219,7 @@ class BillingImplTest {
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                         }
                     },
@@ -1240,7 +1240,7 @@ class BillingImplTest {
                     purchasesUpdatedListener?.onPurchasesUpdated(
                         BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_one_time")
+                                on { products } doReturn listOf("test_lifetime")
                                 on { purchaseToken } doReturn "test_purchase_token_purchased"
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis()
@@ -1280,7 +1280,7 @@ class BillingImplTest {
                 context,
                 billingClientBuilder,
                 products = persistentListOf(
-                    BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -1289,7 +1289,7 @@ class BillingImplTest {
             billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
             assertEquals(
                 BillingStatus.Purchased(
-                    BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                     refundable = true,
                 ),
                 billingImpl.status.value,
@@ -1320,7 +1320,7 @@ class BillingImplTest {
                         }
                     }.let { subscriptionOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_subscription"
+                            on { productId } doReturn "test_monthly"
                             on { subscriptionOfferDetails } doReturn listOf(subscriptionOfferDetailsParam)
                         }
                     },
@@ -1340,7 +1340,7 @@ class BillingImplTest {
                     purchasesUpdatedListener?.onPurchasesUpdated(
                         BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                             mock<Purchase> {
-                                on { products } doReturn listOf("test_subscription")
+                                on { products } doReturn listOf("test_monthly")
                                 on { purchaseToken } doReturn "test_purchase_token_purchased"
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis() - 49.hours.inWholeMilliseconds
@@ -1380,7 +1380,7 @@ class BillingImplTest {
                 context,
                 billingClientBuilder,
                 products = persistentListOf(
-                    BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                    BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -1389,7 +1389,7 @@ class BillingImplTest {
             billingImpl.launchBillingFlow(mock(), "offer_subscription_details")
             assertEquals(
                 BillingStatus.Purchased(
-                    BillingProduct("test_subscription", BillingProduct.Type.SUBSCRIPTION),
+                    BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                     refundable = false,
                 ),
                 billingImpl.status.value,
@@ -1410,7 +1410,7 @@ class BillingImplTest {
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
-                            on { productId } doReturn "test_one_time"
+                            on { productId } doReturn "test_lifetime"
                             on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
                         }
                     },
@@ -1465,7 +1465,7 @@ class BillingImplTest {
                 context,
                 billingClientBuilder,
                 products = persistentListOf(
-                    BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
@@ -1482,8 +1482,8 @@ class BillingImplTest {
         val purchasedProductIds = listOf(
             "spam_one_time",
             "spam_subscription",
-            "test_one_time",
-            "test_subscription",
+            "test_lifetime",
+            "test_monthly",
         ).iterator()
         val billingClient = object : FakeBillingClient() {
             override fun showInAppMessages(
@@ -1525,7 +1525,7 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
             log = FakeLog,
         )
@@ -1551,8 +1551,8 @@ class BillingImplTest {
         val purchasedProductIds = listOf(
             "spam_one_time",
             "spam_subscription",
-            "test_one_time",
-            "test_subscription",
+            "test_lifetime",
+            "test_monthly",
         ).iterator()
         val billingClient = object : FakeBillingClient() {
             override fun showInAppMessages(
@@ -1594,7 +1594,7 @@ class BillingImplTest {
             context,
             billingClientBuilder,
             products = persistentListOf(
-                BillingProduct("test_one_time", BillingProduct.Type.ONE_TIME),
+                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
             log = FakeLog,
         )
@@ -1609,11 +1609,11 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
 
-        // Now that connection is ready, in-app messages query product "test_one_time", so status becomes Purchased
+        // Now that connection is ready, in-app messages query product "test_lifetime", so status becomes Purchased
         job.join()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_one_time" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = true
             ),
             billingImpl.status.value,
         )
