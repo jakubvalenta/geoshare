@@ -43,8 +43,9 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
 
         // Shared point
         testUri(
-            BD09MCPoint(3619467.0, 13392279.0, 17.0, name = "地图上的点"),
-            "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392279,3619467,17z...
+            BD09MCPoint(3619117.0, 13392243.0, 17.0, name = "地图上的点"),
+            "https://j.map.baidu.com/64/lqEk", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392243,3619117,17z...
+            // On desktop, it resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
 
@@ -52,6 +53,15 @@ class BaiduMapInputBehaviorTest : InputBehaviorTest {
         testUri(
             BD09MCPoint(3316047.58, 13502465.77, 19.0, name = "黄岩客运中心"),
             "https://j.map.baidu.com/44/lth", // Resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
+            // On desktop, it also resolves to https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502465.77,3316047.58,19z...
+            timeoutMs = NETWORK_TIMEOUT * 2,
+        )
+
+        // Shared point that requires CSS
+        testUri(
+            BD09MCPoint(3750567.0, 13224572.0, 17.0, name = "地图上的点"),
+            "https://j.map.baidu.com/a7/GXfM", // Resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224572,3750567,17z...
+            // On desktop, it resolves to https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13224540,3750567,17z...
             timeoutMs = NETWORK_TIMEOUT * 2,
         )
     }

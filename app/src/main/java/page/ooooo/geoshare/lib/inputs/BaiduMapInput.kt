@@ -105,10 +105,11 @@ object BaiduMapInput : ShortUriInput, WebInput {
 
     override fun shouldInterceptRequest(requestUrlString: String) =
         // Assets
-        requestUrlString.endsWith(".css")
-            || requestUrlString.endsWith(".ico")
+        requestUrlString.endsWith(".ico")
             || (requestUrlString.endsWith(".png") && !requestUrlString.contains("/image/api/"))
             || requestUrlString.endsWith("/static/common/images/new/loading")
+            // Notice that we don't block .css, so that links such as https://j.map.baidu.com/a7/GXfM redirect to the
+            // correct URL
 
             // Map tiles
             || requestUrlString.contains(@Suppress("SpellCheckingInspection") "bdimg.com/tile/")
