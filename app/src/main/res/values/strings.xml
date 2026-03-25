@@ -12,6 +12,8 @@
     <string name="billing_manage_subscription" translatable="false">Manage your subscription</string>
     <string name="billing_manage_subscription_description" translatable="false">Cancel, pause, or change payment method</string>
     <string name="billing_manage_error" translatable="false">Failed to open Google Play</string>
+    <string name="billing_offers_empty" translatable="false">%1$s is not available in your region</string>
+    <string name="billing_offers_error" translatable="false">Failed to fetch offers</string>
     <string name="billing_one_time" translatable="false">One time payment</string>
     <string name="billing_order_history" translatable="false">Order history</string>
     <string name="billing_pricing" translatable="false">Pricing</string>

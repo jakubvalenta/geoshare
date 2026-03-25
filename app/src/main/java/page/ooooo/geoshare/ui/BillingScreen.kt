@@ -395,7 +395,7 @@ private fun BillingSupportingPane(
     var selectedOffer by remember(sortedBillingOffers) { mutableStateOf(sortedBillingOffers.firstOrNull()) }
 
     when (billingStatus) {
-        is BillingStatus.NotPurchased -> {
+        is BillingStatus.NotPurchased if sortedBillingOffers.isNotEmpty() -> {
             ScaffoldAction(
                 text = stringResource(R.string.billing_purchase_button),
                 modifier = Modifier.testTag("geoShareBillingPurchaseButton"),
@@ -484,6 +484,8 @@ private fun BillingSupportingPane(
                 }
             }
         }
+
+        is BillingStatus.NotPurchased -> {}
 
         is BillingStatus.Purchased -> {
             when (billingStatus.product.type) {
@@ -975,6 +977,78 @@ private fun TabletErrorPreview() {
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
                 true,
             ),
+            onBack = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature),
+            billingMessage = Message(
+                stringResource(
+                    R.string.billing_offers_empty,
+                    stringResource(R.string.app_name_pro),
+                ),
+                isError = true,
+            ),
+            billingOffers = emptyList(),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(),
+            onBack = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkEmptyPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature),
+            billingMessage = Message(
+                stringResource(
+                    R.string.billing_offers_empty,
+                    stringResource(R.string.app_name_pro),
+                ),
+                isError = true,
+            ),
+            billingOffers = emptyList(),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(),
+            onBack = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletEmptyPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature),
+            billingMessage = Message(
+                stringResource(
+                    R.string.billing_offers_empty,
+                    stringResource(R.string.app_name_pro),
+                ),
+                isError = true,
+            ),
+            billingOffers = emptyList(),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(),
             onBack = {},
             onLaunchBillingFlow = {},
             onManageBillingProduct = {},

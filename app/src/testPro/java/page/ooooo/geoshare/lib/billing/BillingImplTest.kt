@@ -39,6 +39,11 @@ import kotlin.time.Duration.Companion.hours
 class BillingImplTest {
 
     private val context: Context = mock {
+        on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
+        on {
+            getString(R.string.billing_offers_empty, "Geo Share Pro")
+        } doReturn "Geo Share Pro is not available in your region"
+        on { getString(R.string.billing_offers_error) } doReturn "Failed to fetch offers"
         on { getString(R.string.billing_purchase_error_unknown) } doReturn "Error when making a purchase"
         on { getString(R.string.billing_setup_error_unknown) } doReturn "Error when fetching purchases"
     }
@@ -449,6 +454,10 @@ class BillingImplTest {
             emptyList<Offer>(),
             billingImpl.queryOffers(),
         )
+        assertEquals(
+            Message("Failed to fetch offers", isError = true),
+            billingImpl.message.value,
+        )
     }
 
     @Test
@@ -489,6 +498,10 @@ class BillingImplTest {
         assertEquals(
             emptyList<Offer>(),
             billingImpl.queryOffers(),
+        )
+        assertEquals(
+            Message("Geo Share Pro is not available in your region", isError = true),
+            billingImpl.message.value,
         )
     }
 
@@ -545,6 +558,10 @@ class BillingImplTest {
             emptyList<Offer>(),
             billingImpl.queryOffers(),
         )
+        assertEquals(
+            Message("Geo Share Pro is not available in your region", isError = true),
+            billingImpl.message.value,
+        )
     }
 
     @Test
@@ -594,6 +611,10 @@ class BillingImplTest {
         assertEquals(
             emptyList<Offer>(),
             billingImpl.queryOffers(),
+        )
+        assertEquals(
+            Message("Geo Share Pro is not available in your region", isError = true),
+            billingImpl.message.value,
         )
     }
 

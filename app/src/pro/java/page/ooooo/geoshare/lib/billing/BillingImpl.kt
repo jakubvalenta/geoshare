@@ -28,13 +28,9 @@ import com.android.billingclient.api.queryProductDetails
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultLog
@@ -192,19 +188,18 @@ class BillingImpl(
         billingClient.endConnection()
     }
 
-    override suspend fun queryOffers(): List<Offer> =
-        queryProductDetailsAndOffers().map { (_, offer) -> offer }.toList()
+    override suspend fun queryOffers(): List<Offer> = queryProductDetailsAndOffers().map { (_, offer) -> offer }
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
-        val (productDetails) = try {
-            queryProductDetailsAndOffers().first { (_, offer) -> offer.token == offerToken }
-        } catch (_: NoSuchElementException) {
-            log.e(TAG, "Offer token not found: $offerToken")
-            _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
-            return
-        }
-
+        val productDetailsAndOffers = queryProductDetailsAndOffers()
+            .firstOrNull { (_, offer) -> offer.token == offerToken }
+            ?: run {
+                log.e(TAG, "Offer token not found: $offerToken")
+                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+                return
+            }
+        val (productDetails) = productDetailsAndOffers
         val productDetailsParamsList = listOf(
             productDetailsParamsBuilder().setProductDetails(productDetails).setOfferToken(offerToken).build()
         )
@@ -263,36 +258,52 @@ class BillingImpl(
         billingClient.showInAppMessages(activity, inAppMessageParams, this)
     }
 
-    private fun queryProductDetailsAndOffers(): Flow<Pair<ProductDetails, Offer>> = flow {
-        products.groupBy { it.type }.forEach { (billingProductType, billingProducts) ->
-            val productType = when (billingProductType) {
-                BillingProduct.Type.DONATION -> return@forEach
-                BillingProduct.Type.ONE_TIME -> ProductType.INAPP
-                BillingProduct.Type.SUBSCRIPTION -> ProductType.SUBS
-            }
-            val productList = billingProducts.map { billingProduct ->
-                QueryProductDetailsParams.Product.newBuilder().setProductId(billingProduct.id)
-                    .setProductType(productType).build()
-            }
-            val params = QueryProductDetailsParams.newBuilder()
-            params.setProductList(productList)
+    private suspend fun queryProductDetailsAndOffers(): List<Pair<ProductDetails, Offer>> =
+        products
+            .groupBy { it.type }
+            .mapNotNull { (billingProductType, billingProducts) ->
+                val productType = when (billingProductType) {
+                    BillingProduct.Type.DONATION -> return@mapNotNull null
+                    BillingProduct.Type.ONE_TIME -> ProductType.INAPP
+                    BillingProduct.Type.SUBSCRIPTION -> ProductType.SUBS
+                }
+                val productList = billingProducts.map { billingProduct ->
+                    QueryProductDetailsParams.Product.newBuilder().setProductId(billingProduct.id)
+                        .setProductType(productType).build()
+                }
+                val params = QueryProductDetailsParams.newBuilder()
+                params.setProductList(productList)
 
-            val productDetailsResult = try {
-                withContext(Dispatchers.IO) {
-                    billingClient.queryProductDetails(params.build())
+                val productDetailsResult = try {
+                    withContext(Dispatchers.IO) {
+                        billingClient.queryProductDetails(params.build())
+                    }
+                } catch (e: Exception) {
+                    log.e(TAG, "Product details query: error", e)
+                    _message.value = Message(
+                        context.getString(R.string.billing_offers_error),
+                        isError = true,
+                    )
+                    return emptyList()
                 }
-            } catch (e: Exception) {
-                log.e(TAG, "Product details query: error", e)
-                return@flow
-            }
-            log.i(TAG, "Product details query: ok")
-            productDetailsResult.productDetailsList?.forEach { productDetails ->
-                for (offer in productDetails.getOffers(log)) {
-                    emit(productDetails to offer)
+                log.i(TAG, "Product details query: ok")
+                productDetailsResult.productDetailsList?.flatMap { productDetails ->
+                    productDetails.getOffers(log).map { offer -> productDetails to offer }
                 }
             }
-        }
-    }
+            .flatten()
+            .also {
+                if (it.isEmpty()) {
+                    log.w(TAG, "No offers found")
+                    _message.value = Message(
+                        context.getString(
+                            R.string.billing_offers_empty,
+                            context.getString(R.string.app_name_pro),
+                        ),
+                        isError = true,
+                    )
+                }
+            }
 
     private fun queryPurchases() {
         for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
