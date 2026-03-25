@@ -81,10 +81,6 @@ class BillingViewModel @Inject constructor(
         }
     }
 
-    fun onPause() {
-        billing.endConnection()
-    }
-
     override fun onCleared() {
         super.onCleared()
         billing.endConnection()

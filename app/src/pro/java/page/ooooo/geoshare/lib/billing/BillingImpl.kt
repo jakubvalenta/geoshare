@@ -60,9 +60,16 @@ class BillingImpl(
     override val features = persistentListOf(AutomationFeature)
     override val refundableDuration = 48.hours
 
-    private val billingClient: BillingClient = billingClientBuilder.setListener(this)
-        .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
-        .enableAutoServiceReconnection().build()
+    private val billingClient: BillingClient = billingClientBuilder
+        .setListener(this)
+        .enablePendingPurchases(
+            PendingPurchasesParams
+                .newBuilder()
+                .enableOneTimeProducts()
+                .build()
+        )
+        .enableAutoServiceReconnection()
+        .build()
 
     private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
     override val status: StateFlow<BillingStatus> = _status
@@ -134,16 +141,22 @@ class BillingImpl(
                 if (newBillingStatus is BillingStatus.Purchased) {
                     log.i(TAG, "Purchase query: purchased")
                     _status.value = newBillingStatus
-                } else if (_status.value is BillingStatus.Loading) {
-                    log.i(
-                        TAG, "Purchase query: not purchased; setting status, because the previous status was loading"
-                    )
-                    _status.value = newBillingStatus
                 } else {
-                    log.i(
-                        TAG,
-                        "Purchase query: not purchased; not setting status, because the previous status contains another purchased product"
-                    )
+                    log.i(TAG, "Purchase query: not purchased")
+                    when (_status.value) {
+                        is BillingStatus.Loading -> {
+                            _status.value = newBillingStatus
+                        }
+
+                        is BillingStatus.NotPurchased -> {}
+
+                        is BillingStatus.Purchased -> {
+                            log.i(
+                                TAG,
+                                "Purchase query: not changing status, because the previous status was purchased and we don't want to overwrite it",
+                            )
+                        }
+                    }
                 }
             }
 
@@ -180,11 +193,12 @@ class BillingImpl(
     }
 
     override fun startConnection() {
-        _message.value = null
+        log.i(TAG, "Starting client connection")
         billingClient.startConnection(this)
     }
 
     override fun endConnection() {
+        log.i(TAG, "Ending client connection")
         billingClient.endConnection()
     }
 
