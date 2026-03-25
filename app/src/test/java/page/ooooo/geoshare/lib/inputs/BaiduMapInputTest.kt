@@ -82,6 +82,17 @@ class BaiduMapInputTest : BaseInputTest() {
     }
 
     @Test
+    fun parseUri_sharedPointDetail() = runTest {
+        assertEquals(
+            ParseUriResult.SucceededAndSupportsWebParsing(
+                persistentListOf(),
+                "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage",
+            ),
+            parseUri("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
+        )
+    }
+
+    @Test
     fun parseUri_place() = runTest {
         assertEquals(
             ParseUriResult.Succeeded(

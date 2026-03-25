@@ -41,7 +41,11 @@ object BaiduMapInput : ShortUriInput, WebInput {
             val firstPart = parts.firstOrNull() ?: return@run
 
             if (firstPart == "") {
-                if (!queryParams["poiShareId"].isNullOrEmpty() || !queryParams["poiShareUid"].isNullOrEmpty()) {
+                if (
+                    !queryParams["poiShareId"].isNullOrEmpty() ||
+                    !queryParams["poiShareUid"].isNullOrEmpty() ||
+                    queryParams["s"]?.contains("uid=") == true
+                ) {
                     // Shared point or shared place
                     // https://map.baidu.com/?poiShareId={id}
                     // https://map.baidu.com/?shareurl=1&poiShareUid={uid}
