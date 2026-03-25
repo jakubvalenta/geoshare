@@ -325,4 +325,8 @@ class BillingImpl(
             billingClient.queryPurchasesAsync(queryPurchasesParams, this)
         }
     }
+
+    override fun dismissMessage() {
+        _message.value = null
+    }
 }

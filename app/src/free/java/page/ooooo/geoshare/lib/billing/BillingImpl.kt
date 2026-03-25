@@ -47,4 +47,6 @@ class BillingImpl(@Suppress("unused") private val context: Context) : Billing {
     override fun manageProduct(product: BillingProduct) {}
 
     override suspend fun showInAppMessages(activity: Activity) {}
+
+    override fun dismissMessage() {}
 }

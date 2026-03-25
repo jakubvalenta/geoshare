@@ -27,4 +27,6 @@ interface Billing {
     fun manageProduct(product: BillingProduct)
 
     suspend fun showInAppMessages(activity: Activity)
+
+    fun dismissMessage()
 }

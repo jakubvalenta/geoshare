@@ -83,4 +83,8 @@ class BillingImpl(private val context: Context) : Billing {
     }
 
     override suspend fun showInAppMessages(activity: Activity) {}
+
+    override fun dismissMessage() {
+        _message.value = null
+    }
 }

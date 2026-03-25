@@ -72,6 +72,10 @@ class BillingViewModel @Inject constructor(
         billing.manageProduct(product)
     }
 
+    fun dismissMessage() {
+        billing.dismissMessage()
+    }
+
     // Lifecycle
 
     fun onResume(activity: Activity) {
