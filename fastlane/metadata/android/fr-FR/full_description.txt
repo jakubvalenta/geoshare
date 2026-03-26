@@ -31,7 +31,8 @@ Si vous utilisez Google Maps pour trouver des lieux, mais que vous préférez un
 - Affiche les <b>coordonnées géographiques</b> d'un lien de carte et permet de les copier dans le presse-papiers dans différents formats, par exemple sous forme de lien geo:.
 - Affiche tous les points d'un lien de <b>liste de lieux</b>.
 - Permet d'exécuter une action <b>automatiquement</b> lors du traitement d'un lien de carte.
-- Permet de <b>lancer la navigation</b> dans TomTom, Waze, Magic Earth…
+- Permet de <b>lancer la navigation</b> dans toutes les applications qui prennent cette fonctionnalité en charge, y compris TomTom.
+- Permet d'ouvrir un lieu dans <b>des cartes Web</b>, qu'elles soient préinstallées ou de votre choix.
 - Permet d'enregistrer une position au format <b>GPX</b>.
 - Gestion des tentatives de connexion en cas de <b>connexion Internet instable</b>.
 - Permet de <b>coller</b> les liens de carte directement dans l'application, sans avoir à les partager.
