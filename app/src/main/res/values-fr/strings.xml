@@ -15,7 +15,7 @@
     <string name="intro_open_by_default_headline">Configurer Android pour ouvrir les liens vers Google Maps dans des cartes alternatives (facultatif)</string>
     <string name="intro_open_by_default_google_maps_content_description">Capture d’écran des paramètres d’ouverture par défaut de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Ouvrir les paramètres de Google Maps</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Allez ensuite dans Paramètres &#8594; Applications &#8594; %1$s &#8594; <i>Ouvrir par défaut</i>, activez l’ouverture des liens dans cette application et appuyez sur <i>Ajouter des liens</i>.]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Allez ensuite dans Paramètres ➞ Applications ➞ %1$s ➞ <i>Ouvrir par défaut</i>, activez l’ouverture des liens dans cette application et appuyez sur <i>Ajouter des liens</i>.]]></string>
     <string name="intro_open_by_default_app_button">Ouvrir les paramètres %1$s</string>
     <string name="intro_nav_close">Fermer</string>
     <string name="intro_nav_next">Suivant</string>
@@ -47,7 +47,7 @@
     <string name="conversion_failed_connection_permission_denied">Ce lien n’est pas pris en charge sans connexion au service de cartographie</string>
     <string name="conversion_failed_parse_html_error">Échec de la récupération de la page Web à partir du service de cartographie</string>
     <string name="conversion_failed_parse_html_connection_error">Erreur de connexion lors de la récupération de la page Web à partir du service de cartographie</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Tout d’abord, allez dans Paramètres &#8594; Applications &#8594; Cartes &#8594; <i>Ouvrir par défaut</i> et désactivez l’ouverture des liens dans cette application.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Tout d’abord, allez dans Paramètres ➞ Applications ➞ Cartes ➞ <i>Ouvrir par défaut</i> et désactivez l’ouverture des liens dans cette application.]]></string>
     <string name="intro_open_by_default_app_note">Si certains liens sont grisés, cela signifie que d’autres applications Google les ouvrent par défaut. Vous pouvez les trouver et désactiver l’ouverture des liens, comme nous l’avons fait pour Google Maps.</string>
     <string name="main_input_uri_label">Collez un lien de carte ici</string>
     <string name="conversion_permission_common_deny">Annuler</string>

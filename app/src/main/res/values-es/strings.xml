@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="main_input_uri_label">Pegue aquí un enlace de mapa</string>
     <string name="intro_title">Intro</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Luego vaya a Ajustes &#8594; Aplicaciones &#8594; %1$s &#8594; <i>Abrir por defecto</i>, active la apertura de enlaces en esta aplicación, y pulse <i>Añadir enlaces</i>.]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Luego vaya a Ajustes ➞ Aplicaciones ➞ %1$s ➞ <i>Abrir por defecto</i>, active la apertura de enlaces en esta aplicación, y pulse <i>Añadir enlaces</i>.]]></string>
     <string name="nav_menu_content_description">Menú</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="intro_open_by_default_app_button">Abrir ajustes de %1$s</string>
@@ -15,7 +15,7 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[Elige <i>%1$s</i> y la aplicación te permitirá abrir la misma ubicación en cualquier aplicación de mapas instalada.]]></string>
     <string name="intro_how_to_share_app_content_description">Captura de pantalla de %1$s</string>
     <string name="intro_open_by_default_headline">Configurar Android para abrir enlaces a Google Maps en mapas alternativos (opcional)</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes &#8594; Aplicaciones &#8594; Mapas &#8594; <i>Abrir por defecto</i> y desactive la apertura de enlaces en esta aplicación.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ <i>Abrir por defecto</i> y desactive la apertura de enlaces en esta aplicación.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Captura de pantalla de la configuración predeterminada de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
     <string name="intro_open_by_default_app_content_description">Captura de pantalla de los ajustes de abrir por defecto de %1$s</string>

@@ -34,7 +34,7 @@
     <string name="intro_settings_activity_not_found">Не удалось открыть настройки</string>
     <string name="main_input_uri_label">Вставьте сюда ссылку на карту</string>
     <string name="intro_open_by_default_google_maps_content_description">Снимок экрана настроек Google Maps «Открыть по умолчанию»</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в настройки &#8594; приложения &#8594; %1$s &#8594; <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
     <string name="main_navigate_to_intro">Узнать больше возможностей приложения</string>
     <string name="converter_google_maps_permission_title">Подключиться к Google?</string>
     <string name="converter_apple_maps_permission_title">Подключиться к Apple?</string>
@@ -56,7 +56,7 @@
     <string name="intro_how_to_share_google_maps_content_description">Снимок экрана Google Карт с диалогом «Поделится ссылкой»</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_bluetooth">Bluetooth</string>
     <string name="conversion_succeeded_apps_not_found">Никакое приложение для карты не установлено</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Сначала, перейдите в настройки &#8594; приложения &#8594; карты &#8594; <i>Открывать по умолчанию</i> и отключите открытие ссылок в этом приложении.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Сначала, перейдите в настройки ➞ приложения ➞ карты ➞ <i>Открывать по умолчанию</i> и отключите открытие ссылок в этом приложении.]]></string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="about_title">О приложении</string>

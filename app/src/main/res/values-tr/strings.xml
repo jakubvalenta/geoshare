@@ -16,7 +16,7 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[Choose <i>%1$s</i> ve uygulama aynı konumu herhangi bir yüklü harita uygulamasında açmanıza izin verecek.]]></string>
     <string name="intro_how_to_share_app_content_description">%1$s’in paylaşım ekranının ekran görüntüsü</string>
     <string name="intro_open_by_default_headline">Android’i Google Haritalar bağlantılarını alternatif haritalarda açacak şekilde yapılandırın (isteğe bağlı)</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>Varsayılan olarak aç</i> ve bu uygulamada bağlantıların açılmasını kapatın.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings ➞ Apps ➞ Maps ➞ <i>Varsayılan olarak aç</i> ve bu uygulamada bağlantıların açılmasını kapatın.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Google Haritalar’ın Varsayılan olarak aç ayarlarının ekran görüntüsü</string>
     <string name="intro_open_by_default_google_maps_button">Google Haritalar ayarlarını açın</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Haritalar</string>
@@ -127,7 +127,7 @@
     <string name="donation_description">Bu uygulama size zaman kazandırıyor mu?</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Şununla paylaş</string>
     <string name="conversion_succeeded_apps_headline">Şununla aç…</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Sonra Ayarlar’a gidin &#8594; Uygulamalar &#8594; %1$s &#8594; <i>Varsayılan olarak aç</i>, bağlantıların uygulamada açılmasını etkinleştirin ve <i>Bağlantılar ekle</i>’ye tıklayın]]></string>
+    <string name="intro_open_by_default_app_caption"><![CDATA[Sonra Ayarlar’a gidin ➞ Uygulamalar ➞ %1$s ➞ <i>Varsayılan olarak aç</i>, bağlantıların uygulamada açılmasını etkinleştirin ve <i>Bağlantılar ekle</i>’ye tıklayın]]></string>
     <string name="output_gpx_location_permission">%1$s mevcut konumunuzdan başlayan bir rota oluşturacaktır.</string>
     <string name="output_gpx_route_share">GPX rotasını paylaş</string>
     <string name="output_gpx_route_share_failed">GPX rotası paylaşımı başarısız oldu</string>

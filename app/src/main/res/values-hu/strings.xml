@@ -9,6 +9,6 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[Válaszd ki: <i>%1$s</i> és az alkalmazás lehetővé teszi, hogy bármely telepített térkép alkalmazással megnyithasd a helyet.]]></string>
     <string name="intro_how_to_share_app_content_description">Képernyőkép a %1$s megosztás képernyőjéről</string>
     <string name="intro_open_by_default_headline">Állítsd át az Androidot, hogy a Google Térkép linkjeit más alkalmazással nyissa meg (nem kötelező)</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings &#8594; Apps &#8594; Maps &#8594; <i>Megnyitás alapértelmezés szerint</i> és kapcsold ki a hivatkzások megnyitását az alkalmazással.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings ➞ Apps ➞ Maps ➞ <i>Megnyitás alapértelmezés szerint</i> és kapcsold ki a hivatkzások megnyitását az alkalmazással.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">A Google Maps alapértelmezett megnyitás képernyőképe</string>
 </resources>
