@@ -210,7 +210,9 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_lifetime" },
+                expired = false,
+                refundable = true,
             ),
             billingImpl.status.value,
         )
@@ -253,7 +255,9 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = false
+                product = billingImpl.products.first { it.id == "test_lifetime" },
+                expired = false,
+                refundable = false,
             ),
             billingImpl.status.value,
         )
@@ -294,7 +298,10 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
+        assertEquals(
+            BillingStatus.NotPurchased(pending = true),
+            billingImpl.status.value,
+        )
     }
 
     @Test
@@ -315,6 +322,7 @@ class BillingImplTest {
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { isAutoRenewing } doReturn true
                         },
                         mock<Purchase> {
                             on { products } doReturn listOf("spam_2")
@@ -346,7 +354,9 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_monthly" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_monthly" },
+                expired = false,
+                refundable = true,
             ),
             billingImpl.status.value,
         )
@@ -387,7 +397,10 @@ class BillingImplTest {
             log = FakeLog,
         )
         billingImpl.startConnection()
-        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
+        assertEquals(
+            BillingStatus.NotPurchased(pending = false),
+            billingImpl.status.value,
+        )
     }
 
     @Test
@@ -431,7 +444,9 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_lifetime" },
+                expired = false,
+                refundable = true,
             ),
             billingImpl.status.value,
         )
@@ -585,7 +600,7 @@ class BillingImplTest {
         val responseProductDetailsLists = listOf(
             listOf(
                 mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details"
+                    on { offerToken } doReturn "offer_lifetime_details"
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
@@ -641,7 +656,7 @@ class BillingImplTest {
             val responseProductDetailsLists = listOf(
                 listOf(
                     mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                        on { offerToken } doReturn "offer_one_time_details_list"
+                        on { offerToken } doReturn "offer_lifetime_details_list"
                         on { formattedPrice } doReturn "$1"
                     }.let { oneTimePurchaseOfferDetails ->
                         mock<ProductDetails> {
@@ -650,7 +665,7 @@ class BillingImplTest {
                         }
                     },
                     mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                        on { offerToken } doReturn "offer_one_time_details"
+                        on { offerToken } doReturn "offer_lifetime_details"
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
@@ -670,7 +685,7 @@ class BillingImplTest {
                         }
                     }.let { pricingPhasesParam ->
                         mock<ProductDetails.SubscriptionOfferDetails> {
-                            on { offerToken } doReturn "offer_subscription_details"
+                            on { offerToken } doReturn "offer_monthly_details"
                             on { pricingPhases } doReturn pricingPhasesParam
                         }
                     }.let { subscriptionOfferDetailsParam ->
@@ -713,9 +728,9 @@ class BillingImplTest {
             )
             assertEquals(
                 listOf(
-                    Offer("offer_one_time_details_list", "$1", Offer.Period.ONE_TIME, "test_lifetime"),
-                    Offer("offer_one_time_details", "$3.33", Offer.Period.ONE_TIME, "test_monthly"),
-                    Offer("offer_subscription_details", "$99.90", Offer.Period.MONTHLY, "test_monthly"),
+                    Offer("offer_lifetime_details_list", "$1", Offer.Period.ONE_TIME, "test_lifetime"),
+                    Offer("offer_lifetime_details", "$3.33", Offer.Period.ONE_TIME, "test_monthly"),
+                    Offer("offer_monthly_details", "$99.90", Offer.Period.MONTHLY, "test_monthly"),
                 ),
                 billingImpl.queryOffers(),
             )
@@ -829,7 +844,7 @@ class BillingImplTest {
         val responseProductDetailsLists = listOf(
             listOf(
                 mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details"
+                    on { offerToken } doReturn "offer_lifetime_details"
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
@@ -902,7 +917,7 @@ class BillingImplTest {
         val responseProductDetailsLists = listOf(
             listOf(
                 mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details"
+                    on { offerToken } doReturn "offer_lifetime_details"
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
@@ -965,7 +980,7 @@ class BillingImplTest {
             resources = resources,
             log = FakeLog,
         )
-        billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
+        billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
         assertTrue(billingImpl.status.value is BillingStatus.Purchased)
         assertEquals(
             Message("Failed to make the purchase", isError = true),
@@ -978,7 +993,7 @@ class BillingImplTest {
         val responseProductDetailsLists = listOf(
             listOf(
                 mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details"
+                    on { offerToken } doReturn "offer_lifetime_details"
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
@@ -1040,7 +1055,7 @@ class BillingImplTest {
             resources = resources,
             log = FakeLog,
         )
-        billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
+        billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
             Message("Purchase cancelled", isError = true),
@@ -1053,7 +1068,7 @@ class BillingImplTest {
         val responseProductDetailsLists = listOf(
             listOf(
                 mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_one_time_details"
+                    on { offerToken } doReturn "offer_lifetime_details"
                     on { formattedPrice } doReturn "$3.33"
                 }.let { oneTimePurchaseOfferDetailsParam ->
                     mock<ProductDetails> {
@@ -1115,7 +1130,7 @@ class BillingImplTest {
             resources = resources,
             log = FakeLog,
         )
-        billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
+        billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
             Message("Failed to make the purchase", isError = true),
@@ -1129,7 +1144,7 @@ class BillingImplTest {
             val responseProductDetailsLists = listOf(
                 listOf(
                     mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                        on { offerToken } doReturn "offer_one_time_details"
+                        on { offerToken } doReturn "offer_lifetime_details"
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
@@ -1222,7 +1237,7 @@ class BillingImplTest {
                 resources = resources,
                 log = FakeLog,
             )
-            billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
+            billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
             assertEquals(
                 listOf("test_purchase_token_purchased_1", "test_purchase_token_purchased_2"),
                 acknowledgedPurchaseParamsList.map { it.purchaseToken },
@@ -1240,7 +1255,7 @@ class BillingImplTest {
             val responseProductDetailsLists = listOf(
                 listOf(
                     mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                        on { offerToken } doReturn "offer_one_time_details"
+                        on { offerToken } doReturn "offer_lifetime_details"
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
@@ -1306,10 +1321,11 @@ class BillingImplTest {
                 resources = resources,
                 log = FakeLog,
             )
-            billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
+            billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
             assertEquals(
                 BillingStatus.Purchased(
                     BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 ),
                 billingImpl.status.value,
@@ -1335,7 +1351,7 @@ class BillingImplTest {
                         }
                     }.let { pricingPhasesParam ->
                         mock<ProductDetails.SubscriptionOfferDetails> {
-                            on { offerToken } doReturn "offer_subscription_details"
+                            on { offerToken } doReturn "offer_monthly_details"
                             on { pricingPhases } doReturn pricingPhasesParam
                         }
                     }.let { subscriptionOfferDetailsParam ->
@@ -1365,6 +1381,7 @@ class BillingImplTest {
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                                 on { purchaseTime } doReturn System.currentTimeMillis() - 49.hours.inWholeMilliseconds
                                 on { isAcknowledged } doReturn false
+                                on { isAutoRenewing } doReturn true
                             },
                         )
                     )
@@ -1401,10 +1418,11 @@ class BillingImplTest {
                 resources = resources,
                 log = FakeLog,
             )
-            billingImpl.launchBillingFlow(mock(), "offer_subscription_details")
+            billingImpl.launchBillingFlow(mock(), "offer_monthly_details")
             assertEquals(
                 BillingStatus.Purchased(
                     BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
+                    expired = false,
                     refundable = false,
                 ),
                 billingImpl.status.value,
@@ -1421,7 +1439,7 @@ class BillingImplTest {
             val responseProductDetailsLists = listOf(
                 listOf(
                     mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                        on { offerToken } doReturn "offer_one_time_details"
+                        on { offerToken } doReturn "offer_lifetime_details"
                         on { formattedPrice } doReturn "$3.33"
                     }.let { oneTimePurchaseOfferDetailsParam ->
                         mock<ProductDetails> {
@@ -1486,8 +1504,11 @@ class BillingImplTest {
                 resources = resources,
                 log = FakeLog,
             )
-            billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
-            assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
+            billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
+            assertEquals(
+                BillingStatus.NotPurchased(pending = false),
+                billingImpl.status.value,
+            )
             assertNull(billingImpl.message.value)
         }
 
@@ -1495,8 +1516,8 @@ class BillingImplTest {
     fun showInAppMessages_waitsForConnection_andWhenResponseIsNotActionNeeded_doesNothing() = runTest {
         val purchaseTimeValue = System.currentTimeMillis()
         val purchasedProductIds = listOf(
-            "spam_one_time",
-            "spam_subscription",
+            "spam_lifetime",
+            "spam_monthly",
             "test_lifetime",
             "test_monthly",
         ).iterator()
@@ -1553,21 +1574,27 @@ class BillingImplTest {
 
         // Start connection. It queries product "spam", so status becomes NotPurchased
         billingImpl.startConnection()
-        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
+        assertEquals(
+            BillingStatus.NotPurchased(pending = false),
+            billingImpl.status.value,
+        )
 
         // Now that connection is ready, in-app messages run, but result is NO_ACTION_NEEDED, so status remains NotPurchased
         job.join()
-        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
+        assertEquals(
+            BillingStatus.NotPurchased(pending = false),
+            billingImpl.status.value,
+        )
     }
 
     @Test
     fun showInAppMessages_waitsForConnection_andWhenResponseIsSubscriptionStatusUpdated_setsNewStatus() = runTest {
         val purchaseTimeValue = System.currentTimeMillis()
-        val purchasedProductIds = listOf(
-            "spam_one_time",
-            "spam_subscription",
-            "test_lifetime",
-            "test_monthly",
+        val purchasedProductIdsAndAutoRenewing = listOf(
+            "spam_lifetime" to false,
+            "spam_monthly" to true,
+            "test_lifetime" to false,
+            "test_monthly" to true,
         ).iterator()
         val billingClient = object : FakeBillingClient() {
             override fun showInAppMessages(
@@ -1585,13 +1612,15 @@ class BillingImplTest {
             }
 
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                val (productId, autoRenewing) = purchasedProductIdsAndAutoRenewing.next()
                 p1.onQueryPurchasesResponse(
                     BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
                         mock<Purchase> {
-                            on { products } doReturn listOf(purchasedProductIds.next())
+                            on { products } doReturn listOf(productId)
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn purchaseTimeValue
                             on { purchaseToken } doReturn "test_purchase_token_purchased"
+                            on { isAutoRenewing } doReturn autoRenewing
                         },
                     )
                 )
@@ -1622,13 +1651,18 @@ class BillingImplTest {
 
         // Start connection. It queries product "spam", so status becomes NotPurchased
         billingImpl.startConnection()
-        assertTrue(billingImpl.status.value is BillingStatus.NotPurchased)
+        assertEquals(
+            BillingStatus.NotPurchased(pending = false),
+            billingImpl.status.value,
+        )
 
         // Now that connection is ready, in-app messages query product "test_lifetime", so status becomes Purchased
         job.join()
         assertEquals(
             BillingStatus.Purchased(
-                product = billingImpl.products.first { it.id == "test_lifetime" }, refundable = true
+                product = billingImpl.products.first { it.id == "test_lifetime" },
+                expired = false,
+                refundable = true,
             ),
             billingImpl.status.value,
         )

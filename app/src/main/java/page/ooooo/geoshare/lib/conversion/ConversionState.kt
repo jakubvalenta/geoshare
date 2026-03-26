@@ -551,7 +551,7 @@ data class ConversionSucceeded(
                 .let { product ->
                     if (product != null) {
                         stateContext.log.w(null, "Automation: Found cached billing status")
-                        BillingStatus.Purchased(product, refundable = true)
+                        BillingStatus.Purchased(product, expired = false, refundable = true)
                     } else {
                         stateContext.log.w(null, "Automation: Didn't find cached billing status")
                         BillingStatus.Loading()

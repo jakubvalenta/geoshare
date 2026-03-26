@@ -6,17 +6,25 @@ import kotlin.time.Duration
 
 fun List<Purchase>.getBillingStatus(products: List<BillingProduct>, refundableDuration: Duration): BillingStatus {
     for (purchase in this) {
-        if (purchase.purchaseState == PurchaseState.PURCHASED) {
-            val product = purchase.products.firstNotNullOfOrNull { productId ->
-                products.firstOrNull { billingProduct -> billingProduct.id == productId }
+        when (purchase.purchaseState) {
+            PurchaseState.PURCHASED -> {
+                val product = purchase.products.firstNotNullOfOrNull { productId ->
+                    products.firstOrNull { billingProduct -> billingProduct.id == productId }
+                }
+                if (product != null) {
+                    return BillingStatus.Purchased(
+                        product = product,
+                        expired = product.type == BillingProduct.Type.SUBSCRIPTION && !purchase.isAutoRenewing, // TODO Test
+                        refundable = purchase.purchaseTime > System.currentTimeMillis() - refundableDuration.inWholeMilliseconds,
+                    )
+                }
             }
-            if (product != null) {
-                return BillingStatus.Purchased(
-                    product = product,
-                    refundable = purchase.purchaseTime > System.currentTimeMillis() - refundableDuration.inWholeMilliseconds,
-                )
+
+            PurchaseState.PENDING -> {
+                // TODO Test
+                return BillingStatus.NotPurchased(pending = true)
             }
         }
     }
-    return BillingStatus.NotPurchased()
+    return BillingStatus.NotPurchased(pending = false)
 }

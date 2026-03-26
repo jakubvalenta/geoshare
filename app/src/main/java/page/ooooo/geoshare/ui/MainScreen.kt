@@ -986,7 +986,7 @@ private fun DefaultPreview() {
             appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
@@ -1031,7 +1031,7 @@ private fun DarkPreview() {
             appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
@@ -1076,7 +1076,7 @@ private fun TabletPreview() {
             appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,
             billingAppNameResId = R.string.app_name,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             changelogShown = false,
             coordinateFormat = CoordinateFormat.DEC,
             inputUriString = "",
@@ -1131,6 +1131,7 @@ private fun SucceededPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1200,6 +1201,7 @@ private fun DarkSucceededPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1269,6 +1271,7 @@ private fun SmallSucceededPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1338,6 +1341,7 @@ private fun TabletSucceededPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1407,6 +1411,7 @@ private fun DarkTabletSucceededPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1471,6 +1476,7 @@ private fun AutomationPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1535,6 +1541,7 @@ private fun DarkAutomationPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1599,6 +1606,7 @@ private fun TabletAutomationPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1663,6 +1671,7 @@ private fun WebViewPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1722,6 +1731,7 @@ private fun DarkWebViewPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1781,6 +1791,7 @@ private fun TabletWebViewPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1832,6 +1843,7 @@ private fun ErrorPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1883,6 +1895,7 @@ private fun DarkErrorPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1934,6 +1947,7 @@ private fun TabletErrorPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -1995,6 +2009,7 @@ private fun LoadingIndicatorPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -2056,6 +2071,7 @@ private fun DarkLoadingIndicatorPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,
@@ -2117,6 +2133,7 @@ private fun TabletLoadingIndicatorPreview() {
             billingAppNameResId = R.string.app_name,
             billingStatus = BillingStatus.Purchased(
                 product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
                 refundable = true,
             ),
             changelogShown = true,

@@ -540,7 +540,7 @@ private fun DefaultPreview() {
             billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             onBack = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
@@ -559,7 +559,7 @@ private fun DarkPreview() {
             billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             onBack = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
@@ -578,7 +578,64 @@ private fun TabletPreview() {
             billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
+            onBack = {},
+            onDismissMessage = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PendingPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(pending = true),
+            onBack = {},
+            onDismissMessage = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkPendingPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(pending = true),
+            onBack = {},
+            onDismissMessage = {},
+            onLaunchBillingFlow = {},
+            onManageBillingProduct = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPendingPreview() {
+    AppTheme {
+        BillingScreen(
+            billingAppNameResId = R.string.app_name_pro,
+            billingFeatures = listOf(AutomationFeature),
+            billingMessage = null,
+            billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
+            billingRefundableDuration = 48.hours,
+            billingStatus = BillingStatus.NotPurchased(pending = true),
             onBack = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
@@ -599,7 +656,8 @@ private fun PurchasedDonationPreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.DONATION),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -621,7 +679,8 @@ private fun DarkPurchasedDonationPreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.DONATION),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -643,7 +702,8 @@ private fun TabletPurchasedDonationPreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.DONATION),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -665,7 +725,8 @@ private fun PurchasedOneTimePreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -687,7 +748,8 @@ private fun DarkPurchasedOneTimePreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -709,7 +771,8 @@ private fun TabletPurchasedOneTimePreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -731,7 +794,8 @@ private fun PurchasedOneTimeNotRefundablePreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                false,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -753,7 +817,8 @@ private fun DarkPurchasedOneTimeNotRefundablePreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                false,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -775,7 +840,8 @@ private fun TabletPurchasedOneTimeNotRefundablePreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                false,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -797,7 +863,8 @@ private fun PurchasedSubscriptionPreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -819,7 +886,8 @@ private fun DarkPurchasedSubscriptionPreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -841,7 +909,8 @@ private fun TabletPurchasedSubscriptionPreview() {
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
                 BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
-                true,
+                expired = false,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -853,21 +922,18 @@ private fun TabletPurchasedSubscriptionPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun SuccessPreview() {
+private fun PurchasedSubscriptionExpiredPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature),
-            billingMessage = Message(
-                stringResource(
-                    R.string.billing_purchase_success, stringResource(R.string.app_name_pro)
-                )
-            ),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
-                BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
+                BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
+                expired = true,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -879,21 +945,18 @@ private fun SuccessPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkSuccessPreview() {
+private fun DarkPurchasedSubscriptionExpiredPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature),
-            billingMessage = Message(
-                stringResource(
-                    R.string.billing_purchase_success, stringResource(R.string.app_name_pro)
-                )
-            ),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
-                BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
+                BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
+                expired = true,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -905,21 +968,18 @@ private fun DarkSuccessPreview() {
 
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
-private fun TabletSuccessPreview() {
+private fun TabletPurchasedSubscriptionExpiredPreview() {
     AppTheme {
         BillingScreen(
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature),
-            billingMessage = Message(
-                stringResource(
-                    R.string.billing_purchase_success, stringResource(R.string.app_name_pro)
-                )
-            ),
+            billingMessage = null,
             billingOffers = listOf(FakeSubscriptionOffer, FakeOneTimeOffer),
             billingRefundableDuration = 48.hours,
             billingStatus = BillingStatus.Purchased(
-                BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                true,
+                BillingProduct("test", BillingProduct.Type.SUBSCRIPTION),
+                expired = true,
+                refundable = true,
             ),
             onBack = {},
             onDismissMessage = {},
@@ -939,7 +999,7 @@ private fun EmptyPreview() {
             billingMessage = null,
             billingOffers = emptyList(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             onBack = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
@@ -958,7 +1018,7 @@ private fun DarkEmptyPreview() {
             billingMessage = null,
             billingOffers = emptyList(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             onBack = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
@@ -977,7 +1037,7 @@ private fun TabletEmptyPreview() {
             billingMessage = null,
             billingOffers = emptyList(),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased(pending = false),
             onBack = {},
             onDismissMessage = {},
             onLaunchBillingFlow = {},
