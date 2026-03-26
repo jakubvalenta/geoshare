@@ -22,7 +22,7 @@ class BillingImpl(@Suppress("unused") private val context: Context) : Billing {
     override val products = persistentListOf(product)
     override val refundableDuration = Duration.ZERO
 
-    override val status = flowOf(BillingStatus.Purchased(product, refundable = false))
+    override val status = flowOf(BillingStatus.Purchased(product, expired = false, refundable = false))
         .stateIn(
             CoroutineScope(Dispatchers.Default),
             SharingStarted.WhileSubscribed(5000),
@@ -44,7 +44,7 @@ class BillingImpl(@Suppress("unused") private val context: Context) : Billing {
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {}
 
-    override fun manageProduct(product: BillingProduct) {}
+    override fun manageProduct(activity: Activity, product: BillingProduct) {}
 
     override suspend fun showInAppMessages(activity: Activity) {}
 
