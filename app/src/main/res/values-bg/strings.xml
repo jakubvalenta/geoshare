@@ -237,4 +237,8 @@
     <string name="links_restore_initial_data_title">Нулиране на уеб картите до фабричните настройки?</string>
     <string name="links_title">Уеб карти</string>
     <string name="links_update">Редактиране на уеб карта</string>
+    <string name="user_preferences_coordinate_format_description">Изберете формата, в който се показват всички географски координати в приложението.</string>
+    <string name="user_preferences_coordinate_format_option_dec">Десетични степени</string>
+    <string name="user_preferences_coordinate_format_option_deg_min_sec">Градуси, минути, секунди</string>
+    <string name="user_preferences_coordinate_format_title">Координатен формат</string>
 </resources>
