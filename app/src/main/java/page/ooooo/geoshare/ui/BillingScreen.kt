@@ -3,33 +3,24 @@ package page.ooooo.geoshare.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -51,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -62,7 +52,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.R
@@ -74,11 +63,12 @@ import page.ooooo.geoshare.lib.billing.FakeOneTimeOffer
 import page.ooooo.geoshare.lib.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
-import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ScaffoldAction
+import page.ooooo.geoshare.ui.components.SegmentedList
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
@@ -218,6 +208,28 @@ private fun BillingMainPane(
 ) {
     val spacing = LocalSpacing.current
 
+    when (billingStatus) {
+        is BillingStatus.Purchased if !billingStatus.expired ->
+            BillingStatusCard(
+                stringResource(R.string.billing_purchase_success, stringResource(R.string.app_name_pro)),
+                Modifier.testTag("geoShareBillingStatusPurchased"),
+            )
+
+        is BillingStatus.Purchased ->
+            BillingStatusCard(
+                stringResource(R.string.billing_status_expired),
+                Modifier.testTag("geoShareBillingStatusExpired"), // TODO Test
+            )
+
+        is BillingStatus.NotPurchased if billingStatus.pending ->
+            BillingStatusCard(
+                stringResource(R.string.billing_status_pending),
+                Modifier.testTag("geoShareBillingStatusPending"), // TODO Test
+            )
+
+        else -> {}
+    }
+
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -249,8 +261,7 @@ private fun BillingMainPane(
                         R.string.billing_intro_purchased
                     } else {
                         R.string.billing_intro_not_purchased
-                    },
-                    R.string.billing_intro_not_purchased,
+                    }
                 ),
                 Modifier.padding(top = spacing.mediumAdaptive),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -318,50 +329,62 @@ private fun BillingMainPane(
                     }
                 }
             }
-            if (billingStatus is BillingStatus.Purchased) {
-                CompositionLocalProvider(
-                    LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
-                    LocalTextStyle provides MaterialTheme.typography.bodySmall,
-                ) {
-                    HorizontalDivider(
-                        Modifier
-                            .padding(horizontal = spacing.windowPadding)
-                            .padding(top = spacing.largeAdaptive),
-                        thickness = Dp.Hairline,
-                    )
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = spacing.windowPadding + 18.dp, vertical = spacing.mediumAdaptive),
-                        verticalArrangement = Arrangement.spacedBy(spacing.smallAdaptive)
-                    ) {
-                        Text(buildAnnotatedString {
-                            withLink(
-                                LinkAnnotation.Url(
-                                    "https://geoshare.ooooo.page/terms/",
-                                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
-                                )
-                            ) {
-                                append(stringResource(R.string.billing_terms_of_service))
-                            }
-                        })
-                        Text(buildAnnotatedString {
-                            withLink(
-                                LinkAnnotation.Url(
-                                    "mailto:geoshare-support@jakubvalenta.cz",
-                                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
-                                )
-                            ) {
-                                append(stringResource(R.string.billing_support_email))
-                            }
-                        })
-                    }
-                }
-            }
         }
     }
 }
 
+@Composable
+private fun BillingStatusCard(text: String, modifier: Modifier = Modifier) {
+    val spacing = LocalSpacing.current
+
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.windowPadding),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        ),
+    ) {
+        Text(
+            text,
+            modifier.padding(spacing.small),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
+private fun BillingLegalText() {
+    Text(
+        buildAnnotatedString {
+            withLink(
+                LinkAnnotation.Url(
+                    "https://geoshare.ooooo.page/terms/",
+                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+                )
+            ) {
+                append(stringResource(R.string.billing_terms_of_service))
+            }
+            append(" • ")
+            withLink(
+                LinkAnnotation.Url(
+                    "mailto:geoshare-support@jakubvalenta.cz",
+                    TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+                )
+            ) {
+                append(stringResource(R.string.billing_support_email))
+            }
+        },
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = LocalSpacing.current.windowPadding),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodySmall,
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BillingSupportingPane(
     billingOffers: List<Offer>,
@@ -406,72 +429,54 @@ private fun BillingSupportingPane(
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 },
+                after = { BillingLegalText() },
             ) {
-                ElevatedCard(
-                    Modifier
-                        .selectableGroup()
-                        .padding(horizontal = spacing.small),
-                ) {
-                    sortedBillingOffers.forEachIndexed { i, offer ->
-                        ListItem(
-                            headlineContent = {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    RadioButton(
-                                        selected = offer == selectedOffer,
-                                        // Null recommended for accessibility with screen readers
-                                        onClick = null,
-                                    )
-                                    Column(Modifier.weight(1f)) {
-                                        Text(
-                                            when (offer.period) {
-                                                Offer.Period.ONE_TIME -> stringResource(R.string.billing_one_time)
-                                                Offer.Period.MONTHLY -> stringResource(R.string.billing_subscription_monthly)
-                                            },
-                                            style = MaterialTheme.typography.bodyLarge,
-                                        )
-                                        Text(
-                                            when (offer.period) {
-                                                Offer.Period.ONE_TIME -> stringResource(
-                                                    R.string.billing_refund_description,
-                                                    billingRefundableDuration.toInt(DurationUnit.HOURS),
-                                                )
-
-                                                Offer.Period.MONTHLY -> stringResource(R.string.billing_subscription_cancel_description)
-                                            },
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                    Text(
-                                        offer.formattedPrice,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                .testTag(
-                                    when (offer.period) {
-                                        Offer.Period.ONE_TIME -> "geoShareBillingOfferOneTime"
-                                        Offer.Period.MONTHLY -> "geoShareBillingOfferMonthly"
-                                    },
-                                )
-                                .selectable(
-                                    selected = offer == selectedOffer,
-                                    role = Role.RadioButton,
-                                    onClick = { selectedOffer = offer },
-                                ),
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            ),
-                        )
-                        if (i < billingOffers.size - 1) {
-                            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
+                SegmentedList(
+                    values = sortedBillingOffers,
+                    modifier = Modifier.padding(horizontal = spacing.small),
+                    itemHeadline = { offer ->
+                        when (offer.period) {
+                            Offer.Period.ONE_TIME -> stringResource(R.string.billing_one_time)
+                            Offer.Period.MONTHLY -> stringResource(R.string.billing_subscription_monthly)
                         }
-                    }
-                }
+                    },
+                    itemIsSelected = { offer -> offer == selectedOffer },
+                    itemOnClick = { offer -> selectedOffer = offer },
+                    itemLeadingContent = { offer ->
+                        {
+                            RadioButton(
+                                selected = offer == selectedOffer,
+                                // Null recommended for accessibility with screen readers
+                                onClick = null,
+                            )
+                        }
+                    },
+                    itemSupportingContent = { offer ->
+                        {
+                            Text(
+                                when (offer.period) {
+                                    Offer.Period.ONE_TIME -> stringResource(
+                                        R.string.billing_refund_description,
+                                        billingRefundableDuration.toInt(DurationUnit.HOURS),
+                                    )
+
+                                    Offer.Period.MONTHLY -> stringResource(R.string.billing_subscription_cancel_description)
+                                },
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    },
+                    itemTrailingContent = { offer ->
+                        {
+                            Text(
+                                offer.formattedPrice,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    },
+                    itemTestTag = { offer -> "geoShareBillingOffer_${offer.period}" },
+                )
             }
         }
 
@@ -490,6 +495,7 @@ private fun BillingSupportingPane(
                         innerPadding = innerPadding,
                         bottomCorners = bottomCorners,
                         modifier = Modifier.testTag("geoShareBillingManageButtonOneTime"),
+                        after = { BillingLegalText() },
                     ) {
                         if (billingStatus.refundable) {
                             Text(
@@ -513,6 +519,7 @@ private fun BillingSupportingPane(
                         innerPadding = innerPadding,
                         bottomCorners = bottomCorners,
                         modifier = Modifier.testTag("geoShareBillingManageButtonSubscription"),
+                        after = { BillingLegalText() },
                     ) {
                         Text(
                             stringResource(R.string.billing_manage_subscription_description),

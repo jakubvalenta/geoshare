@@ -6,14 +6,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
@@ -26,11 +25,12 @@ fun ScaffoldAction(
     bottomCorners: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
-    content: @Composable () -> Unit = {},
+    after: @Composable () -> Unit = {},
+    before: @Composable () -> Unit = {},
 ) {
     val spacing = LocalSpacing.current
 
-    ElevatedCard(
+    Card(
         shape = MaterialTheme.shapes.large.run {
             if (bottomCorners) {
                 this
@@ -41,11 +41,10 @@ fun ScaffoldAction(
                 )
             }
         },
-        colors = CardDefaults.elevatedCardColors(
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp),
     ) {
         Column(
             Modifier
@@ -55,7 +54,7 @@ fun ScaffoldAction(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
-            content()
+            before()
             LargeButton(
                 text,
                 modifier,
@@ -64,6 +63,7 @@ fun ScaffoldAction(
                 contentColor = contentColor,
                 onClick = onClick,
             )
+            after()
         }
     }
 }

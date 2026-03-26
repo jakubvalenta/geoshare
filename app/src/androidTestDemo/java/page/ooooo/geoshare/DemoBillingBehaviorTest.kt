@@ -42,8 +42,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == offerResourceName }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
 
-        // Shows success message
-        onElement { viewIdResourceName == "geoShareBillingMessageSuccess" }
+        // Shows status purchased
+        onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
 
         // Go to automation preferences
         pressBack()
@@ -87,7 +87,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
     @Test
     fun allowsPurchasingAndRefundingOneTimeProduct() {
         purchaseAndRefund(
-            offerResourceName = "geoShareBillingOfferOneTime",
+            offerResourceName = "geoShareBillingOffer_${Offer.Period.ONE_TIME}",
             manageButtonResourceName = "geoShareBillingManageButtonOneTime",
         )
     }
@@ -95,7 +95,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
     @Test
     fun allowsPurchasingAndRefundingSubscription() {
         purchaseAndRefund(
-            offerResourceName = "geoShareBillingOfferMonthly",
+            offerResourceName = "geoShareBillingOffer_${Offer.Period.MONTHLY}",
             manageButtonResourceName = "geoShareBillingManageButtonSubscription",
         )
     }
@@ -119,7 +119,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }.click()
 
         // Purchase an offer
-        onElement { viewIdResourceName == "geoShareBillingOfferOneTime" }.click()
+        onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.ONE_TIME}" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
 
         // Go to automation preferences
