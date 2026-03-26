@@ -61,7 +61,7 @@ android {
             )
         }
         getByName("debug") {
-            // applicationIdSuffix = ".debug"
+            applicationIdSuffix = ".debug"
         }
     }
     flavorDimensions += "tier"
