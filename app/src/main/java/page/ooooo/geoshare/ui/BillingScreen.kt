@@ -114,7 +114,7 @@ fun BillingScreen(
             billingViewModel.launchBillingFlow(context as Activity, offerToken)
         },
         onManageBillingProduct = { product ->
-            billingViewModel.manageBillingProduct(product)
+            billingViewModel.manageBillingProduct(context as Activity, product)
         },
     )
 }

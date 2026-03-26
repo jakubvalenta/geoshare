@@ -68,8 +68,8 @@ class BillingViewModel @Inject constructor(
         }
     }
 
-    fun manageBillingProduct(product: BillingProduct) {
-        billing.manageProduct(product)
+    fun manageBillingProduct(activity: Activity, product: BillingProduct) {
+        billing.manageProduct(activity, product)
     }
 
     fun dismissMessage() {

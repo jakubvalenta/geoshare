@@ -24,7 +24,7 @@ interface Billing {
 
     suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 
-    fun manageProduct(product: BillingProduct)
+    fun manageProduct(activity: Activity, product: BillingProduct)
 
     suspend fun showInAppMessages(activity: Activity)
 

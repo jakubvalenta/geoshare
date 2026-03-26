@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
@@ -39,7 +40,7 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 class BillingImpl(
-    private val context: Context,
+    context: Context,
     billingClientBuilder: BillingClientBuilder = DefaultBillingClientBuilder(context),
     override val products: ImmutableList<BillingProduct> = persistentListOf(
         BillingProduct("pro_lifetime", BillingProduct.Type.ONE_TIME),
@@ -47,13 +48,15 @@ class BillingImpl(
     ),
     private val productDetailsParamsBuilder: () -> ProductDetailsParamsBuilder = { DefaultProductDetailsParamsBuilder() },
     private val billingFlowParamsBuilder: () -> BillingFlowParamsBuilder = { DefaultBillingFlowParamsBuilder() },
+    private val resources: Resources = context.resources,
     private val log: ILog = DefaultLog,
-) : Billing, AcknowledgePurchaseResponseListener, BillingClientStateListener, InAppMessageResponseListener,
-    PurchasesResponseListener, PurchasesUpdatedListener {
-
-    companion object {
-        const val TAG = "Billing"
-    }
+) :
+    Billing,
+    AcknowledgePurchaseResponseListener,
+    BillingClientStateListener,
+    InAppMessageResponseListener,
+    PurchasesResponseListener,
+    PurchasesUpdatedListener {
 
     @StringRes
     override val appNameResId = R.string.app_name_pro
@@ -86,7 +89,7 @@ class BillingImpl(
 
             else -> {
                 log.e(TAG, "Billing setup: error ${billingResult.debugMessage}")
-                _message.value = Message(context.getString(R.string.billing_setup_error_unknown), isError = true)
+                _message.value = Message(resources.getString(R.string.billing_setup_error_unknown), isError = true)
             }
         }
     }
@@ -112,8 +115,8 @@ class BillingImpl(
                     log.i(TAG, "Purchase update: purchased")
                     _status.value = newBillingStatus
                     _message.value = Message(
-                        context.getString(
-                            R.string.billing_purchase_success, context.getString(appNameResId)
+                        resources.getString(
+                            R.string.billing_purchase_success, resources.getString(appNameResId)
                         )
                     )
                 } else {
@@ -124,12 +127,12 @@ class BillingImpl(
 
             BillingClient.BillingResponseCode.USER_CANCELED -> {
                 log.i(TAG, "Purchase update: cancelled")
-                _message.value = Message(context.getString(R.string.billing_purchase_error_cancelled), isError = true)
+                _message.value = Message(resources.getString(R.string.billing_purchase_error_cancelled), isError = true)
             }
 
             else -> {
                 log.e(TAG, "Purchase update: error ${billingResult.debugMessage}")
-                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+                _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
     }
@@ -162,7 +165,7 @@ class BillingImpl(
 
             else -> {
                 log.e(TAG, "Purchases query: error ${billingResult.debugMessage}")
-                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+                _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
     }
@@ -210,7 +213,7 @@ class BillingImpl(
             .firstOrNull { (_, offer) -> offer.token == offerToken }
             ?: run {
                 log.e(TAG, "Offer token not found: $offerToken")
-                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+                _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
                 return
             }
         val (productDetails) = productDetailsAndOffers
@@ -227,19 +230,19 @@ class BillingImpl(
 
             else -> {
                 log.e(TAG, "Billing flow: error ${billingResult.debugMessage}")
-                _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+                _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
     }
 
-    override fun manageProduct(product: BillingProduct) {
+    override fun manageProduct(activity: Activity, product: BillingProduct) {
         _message.value = null
         try {
             when (product.type) {
                 BillingProduct.Type.DONATION -> {}
 
                 BillingProduct.Type.ONE_TIME -> {
-                    context.startActivity(
+                    activity.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
                             "https://play.google.com/store/account/orderhistory".toUri(),
@@ -248,7 +251,7 @@ class BillingImpl(
                 }
 
                 BillingProduct.Type.SUBSCRIPTION -> {
-                    context.startActivity(
+                    activity.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
                             "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare".format(
@@ -259,7 +262,7 @@ class BillingImpl(
                 }
             }
         } catch (_: ActivityNotFoundException) {
-            _message.value = Message(context.getString(R.string.billing_manage_error), isError = true)
+            _message.value = Message(resources.getString(R.string.billing_manage_error), isError = true)
         }
     }
 
@@ -295,7 +298,7 @@ class BillingImpl(
                 } catch (e: Exception) {
                     log.e(TAG, "Product details query: error", e)
                     _message.value = Message(
-                        context.getString(R.string.billing_offers_error),
+                        resources.getString(R.string.billing_offers_error),
                         isError = true,
                     )
                     return emptyList()
@@ -310,9 +313,9 @@ class BillingImpl(
                 if (it.isEmpty()) {
                     log.w(TAG, "No offers found")
                     _message.value = Message(
-                        context.getString(
+                        resources.getString(
                             R.string.billing_offers_empty,
-                            context.getString(R.string.app_name_pro),
+                            resources.getString(R.string.app_name_pro),
                         ),
                         isError = true,
                     )
@@ -328,5 +331,9 @@ class BillingImpl(
 
     override fun dismissMessage() {
         _message.value = null
+    }
+
+    companion object {
+        const val TAG = "Billing"
     }
 }

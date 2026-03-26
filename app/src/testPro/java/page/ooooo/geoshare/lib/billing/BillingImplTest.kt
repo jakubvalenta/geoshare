@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
 import com.android.billingclient.api.BillingClientStateListener
@@ -38,15 +39,18 @@ import kotlin.time.Duration.Companion.hours
 @OptIn(ExperimentalCoroutinesApi::class)
 class BillingImplTest {
 
-    private val context: Context = mock {
+    private val resources: Resources = mock {
         on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
         on {
             getString(R.string.billing_offers_empty, "Geo Share Pro")
         } doReturn "Geo Share Pro is not available in your region"
         on { getString(R.string.billing_offers_error) } doReturn "Failed to fetch offers"
-        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Error when making a purchase"
-        on { getString(R.string.billing_setup_error_unknown) } doReturn "Error when fetching purchases"
+        on { getString(R.string.billing_purchase_error_cancelled) } doReturn "Purchase cancelled"
+        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
+        on { getString(eq(R.string.billing_purchase_success), any()) } doReturn "Thanks for buying Geo Share Pro"
+        on { getString(R.string.billing_setup_error_unknown) } doReturn "Failed to fetch purchases"
     }
+    private val context: Context = mock()
 
     @Test
     fun status_whenStartConnectionIsNotCalled_isLoading() {
@@ -79,6 +83,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
@@ -115,12 +120,13 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            Message("Error when fetching purchases", isError = true),
+            Message("Failed to fetch purchases", isError = true),
             billingImpl.message.value,
         )
     }
@@ -156,12 +162,13 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            Message("Error when making a purchase", isError = true),
+            Message("Failed to make the purchase", isError = true),
             billingImpl.message.value,
         )
     }
@@ -197,6 +204,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -239,6 +247,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -281,6 +290,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -330,6 +340,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -372,6 +383,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -413,6 +425,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -447,6 +460,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.startConnection()
@@ -493,6 +507,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         assertEquals(
@@ -552,6 +567,7 @@ class BillingImplTest {
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                 BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         assertEquals(
@@ -606,6 +622,7 @@ class BillingImplTest {
             products = persistentListOf(
                 BillingProduct("test_donation", BillingProduct.Type.DONATION),
             ),
+            resources = resources,
             log = FakeLog,
         )
         assertEquals(
@@ -691,6 +708,7 @@ class BillingImplTest {
                     BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                     BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                 ),
+                resources = resources,
                 log = FakeLog,
             )
             assertEquals(
@@ -795,6 +813,7 @@ class BillingImplTest {
                     BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
                     BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
                 ),
+                resources = resources,
                 log = FakeLog,
             )
             assertEquals(
@@ -861,15 +880,13 @@ class BillingImplTest {
             override fun startConnection(p0: BillingClientStateListener) {}
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val context: Context = mock {
-            on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
-        }
         val billingImpl = BillingImpl(
             context,
             billingClientBuilder,
             products = persistentListOf(
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.launchBillingFlow(mock(), "spam")
@@ -937,11 +954,6 @@ class BillingImplTest {
             override fun startConnection(p0: BillingClientStateListener) {}
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val context: Context = mock {
-            on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
-            on { getString(eq(R.string.billing_purchase_success), any()) } doReturn "Thanks for buying Geo Share Pro"
-            on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
-        }
         val billingImpl = BillingImpl(
             context,
             billingClientBuilder,
@@ -950,6 +962,7 @@ class BillingImplTest {
             ),
             productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
             billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
@@ -1016,9 +1029,6 @@ class BillingImplTest {
             override fun startConnection(p0: BillingClientStateListener) {}
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val context: Context = mock {
-            on { getString(R.string.billing_purchase_error_cancelled) } doReturn "Purchase cancelled"
-        }
         val billingImpl = BillingImpl(
             context,
             billingClientBuilder,
@@ -1027,6 +1037,7 @@ class BillingImplTest {
             ),
             productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
             billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
@@ -1093,9 +1104,6 @@ class BillingImplTest {
             override fun startConnection(p0: BillingClientStateListener) {}
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val context: Context = mock {
-            on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
-        }
         val billingImpl = BillingImpl(
             context,
             billingClientBuilder,
@@ -1104,6 +1112,7 @@ class BillingImplTest {
             ),
             productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
             billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+            resources = resources,
             log = FakeLog,
         )
         billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
@@ -1202,12 +1211,6 @@ class BillingImplTest {
                 override fun startConnection(p0: BillingClientStateListener) {}
             }
             val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-            val context: Context = mock {
-                on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
-                on {
-                    getString(eq(R.string.billing_purchase_success), any())
-                } doReturn "Thanks for buying Geo Share Pro"
-            }
             val billingImpl = BillingImpl(
                 context,
                 billingClientBuilder,
@@ -1216,6 +1219,7 @@ class BillingImplTest {
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+                resources = resources,
                 log = FakeLog,
             )
             billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
@@ -1291,12 +1295,6 @@ class BillingImplTest {
                 override fun startConnection(p0: BillingClientStateListener) {}
             }
             val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-            val context: Context = mock {
-                on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
-                on {
-                    getString(eq(R.string.billing_purchase_success), any())
-                } doReturn "Thanks for buying Geo Share Pro"
-            }
             val billingImpl = BillingImpl(
                 context,
                 billingClientBuilder,
@@ -1305,6 +1303,7 @@ class BillingImplTest {
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+                resources = resources,
                 log = FakeLog,
             )
             billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
@@ -1391,12 +1390,6 @@ class BillingImplTest {
                 override fun startConnection(p0: BillingClientStateListener) {}
             }
             val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-            val context: Context = mock {
-                on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
-                on {
-                    getString(eq(R.string.billing_purchase_success), any())
-                } doReturn "Thanks for buying Geo Share Pro"
-            }
             val billingImpl = BillingImpl(
                 context,
                 billingClientBuilder,
@@ -1405,6 +1398,7 @@ class BillingImplTest {
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+                resources = resources,
                 log = FakeLog,
             )
             billingImpl.launchBillingFlow(mock(), "offer_subscription_details")
@@ -1481,7 +1475,6 @@ class BillingImplTest {
                 override fun startConnection(p0: BillingClientStateListener) {}
             }
             val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-            val context: Context = mock {}
             val billingImpl = BillingImpl(
                 context,
                 billingClientBuilder,
@@ -1490,6 +1483,7 @@ class BillingImplTest {
                 ),
                 productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
                 billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+                resources = resources,
                 log = FakeLog,
             )
             billingImpl.launchBillingFlow(mock(), "offer_one_time_details")
@@ -1541,13 +1535,13 @@ class BillingImplTest {
             }
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val context: Context = mock {}
         val billingImpl = BillingImpl(
             context,
             billingClientBuilder,
             products = persistentListOf(
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
+            resources = resources,
             log = FakeLog,
         )
 
@@ -1610,13 +1604,13 @@ class BillingImplTest {
             }
         }
         val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val context: Context = mock {}
         val billingImpl = BillingImpl(
             context,
             billingClientBuilder,
             products = persistentListOf(
                 BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
             ),
+            resources = resources,
             log = FakeLog,
         )
 
