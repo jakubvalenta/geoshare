@@ -46,7 +46,7 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Больше не спрашивать меня</string>
     <string name="faq_title">ЧаВо</string>
-    <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису (Google, Apple и т.д.)?</string>
+    <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису?</string>
     <string name="user_preferences_title">Настройки</string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
     <string name="conversion_failed_unshorten_connection_error">Ошибка подключения при открытии короткой ссылки</string>
@@ -70,7 +70,7 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[Выберете <i>%1$s</i> и приложение позволит вам открыть то же место в любом установленном приложении для работы с картами.]]></string>
     <string name="conversion_failed_unshorten_error">Не удалось открыть короткую ссылку</string>
     <string name="about_text"><![CDATA[<p>%1$s — это бесплатное приложение с открытым исходным кодом, распространяемое по лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или более поздней версии.</p><br><p>Вы можете найти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, где вы также можете <a href="https://github.com/jakubvalenta/geoshare/issues">сообщать о проблемах</a>.</p><br><p>Мы будем рады вашим отзывам. Вы можете связаться со мной по адресу <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="user_preferences_connection_description">Чтобы поддерживать короткие ссылки на карты и получать координаты с веб-страницы картографического сервиса, когда ссылка их не содержит, %1$s может подключаться к картографическому сервису. Более подробную информацию вы можете найти в разделе ЧаВо.</string>
+    <string name="user_preferences_connection_description">Для поддержки коротких ссылок и ссылок без географических координат в URL-адресе, %1$s может подключаться к картографическому сервису (Google Карты, Карты Apple и др.).</string>
     <string name="converter_google_maps_loading_indicator_title">Подключение к Google…</string>
     <string name="converter_apple_maps_loading_indicator_title">Подключение к Apple…</string>
     <string name="conversion_loading_indicator_cancel">Отмена</string>
@@ -253,4 +253,19 @@
     <string name="user_preferences_coordinate_format_option_dec">Десятичные градусы</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Градусы, минуты, секунды</string>
     <string name="user_preferences_coordinate_format_title">Формат координат</string>
+    <string name="conversion_succeeded_hide">Скрыть</string>
+    <string name="intro_open_by_default_app_note_1">Выберите %1$s, %2$s и %3$s. Это основные ссылки Google Карты. Вы можете выбрать другие карты или более редкие ссылки, но это не обязательно.</string>
+    <string name="links_message_disabled_group">Сейчас web-карта скрыта. Вы можете включить её в настройках.</string>
+    <string name="user_preferences_apps_visible_all">Все приложения включены</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="one">%1$d приложение из %2$d включено</item>
+        <item quantity="few">%1$d приложения из %2$d включены</item>
+        <item quantity="many">%1$d приложений из %2$d включены</item>
+        <item quantity="other">%1$d приложений из %2$d включены</item>
+    </plurals>
+    <string name="user_preferences_apps_description">Выберите, какие из установленных приложений показывать после преобразования ссылки на карту в координаты.</string>
+    <string name="user_preferences_apps_message_hidden">Приложение скрыто. Вы можете включить его в настройках.</string>
+    <string name="user_preferences_apps_title">Приложения</string>
+    <string name="user_preferences_section_input">Ввод</string>
+    <string name="user_preferences_section_output">Вывод</string>
 </resources>
