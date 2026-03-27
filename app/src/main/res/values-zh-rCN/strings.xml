@@ -26,8 +26,8 @@
     <string name="permission_do_not_ask">不要再询问我</string>
     <string name="faq_title">常见问题</string>
     <string name="user_preferences_title">偏好设置</string>
-    <string name="user_preferences_connection_title">是否允许连接到地图服务（Google、Apple 等）？</string>
-    <string name="user_preferences_connection_description">为了支持短地图链接，并在链接不包含坐标时从地图服务的网页获取坐标，%1$s 可以连接到地图服务。您可以在常见问题屏幕上找到更多信息。</string>
+    <string name="user_preferences_connection_title">允许连接到地图服务吗？</string>
+    <string name="user_preferences_connection_description">为了支持短链接和 URL 中不包含地理坐标的链接，%1$s 可以连接到地图服务（Google 地图、Apple 地图等）。</string>
     <string name="yes">是</string>
     <string name="user_preferences_connection_option_ask">连接前询问</string>
     <string name="no">否</string>
@@ -209,7 +209,7 @@
     <string name="links_delete">删除</string>
     <string name="links_delete_text">网络地图“%1$s”将被永久删除。</string>
     <string name="links_delete_title">删除网络地图？</string>
-    <string name="links_description">网络地图允许在浏览器中打开坐标。启用预装地图或添加自定义地图。</string>
+    <string name="links_description">网络地图允许在浏览器中打开坐标。开启预装地图或添加自定义地图。</string>
     <string name="links_form_advanced">高级</string>
     <string name="links_form_enabled_option_app">在应用列表中显示</string>
     <string name="links_form_enabled_option_chip">在坐标框中显示</string>
@@ -235,4 +235,16 @@
     <string name="user_preferences_coordinate_format_option_dec">十进制度数</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">度分秒</string>
     <string name="user_preferences_coordinate_format_title">坐标格式</string>
+    <string name="conversion_succeeded_hide">隐藏</string>
+    <string name="intro_open_by_default_app_note_1">选择 %1$s、%2$s 和 %3$s。这些是常见的 Google 地图链接。您也可以选择其他地图或更罕见的链接，但这不是必需的。</string>
+    <string name="links_message_disabled_group">网络地图已被隐藏。您可以在偏好设置中再次显示它。</string>
+    <string name="user_preferences_apps_visible_all">所有应用均可见</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="other">%2$d 个应用中有 %1$d 个可见</item>
+    </plurals>
+    <string name="user_preferences_apps_description">选择将地图链接转换为坐标后应显示的已安装应用。</string>
+    <string name="user_preferences_apps_message_hidden">应用已被隐藏。您可以在偏好设置中再次显示它。</string>
+    <string name="user_preferences_apps_title">应用</string>
+    <string name="user_preferences_section_input">输入</string>
+    <string name="user_preferences_section_output">输出</string>
 </resources>
