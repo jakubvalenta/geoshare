@@ -34,7 +34,7 @@
     <string name="faq_title">FAQ</string>
     <string name="user_preferences_title">Préférences</string>
     <string name="user_preferences_connection_title">Autoriser la connexion au service de cartographie ?</string>
-    <string name="user_preferences_connection_description">Pour prendre en charge les liens courts et les liens dont l\'URL ne contient pas de coordonnées géographiques, %1$s peut se connecter au service de cartographie (Google Maps, Apple Maps, etc.).</string>
+    <string name="user_preferences_connection_description">Pour prendre en charge les liens courts et les liens dont l’URL ne contient pas de coordonnées géographiques, %1$s peut se connecter au service de cartographie (Google Maps, Apple Maps, etc.).</string>
     <string name="yes">Oui</string>
     <string name="user_preferences_connection_option_ask">Demandez avant de vous connecter</string>
     <string name="no">Non</string>
@@ -221,7 +221,7 @@
     <string name="links_delete">Supprimer</string>
     <string name="links_delete_text">La carte web « %1$s » sera définitivement supprimée.</string>
     <string name="links_delete_title">Supprimer la carte web ?</string>
-    <string name="links_description">Les cartes Web permettent d\'afficher des coordonnées dans le navigateur. Activez celles qui sont préinstallées ou ajoutez les vôtres.</string>
+    <string name="links_description">Les cartes Web permettent d’afficher des coordonnées dans le navigateur. Activez celles qui sont préinstallées ou ajoutez les vôtres.</string>
     <string name="links_form_advanced">Avancé</string>
     <string name="links_form_enabled_option_app">Afficher dans la liste des applications</string>
     <string name="links_form_enabled_option_chip">Afficher dans la boîte de coordonnées</string>
@@ -248,7 +248,7 @@
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Degrés, minutes, secondes</string>
     <string name="user_preferences_coordinate_format_title">Format de coordonnées</string>
     <string name="conversion_succeeded_hide">Masquer</string>
-    <string name="intro_open_by_default_app_note_1">Sélectionnez %1$s, %2$s et %3$s. Il s\'agit des liens Google Maps les plus courants. Vous pouvez également choisir d\'autres cartes ou des liens moins courants, mais ce n\'est pas indispensable.</string>
+    <string name="intro_open_by_default_app_note_1">Sélectionnez %1$s, %2$s et %3$s. Il s’agit des liens Google Maps les plus courants. Vous pouvez également choisir d’autres cartes ou des liens moins courants, mais ce n’est pas indispensable.</string>
     <string name="links_message_disabled_group">La carte web a été masquée. Vous pouvez la réafficher dans les préférences.</string>
     <string name="user_preferences_apps_visible_all">Toutes les applications sont visibles</string>
     <plurals name="user_preferences_apps_visible_count">
@@ -256,8 +256,8 @@
         <item quantity="many">%1$d applications sur %2$d sont visibles</item>
         <item quantity="other">%1$d applications sur %2$d sont visibles</item>
     </plurals>
-    <string name="user_preferences_apps_description">Choisissez quelles applications installées doivent s\'afficher après la conversion d\'un lien de carte en coordonnées.</string>
-    <string name="user_preferences_apps_message_hidden">L\'application a été masquée. Vous pouvez la réafficher dans les préférences.</string>
+    <string name="user_preferences_apps_description">Choisissez quelles applications installées doivent s’afficher après la conversion d’un lien de carte en coordonnées.</string>
+    <string name="user_preferences_apps_message_hidden">L’application a été masquée. Vous pouvez la réafficher dans les préférences.</string>
     <string name="user_preferences_apps_title">Applications</string>
     <string name="user_preferences_section_input">Saisie</string>
     <string name="user_preferences_section_output">Résultat</string>
