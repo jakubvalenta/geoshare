@@ -434,9 +434,9 @@ private fun ConnectionPermissionPreferenceValue(value: Permission) {
     Text(
         stringResource(
             when (value) {
-                Permission.ALWAYS -> R.string.yes
+                Permission.ALWAYS -> R.string.user_preferences_connection_option_always
                 Permission.ASK -> R.string.user_preferences_connection_option_ask
-                Permission.NEVER -> R.string.no
+                Permission.NEVER -> R.string.user_preferences_connection_option_never
             }
         )
     )
