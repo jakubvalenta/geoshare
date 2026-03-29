@@ -30,7 +30,7 @@
     <string name="main_navigate_to_intro">Открийте още функции на приложението</string>
     <string name="conversion_error_report">Докладване на проблем</string>
     <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.]]></string>
-    <string name="user_preferences_connection_title">Да се разреши ли свързване с картографска услуга (Google, Apple и др.)?</string>
+    <string name="user_preferences_connection_title">Връзка с картографска услуга</string>
     <string name="yes">Да</string>
     <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>
     <string name="no">Не</string>
@@ -48,7 +48,7 @@
     <string name="conversion_failed_parse_html_error">Неуспешно извличане на уеб страница от услугата за карти</string>
     <string name="user_preferences_title">Предпочитания</string>
     <string name="about_text"><![CDATA[<p>%1$s е безплатно приложение с отворен код, разпространявано под <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или по-нов лиценз.</p><br><p>Можете да намерите кода на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, където можете също да <a href="https://github.com/jakubvalenta/geoshare/issues">докладвате за проблеми</a>.</p><br><p>Вашите отзиви са добре дошли. Можете да се свържете с мен на <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
-    <string name="user_preferences_connection_description">За да поддържа кратки връзки към карти и да получава координати от уеб страницата на картографската услуга, когато връзката не ги съдържа, %1$s може да се свърже с картографската услуга. Можете да намерите повече информация на екрана с ЧЗВ.</string>
+    <string name="user_preferences_connection_description">За да поддържа кратки връзки и връзки, които не съдържат географски координати в URL адреса, %1$s може да се свърже с картографската услуга (Google Maps, Apple Maps и др.).</string>
     <string name="conversion_failed_parse_html_connection_error">Грешка във връзката при извличане на уеб страница от услугата за карти</string>
     <string name="conversion_failed_unshorten_connection_error">Грешка при свързване когато се разрешава кратка връзка</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Споделяне с</string>
@@ -215,7 +215,7 @@
     <string name="links_delete">Изтриване</string>
     <string name="links_delete_text">Уеб картата „%1$s“ ще бъде изтрита за постоянно.</string>
     <string name="links_delete_title">Изтриване на уеб картата?</string>
-    <string name="links_description">Уеб картите позволяват отваряне на координати в браузъра. Активирайте предварително инсталираните или добавете свои собствени.</string>
+    <string name="links_description">Уеб картите позволяват отваряне на координати в браузъра. Включете предварително инсталираните или добавете свои собствени.</string>
     <string name="links_form_advanced">Разширено</string>
     <string name="links_form_enabled_option_app">Показване в списъка с приложения</string>
     <string name="links_form_enabled_option_chip">Показване в полето за координати</string>
@@ -241,4 +241,19 @@
     <string name="user_preferences_coordinate_format_option_dec">Десетични степени</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">Градуси, минути, секунди</string>
     <string name="user_preferences_coordinate_format_title">Координатен формат</string>
+    <string name="conversion_succeeded_hide">Скриване</string>
+    <string name="intro_open_by_default_app_note_1">Изберете %1$s, %2$s и %3$s. Това са често срещаните връзки към Google Maps. Можете да изберете и други карти или по-редките връзки, но това не е задължително.</string>
+    <string name="user_preferences_connection_option_always">Разрешаване</string>
+    <string name="user_preferences_connection_option_never">Никога не позволявай</string>
+    <string name="links_message_disabled_group">Уеб картата е скрита. Можете да я покажете отново в предпочитанията.</string>
+    <string name="user_preferences_apps_visible_all">Всички приложения са видими</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="one">%1$d приложение от %2$d е видимо</item>
+        <item quantity="other">%1$d приложения от %2$d са видими</item>
+    </plurals>
+    <string name="user_preferences_apps_description">Изберете кои от инсталираните ви приложения да се показват след преобразуване на връзка към карта в координати.</string>
+    <string name="user_preferences_apps_message_hidden">Приложението е скрито. Можете да го покажете отново в предпочитанията.</string>
+    <string name="user_preferences_apps_title">Приложения</string>
+    <string name="user_preferences_section_input">Вход</string>
+    <string name="user_preferences_section_output">Изход</string>
 </resources>
