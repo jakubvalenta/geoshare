@@ -33,8 +33,8 @@
     <string name="permission_do_not_ask">Não me pergunte novamente</string>
     <string name="faq_title">Perguntas frequentes</string>
     <string name="user_preferences_title">Preferências</string>
-    <string name="user_preferences_connection_title">Permitir conectar ao mapa (Google, Apple, etc.)?</string>
-    <string name="user_preferences_connection_description">Para suportar links curtos, e obter coordenadas da página web do mapa quando o link não tem elas, o %1$s pode conectar ao serviço de mapas. Você pode encontrar mais informações na tela de perguntas frequentes.</string>
+    <string name="user_preferences_connection_title">Conexão ao serviço de mapas</string>
+    <string name="user_preferences_connection_description">Para suportar links curtos, e links que não contém as coordenadas geográficas na URL, o %1$s pode se conectar ao serviço de mapas (Google Maps, Apple Maps, etc).</string>
     <string name="yes">Sim</string>
     <string name="user_preferences_connection_option_ask">Perguntar antes de conectar</string>
     <string name="no">Não</string>
@@ -247,4 +247,20 @@
     <string name="links_restore_initial_data_title">Reconfigurar os mapas da web?</string>
     <string name="links_title">Mapas da web</string>
     <string name="links_update">Editar mapa da web</string>
+    <string name="conversion_succeeded_hide">Ocultar</string>
+    <string name="intro_open_by_default_app_note_1">Selecione %1$s, %2$s, e %3$s. Esses são os links comuns do Google Maps. Você pode escolher outros mapas ou os links mais raros também, mas não são essenciais.</string>
+    <string name="user_preferences_connection_option_always">Permitir</string>
+    <string name="user_preferences_connection_option_never">Nunca permitir</string>
+    <string name="links_message_disabled_group">O mapa da web foi oculto. Você pode exibi-lo novamente nas preferências.</string>
+    <string name="user_preferences_apps_visible_all">Todos os apps estão visíveis</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="one">%1$d app de %2$d está visível</item>
+        <item quantity="many">%1$d de apps de %2$d estão visíveis</item>
+        <item quantity="other">%1$d apps de %2$d estão visíveis</item>
+    </plurals>
+    <string name="user_preferences_apps_description">Escolha qual dos seus apps instalados devem aparecer após converter um link de mapa para coordenadas.</string>
+    <string name="user_preferences_apps_message_hidden">O app foi oculto. Você pode exibi-lo novamente nas preferências.</string>
+    <string name="user_preferences_apps_title">Apps</string>
+    <string name="user_preferences_section_input">Entrada</string>
+    <string name="user_preferences_section_output">Saída</string>
 </resources>
