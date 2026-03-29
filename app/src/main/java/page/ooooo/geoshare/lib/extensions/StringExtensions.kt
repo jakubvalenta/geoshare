@@ -15,20 +15,20 @@ fun String.decodeBasicHtmlEntities(): String =
  * grapheme cluster boundaries (UAX #29). It correctly handles surrogate pairs, combining characters, emoji modifier
  * sequences, and Zero Width Joiner (ZWJ) sequences.
  */
-fun String.firstGraphemeOrNull(): String? {
-    if (isEmpty()) {
-        return null
+fun String.firstGraphemeOrNull(): String? =
+    if (isNotEmpty()) {
+        val it = BreakIterator.getCharacterInstance()
+        it.setText(this)
+        val end = it.next()
+        substring(0, end)
+    } else {
+        null
     }
-    val it = BreakIterator.getCharacterInstance()
-    it.setText(this)
-    val end = it.next()
-    return substring(0, end)
-}
 
 fun String.truncateMiddle(maxLength: Int = 60, ellipsis: String = "\u2026"): String =
-    if (this.length > maxLength) {
+    if (length > maxLength) {
         val partLength: Int = maxLength / 2
-        "${this.take(partLength)}${ellipsis}${this.substring(this.length - partLength)}"
+        "${take(partLength)}${ellipsis}${substring(length - partLength)}"
     } else {
         this
     }
