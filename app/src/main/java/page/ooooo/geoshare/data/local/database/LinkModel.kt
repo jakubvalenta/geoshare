@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.firstGraphemeOrNull
 import page.ooooo.geoshare.lib.point.Srs
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.components.CharacterIconDescriptor
@@ -59,7 +60,7 @@ data class Link(
         }
 
     val icon: IconDescriptor
-        get() = CharacterIconDescriptor(name.firstOrNull())
+        get() = CharacterIconDescriptor(name.firstGraphemeOrNull())
 }
 
 @Dao

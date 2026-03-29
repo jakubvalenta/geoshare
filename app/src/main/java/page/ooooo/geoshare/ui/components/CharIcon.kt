@@ -30,7 +30,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CharIcon(
-    char: Char?,
+    text: String?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
     inverseContentColor: Color = MaterialTheme.colorScheme.surface,
@@ -40,9 +40,9 @@ fun CharIcon(
         modifier.background(LocalContentColor.current, shape),
         contentAlignment = Alignment.Center,
     ) {
-        char?.let { char ->
+        text?.let { char ->
             Text(
-                char.toString(),
+                char,
                 Modifier.semantics {
                     if (contentDescription != null) {
                         this.contentDescription = contentDescription
@@ -65,7 +65,7 @@ fun CharIcon(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            CharIcon('s', contentDescription = null, Modifier.size(24.dp))
+            CharIcon("a", contentDescription = null, Modifier.size(24.dp))
         }
     }
 }
@@ -75,7 +75,7 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            CharIcon('s', contentDescription = null, Modifier.size(24.dp))
+            CharIcon("a", contentDescription = null, Modifier.size(24.dp))
         }
     }
 }
@@ -87,7 +87,7 @@ private fun LargePreview() {
         Surface {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                 CharIcon(
-                    'L',
+                    "A",
                     contentDescription = null,
                     Modifier.size(46.dp),
                     inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -104,7 +104,41 @@ private fun DarkLargePreview() {
         Surface {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
                 CharIcon(
-                    'L',
+                    "A",
+                    contentDescription = null,
+                    Modifier.size(46.dp),
+                    inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmojiPreview() {
+    AppTheme {
+        Surface {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                CharIcon(
+                    "🇬🇷",
+                    contentDescription = null,
+                    Modifier.size(46.dp),
+                    inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkEmojiPreview() {
+    AppTheme {
+        Surface {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                CharIcon(
+                    "🇬🇷",
                     contentDescription = null,
                     Modifier.size(46.dp),
                     inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
