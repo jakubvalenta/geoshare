@@ -26,7 +26,7 @@
     <string name="permission_do_not_ask">不要再询问我</string>
     <string name="faq_title">常见问题</string>
     <string name="user_preferences_title">偏好设置</string>
-    <string name="user_preferences_connection_title">允许连接到地图服务吗？</string>
+    <string name="user_preferences_connection_title">地图服务连接</string>
     <string name="user_preferences_connection_description">为了支持短链接和 URL 中不包含地理坐标的链接，%1$s 可以连接到地图服务（Google 地图、Apple 地图等）。</string>
     <string name="yes">是</string>
     <string name="user_preferences_connection_option_ask">连接前询问</string>
@@ -247,4 +247,6 @@
     <string name="user_preferences_apps_title">应用</string>
     <string name="user_preferences_section_input">输入</string>
     <string name="user_preferences_section_output">输出</string>
+    <string name="user_preferences_connection_option_always">允许</string>
+    <string name="user_preferences_connection_option_never">永不允许</string>
 </resources>
