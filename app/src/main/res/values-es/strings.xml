@@ -18,7 +18,6 @@
     <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ <i>Abrir por defecto</i> y desactive la apertura de enlaces en esta aplicación.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">Captura de pantalla de la configuración predeterminada de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
-    <string name="intro_open_by_default_app_content_description">Captura de pantalla de los ajustes de abrir por defecto de %1$s</string>
     <string name="intro_nav_close">Cerrar</string>
     <string name="intro_nav_next">SIguiente</string>
     <string name="main_navigate_to_intro">Descubrir más características de la app</string>

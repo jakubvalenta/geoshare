@@ -11,7 +11,6 @@
     <string name="intro_title">Wprowadzenie</string>
     <string name="nav_back_content_description">Powrót do ekranu głównego</string>
     <string name="nav_menu_content_description">Menu</string>
-    <string name="intro_open_by_default_app_content_description">Zrzut ekranu ustawień Otwórz domyślnie %1$s</string>
     <string name="intro_open_by_default_app_button">Otwórz ustawienia %1$s</string>
     <string name="intro_nav_close">Zamknij</string>
     <string name="intro_nav_next">Dalej</string>

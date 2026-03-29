@@ -74,7 +74,6 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">In the app</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">In your browser</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Then go to Settings ➞ Apps ➞ %1$s ➞ <i>Open by default</i>, turn on the opening of links in this app, and tap <i>Add links</i>.]]></string>
-    <string name="intro_open_by_default_app_content_description">Screenshot of %1$s’s Open by default settings</string>
     <string name="intro_open_by_default_app_button">Open %1$s settings</string>
     <string name="intro_open_by_default_app_note_1">Select %1$s, %2$s, and %3$s. These are the common Google Maps links. You can choose other maps or the more rare links too, but it’s not essential.</string>
     <string name="intro_open_by_default_app_note">If some links are grayed out, other map apps are set to open them by default. You can find these apps and turn off the opening of links for them, like we did for Google Maps.</string>
