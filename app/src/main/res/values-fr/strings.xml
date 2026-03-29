@@ -6,7 +6,6 @@
     <string name="intro_how_to_share_headline">Comment afficher un emplacement sur une carte dans une autre application cartographique</string>
     <string name="intro_how_to_share_google_maps_caption">Partagez un emplacement depuis votre application cartographique ou votre navigateur Web.</string>
     <string name="intro_how_to_share_google_maps_content_description">Capture d’écran de l’écran de partage de Google Maps</string>
-    <string name="intro_open_by_default_app_content_description">Capture d’écran des paramètres d’ouverture par défaut de %1$s</string>
     <string name="conversion_error_report">Signaler un problème</string>
     <string name="conversion_error_retry">Réessayer</string>
     <string name="main_navigate_to_intro">Découvrez plus de fonctionnalités de l’appli</string>

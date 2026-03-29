@@ -4,7 +4,6 @@
     <string name="intro_how_to_share_google_maps_content_description">Bildschirmfoto von Google Maps share Sheet</string>
     <string name="intro_how_to_share_app_content_description">Bildschirmfoto von %1$s share Sheet</string>
     <string name="intro_open_by_default_google_maps_button">Google Maps Einstellung öffnen</string>
-    <string name="intro_open_by_default_app_content_description">Bildschirmfoto von %1$s Standardmäßig öffnen Einstellungen</string>
     <string name="intro_open_by_default_app_button">Öffne die Einstellungen von %1$s</string>
     <string name="intro_open_by_default_app_note">Wenn manche Links ausgegraut sind, öffnen andere Google Apps diese Links Standardmäßig. Du kannst diese Apps suchen und bei den das Öffnen von Links unterbinden, so wie es zuvor bei Google Maps gemacht wurde.</string>
     <string name="intro_nav_next">Weiter</string>

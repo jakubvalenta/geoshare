@@ -6,7 +6,6 @@
     <string name="intro_title">Въведение</string>
     <string name="intro_how_to_share_app_content_description">Екранна снимка на екрана за споделяне на %1$s</string>
     <string name="intro_open_by_default_google_maps_content_description">Екранна снимка на настройките за отваряне по подразбиране на Google Карти</string>
-    <string name="intro_open_by_default_app_content_description">Екранна снимка на настройките за отваряне по подразбиране на %1$s</string>
     <string name="intro_nav_next">Следващо</string>
     <string name="intro_nav_finish">Да започваме</string>
     <string name="main_input_uri_label">Поставете връзка към картата тук</string>

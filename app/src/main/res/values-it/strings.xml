@@ -10,7 +10,6 @@
     <string name="intro_how_to_share_headline">Come visualizzare le posizioni in altre app di mappe</string>
     <string name="intro_how_to_share_app_content_description">Screenshot menu di condivisione di %1$s</string>
     <string name="intro_open_by_default_google_maps_button">Apri impostazioni di Google Maps</string>
-    <string name="intro_open_by_default_app_content_description">Screenshot menu Apri come impostazione predefinita di %1$s</string>
     <string name="intro_open_by_default_app_button">Apri impostazioni di %1$s</string>
     <string name="intro_nav_finish">Iniziamo</string>
     <string name="main_input_uri_clear_content_description">Cancella</string>
