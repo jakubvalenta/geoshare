@@ -23,7 +23,7 @@ data class ResourceIconDescriptor(val id: Int) : IconDescriptor
 
 data class ImageVectorIconDescriptor(val imageVector: ImageVector) : IconDescriptor
 
-data class CharacterIconDescriptor(val char: Char?) : IconDescriptor
+data class CharacterIconDescriptor(val text: String?) : IconDescriptor
 
 @Composable
 fun IconFromDescriptor(
@@ -41,7 +41,7 @@ fun IconFromDescriptor(
         )
 
         is CharacterIconDescriptor -> CharIcon(
-            descriptor.char,
+            descriptor.text,
             contentDescription,
             modifier.requiredSize(size),
             inverseContentColor,
