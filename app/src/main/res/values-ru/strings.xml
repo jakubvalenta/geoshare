@@ -46,7 +46,7 @@
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="permission_do_not_ask">Больше не спрашивать меня</string>
     <string name="faq_title">ЧаВо</string>
-    <string name="user_preferences_connection_title">Разрешить подключение к картографическому сервису?</string>
+    <string name="user_preferences_connection_title">Подключение к картографическому сервису</string>
     <string name="user_preferences_title">Настройки</string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
     <string name="conversion_failed_unshorten_connection_error">Ошибка подключения при открытии короткой ссылки</string>
@@ -268,4 +268,6 @@
     <string name="user_preferences_apps_title">Приложения</string>
     <string name="user_preferences_section_input">Ввод</string>
     <string name="user_preferences_section_output">Вывод</string>
+    <string name="user_preferences_connection_option_always">Разрешить</string>
+    <string name="user_preferences_connection_option_never">Запретить</string>
 </resources>
