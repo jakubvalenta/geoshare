@@ -506,7 +506,7 @@ private fun MainScreen(
                     )
                     if (!wide) {
                         Column(
-                            // This column must not have weight(1f), otherwise the last row of app icons gets shrinked
+                            // This column must not have weight(1f), otherwise the last row of app icons gets shrunk
                             Modifier
                                 .fillMaxWidth()
                                 .background(containerColor)
