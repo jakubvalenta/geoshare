@@ -261,4 +261,6 @@
     <string name="user_preferences_apps_title">Applications</string>
     <string name="user_preferences_section_input">Saisie</string>
     <string name="user_preferences_section_output">Résultat</string>
+    <string name="user_preferences_connection_option_always">Autoriser</string>
+    <string name="user_preferences_connection_option_never">Ne jamais autoriser</string>
 </resources>
