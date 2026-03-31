@@ -26,7 +26,7 @@ class BillingImpl(private val context: Context) : Billing {
     )
     override val refundableDuration = 48.hours
 
-    private val offers = listOf(
+    private val offers = persistentListOf(
         Offer("offer_one_time", "$19", Offer.Period.ONE_TIME, "demo_lifetime"),
         Offer("offer_subscription", "$1.50", Offer.Period.MONTHLY, "demo_monthly"),
     )
@@ -41,13 +41,13 @@ class BillingImpl(private val context: Context) : Billing {
         _message.value = null
         CoroutineScope(Dispatchers.Default).launch {
             delay(2.seconds)
-            _status.value = BillingStatus.NotPurchased()
+            _status.value = BillingStatus.NotPurchased(pending = false)
         }
     }
 
     override fun endConnection() {}
 
-    override suspend fun queryOffers(): List<Offer> = offers
+    override suspend fun queryOffers(): BillingOffers = BillingOffers.Done(offers)
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
@@ -56,7 +56,7 @@ class BillingImpl(private val context: Context) : Billing {
             products.firstOrNull { product -> product.id == offer.productId }
         }
         if (product != null) {
-            _status.value = BillingStatus.Purchased(product, refundable = true)
+            _status.value = BillingStatus.Purchased(product, expired = false, refundable = true)
             _message.value = Message(
                 context.getString(
                     R.string.billing_purchase_success, context.getString(appNameResId)
@@ -67,17 +67,17 @@ class BillingImpl(private val context: Context) : Billing {
         }
     }
 
-    override fun manageProduct(product: BillingProduct) {
+    override fun manageProduct(activity: Activity, product: BillingProduct) {
         _message.value = null
         when (product.type) {
             BillingProduct.Type.DONATION -> {}
 
             BillingProduct.Type.ONE_TIME -> {
-                _status.value = BillingStatus.NotPurchased()
+                _status.value = BillingStatus.NotPurchased(pending = false)
             }
 
             BillingProduct.Type.SUBSCRIPTION -> {
-                _status.value = BillingStatus.NotPurchased()
+                _status.value = BillingStatus.NotPurchased(pending = false)
             }
         }
     }
