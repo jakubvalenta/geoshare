@@ -41,9 +41,6 @@ class BillingImplTest {
 
     private val resources: Resources = mock {
         on { getString(R.string.app_name_pro) } doReturn "Geo Share Pro"
-        on {
-            getString(R.string.billing_offers_empty, "Geo Share Pro")
-        } doReturn "Geo Share Pro is not available in your region"
         on { getString(R.string.billing_offers_error) } doReturn "Failed to fetch offers"
         on { getString(R.string.billing_purchase_error_cancelled) } doReturn "Purchase cancelled"
         on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
@@ -480,7 +477,7 @@ class BillingImplTest {
         )
         billingImpl.startConnection()
         assertEquals(
-            emptyList<Offer>(),
+            BillingOffers.Done(persistentListOf()),
             billingImpl.queryOffers(),
         )
         assertEquals(
@@ -526,13 +523,10 @@ class BillingImplTest {
             log = FakeLog,
         )
         assertEquals(
-            emptyList<Offer>(),
+            BillingOffers.Done(persistentListOf()),
             billingImpl.queryOffers(),
         )
-        assertEquals(
-            Message("Geo Share Pro is not available in your region", isError = true),
-            billingImpl.message.value,
-        )
+        assertNull(billingImpl.message.value)
     }
 
     @Test
@@ -586,13 +580,10 @@ class BillingImplTest {
             log = FakeLog,
         )
         assertEquals(
-            emptyList<Offer>(),
+            BillingOffers.Done(persistentListOf()),
             billingImpl.queryOffers(),
         )
-        assertEquals(
-            Message("Geo Share Pro is not available in your region", isError = true),
-            billingImpl.message.value,
-        )
+        assertNull(billingImpl.message.value)
     }
 
     @Test
@@ -641,13 +632,10 @@ class BillingImplTest {
             log = FakeLog,
         )
         assertEquals(
-            emptyList<Offer>(),
+            BillingOffers.Done(persistentListOf()),
             billingImpl.queryOffers(),
         )
-        assertEquals(
-            Message("Geo Share Pro is not available in your region", isError = true),
-            billingImpl.message.value,
-        )
+        assertNull(billingImpl.message.value)
     }
 
     @Test
@@ -727,10 +715,12 @@ class BillingImplTest {
                 log = FakeLog,
             )
             assertEquals(
-                listOf(
-                    Offer("offer_lifetime_details_list", "$1", Offer.Period.ONE_TIME, "test_lifetime"),
-                    Offer("offer_lifetime_details", "$3.33", Offer.Period.ONE_TIME, "test_monthly"),
-                    Offer("offer_monthly_details", "$99.90", Offer.Period.MONTHLY, "test_monthly"),
+                BillingOffers.Done(
+                    persistentListOf(
+                        Offer("offer_lifetime_details_list", "$1", Offer.Period.ONE_TIME, "test_lifetime"),
+                        Offer("offer_lifetime_details", "$3.33", Offer.Period.ONE_TIME, "test_monthly"),
+                        Offer("offer_monthly_details", "$99.90", Offer.Period.MONTHLY, "test_monthly"),
+                    )
                 ),
                 billingImpl.queryOffers(),
             )
@@ -832,8 +822,10 @@ class BillingImplTest {
                 log = FakeLog,
             )
             assertEquals(
-                listOf(
-                    Offer("offer_monthly_infinite", "$3", Offer.Period.MONTHLY, "test_lifetime"),
+                BillingOffers.Done(
+                    persistentListOf(
+                        Offer("offer_monthly_infinite", "$3", Offer.Period.MONTHLY, "test_lifetime"),
+                    )
                 ),
                 billingImpl.queryOffers(),
             )

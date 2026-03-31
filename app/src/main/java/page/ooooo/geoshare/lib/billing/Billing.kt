@@ -20,7 +20,7 @@ interface Billing {
 
     fun endConnection()
 
-    suspend fun queryOffers(): List<Offer>
+    suspend fun queryOffers(): BillingOffers
 
     suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 

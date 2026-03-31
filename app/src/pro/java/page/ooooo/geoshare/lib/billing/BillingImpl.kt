@@ -28,6 +28,7 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -205,7 +206,10 @@ class BillingImpl(
         billingClient.endConnection()
     }
 
-    override suspend fun queryOffers(): List<Offer> = queryProductDetailsAndOffers().map { (_, offer) -> offer }
+    override suspend fun queryOffers() =
+        BillingOffers.Done(
+            offers = queryProductDetailsAndOffers().map { (_, offer) -> offer }.toImmutableList(),
+        )
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
         _message.value = null
@@ -312,13 +316,6 @@ class BillingImpl(
             .also {
                 if (it.isEmpty()) {
                     log.w(TAG, "No offers found")
-                    _message.value = Message(
-                        resources.getString(
-                            R.string.billing_offers_empty,
-                            resources.getString(R.string.app_name_pro),
-                        ),
-                        isError = true,
-                    )
                 }
             }
 
