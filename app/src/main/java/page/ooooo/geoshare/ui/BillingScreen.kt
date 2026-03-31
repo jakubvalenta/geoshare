@@ -237,13 +237,13 @@ private fun BillingMainPane(
             is BillingStatus.Purchased ->
                 BillingStatusCard(
                     stringResource(R.string.billing_status_expired),
-                    Modifier.testTag("geoShareBillingStatusExpired"), // TODO Test
+                    Modifier.testTag("geoShareBillingStatusExpired"),
                 )
 
             is BillingStatus.NotPurchased if billingStatus.pending ->
                 BillingStatusCard(
                     stringResource(R.string.billing_status_pending),
-                    Modifier.testTag("geoShareBillingStatusPending"), // TODO Test
+                    Modifier.testTag("geoShareBillingStatusPending"),
                 )
 
             is BillingStatus.NotPurchased if (billingOffers as? BillingOffers.Done)?.offers?.isEmpty() == true ->

@@ -56,12 +56,9 @@ class BillingImpl(private val context: Context) : Billing {
             products.firstOrNull { product -> product.id == offer.productId }
         }
         if (product != null) {
+            _status.value = BillingStatus.NotPurchased(pending = true)
+            delay(3.seconds)
             _status.value = BillingStatus.Purchased(product, expired = false, refundable = true)
-            _message.value = Message(
-                context.getString(
-                    R.string.billing_purchase_success, context.getString(appNameResId)
-                )
-            )
         } else {
             _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
         }
@@ -77,7 +74,12 @@ class BillingImpl(private val context: Context) : Billing {
             }
 
             BillingProduct.Type.SUBSCRIPTION -> {
-                _status.value = BillingStatus.NotPurchased(pending = false)
+                // If the status is not expired, make it expired
+                _status.value = (_status.value as? BillingStatus.Purchased)
+                    ?.takeUnless { it.expired }
+                    ?.copy(expired = true)
+                    // If the status is expired, make it not purchased
+                    ?: BillingStatus.NotPurchased(pending = false)
             }
         }
     }
