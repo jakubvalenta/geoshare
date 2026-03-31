@@ -37,8 +37,8 @@
     <string name="about_text"><![CDATA[<p>%1$s هو تطبيق مجاني ومفتوح المصدر يتم توزيعه بموجب رخصة <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> أو أحدث.</p><br><p>يمكنك العثور على الكود على <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>، حيث يمكنك أيضًا <a href="https://github.com/jakubvalenta/geoshare/issues">الإبلاغ عن المشكلات</a>.</p><br><p>ملاحظاتك مرحب بها. يمكنك التواصل معي على <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
     <string name="faq_title">الأسئلة الشائعة</string>
     <string name="user_preferences_title">التفضيلات</string>
-    <string name="user_preferences_connection_title">السماح بالاتصال بخدمة الخرائط (جوجل، Apple، إلخ)؟</string>
-    <string name="user_preferences_connection_description">لدعم روابط الخرائط القصيرة، وللحصول على الإحداثيات من صفحة الويب الخاصة بخدمة الخرائط عندما لا يحتوي الرابط عليها، يمكن لـ %1$s الاتصال بخدمة الخرائط. يمكنك العثور على مزيد من المعلومات في شاشة الأسئلة الشائعة.</string>
+    <string name="user_preferences_connection_title">الاتصال بخدمة الخرائط</string>
+    <string name="user_preferences_connection_description">لدعم الروابط القصيرة والروابط التي لا تحتوي على إحداثيات جغرافية في عنوان URL، يمكن لـ %1$s الاتصال بخدمة الخرائط (خرائط جوجل، وخرائط Apple، وما إلى ذلك).</string>
     <string name="yes">نعم</string>
     <string name="user_preferences_connection_option_ask">اسأل قبل الاتصال</string>
     <string name="no">لا</string>
@@ -264,4 +264,23 @@
     <string name="user_preferences_coordinate_format_option_dec">درجات عشرية</string>
     <string name="user_preferences_coordinate_format_option_deg_min_sec">درجات، دقائق، ثوانٍ</string>
     <string name="user_preferences_coordinate_format_title">تنسيق الإحداثيات</string>
+    <string name="conversion_succeeded_hide">أخفِ</string>
+    <string name="intro_open_by_default_app_note_1">حدّد %1$s و%2$s و%3$s. هذه هي روابط خرائط جوجل الشائعة. يمكنك اختيار خرائط أخرى أو الروابط الأكثر ندرة أيضًا، لكن الأمر ليس ضروريًا.</string>
+    <string name="user_preferences_connection_option_always">اسمح</string>
+    <string name="user_preferences_connection_option_never">لا تسمح أبدًا</string>
+    <string name="links_message_disabled_group">أُخفِيَ خريطة الويب. يمكنك إظهارها مرة أخرى من التفضيلات.</string>
+    <string name="user_preferences_apps_visible_all">كل التطبيقات ظاهرة</string>
+    <string name="user_preferences_apps_description">اختر أيًا من تطبيقاتك المثبتة تود إظهارها بعد تحويل رابط الخريطة إلى إحداثيات.</string>
+    <string name="user_preferences_apps_message_hidden">أُخفِيَ التطبيق. يمكنك إظهاره مرة أخرى من التفضيلات.</string>
+    <string name="user_preferences_apps_title">التطبيقات</string>
+    <string name="user_preferences_section_input">الإدخال</string>
+    <string name="user_preferences_section_output">المخرج</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="zero">لا تطبيقات ظاهرة</item>
+        <item quantity="one">تطبيق واحد ظاهر من أصل %2$d</item>
+        <item quantity="two">تطبيقان ظاهران من أصل %2$d</item>
+        <item quantity="few">%1$d تطبيقات ظاهرة من أصل %2$d</item>
+        <item quantity="many">%1$d تطبيقًا ظاهرًا من أصل %2$d</item>
+        <item quantity="other">%1$d تطبيق ظاهر من أصل %2$d</item>
+    </plurals>
 </resources>
