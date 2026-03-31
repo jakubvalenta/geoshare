@@ -37,9 +37,9 @@
     <string name="permission_do_not_ask">Neptejte se mě znovu</string>
     <string name="faq_title">Nejčastější dotazy</string>
     <string name="user_preferences_title">Nastavení</string>
-    <string name="user_preferences_connection_title">Povolit spojení s mapovou službou (Google, Apple atd.)?</string>
+    <string name="user_preferences_connection_title">Spojení s mapovou službou</string>
     <string name="user_preferences_automation_title">Automatizace</string>
-    <string name="user_preferences_connection_description">Pro podporu krátkých odkazů a pro získání souřadnic z webové stránky mapové služby, když odkaz souřadnice neobsahuje, se %1$s může spojit s danou mapovou službou. Více informací najdete na obrazovce Nejčastější dotazy.</string>
+    <string name="user_preferences_connection_description">Pro podporu krátkých odkazů a odkazů, které neobsahují zeměpisné souřadnice v URL, se %1$s může spojit s danou mapovou službou (Google Mapy, Apple Mapy atd.).</string>
     <string name="yes">Ano</string>
     <string name="user_preferences_connection_option_ask">Zeptat se před spojením</string>
     <string name="no">Ne</string>
@@ -251,4 +251,21 @@
     <string name="links_restore_initial_data_title">Obnovit webové mapy do továrního nastavení?</string>
     <string name="links_title">Webové mapy</string>
     <string name="links_update">Upravit webovou mapu</string>
+    <string name="conversion_succeeded_hide">Skrýt</string>
+    <string name="intro_open_by_default_app_note_1">Vyberte %1$s, %2$s a %3$s. Jedná se o obvyklé odkazy na Google Mapy. Můžete vybrat také další mapy nebo méně obvyklé odkazy, ale není to nezbytné.</string>
+    <string name="user_preferences_connection_option_always">Povolit</string>
+    <string name="user_preferences_connection_option_never">Nikdy nepovolit</string>
+    <string name="links_message_disabled_group">Webová mapa byla skryta. Můžete ji opět zobrazit v nastavení.</string>
+    <string name="user_preferences_apps_visible_all">Všechny aplikace jsou viditelné</string>
+    <plurals name="user_preferences_apps_visible_count">
+        <item quantity="one">%1$d aplikace z %2$d je viditelná</item>
+        <item quantity="few">%1$d aplikace z %2$d jsou viditelné</item>
+        <item quantity="many">%1$d aplikací z %2$d je viditelných</item>
+        <item quantity="other">%1$d aplikací z %2$d je viditelných</item>
+    </plurals>
+    <string name="user_preferences_apps_description">Vyberte, které z nainstalovaných aplikací se mají zobrazit po převedení odkazu na mapu na souřadnice.</string>
+    <string name="user_preferences_apps_message_hidden">Aplikace byla skryta. Můžete ji opět zobrazit v nastavení.</string>
+    <string name="user_preferences_apps_title">Aplikace</string>
+    <string name="user_preferences_section_input">Vstup</string>
+    <string name="user_preferences_section_output">Výstup</string>
 </resources>
