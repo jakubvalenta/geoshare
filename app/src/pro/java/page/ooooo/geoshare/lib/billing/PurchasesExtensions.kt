@@ -14,14 +14,13 @@ fun List<Purchase>.getBillingStatus(products: List<BillingProduct>, refundableDu
                 if (product != null) {
                     return BillingStatus.Purchased(
                         product = product,
-                        expired = product.type == BillingProduct.Type.SUBSCRIPTION && !purchase.isAutoRenewing, // TODO Test
+                        expired = product.type == BillingProduct.Type.SUBSCRIPTION && !purchase.isAutoRenewing,
                         refundable = purchase.purchaseTime > System.currentTimeMillis() - refundableDuration.inWholeMilliseconds,
                     )
                 }
             }
 
             PurchaseState.PENDING -> {
-                // TODO Test
                 return BillingStatus.NotPurchased(pending = true)
             }
         }
