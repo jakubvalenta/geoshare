@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -67,6 +68,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.components.AnimatedMessage
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
@@ -437,26 +439,8 @@ private fun BillingSupportingPane(
     when (billingStatus) {
         is BillingStatus.NotPurchased if sortedBillingOffers.isNotEmpty() -> {
             ScaffoldAction(
-                text = stringResource(R.string.billing_purchase_button),
-                modifier = Modifier.testTag("geoShareBillingPurchaseButton"),
                 innerPadding = innerPadding,
                 bottomCorners = bottomCorners,
-                onClick = {
-                    selectedOffer?.let { selectedOffer ->
-                        onLaunchBillingFlow(selectedOffer.token)
-                    }
-                },
-                containerColor = if (selectedOffer != null) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceContainerHighest
-                },
-                contentColor = if (selectedOffer != null) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
-                after = { BillingLegalText() },
             ) {
                 SegmentedList(
                     values = sortedBillingOffers,
@@ -504,6 +488,20 @@ private fun BillingSupportingPane(
                     },
                     itemTestTag = { offer -> "geoShareBillingOffer_${offer.period}" },
                 )
+                LargeButton(
+                    stringResource(R.string.billing_purchase_button),
+                    Modifier.testTag("geoShareBillingPurchaseButton"),
+                    enabled = selectedOffer != null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
+                ) {
+                    selectedOffer?.let { selectedOffer ->
+                        onLaunchBillingFlow(selectedOffer.token)
+                    }
+                }
+                BillingLegalText()
             }
         }
 
@@ -515,46 +513,44 @@ private fun BillingSupportingPane(
 
                 BillingProduct.Type.ONE_TIME -> {
                     ScaffoldAction(
-                        text = stringResource(R.string.billing_order_history),
-                        onClick = {
-                            onManageBillingProduct(billingStatus.product)
-                        },
                         innerPadding = innerPadding,
                         bottomCorners = bottomCorners,
-                        modifier = Modifier.testTag("geoShareBillingManageButtonOneTime"),
-                        after = { BillingLegalText() },
                     ) {
-                        if (billingStatus.refundable) {
-                            // TODO Put text inside button
-                            Text(
-                                stringResource(
-                                    R.string.billing_refund_description,
-                                    billingRefundableDuration.toInt(DurationUnit.HOURS)
-                                ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
+                        Text(
+                            stringResource(
+                                R.string.billing_refund_description,
+                                billingRefundableDuration.toInt(DurationUnit.HOURS)
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        LargeButton(
+                            stringResource(R.string.billing_order_history),
+                            Modifier.testTag("geoShareBillingManageButtonOneTime"),
+                        ) {
+                            onManageBillingProduct(billingStatus.product)
                         }
+                        BillingLegalText()
                     }
                 }
 
                 BillingProduct.Type.SUBSCRIPTION -> {
                     ScaffoldAction(
-                        text = stringResource(R.string.billing_manage_subscription),
-                        onClick = {
-                            onManageBillingProduct(billingStatus.product)
-                        },
                         innerPadding = innerPadding,
                         bottomCorners = bottomCorners,
-                        modifier = Modifier.testTag("geoShareBillingManageButtonSubscription"),
-                        after = { BillingLegalText() },
                     ) {
-                        // TODO Put text inside button
                         Text(
                             stringResource(R.string.billing_manage_subscription_description),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium,
                         )
+                        LargeButton(
+                            stringResource(R.string.billing_manage_subscription),
+                            Modifier.testTag("geoShareBillingManageButtonSubscription"),
+                        ) {
+                            onManageBillingProduct(billingStatus.product)
+                        }
+                        BillingLegalText()
                     }
                 }
             }

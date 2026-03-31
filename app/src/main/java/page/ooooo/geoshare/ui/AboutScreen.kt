@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.ui.components.BasicSupportingPaneScaffold
+import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -155,20 +157,23 @@ private fun AboutSupportingPane(
         val uriHandler = LocalUriHandler.current
 
         ScaffoldAction(
-            text = stringResource(R.string.donation_button),
-            onClick = {
-                uriHandler.openUri("https://ko-fi.com/jakubvalenta")
-            },
             innerPadding = innerPadding,
             bottomCorners = bottomCorners,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ) {
             Text(
                 stringResource(R.string.donation_description),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
+            LargeButton(
+                stringResource(R.string.donation_button),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
+            ) {
+                uriHandler.openUri("https://ko-fi.com/jakubvalenta")
+            }
         }
     }
 }
