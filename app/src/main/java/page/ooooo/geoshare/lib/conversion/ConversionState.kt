@@ -28,8 +28,6 @@ import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.inputs.HtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
-import page.ooooo.geoshare.lib.inputs.ParseUriResult
 import page.ooooo.geoshare.lib.inputs.ShortUriInput
 import page.ooooo.geoshare.lib.inputs.WebInput
 import page.ooooo.geoshare.lib.outputs.Action
@@ -230,53 +228,50 @@ data class UnshortenedUrl(
     val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ConversionState {
     override suspend fun transition(): State =
-        when (val res = withContext(dispatcher) { input.parseUri(uri, stateContext.uriQuote) }) {
-            is ParseUriResult.Succeeded -> {
-                stateContext.log.i(null, "URI Pattern: Converted $uri to ${res.points}")
-                ConversionSucceeded(stateContext, inputUriString, res.points)
-            }
-
-            is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
+        withContext(dispatcher) { input.parseUri(uri, stateContext.uriQuote) }.run {
+            if (points.lastOrNull()?.hasCoordinates() == true) {
+                stateContext.log.i(null, "URI Pattern: Converted $uri to $points")
+                ConversionSucceeded(stateContext, inputUriString, points)
+            } else if (htmlUriString != null) {
                 if (input is HtmlInput) {
                     when (permission
                         ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseHtmlPermission(
-                            stateContext, inputUriString, input, uri, res.points, res.htmlUriString
+                            stateContext, inputUriString, input, uri, points, htmlUriString
                         )
 
                         Permission.ASK -> RequestedParseHtmlPermission(
-                            stateContext, inputUriString, input, uri, res.points, res.htmlUriString
+                            stateContext, inputUriString, input, uri, points, htmlUriString
                         )
 
-                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
+                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, points)
                     }
                 } else {
                     stateContext.log.e(null, "URI Pattern: Input doesn't support HTML parsing")
-                    DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
+                    DeniedParseHtmlPermission(stateContext, inputUriString, points)
                 }
-            }
-
-            is ParseUriResult.SucceededAndSupportsWebParsing -> {
+            } else if (webUriString != null) {
                 if (input is WebInput) {
                     when (permission
                         ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                         Permission.ALWAYS -> GrantedParseWebPermission(
-                            stateContext, inputUriString, input, uri, res.points, res.webUriString
+                            stateContext, inputUriString, input, uri, points, webUriString
                         )
 
                         Permission.ASK -> RequestedParseWebPermission(
-                            stateContext, inputUriString, input, uri, res.points, res.webUriString
+                            stateContext, inputUriString, input, uri, points, webUriString
                         )
 
-                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
+                        Permission.NEVER -> DeniedParseHtmlPermission(stateContext, inputUriString, points)
                     }
                 } else {
                     stateContext.log.e(null, "URI Pattern: Input doesn't support web parsing")
-                    DeniedParseHtmlPermission(stateContext, inputUriString, res.points)
+                    DeniedParseHtmlPermission(stateContext, inputUriString, points)
                 }
-            }
-
-            is ParseUriResult.Failed -> {
+            } else if (points.lastOrNull()?.hasName() == true) {
+                stateContext.log.i(null, "URI Pattern: Converted $uri to $points")
+                ConversionSucceeded(stateContext, inputUriString, points)
+            } else {
                 stateContext.log.i(null, "URI Pattern: Failed to parse $uri")
                 ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString)
             }
@@ -326,7 +321,7 @@ data class GrantedParseHtmlPermission(
         }
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
-            val res = stateContext.networkTools.getSource(htmlUrl, retry, dispatcher = Dispatchers.Default) { channel ->
+            stateContext.networkTools.getSource(htmlUrl, retry, dispatcher = Dispatchers.Default) { channel ->
                 input.parseHtml(
                     htmlUrl.toString(),
                     channel,
@@ -334,34 +329,26 @@ data class GrantedParseHtmlPermission(
                     uriQuote = stateContext.uriQuote,
                     log = stateContext.log,
                 )
-            }
-            when (res) {
-                is ParseHtmlResult.Succeeded -> {
-                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to ${res.points}")
-                    ConversionSucceeded(stateContext, inputUriString, res.points)
-                }
-
-                is ParseHtmlResult.RequiresRedirect -> {
-                    stateContext.log.i(
-                        null, "HTML Pattern: Parsed $htmlUrl to redirect URI ${res.redirectUriString}"
-                    )
-                    val redirectUri = Uri.parse(res.redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
+            }.run {
+                if (points.lastOrNull()?.hasCoordinates() == true) {
+                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $points")
+                    ConversionSucceeded(stateContext, inputUriString, points)
+                } else if (redirectUriString != null) {
+                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to redirect URI $redirectUriString")
+                    val redirectUri = Uri.parse(redirectUriString, stateContext.uriQuote).toAbsoluteUri(uri)
                     ReceivedUri(stateContext, inputUriString, input, redirectUri, Permission.ALWAYS)
-                }
-
-                is ParseHtmlResult.RequiresWebParsing -> {
+                } else if (webUriString != null) {
                     if (input is WebInput) {
                         stateContext.log.i(null, "HTML Pattern: URI $htmlUrl requires web parsing")
-                        GrantedParseWebPermission(
-                            stateContext, inputUriString, input, uri, pointsFromUri, res.webUriString
-                        )
+                        GrantedParseWebPermission(stateContext, inputUriString, input, uri, pointsFromUri, webUriString)
                     } else {
                         stateContext.log.e(null, "HTML Pattern: Input doesn't support web parsing")
                         ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
                     }
-                }
-
-                is ParseHtmlResult.Failed -> {
+                } else if (points.lastOrNull()?.hasName() == true) {
+                    stateContext.log.i(null, "HTML Pattern: Parsed $htmlUrl to $points")
+                    ConversionSucceeded(stateContext, inputUriString, points)
+                } else {
                     stateContext.log.w(null, "HTML Pattern: Failed to parse $htmlUrl")
                     ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
                 }
@@ -466,28 +453,14 @@ data class GrantedParseWebPermission(
                 .timeout(timeout)
                 .first()
             val matchingUriString = input.uriPattern.find(urlString)?.value
-            when (
-                val res = matchingUriString?.let { uriString ->
-                    input.parseUri(Uri.parse(uriString, stateContext.uriQuote), stateContext.uriQuote)
-                }
-            ) {
-                is ParseUriResult.Succeeded -> {
-                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to ${res.points}")
-                    ConversionSucceeded(stateContext, inputUriString, res.points)
-                }
-
-                is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
-                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to ${res.points}")
-                    ConversionSucceeded(stateContext, inputUriString, res.points)
-                }
-
-                is ParseUriResult.SucceededAndSupportsWebParsing,
-                    -> {
-                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to ${res.points}")
-                    ConversionSucceeded(stateContext, inputUriString, res.points)
-                }
-
-                is ParseUriResult.Failed, null -> {
+            matchingUriString?.let { uriString ->
+                input.parseUri(Uri.parse(uriString, stateContext.uriQuote), stateContext.uriQuote)
+            }.run {
+                // TODO Test
+                if (this?.points?.isNotEmpty() == true) {
+                    stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to $points")
+                    ConversionSucceeded(stateContext, inputUriString, points)
+                } else {
                     stateContext.log.w(ConversionState.TAG, "Failed to parse web URL $webUriString")
                     ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString)
                 }

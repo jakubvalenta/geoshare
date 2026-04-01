@@ -106,6 +106,7 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.GrantedParseWebPermission
@@ -1941,6 +1942,63 @@ private fun TabletErrorPreview() {
             currentState = ConversionFailed(
                 errorMessageResId = R.string.conversion_failed_parse_url_error,
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+            ),
+            appDetails = emptyMap(),
+            automationFeatureStatus = FeatureStatus.AVAILABLE,
+            billingAppNameResId = R.string.app_name,
+            billingStatus = BillingStatus.Purchased(
+                product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                expired = false,
+                refundable = true,
+            ),
+            changelogShown = true,
+            coordinateFormat = CoordinateFormat.DEC,
+            inputUriString = "",
+            largeLoadingIndicatorVisible = false,
+            linkMessage = null,
+            outputsForApps = emptyMap(),
+            outputsForLinks = emptyMap(),
+            outputsForPoint = emptyList(),
+            outputsForPointChips = emptyList(),
+            outputsForPoints = emptyList(),
+            outputsForPointsChips = emptyList(),
+            outputsForSharing = emptyList(),
+            userPreferenceMessage = null,
+            onCancel = {},
+            onDisableLinkGroup = {},
+            onDismissLinkMessage = {},
+            onDismissUserPreferenceMessage = {},
+            onDeny = {},
+            onGrant = {},
+            onHideApp = {},
+            onNavigateToAboutScreen = {},
+            onNavigateToBillingScreen = {},
+            onNavigateToFaqScreen = {},
+            onNavigateToInputsScreen = {},
+            onNavigateToIntroScreen = {},
+            onNavigateToLinksScreen = {},
+            onNavigateToUserPreferencesAutomationScreen = {},
+            onNavigateToUserPreferencesScreen = {},
+            onReset = {},
+            onExecute = {},
+            onStart = {},
+        ) {}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyPreview() {
+    AppTheme {
+        MainScreen(
+            currentState = ConversionSucceeded(
+                ConversionStateContext(
+                    linkRepository = FakeLinkRepository(),
+                    userPreferencesRepository = FakeUserPreferencesRepository(),
+                    billing = BillingImpl(LocalContext.current),
+                ),
+                "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
+                persistentListOf(),
             ),
             appDetails = emptyMap(),
             automationFeatureStatus = FeatureStatus.AVAILABLE,

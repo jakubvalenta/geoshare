@@ -98,23 +98,10 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
             val line = channel.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
                 val uri = Uri.parse(attr.decodeBasicHtmlEntities(), uriQuote)
-                when (val res = parseUri(uri)) {
-                    is ParseUriResult.Failed -> {}
-
-                    is ParseUriResult.Succeeded -> {
-                        points = res.points
-                        return@buildParseHtmlResult
-                    }
-
-                    is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
-                        points = res.points
-                        return@buildParseHtmlResult
-                    }
-
-                    is ParseUriResult.SucceededAndSupportsWebParsing -> {
-                        points = res.points
-                        return@buildParseHtmlResult
-                    }
+                val res = parseUri(uri)
+                if (res.points.isNotEmpty()) {
+                    points = res.points
+                    return@buildParseHtmlResult
                 }
             }
         }
