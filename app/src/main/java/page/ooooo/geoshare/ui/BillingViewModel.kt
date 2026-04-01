@@ -15,11 +15,11 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
+import page.ooooo.geoshare.lib.billing.BillingOffers
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.billing.FeatureStatus
-import page.ooooo.geoshare.lib.billing.Offer
 import javax.inject.Inject
 import kotlin.time.Duration
 
@@ -45,7 +45,7 @@ class BillingViewModel @Inject constructor(
     val billingAppNameResId: Int = billing.appNameResId
     val billingMessage: StateFlow<Message?> = billing.message
     val billingFeatures: ImmutableList<Feature> = billing.features
-    val billingOffers: StateFlow<List<Offer>> =
+    val billingOffers: StateFlow<BillingOffers> =
         billing.status
             .filter { it !is BillingStatus.Loading }
             .distinctUntilChanged()
@@ -55,7 +55,7 @@ class BillingViewModel @Inject constructor(
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                emptyList(),
+                BillingOffers.Loading(),
             )
     val billingRefundableDuration: Duration = billing.refundableDuration
     val billingStatus: StateFlow<BillingStatus> = billing.status
@@ -68,8 +68,12 @@ class BillingViewModel @Inject constructor(
         }
     }
 
-    fun manageBillingProduct(product: BillingProduct) {
-        billing.manageProduct(product)
+    fun manageBillingProduct(activity: Activity, product: BillingProduct) {
+        billing.manageProduct(activity, product)
+    }
+
+    fun dismissMessage() {
+        billing.dismissMessage()
     }
 
     // Lifecycle
@@ -79,10 +83,6 @@ class BillingViewModel @Inject constructor(
         viewModelScope.launch {
             billing.showInAppMessages(activity)
         }
-    }
-
-    fun onPause() {
-        billing.endConnection()
     }
 
     override fun onCleared() {

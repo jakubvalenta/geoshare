@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.R
 import kotlin.time.Duration
 
-class BillingImpl(@Suppress("unused") private val context: Context) : Billing {
+class BillingImpl(@Suppress("unused") context: Context) : Billing {
 
     private val product = BillingProduct("free_donation", BillingProduct.Type.DONATION)
 
@@ -22,7 +22,7 @@ class BillingImpl(@Suppress("unused") private val context: Context) : Billing {
     override val products = persistentListOf(product)
     override val refundableDuration = Duration.ZERO
 
-    override val status = flowOf(BillingStatus.Purchased(product, refundable = false))
+    override val status = flowOf(BillingStatus.Purchased(product, expired = false, refundable = false))
         .stateIn(
             CoroutineScope(Dispatchers.Default),
             SharingStarted.WhileSubscribed(5000),
@@ -40,11 +40,13 @@ class BillingImpl(@Suppress("unused") private val context: Context) : Billing {
 
     override fun endConnection() {}
 
-    override suspend fun queryOffers(): List<Offer> = emptyList()
+    override suspend fun queryOffers(): BillingOffers = BillingOffers.Done(persistentListOf())
 
     override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {}
 
-    override fun manageProduct(product: BillingProduct) {}
+    override fun manageProduct(activity: Activity, product: BillingProduct) {}
 
     override suspend fun showInAppMessages(activity: Activity) {}
+
+    override fun dismissMessage() {}
 }

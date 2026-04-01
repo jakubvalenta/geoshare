@@ -2,13 +2,6 @@ package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -75,15 +67,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-private fun isMessageShown(state: ConversionState.HasResult?): Boolean =
-    state is ActionWaiting && state.action.output is Output.HasAutomationDelay ||
-        state is ActionSucceeded && !state.isAutomation && state.action.output is Output.HasSuccessText ||
-        state is ActionFailed && !state.isAutomation && state.action.output is Output.HasErrorText ||
-        state is ActionSucceeded && state.isAutomation && state.action.output is Output.HasAutomationSuccessText ||
-        state is ActionFailed && state.isAutomation && state.action.output is Output.HasAutomationErrorText ||
-        state is LocationFindingFailed ||
-        state is ConversionState.HasSmallLoadingIndicator
-
 @Composable
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
@@ -96,46 +79,23 @@ fun ResultSuccessMessage(
 ) {
     val spacing = LocalSpacing.current
     var counterSec by remember { mutableIntStateOf(0) }
-    var targetState by remember {
-        mutableStateOf(
-            if (animationsEnabled && isMessageShown(currentState)) {
-                // To make the message appear with an animation, first start with null state and only later change it to
-                // the current state (using LaunchedEffect).
-                null
-            } else {
-                currentState
-            }
-        )
-    }
 
-    LaunchedEffect(currentState) {
-        targetState = currentState
-    }
-
-    AnimatedContent(
-        targetState,
+    AnimatedMessage(
+        state = currentState,
+        isMessageShown = { state ->
+            state is ActionWaiting && state.action.output is Output.HasAutomationDelay ||
+                state is ActionSucceeded && !state.isAutomation && state.action.output is Output.HasSuccessText ||
+                state is ActionFailed && !state.isAutomation && state.action.output is Output.HasErrorText ||
+                state is ActionSucceeded && state.isAutomation && state.action.output is Output.HasAutomationSuccessText ||
+                state is ActionFailed && state.isAutomation && state.action.output is Output.HasAutomationErrorText ||
+                state is LocationFindingFailed ||
+                state is ConversionState.HasSmallLoadingIndicator
+        },
         modifier = modifier
             .padding(horizontal = spacing.windowPadding)
             .fillMaxWidth()
             .height(40.dp),
-        transitionSpec = {
-            if (!animationsEnabled) {
-                EnterTransition.None togetherWith ExitTransition.None
-            } else {
-                val initialStateMessageShown = isMessageShown(this.initialState)
-                val targetStateMessageShown = isMessageShown(this.targetState)
-                if (!initialStateMessageShown && !targetStateMessageShown) {
-                    // Message stays hidden
-                    EnterTransition.None togetherWith ExitTransition.None
-                } else if (targetStateMessageShown) {
-                    // Showing message or changing shown message
-                    slideInHorizontally { fullWidth -> -fullWidth } togetherWith fadeOut()
-                } else {
-                    // Hiding message
-                    fadeIn() togetherWith fadeOut()
-                }
-            }
-        }
+        animationsEnabled = animationsEnabled,
     ) { targetState ->
         when (targetState) {
             is ActionWaiting if targetState.action.output is Output.HasAutomationDelay ->

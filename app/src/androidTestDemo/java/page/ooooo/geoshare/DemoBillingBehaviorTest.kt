@@ -7,13 +7,17 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
-import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.BehaviorTest.Companion.ELEMENT_DOES_NOT_EXIST_TIMEOUT
+import page.ooooo.geoshare.data.local.preferences.Automation
+import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
+import page.ooooo.geoshare.lib.billing.Offer
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 
 @RunWith(AndroidJUnit4::class)
 class DemoBillingBehaviorTest : BehaviorTest {
 
-    private fun purchaseAndRefund(offerResourceName: String, manageButtonResourceName: String) = uiAutomator {
+    @Test
+    fun allowsPurchasingAndRefundingOneTimeProduct() = uiAutomator {
         // Launch application and close intro
         launchApplication()
         closeIntro()
@@ -37,11 +41,14 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
 
         // Purchase an offer
-        onElement { viewIdResourceName == offerResourceName }.click()
+        onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.ONE_TIME}" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
 
-        // Shows success message
-        onElement { viewIdResourceName == "geoShareBillingMessageSuccess" }
+        // Shows status pending
+        onElement { viewIdResourceName == "geoShareBillingStatusPending" }
+
+        // Shows status purchased
+        onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
 
         // Go to automation preferences
         pressBack()
@@ -66,7 +73,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToBillingScreen()
 
         // Refund product
-        onElement { viewIdResourceName == manageButtonResourceName }.click()
+        onElement { viewIdResourceName == "geoShareBillingManageButtonOneTime" }.click()
 
         // Go to main screen
         pressBack()
@@ -83,19 +90,82 @@ class DemoBillingBehaviorTest : BehaviorTest {
     }
 
     @Test
-    fun allowsPurchasingAndRefundingOneTimeProduct() {
-        purchaseAndRefund(
-            offerResourceName = "geoShareBillingOfferOneTime",
-            manageButtonResourceName = "geoShareBillingManageButtonOneTime",
-        )
-    }
+    fun allowsPurchasingAndRefundingSubscription() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
 
-    @Test
-    fun allowsPurchasingAndRefundingSubscription() {
-        purchaseAndRefund(
-            offerResourceName = "geoShareBillingOfferMonthly",
-            manageButtonResourceName = "geoShareBillingManageButtonSubscription",
-        )
+        // Shows Geo Share headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
+
+        // Go to automation preferences
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+
+        // Shows automation paywall
+        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
+
+        // Go to main screen
+        pressBack()
+        quickWaitForStableInActiveWindow()
+        pressBack()
+
+        // Go to billing screen using billing icon
+        onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
+
+        // Purchase an offer
+        onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.MONTHLY}" }.click()
+        onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
+
+        // Shows status pending
+        onElement { viewIdResourceName == "geoShareBillingStatusPending" }
+
+        // Shows status purchased
+        onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
+
+        // Go to automation preferences
+        pressBack()
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+
+        // Does not show automation paywall
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareFeatureBadgeLarge" })
+
+        // Go to main screen
+        pressBack()
+        quickWaitForStableInActiveWindow()
+        pressBack()
+
+        // Shows Geo Share Pro headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share Pro" }
+
+        // Does not show billing icon
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainBillingIcon" })
+
+        // Go to billing screen using main menu
+        goToBillingScreen()
+
+        // Expire subscription
+        onElement { viewIdResourceName == "geoShareBillingManageButtonSubscription" }.click()
+
+        // Shows expired message
+        onElement { viewIdResourceName == "geoShareBillingStatusExpired" }
+
+        // Cancel subscription
+        onElement { viewIdResourceName == "geoShareBillingManageButtonSubscription" }.click()
+
+        // Go to main screen
+        pressBack()
+
+        // Shows Geo Share headline
+        onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share" }
+
+        // Go to automation preferences
+        goToUserPreferencesList()
+        goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
+
+        // Shows automation paywall
+        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
     }
 
     @Test
@@ -117,8 +187,11 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }.click()
 
         // Purchase an offer
-        onElement { viewIdResourceName == "geoShareBillingOfferOneTime" }.click()
+        onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.ONE_TIME}" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
+
+        // Shows status purchased
+        onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
 
         // Go to automation preferences
         pressBack()
@@ -143,7 +216,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultSuccessMessage" }
     }
 
-    private fun goToBillingScreen() {
+    private fun goToBillingScreen() = uiAutomator {
         goToMenuItem { viewIdResourceName == "geoShareMainMenuBilling" }
     }
 }

@@ -70,13 +70,13 @@ android {
             isDefault = true
             dimension = "tier"
         }
-        create("paid") {
+        create("pro") {
             dimension = "tier"
-            versionNameSuffix = "-paid"
+            applicationIdSuffix = ".pro"
         }
         create("demo") {
             dimension = "tier"
-            versionNameSuffix = "-demo"
+            applicationIdSuffix = ".demo"
         }
     }
     buildFeatures {
@@ -126,8 +126,8 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    "paidImplementation"(libs.android.billingclient.billing)
-    "paidImplementation"(libs.android.billingclient.billing.ktx)
+    "proImplementation"(libs.android.billingclient.billing)
+    "proImplementation"(libs.android.billingclient.billing.ktx)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

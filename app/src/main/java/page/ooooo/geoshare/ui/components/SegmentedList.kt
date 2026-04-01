@@ -38,8 +38,20 @@ fun <T> SegmentedList(
 ) {
     val colors = ListItemDefaults.segmentedColors(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        leadingContentColor = MaterialTheme.colorScheme.onSurface,
+        trailingContentColor = MaterialTheme.colorScheme.onSurface,
+        supportingContentColor = MaterialTheme.colorScheme.onSurface,
         disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+        disabledContentColor = MaterialTheme.colorScheme.onSurface,
+        disabledLeadingContentColor = MaterialTheme.colorScheme.onSurface,
+        disabledTrailingContentColor = MaterialTheme.colorScheme.onSurface,
+        disabledSupportingContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        selectedContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedLeadingContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedTrailingContentColor = MaterialTheme.colorScheme.onSurface,
+        selectedSupportingContentColor = MaterialTheme.colorScheme.onSurface,
     )
     Column(
         modifier = modifier.selectableGroup(),

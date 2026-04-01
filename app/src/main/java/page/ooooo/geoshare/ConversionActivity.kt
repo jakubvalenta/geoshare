@@ -36,11 +36,6 @@ class ConversionActivity : ComponentActivity() {
         billingViewModel.onResume(this)
     }
 
-    override fun onPause() {
-        super.onPause()
-        billingViewModel.onPause()
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.i(TAG, "New intent: ${intent.data}")

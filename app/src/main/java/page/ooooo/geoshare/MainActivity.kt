@@ -28,9 +28,4 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         billingViewModel.onResume(this)
     }
-
-    override fun onPause() {
-        super.onPause()
-        billingViewModel.onPause()
-    }
 }

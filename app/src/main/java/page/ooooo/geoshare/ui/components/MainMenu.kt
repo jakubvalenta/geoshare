@@ -174,7 +174,7 @@ private fun DefaultPreview() {
                         MainMenu(
                             currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(),
+                            billingStatus = BillingStatus.NotPurchased(pending = false),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -205,7 +205,7 @@ private fun DarkPreview() {
                         MainMenu(
                             currentState = Initial(),
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = BillingStatus.NotPurchased(),
+                            billingStatus = BillingStatus.NotPurchased(pending = false),
                             changelogShown = false,
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -238,6 +238,7 @@ private fun DonationPreview() {
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.Purchased(
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),
+                                expired = false,
                                 refundable = true,
                             ),
                             changelogShown = false,
@@ -272,6 +273,7 @@ private fun DarkDonationPreview() {
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = BillingStatus.Purchased(
                                 product = BillingProduct("test", BillingProduct.Type.DONATION),
+                                expired = false,
                                 refundable = true,
                             ),
                             changelogShown = false,

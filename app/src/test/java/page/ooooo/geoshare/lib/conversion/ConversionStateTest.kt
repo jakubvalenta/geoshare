@@ -2628,6 +2628,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2660,6 +2661,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2711,6 +2713,7 @@ class ConversionStateTest {
         advanceTimeBy(2.seconds)
         mockStatus.value = BillingStatus.Purchased(
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+            expired = false,
             refundable = true,
         )
         advanceUntilIdle()
@@ -2729,7 +2732,7 @@ class ConversionStateTest {
         val inputUriString = "https://maps.google.com/foo"
         val points = persistentListOf(WGS84Point(1.0, 2.0))
         val automation = CopyCoordsDecAutomation
-        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased())
+        val mockStatus = MutableStateFlow<BillingStatus>(BillingStatus.NotPurchased(pending = false))
         val mockBilling: Billing = mock {
             on { status } doReturn mockStatus
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
@@ -2750,6 +2753,7 @@ class ConversionStateTest {
         advanceTimeBy(2.seconds)
         mockStatus.value = BillingStatus.Purchased(
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+            expired = false,
             refundable = true,
         )
         advanceUntilIdle()
@@ -2786,6 +2790,7 @@ class ConversionStateTest {
         advanceTimeBy(5.seconds)
         mockStatus.value = BillingStatus.Purchased(
             product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+            expired = false,
             refundable = true,
         )
         advanceUntilIdle()
@@ -2806,6 +2811,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2838,6 +2844,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2871,6 +2878,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2902,6 +2910,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2931,6 +2940,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )
@@ -2964,6 +2974,7 @@ class ConversionStateTest {
             on { status } doReturn MutableStateFlow(
                 BillingStatus.Purchased(
                     product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
                     refundable = true,
                 )
             )

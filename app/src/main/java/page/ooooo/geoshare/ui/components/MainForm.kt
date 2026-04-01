@@ -154,7 +154,7 @@ private fun DefaultPreview() {
                 MainForm(
                     inputUriString = "",
                     billingAppNameResId = R.string.app_name_pro,
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
@@ -174,7 +174,7 @@ private fun DarkPreview() {
                 MainForm(
                     inputUriString = "",
                     billingAppNameResId = R.string.app_name_pro,
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     errorMessageResId = null,
                     onSetErrorMessageResId = {},
                     onSubmit = {},
@@ -196,6 +196,7 @@ private fun FilledPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                        expired = false,
                         refundable = true,
                     ),
                     errorMessageResId = null,
@@ -219,6 +220,7 @@ private fun DarkFilledPreview() {
                     billingAppNameResId = R.string.app_name_pro,
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                        expired = false,
                         refundable = true,
                     ),
                     errorMessageResId = null,
@@ -240,7 +242,7 @@ private fun ErrorPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     errorMessageResId = R.string.conversion_failed_missing_url,
                     onSetErrorMessageResId = {},
                     onUpdateInput = {},
@@ -260,7 +262,7 @@ private fun DarkErrorPreview() {
                 MainForm(
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     billingAppNameResId = R.string.app_name_pro,
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     errorMessageResId = R.string.conversion_failed_missing_url,
                     onSetErrorMessageResId = {},
                     onUpdateInput = {},

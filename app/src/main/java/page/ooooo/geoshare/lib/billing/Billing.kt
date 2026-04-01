@@ -20,11 +20,13 @@ interface Billing {
 
     fun endConnection()
 
-    suspend fun queryOffers(): List<Offer>
+    suspend fun queryOffers(): BillingOffers
 
     suspend fun launchBillingFlow(activity: Activity, offerToken: String)
 
-    fun manageProduct(product: BillingProduct)
+    fun manageProduct(activity: Activity, product: BillingProduct)
 
     suspend fun showInAppMessages(activity: Activity)
+
+    fun dismissMessage()
 }
