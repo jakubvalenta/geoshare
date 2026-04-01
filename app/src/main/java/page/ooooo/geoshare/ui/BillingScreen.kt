@@ -252,7 +252,6 @@ private fun BillingMainPane(
                         R.string.billing_offers_empty,
                         stringResource(R.string.app_name_pro),
                     ),
-                    Modifier.testTag("geoShareBillingStatusNoOffers"), // TODO Test
                 )
 
             else -> {}
