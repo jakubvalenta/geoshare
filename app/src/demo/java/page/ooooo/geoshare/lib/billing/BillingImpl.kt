@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.billing
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +16,10 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-class BillingImpl(private val context: Context) : Billing {
+class BillingImpl(
+    context: Context,
+    private val resources: Resources = context.resources,
+) : Billing {
 
     @StringRes
     override val appNameResId = R.string.app_name_pro
@@ -60,7 +64,7 @@ class BillingImpl(private val context: Context) : Billing {
             delay(3.seconds)
             _status.value = BillingStatus.Purchased(product, expired = false, refundable = true)
         } else {
-            _message.value = Message(context.getString(R.string.billing_purchase_error_unknown), isError = true)
+            _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
         }
     }
 
