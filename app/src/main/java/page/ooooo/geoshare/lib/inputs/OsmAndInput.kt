@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toZLatLonPoint
 import page.ooooo.geoshare.lib.point.Point
 
 object OsmAndInput : Input, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?osmand\.net/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OSM_AND,
         nameResId = R.string.converter_osm_and_name,

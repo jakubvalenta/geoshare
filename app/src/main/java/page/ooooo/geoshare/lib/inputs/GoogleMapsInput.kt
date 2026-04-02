@@ -22,7 +22,7 @@ import page.ooooo.geoshare.lib.point.Point
 
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     override val uriPattern =
-        Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]\S+""")
+        Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,

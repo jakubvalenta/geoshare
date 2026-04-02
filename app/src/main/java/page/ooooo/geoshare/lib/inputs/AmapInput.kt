@@ -10,7 +10,7 @@ import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.point.Point
 
 object AmapInput : ShortUriInput, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:surl|wb)\.amap\.com/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.AMAP,
         nameResId = R.string.converter_amap_name,

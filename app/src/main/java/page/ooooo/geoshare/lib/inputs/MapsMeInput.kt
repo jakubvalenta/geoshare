@@ -12,7 +12,7 @@ import page.ooooo.geoshare.lib.point.WGS84Point
 object MapsMeInput : Input {
     private const val HASH = """[A-Za-z0-9\-_]{2,}"""
 
-    override val uriPattern = Regex("""(?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/\S+""")
+    override val uriPattern = Regex("""(?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPS_ME,
         nameResId = R.string.converter_ge0_name,
