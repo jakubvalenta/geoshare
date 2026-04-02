@@ -46,15 +46,15 @@ class AmapInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertTrue(parseUri("https://wb.amap.com") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://wb.amap.com/") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://wb.amap.com/?spam=1") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("https://wb.amap.com"))
+        assertEquals(ParseUriResult(), parseUri("https://wb.amap.com/"))
+        assertEquals(ParseUriResult(), parseUri("https://wb.amap.com/?spam=1"))
     }
 
     @Test
     fun parseUri_inChina() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         31.222811749011463, 121.46840706467624,
@@ -69,7 +69,7 @@ class AmapInputTest : BaseInputTest() {
     @Test
     fun parseUri_inChinaWithoutName() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(31.222811749011463, 121.46840706467624))
             ),
             parseUri("https://wb.amap.com/?q=31.222811749011463%2C121.46840706467624"),
@@ -79,7 +79,7 @@ class AmapInputTest : BaseInputTest() {
     @Test
     fun parseUri_notInChina() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         45.8289525077221, 1.266689300537103,
@@ -94,7 +94,7 @@ class AmapInputTest : BaseInputTest() {
     @Test
     fun parseUri_notInChinaWithoutName() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(45.8289525077221, 1.266689300537103))
             ),
             parseUri("https://wb.amap.com/?p=P0JANYX6NL%2C45.8289525077221%2C1.266689300537103"),

@@ -1241,6 +1241,55 @@ class ConversionStateTest {
         }
 
     @Test
+    fun unshortenedUrl_parseUriReturnsPointWithNameOnly_returnsConversionSucceeded() =
+        runTest {
+            val inputUriString = "https://maps.google.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val points = persistentListOf(
+                WGS84Point(1.0, 2.0),
+                WGS84Point(name = "foo bar"),
+            )
+            val mockGoogleMapsInput: GoogleMapsInput = mock {
+                on { parseUri(any(), any()) } doReturn ParseUriResult(points)
+            }
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                on { getValue(ConnectionPermissionPreference) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(
+                userPreferencesRepository = mockUserPreferencesRepository,
+                inputs = listOf(mockGoogleMapsInput),
+            )
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
+            assertEquals(
+                ConversionSucceeded(stateContext, inputUriString, points),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun unshortenedUrl_parseUriReturnsEmptyPoint_returnsConversionFailed() =
+        runTest {
+            val inputUriString = "https://maps.google.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val points = persistentListOf(WGS84Point())
+            val mockGoogleMapsInput: GoogleMapsInput = mock {
+                on { parseUri(any(), any()) } doReturn ParseUriResult(points)
+            }
+            val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
+                on { getValue(ConnectionPermissionPreference) } doThrow NotImplementedError()
+            }
+            val stateContext = mockStateContext(
+                userPreferencesRepository = mockUserPreferencesRepository,
+                inputs = listOf(mockGoogleMapsInput),
+            )
+            val state = UnshortenedUrl(stateContext, inputUriString, mockGoogleMapsInput, uri, null)
+            assertEquals(
+                ConversionFailed(R.string.conversion_failed_parse_url_error, inputUriString),
+                state.transition(),
+            )
+        }
+
+    @Test
     fun requestedParseHtmlPermission_transition_returnsNull() = runTest {
         val inputUriString = "https://maps.apple.com/foo"
         val uri = Uri.parse(inputUriString, uriQuote)
@@ -1949,11 +1998,106 @@ class ConversionStateTest {
     @Test
     fun grantedParseHtmlPermission_parseHtmlReturnsPointWithNameOnly_returnsConversionSucceeded() =
         runTest {
-            // TODO
-            // val points = persistentListOf(
-            //     WGS84Point(1.0, 2.0),
-            //     WGS84Point(name = "foo bar"),
-            // )
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val html = "<html></html>"
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
+            val htmlUriString = "https://api.apple.com/foo.json"
+            val pointsFromHtml = persistentListOf(
+                WGS84Point(1.0, 2.0),
+                WGS84Point(name = "foo bar"),
+            )
+            val mockInput = object : HtmlInput {
+                override val uriPattern = Regex(".")
+                override val documentation =
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
+                override val permissionTitleResId = -1
+                override val loadingIndicatorTitleResId = -1
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
+                    throw NotImplementedError()
+                }
+
+                override suspend fun parseHtml(
+                    htmlUrlString: String,
+                    channel: ByteReadChannel,
+                    pointsFromUri: ImmutableList<Point>,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                ) = ParseHtmlResult(pointsFromHtml)
+            }
+            val stateContext = mockStateContext(
+                inputs = listOf(mockInput),
+                networkTools = object : MockNetworkTools() {
+                    override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
+                        html
+                    } else {
+                        super.onGetSource(url)
+                    }
+                },
+            )
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                mockInput,
+                uri,
+                pointsFromUri,
+                htmlUriString,
+            )
+            assertEquals(
+                ConversionSucceeded(stateContext, inputUriString, pointsFromHtml),
+                state.transition(),
+            )
+        }
+
+    @Test
+    fun grantedParseHtmlPermission_parseHtmlReturnsEmptyPoint_returnsConversionFailed() =
+        runTest {
+            val inputUriString = "https://maps.apple.com/foo"
+            val uri = Uri.parse(inputUriString, uriQuote)
+            val html = "<html></html>"
+            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
+            val htmlUriString = "https://api.apple.com/foo.json"
+            val pointsFromHtml = persistentListOf(WGS84Point())
+            val mockInput = object : HtmlInput {
+                override val uriPattern = Regex(".")
+                override val documentation =
+                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
+                override val permissionTitleResId = -1
+                override val loadingIndicatorTitleResId = -1
+                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote): ParseUriResult {
+                    throw NotImplementedError()
+                }
+
+                override suspend fun parseHtml(
+                    htmlUrlString: String,
+                    channel: ByteReadChannel,
+                    pointsFromUri: ImmutableList<Point>,
+                    uriQuote: UriQuote,
+                    log: ILog,
+                ) = ParseHtmlResult(pointsFromHtml)
+            }
+            val stateContext = mockStateContext(
+                inputs = listOf(mockInput),
+                networkTools = object : MockNetworkTools() {
+                    override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
+                        html
+                    } else {
+                        super.onGetSource(url)
+                    }
+                },
+            )
+            val state = GrantedParseHtmlPermission(
+                stateContext,
+                inputUriString,
+                mockInput,
+                uri,
+                pointsFromUri,
+                htmlUriString,
+            )
+            assertEquals(
+                ConversionFailed(R.string.conversion_failed_parse_html_error, inputUriString),
+                state.transition(),
+            )
         }
 
     @Test
@@ -2279,86 +2423,6 @@ class ConversionStateTest {
                 override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
                     if (uri.toString() == urlString) {
                         ParseUriResult(resPoints)
-                    } else {
-                        throw NotImplementedError()
-                    }
-
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(inputs = listOf(mockInput))
-            val state = GrantedParseWebPermission(
-                stateContext, inputUriString, mockInput, uri, pointsFromUri, webUriString
-            )
-            var res: State? = null
-            launch {
-                res = state.transition()
-            }
-            state.onUrlChange(urlString)
-            advanceUntilIdle()
-            assertEquals(
-                ConversionSucceeded(stateContext, inputUriString, resPoints),
-                res,
-            )
-        }
-
-    @Test
-    fun grantedParseWebPermission_urlChangeIsCalledAndUriPatternMatchesAndParseUriReturnsPointsAndHtmlUri_returnsConversionFailed() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
-            val resPoints = persistentListOf(WGS84Point(3.0, 4.0))
-            val webUriString = "$inputUriString/web"
-            val urlString = "$webUriString/current"
-            val mockInput = object : WebInput {
-                override val uriPattern = Regex("""^https://maps\.apple\.com/\S*""")
-                override val documentation =
-                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
-
-                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
-                    if (uri.toString() == urlString) {
-                        ParseUriResult(resPoints, htmlUriString = "$inputUriString/html")
-                    } else {
-                        throw NotImplementedError()
-                    }
-
-                override val permissionTitleResId = -1
-                override val loadingIndicatorTitleResId = -1
-            }
-            val stateContext = mockStateContext(inputs = listOf(mockInput))
-            val state = GrantedParseWebPermission(
-                stateContext, inputUriString, mockInput, uri, pointsFromUri, webUriString
-            )
-            var res: State? = null
-            launch {
-                res = state.transition()
-            }
-            state.onUrlChange(urlString)
-            advanceUntilIdle()
-            assertEquals(
-                ConversionSucceeded(stateContext, inputUriString, resPoints),
-                res,
-            )
-        }
-
-    @Test
-    fun grantedParseWebPermission_urlChangeIsCalledAndUriPatternMatchesAndParseUriReturnsPointsAndWebUri_returnsConversionFailed() =
-        runTest {
-            val inputUriString = "https://maps.apple.com/foo"
-            val uri = Uri.parse(inputUriString, uriQuote)
-            val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
-            val resPoints = persistentListOf(WGS84Point(3.0, 4.0))
-            val webUriString = "$inputUriString/web"
-            val urlString = "$webUriString/current"
-            val mockInput = object : WebInput {
-                override val uriPattern = Regex("""^https://maps\.apple\.com/\S*""")
-                override val documentation =
-                    InputDocumentation(id = GeoUriInput.documentation.id, nameResId = -1, items = emptyList())
-
-                override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) =
-                    if (uri.toString() == urlString) {
-                        ParseUriResult(resPoints, webUriString = "$inputUriString/web")
                     } else {
                         throw NotImplementedError()
                     }

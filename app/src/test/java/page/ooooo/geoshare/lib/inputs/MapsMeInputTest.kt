@@ -50,39 +50,39 @@ class MapsMeInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPath() = runTest {
-        assertTrue(parseUri("ge0:") is ParseUriResult.Failed)
-        assertTrue(parseUri("http://ge0.me") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://omaps.app") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://comaps.at") is ParseUriResult.Failed)
-        assertTrue(parseUri("ge0:/") is ParseUriResult.Failed)
-        assertTrue(parseUri("ge0://") is ParseUriResult.Failed)
-        assertTrue(parseUri("http://ge0.me/") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://omaps.app/") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://comaps.at/") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("ge0:"))
+        assertEquals(ParseUriResult(), parseUri("http://ge0.me"))
+        assertEquals(ParseUriResult(), parseUri("https://omaps.app"))
+        assertEquals(ParseUriResult(), parseUri("https://comaps.at"))
+        assertEquals(ParseUriResult(), parseUri("ge0:/"))
+        assertEquals(ParseUriResult(), parseUri("ge0://"))
+        assertEquals(ParseUriResult(), parseUri("http://ge0.me/"))
+        assertEquals(ParseUriResult(), parseUri("https://omaps.app/"))
+        assertEquals(ParseUriResult(), parseUri("https://comaps.at/"))
     }
 
     @Test
     fun parseUri_shortLink() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0, name = "América do Norte"))
             ),
             parseUri("ge0://ApYSV0YTAl/América_do_Norte"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0, name = "Madagascar"))
             ),
             parseUri("http://ge0.me/AbCMCNp0LO/Madagascar"),
         )
         assertEquals(
-            @Suppress("SpellCheckingInspection") ParseUriResult.Succeeded(
+            @Suppress("SpellCheckingInspection") ParseUriResult(
                 persistentListOf(WGS84Point(40.7127405, -74.005997, z = 9.0, name = "Nova Iorque"))
             ),
             parseUri("https://omaps.app/Umse5f0H8a/Nova_Iorque"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(WGS84Point(52.4877386, 13.3815233, z = 14.0, name = "Kreuzberg"))
             ),
             parseUri("https://comaps.at/o4MnIOApKp/Kreuzberg"),
@@ -92,25 +92,25 @@ class MapsMeInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLinkWithoutName() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0))),
+            ParseUriResult(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0))),
             parseUri("ge0://ApYSV0YTAl"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0))),
+            ParseUriResult(persistentListOf(WGS84Point(51.0000004, -108.9999868, z = 4.0))),
             parseUri("ge0://ApYSV0YTAl/"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0))),
+            ParseUriResult(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0))),
             parseUri("http://ge0.me/AbCMCNp0LO"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0))),
+            ParseUriResult(persistentListOf(WGS84Point(-18.9249432, 46.4416404, z = 4.0))),
             parseUri("http://ge0.me/AbCMCNp0LO/"),
         )
     }
 
     @Test
     fun parseUri_hostThatLooksLikeHash() = runTest {
-        assertTrue(parseUri("https://ApYSV0YTAl/") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("https://ApYSV0YTAl/"))
     }
 }

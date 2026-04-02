@@ -56,14 +56,14 @@ class GeoUriInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertTrue(parseUri("geo:") is ParseUriResult.Failed)
-        assertTrue(parseUri("geo:?spam=1") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("geo:"))
+        assertEquals(ParseUriResult(), parseUri("geo:?spam=1"))
     }
 
     @Test
     fun parseUri_coordsAndQAndZ() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4))),
+            ParseUriResult(persistentListOf(WGS84Point(50.123456, -11.123456, name = "foo bar", z = 3.4))),
             parseUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"),
         )
     }
@@ -71,7 +71,7 @@ class GeoUriInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordsAndQCoords() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(50.123456, -11.123456))),
+            ParseUriResult(persistentListOf(WGS84Point(50.123456, -11.123456))),
             parseUri("geo:50.123456,-11.123456?q=50.123456,-11.123456"),
         )
     }
@@ -79,7 +79,7 @@ class GeoUriInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordsAndQCoordsDiffer_qCoordsTakePrecedence() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(40.7127400, -74.0059965))),
+            ParseUriResult(persistentListOf(WGS84Point(40.7127400, -74.0059965))),
             parseUri("geo:50.123456,-11.123456?q=40.7127400,-74.0059965"),
         )
     }
@@ -88,7 +88,7 @@ class GeoUriInputTest : BaseInputTest() {
     fun parseUri_coordsAndName() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127400,
@@ -107,13 +107,13 @@ class GeoUriInputTest : BaseInputTest() {
     fun parseUri_coordsAndNameInSeparateQueryParam() = runTest {
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(40.7127400, -74.0059965, name = "Nova Iorque"))),
+            ParseUriResult(persistentListOf(WGS84Point(40.7127400, -74.0059965, name = "Nova Iorque"))),
             @Suppress("SpellCheckingInspection")
             parseUri("geo:40.7127400,-74.0059965?q=40.7127400,-74.0059965&(Nova%20Iorque)"),
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127400,
@@ -128,7 +128,7 @@ class GeoUriInputTest : BaseInputTest() {
         )
         assertEquals(
             @Suppress("SpellCheckingInspection")
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     WGS84Point(
                         40.7127400,
@@ -146,7 +146,7 @@ class GeoUriInputTest : BaseInputTest() {
     @Test
     fun parseUri_qOnly() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(name = "foo bar"))),
+            ParseUriResult(persistentListOf(WGS84Point(name = "foo bar"))),
             parseUri("geo:?q=foo%20bar"),
         )
     }
@@ -154,7 +154,7 @@ class GeoUriInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordsInQWithSpace() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(45.4786785, 9.2473799))),
+            ParseUriResult(persistentListOf(WGS84Point(45.4786785, 9.2473799))),
             parseUri("geo:0,0?q=45.4786785,%209.2473799"),
         )
     }

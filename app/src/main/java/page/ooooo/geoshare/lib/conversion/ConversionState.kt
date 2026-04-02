@@ -456,8 +456,7 @@ data class GrantedParseWebPermission(
             matchingUriString?.let { uriString ->
                 input.parseUri(Uri.parse(uriString, stateContext.uriQuote), stateContext.uriQuote)
             }.run {
-                // TODO Test
-                if (this?.points?.isNotEmpty() == true) {
+                if (this?.points != null && this.points.isNotEmpty()) {
                     stateContext.log.i(ConversionState.TAG, "Parsed web URL $matchingUriString to $points")
                     ConversionSucceeded(stateContext, inputUriString, points)
                 } else {

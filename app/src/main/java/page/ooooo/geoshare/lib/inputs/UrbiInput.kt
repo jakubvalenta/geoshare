@@ -52,8 +52,6 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
     override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
-            htmlUriString = toString()
-
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
             Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.let {
@@ -81,6 +79,8 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
                 )
                 return@run
             }
+
+            htmlUriString = toString()
         }
     }
 

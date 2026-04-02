@@ -228,7 +228,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
             points = mutablePoints.toImmutableList()
         } else if (defaultPoint != null) {
             points = persistentListOf(defaultPoint)
-        } else {
+        } else if (redirectUriString == null) {
             // Go to web parsing
             webUriString = htmlUrlString
         }
