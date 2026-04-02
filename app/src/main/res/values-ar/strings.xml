@@ -16,7 +16,7 @@
     <string name="intro_how_to_share_app_caption"><![CDATA[اختر <i>%1$s</i> وسيسمح لك التطبيق بفتح نفس الموقع في أي تطبيق خرائط مثبت.]]></string>
     <string name="intro_how_to_share_app_content_description">لقطة شاشة لشاشة المشاركة في %1$s</string>
     <string name="intro_open_by_default_headline">اضبط أندرويد لفتح روابط خرائط جوجل في خرائط بديلة (اختياري)</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[أولاً، انتقل إلى الإعدادات &#8592; التطبيقات &8592; الخرائط &#8592; <i>فتح افتراضيًا</i> وأوقف فتح الروابط في هذا التطبيق.]]></string>
+    <string name="intro_open_by_default_google_maps_caption"><![CDATA[أولاً، انتقل إلى الإعدادات &#8592; التطبيقات &#8592; الخرائط &#8592; <i>فتح افتراضيًا</i> وأوقف فتح الروابط في هذا التطبيق.]]></string>
     <string name="intro_open_by_default_google_maps_content_description">لقطة شاشة لإعدادات فتح افتراضيًا في خرائط جوجل</string>
     <string name="intro_open_by_default_google_maps_button">افتح إعدادات خرائط جوجل</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[ثم انتقل إلى الإعدادات &#8592; التطبيقات &#8592; %1$s &#8592; <i>فتح افتراضيًا</i>، وفعّل فتح الروابط في هذا التطبيق، وانقر على <i>إضافة روابط</i>.]]></string>
