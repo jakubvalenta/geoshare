@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,13 +12,16 @@ class OsmAndInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://osmand.net/map?pin=52.51628,13.37771"))
-        assertTrue(doesUriPatternMatch("osmand.net/map?pin=52.51628,13.37771"))
+        assertEquals(
+            "https://osmand.net/map?pin=52.51628,13.37771",
+            getUri("https://osmand.net/map?pin=52.51628,13.37771")
+        )
+        assertEquals("osmand.net/map?pin=52.51628,13.37771", getUri("osmand.net/map?pin=52.51628,13.37771"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/"))
+        assertNull(getUri("https://www.example.com/"))
     }
 
     @Test

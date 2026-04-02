@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,23 +13,38 @@ class MapyComInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
-        assertTrue(doesUriPatternMatch("https://hapticke.mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
-        assertTrue(doesUriPatternMatch("https://mapy.cz?x=14.0184810&y=50.0525078&z=9"))
-        assertTrue(doesUriPatternMatch("https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9"))
-        @Suppress("SpellCheckingInspection") assertTrue(doesUriPatternMatch("mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
+        assertEquals(
+            "https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
+            getUri("https://mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+        )
+        assertEquals(
+            "https://hapticke.mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
+            getUri("https://hapticke.mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+        )
+        assertEquals(
+            "https://mapy.cz?x=14.0184810&y=50.0525078&z=9",
+            getUri("https://mapy.cz?x=14.0184810&y=50.0525078&z=9")
+        )
+        assertEquals(
+            "https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9",
+            getUri("https://mapy.cz/zakladni?x=14.0184810&y=50.0525078&z=9")
+        )
+        @Suppress("SpellCheckingInspection") assertEquals(
+            "mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9",
+            getUri("mapy.com/en/zakladni?x=14.0184810&y=50.0525078&z=9")
+        )
     }
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("https://mapy.com/s/jakuhelasu"))
-        assertTrue(doesUriPatternMatch("https://mapy.cz/s/jakuhelasu"))
-        @Suppress("SpellCheckingInspection") assertTrue(doesUriPatternMatch("mapy.com/s/jakuhelasu"))
+        assertEquals("https://mapy.com/s/jakuhelasu", getUri("https://mapy.com/s/jakuhelasu"))
+        assertEquals("https://mapy.cz/s/jakuhelasu", getUri("https://mapy.cz/s/jakuhelasu"))
+        @Suppress("SpellCheckingInspection") assertEquals("mapy.com/s/jakuhelasu", getUri("mapy.com/s/jakuhelasu"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
+        assertNull(getUri("https://www.example.com/en/zakladni?x=14.0184810&y=50.0525078&z=9"))
     }
 
     @Test
@@ -118,21 +133,21 @@ class MapyComInputTest : BaseInputTest() {
     }
 
     @Test
-    fun isShortUri_correct() {
-        assertTrue(isShortUri("https://mapy.com/s/jakuhelasu"))
-        assertTrue(isShortUri("https://www.mapy.com/s/jakuhelasu"))
-        assertTrue(isShortUri("https://mapy.cz/s/jakuhelasu"))
+    fun shortUriPattern_correct() {
+        assertNotNull(getShortUri("https://mapy.com/s/jakuhelasu"))
+        assertNotNull(getShortUri("https://www.mapy.com/s/jakuhelasu"))
+        assertNotNull(getShortUri("https://mapy.cz/s/jakuhelasu"))
     }
 
     @Test
-    fun isShortUri_wrongPath() {
-        assertFalse(isShortUri("https://mapy.com/"))
-        assertFalse(isShortUri("https://mapy.com/s"))
-        assertFalse(isShortUri("https://mapy.com/s/"))
+    fun shortUriPattern_wrongPath() {
+        assertNull(getShortUri("https://mapy.com/"))
+        assertNull(getShortUri("https://mapy.com/s"))
+        assertNull(getShortUri("https://mapy.com/s/"))
     }
 
     @Test
-    fun isShortUri_unknownDomain() {
-        assertFalse(isShortUri("https://www.example.com/foo"))
+    fun shortUriPattern_unknownDomain() {
+        assertNull(getShortUri("https://www.example.com/foo"))
     }
 }

@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,20 +13,26 @@ class YandexMapsInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
+        assertEquals(
+            "https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
+            getUri("https://yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8")
+        )
         @Suppress("SpellCheckingInspection")
-        assertTrue(doesUriPatternMatch("yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
+        assertEquals(
+            "yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8",
+            getUri("yandex.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8")
+        )
     }
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("https://yandex.com/maps/-/CLAvMI18"))
-        assertTrue(doesUriPatternMatch("yandex.com/maps/-/CLAvMI18"))
+        assertEquals("https://yandex.com/maps/-/CLAvMI18", getUri("https://yandex.com/maps/-/CLAvMI18"))
+        assertEquals("yandex.com/maps/-/CLAvMI18", getUri("yandex.com/maps/-/CLAvMI18"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
+        assertNull(getUri("https://www.example.com/maps?whatshere%5Bpoint%5D=144.96315783657045%2C-37.81384550131279&whatshere%5Bzoom%5D=17.852003&ll=144.96315783657042%2C-37.81384550094835&z=17.852003&si=6u8menx2bg23cfx27y7p1je8y8"))
     }
 
     @Test
@@ -135,20 +141,20 @@ class YandexMapsInputTest : BaseInputTest() {
     }
 
     @Test
-    fun isShortUri_correct() {
-        assertTrue(isShortUri("https://yandex.com/maps/-/CLAvMI18"))
+    fun shortUriPattern_correct() {
+        assertNotNull(getShortUri("https://yandex.com/maps/-/CLAvMI18"))
     }
 
     @Test
-    fun isShortUri_wrongPath() {
-        assertFalse(isShortUri("https://yandex.com/"))
-        assertFalse(isShortUri("https://yandex.com/maps/"))
-        assertFalse(isShortUri("https://yandex.com/maps/-/"))
-        assertFalse(isShortUri("https://yandex.com/foo"))
+    fun shortUriPattern_wrongPath() {
+        assertNull(getShortUri("https://yandex.com/"))
+        assertNull(getShortUri("https://yandex.com/maps/"))
+        assertNull(getShortUri("https://yandex.com/maps/-/"))
+        assertNull(getShortUri("https://yandex.com/foo"))
     }
 
     @Test
-    fun isShortUri_unknownDomain() {
-        assertFalse(isShortUri("https://www.example.com/foo"))
+    fun shortUriPattern_unknownDomain() {
+        assertNull(getShortUri("https://www.example.com/foo"))
     }
 }

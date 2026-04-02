@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -16,25 +15,28 @@ class AppleMapsInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://maps.apple.com/?ll=50.894967,4.341626"))
-        assertTrue(doesUriPatternMatch("maps.apple.com/?ll=50.894967,4.341626"))
+        assertEquals(
+            "https://maps.apple.com/?ll=50.894967,4.341626",
+            getUri("https://maps.apple.com/?ll=50.894967,4.341626")
+        )
+        assertEquals("maps.apple.com/?ll=50.894967,4.341626", getUri("maps.apple.com/?ll=50.894967,4.341626"))
     }
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("https://maps.apple/p/7E-Brjrk_THN14"))
+        assertEquals("https://maps.apple/p/7E-Brjrk_THN14", getUri("https://maps.apple/p/7E-Brjrk_THN14"))
         @Suppress("SpellCheckingInspection")
-        assertTrue(doesUriPatternMatch("maps.apple/p/7E-Brjrk_THN14"))
+        assertEquals("maps.apple/p/7E-Brjrk_THN14", getUri("maps.apple/p/7E-Brjrk_THN14"))
     }
 
     @Test
     fun uriPattern_noPath() {
-        assertTrue(doesUriPatternMatch("https://maps.apple.com?q=foo"))
+        assertEquals("https://maps.apple.com?q=foo", getUri("https://maps.apple.com?q=foo"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/?ll=50.894967,4.341626"))
+        assertNull(getUri("https://www.example.com/?ll=50.894967,4.341626"))
     }
 
     @Test
