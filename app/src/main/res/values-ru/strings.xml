@@ -269,4 +269,6 @@
     <string name="user_preferences_section_output">Вывод</string>
     <string name="user_preferences_connection_option_always">Разрешить</string>
     <string name="user_preferences_connection_option_never">Запретить</string>
+    <string name="billing_status_expired">Срок действия вашей подписки скоро истечёт</string>
+    <string name="billing_status_pending">Ваш платёж ожидает подтверждения</string>
 </resources>
