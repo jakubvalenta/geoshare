@@ -283,4 +283,6 @@
         <item quantity="many">%1$d تطبيقًا ظاهرًا من أصل %2$d</item>
         <item quantity="other">%1$d تطبيق ظاهر من أصل %2$d</item>
     </plurals>
+    <string name="billing_status_expired">اشتراكك سينتهي قريبًا</string>
+    <string name="billing_status_pending">دفعتك قيد الانتظار</string>
 </resources>
