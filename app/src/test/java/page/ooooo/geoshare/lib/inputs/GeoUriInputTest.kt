@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,32 +12,32 @@ class GeoUriInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_geoUri() {
-        assertTrue(doesUriPatternMatch("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+        assertEquals("geo:50.123456,-11.123456?q=foo%20bar&z=3.4", getUri("geo:50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
     fun uriPattern_geoUriWithSpaceInQ() = runTest {
-        assertTrue(doesUriPatternMatch("geo:0,0?q=45.4786785, 9.2473799"))
+        assertEquals("geo:0,0?q=45.4786785, 9.2473799", getUri("geo:0,0?q=45.4786785, 9.2473799"))
     }
 
     @Test
     fun uriPattern_noPath() {
-        assertTrue(doesUriPatternMatch("geo:?q=foo"))
+        assertEquals("geo:?q=foo", getUri("geo:?q=foo"))
     }
 
     @Test
     fun uriPattern_noScheme() {
-        assertFalse(doesUriPatternMatch("50.123456,-11.123456?q=foo%20bar&z=3.4"))
+        assertNull(getUri("50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
     fun uriPattern_nonGeoScheme() {
-        assertFalse(doesUriPatternMatch("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
+        assertNull(getUri("ftp:50.123456,-11.123456?q=foo%20bar&z=3.4"))
     }
 
     @Test
     fun uriPattern_unknownPath() {
-        assertTrue(doesUriPatternMatch("geo:example?q=foo%20bar&z=3.4"))
+        assertEquals("geo:example?q=foo%20bar&z=3.4", getUri("geo:example?q=foo%20bar&z=3.4"))
     }
 
     @Test

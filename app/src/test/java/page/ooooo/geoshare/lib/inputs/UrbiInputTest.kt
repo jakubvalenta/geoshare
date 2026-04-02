@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,39 +12,105 @@ class UrbiInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://2gis.uz/tashkent/firm/70000001060803297"))
-        assertTrue(doesUriPatternMatch("https://2gis.ae/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.am/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.az/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.cl/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.com.cy/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.cz/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.it/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.kg/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.kz/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.ru/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://2gis.uz/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi-bh.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi-eg.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi-kw.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi-om.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi-qa.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi-sa.com/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi.bh/dubai/geo/55.171971%2C25.289452"))
-        assertTrue(doesUriPatternMatch("https://urbi.qa/dubai/geo/55.171971%2C25.289452"))
+        assertEquals(
+            "https://2gis.uz/tashkent/firm/70000001060803297",
+            getUri("https://2gis.uz/tashkent/firm/70000001060803297")
+        )
+        assertEquals(
+            "https://2gis.ae/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.ae/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.am/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.am/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.az/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.az/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.cl/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.cl/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.com.cy/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.com.cy/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.cz/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.cz/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.it/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.it/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.kg/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.kg/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.kz/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.kz/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.ru/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.ru/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://2gis.uz/dubai/geo/55.171971%2C25.289452",
+            getUri("https://2gis.uz/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452",
+            getUri("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi-bh.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi-bh.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi-eg.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi-eg.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi-kw.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi-kw.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi-om.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi-om.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi-qa.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi-qa.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi-sa.com/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi-sa.com/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi.bh/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi.bh/dubai/geo/55.171971%2C25.289452")
+        )
+        assertEquals(
+            "https://urbi.qa/dubai/geo/55.171971%2C25.289452",
+            getUri("https://urbi.qa/dubai/geo/55.171971%2C25.289452")
+        )
     }
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("https://go.2gis.com/WSTdK"))
-        assertTrue(doesUriPatternMatch("https://go.urbi.ae/3JtpM"))
+        assertEquals("https://go.2gis.com/WSTdK", getUri("https://go.2gis.com/WSTdK"))
+        assertEquals("https://go.urbi.ae/3JtpM", getUri("https://go.urbi.ae/3JtpM"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://example.com/tashkent/firm/70000001060803297"))
+        assertNull(getUri("https://example.com/tashkent/firm/70000001060803297"))
     }
 
     @Test

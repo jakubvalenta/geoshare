@@ -11,18 +11,18 @@ class CoordinatesInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_supportedUrl() {
-        assertTrue(doesUriPatternMatch("50.21972°\u00a0N, 0.68453°\u00a0W"))
-        assertTrue(doesUriPatternMatch("31°57′N 35°56′E"))
+        assertEquals("50.21972°\u00a0N, 0.68453°\u00a0W", getUri("50.21972°\u00a0N, 0.68453°\u00a0W"))
+        assertEquals("31°57′N 35°56′E", getUri("31°57′N 35°56′E"))
     }
 
     @Test
     fun uriPattern_unknownPath() {
-        assertFalse(doesUriPatternMatch("spam"))
+        assertNull(getUri("spam"))
     }
 
     @Test
     fun uriPattern_exampleUrl() {
-        assertFalse(doesUriPatternMatch("https://example.com/"))
+        assertNull(getUri("https://example.com/"))
     }
 
     @Test

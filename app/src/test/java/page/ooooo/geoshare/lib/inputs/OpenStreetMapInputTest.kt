@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,25 +12,40 @@ class OpenStreetMapInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/#map=16/51.49/-0.13"))
-        assertTrue(doesUriPatternMatch("www.openstreetmap.org/#map=16/51.49/-0.13"))
-        assertTrue(doesUriPatternMatch("openstreetmap.org/#map=16/51.49/-0.13"))
-        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/directions?to=51.0528,13.7364"))
-        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/node/6284640534"))
-        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/relation/910699"))
-        assertTrue(doesUriPatternMatch("https://www.openstreetmap.org/way/596674456"))
-        assertTrue(doesUriPatternMatch("https://osm.org/#map=16/51.49/-0.13"))
+        assertEquals(
+            "https://www.openstreetmap.org/#map=16/51.49/-0.13",
+            getUri("https://www.openstreetmap.org/#map=16/51.49/-0.13")
+        )
+        assertEquals("www.openstreetmap.org/#map=16/51.49/-0.13", getUri("www.openstreetmap.org/#map=16/51.49/-0.13"))
+        assertEquals("openstreetmap.org/#map=16/51.49/-0.13", getUri("openstreetmap.org/#map=16/51.49/-0.13"))
+        assertEquals(
+            "https://www.openstreetmap.org/directions?to=51.0528,13.7364",
+            getUri("https://www.openstreetmap.org/directions?to=51.0528,13.7364")
+        )
+        assertEquals(
+            "https://www.openstreetmap.org/node/6284640534",
+            getUri("https://www.openstreetmap.org/node/6284640534")
+        )
+        assertEquals(
+            "https://www.openstreetmap.org/relation/910699",
+            getUri("https://www.openstreetmap.org/relation/910699")
+        )
+        assertEquals(
+            "https://www.openstreetmap.org/way/596674456",
+            getUri("https://www.openstreetmap.org/way/596674456")
+        )
+        assertEquals("https://osm.org/#map=16/51.49/-0.13", getUri("https://osm.org/#map=16/51.49/-0.13"))
     }
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("https://osm.org/go/0EEQjE--"))
-        assertTrue(doesUriPatternMatch("https://openstreetmap.org/go/0EEQjE--"))
+        assertEquals("https://osm.org/go/0EEQjE--", getUri("https://osm.org/go/0EEQjE--"))
+        assertEquals("https://openstreetmap.org/go/0EEQjE--", getUri("https://openstreetmap.org/go/0EEQjE--"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/#map=16/51.49/-0.13"))
+        assertNull(getUri("https://www.example.com/#map=16/51.49/-0.13"))
     }
 
     @Test

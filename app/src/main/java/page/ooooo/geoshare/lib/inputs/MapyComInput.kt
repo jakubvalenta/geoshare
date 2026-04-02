@@ -14,7 +14,7 @@ object MapyComInput : ShortUriInput, Input.HasRandomUri {
     private const val COORDS = """(\d{1,2}(?:\.\d{1,16})?)[NS], (\d{1,3}(?:\.\d{1,16})?)[WE]"""
 
     override val uriPattern =
-        Regex("""$COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]\S+""")
+        Regex("""$COORDS|(?:https?://)?(?:(?:hapticke|www)\.)?mapy\.[a-z]{2,3}[/?]$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.MAPY_COM,
         nameResId = R.string.converter_mapy_com_name,

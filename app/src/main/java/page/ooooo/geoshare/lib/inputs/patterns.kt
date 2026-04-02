@@ -8,6 +8,16 @@ const val LON = """[+ ]?($LON_NUM)"""
 const val Z = """(\d{1,2}(?:\.\d{1,$MAX_PRECISION})?)"""
 
 /**
+ * Matches all characters up until two spaces, new line, or end of string.
+ *
+ * This allows us to support URIs that contain spaces (but not two or more consecutive spaces), which are not valid
+ * URIs but users might expect the app to support such URIs nevertheless. Example:
+ *
+ * "https://maps.google.com/maps?daddr=2088 Albion Rd"
+ */
+const val URI_REST = """.+?(?= {2}|\n|$)"""
+
+/**
  * Name when it appears in URI query param
  *
  * Notice that if it contains LAT,LON, then the group doesn't match.

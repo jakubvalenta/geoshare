@@ -167,7 +167,7 @@ class ConversionStateTest {
 
     @Test
     fun receivedUriString_inputUriStringHasUriInTheMiddle_returnsReceivedUriWithPermissionNull() = runTest {
-        val inputUriString = "FOO https://maps.google.com/foo BAR"
+        val inputUriString = "FOO\nhttps://maps.google.com/foo\nBAR"
         val matchedInputUriString = "https://maps.google.com/foo"
         val uri = Uri.parse(matchedInputUriString, uriQuote)
         val stateContext = mockStateContext()

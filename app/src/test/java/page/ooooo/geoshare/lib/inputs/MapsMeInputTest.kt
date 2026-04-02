@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,23 +12,23 @@ class MapsMeInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("ge0://AbCMCNp0LO"))
-        assertTrue(doesUriPatternMatch("http://ge0.me/AbCMCNp0LO"))
-        assertTrue(doesUriPatternMatch("https://omaps.app/AbCMCNp0LO"))
-        assertTrue(doesUriPatternMatch("https://comaps.at/AbCMCNp0LO"))
-        assertTrue(doesUriPatternMatch("ge0://AbCMCNp0LO/"))
-        assertTrue(doesUriPatternMatch("http://ge0.me/AbCMCNp0LO/"))
-        assertTrue(doesUriPatternMatch("https://omaps.app/AbCMCNp0LO/"))
-        assertTrue(doesUriPatternMatch("https://comaps.at/AbCMCNp0LO/"))
-        assertTrue(doesUriPatternMatch("ge0://AbCMCNp0LO/Madagascar"))
-        assertTrue(doesUriPatternMatch("http://ge0.me/AbCMCNp0LO/Madagascar"))
-        assertTrue(doesUriPatternMatch("https://omaps.app/AbCMCNp0LO/Madagascar"))
-        assertTrue(doesUriPatternMatch("https://comaps.at/AbCMCNp0LO/Madagascar"))
+        assertEquals("ge0://AbCMCNp0LO", getUri("ge0://AbCMCNp0LO"))
+        assertEquals("http://ge0.me/AbCMCNp0LO", getUri("http://ge0.me/AbCMCNp0LO"))
+        assertEquals("https://omaps.app/AbCMCNp0LO", getUri("https://omaps.app/AbCMCNp0LO"))
+        assertEquals("https://comaps.at/AbCMCNp0LO", getUri("https://comaps.at/AbCMCNp0LO"))
+        assertEquals("ge0://AbCMCNp0LO/", getUri("ge0://AbCMCNp0LO/"))
+        assertEquals("http://ge0.me/AbCMCNp0LO/", getUri("http://ge0.me/AbCMCNp0LO/"))
+        assertEquals("https://omaps.app/AbCMCNp0LO/", getUri("https://omaps.app/AbCMCNp0LO/"))
+        assertEquals("https://comaps.at/AbCMCNp0LO/", getUri("https://comaps.at/AbCMCNp0LO/"))
+        assertEquals("ge0://AbCMCNp0LO/Madagascar", getUri("ge0://AbCMCNp0LO/Madagascar"))
+        assertEquals("http://ge0.me/AbCMCNp0LO/Madagascar", getUri("http://ge0.me/AbCMCNp0LO/Madagascar"))
+        assertEquals("https://omaps.app/AbCMCNp0LO/Madagascar", getUri("https://omaps.app/AbCMCNp0LO/Madagascar"))
+        assertEquals("https://comaps.at/AbCMCNp0LO/Madagascar", getUri("https://comaps.at/AbCMCNp0LO/Madagascar"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/AbCMCNp0LO/Madagascar"))
+        assertNull(getUri("https://www.example.com/AbCMCNp0LO/Madagascar"))
     }
 
     @Test

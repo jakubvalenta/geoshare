@@ -3,8 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.lib.point.WGS84Point
 
@@ -13,28 +12,52 @@ class WazeInputTest : BaseInputTest() {
 
     @Test
     fun uriPattern_fullUrl() {
-        assertTrue(doesUriPatternMatch("https://waze.com/ul?ll=45.6906304,-120.810983&z=10"))
-        assertTrue(doesUriPatternMatch("waze.com/ul?ll=45.6906304,-120.810983&z=10"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ"))
-        assertTrue(doesUriPatternMatch("https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/ul?venue_id=2884104.28644432.6709020"))
+        assertEquals(
+            "https://waze.com/ul?ll=45.6906304,-120.810983&z=10",
+            getUri("https://waze.com/ul?ll=45.6906304,-120.810983&z=10")
+        )
+        assertEquals("waze.com/ul?ll=45.6906304,-120.810983&z=10", getUri("waze.com/ul?ll=45.6906304,-120.810983&z=10"))
+        assertEquals(
+            "https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983",
+            getUri("https://www.waze.com/live-map/directions?to=ll.45.6906304,-120.810983")
+        )
+        assertEquals(
+            "https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020",
+            getUri("https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020")
+        )
+        assertEquals(
+            "https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020",
+            getUri("https://www.waze.com/live-map/directions?to=place.w.2884104.28644432.6709020")
+        )
+        assertEquals(
+            "https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020",
+            getUri("https://www.waze.com/live-map/directions/cn-tower-front-st-w-301-toronto?to=place.w.2884104.28644432.6709020")
+        )
+        assertEquals(
+            "https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ",
+            getUri("https://www.waze.com/live-map/directions/potsdam-bb-de?to=place.ChIJt9Y6hM31qEcRm-yqC5j4ZcU&from=place.ChIJAVkDPzdOqEcRcDteW0YgIQQ")
+        )
+        assertEquals(
+            "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location",
+            getUri("https://ul.waze.com/ul?venue_id=2884104.28644432.6709020&overview=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location")
+        )
+        assertEquals(
+            "https://www.waze.com/ul?venue_id=2884104.28644432.6709020",
+            getUri("https://www.waze.com/ul?venue_id=2884104.28644432.6709020")
+        )
     }
 
     @Test
     fun uriPattern_shortUrl() {
-        assertTrue(doesUriPatternMatch("https://waze.com/ul/hu00uswvn3"))
-        @Suppress("SpellCheckingInspection") assertTrue(doesUriPatternMatch("waze.com/ul/hu00uswvn3"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/ul/hu00uswvn3"))
-        assertTrue(doesUriPatternMatch("https://www.waze.com/live-map?h=u00uswvn3"))
+        assertEquals("https://waze.com/ul/hu00uswvn3", getUri("https://waze.com/ul/hu00uswvn3"))
+        @Suppress("SpellCheckingInspection") assertEquals("waze.com/ul/hu00uswvn3", getUri("waze.com/ul/hu00uswvn3"))
+        assertEquals("https://www.waze.com/ul/hu00uswvn3", getUri("https://www.waze.com/ul/hu00uswvn3"))
+        assertEquals("https://www.waze.com/live-map?h=u00uswvn3", getUri("https://www.waze.com/live-map?h=u00uswvn3"))
     }
 
     @Test
     fun uriPattern_unknownHost() {
-        assertFalse(doesUriPatternMatch("https://www.example.com/ul?ll=45.6906304,-120.810983&z=10"))
+        assertNull(getUri("https://www.example.com/ul?ll=45.6906304,-120.810983&z=10"))
     }
 
     @Test

@@ -22,7 +22,7 @@ object OpenStreetMapInput : HtmlInput, Input.HasRandomUri {
     private const val ELEMENT_PATH = """/(node|relation|way)/(\d+)(?:[/?#].*|$)"""
     private const val HASH = """[A-Za-z0-9_~]+-+"""
 
-    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.OPEN_STREET_MAP,
         nameResId = R.string.converter_open_street_map_name,

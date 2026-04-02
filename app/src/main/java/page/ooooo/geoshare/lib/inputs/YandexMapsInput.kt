@@ -15,7 +15,7 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.point.Point
 
 object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
-    override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.YANDEX_MAPS,
         nameResId = R.string.converter_yandex_maps_name,
@@ -43,8 +43,7 @@ object YandexMapsInput : ShortUriInput, HtmlInput, Input.HasRandomUri {
             InputDocumentationItem.Url(22, "https://yandex.uz/maps"),
         ),
     )
-    override val shortUriPattern =
-        Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
+    override val shortUriPattern = Regex("""(?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+""")
     override val shortUriMethod = ShortUriInput.Method.HEAD
 
     override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {

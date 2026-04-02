@@ -26,7 +26,7 @@ object WazeInput : HtmlInput, Input.HasRandomUri {
     @Suppress("SpellCheckingInspection")
     private const val HASH = """[0-9bcdefghjkmnpqrstuvwxyz]+"""
 
-    override val uriPattern = Regex("""(?:https?://)?(?:(?:www|ul)\.)?waze\.com/\S+""")
+    override val uriPattern = Regex("""(?:https?://)?(?:(?:www|ul)\.)?waze\.com/$URI_REST""")
 
     override val documentation = InputDocumentation(
         id = InputDocumentationId.WAZE,

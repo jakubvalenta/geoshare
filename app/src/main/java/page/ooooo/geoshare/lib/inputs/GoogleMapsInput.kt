@@ -22,7 +22,7 @@ import page.ooooo.geoshare.lib.point.Point
 
 object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri {
     override val uriPattern =
-        Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]\S+""")
+        Regex("""(?:https?://)?(?:(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}|(?:maps\.)?(?:app\.)?goo\.gl|g\.co)[/?#]$URI_REST""")
     override val documentation = InputDocumentation(
         id = InputDocumentationId.GOOGLE_MAPS,
         nameResId = R.string.converter_google_maps_name,
@@ -71,7 +71,14 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
             // API coordinates
             // https://maps.google.com/?ll={lat},{lon}
             // https://maps.google.com/?q={lat},{lon}
-            listOf("q", "query", "ll", "viewpoint", "center")
+            listOf(
+                @Suppress("SpellCheckingInspection") "daddr",
+                "q",
+                "query",
+                "ll",
+                "viewpoint",
+                "center",
+            )
                 .firstNotNullOfOrNull { key -> LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint() }?.let {
                     points = persistentListOf(it.asGCJ02().copy(z = z))
                     return@run
@@ -79,7 +86,14 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
 
             // API search
             // https://maps.google.com/?q={name}
-            listOf("q", "query", "ll", "viewpoint", "center").forEach { key ->
+            listOf(
+                @Suppress("SpellCheckingInspection") "daddr",
+                "q",
+                "query",
+                "ll",
+                "viewpoint",
+                "center",
+            ).forEach { key ->
                 Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()?.let { name ->
                     points = persistentListOf(GCJ02Point(z = z, name = name))
                     // Go to HTML parsing if needed
