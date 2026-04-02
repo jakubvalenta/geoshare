@@ -36,6 +36,7 @@ import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.point.Point
 import page.ooooo.geoshare.ui.UserPreferencesGroupId
 import java.net.InetAddress
+import java.net.SocketException
 import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -176,12 +177,16 @@ interface BehaviorTest {
     }
 
     suspend fun assumeHttpHeadIsSuccess(@Suppress("SameParameterValue") url: String) {
-        val status = withContext(Dispatchers.IO) {
-            HttpClient(CIO).head(url).status
+        val status = try {
+            withContext(Dispatchers.IO) {
+                HttpClient(CIO).head(url).status
+            }
+        } catch (_: SocketException) {
+            null
         }
         assumeTrue(
-            "This test only works when HTTP HEAD request succeeds but it was ${status.value} for $url",
-            status.isSuccess(),
+            "This test only works when HTTP HEAD request succeeds but it ${if (status != null) "was ${status.value}" else "timed out"} for $url",
+            status?.isSuccess() == true,
         )
     }
 
