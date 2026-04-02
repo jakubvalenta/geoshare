@@ -38,15 +38,15 @@ class HereWeGoInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
-        assertTrue(parseUri("https://wego.here.com") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://wego.here.com/") is ParseUriResult.Failed)
-        assertTrue(parseUri("https://wego.here.com/?spam=1") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("https://wego.here.com"))
+        assertEquals(ParseUriResult(), parseUri("https://wego.here.com/"))
+        assertEquals(ParseUriResult(), parseUri("https://wego.here.com/?spam=1"))
     }
 
     @Test
     fun parseUri_coordinatesPath() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.536213398175434, 13.417085409306102))),
+            ParseUriResult(persistentListOf(WGS84Point(52.536213398175434, 13.417085409306102))),
             parseUri("https://share.here.com/l/52.536213398175434,13.417085409306102"),
         )
     }
@@ -54,7 +54,7 @@ class HereWeGoInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinatesQueryParam() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(50.21972, -0.68453, z = 6.93))),
+            ParseUriResult(persistentListOf(WGS84Point(50.21972, -0.68453, z = 6.93))),
             parseUri("https://wego.here.com/?map=50.21972,-0.68453,6.93"),
         )
     }
@@ -62,7 +62,7 @@ class HereWeGoInputTest : BaseInputTest() {
     @Test
     fun parseUri_place() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.68444319987284, -8.623429663612297))),
+            ParseUriResult(persistentListOf(WGS84Point(52.68444319987284, -8.623429663612297))),
             parseUri("https://wego.here.com/p/s-aWQ9O2xhdD01Mi42ODQ0NDMxOTk4NzI4NDtsb249LTguNjIzNDI5NjYzNjEyMjk3O249TGltZXJpY2s="),
         )
     }
@@ -70,7 +70,7 @@ class HereWeGoInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(52.68444319987284, -8.623429663612297, z = 16.0))),
+            ParseUriResult(persistentListOf(WGS84Point(52.68444319987284, -8.623429663612297, z = 16.0))),
             parseUri("https://wego.here.com/p/s-aWQ9O2xhdD01Mi42ODQ0NDMxOTk4NzI4NDtsb249LTguNjIzNDI5NjYzNjEyMjk3O249TGltZXJpY2s=?map=52.68444,-8.62343,16"),
         )
     }
@@ -78,7 +78,7 @@ class HereWeGoInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLink() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(-38.14749, 145.14347))),
+            ParseUriResult(persistentListOf(WGS84Point(-38.14749, 145.14347))),
             parseUri("https://share.here.com/p/e-eyJ2ZXJzaW9uIjoiMS4wLjMiLCJwcm92aWRlcklkIjoiMDM2OGx4eDUtYWNkYjgxOGNlNjU1MDc2OTY2ZTU0NThhZTRkZWRkM2MiLCJsYXRpdHVkZSI6LTM4LjE0NzQ5LCJsb25naXR1ZGUiOjE0NS4xNDM0N30="),
         )
     }

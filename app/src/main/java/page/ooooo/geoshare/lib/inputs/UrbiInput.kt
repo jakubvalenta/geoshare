@@ -52,8 +52,6 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
 
     override suspend fun parseUri(uri: Uri, uriQuote: UriQuote) = buildParseUriResult {
         uri.run {
-            htmlUriString = toString()
-
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
             Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint()?.let {
@@ -81,6 +79,8 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
                 )
                 return@run
             }
+
+            htmlUriString = toString()
         }
     }
 
@@ -98,23 +98,10 @@ object UrbiInput : HtmlInput, Input.HasRandomUri {
             val line = channel.readLine() ?: break
             pattern.find(line)?.groupOrNull()?.let { attr ->
                 val uri = Uri.parse(attr.decodeBasicHtmlEntities(), uriQuote)
-                when (val res = parseUri(uri)) {
-                    is ParseUriResult.Failed -> {}
-
-                    is ParseUriResult.Succeeded -> {
-                        points = res.points
-                        return@buildParseHtmlResult
-                    }
-
-                    is ParseUriResult.SucceededAndSupportsHtmlParsing -> {
-                        points = res.points
-                        return@buildParseHtmlResult
-                    }
-
-                    is ParseUriResult.SucceededAndSupportsWebParsing -> {
-                        points = res.points
-                        return@buildParseHtmlResult
-                    }
+                val res = parseUri(uri)
+                if (res.points.isNotEmpty()) {
+                    points = res.points
+                    return@buildParseHtmlResult
                 }
             }
         }

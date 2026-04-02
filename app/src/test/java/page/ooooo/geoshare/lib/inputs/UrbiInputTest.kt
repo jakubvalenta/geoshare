@@ -59,7 +59,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_point() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(25.284889, 55.172173))),
+            ParseUriResult(persistentListOf(WGS84Point(25.284889, 55.172173))),
             parseUri("https://maps.urbi.ae/dubai/geo/55.172173%2C25.284889"),
         )
     }
@@ -67,7 +67,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_pointWithMarker() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(25.25915, 55.225263, z = 12.77))),
+            ParseUriResult(persistentListOf(WGS84Point(25.25915, 55.225263, z = 12.77))),
             parseUri("https://maps.urbi.ae/dubai/geo/55.171971%2C25.289452?m=55.225263%2C25.25915%2F12.77"),
         )
     }
@@ -75,9 +75,9 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_geo() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://maps.urbi.ae/dubai/geo/13933621232533580",
+                htmlUriString = "https://maps.urbi.ae/dubai/geo/13933621232533580",
             ),
             parseUri("https://maps.urbi.ae/dubai/geo/13933621232533580"),
         )
@@ -86,9 +86,9 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_firm() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://2gis.uz/tashkent/firm/70000001060803297",
+                htmlUriString = "https://2gis.uz/tashkent/firm/70000001060803297",
             ),
             parseUri("https://2gis.uz/tashkent/firm/70000001060803297"),
         )
@@ -97,7 +97,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_firmWithCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(25.19925, 55.332211))),
+            ParseUriResult(persistentListOf(WGS84Point(25.19925, 55.332211))),
             parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925"),
         )
     }
@@ -105,7 +105,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_firmWithMarker() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(25.196707, 55.320748, z = 14.82))),
+            ParseUriResult(persistentListOf(WGS84Point(25.196707, 55.320748, z = 14.82))),
             parseUri("https://maps.urbi.ae/dubai/firm/70000001043503020/55.332211%2C25.19925?m=55.320748%2C25.196707%2F14.82"),
         )
     }
@@ -113,11 +113,17 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_shortLink() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://go.2gis.com/WSTdK"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://go.2gis.com/WSTdK",
+            ),
             parseUri("https://go.2gis.com/WSTdK"),
         )
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://go.urbi.ae/3JtpM"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://go.urbi.ae/3JtpM",
+            ),
             parseUri("https://go.urbi.ae/3JtpM"),
         )
     }
@@ -125,7 +131,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_api() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     WGS84Point(
                         41.285765, 69.234083,
@@ -141,7 +147,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseUri_apiWithoutTitle() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(WGS84Point(41.285765, 69.234083, z = 17.0))),
+            ParseUriResult(persistentListOf(WGS84Point(41.285765, 69.234083, z = 17.0))),
             parseUri("https://share.api.2gis.ru/getimage?city=tashkent&zoom=17&center=69.234083%2C41.285765"),
         )
     }
@@ -149,7 +155,7 @@ class UrbiInputTest : BaseInputTest() {
     @Test
     fun parseHtml() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(
+            ParseHtmlResult(
                 persistentListOf(
                     WGS84Point(
                         41.285765, 69.234083,

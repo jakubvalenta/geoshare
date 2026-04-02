@@ -55,7 +55,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_center() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0))),
+            ParseUriResult(persistentListOf(BD09MCPoint(3317203.0, 13520653.0, 13.0))),
             parseUri("https://map.baidu.com/@13520653,3317203,13z"),
         )
     }
@@ -63,7 +63,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_point() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(BD09MCPoint(3619117.0, 13392211.0, 17.0, name = "地图上的点"))
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E5%9C%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9/@13392211,3619117,17z?querytype=share&poiShareId=p8cdf0522067cf66173901fc9e4&da_src=shareurl"),
@@ -73,9 +73,9 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_sharedPoint() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsWebParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4",
+                webUriString = "https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4",
             ),
             parseUri("https://map.baidu.com/?poiShareId=p8cdf0522067cf66173901fc9e4"),
         )
@@ -84,9 +84,9 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_sharedPointDetail() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsWebParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage",
+                webUriString = "https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage",
             ),
             parseUri("https://map.baidu.com/?newmap=1&s=inf%26uid%3D2c2bd9487c142391100daa62&sharecallbackflag=poiDetailPage"),
         )
@@ -95,7 +95,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_place() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(BD09MCPoint(3315902.2199999997, 13502918.375, 16.0, name = "黄岩客运中心"))
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://map.baidu.com/poi/%E9%BB%84%E5%B2%A9%E5%AE%A2%E8%BF%90%E4%B8%AD%E5%BF%83/@13502918.375,3315902.2199999997,16z?uid=fef3b5922f87e66c63180999&info_merge=1&isBizPoi=false&ugc_type=3&ugc_ver=1&device_ratio=2&compat=1&routetype=drive&en_uid=fef3b5922f87e66c63180999&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"),
@@ -105,9 +105,9 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_sharedPlace_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsWebParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999",
+                webUriString = "https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999",
             ),
             parseUri("https://map.baidu.com/?shareurl=1&poiShareUid=fef3b5922f87e66c63180999"),
         )
@@ -116,9 +116,9 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_mobilePlaceDetailWithoutCoords_returnsSupportsWebParsing() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsWebParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
+                webUriString = "https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1"
             ),
             parseUri("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1")
         )
@@ -127,7 +127,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_mobilePlaceDetailWithCoords_returnsSucceeded() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(BD09MCPoint(3619117.0, 13392211.0))
             ),
             parseUri("https://map.baidu.com/mobile/webapp/place/detail/qt=inf&uid=p8cdf0522067cf66173901fc9e4/act=read_share&vt=map&da_from=weixin&openna=1&sharegeo=13392211%2C3619117")
@@ -137,7 +137,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsOnePointNoParams() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号")),
             ),
             parseUri(
@@ -149,7 +149,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsTwoPoints() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     BD09MCPoint(2629182.88, 12613508.26, name = "广东省广州市越秀区白云街道烟雨路"),
                     BD09MCPoint(2631139.59, 12611885.88, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
@@ -164,7 +164,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsTwoPointsNoParams() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路"),
                     BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号"),
@@ -179,7 +179,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsThreePoints() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     BD09MCPoint(2629184.09, 12613508.26, name = "广东省广州市越秀区白云街道烟雨路"),
                     BD09MCPoint(
@@ -199,7 +199,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsThreePointsNoParams() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路"),
                     BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号"),
@@ -215,7 +215,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFourPoints() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     BD09MCPoint(2629182.88, 12613508.26, name = "广东省广州市越秀区白云街道烟雨路"),
                     BD09MCPoint(
@@ -240,7 +240,7 @@ class BaiduMapInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFourPointsNoParams() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路"),
                     BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号"),

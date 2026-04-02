@@ -84,28 +84,37 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_noPathOrKnownUrlQueryParams() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://maps.google.com"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://maps.google.com",
+            ),
             parseUri("https://maps.google.com"),
         )
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://maps.google.com/"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://maps.google.com/",
+            ),
             parseUri("https://maps.google.com/"),
         )
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://maps.google.com/?spam=1"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://maps.google.com/?spam=1",
+            ),
             parseUri("https://maps.google.com/?spam=1"),
         )
     }
 
     @Test
     fun parseUri_unknownPath() = runTest {
-        assertTrue(parseUri("https://maps.google.com/spam") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("https://maps.google.com/spam"))
     }
 
     @Test
     fun parseUri_coordinatesOnly() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 6.0))),
+            ParseUriResult(persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 6.0))),
             parseUri("https://www.google.com/maps/@52.5067296,13.2599309,6z"),
         )
     }
@@ -113,7 +122,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinatesInChina() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0))),
+            ParseUriResult(persistentListOf(GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0))),
             parseUri("https://www.google.com/maps/@31.22850685422705,121.47552456472106,11z"),
         )
     }
@@ -121,7 +130,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_coordinatesOnlyStreetView() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(53.512825, 57.6891441))),
+            ParseUriResult(persistentListOf(GCJ02Point(53.512825, 57.6891441))),
             parseUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/@53.512825,57.6891441,0a,75y,90t/data=abc?utm_source=mstt_0&g_ep=def"),
         )
     }
@@ -129,7 +138,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"))
             ),
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
@@ -139,7 +148,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveCoordinatesWithManyDecimalPlaces() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         44.448337599999995,
@@ -155,7 +164,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndNegativeCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(-17.2165721, -149.9470294, z = 11.0, name = "Berlin, Germany"))
             ),
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@-17.2165721,-149.9470294,11z/"),
@@ -165,7 +174,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndIntegerCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.0, 13.0, z = 11.0, name = "Berlin, Germany"))
             ),
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52,13,11z/"),
@@ -175,7 +184,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndFractionalZoom() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 6.33, name = "Berlin, Germany"))
             ),
             parseUri("https://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,6.33z/"),
@@ -185,7 +194,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndData() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(40.785091, -73.968285, z = 15.0, name = "Central Park"))
             ),
             parseUri("https://www.google.com/maps/place/Central+Park/@40.785091,-73.968285,15z/data=!3m1!4b1!4m5!3m4!1s0x89c2589a018531e3:0xb9df1f3170d990b5!8m2"),
@@ -195,7 +204,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndDataInChina() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(39.9168038, 116.3971621, z = 17.0, name = "Forbidden City"))
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI"),
@@ -205,7 +214,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveCoordinatesAndPositiveDataCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(44.4490541, 26.0888398, z = 11.42, name = "RAI - Romantic & Intimate"))
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/place/RAI+-+Romantic+%26+Intimate/@44.5190589,25.7489796,11.42z/data=!4m6!3m5!1s0x40b1ffed911b9fcf:0x7394a7e7855d3929!8m2!3d44.4490541!4d26.0888398!16s%2Fg%2F11svmp0zhs"),
@@ -215,7 +224,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndNegativeCoordinatesAndNegativeDataCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(40.785091, -73.968285, z = 15.0, name = "Central Park")
                 )
@@ -227,7 +236,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAndPositiveDataCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         44.4490541,
@@ -243,7 +252,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAsCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.04, -2.35, z = 15.0))
             ),
             parseUri("https://maps.google.com/maps/place/52.04,-2.35/@52.03877,-2.3416,15z/data=!3m1!1e3"),
@@ -253,7 +262,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeAsCoordinatesWithPlus() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.492611, 13.431726, z = 17.0))
             ),
             parseUri("https://www.google.com/maps/place/52.492611,+13.431726/@52.4929475,13.4317905,17z/data=!4m4!3m3!8m2?force=pwa"),
@@ -263,7 +272,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeCoordinatesOnly() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.03877, -2.3416))
             ),
             parseUri("https://maps.google.com/maps/place/52.03877,-2.3416/data=!3m1!1e3"),
@@ -273,16 +282,16 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeOnly() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = "Poznań Old Town, 61-001 Poznań, Poland")),
-                "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd",
+                htmlUriString = "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd",
             ),
             parseUri("https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd"),
         )
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = @Suppress("SpellCheckingInspection") "Wikimedia Foundation, Inc., 1 Sansome St #1895, San Francisco, CA 94104, Vereinigte Staaten")),
-                "https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b%3A0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1",
+                htmlUriString = "https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b%3A0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1",
             ),
             parseUri("https://www.google.com/maps/place/Wikimedia+Foundation,+Inc.,+1+Sansome+St+%231895,+San+Francisco,+CA+94104,+Vereinigte+Staaten/data=!4m2!3m1!1s0x8085807d3bb6272b:0xfeadb8d7203f8179!17m2!4m1!1e3!18m1!1e1"),
         )
@@ -291,9 +300,9 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeWithoutName() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda",
+                htmlUriString = "https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705%3A0xa9ea51361ed84bda",
             ),
             parseUri("https://www.google.com/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda"),
         )
@@ -302,9 +311,9 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeList() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(),
-                "https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi",
+                htmlUriString = "https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi",
             ),
             parseUri("https://www.google.com/maps/placelists/list/abcdef?g_ep=ghijkl%3D&g_st=isi"),
         )
@@ -313,9 +322,9 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_placeListInData() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(),
-                @Suppress("SpellCheckingInspection") "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts",
+                htmlUriString = @Suppress("SpellCheckingInspection") "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts",
             ),
             parseUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXXYYY!3e3?skid=foo&g_ep=bar&entry=tts"),
         )
@@ -324,7 +333,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(48.8584, 2.2945))
             ),
             parseUri("https://www.google.com/maps/search/48.8584,2.2945"),
@@ -334,7 +343,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchPlace() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(name = "restaurants near me"))),
+            ParseUriResult(persistentListOf(GCJ02Point(name = "restaurants near me"))),
             parseUri("https://www.google.com/maps/search/restaurants+near+me"),
         )
     }
@@ -342,7 +351,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchQueryCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(47.5951518, -122.3316393))
             ),
             parseUri("https://www.google.com/maps/search/?query_place_id=ChIJKxjxuaNqkFQR3CK6O1HNNqY&query=47.5951518,-122.3316393&api=1"),
@@ -352,9 +361,9 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_searchQueryPlace() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = @Suppress("SpellCheckingInspection") "centurylink+field")),
-                "https://www.google.com/maps/search/?api=1&query=centurylink%20field",
+                htmlUriString = "https://www.google.com/maps/search/?api=1&query=centurylink%20field",
             ),
             parseUri("https://www.google.com/maps/search/?api=1&query=centurylink%2Bfield"),
         )
@@ -363,13 +372,13 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_parameterLlTakesPrecedenceOverViewpointAndCenter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(49.93556240, -7.30123395))
             ),
             parseUri("https://maps.google.com/?ll=49.93556240,-7.30123395&viewpoint=34.0522,-118.2437"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(49.93556240, -7.30123395))
             ),
             parseUri("https://maps.google.com/?ll=49.93556240,-7.30123395&center=34.0522,-118.2437"),
@@ -379,19 +388,19 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_parameterQTakesPrecedenceOverLlAndViewpointAndCenter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(40.7128, -74.0060))
             ),
             parseUri("https://www.google.com/?q=40.7128,-74.0060&ll=34.0522,-118.2437"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(40.7128, -74.0060))
             ),
             parseUri("https://www.google.com/?q=40.7128,-74.0060&viewpoint=34.0522,-118.2437"),
         )
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(40.7128, -74.0060))
             ),
             parseUri("https://www.google.com/?q=40.7128,-74.0060&center=34.0522,-118.2437"),
@@ -401,16 +410,16 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_parameterDestinationTakesPrecedence() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = "Cherbourg,France")),
-                "https://www.google.com/?destination=Cherbourg,France&q=Paris,France",
+                htmlUriString = "https://www.google.com/?destination=Cherbourg,France&q=Paris,France",
             ),
             parseUri("https://www.google.com/?destination=Cherbourg,France&q=Paris,France"),
         )
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = "Cherbourg,France")),
-                "https://www.google.com/?destination=Cherbourg,France&query=Paris,France",
+                htmlUriString = "https://www.google.com/?destination=Cherbourg,France&query=Paris,France",
             ),
             parseUri("https://www.google.com/?destination=Cherbourg,France&query=Paris,France"),
         )
@@ -419,7 +428,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(40.7128, -74.0060),
                     GCJ02Point(34.0522, -118.2437),
@@ -432,7 +441,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsCoordinatesWithCenter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(40.7128, -74.0060),
                     GCJ02Point(34.0522, -118.2437, z = 16.0),
@@ -445,7 +454,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsPlaceAndCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(name = "My location"),
                     GCJ02Point(
@@ -463,12 +472,12 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromTo() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(name = "New York, NY"),
                     GCJ02Point(name = "Los Angeles, CA"),
                 ),
-                "https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA",
+                htmlUriString = "https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA",
             ),
             parseUri("https://www.google.com/maps/dir/New+York,+NY/Los+Angeles,+CA"),
         )
@@ -477,12 +486,12 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromToWithInvalidData() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(name = "Berlin"),
                     GCJ02Point(name = "Potsdam"),
                 ),
-                "https://www.google.com/maps/dir/Berlin/Potsdam/data=spam",
+                htmlUriString = "https://www.google.com/maps/dir/Berlin/Potsdam/data=spam",
             ),
             parseUri("https://www.google.com/maps/dir/Berlin/Potsdam/data=spam"),
         )
@@ -491,13 +500,13 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromToVia() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(name = "New York, NY"),
                     GCJ02Point(name = "Philadelphia, PA"),
                     GCJ02Point(name = "Washington, DC"),
                 ),
-                "https://www.google.com/maps/dir/New+York,+NY/Philadelphia,+PA/Washington,+DC",
+                htmlUriString = "https://www.google.com/maps/dir/New+York,+NY/Philadelphia,+PA/Washington,+DC",
             ),
             parseUri("https://www.google.com/maps/dir/New+York,+NY/Philadelphia,+PA/Washington,+DC"),
         )
@@ -506,7 +515,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromToViaWithCenter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(name = @Suppress("SpellCheckingInspection") "Hermannstraße 1, 12049 Berlin, Germany"),
                     GCJ02Point(name = @Suppress("SpellCheckingInspection") "Weserstr. 1, 12047 Berlin, Germany"),
@@ -525,7 +534,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsFromToViaWithCoordinatesInData() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         52.4858222,
@@ -552,7 +561,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsWithSeveralWaypoints() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         55.626402299999995, 37.1331874,
@@ -589,7 +598,10 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsEmpty() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://www.google.com/maps/dir/"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://www.google.com/maps/dir/",
+            ),
             parseUri("https://www.google.com/maps/dir/"),
         )
     }
@@ -597,7 +609,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_directionsEmptyPathPart() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         -31.9614112, 115.8523381,
@@ -613,7 +625,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_streetView() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(48.8584, 2.2945))),
+            ParseUriResult(persistentListOf(GCJ02Point(48.8584, 2.2945))),
             parseUri(@Suppress("SpellCheckingInspection") "https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120"),
         )
     }
@@ -621,7 +633,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_apiCenter() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(-33.712206, 150.311941, z = 12.0))),
+            ParseUriResult(persistentListOf(GCJ02Point(-33.712206, 150.311941, z = 12.0))),
             parseUri("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=12&basemap=terrain"),
         )
     }
@@ -629,7 +641,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_apiCenterWithInvalidZoom() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(-33.712206, 150.311941))),
+            ParseUriResult(persistentListOf(GCJ02Point(-33.712206, 150.311941))),
             parseUri("https://www.google.com/maps/@?api=1&map_action=map&center=-33.712206,150.311941&zoom=spam&basemap=terrain"),
         )
     }
@@ -637,12 +649,12 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_apiDirections() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(name = "Paris,France"),
                     GCJ02Point(name = "Cherbourg,France"),
                 ),
-                "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%20Mans,France%7CCaen,France",
+                htmlUriString = "https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%20Mans,France%7CCaen,France",
             ),
             parseUri("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France"),
         )
@@ -651,7 +663,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_apiViewpoint() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(48.857832, 2.295226))),
+            ParseUriResult(persistentListOf(GCJ02Point(48.857832, 2.295226))),
             parseUri("https://www.google.com/maps/@?fov=80&pitch=38&heading=-45&viewpoint=48.857832,2.295226&map_action=pano&api=1"),
         )
     }
@@ -659,7 +671,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_qParameterCoordinates() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(48.857832, 2.295226))),
+            ParseUriResult(persistentListOf(GCJ02Point(48.857832, 2.295226))),
             parseUri("https://www.google.com/maps?foo=bar&q=48.857832,2.295226&spam"),
         )
     }
@@ -667,7 +679,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_qParameterCoordinatesWithTrailingSlash() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(48.857832, 2.295226))),
+            ParseUriResult(persistentListOf(GCJ02Point(48.857832, 2.295226))),
             parseUri("https://www.google.com/maps/?q=48.857832,2.295226"),
         )
     }
@@ -675,7 +687,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_qParameterCoordinatesWithEmptyPath() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(persistentListOf(GCJ02Point(39.797573, 18.370173))),
+            ParseUriResult(persistentListOf(GCJ02Point(39.797573, 18.370173))),
             parseUri("https://maps.google.com/?q=39.797573,18.370173&entry=gps&g_ep=abc&shorturl=1"),
         )
     }
@@ -683,9 +695,9 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_qParameterPlace() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = "Central Park")),
-                "https://www.google.com/maps?foo=bar&q=Central%20Park&spam",
+                htmlUriString = "https://www.google.com/maps?foo=bar&q=Central%20Park&spam",
             ),
             parseUri("https://www.google.com/maps?foo=bar&q=Central Park&spam"),
         )
@@ -694,9 +706,9 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_qParameterPlaceWithoutPath() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(name = @Suppress("SpellCheckingInspection") "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach")),
-                "https://maps.google.com?q=Caf%C3%A9%20Heinemann,%20Bismarckstra%C3%9Fe%2091,%2041061%20M%C3%B6nchengladbach&ftid=0x47b8ac99b0a68bdd%3A0x8024629be3e9996&entry=gps&lucs=,94224825,94227247,94227248,47071704,47069508,94218641,94233073,94203019,47084304,94208458,94208447",
+                htmlUriString = "https://maps.google.com?q=Caf%C3%A9%20Heinemann,%20Bismarckstra%C3%9Fe%2091,%2041061%20M%C3%B6nchengladbach&ftid=0x47b8ac99b0a68bdd%3A0x8024629be3e9996&entry=gps&lucs=,94224825,94227247,94227248,47071704,47069508,94218641,94233073,94203019,47084304,94208458,94208447",
             ),
             parseUri("https://maps.google.com?q=Caf%C3%A9+Heinemann,+Bismarckstra%C3%9Fe+91,+41061+M%C3%B6nchengladbach&ftid=0x47b8ac99b0a68bdd:0x8024629be3e9996&entry=gps&lucs=,94224825,94227247,94227248,47071704,47069508,94218641,94233073,94203019,47084304,94208458,94208447"),
         )
@@ -705,7 +717,10 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_qParameterEmpty() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(persistentListOf(), "https://www.google.com/maps"),
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://www.google.com/maps",
+            ),
             parseUri("https://www.google.com/maps"),
         )
     }
@@ -713,7 +728,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_googleMapsGo() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(
                     GCJ02Point(
                         -31.9614112, 115.8523381,
@@ -728,20 +743,22 @@ class GoogleMapsInputTest : BaseInputTest() {
 
     @Test
     fun parseUri_googleSearch() = runTest {
-        assertTrue(parseUri("https://www.google.com/search?sca_esv=123&hl=en") is ParseUriResult.Failed)
+        assertEquals(ParseUriResult(), parseUri("https://www.google.com/search?sca_esv=123&hl=en"))
     }
 
     @Test
     fun parseUri_myMaps() = runTest {
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
-                persistentListOf(), "https://www.google.com/maps/d/edit?mid=abcdef"
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://www.google.com/maps/d/edit?mid=abcdef",
             ),
             parseUri("https://www.google.com/maps/d/edit?mid=abcdef"),
         )
         assertEquals(
-            ParseUriResult.SucceededAndSupportsHtmlParsing(
-                persistentListOf(), "https://www.google.com/maps/d/viewer?mid=abcdef"
+            ParseUriResult(
+                persistentListOf(),
+                htmlUriString = "https://www.google.com/maps/d/viewer?mid=abcdef",
             ),
             parseUri("https://www.google.com/maps/d/viewer?mid=abcdef"),
         )
@@ -750,7 +767,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_http() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"))
             ),
             parseUri("http://www.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
@@ -760,7 +777,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_ukDomain() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"))
             ),
             parseUri("https://maps.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
@@ -770,7 +787,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseUri_noScheme() = runTest {
         assertEquals(
-            ParseUriResult.Succeeded(
+            ParseUriResult(
                 persistentListOf(GCJ02Point(52.5067296, 13.2599309, z = 11.0, name = "Berlin, Germany"))
             ),
             parseUri("maps.google.com/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/data=12345?entry=ttu&g_ep=678910"),
@@ -780,7 +797,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_link() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(persistentListOf(GCJ02Point(44.4490541, 26.0888398))),
+            ParseHtmlResult(persistentListOf(GCJ02Point(44.4490541, 26.0888398))),
             parseHtml(
                 @Suppress("SpellCheckingInspection")
                 """<html>
@@ -799,7 +816,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_appInitializationStateOnly() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(persistentListOf(GCJ02Point(52.484201500000005, 13.416727700000001))),
+            ParseHtmlResult(persistentListOf(GCJ02Point(52.484201500000005, 13.416727700000001))),
             parseHtml(
                 """/div\u003e\u003c/div\u003e\u003c/div\u003e"]],0];window.APP_INITIALIZATION_STATE=[[[2429.720134961757,13.416727700000001,52.484201500000005],[0,0,0],[1024,768],13.1],[[["m",[17,70414,43002]"""
             ),
@@ -809,7 +826,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_whenHtmlContainsGenericMetaTagAndAppInitState_returnsRequiresWebParsing() = runTest {
         assertEquals(
-            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            ParseHtmlResult(webUriString = "https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml(
                 @Suppress("SpellCheckingInspection")
                 """<head><meta content="Google Maps" itemprop="name">
@@ -822,7 +839,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_placeList() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(
+            ParseHtmlResult(
                 persistentListOf(
                     GCJ02Point(59.1293656, 11.4585672),
                     GCJ02Point(59.4154007, 11.659710599999999),
@@ -848,7 +865,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_placeListHighPrecision() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(persistentListOf(GCJ02Point(5.5592846, -0.19743059999999998))),
+            ParseHtmlResult(persistentListOf(GCJ02Point(5.5592846, -0.19743059999999998))),
             parseHtml(
                 """ll,"Ghana",null,"",[null,null,5.5592846,-0.19743059999999998],["1143791729983858547","-469"""
             ),
@@ -858,7 +875,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_myMaps() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(
+            ParseHtmlResult(
                 persistentListOf(
                     GCJ02Point(52.49016, 13.434500000000071),
                     GCJ02Point(52.49534999999999, 13.431890000000067),
@@ -889,7 +906,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_placeListOnePoint() = runTest {
         assertEquals(
-            ParseHtmlResult.Succeeded(persistentListOf(GCJ02Point(59.1293656, 11.4585672))),
+            ParseHtmlResult(persistentListOf(GCJ02Point(59.1293656, 11.4585672))),
             parseHtml(
                 @Suppress("SpellCheckingInspection")
                 """<html>
@@ -908,7 +925,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_htmlDoesNotMatch_returnsRequiresWebParsing() = runTest {
         assertEquals(
-            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            ParseHtmlResult(webUriString = "https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml("spam", "https://www.google.com/maps/place/Berlin,+Germany/")
         )
     }
@@ -916,7 +933,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_googleSearchHtmlDoesNotContainUrl_returnsRequiresWebParsing() = runTest {
         assertEquals(
-            ParseHtmlResult.RequiresWebParsing("https://www.google.com/maps/place/Berlin,+Germany/"),
+            ParseHtmlResult(webUriString = "https://www.google.com/maps/place/Berlin,+Germany/"),
             parseHtml("<html></html>", "https://www.google.com/maps/place/Berlin,+Germany/"),
         )
     }
@@ -924,8 +941,8 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_googleSearchHtmlContainsRelativeUrl_returnsRequiresRedirect() = runTest {
         assertEquals(
-            ParseHtmlResult.RequiresRedirect(
-                @Suppress("SpellCheckingInspection") "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
+            ParseHtmlResult(
+                redirectUriString = @Suppress("SpellCheckingInspection") "/maps/place//data=!4m2!3m1!1s0xc3f7d4e21a00705:0xa9ea51361ed84bda?sa=X&amp;ved=2ahUKEwiY7vv80aeKAxU41QIHHSgBOlsQ4kB6BAgHEAA&amp;hl=de&amp;gl=de",
             ),
             parseHtml(
                 @Suppress("SpellCheckingInspection")
@@ -945,7 +962,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_googleSearchHtmlContainsAbsoluteUrl_returnsRequiresRedirect() = runTest {
         assertEquals(
-            ParseHtmlResult.RequiresRedirect("https://www.example.com/foo"),
+            ParseHtmlResult(redirectUriString = "https://www.example.com/foo"),
             parseHtml("""<html><a href="" data-url="https://www.example.com/foo"></a></html>"""),
         )
     }
@@ -953,7 +970,7 @@ class GoogleMapsInputTest : BaseInputTest() {
     @Test
     fun parseHtml_googleSearchHtmlContainsInvalidUrl_returnsRequiresRedirect() = runTest {
         assertEquals(
-            ParseHtmlResult.RequiresRedirect("spam"),
+            ParseHtmlResult(redirectUriString = "spam"),
             parseHtml("""<html><a href="" data-url="spam"></a></html>"""),
         )
     }

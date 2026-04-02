@@ -4,62 +4,40 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.point.Point
 
-sealed interface ParseUriResult {
-
+data class ParseUriResult(
+    val points: ImmutableList<Point> = persistentListOf(),
+    val htmlUriString: String? = null,
+    val webUriString: String? = null,
+) {
     class Builder {
         var points: ImmutableList<Point> = persistentListOf()
         var htmlUriString: String? = null
         var webUriString: String? = null
 
-        fun build(): ParseUriResult =
-            points.takeIf { it.lastOrNull()?.hasCoordinates() == true }?.let {
-                Succeeded(points)
-            } ?: htmlUriString?.let { htmlUriString ->
-                SucceededAndSupportsHtmlParsing(points, htmlUriString)
-            } ?: webUriString?.let { webUriString ->
-                SucceededAndSupportsWebParsing(points, webUriString)
-            } ?: points.takeIf { it.lastOrNull()?.hasName() == true }?.let {
-                Succeeded(points)
-            } ?: Failed()
+        fun build(): ParseUriResult = ParseUriResult(
+            points = points,
+            htmlUriString = htmlUriString,
+            webUriString = webUriString,
+        )
     }
-
-    data class Succeeded(val points: ImmutableList<Point>) : ParseUriResult
-
-    data class SucceededAndSupportsHtmlParsing(val points: ImmutableList<Point>, val htmlUriString: String) :
-        ParseUriResult
-
-    data class SucceededAndSupportsWebParsing(val points: ImmutableList<Point>, val webUriString: String) :
-        ParseUriResult
-
-    class Failed : ParseUriResult
 }
 
-sealed interface ParseHtmlResult {
-
+data class ParseHtmlResult(
+    val points: ImmutableList<Point> = persistentListOf(),
+    val redirectUriString: String? = null,
+    val webUriString: String? = null,
+) {
     class Builder {
         var points: ImmutableList<Point> = persistentListOf()
         var redirectUriString: String? = null
         var webUriString: String? = null
 
-        fun build(): ParseHtmlResult =
-            points.takeIf { it.lastOrNull()?.hasCoordinates() == true }?.let {
-                Succeeded(points)
-            } ?: redirectUriString?.let { redirectUriString ->
-                RequiresRedirect(redirectUriString)
-            } ?: webUriString?.let { webUriString ->
-                RequiresWebParsing(webUriString)
-            } ?: points.takeIf { it.lastOrNull()?.hasName() == true }?.let {
-                Succeeded(points)
-            } ?: Failed()
+        fun build(): ParseHtmlResult = ParseHtmlResult(
+            points = points,
+            redirectUriString = redirectUriString,
+            webUriString = webUriString,
+        )
     }
-
-    data class Succeeded(val points: ImmutableList<Point>) : ParseHtmlResult
-
-    data class RequiresRedirect(val redirectUriString: String) : ParseHtmlResult
-
-    data class RequiresWebParsing(val webUriString: String) : ParseHtmlResult
-
-    class Failed : ParseHtmlResult
 }
 
 suspend fun buildParseUriResult(block: suspend ParseUriResult.Builder.() -> Unit): ParseUriResult =
