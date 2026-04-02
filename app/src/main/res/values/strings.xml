@@ -24,8 +24,8 @@
     <string name="billing_purchase_success" translatable="false">Thanks for buying %1$s</string>
     <string name="billing_refund_description" translatable="false">Refund within 48h since the purchase:</string>
     <string name="billing_setup_error_unknown" translatable="false">Failed to fetch purchases</string>
-    <string name="billing_status_expired">Your subscription expires soon</string>
-    <string name="billing_status_pending">Your payment is pending</string>
+    <string name="billing_status_expired" translatable="false">Your subscription expires soon</string>
+    <string name="billing_status_pending" translatable="false">Your payment is pending</string>
     <string name="billing_subscription_cancel_description" translatable="false">Cancel anytime</string>
     <string name="billing_subscription_monthly" translatable="false">Monthly subscription</string>
     <string name="billing_terms_of_service" translatable="false">Terms of service</string>
