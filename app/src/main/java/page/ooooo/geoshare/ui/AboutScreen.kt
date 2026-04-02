@@ -127,7 +127,13 @@ private fun ColumnScope.AboutMainPane(
         Modifier.padding(bottom = spacing.mediumAdaptive),
         style = MaterialTheme.typography.headlineSmall,
     )
-    ParagraphHtml(stringResource(R.string.about_text, appName))
+    ParagraphHtml(
+        stringResource(
+            R.string.about_text,
+            appName,
+            stringResource(R.string.about_support_email),
+        )
+    )
 
     if (donation) {
         ElevatedCard(

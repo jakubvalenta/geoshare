@@ -47,7 +47,7 @@
     <string name="main_input_uri_supporting_text">p.e. https://maps.app.goo.gl/… o maps.apple.com/…</string>
     <string name="conversion_permission_common_text"><![CDATA[El enlace <tt>%1$s</tt> no contiene coordenadas. %2$s necesita conectar al servicio de mapas para obtenerlos.]]></string>
     <string name="main_input_uri_clear_content_description">Limpiar</string>
-    <string name="about_text"><![CDATA[<p>%1$s es una aplicación libre y de código abierto distribuido bajo la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o superior.</p><br><p>Puede encontrar el código por <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, donde puede también<a href="https://github.com/jakubvalenta/geoshare/issues">reportar incidentes</a>.</p><br><p>Sus comentarios son bienvenidos. Puede contactarme vía <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
+    <string name="about_text"><![CDATA[<p>%1$s es una aplicación libre y de código abierto distribuido bajo la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o superior.</p><br><p>Puede encontrar el código por <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, donde puede también<a href="https://github.com/jakubvalenta/geoshare/issues">reportar incidentes</a>.</p><br><p>Sus comentarios son bienvenidos. Puede contactarme vía <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_title">¿Permitir conectarse al servicio de mapas (Google, Apple, etc.)?</string>
     <string name="conversion_failed_parse_html_error">Error al obtener la página web del servicio de mapas</string>
     <string name="conversion_succeeded_skip">Copiar enlace original</string>

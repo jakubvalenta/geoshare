@@ -33,7 +33,7 @@
     <string name="about_title">O aplikaci</string>
     <string name="about_app_icon_content_description">Ikona aplikace</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
-    <string name="about_text"><![CDATA[<p>%1$s je svobodná aplikace s otevřeným zdrojovým kódem pod licencí <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> nebo pozdější verze.</p><br><p>Kód najdete na <a href="https://github.com/jakubvalenta/geoshare">GitHubu</a>, kde můžete také <a href="https://github.com/jakubvalenta/geoshare/issues">hlásit problémy</a>.</p><br><p>Vaše připomínky jsou vítány. Můžete mě kontaktovat na <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
+    <string name="about_text"><![CDATA[<p>%1$s je svobodná aplikace s otevřeným zdrojovým kódem pod licencí <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> nebo pozdější verze.</p><br><p>Kód najdete na <a href="https://github.com/jakubvalenta/geoshare">GitHubu</a>, kde můžete také <a href="https://github.com/jakubvalenta/geoshare/issues">hlásit problémy</a>.</p><br><p>Vaše připomínky jsou vítány. Můžete mě kontaktovat na <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="permission_do_not_ask">Neptejte se mě znovu</string>
     <string name="faq_title">Nejčastější dotazy</string>
     <string name="user_preferences_title">Nastavení</string>
