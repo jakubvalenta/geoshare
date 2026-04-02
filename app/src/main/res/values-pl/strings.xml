@@ -43,7 +43,7 @@
     <string name="conversion_failed_missing_url">Brakujący adres URL</string>
     <string name="about_app_icon_content_description">Ikona aplikacji</string>
     <string name="permission_do_not_ask">Nie pytaj ponownie</string>
-    <string name="about_text"><![CDATA[<p>%1$s to darmowa aplikacja o otwartym kodzie źródłowym dystrybuowana w ramach<a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a>lub nowszej licencji.</p><br><p>Kod aplikacji można znaleźć pod adresem <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, gdzie również można<a href="https://github.com/jakubvalenta/geoshare/issues">zgłaszać problemy</a>.</p><br><p>Twoja opinia jest mile widziana. Więc możesz się ze mną skontaktować pod adresem <a href="mailto:jakub@jakubvalenta.cz">jakub@jakubvalenta.cz</a>.</p>]]></string>
+    <string name="about_text"><![CDATA[<p>%1$s to darmowa aplikacja o otwartym kodzie źródłowym dystrybuowana w ramach<a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a>lub nowszej licencji.</p><br><p>Kod aplikacji można znaleźć pod adresem <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, gdzie również można<a href="https://github.com/jakubvalenta/geoshare/issues">zgłaszać problemy</a>.</p><br><p>Twoja opinia jest mile widziana. Więc możesz się ze mną skontaktować pod adresem <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="conversion_failed_connection_permission_denied">Ten link nie jest obsługiwany bez połączenia z Google</string>
     <string name="conversion_succeeded_apps_not_found">Nie zainstalowano żadnej aplikacji, która może otwierać linki geo:</string>
     <string name="conversion_failed_parse_html_error">Nie udało się pobrać strony Map Google</string>

@@ -388,7 +388,7 @@ private fun BillingLegalText() {
         buildAnnotatedString {
             withLink(
                 LinkAnnotation.Url(
-                    "https://geoshare.ooooo.page/terms/",
+                    stringResource(R.string.about_terms_url),
                     TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
                 )
             ) {
@@ -397,7 +397,7 @@ private fun BillingLegalText() {
             append(" • ")
             withLink(
                 LinkAnnotation.Url(
-                    "mailto:geoshare-support@jakubvalenta.cz",
+                    "mailto:" + stringResource(R.string.about_support_email),
                     TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
                 )
             ) {
