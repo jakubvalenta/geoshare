@@ -858,6 +858,18 @@ class GoogleMapsInputTest : BaseInputTest() {
     }
 
     @Test
+    fun parseHtml_directionsPreview() = runTest {
+        assertEquals(
+            ParseHtmlResult(persistentListOf(GCJ02Point(43.7481, -79.6332))),
+            parseHtml(
+                @Suppress("SpellCheckingInspection")
+                """<head><link href="/maps/preview/directions?authuser=0&amp;hl=cs&amp;gl=cz&amp;pb=%211m0%211m4%213m2%213d43.7481%214d-79.6332%216e2%213m12%211m3%211d1311445.7816005738%212d14.4656836%213d50.05974015%212m3%211f0.0%212f0.0%213f0.0%213m2%211i1024%212i768%214f13.1%216m55%211m5%2118b1%2130b1%2131m1%211b1%2134e1%212m4%215m1%216e2%2120e3%2139b1%216m26%2149b1%2163m0%2166b1%2174i150000%2185b1%2191b1%21114b1%21149b1%21206b1%21209b1%21212b1%21216b1%21222b1%21223b1%21232b1%21234b1%21235b1%21239b1%21244b1%21246b1%21250b1%21253b1%21258b1%21260b1%21266b1%21268b1%2110b1%2112b1%2113b1%2114b1%2116b1%2117m1%213e1%2120m5%211e6%212e1%215e2%216b1%2114b1%2146m1%211b0%2196b1%2199b1%2115m3%211sf1LOaYSxN4G-i-gPtfbPkQQ%217e81%2115i10142%2120m28%211m6%211m2%211i0%212i0%212m2%211i530%212i768%211m6%211m2%211i974%212i0%212m2%211i1024%212i768%211m6%211m2%211i0%212i0%212m2%211i1024%212i20%211m6%211m2%211i0%212i748%212m2%211i1024%212i768%2127b1%2140i773%2147m2%218b1%2110e2" as="fetch" crossorigin="" rel="preload">
+[null,null,43.7481,-79.6332]...[null,[-79.6332,43.7481]"""
+            ),
+        )
+    }
+
+    @Test
     fun parseHtml_placeList() = runTest {
         assertEquals(
             ParseHtmlResult(

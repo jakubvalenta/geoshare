@@ -192,6 +192,7 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
         var defaultPoint: GCJ02Point? = null
 
         var genericMetaTagFound = false
+        val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")
         val pointPattern = Regex("""\[(?:null,null,|null,\[)$LAT,$LON]""")
         val defaultPointLinkPattern = Regex("""/@$LAT,$LON""")
         val defaultPointAppInitStatePattern =
@@ -209,7 +210,18 @@ object GoogleMapsInput : ShortUriInput, HtmlInput, WebInput, Input.HasRandomUri 
             }
             if (
                 mutablePoints.addAll(
-                    pointPattern.findAll(line).mapNotNull { it.toLatLonPoint()?.asGCJ02()?.copy(name = name) }
+                    directionsPreviewPattern.findAll(line)
+                        .mapNotNull { it.toLatLonPoint()?.asGCJ02()?.copy(name = name) }
+                )
+            ) {
+                log.d("GoogleMapsInput", "HTML Pattern: Directions preview pattern matched line $line")
+                // Stop parsing, so that we don't add points that we've just parsed again from SCRIPT tags
+                break
+            }
+            if (
+                mutablePoints.addAll(
+                    pointPattern.findAll(line)
+                        .mapNotNull { it.toLatLonPoint()?.asGCJ02()?.copy(name = name) }
                 )
             ) {
                 log.d("GoogleMapsInput", "HTML Pattern: Point pattern matched line $line")

@@ -110,6 +110,12 @@ class GoogleMapsInputBehaviorTest : InputBehaviorTest {
             GCJ02Point(52.5200066, 13.404954, name = "Berlin"),
             "https://www.google.com/maps/place/Berlin,+Germany/",
         )
+
+        // Directions address
+        testUri(
+            GCJ02Point(43.7481, -79.6332, name = "2088 Albion Rd @43.7481,-79.6332"),
+            @Suppress("SpellCheckingInspection") "https://maps.google.com/maps?f=d&daddr=2088%20Albion%20Rd+@43.7481,-79.6332&doflg=ptm&navigate=yes",
+        )
     }
 
     @Test
