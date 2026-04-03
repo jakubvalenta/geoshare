@@ -74,6 +74,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.ConversionViewModel
 import page.ooooo.geoshare.R
@@ -189,7 +190,6 @@ fun MainScreen(
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val changelogShown by inputsViewModel.changelogShown.collectAsStateWithLifecycle()
-    val largeLoadingIndicatorVisible by conversionViewModel.largeLoadingIndicatorVisible.collectAsStateWithLifecycle()
     val linkMessage by linkViewModel.message.collectAsStateWithLifecycle()
     val outputsForApps by conversionViewModel.outputsForApps.collectAsStateWithLifecycle()
     val outputsForLinks by conversionViewModel.outputsForLinks.collectAsStateWithLifecycle()
@@ -295,6 +295,22 @@ fun MainScreen(
                     conversionViewModel.finishLocationAction(success)
                 }
             }
+        }
+    }
+
+    // Loading indicator
+
+    var largeLoadingIndicatorVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(currentState) {
+        if (currentState is ConversionState.HasLargeLoadingIndicator) {
+            // Show loading indicator if the state lasts longer than 200ms.
+            delay(200L)
+            largeLoadingIndicatorVisible = true
+        } else {
+            // Hide loading indicator if another loading indicator is not shown within the next 200ms.
+            delay(200L)
+            largeLoadingIndicatorVisible = false
         }
     }
 
