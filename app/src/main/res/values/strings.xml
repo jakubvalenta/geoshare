@@ -234,10 +234,10 @@
     <string name="conversion_failed_unshorten_error">Failed to resolve short link</string>
     <string name="conversion_failed_unshorten_error_with_reason">Failed to resolve short link due to: %1$s</string>
     <string name="conversion_failed_parse_url_error">Failed to process map link</string>
-    <string name="conversion_failed_reason_invalid_url" translatable="false">invalid URL</string>
-    <string name="conversion_failed_reason_missing_header" translatable="false">missing HTTP header</string>
-    <string name="conversion_failed_reason_no_points" translatable="false">no points found</string>
-    <string name="conversion_failed_reason_timeout" translatable="false">timeout</string>
+    <string name="conversion_failed_reason_invalid_url">invalid URL</string>
+    <string name="conversion_failed_reason_missing_header">missing HTTP header</string>
+    <string name="conversion_failed_reason_no_points">no points found</string>
+    <string name="conversion_failed_reason_timeout">timeout</string>
     <string name="conversion_succeeded_apps_not_found">No map app is installed</string>
     <string name="copying_finished">Copied to clipboard</string>
     <string name="conversion_failed_connection_permission_denied">This link is not supported without connecting to the map service</string>
