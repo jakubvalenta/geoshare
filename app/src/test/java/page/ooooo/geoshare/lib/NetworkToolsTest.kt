@@ -246,10 +246,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        val tr = NetworkTools.RecoverableException(
-            R.string.conversion_failed_parse_html_connection_error,
-            SocketTimeoutException(),
-        )
+        val tr = NetworkTools.RecoverableException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
@@ -268,10 +265,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        val tr = NetworkTools.RecoverableException(
-            R.string.conversion_failed_parse_html_connection_error,
-            SocketTimeoutException(),
-        )
+        val tr = NetworkTools.RecoverableException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
@@ -291,7 +285,7 @@ class NetworkToolsTest {
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log)
         val tr = NetworkTools.RecoverableException(
-            R.string.conversion_failed_parse_html_connection_error,
+            R.string.network_exception_unknown,
             SocketTimeoutException(),
         )
         val workDuration = testScheduler.timeSource.measureTime {
@@ -312,10 +306,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        val tr = NetworkTools.RecoverableException(
-            R.string.conversion_failed_parse_html_connection_error,
-            SocketTimeoutException(),
-        )
+        val tr = NetworkTools.RecoverableException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
@@ -334,10 +325,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("test content") }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        val tr = NetworkTools.RecoverableException(
-            R.string.conversion_failed_parse_html_connection_error,
-            SocketTimeoutException(),
-        )
+        val tr = NetworkTools.RecoverableException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 "test content",
@@ -356,10 +344,7 @@ class NetworkToolsTest {
         val url = URL("https://example.com/")
         val mockEngine = MockEngine { respond("") }
         val mockNetworkTools = NetworkTools(mockEngine, log)
-        val tr = NetworkTools.RecoverableException(
-            R.string.conversion_failed_parse_html_connection_error,
-            SocketTimeoutException(),
-        )
+        val tr = NetworkTools.RecoverableException(R.string.network_exception_unknown, SocketTimeoutException())
         val workDuration = testScheduler.timeSource.measureTime {
             var threw: NetworkTools.NetworkException? = null
             try {

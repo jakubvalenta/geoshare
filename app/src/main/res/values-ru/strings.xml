@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_menu_content_description">Меню</string>
-    <string name="conversion_failed_parse_html_connection_error">Ошибка подключения при получении веб-страницы из картографического сервиса</string>
     <string name="main_create_geo_uri">Показать координаты</string>
     <string name="intro_open_by_default_app_screenshot_cancel">Отменить</string>
     <string name="intro_open_by_default_app_screenshot_add">Добавить</string>
@@ -49,7 +48,6 @@
     <string name="user_preferences_connection_title">Подключение к картографическому сервису</string>
     <string name="user_preferences_title">Настройки</string>
     <string name="user_preferences_connection_option_ask">Спросить перед подключением</string>
-    <string name="conversion_failed_unshorten_connection_error">Ошибка подключения при открытии короткой ссылки</string>
     <string name="copying_finished">Скопировано в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>
     <string name="conversion_failed_parse_url_error">Не удалось обработать ссылку на карту</string>

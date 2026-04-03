@@ -749,14 +749,14 @@ private fun MainMainPane(
     when (currentState) {
         is ConversionState.HasLargeLoadingIndicator if largeLoadingIndicatorVisible -> {
             MainLoadingIndicator(
-                loadingIndicator = currentState.getLargeLoadingIndicator(LocalResources.current),
+                loadingIndicator = currentState.getLargeLoadingIndicator(),
                 onCancel = onCancel,
             )
         }
 
         is ConversionState.HasError -> {
             ResultError(
-                currentState.errorMessageResId,
+                currentState.message,
                 currentState.inputUriString,
                 onNavigateToInputsScreen = onNavigateToInputsScreen,
                 onRetry = {
@@ -1459,10 +1459,12 @@ private fun DarkTabletSucceededPreview() {
 @Composable
 private fun AutomationPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1524,10 +1526,12 @@ private fun AutomationPreview() {
 @Composable
 private fun DarkAutomationPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1589,10 +1593,12 @@ private fun DarkAutomationPreview() {
 @Composable
 private fun TabletAutomationPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = ActionWaiting(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1654,10 +1660,12 @@ private fun TabletAutomationPreview() {
 @Composable
 private fun WebViewPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1714,10 +1722,12 @@ private fun WebViewPreview() {
 @Composable
 private fun DarkWebViewPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1774,10 +1784,12 @@ private fun DarkWebViewPreview() {
 @Composable
 private fun TabletWebViewPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = GrantedParseWebPermission(
                 stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -1836,7 +1848,7 @@ private fun ErrorPreview() {
     AppTheme {
         MainScreen(
             currentState = ConversionFailed(
-                errorMessageResId = R.string.conversion_failed_parse_url_error,
+                message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             appDetails = emptyMap(),
@@ -1888,7 +1900,7 @@ private fun DarkErrorPreview() {
     AppTheme {
         MainScreen(
             currentState = ConversionFailed(
-                errorMessageResId = R.string.conversion_failed_parse_url_error,
+                message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             appDetails = emptyMap(),
@@ -1940,7 +1952,7 @@ private fun TabletErrorPreview() {
     AppTheme {
         MainScreen(
             currentState = ConversionFailed(
-                errorMessageResId = R.string.conversion_failed_parse_url_error,
+                message = stringResource(R.string.conversion_failed_parse_url_error),
                 inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
             ),
             appDetails = emptyMap(),
@@ -1990,10 +2002,12 @@ private fun TabletErrorPreview() {
 @Composable
 private fun EmptyPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = ConversionSucceeded(
-                ConversionStateContext(
+                stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -2047,10 +2061,12 @@ private fun EmptyPreview() {
 @Composable
 private fun LoadingIndicatorPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = GrantedUnshortenPermission(
-                ConversionStateContext(
+                stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -2109,10 +2125,12 @@ private fun LoadingIndicatorPreview() {
 @Composable
 private fun DarkLoadingIndicatorPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = GrantedUnshortenPermission(
-                ConversionStateContext(
+                stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),
@@ -2171,10 +2189,12 @@ private fun DarkLoadingIndicatorPreview() {
 @Composable
 private fun TabletLoadingIndicatorPreview() {
     AppTheme {
+        val resources = LocalResources.current
         MainScreen(
             currentState = GrantedUnshortenPermission(
-                ConversionStateContext(
+                stateContext = ConversionStateContext(
                     linkRepository = FakeLinkRepository(),
+                    resources = resources,
                     userPreferencesRepository = FakeUserPreferencesRepository(),
                     billing = BillingImpl(LocalContext.current),
                 ),

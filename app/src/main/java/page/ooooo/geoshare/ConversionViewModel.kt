@@ -1,5 +1,6 @@
 package page.ooooo.geoshare
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,6 +67,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
     appsRepository: AppsRepository,
+    @ApplicationContext context: Context,
     private val linkRepository: LinkRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val billing: Billing,
@@ -74,6 +77,7 @@ class ConversionViewModel @Inject constructor(
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         linkRepository = linkRepository,
+        resources = context.resources,
         userPreferencesRepository = userPreferencesRepository,
         billing = billing,
     ) { newState ->
@@ -193,7 +197,7 @@ class ConversionViewModel @Inject constructor(
                 stateContext.log.e(TAG, "Exception while transitioning state", tr)
                 stateContext.log.e(TAG, tr.stackTraceToString())
                 stateContext.currentState = ConversionFailed(
-                    R.string.conversion_failed_parse_url_error,
+                    stateContext.resources.getString(R.string.conversion_failed_parse_url_error),
                     inputUriString,
                 )
             }
@@ -299,7 +303,13 @@ class ConversionViewModel @Inject constructor(
     fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
         (stateContext.currentState as? ConversionState.HasResult)?.let { currentState ->
             transition {
-                LocationPermissionReceived(currentState.inputUriString, currentState.points, action, isAutomation)
+                LocationPermissionReceived(
+                    stateContext,
+                    currentState.inputUriString,
+                    currentState.points,
+                    action,
+                    isAutomation,
+                )
             }
         }
     }
@@ -308,7 +318,11 @@ class ConversionViewModel @Inject constructor(
         (stateContext.currentState as? LocationRationaleConfirmed)?.let { currentState ->
             transition {
                 LocationPermissionReceived(
-                    currentState.inputUriString, currentState.points, currentState.action, currentState.isAutomation
+                    stateContext,
+                    currentState.inputUriString,
+                    currentState.points,
+                    currentState.action,
+                    currentState.isAutomation,
                 )
             }
         }

@@ -46,6 +46,11 @@ open class NetworkTools(
 
     data class Retry(val count: Int, val tr: NetworkException)
 
+    /**
+     * Make a HEAD request to [url] and return the value of the response Location header.
+     *
+     * The network request is executed on [dispatcher].
+     */
     @Throws(NetworkException::class)
     open suspend fun requestLocationHeader(
         url: URL,
@@ -83,6 +88,11 @@ open class NetworkTools(
         }
     }
 
+    /**
+     * Make a GET request to [url], follow all redirects, and then return the final URL that the request redirected to.
+     *
+     * The network request is executed on [dispatcher].
+     */
     @Throws(NetworkException::class)
     open suspend fun getRedirectUrlString(
         url: URL,
