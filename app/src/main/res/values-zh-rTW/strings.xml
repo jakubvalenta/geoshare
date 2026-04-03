@@ -85,11 +85,9 @@
     <string name="yes">總是</string>
     <string name="user_preferences_connection_option_ask">在連接前詢問</string>
     <string name="no">一律不要</string>
-    <string name="conversion_failed_unshorten_connection_error">擷取短網頁內容時連接失敗</string>
     <string name="conversion_failed_parse_url_error">無法處理地圖連結</string>
     <string name="conversion_succeeded_apps_not_found">沒有安裝任何的地圖應用程式</string>
     <string name="copying_finished">從剪貼簿中複製座標</string>
-    <string name="conversion_failed_parse_html_connection_error">從地圖服務擷取網頁時發生連線錯誤</string>
     <string name="conversion_failed_unsupported_service">不支援的地圖服務</string>
     <string name="conversion_succeeded_point_number">%1$d項</string>
     <string name="inputs_all">所有的地圖服務</string>

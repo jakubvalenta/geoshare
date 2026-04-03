@@ -179,7 +179,7 @@ fun ResultSuccessMessage(
 
             is ConversionState.HasSmallLoadingIndicator -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.getSmallLoadingIndicator(LocalResources.current).message,
+                    targetState.getSmallLoadingIndicator().message,
                     Modifier.testTag("geoShareResultSuccessSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
@@ -400,11 +400,13 @@ private fun ActionWaitingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val resources = LocalResources.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
@@ -435,11 +437,13 @@ private fun DarkActionWaitingPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val resources = LocalResources.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = ActionWaiting(
                     stateContext = ConversionStateContext(
                         linkRepository = FakeLinkRepository(),
+                        resources = resources,
                         userPreferencesRepository = FakeUserPreferencesRepository(),
                         billing = BillingImpl(LocalContext.current),
                     ),
@@ -470,9 +474,16 @@ private fun LocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val resources = LocalResources.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
+                    stateContext = ConversionStateContext(
+                        linkRepository = FakeLinkRepository(),
+                        resources = resources,
+                        userPreferencesRepository = FakeUserPreferencesRepository(),
+                        billing = BillingImpl(LocalContext.current),
+                    ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
                     action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),
@@ -499,9 +510,16 @@ private fun DarkLocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
+            val resources = LocalResources.current
             @SuppressLint("LocalContextGetResourceValueCall")
             ResultSuccessMessage(
                 currentState = LocationPermissionReceived(
+                    stateContext = ConversionStateContext(
+                        linkRepository = FakeLinkRepository(),
+                        resources = resources,
+                        userPreferencesRepository = FakeUserPreferencesRepository(),
+                        billing = BillingImpl(LocalContext.current),
+                    ),
                     inputUriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
                     points = persistentListOf(Point.example),
                     action = OpenRouteOnePointGpxOutput(TOMTOM_PACKAGE_NAME).toAction(Point.example),

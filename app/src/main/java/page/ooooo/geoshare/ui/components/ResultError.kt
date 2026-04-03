@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +39,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultError(
-    @StringRes errorMessageResId: Int,
+    message: String,
     inputUriString: String,
     initialRetryLoadingIndicatorVisible: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
@@ -64,7 +63,7 @@ fun ResultError(
                 Headline(stringResource(R.string.conversion_error_title))
                 SelectionContainer(Modifier.padding(bottom = spacing.smallAdaptive)) {
                     Text(
-                        stringResource(errorMessageResId),
+                        message,
                         Modifier.testTag("geoShareConversionErrorMessage"),
                         style = MaterialTheme.typography.bodyLarge,
                     )
@@ -142,7 +141,7 @@ private fun DefaultPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
@@ -161,7 +160,7 @@ private fun DarkPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "https://www.google.com/maps/place/Central+Park/data=!3d44.4490541!4d26.0888398",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
@@ -180,7 +179,7 @@ private fun CoordinatesPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "41°24′12.2″N 2°10′26.5″E",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
@@ -199,7 +198,7 @@ private fun DarkCoordinatesPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "41°24′12.2″N 2°10′26.5″E",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
@@ -218,7 +217,7 @@ private fun EmptyPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
@@ -237,7 +236,7 @@ private fun DarkEmptyPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "",
                 initialRetryLoadingIndicatorVisible = false,
                 onNavigateToInputsScreen = {},
@@ -256,7 +255,7 @@ private fun LoadingIndicatorPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "",
                 initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},
@@ -275,7 +274,7 @@ private fun DarkLoadingIndicatorPreview() {
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
         ) {
             ResultError(
-                R.string.conversion_failed_parse_url_error,
+                stringResource(R.string.conversion_failed_parse_url_error),
                 "",
                 initialRetryLoadingIndicatorVisible = true,
                 onNavigateToInputsScreen = {},

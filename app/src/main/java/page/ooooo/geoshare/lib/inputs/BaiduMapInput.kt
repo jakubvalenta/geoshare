@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find

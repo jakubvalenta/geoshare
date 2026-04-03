@@ -51,8 +51,6 @@
     <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
     <string name="conversion_failed_parse_html_error">Nepodařilo se stáhnout webovou stránku mapové služky</string>
     <string name="nav_back_content_description">Zpět na hlavní obrazovku</string>
-    <string name="conversion_failed_unshorten_connection_error">Chyba spojení při zpracovávání krátkého odkazu</string>
-    <string name="conversion_failed_parse_html_connection_error">Chyba spojení při stahování webové stránky mapové služby</string>
     <string name="intro_how_to_share_google_maps_screenshot_title">Sdílení odkazu</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Umístěný špendlík</string>
     <string name="intro_how_to_share_google_maps_screenshot_app_messaging">SMS a MMS</string>

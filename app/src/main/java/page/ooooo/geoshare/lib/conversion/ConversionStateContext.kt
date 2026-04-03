@@ -1,15 +1,18 @@
 package page.ooooo.geoshare.lib.conversion
 
+import android.content.res.Resources
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.network.NetworkTools
 
 data class ConversionStateContext(
     val inputs: List<Input> = emptyList(),
     val networkTools: NetworkTools = NetworkTools(),
     val linkRepository: LinkRepository,
+    val resources: Resources,
     val userPreferencesRepository: UserPreferencesRepository,
     val log: ILog = DefaultLog,
     val billing: Billing,

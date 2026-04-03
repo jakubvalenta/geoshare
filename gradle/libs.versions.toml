@@ -23,7 +23,7 @@ kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.10.0"
 ksp = "2.3.4"
-ktor = "3.4.1"
+ktor = "3.4.2"
 mockitoKotlin = "6.3.0"
 
 [libraries]

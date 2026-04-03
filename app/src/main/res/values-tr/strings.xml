@@ -95,12 +95,10 @@
     <string name="no">Hayır</string>
     <string name="user_preferences_connection_title">Harita servislerine (Google, Apple vb.) bağlanmaya izin verilsin mi?</string>
     <string name="conversion_failed_missing_url">Eksik URL</string>
-    <string name="conversion_failed_unshorten_connection_error">Kısa link çözülürken bağlantı hatası oluştu</string>
     <string name="conversion_failed_parse_url_error">Harita bağlantısı işlenemedi</string>
     <string name="conversion_succeeded_apps_not_found">Hiçbir harita uygulaması yüklü değil</string>
     <string name="copying_finished">Panoya kopyalandı</string>
     <string name="conversion_failed_connection_permission_denied">Harita servisine bağlanmadan bu bağlantı desteklenmiyor</string>
-    <string name="conversion_failed_parse_html_connection_error">Harita servisinden web sayfası alınırken bağlantı hatası oluştu</string>
     <string name="conversion_failed_unsupported_service">Desteklenmeyen harita servisi</string>
     <string name="conversion_failed_cancelled">İptal edildi</string>
     <string name="conversion_succeeded_point_number">%1$d nokta</string>

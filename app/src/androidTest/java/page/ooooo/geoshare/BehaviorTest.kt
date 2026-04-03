@@ -25,11 +25,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.lib.NetworkTools.Companion.CONNECT_TIMEOUT
-import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
-import page.ooooo.geoshare.lib.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
-import page.ooooo.geoshare.lib.NetworkTools.Companion.MAX_RETRIES
-import page.ooooo.geoshare.lib.NetworkTools.Companion.REQUEST_TIMEOUT
+import page.ooooo.geoshare.lib.network.NetworkTools.Companion.CONNECT_TIMEOUT
+import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE
+import page.ooooo.geoshare.lib.network.NetworkTools.Companion.EXPONENTIAL_DELAY_BASE_DELAY
+import page.ooooo.geoshare.lib.network.NetworkTools.Companion.MAX_RETRIES
+import page.ooooo.geoshare.lib.network.NetworkTools.Companion.REQUEST_TIMEOUT
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
 import page.ooooo.geoshare.lib.formats.CoordsFormat
