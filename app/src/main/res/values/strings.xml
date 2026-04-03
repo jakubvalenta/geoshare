@@ -287,6 +287,7 @@
     <string name="network_exception_response_error">response error</string>
     <string name="network_exception_server_response_error">server response error</string>
     <string name="network_exception_socket_timeout">socket timeout</string>
+    <string name="network_exception_too_many_requests">too many requests</string>
     <string name="network_exception_unknown">unknown error</string>
     <string name="network_exception_unresolved_address">unresolved address</string>
     <string name="reset">reset</string>

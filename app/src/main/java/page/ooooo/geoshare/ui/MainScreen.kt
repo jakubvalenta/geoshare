@@ -82,7 +82,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.android.AndroidTools
 import page.ooooo.geoshare.lib.android.AppDetails
@@ -124,6 +124,7 @@ import page.ooooo.geoshare.lib.conversion.RequestedUnshortenPermission
 import page.ooooo.geoshare.lib.conversion.State
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
+import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
 import page.ooooo.geoshare.lib.outputs.LocationAction
@@ -2075,7 +2076,7 @@ private fun LoadingIndicatorPreview() {
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
-                    NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
+                    RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
             appDetails = emptyMap(),
@@ -2139,7 +2140,7 @@ private fun DarkLoadingIndicatorPreview() {
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
-                    NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
+                    RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
             appDetails = emptyMap(),
@@ -2203,7 +2204,7 @@ private fun TabletLoadingIndicatorPreview() {
                 Uri.parse("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 retry = NetworkTools.Retry(
                     2,
-                    NetworkTools.RecoverableException(R.string.network_exception_connect_timeout, Exception()),
+                    RecoverableNetworkException(R.string.network_exception_connect_timeout, Exception()),
                 )
             ),
             appDetails = emptyMap(),

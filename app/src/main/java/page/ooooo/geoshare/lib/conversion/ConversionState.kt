@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.local.preferences.BillingCachedProductIdPreferen
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingStatus
@@ -29,6 +29,8 @@ import page.ooooo.geoshare.lib.inputs.HtmlInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.ShortUriInput
 import page.ooooo.geoshare.lib.inputs.WebInput
+import page.ooooo.geoshare.lib.network.RecoverableNetworkException
+import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.BasicAction
 import page.ooooo.geoshare.lib.outputs.FileAction
@@ -169,8 +171,8 @@ data class GrantedUnshortenPermission(
         }
         return try {
             val unshortenedUrlString = when (input.shortUriMethod) {
-                ShortUriInput.Method.GET -> stateContext.networkTools.getRedirectUrlString(url, retry)
-                ShortUriInput.Method.HEAD -> stateContext.networkTools.requestLocationHeader(url, retry)
+                ShortUriInput.Method.GET -> stateContext.networkTools.httpGetRedirectedUrlString(url, retry)
+                ShortUriInput.Method.HEAD -> stateContext.networkTools.httpHeadLocationHeader(url, retry)
             }
             if (unshortenedUrlString != null) {
                 val unshortenedUri = Uri.parse(unshortenedUrlString, stateContext.uriQuote).toAbsoluteUri(uri)
@@ -188,7 +190,7 @@ data class GrantedUnshortenPermission(
             }
         } catch (_: CancellationException) {
             ConversionFailed(stateContext.resources.getString(R.string.conversion_failed_cancelled), inputUriString)
-        } catch (tr: NetworkTools.RecoverableException) {
+        } catch (tr: RecoverableNetworkException) {
             GrantedUnshortenPermission(
                 stateContext,
                 inputUriString,
@@ -196,7 +198,7 @@ data class GrantedUnshortenPermission(
                 uri,
                 retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
             )
-        } catch (tr: NetworkTools.UnrecoverableException) {
+        } catch (tr: UnrecoverableNetworkException) {
             ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_unshorten_error_with_reason,
@@ -343,7 +345,11 @@ data class GrantedParseHtmlPermission(
         }
         stateContext.log.i(null, "HTML Pattern: Downloading $htmlUrl")
         return try {
-            stateContext.networkTools.getSource(htmlUrl, retry, dispatcher = Dispatchers.Default) { channel ->
+            stateContext.networkTools.httpGetBodyAsByteReadChannel(
+                htmlUrl,
+                retry,
+                dispatcher = Dispatchers.Default
+            ) { channel ->
                 input.parseHtml(
                     htmlUrl.toString(),
                     channel,
@@ -383,7 +389,7 @@ data class GrantedParseHtmlPermission(
             }
         } catch (_: CancellationException) {
             ConversionFailed(stateContext.resources.getString(R.string.conversion_failed_cancelled), inputUriString)
-        } catch (tr: NetworkTools.RecoverableException) {
+        } catch (tr: RecoverableNetworkException) {
             GrantedParseHtmlPermission(
                 stateContext,
                 inputUriString,
@@ -393,7 +399,7 @@ data class GrantedParseHtmlPermission(
                 htmlUriString,
                 retry = NetworkTools.Retry((retry?.count ?: 0) + 1, tr),
             )
-        } catch (tr: NetworkTools.UnrecoverableException) {
+        } catch (tr: UnrecoverableNetworkException) {
             ConversionFailed(
                 stateContext.resources.getString(
                     R.string.conversion_failed_parse_html_error_with_reason,

@@ -45,7 +45,7 @@ import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.ILog
-import page.ooooo.geoshare.lib.NetworkTools
+import page.ooooo.geoshare.lib.network.NetworkTools
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.GOOGLE_MAPS_PACKAGE_NAME
@@ -63,6 +63,8 @@ import page.ooooo.geoshare.lib.inputs.ParseHtmlResult
 import page.ooooo.geoshare.lib.inputs.ParseUriResult
 import page.ooooo.geoshare.lib.inputs.ShortUriInput
 import page.ooooo.geoshare.lib.inputs.WebInput
+import page.ooooo.geoshare.lib.network.RecoverableNetworkException
+import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
@@ -82,7 +84,7 @@ import kotlin.time.measureTime
 class ConversionStateTest {
 
     private open class MockNetworkTools : NetworkTools() {
-        override suspend fun requestLocationHeader(
+        override suspend fun httpHeadLocationHeader(
             url: URL,
             retry: Retry?,
             dispatcher: CoroutineDispatcher,
@@ -92,7 +94,7 @@ class ConversionStateTest {
             throw NotImplementedError()
         }
 
-        override suspend fun getRedirectUrlString(
+        override suspend fun httpGetRedirectedUrlString(
             url: URL,
             retry: Retry?,
             dispatcher: CoroutineDispatcher,
@@ -102,7 +104,7 @@ class ConversionStateTest {
             throw NotImplementedError()
         }
 
-        override suspend fun <T> getSource(
+        override suspend fun <T> httpGetBodyAsByteReadChannel(
             url: URL,
             retry: Retry?,
             dispatcher: CoroutineDispatcher,
@@ -564,9 +566,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val tr = NetworkTools.RecoverableException(
-                R.string.network_exception_socket_timeout, SocketTimeoutException()
-            )
+            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
@@ -593,9 +593,7 @@ class ConversionStateTest {
         runTest {
             val inputUriString = "https://maps.app.goo.gl/foo"
             val uri = Uri.parse(inputUriString, uriQuote)
-            val tr = NetworkTools.RecoverableException(
-                R.string.network_exception_socket_timeout, SocketTimeoutException()
-            )
+            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
@@ -613,7 +611,7 @@ class ConversionStateTest {
                 uri,
                 retry = NetworkTools.Retry(
                     1,
-                    NetworkTools.RecoverableException(
+                    RecoverableNetworkException(
                         R.string.network_exception_socket_timeout,
                         SocketTimeoutException()
                     ),
@@ -636,9 +634,8 @@ class ConversionStateTest {
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
                         if (url.toString() == inputUriString) {
-                            throw UnrecoverableException(
-                                R.string.network_exception_server_response_error,
-                                Exception(),
+                            throw UnrecoverableNetworkException(
+                                R.string.network_exception_server_response_error, Exception()
                             )
                         } else {
                             super.onRequestLocationHeader(url)
@@ -669,9 +666,8 @@ class ConversionStateTest {
                 networkTools = object : MockNetworkTools() {
                     override fun onRequestLocationHeader(url: URL): String? =
                         if (url.toString() == inputUriString) {
-                            throw UnrecoverableException(
-                                R.string.network_exception_server_response_error,
-                                SocketTimeoutException(),
+                            throw UnrecoverableNetworkException(
+                                R.string.network_exception_server_response_error, SocketTimeoutException()
                             )
                         } else {
                             super.onRequestLocationHeader(url)
@@ -864,7 +860,7 @@ class ConversionStateTest {
             uri,
             retry = NetworkTools.Retry(
                 1,
-                NetworkTools.RecoverableException(R.string.network_exception_eof, EOFException()),
+                RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
             ),
         )
         assertEquals(
@@ -1622,9 +1618,7 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
-            val tr = NetworkTools.RecoverableException(
-                R.string.network_exception_socket_timeout, SocketTimeoutException(),
-            )
+            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
@@ -1663,9 +1657,7 @@ class ConversionStateTest {
             val uri = Uri.parse(inputUriString, uriQuote)
             val pointsFromUri = persistentListOf(WGS84Point(name = "bar"))
             val htmlUriString = "$inputUriString/html"
-            val tr = NetworkTools.RecoverableException(
-                R.string.network_exception_socket_timeout, SocketTimeoutException(),
-            )
+            val tr = RecoverableNetworkException(R.string.network_exception_socket_timeout, SocketTimeoutException())
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
@@ -1708,9 +1700,8 @@ class ConversionStateTest {
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        throw UnrecoverableException(
-                            R.string.network_exception_server_response_error,
-                            Exception(),
+                        throw UnrecoverableNetworkException(
+                            R.string.network_exception_server_response_error, Exception()
                         )
                     } else {
                         super.onGetSource(url)
@@ -1747,9 +1738,8 @@ class ConversionStateTest {
             val stateContext = mockStateContext(
                 networkTools = object : MockNetworkTools() {
                     override fun onGetSource(url: URL): String = if (url.toString() == htmlUriString) {
-                        throw UnrecoverableException(
-                            R.string.network_exception_server_response_error,
-                            SocketTimeoutException(),
+                        throw UnrecoverableNetworkException(
+                            R.string.network_exception_server_response_error, SocketTimeoutException()
                         )
                     } else {
                         super.onGetSource(url)
@@ -2228,7 +2218,7 @@ class ConversionStateTest {
             htmlUriString,
             retry = NetworkTools.Retry(
                 1,
-                NetworkTools.RecoverableException(R.string.network_exception_eof, EOFException()),
+                RecoverableNetworkException(R.string.network_exception_eof, EOFException()),
             ),
         )
         assertEquals(

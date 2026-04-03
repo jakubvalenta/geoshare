@@ -6,6 +6,7 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.*
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.network.NetworkTools
 
 data class ConversionStateContext(
     val inputs: List<Input> = emptyList(),
