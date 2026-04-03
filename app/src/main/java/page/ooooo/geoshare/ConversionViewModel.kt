@@ -15,7 +15,6 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -74,6 +73,9 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
+    private val _currentState = MutableStateFlow<State>(Initial())
+    val currentState: StateFlow<State> = _currentState
+
     val stateContext = ConversionStateContext(
         inputs = allInputs,
         linkRepository = linkRepository,
@@ -83,36 +85,10 @@ class ConversionViewModel @Inject constructor(
     ) { newState ->
         Log.d(TAG, "Current state is ${newState::class.simpleName}")
         _currentState.value = newState
-        when (newState) {
-            is ConversionState.HasLargeLoadingIndicator -> {
-                loadingIndicatorJob?.cancel()
-                loadingIndicatorJob = viewModelScope.launch {
-                    // Show loading indicator only if the state lasts longer than 200ms.
-                    delay(200L)
-                    _largeLoadingIndicatorVisible.value = true
-                }
-            }
-
-            else -> {
-                loadingIndicatorJob?.cancel()
-                loadingIndicatorJob = viewModelScope.launch {
-                    // Hide loading indicator only if another loading indicator is not shown within the next 200ms.
-                    delay(200L)
-                    _largeLoadingIndicatorVisible.value = false
-                }
-            }
-        }
     }
-
-    private val _currentState = MutableStateFlow<State>(Initial())
-    val currentState: StateFlow<State> = _currentState
 
     var inputUriString by savedStateHandle.saveable("inputUriString") { mutableStateOf("") }
 
-    private val _largeLoadingIndicatorVisible = MutableStateFlow(false)
-    val largeLoadingIndicatorVisible: StateFlow<Boolean> = _largeLoadingIndicatorVisible
-
-    private var loadingIndicatorJob: Job? = null
     private var transitionJob: Job? = null
 
     val appDetails = appsRepository.appDetails
