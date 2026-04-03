@@ -34,6 +34,7 @@ fun <T> DropdownField(
     onValueChange: (value: T) -> Unit,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
     supportingText: (@Composable () -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -57,6 +58,7 @@ fun <T> DropdownField(
                 modifier = Modifier
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                     .fillMaxWidth(),
+                enabled = enabled,
                 readOnly = true,
                 label = label,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },

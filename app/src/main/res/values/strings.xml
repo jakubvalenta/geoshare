@@ -7,6 +7,8 @@
     <string name="billing_feature_automation_item_copy" translatable="false">Copy to clipboard</string>
     <string name="billing_feature_automation_item_navigate" translatable="false">Launch navigation in TomTom, Waze, MagicEarth…</string>
     <string name="billing_feature_automation_item_open_app" translatable="false">Show map</string>
+    <string name="billing_feature_custom_link" translatable="false">Custom web maps</string>
+    <string name="billing_feature_custom_link_description" translatable="false">Open a location in your favorite (or private) web map.</string>
     <string name="billing_intro_not_purchased" translatable="false">Upgrade to</string>
     <string name="billing_intro_purchased" translatable="false">You have</string>
     <string name="billing_manage_subscription" translatable="false">Manage your subscription</string>

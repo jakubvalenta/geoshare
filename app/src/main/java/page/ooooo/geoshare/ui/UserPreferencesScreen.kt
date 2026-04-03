@@ -85,7 +85,11 @@ import page.ooooo.geoshare.lib.android.DataType
 import page.ooooo.geoshare.lib.android.DataTypes
 import page.ooooo.geoshare.lib.android.ORGANIC_MAPS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
-import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.CustomLinkFeature
+import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.point.Point
@@ -135,8 +139,9 @@ fun UserPreferencesScreen(
 ) {
     val apps by viewModel.apps.collectAsStateWithLifecycle()
     val appDetails by viewModel.appDetails.collectAsStateWithLifecycle()
-    val automationFeatureStatus by billingViewModel.automationFeatureStatus.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
+    val billingFeatures = billingViewModel.billingFeatures
+    val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
     val links by viewModel.links.collectAsStateWithLifecycle()
     val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
@@ -144,8 +149,9 @@ fun UserPreferencesScreen(
         initialGroupId = initialGroupId,
         apps = apps,
         appDetails = appDetails,
-        automationFeatureStatus = automationFeatureStatus,
         billingAppNameResId = billingAppNameResId,
+        billingFeatures = billingFeatures,
+        billingStatus = billingStatus,
         links = links,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
@@ -163,8 +169,9 @@ private fun UserPreferencesScreen(
     initialGroupId: UserPreferencesGroupId?,
     apps: DataTypes,
     appDetails: AppDetails,
-    automationFeatureStatus: FeatureStatus,
     billingAppNameResId: Int,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     links: List<Link>,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
@@ -193,7 +200,8 @@ private fun UserPreferencesScreen(
                 currentGroupId = currentGroupId,
                 apps = apps,
                 appDetails = appDetails,
-                automationFeatureStatus = automationFeatureStatus,
+                billingStatus = billingStatus,
+                billingFeatures = billingFeatures,
                 links = links,
                 values = userPreferencesValues,
                 onBack = {
@@ -219,8 +227,9 @@ private fun UserPreferencesScreen(
                     currentGroupId = currentGroupId,
                     apps = apps,
                     appDetails = appDetails,
-                    automationFeatureStatus = automationFeatureStatus,
                     billingAppNameResId = billingAppNameResId,
+                    billingFeatures = billingFeatures,
+                    billingStatus = billingStatus,
                     links = links,
                     values = userPreferencesValues,
                     wide = wide,
@@ -249,7 +258,8 @@ private fun UserPreferencesListPane(
     values: UserPreferencesValues,
     apps: DataTypes,
     appDetails: AppDetails,
-    automationFeatureStatus: FeatureStatus,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     links: List<Link>,
     onBack: () -> Unit,
     onNavigateToGroup: (id: UserPreferencesGroupId) -> Unit,
@@ -258,8 +268,9 @@ private fun UserPreferencesListPane(
     val spacing = LocalSpacing.current
     var automationDelayEnabled by retain { mutableStateOf(true) }
 
-    LaunchedEffect(values, automationFeatureStatus, links) {
-        automationDelayEnabled = automationFeatureStatus == FeatureStatus.AVAILABLE &&
+    LaunchedEffect(values, billingStatus, links) {
+        automationDelayEnabled = billingStatus is BillingStatus.Purchased &&
+            AutomationFeature in billingFeatures &&
             values.automation.toOutput { links.findByUUID(it) } is Output.HasAutomationDelay
     }
 
@@ -305,7 +316,7 @@ private fun UserPreferencesListPane(
                     UserPreferencesGroup(
                         id = UserPreferencesGroupId.AUTOMATION,
                         headline = { stringResource(R.string.user_preferences_automation_title) },
-                        trailingContent = if (automationFeatureStatus == FeatureStatus.NOT_AVAILABLE) {
+                        trailingContent = if (billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures) {
                             {
                                 FeatureBadgeSmall(onClick = { onNavigateToGroup(UserPreferencesGroupId.AUTOMATION) })
                             }
@@ -504,8 +515,9 @@ private fun UserPreferencesDetailPane(
     currentGroupId: UserPreferencesGroupId,
     apps: DataTypes,
     appDetails: AppDetails,
-    automationFeatureStatus: FeatureStatus,
     billingAppNameResId: Int,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     links: List<Link>,
     values: UserPreferencesValues,
     wide: Boolean,
@@ -522,7 +534,7 @@ private fun UserPreferencesDetailPane(
                 description = {
                     stringResource(R.string.user_preferences_automation_description)
                 },
-                featureStatus = automationFeatureStatus,
+                featureNotPurchased = billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures,
                 onBack = onBack,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             ) {
@@ -535,7 +547,7 @@ private fun UserPreferencesDetailPane(
                         links,
                     ),
                     values = values,
-                    enabled = automationFeatureStatus == FeatureStatus.AVAILABLE,
+                    enabled = billingStatus is BillingStatus.Purchased && AutomationFeature in billingFeatures,
                     getItemTestTag = { option ->
                         try {
                             Json.encodeToString(option)
@@ -558,7 +570,7 @@ private fun UserPreferencesDetailPane(
                 description = {
                     stringResource(R.string.user_preferences_automation_delay_sec_description)
                 },
-                featureStatus = automationFeatureStatus,
+                featureNotPurchased = billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures,
                 onBack = onBack,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             ) {
@@ -735,7 +747,7 @@ private fun UserPreferencesControls(
     billingAppNameResId: Int,
     wide: Boolean,
     description: (@Composable () -> String)? = null,
-    featureStatus: FeatureStatus = FeatureStatus.AVAILABLE,
+    featureNotPurchased: Boolean = false,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     content: LazyListScope.() -> Unit,
@@ -764,7 +776,7 @@ private fun UserPreferencesControls(
                             Modifier
                                 .padding(bottom = spacing.mediumAdaptive)
                                 .run {
-                                    if (featureStatus == FeatureStatus.NOT_AVAILABLE) {
+                                    if (featureNotPurchased) {
                                         alpha(0.7f)
                                     } else {
                                         this
@@ -776,7 +788,7 @@ private fun UserPreferencesControls(
                 this.content()
             }
         }
-        if (featureStatus == FeatureStatus.NOT_AVAILABLE) {
+        if (featureNotPurchased) {
             FeatureBadgeLarge(
                 billingAppNameResId = billingAppNameResId,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
@@ -966,8 +978,9 @@ private fun DefaultPreview() {
                     initialGroupId = null,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -990,8 +1003,9 @@ private fun DarkPreview() {
                     initialGroupId = null,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1014,8 +1028,9 @@ private fun TabletPreview() {
                     initialGroupId = null,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1038,8 +1053,9 @@ private fun ConnectionPermissionPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1062,8 +1078,9 @@ private fun DarkConnectionPermissionPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1086,8 +1103,9 @@ private fun TabletConnectionPermissionPreview() {
                     initialGroupId = UserPreferencesGroupId.CONNECTION_PERMISSION,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1110,8 +1128,9 @@ private fun CoordinateFormatPreview() {
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1134,8 +1153,9 @@ private fun DarkCoordinateFormatPreview() {
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1158,8 +1178,9 @@ private fun TabletCoordinateFormatPreview() {
                     initialGroupId = UserPreferencesGroupId.COORDINATE_FORMAT,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = defaultFakeUserPreferences,
                     onBack = {},
@@ -1191,8 +1212,13 @@ private fun AutomationPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1227,8 +1253,13 @@ private fun DarkAutomationPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1263,8 +1294,13 @@ private fun TabletAutomationPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1299,8 +1335,9 @@ private fun AutomationFeatureNotAvailablePreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1335,8 +1372,9 @@ private fun DarkAutomationFeatureNotAvailablePreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1371,8 +1409,9 @@ private fun TabletAutomationFeatureNotAvailablePreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1398,8 +1437,13 @@ private fun AutomationDelayPreview() {
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1425,8 +1469,13 @@ private fun DarkAutomationDelayPreview() {
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1452,8 +1501,13 @@ private fun TableAutomationDelayPreview() {
                     initialGroupId = UserPreferencesGroupId.AUTOMATION_DELAY,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.AVAILABLE,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Purchased(
+                        BillingProduct("test", BillingProduct.Type.DONATION),
+                        expired = false,
+                        refundable = true,
+                    ),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1498,8 +1552,9 @@ private fun HiddenAppsPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
@@ -1543,8 +1598,9 @@ private fun DarkHiddenAppsPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
@@ -1588,8 +1644,9 @@ private fun TabletHiddenAppsPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         hiddenApps = setOf(ORGANIC_MAPS_PACKAGE_NAME),
@@ -1633,8 +1690,9 @@ private fun HiddenAppsLoadingPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
@@ -1676,8 +1734,9 @@ private fun DarkHiddenAppsLoadingPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
@@ -1719,8 +1778,9 @@ private fun TabletHiddenAppsLoadingPreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(),
                     onBack = {},
@@ -1743,8 +1803,9 @@ private fun DeveloperOptionsPreview() {
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1770,8 +1831,9 @@ private fun DarkDeveloperOptionsPreview() {
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,
@@ -1797,8 +1859,9 @@ private fun TableDeveloperOptionsPreview() {
                     initialGroupId = UserPreferencesGroupId.DEVELOPER_OPTIONS,
                     apps = emptyMap(),
                     appDetails = emptyMap(),
-                    automationFeatureStatus = FeatureStatus.LOADING,
                     billingAppNameResId = R.string.app_name_pro,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.Loading(),
                     links = defaultFakeLinks,
                     userPreferencesValues = UserPreferencesValues(
                         automation = SavePointsGpxAutomation,

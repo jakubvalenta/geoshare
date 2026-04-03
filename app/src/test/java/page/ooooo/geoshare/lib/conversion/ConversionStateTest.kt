@@ -54,6 +54,7 @@ import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.inputs.GeoUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleMapsInput
 import page.ooooo.geoshare.lib.inputs.HtmlInput
@@ -2669,7 +2670,7 @@ class ConversionStateTest {
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2695,7 +2696,7 @@ class ConversionStateTest {
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2723,7 +2724,7 @@ class ConversionStateTest {
         val mockBilling: Billing = mock {
             on { status } doReturn MutableStateFlow(BillingStatus.Loading())
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2792,7 +2793,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2822,7 +2823,7 @@ class ConversionStateTest {
         val mockBilling: Billing = mock {
             on { status } doReturn mockStatus
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2862,7 +2863,7 @@ class ConversionStateTest {
         val mockBilling: Billing = mock {
             on { status } doReturn mockStatus
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2899,7 +2900,7 @@ class ConversionStateTest {
         val mockBilling: Billing = mock {
             on { status } doReturn mockStatus
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2942,7 +2943,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -2975,7 +2976,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -3009,7 +3010,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -3041,7 +3042,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -3071,7 +3072,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation
@@ -3105,7 +3106,7 @@ class ConversionStateTest {
                 )
             )
             on { products } doReturn persistentListOf(BillingProduct("test", BillingProduct.Type.ONE_TIME))
-            on { features } doReturn persistentListOf(AutomationFeature)
+            on { features } doReturn persistentListOf(AutomationFeature, CustomLinkFeature)
         }
         val mockUserPreferencesRepository: FakeUserPreferencesRepository = mock {
             on { getValue(AutomationPreference) } doReturn automation

@@ -13,13 +13,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingOffers
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.billing.FeatureStatus
 import javax.inject.Inject
 import kotlin.time.Duration
 
@@ -28,20 +26,6 @@ class BillingViewModel @Inject constructor(
     private val billing: Billing,
 ) : ViewModel() {
 
-    val automationFeatureStatus: StateFlow<FeatureStatus> =
-        billing.status
-            .map { billingStatus ->
-                when (billingStatus) {
-                    is BillingStatus.Loading -> FeatureStatus.LOADING
-                    is BillingStatus.Purchased if billing.features.contains(AutomationFeature) -> FeatureStatus.AVAILABLE
-                    else -> FeatureStatus.NOT_AVAILABLE
-                }
-            }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                FeatureStatus.LOADING,
-            )
     val billingAppNameResId: Int = billing.appNameResId
     val billingMessage: StateFlow<Message?> = billing.message
     val billingFeatures: ImmutableList<Feature> = billing.features

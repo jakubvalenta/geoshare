@@ -47,8 +47,12 @@ import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.OSMAND_PLUS_PACKAGE_NAME
 import page.ooooo.geoshare.lib.android.TOMTOM_PACKAGE_NAME
+import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.BillingImpl
-import page.ooooo.geoshare.lib.billing.FeatureStatus
+import page.ooooo.geoshare.lib.billing.BillingProduct
+import page.ooooo.geoshare.lib.billing.BillingStatus
+import page.ooooo.geoshare.lib.billing.CustomLinkFeature
+import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.ActionFailed
 import page.ooooo.geoshare.lib.conversion.ActionFinished
 import page.ooooo.geoshare.lib.conversion.ActionSucceeded
@@ -71,7 +75,8 @@ import kotlin.time.DurationUnit
 fun ResultSuccessMessage(
     currentState: ConversionState.HasResult,
     appDetails: AppDetails,
-    automationFeatureStatus: FeatureStatus,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     modifier: Modifier = Modifier,
     animationsEnabled: Boolean = true,
     onCancel: () -> Unit,
@@ -196,14 +201,15 @@ fun ResultSuccessMessage(
                 }
             }
 
-            else -> DefaultResultMessageRow(automationFeatureStatus, onNavigateToUserPreferencesAutomationScreen)
+            else -> DefaultResultMessageRow(billingFeatures, billingStatus, onNavigateToUserPreferencesAutomationScreen)
         }
     }
 }
 
 @Composable
 private fun DefaultResultMessageRow(
-    automationFeatureStatus: FeatureStatus,
+    billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     onNavigateToUserPreferencesAutomationScreen: () -> Unit,
 ) {
     ResultMessageRow {
@@ -212,7 +218,7 @@ private fun DefaultResultMessageRow(
             style = MaterialTheme.typography.headlineSmall,
         )
         FeatureBadged(
-            enabled = automationFeatureStatus == FeatureStatus.NOT_AVAILABLE,
+            enabled = billingStatus is BillingStatus.NotPurchased && AutomationFeature in billingFeatures,
             badge = { modifier ->
                 FeatureBadgeSmall(
                     onNavigateToUserPreferencesAutomationScreen,
@@ -292,7 +298,12 @@ private fun ActionFinishedPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -321,7 +332,12 @@ private fun DarkActionFinishedPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -351,7 +367,8 @@ private fun ActionFinishedFeatureNotAvailablePreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     animationsEnabled = false,
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -383,7 +400,8 @@ private fun DarkActionFinishedFeatureNotAvailablePreview() {
                             context.getDrawable(R.mipmap.ic_launcher_round)!!
                         ),
                     ),
-                    automationFeatureStatus = FeatureStatus.NOT_AVAILABLE,
+                    billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                    billingStatus = BillingStatus.NotPurchased(pending = false),
                     animationsEnabled = false,
                     onCancel = {},
                     onNavigateToUserPreferencesAutomationScreen = {},
@@ -422,7 +440,12 @@ private fun ActionWaitingPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -459,7 +482,12 @@ private fun DarkActionWaitingPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -495,7 +523,12 @@ private fun LocationPermissionReceivedPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -531,7 +564,12 @@ private fun DarkLocationPermissionReceivedPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -560,7 +598,12 @@ private fun SucceededPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -589,7 +632,12 @@ private fun DarSucceededPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -618,7 +666,12 @@ private fun SucceededNoMessagePreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -647,7 +700,12 @@ private fun DarkSucceededNoMessagePreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -676,7 +734,12 @@ private fun FailedPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},
@@ -705,7 +768,12 @@ private fun DarkFailedPreview() {
                         context.getDrawable(R.mipmap.ic_launcher_round)!!
                     ),
                 ),
-                automationFeatureStatus = FeatureStatus.AVAILABLE,
+                billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
+                billingStatus = BillingStatus.Purchased(
+                    BillingProduct("test", BillingProduct.Type.DONATION),
+                    expired = false,
+                    refundable = true,
+                ),
                 animationsEnabled = false,
                 onCancel = {},
                 onNavigateToUserPreferencesAutomationScreen = {},

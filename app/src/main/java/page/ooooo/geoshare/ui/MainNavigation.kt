@@ -105,6 +105,7 @@ fun MainNavigation(
         composable<LinksRoute> { backStackEntry ->
             LinksScreen(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
+                onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
             )
         }
         composable<BillingRoute> {

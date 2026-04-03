@@ -22,3 +22,13 @@ object AutomationFeature : Feature {
         R.string.billing_feature_automation_item_copy,
     )
 }
+
+object CustomLinkFeature : Feature {
+    @StringRes
+    override val titleResId = R.string.billing_feature_custom_link
+
+    @StringRes
+    override val descriptionResId = R.string.billing_feature_custom_link_description
+
+    override val itemsResIds = emptyList<Int>()
+}
