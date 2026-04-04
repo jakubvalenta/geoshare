@@ -399,8 +399,8 @@ private fun LinksDetailPane(
     wide: Boolean,
     appEnabled: Boolean,
     billingAppNameResId: Int,
-    billingStatus: BillingStatus,
     billingFeatures: List<Feature>,
+    billingStatus: BillingStatus,
     chipEnabled: Boolean,
     coordsUriTemplate: String,
     group: String,
@@ -476,12 +476,12 @@ private fun LinksDetailPane(
                         modifier = Modifier
                             .width(600.dp)
                             .padding(top = spacing.smallAdaptive, bottom = spacing.tinyAdaptive),
-                        enabled = destination != -1 || billingStatus is BillingStatus.Purchased && CustomLinkFeature in billingFeatures,
+                        enabled = billingStatus is BillingStatus.Purchased && CustomLinkFeature in billingFeatures,
                     )
                 }
             }
         }
-        if (destination == -1 && billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures) {
+        if (billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures) {
             FeatureBadgeLarge(
                 billingAppNameResId = billingAppNameResId,
                 onNavigateToBillingScreen = onNavigateToBillingScreen,

@@ -209,6 +209,7 @@ fun LinkForm(
                                         )
                                     }
                                 },
+                                enabled = enabled,
                                 contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
                             )
                         }
