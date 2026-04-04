@@ -12,11 +12,18 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.FlowPreview
@@ -38,10 +45,14 @@ fun ConversionWebView(
     extendWebSettings: (settings: WebSettings) -> Unit,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
+    widthPx: Int = 1078,
+    heightPx: Int = 2063,
     urlChangeCheckInterval: Duration = 1.seconds,
     urlChangeDebounceTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
+    val density = LocalDensity.current
+    val (width, height) = with(density) { widthPx.toDp() to heightPx.toDp() }
 
     // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
     // strict than the patterns in Input (for example only HTTPS should be allowed) and they should not change often.
@@ -69,19 +80,28 @@ fun ConversionWebView(
             }
     }
 
-
     // Render a placeholder in Preview, because WebView is not supported there
     val isPreview = LocalInspectionMode.current
     if (isPreview) {
-        Text("WebView: $unsafeUrl")
+        Box(
+            Modifier
+                .requiredSize(width, height)
+                .background(Color(0x80FFFFFF)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("WebView: $unsafeUrl")
+        }
         return
     }
 
     AndroidView(
         factory = {
             WebView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(1080, 1920)
-                setBackgroundColor(0x00000000) // Prevent a visible white rectangle before the URL loads
+                // Set layout params width and height, otherwise the web page is invisible for some reason
+                layoutParams = ViewGroup.LayoutParams(widthPx, heightPx)
+
+                // Set background to prevent a visible white rectangle before the URL loads
+                setBackgroundColor(0x00000000)
 
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
@@ -137,10 +157,15 @@ fun ConversionWebView(
                         return super.shouldInterceptRequest(view, request)
                     }
                 }
+
+                if (safeUrl != null) {
+                    loadUrl(safeUrl)
+                }
             }
         },
+        modifier = Modifier.requiredSize(width, height),
         update = { webView ->
-            if (safeUrl != null) {
+            if (safeUrl != null && webView.url != safeUrl) {
                 webView.loadUrl(safeUrl)
             }
         },
