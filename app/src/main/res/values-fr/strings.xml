@@ -95,7 +95,7 @@
     <string name="inputs_all">Tous les services de cartographie</string>
     <string name="inputs_recent">Récemment ajoutés</string>
     <string name="inputs_default_handler">S’ouvre par défaut dans %1$s</string>
-    <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de %3$s.</string>
+    <string name="conversion_loading_indicator_description">Tentative %1$d sur %2$d en raison de : %3$s</string>
     <string name="main_input_uri_paste_content_description">Coller</string>
     <string name="conversion_succeeded_save_gpx_failed">Échec de l’enregistrement du GPX</string>
     <string name="conversion_automation_copy_link_succeeded">Lien copié automatiquement</string>
@@ -260,4 +260,11 @@
     <string name="user_preferences_section_output">Résultat</string>
     <string name="user_preferences_connection_option_always">Autoriser</string>
     <string name="user_preferences_connection_option_never">Ne jamais autoriser</string>
+    <string name="conversion_failed_unshorten_error_with_reason">Impossible de résoudre le lien raccourci en raison de : %1$s</string>
+    <string name="conversion_failed_reason_invalid_url">URL invalide</string>
+    <string name="conversion_failed_reason_missing_header">En-tête HTTP manquant</string>
+    <string name="conversion_failed_reason_no_points">Aucun point trouvé</string>
+    <string name="conversion_failed_reason_timeout">temps mort</string>
+    <string name="conversion_failed_parse_html_error_with_reason">Échec du traitement de la page Web pour la raison suivante : %1$s</string>
+    <string name="network_exception_too_many_requests">Trop de demandes</string>
 </resources>
