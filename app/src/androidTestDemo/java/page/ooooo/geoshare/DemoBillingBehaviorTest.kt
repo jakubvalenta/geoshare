@@ -1,6 +1,8 @@
 package page.ooooo.geoshare
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.serialization.json.Json
@@ -29,15 +31,15 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
-        // Shows automation paywall
-        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
+        // Shows feature wall
+        onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
 
         // Go to main screen
         pressBack()
         quickWaitForStableInActiveWindow()
         pressBack()
 
-        // Go to billing screen using billing icon
+        // Go to billing screen using feature badge
         onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
 
         // Purchase an offer
@@ -55,8 +57,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
-        // Does not show automation paywall
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareFeatureBadgeLarge" })
+        // Does not show feature wall
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareAutomationFeatureWall" })
 
         // Go to main screen
         pressBack()
@@ -66,7 +68,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Shows Geo Share Pro headline
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share Pro" }
 
-        // Does not show billing icon
+        // Does not show feature badge
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainBillingIcon" })
 
         // Go to billing screen using main menu
@@ -85,8 +87,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
-        // Shows automation paywall
-        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
+        // Shows feature wall
+        onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
     }
 
     @Test
@@ -102,15 +104,15 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
-        // Shows automation paywall
-        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
+        // Shows feature wall
+        onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
 
         // Go to main screen
         pressBack()
         quickWaitForStableInActiveWindow()
         pressBack()
 
-        // Go to billing screen using billing icon
+        // Go to billing screen using feature badge
         onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
 
         // Purchase an offer
@@ -128,8 +130,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
-        // Does not show automation paywall
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareFeatureBadgeLarge" })
+        // Does not show feature wall
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareAutomationFeatureWall" })
 
         // Go to main screen
         pressBack()
@@ -139,7 +141,7 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Shows Geo Share Pro headline
         onElement { viewIdResourceName == "geoShareAppHeadlineText" && textAsString() == "Geo Share Pro" }
 
-        // Does not show billing icon
+        // Does not show feature badge
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareMainBillingIcon" })
 
         // Go to billing screen using main menu
@@ -164,8 +166,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         goToUserPreferencesList()
         goToUserPreferencesDetail(UserPreferencesGroupId.AUTOMATION)
 
-        // Shows automation paywall
-        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }
+        // Shows feature wall
+        onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }
     }
 
     @Test
@@ -177,14 +179,14 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Share a Google Maps coordinates link with the app
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
 
-        // Shows billing icon
-        onElement { viewIdResourceName == "geoShareResultAutomationBadge" }
+        // Shows feature badge
+        onElement { viewIdResourceName == "geoShareAutomationFeatureBadge" }
 
         // Go to automation preferences using the button
         onElement { viewIdResourceName == "geoShareResultAutomationButton" }.click()
 
-        // Go to billing screen using the automation paywall
-        onElement { viewIdResourceName == "geoShareFeatureBadgeLarge" }.click()
+        // Go to billing screen using the feature wall
+        onElement { viewIdResourceName == "geoShareAutomationFeatureWall" }.click()
 
         // Purchase an offer
         onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.ONE_TIME}" }.click()
@@ -203,8 +205,8 @@ class DemoBillingBehaviorTest : BehaviorTest {
         // Go to the result screen
         pressBack()
 
-        // Does not show billing icon
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareResultAutomationBadge" })
+        // Does not show feature badge
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareAutomationFeatureBadge" })
 
         // Go to the main screen
         pressBack()
@@ -214,6 +216,54 @@ class DemoBillingBehaviorTest : BehaviorTest {
 
         // Shows automation success message
         onElement(pollIntervalMs = 50L) { viewIdResourceName == "geoShareResultSuccessMessage" }
+    }
+
+    @Test
+    fun allowsUsingCustomLinkAfterPurchase() = uiAutomator {
+        // Launch application and close intro
+        launchApplication()
+        closeIntro()
+
+        // Go to link list
+        goToUserPreferencesList()
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferencesGroupId.LINKS}" }.click()
+
+        // Shows feature badge
+        onElement { viewIdResourceName == "geoShareCustomLinkFeatureBadge" }
+
+        // Go to link detail
+        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }.click()
+
+        // Go to billing screen using the feature wall
+        onElement { viewIdResourceName == "geoShareCustomLinkFeatureWall" }.click()
+
+        // Purchase an offer
+        onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.ONE_TIME}" }.click()
+        onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
+
+        // Shows status purchased
+        onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
+
+        // Go back to link detail
+        pressBack()
+
+        // Does not show feature wall
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareCustomLinkFeatureWall" })
+
+        // Update link
+        onElement { viewIdResourceName == "geoShareLinkFormName" && textAsString() == "Apple Maps navigation" }.apply {
+            setText("$text edited")
+        }
+        onElement { viewIdResourceName == "geoShareLinkDetailPane" }.apply {
+            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkFormSave" }.click()
+        }
+
+        // Shows updated link
+        onElement { viewIdResourceName == "geoShareLinksListItem_a5092c63-cf5c-4225-9059-e888ae12e215" }
+        onElement { textAsString() == "Apple Maps navigation edited" }
+
+        // Does not show feature badge
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareCustomLinkFeatureBadge" })
     }
 
     private fun goToBillingScreen() = uiAutomator {

@@ -61,7 +61,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.point.Srs
 import page.ooooo.geoshare.ui.components.BasicListDetailScaffold
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
-import page.ooooo.geoshare.ui.components.FeatureBadgeLarge
+import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.FeatureBadged
 import page.ooooo.geoshare.ui.components.LinkForm
@@ -308,7 +308,7 @@ private fun LinksListPane(
                 badge = { modifier ->
                     FeatureBadgeSmall(
                         { onNavigateToContentKey(-1) },
-                        modifier.testTag("geoShareLinksListCustomLinkBadge") // TODO Instrumented test
+                        modifier.testTag("geoShareCustomLinkFeatureBadge"),
                     )
                 },
             ) { modifier ->
@@ -482,8 +482,9 @@ private fun LinksDetailPane(
             }
         }
         if (billingStatus is BillingStatus.NotPurchased && CustomLinkFeature in billingFeatures) {
-            FeatureBadgeLarge(
+            FeatureWall(
                 billingAppNameResId = billingAppNameResId,
+                modifier = Modifier.testTag("geoShareCustomLinkFeatureWall"),
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             )
         }

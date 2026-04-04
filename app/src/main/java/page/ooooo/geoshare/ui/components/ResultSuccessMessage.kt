@@ -222,7 +222,7 @@ private fun DefaultResultMessageRow(
             badge = { modifier ->
                 FeatureBadgeSmall(
                     onNavigateToUserPreferencesAutomationScreen,
-                    modifier.testTag("geoShareResultAutomationBadge")
+                    modifier.testTag("geoShareAutomationFeatureBadge")
                 )
             },
         ) { modifier ->

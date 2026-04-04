@@ -93,7 +93,7 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.formats.CoordsFormat
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.point.Point
-import page.ooooo.geoshare.ui.components.FeatureBadgeLarge
+import page.ooooo.geoshare.ui.components.FeatureWall
 import page.ooooo.geoshare.ui.components.FeatureBadgeSmall
 import page.ooooo.geoshare.ui.components.IconFromDescriptor
 import page.ooooo.geoshare.ui.components.LabelLarge
@@ -789,8 +789,9 @@ private fun UserPreferencesControls(
             }
         }
         if (featureNotPurchased) {
-            FeatureBadgeLarge(
+            FeatureWall(
                 billingAppNameResId = billingAppNameResId,
+                modifier = Modifier.testTag("geoShareAutomationFeatureWall"),
                 onNavigateToBillingScreen = onNavigateToBillingScreen,
             )
         }

@@ -27,13 +27,13 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
-fun BoxScope.FeatureBadgeLarge(
+fun BoxScope.FeatureWall(
     billingAppNameResId: Int,
+    modifier: Modifier = Modifier,
     onNavigateToBillingScreen: () -> Unit,
 ) {
     ElevatedCard(
-        Modifier
-            .testTag("geoShareFeatureBadgeLarge")
+        modifier
             .align(Alignment.Center)
             .clickable(onClick = onNavigateToBillingScreen, role = Role.Button),
         shape = MaterialTheme.shapes.extraLarge,
@@ -73,7 +73,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             Box {
-                FeatureBadgeLarge(
+                FeatureWall(
                     billingAppNameResId = R.string.app_name_pro,
                     onNavigateToBillingScreen = {},
                 )
@@ -88,7 +88,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             Box {
-                FeatureBadgeLarge(
+                FeatureWall(
                     billingAppNameResId = R.string.app_name_pro,
                     onNavigateToBillingScreen = {},
                 )
