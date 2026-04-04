@@ -111,17 +111,13 @@ fun ConversionWebView(
                 cookieManager.setAcceptCookie(false)
                 cookieManager.setAcceptThirdPartyCookies(this, false)
 
-                // Configure JavaScript security
+                // Allow JavaScript and configure its security
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
-
-                // Allow JavaScript
                 settings.javaScriptEnabled = true
-
-                // Set user agent, in case a web page checks
-                settings.userAgentString = NetworkTools.MOBILE_USER_AGENT
-
                 extendWebSettings(settings)
+
+                // Notice that we don't set custom user agent, because it makes Google Maps serve an error page
 
                 setWebChromeClient(object : WebChromeClient() {
                     override fun onConsoleMessage(cm: ConsoleMessage): Boolean =
