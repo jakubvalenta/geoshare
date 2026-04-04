@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -32,6 +33,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
+import page.ooooo.geoshare.lib.network.NetworkTools
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,14 +48,14 @@ fun ConversionWebView(
     extendWebSettings: (settings: WebSettings) -> Unit,
     onUrlChange: (urlString: String) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
-    widthPx: Int = 1078,
-    heightPx: Int = 2063,
+    // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
+    sizePx: Size = Size(1080 - 2f, 1920f - 277f),
     urlChangeCheckInterval: Duration = 1.seconds,
     urlChangeDebounceTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
-    val (width, height) = with(density) { widthPx.toDp() to heightPx.toDp() }
+    val size = with(density) { sizePx.toDpSize() }
 
     // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
     // strict than the patterns in Input (for example only HTTPS should be allowed) and they should not change often.
@@ -85,7 +88,7 @@ fun ConversionWebView(
     if (isPreview) {
         Box(
             Modifier
-                .requiredSize(width, height)
+                .requiredSize(size)
                 .background(Color(0x80FFFFFF)),
             contentAlignment = Alignment.Center,
         ) {
@@ -98,18 +101,26 @@ fun ConversionWebView(
         factory = {
             WebView(context).apply {
                 // Set layout params width and height, otherwise the web page is invisible for some reason
-                layoutParams = ViewGroup.LayoutParams(widthPx, heightPx)
+                layoutParams = ViewGroup.LayoutParams(sizePx.width.roundToInt(), sizePx.height.roundToInt())
 
                 // Set background to prevent a visible white rectangle before the URL loads
                 setBackgroundColor(0x00000000)
 
+                // Don't allow cookies
                 val cookieManager = CookieManager.getInstance()
                 cookieManager.setAcceptCookie(false)
                 cookieManager.setAcceptThirdPartyCookies(this, false)
 
+                // Configure JavaScript security
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
+
+                // Allow JavaScript
                 settings.javaScriptEnabled = true
+
+                // Set user agent, in case a web page checks
+                settings.userAgentString = NetworkTools.MOBILE_USER_AGENT
+
                 extendWebSettings(settings)
 
                 setWebChromeClient(object : WebChromeClient() {
@@ -163,7 +174,7 @@ fun ConversionWebView(
                 }
             }
         },
-        modifier = Modifier.requiredSize(width, height),
+        modifier = Modifier.requiredSize(size),
         update = { webView ->
             if (safeUrl != null && webView.url != safeUrl) {
                 webView.loadUrl(safeUrl)
