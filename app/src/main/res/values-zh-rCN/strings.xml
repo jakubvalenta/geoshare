@@ -93,7 +93,7 @@
     <string name="inputs_all">所有地图服务</string>
     <string name="inputs_recent">最近添加的</string>
     <string name="inputs_default_handler">在 %1$s 中默认打开</string>
-    <string name="conversion_loading_indicator_description">由于 %3$s， 第 %1$d 次尝试，共 %2$d 次。</string>
+    <string name="conversion_loading_indicator_description">第 %1$d 次尝试，共 %2$d 次：原因：%3$s</string>
     <string name="conversion_succeeded_save_gpx_failed">无法保存 GPX</string>
     <string name="main_input_uri_paste_content_description">粘贴</string>
     <string name="conversion_automation_copy_link_succeeded">已自动复制链接</string>
@@ -248,4 +248,11 @@
     <string name="user_preferences_connection_option_never">永不允许</string>
     <string name="billing_status_expired">您的订阅即将到期</string>
     <string name="billing_status_pending">您的付款正在处理中</string>
+    <string name="conversion_failed_unshorten_error_with_reason">无法解析短链接，原因：%1$s</string>
+    <string name="conversion_failed_reason_invalid_url">URL 无效</string>
+    <string name="conversion_failed_reason_missing_header">缺少 HTTP 标头</string>
+    <string name="conversion_failed_reason_no_points">未找到点</string>
+    <string name="conversion_failed_reason_timeout">超时</string>
+    <string name="conversion_failed_parse_html_error_with_reason">无法处理网页，原因：%1$s</string>
+    <string name="network_exception_too_many_requests">请求过多</string>
 </resources>
