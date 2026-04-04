@@ -270,7 +270,7 @@ private fun BillingMainPane(
             )
         } else {
             Card(
-                Modifier.padding(top = spacing.largeAdaptive),
+                Modifier.padding(top = spacing.small),
                 shape = MaterialShapes.Sunny.toShape(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -292,11 +292,11 @@ private fun BillingMainPane(
                         R.string.billing_intro_not_purchased
                     }
                 ),
-                Modifier.padding(top = spacing.mediumAdaptive),
+                Modifier.padding(top = spacing.smallAdaptive),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )
-            MainHeadline(billingAppNameResId, Modifier.padding(top = spacing.smallAdaptive), iconEnabled = false)
+            MainHeadline(billingAppNameResId, Modifier.padding(top = spacing.tinyAdaptive), iconEnabled = false)
             CompositionLocalProvider(
                 LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
                     lineBreak = LineBreak.Paragraph,
@@ -308,7 +308,7 @@ private fun BillingMainPane(
                         .fillMaxWidth()
                         .padding(
                             start = spacing.small,
-                            top = spacing.largeAdaptive,
+                            top = spacing.smallAdaptive,
                             end = spacing.medium,
                         ),
                     bulletSpace = spacing.tiny,
@@ -331,7 +331,7 @@ private fun BillingMainPane(
                     }
                     billingFeatures.forEach { feature ->
                         TextListItem(
-                            Modifier.padding(vertical = spacing.smallAdaptive),
+                            Modifier.padding(vertical = spacing.tinyAdaptive),
                             bullet = {
                                 Icon(
                                     imageVector = Icons.Default.Done,
@@ -346,7 +346,7 @@ private fun BillingMainPane(
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
-                        TextListItem(Modifier.padding(bottom = spacing.smallAdaptive)) {
+                        TextListItem(Modifier.padding(bottom = spacing.tinyAdaptive)) {
                             Text(stringResource(feature.descriptionResId))
                         }
                         feature.itemsResIds.forEach { itemResId ->
